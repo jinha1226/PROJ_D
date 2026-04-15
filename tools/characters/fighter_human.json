@@ -1,0 +1,17 @@
+{
+  "id": "fighter_human",
+  "body_def": "body_male",
+  "body_variant": "",
+  "skin_tint": null,
+  "equipment": [
+    {"def": "longsword", "variant": "longsword"},
+    {"def": "iron_shield", "variant": "crusader"},
+    {"def": "plate_chest", "variant": "steel"},
+    {"def": "plate_legs", "variant": "steel"},
+    {"def": "plate_boots", "variant": "steel"},
+    {"def": "plate_gloves", "variant": "steel"},
+    {"def": "plate_helm", "variant": "steel"},
+    {"def": "hair_buzzcut", "variant": "black"}
+  ],
+  "notes": "Heavy fighter preset. Plate variant names assumed."
+}

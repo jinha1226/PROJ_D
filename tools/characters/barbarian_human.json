@@ -1,0 +1,14 @@
+{
+  "id": "barbarian_human",
+  "body_def": "body_muscular",
+  "body_variant": "",
+  "skin_tint": null,
+  "equipment": [
+    {"def": "waraxe", "variant": "waraxe"},
+    {"def": "leather_chest", "variant": "brown"},
+    {"def": "leather_legs", "variant": "brown"},
+    {"def": "leather_boots", "variant": "brown"},
+    {"def": "hair_buzzcut", "variant": "dark brown"}
+  ],
+  "notes": "M1 barbarian. Uses muscular body; waraxe only has oversize slash animation."
+}

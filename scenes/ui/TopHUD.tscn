@@ -1,0 +1,71 @@
+[gd_scene load_steps=4 format=3 uid="uid://btophudroot1"]
+
+[ext_resource type="Script" path="res://scripts/ui/TopHUD.gd" id="1_tophud"]
+
+[sub_resource type="StyleBoxFlat" id="SB_HP"]
+bg_color = Color(0.752941, 0.188235, 0.188235, 1)
+
+[sub_resource type="StyleBoxFlat" id="SB_MP"]
+bg_color = Color(0.188235, 0.376471, 0.752941, 1)
+
+[node name="TopHUD" type="Control"]
+anchor_right = 1.0
+offset_bottom = 148.0
+script = ExtResource("1_tophud")
+
+[node name="BG" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.08, 0.08, 0.1, 0.85)
+
+[node name="Margin" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+theme_override_constants/separation = 4
+
+[node name="HBox" type="HBoxContainer" parent="Margin/VBox"]
+theme_override_constants/separation = 8
+
+[node name="MinimapButton" type="Button" parent="Margin/VBox/HBox"]
+custom_minimum_size = Vector2(72, 72)
+text = "🗺"
+
+[node name="HPBar" type="ProgressBar" parent="Margin/VBox/HBox"]
+custom_minimum_size = Vector2(0, 72)
+size_flags_horizontal = 3
+max_value = 100.0
+value = 100.0
+theme_override_styles/fill = SubResource("SB_HP")
+
+[node name="MPBar" type="ProgressBar" parent="Margin/VBox/HBox"]
+custom_minimum_size = Vector2(0, 72)
+size_flags_horizontal = 3
+max_value = 100.0
+value = 100.0
+theme_override_styles/fill = SubResource("SB_MP")
+
+[node name="DepthLabel" type="Label" parent="Margin/VBox/HBox"]
+custom_minimum_size = Vector2(80, 72)
+text = "B1F"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BagButton" type="Button" parent="Margin/VBox/HBox"]
+custom_minimum_size = Vector2(72, 72)
+text = "🎒"
+
+[node name="SkillsButton" type="Button" parent="Margin/VBox/HBox"]
+custom_minimum_size = Vector2(72, 72)
+text = "스킬"
+
+[node name="WeaponSkillLabel" type="Label" parent="Margin/VBox"]
+custom_minimum_size = Vector2(0, 40)
+text = "장착: -"
+theme_override_font_sizes/font_size = 18
+modulate = Color(0.85, 0.85, 0.95, 1)

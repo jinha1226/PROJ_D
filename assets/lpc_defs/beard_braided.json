@@ -1,0 +1,14 @@
+{
+  "name": "Medium Beard",
+  "layer_1": {
+    "zPos": 128,
+    "male": "beards/beard/medium/",
+    "muscular": "beards/beard/medium/"
+  },
+  "variants": ["ash", "black", "blonde", "blue", "carrot", "chestnut", "dark_brown", "dark_gray", "ginger", "gold", "gray", "green", "light_brown", "navy", "orange", "pink", "platinum", "purple", "raven", "red", "redhead", "rose", "sandy", "strawberry", "violet", "white"],
+  "default_variant": "dark_brown",
+  "animations": ["walk"],
+  "notes": "Mapped 'braided' to ULPC 'medium' beard (no braided variant exists). Other styles: 5oclock_shadow, trimmed, winter.",
+  "path": ["beards", "beard", "beard_medium"],
+  "type_name": "beard"
+}

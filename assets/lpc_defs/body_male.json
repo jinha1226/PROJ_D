@@ -1,0 +1,14 @@
+{
+  "name": "Body (Male)",
+  "tags": ["human", "adult", "male"],
+  "layer_1": {
+    "zPos": 10,
+    "male": "body/bodies/male/"
+  },
+  "variants": [""],
+  "default_variant": "",
+  "animations": ["walk", "slash", "thrust", "shoot", "hurt", "spellcast", "idle", "combat_idle", "run", "jump", "sit", "emote", "climb", "backslash", "halfslash"],
+  "notes": "Body PNGs are flat per-animation sheets at body/bodies/male/<anim>.png. Recoloring handled at runtime via palette.",
+  "path": ["body", "bodies", "body_male"],
+  "type_name": "body"
+}

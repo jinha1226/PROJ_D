@@ -1,0 +1,12 @@
+{
+  "id": "boneknight",
+  "body_def": "body_skeleton",
+  "body_variant": "skeleton",
+  "skin_tint": null,
+  "equipment": [
+    {"def": "longsword", "variant": "longsword"},
+    {"def": "chain_chest", "variant": "steel"},
+    {"def": "iron_shield", "variant": "crusader"}
+  ],
+  "notes": "Bone knight: skeleton body + longsword + chainmail + shield."
+}

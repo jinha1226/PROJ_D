@@ -1,0 +1,32 @@
+[gd_scene load_steps=2 format=3 uid="uid://bessenceslot1"]
+
+[ext_resource type="Script" path="res://scripts/ui/EssenceSlot.gd" id="1_es"]
+
+[node name="EssenceSlot" type="Button"]
+custom_minimum_size = Vector2(96, 96)
+flat = true
+script = ExtResource("1_es")
+
+[node name="Border" type="Panel" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Icon" type="TextureRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "○"
+mouse_filter = 2

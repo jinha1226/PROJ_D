@@ -1,0 +1,13 @@
+{
+  "id": "orc",
+  "body_def": "body_muscular",
+  "body_variant": "",
+  "skin_tint": "#5a8a3a",
+  "equipment": [
+    {"def": "waraxe", "variant": "waraxe"},
+    {"def": "leather_chest", "variant": "brown"},
+    {"def": "leather_legs", "variant": "brown"},
+    {"def": "horns_small", "variant": "horns"}
+  ],
+  "notes": "Orc: muscular + waraxe + leather + green tint."
+}

@@ -1,0 +1,10 @@
+{
+  "id": "troll",
+  "body_def": "body_muscular",
+  "body_variant": "",
+  "skin_tint": "#4a7a5a",
+  "equipment": [
+    {"def": "club", "variant": "club"}
+  ],
+  "notes": "Troll: muscular body + club + green tint. Very limited animations (club only has walk)."
+}

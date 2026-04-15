@@ -1,0 +1,15 @@
+{
+  "id": "smith_dwarf",
+  "body_def": "body_muscular",
+  "body_variant": "",
+  "skin_tint": null,
+  "equipment": [
+    {"def": "waraxe", "variant": "waraxe"},
+    {"def": "chain_chest", "variant": "steel"},
+    {"def": "leather_legs", "variant": "brown"},
+    {"def": "leather_boots", "variant": "brown"},
+    {"def": "beard_full", "variant": "dark_brown"},
+    {"def": "hair_buzzcut", "variant": "dark brown"}
+  ],
+  "notes": "Dwarf smith proxy: muscular body + full beard. ULPC has no native short/dwarf body, so we rely on muscular + beard signature."
+}

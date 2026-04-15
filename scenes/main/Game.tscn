@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://bgamemainroot"]
+
+[ext_resource type="Script" path="res://scripts/core/GameBootstrap.gd" id="1_boot"]
+[ext_resource type="PackedScene" uid="uid://bdungeonmap001" path="res://scenes/dungeon/DungeonMap.tscn" id="2_dmap"]
+[ext_resource type="PackedScene" uid="uid://buiroot00001" path="res://scenes/ui/UI.tscn" id="3_ui"]
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_boot")
+
+[node name="DungeonLayer" type="Node2D" parent="."]
+
+[node name="DungeonMap" parent="DungeonLayer" instance=ExtResource("2_dmap")]
+
+[node name="EntityLayer" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(2, 2)
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="UI" parent="UILayer" instance=ExtResource("3_ui")]

@@ -1,0 +1,15 @@
+{
+  "name": "Body (Zombie)",
+  "tags": ["undead", "zombie", "monster"],
+  "layer_1": {
+    "zPos": 10,
+    "male": "body/bodies/zombie/"
+  },
+  "variants": ["zombie"],
+  "default_variant": "zombie",
+  "animations": ["walk"],
+  "stub": true,
+  "notes": "ULPC zombie body only has walk/zombie.png; other animations missing.",
+  "path": ["body", "bodies", "body_zombie"],
+  "type_name": "body"
+}

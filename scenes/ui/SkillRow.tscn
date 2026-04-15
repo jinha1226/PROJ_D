@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://bskillrow0001"]
+
+[ext_resource type="Script" path="res://scripts/ui/SkillRow.gd" id="1_skrow"]
+
+[node name="SkillRow" type="HBoxContainer"]
+custom_minimum_size = Vector2(880, 96)
+script = ExtResource("1_skrow")

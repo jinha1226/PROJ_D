@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "human"
+display_name = "인간"
+base_str = 11
+base_dex = 11
+base_int = 11
+hp_per_level = 5
+mp_per_level = 3
+move_speed_mod = 0
+lpc_asset = "human_base"
