@@ -535,16 +535,6 @@ func _restore_floor(depth: int) -> void:
 
 
 func _on_player_leveled_up(new_level: int) -> void:
-	# Demonspawn skips the popup — every level-up auto-rolls 2 random
-	# distinct stats (the species's mutation flavour).
-	if player != null and player.race_res != null \
-			and player.race_res.racial_trait == "demonspawn_mutations":
-		var pool: Array[String] = ["STR", "DEX", "INT"]
-		pool.shuffle()
-		player.apply_level_up_stat(pool[0])
-		player.apply_level_up_stat(pool[1])
-		print("Demonspawn mutation Lv.%d: %s + %s" % [new_level, pool[0], pool[1]])
-		return
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null or not popup_mgr.has_method("show_levelup_popup"):
 		return

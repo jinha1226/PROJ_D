@@ -102,6 +102,8 @@ func _compose_preset() -> Dictionary:
 		equipment.append({"def": race_res.beard_def, "variant": race_res.beard_color})
 	if race_res.horns_def != "":
 		equipment.append({"def": race_res.horns_def, "variant": race_res.horns_color})
+	if race_res.ears_def != "":
+		equipment.append({"def": race_res.ears_def, "variant": race_res.ears_color})
 	# Job starting equipment — simple string ids.
 	if job_res != null:
 		for item_id in job_res.starting_equipment:

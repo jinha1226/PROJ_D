@@ -7,7 +7,7 @@ const JOB_SELECT_PATH := "res://scenes/menu/JobSelect.tscn"
 const MAIN_MENU_PATH := "res://scenes/menu/MainMenu.tscn"
 const RACE_IDS: Array[String] = [
 	"human", "hill_orc", "minotaur", "deep_elf",
-	"troll", "spriggan", "demonspawn", "draconian",
+	"troll", "spriggan", "catfolk", "draconian",
 ]
 
 var _selected_id: String = ""
@@ -94,6 +94,8 @@ func _race_to_preset(r: RaceData) -> Dictionary:
 		equipment.append({"def": r.beard_def, "variant": r.beard_color})
 	if r.horns_def != "":
 		equipment.append({"def": r.horns_def, "variant": r.horns_color})
+	if r.ears_def != "":
+		equipment.append({"def": r.ears_def, "variant": r.ears_color})
 	return {
 		"id": r.id,
 		"body_def": r.body_def,

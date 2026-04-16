@@ -26,6 +26,8 @@ extends Resource
 @export var beard_color: String = "brown"
 @export var horns_def: String = ""          # "" = no horns
 @export var horns_color: String = "brown"
+@export var ears_def: String = ""           # "" = default human ears
+@export var ears_color: String = "brown"
 @export var base_ac: int = 0                # racial intrinsic AC
 # Freeform trait id for racial abilities (implemented in M2+).
 # Examples: "trollregen", "demonspawn_mutations", "spriggan_speed".

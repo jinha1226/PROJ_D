@@ -112,6 +112,8 @@ func _compose_preset(j: JobData) -> Dictionary:
 			equipment.append({"def": _preview_race.beard_def, "variant": _preview_race.beard_color})
 		if _preview_race.horns_def != "":
 			equipment.append({"def": _preview_race.horns_def, "variant": _preview_race.horns_color})
+		if _preview_race.ears_def != "":
+			equipment.append({"def": _preview_race.ears_def, "variant": _preview_race.ears_color})
 	for item_id in j.starting_equipment:
 		var sid: String = String(item_id)
 		if WeaponRegistry.is_weapon(sid):
