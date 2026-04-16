@@ -19,6 +19,11 @@ node_modules/
 # See CREDITS_LPC.md for license attribution.
 Universal-LPC-Spritesheet-Character-Generator/
 
+# DCSS reference install (tile source). Only the PNGs we actually use get
+# copied into assets/dcss_tiles/ — the exe, lua, docs, dats shouldn't ship.
+dcss-*-win32-tiles/
+dcss-*-win32-tiles.zip
+
 # OS
 .DS_Store
 Thumbs.db
