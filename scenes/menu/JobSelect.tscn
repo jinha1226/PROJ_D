@@ -34,7 +34,7 @@ horizontal_scroll_mode = 0
 [node name="Grid" type="GridContainer" parent="Scroll"]
 size_flags_horizontal = 3
 columns = 2
-theme_override_constants/h_separation = 16
+theme_override_constants/h_separation = 6
 theme_override_constants/v_separation = 16
 
 [node name="Footer" type="HBoxContainer" parent="."]

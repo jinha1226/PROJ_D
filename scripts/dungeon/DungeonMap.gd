@@ -133,16 +133,24 @@ func _draw() -> void:
 				draw_rect(rect, unseen_color, true)
 				continue
 			var t: int = generator.map[x][y]
-			var c: Color = floor_color
+			# Base-layer (floor) always drawn under walls so wall tiles can
+			# show a slimmer wall slab and still look connected.
+			var base: Color = floor_color
 			match t:
-				DungeonGenerator.TileType.WALL: c = wall_color
-				DungeonGenerator.TileType.FLOOR: c = floor_color
-				DungeonGenerator.TileType.STAIRS_DOWN: c = stairs_color
-				DungeonGenerator.TileType.STAIRS_UP: c = stairs_up_color
-				_: c = floor_color
-			if not is_tile_visible(tile):
-				c = c.darkened(0.55)  # explored but outside current sight
-			draw_rect(rect, c, true)
+				DungeonGenerator.TileType.STAIRS_DOWN: base = stairs_color
+				DungeonGenerator.TileType.STAIRS_UP: base = stairs_up_color
+				_: base = floor_color
+			var dim_base: bool = not is_tile_visible(tile)
+			if dim_base:
+				base = base.darkened(0.55)
+			draw_rect(rect, base, true)
+			if t == DungeonGenerator.TileType.WALL:
+				# Wall as a thinner slab centred in the tile (40% tall, full
+				# width) so connected walls still look continuous horizontally.
+				var wc: Color = wall_color if not dim_base else wall_color.darkened(0.55)
+				var wh: float = TILE_SIZE * 0.4
+				var wy: float = rect.position.y + (TILE_SIZE - wh) * 0.5
+				draw_rect(Rect2(rect.position.x, wy, TILE_SIZE, wh), wc, true)
 	# Path overlay dots (only draw on explored tiles so hidden paths aren't spoilery).
 	var path_color: Color = Color(0.2, 0.85, 0.85, 0.55)
 	var dot_size: float = TILE_SIZE * 0.35

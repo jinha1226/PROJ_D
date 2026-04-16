@@ -127,6 +127,24 @@ func _on_tap(grid: Vector2i) -> void:
 	_step_auto_move()
 
 
+## External entrypoint — used by the minimap popup to route a tap on a
+## distant tile through the same A* auto-move path logic as an in-world tap.
+func begin_auto_move_to(target: Vector2i) -> bool:
+	if player == null or generator == null or not player.is_alive:
+		return false
+	if target == player.grid_pos:
+		return false
+	var path: Array[Vector2i] = Pathfinding.find_path(generator, player.grid_pos, target)
+	if path.is_empty():
+		return false
+	_auto_move_path = path
+	_is_auto_moving = true
+	_auto_steps = 0
+	_update_path_overlay()
+	_step_auto_move()
+	return true
+
+
 func _on_longpress(grid: Vector2i) -> void:
 	if not player.is_alive:
 		return

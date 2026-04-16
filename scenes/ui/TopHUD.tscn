@@ -69,7 +69,7 @@ custom_minimum_size = Vector2(72, 72)
 text = "SKILLS"
 
 [node name="WeaponSkillLabel" type="Label" parent="Margin/VBox"]
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 48)
 text = "Equipped: -"
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 26
 modulate = Color(0.85, 0.85, 0.95, 1)

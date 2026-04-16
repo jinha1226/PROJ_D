@@ -664,12 +664,12 @@ func _on_skill_training_toggled(pressed: bool, skill_id: String) -> void:
 
 func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> Control:
 	var row := HBoxContainer.new()
-	row.custom_minimum_size = Vector2(0, 64)
+	row.custom_minimum_size = Vector2(0, 80)
 	row.add_theme_constant_override("separation", 10)
 
 	var chk := CheckBox.new()
 	chk.button_pressed = bool(entry.get("training", false))
-	chk.custom_minimum_size = Vector2(48, 48)
+	chk.custom_minimum_size = Vector2(56, 56)
 	chk.toggled.connect(_on_skill_training_toggled.bind(skill_id))
 	row.add_child(chk)
 
@@ -678,7 +678,7 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 	if category == "magic":
 		name_lab.text += "  (M2)"
 	name_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_lab.add_theme_font_size_override("font_size", 22)
+	name_lab.add_theme_font_size_override("font_size", 32)
 	row.add_child(name_lab)
 
 	var level: int = int(entry.get("level", 0))
@@ -689,14 +689,14 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 		lv_lab.text = "MASTER"
 	else:
 		lv_lab.text = "Lv.%d  (%d/%d)" % [level, int(xp), int(need)]
-	lv_lab.add_theme_font_size_override("font_size", 22)
+	lv_lab.add_theme_font_size_override("font_size", 30)
 	lv_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	row.add_child(lv_lab)
 
 	var cat_lab := Label.new()
 	cat_lab.text = category.to_upper()
-	cat_lab.custom_minimum_size = Vector2(100, 0)
-	cat_lab.add_theme_font_size_override("font_size", 18)
+	cat_lab.custom_minimum_size = Vector2(120, 0)
+	cat_lab.add_theme_font_size_override("font_size", 24)
 	cat_lab.modulate = Color(0.6, 0.65, 0.75, 1)
 	cat_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	row.add_child(cat_lab)
@@ -718,6 +718,7 @@ func _on_bag_pressed() -> void:
 		var empty := Label.new()
 		empty.text = "Inventory is empty. Walk over items to pick them up."
 		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		empty.add_theme_font_size_override("font_size", 28)
 		vb.add_child(empty)
 	else:
 		for i in range(items.size()):
@@ -736,27 +737,34 @@ func _on_bag_pressed() -> void:
 			info_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			info_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			info_btn.tooltip_text = _build_item_tooltip(it)
+			info_btn.add_theme_font_size_override("font_size", 28)
 			info_btn.pressed.connect(_on_bag_info.bind(it))
 			row.add_child(info_btn)
 			if kind == "weapon" or kind == "armor":
 				var eq_btn := Button.new()
 				eq_btn.text = "Equip"
+				eq_btn.add_theme_font_size_override("font_size", 26)
+				eq_btn.custom_minimum_size = Vector2(140, 80)
 				eq_btn.pressed.connect(_on_bag_equip.bind(i, dlg))
 				row.add_child(eq_btn)
 			else:
 				var use_btn := Button.new()
 				use_btn.text = "Use"
+				use_btn.add_theme_font_size_override("font_size", 26)
+				use_btn.custom_minimum_size = Vector2(140, 80)
 				use_btn.pressed.connect(_on_bag_use.bind(i, dlg))
 				row.add_child(use_btn)
 			var drop_btn := Button.new()
 			drop_btn.text = "Drop"
+			drop_btn.add_theme_font_size_override("font_size", 26)
+			drop_btn.custom_minimum_size = Vector2(140, 80)
 			drop_btn.pressed.connect(_on_bag_drop.bind(i, dlg))
 			row.add_child(drop_btn)
 			vb.add_child(row)
 	popup_mgr.add_child(dlg)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(720, 900))
+	dlg.popup_centered(Vector2i(960, 1400))
 
 
 ## Build a multi-line tooltip string comparing this item to what the
@@ -891,7 +899,7 @@ func _on_status_pressed() -> void:
 	dlg.ok_button_text = "Close"
 	var lab := Label.new()
 	lab.text = _build_status_text()
-	lab.add_theme_font_size_override("font_size", 24)
+	lab.add_theme_font_size_override("font_size", 30)
 	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lab.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -954,6 +962,9 @@ func _describe_trait(trait_id: String) -> String:
 		_: return trait_id
 
 
+const _MM_SCALE: int = 12  # pixels per tile in the minimap texture
+
+
 func _on_minimap_pressed() -> void:
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null:
@@ -963,7 +974,7 @@ func _on_minimap_pressed() -> void:
 		return
 	var dlg := AcceptDialog.new()
 	var depth: int = GameManager.current_depth if GameManager != null else 1
-	dlg.title = "Map — B%dF" % depth
+	dlg.title = "Map — B%dF (tap to travel)" % depth
 	dlg.ok_button_text = "Close"
 
 	var vb := VBoxContainer.new()
@@ -971,17 +982,59 @@ func _on_minimap_pressed() -> void:
 	var tex_rect := TextureRect.new()
 	tex_rect.texture = _build_minimap_texture(dmap, player.grid_pos if player else Vector2i.ZERO)
 	tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	tex_rect.custom_minimum_size = Vector2(600, 960)
+	var mm_w: int = DungeonGenerator.MAP_WIDTH * _MM_SCALE
+	var mm_h: int = DungeonGenerator.MAP_HEIGHT * _MM_SCALE
+	tex_rect.custom_minimum_size = Vector2(mm_w, mm_h)
+	tex_rect.mouse_filter = Control.MOUSE_FILTER_STOP
+	tex_rect.gui_input.connect(_on_minimap_tapped.bind(tex_rect, dlg))
 	vb.add_child(tex_rect)
 
 	popup_mgr.add_child(dlg)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(700, 1200))
+	dlg.popup_centered(Vector2i(mm_w + 80, mm_h + 240))
+
+
+## Tapping on the minimap converts local pixel → grid tile and kicks off
+## auto-move toward it. Closes the popup on success.
+func _on_minimap_tapped(event: InputEvent, tex_rect: TextureRect, dlg: AcceptDialog) -> void:
+	var is_tap: bool = false
+	var pos: Vector2 = Vector2.ZERO
+	if event is InputEventMouseButton and event.pressed:
+		is_tap = true
+		pos = event.position
+	elif event is InputEventScreenTouch and event.pressed:
+		is_tap = true
+		pos = event.position
+	if not is_tap or player == null or generator == null or touch_input == null:
+		return
+	# Reverse the STRETCH_KEEP_ASPECT_CENTERED transform to find the tile.
+	var rect_size: Vector2 = tex_rect.size
+	var mm_w: float = DungeonGenerator.MAP_WIDTH * _MM_SCALE
+	var mm_h: float = DungeonGenerator.MAP_HEIGHT * _MM_SCALE
+	var scale: float = min(rect_size.x / mm_w, rect_size.y / mm_h)
+	var draw_w: float = mm_w * scale
+	var draw_h: float = mm_h * scale
+	var off_x: float = (rect_size.x - draw_w) * 0.5
+	var off_y: float = (rect_size.y - draw_h) * 0.5
+	var local_x: float = pos.x - off_x
+	var local_y: float = pos.y - off_y
+	if local_x < 0 or local_y < 0 or local_x > draw_w or local_y > draw_h:
+		return
+	var tx: int = int(local_x / (_MM_SCALE * scale))
+	var ty: int = int(local_y / (_MM_SCALE * scale))
+	var target: Vector2i = Vector2i(tx, ty)
+	if not generator.is_walkable(target):
+		return
+	if not $DungeonLayer/DungeonMap.is_explored(target):
+		return  # Can't travel to fog.
+	# Close map and start auto-move.
+	dlg.queue_free()
+	touch_input.begin_auto_move_to(target)
 
 
 func _build_minimap_texture(dmap: DungeonMap, player_pos: Vector2i) -> ImageTexture:
-	const MM_SCALE: int = 8
+	var MM_SCALE: int = _MM_SCALE
 	var mw: int = DungeonGenerator.MAP_WIDTH
 	var mh: int = DungeonGenerator.MAP_HEIGHT
 	var img: Image = Image.create(mw * MM_SCALE, mh * MM_SCALE, false, Image.FORMAT_RGBA8)

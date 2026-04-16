@@ -8,10 +8,10 @@ class_name ZoomController
 ## Desktop: mouse wheel or trackpad magnify gesture.
 ## Persists to user://settings.json via SaveManager autoload.
 
-const MIN_ZOOM: float = 0.5
+const MIN_ZOOM: float = 0.25
 const MAX_ZOOM: float = 4.0
-const WHEEL_STEP_IN: float = 1.15
-const WHEEL_STEP_OUT: float = 0.87
+const WHEEL_STEP_IN: float = 1.20
+const WHEEL_STEP_OUT: float = 0.83
 const DEFAULT_ZOOM: float = 2.0
 
 @export var camera: Camera2D
@@ -106,9 +106,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			var b: Vector2 = positions[1]
 			var dist: float = a.distance_to(b)
 			if _last_pinch_dist > 0.0 and dist > 0.0:
+				# Raw ratio — zoom range clamp in _set_zoom already prevents
+				# runaway. Damping felt sluggish, especially on pinch-in.
 				var factor: float = dist / _last_pinch_dist
-				# Damp slightly so a quick spread doesn't blow past MAX_ZOOM.
-				factor = lerp(1.0, factor, 0.85)
 				_set_zoom(_current_zoom * factor)
 			_last_pinch_dist = dist
 			get_viewport().set_input_as_handled()

@@ -35,7 +35,7 @@ func _build_cards() -> void:
 func _make_card(r: RaceData) -> Button:
 	var btn := Button.new()
 	btn.toggle_mode = true
-	btn.custom_minimum_size = Vector2(510, 480)
+	btn.custom_minimum_size = Vector2(540, 520)
 	btn.pressed.connect(_on_card_pressed.bind(r.id))
 
 	var hbox := HBoxContainer.new()
@@ -75,7 +75,7 @@ func _make_card(r: RaceData) -> Button:
 	label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
-	label.add_theme_font_size_override("font_size", 32)
+	label.add_theme_font_size_override("font_size", 36)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.text = "%s\n\nSTR %d  DEX %d  INT %d\nHP/lv %d  MP/lv %d\n\n%s" % [
 		r.display_name, r.base_str, r.base_dex, r.base_int,

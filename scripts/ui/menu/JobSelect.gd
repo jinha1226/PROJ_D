@@ -42,7 +42,7 @@ func _build_cards() -> void:
 func _make_card(j: JobData) -> Button:
 	var btn := Button.new()
 	btn.toggle_mode = true
-	btn.custom_minimum_size = Vector2(510, 500)
+	btn.custom_minimum_size = Vector2(540, 540)
 	btn.pressed.connect(_on_card_pressed.bind(j.id))
 
 	var hbox := HBoxContainer.new()
@@ -82,7 +82,7 @@ func _make_card(j: JobData) -> Button:
 	label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
-	label.add_theme_font_size_override("font_size", 28)
+	label.add_theme_font_size_override("font_size", 32)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var stat_line := "STR%s%d  DEX%s%d  INT%s%d" % [
 		"+" if j.str_bonus >= 0 else "", j.str_bonus,
