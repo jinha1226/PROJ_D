@@ -61,7 +61,7 @@ func _ready() -> void:
 	var dungeon_layer: Node2D = $DungeonLayer
 	var dmap: DungeonMap = dungeon_layer.get_node("DungeonMap")
 	dmap.render(generator)
-	dmap.mark_explored(generator.spawn_pos)
+	dmap.update_fov(generator.spawn_pos)
 
 	var cam: Camera2D = $Camera2D
 	cam.position = Vector2(generator.spawn_pos.x * TILE_SIZE + TILE_SIZE / 2.0, generator.spawn_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
@@ -191,8 +191,17 @@ func _ready() -> void:
 	await get_tree().process_frame
 	_spawn_monsters_for_current_depth()
 	_spawn_dummy_items(5)
+	_refresh_actor_visibility(dmap)
 
+	if not TurnManager.player_turn_started.is_connected(_on_turn_refresh_visibility):
+		TurnManager.player_turn_started.connect(_on_turn_refresh_visibility)
 	TurnManager.start_player_turn()
+
+
+func _on_turn_refresh_visibility() -> void:
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	if dmap != null:
+		_refresh_actor_visibility(dmap)
 
 
 func _spawn_monsters_for_current_depth() -> void:
@@ -258,7 +267,17 @@ func _on_player_moved(new_pos: Vector2i) -> void:
 	cam.position = Vector2(new_pos.x * TILE_SIZE + TILE_SIZE / 2.0, new_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	if dmap != null:
-		dmap.mark_explored(new_pos)
+		dmap.update_fov(new_pos)
+		_refresh_actor_visibility(dmap)
+
+
+func _refresh_actor_visibility(dmap: DungeonMap) -> void:
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if is_instance_valid(m) and m is Monster:
+			m.visible = dmap.is_visible(m.grid_pos)
+	for it in get_tree().get_nodes_in_group("floor_items"):
+		if is_instance_valid(it) and it is FloorItem:
+			it.visible = dmap.is_visible(it.grid_pos)
 
 
 func _on_stairs_tapped(_pos: Vector2i) -> void:
@@ -308,7 +327,7 @@ func _regenerate_dungeon(going_up: bool) -> void:
 	var entry_pos: Vector2i = generator.stairs_down_pos if going_up else generator.spawn_pos
 	player.grid_pos = entry_pos
 	player.position = Vector2(entry_pos.x * TILE_SIZE + TILE_SIZE / 2.0, entry_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
-	dmap.mark_explored(entry_pos)
+	dmap.update_fov(entry_pos)
 	var cam: Camera2D = $Camera2D
 	cam.position = player.position
 	if touch_input:
@@ -321,6 +340,7 @@ func _regenerate_dungeon(going_up: bool) -> void:
 	else:
 		_spawn_monsters_for_current_depth()
 		_spawn_dummy_items(5)
+	_refresh_actor_visibility(dmap)
 
 
 func _save_current_floor() -> void:
