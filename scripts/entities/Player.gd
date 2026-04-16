@@ -343,17 +343,101 @@ func use_item(index: int) -> void:
 	if index < 0 or index >= items.size():
 		return
 	var it: Dictionary = items[index]
-	match String(it.get("kind", "")):
-		"potion":
-			if stats != null:
-				stats.HP = min(stats.hp_max, stats.HP + 20)
-				stats_changed.emit()
-		"scroll":
-			print("Read scroll: %s" % it.get("name", ""))
+	var item_id: String = String(it.get("id", ""))
+	var info: Dictionary = ConsumableRegistry.get_info(item_id)
+	var consumed: bool = false
+	if info.is_empty():
+		# Unknown id — fall back to legacy kind heuristic.
+		match String(it.get("kind", "")):
+			"potion":
+				if stats != null:
+					stats.HP = min(stats.hp_max, stats.HP + 20)
+					stats_changed.emit()
+				consumed = true
+			"scroll":
+				print("Read scroll: %s" % it.get("name", ""))
+				consumed = true
+			_:
+				print("Used: %s" % it.get("name", ""))
+				consumed = true
+	else:
+		consumed = _apply_consumable_effect(info)
+	if consumed:
+		items.remove_at(index)
+		inventory_changed.emit()
+		# Using an item costs a turn.
+		TurnManager.end_player_turn()
+
+
+func _apply_consumable_effect(info: Dictionary) -> bool:
+	match String(info.get("effect", "")):
+		"heal":
+			if stats == null:
+				return false
+			stats.HP = min(stats.hp_max, stats.HP + int(info.get("amount", 20)))
+			stats_changed.emit()
+			return true
+		"restore_mp":
+			if stats == null:
+				return false
+			stats.MP = min(stats.mp_max, stats.MP + int(info.get("amount", 20)))
+			stats_changed.emit()
+			return true
+		"teleport_random":
+			return _teleport_random()
+		"blink":
+			return _teleport_blink(4)
+		"magic_mapping":
+			var dmap: Node = get_tree().root.get_node_or_null("Game/DungeonLayer/DungeonMap")
+			if dmap != null and dmap.has_method("reveal_all"):
+				dmap.reveal_all()
+				return true
+			return false
 		_:
-			print("Used: %s" % it.get("name", ""))
-	items.remove_at(index)
-	inventory_changed.emit()
+			print("Unknown consumable effect: %s" % info.get("effect"))
+			return false
+
+
+func _teleport_random() -> bool:
+	if generator == null:
+		return false
+	var candidates: Array = []
+	for x in DungeonGenerator.MAP_WIDTH:
+		for y in DungeonGenerator.MAP_HEIGHT:
+			var p: Vector2i = Vector2i(x, y)
+			if generator.is_walkable(p) and p != grid_pos:
+				candidates.append(p)
+	if candidates.is_empty():
+		return false
+	_teleport_to(candidates[randi() % candidates.size()])
+	return true
+
+
+func _teleport_blink(radius: int) -> bool:
+	if generator == null:
+		return false
+	var candidates: Array = []
+	for dy in range(-radius, radius + 1):
+		for dx in range(-radius, radius + 1):
+			if dx == 0 and dy == 0:
+				continue
+			if max(abs(dx), abs(dy)) > radius:
+				continue
+			var p: Vector2i = grid_pos + Vector2i(dx, dy)
+			if generator.is_walkable(p):
+				candidates.append(p)
+	if candidates.is_empty():
+		return false
+	_teleport_to(candidates[randi() % candidates.size()])
+	return true
+
+
+func _teleport_to(target: Vector2i) -> void:
+	grid_pos = target
+	position = Vector2(target.x * tile_size + tile_size / 2.0, target.y * tile_size + tile_size / 2.0)
+	if _move_tween != null and _move_tween.is_valid():
+		_move_tween.kill()
+	moved.emit(grid_pos)
 
 
 func drop_item(index: int) -> void:

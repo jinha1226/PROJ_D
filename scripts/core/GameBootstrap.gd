@@ -337,15 +337,9 @@ func _maybe_drop_loot(monster: Monster) -> void:
 
 
 func _spawn_dummy_items(count: int) -> void:
-	# M1 dummy item spawn: scatter a few potions/scrolls on walkable tiles.
-	const DUMMY_ITEMS: Array = [
-		{"id": "minor_potion",  "name": "Minor Healing Potion", "kind": "potion", "color": Color(0.9, 0.3, 0.3)},
-		{"id": "scroll_mag",    "name": "Scroll of Magic",      "kind": "scroll", "color": Color(0.8, 0.7, 0.4)},
-		{"id": "gold_coin",     "name": "Gold Coin",            "kind": "junk",   "color": Color(1.0, 0.85, 0.2)},
-		{"id": "mystery_herb",  "name": "Mystery Herb",         "kind": "potion", "color": Color(0.3, 0.8, 0.4)},
-		{"id": "rusty_key",     "name": "Rusty Key",            "kind": "junk",   "color": Color(0.6, 0.5, 0.3)},
-	]
+	# Drop a sample of every consumable so all effects are reachable in test play.
 	var entity_layer: Node = $EntityLayer
+	var ids: Array = ConsumableRegistry.all_ids()
 	var placed: int = 0
 	var attempts: int = 0
 	while placed < count and attempts < 200:
@@ -357,10 +351,12 @@ func _spawn_dummy_items(count: int) -> void:
 			continue
 		if gp == player.grid_pos:
 			continue
-		var template: Dictionary = DUMMY_ITEMS[placed % DUMMY_ITEMS.size()]
+		var iid: String = String(ids[placed % ids.size()])
+		var info: Dictionary = ConsumableRegistry.get_info(iid)
 		var fi: FloorItem = FloorItem.new()
 		entity_layer.add_child(fi)
-		fi.setup(gp, template.id, template.name, template.kind, template.color)
+		fi.setup(gp, iid, String(info.get("name", iid)), String(info.get("kind", "junk")),
+				info.get("color", Color(0.9, 0.9, 0.4)))
 		placed += 1
 
 
@@ -794,10 +790,11 @@ func _build_item_tooltip(it: Dictionary) -> String:
 			return "%s [%s slot]\nAC: %d (%s%d vs %s)" % [
 				name_s, slot, new_ac, sign_a, diff_ac, cur_name,
 			]
-		"potion":
-			return "%s\nDrink to restore 20 HP." % name_s
-		"scroll":
-			return "%s\nRead to trigger its effect." % name_s
+		"potion", "scroll":
+			var desc: String = ConsumableRegistry.description_for(id)
+			if desc == "":
+				desc = ("Drink." if kind == "potion" else "Read aloud.")
+			return "%s\n%s" % [name_s, desc]
 		_:
 			return "%s\nMiscellaneous junk." % name_s
 

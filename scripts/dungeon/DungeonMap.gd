@@ -55,6 +55,14 @@ func mark_explored(center: Vector2i, radius: int = EXPLORE_RADIUS) -> void:
 	update_fov(center, radius)
 
 
+## Mark every tile explored — used by the Magic Mapping scroll.
+func reveal_all() -> void:
+	if generator == null:
+		return
+	explored.fill(1)
+	queue_redraw()
+
+
 func is_explored(tile: Vector2i) -> bool:
 	var mw: int = DungeonGenerator.MAP_WIDTH
 	if tile.x < 0 or tile.x >= mw or tile.y < 0 or tile.y >= DungeonGenerator.MAP_HEIGHT:
