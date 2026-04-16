@@ -17,6 +17,20 @@ const _SKILL_CATEGORY_LABELS: Dictionary = {
 	"all": "ALL", "weapon": "WEAPON", "defense": "DEFENSE",
 	"magic": "MAGIC", "misc": "MISC", "spells": "CAST",
 }
+
+const _COMPANION_SCENE: PackedScene = preload("res://scenes/entities/Companion.tscn")
+# Essence id → companion archetype (MonsterData tres filename).
+const _ESSENCE_TO_COMPANION: Dictionary = {
+	"boneknight_essence":   "skeleton",
+	"lich_essence":         "skeleton",
+	"ogre_essence":         "goblin",     # placeholder — a beefy orc would be better
+	"titan_essence":        "orc",
+	"fire_sprite_essence":  "fire_sprite",
+	"dragon_essence":       "orc",        # placeholder
+	"snake_essence":        "adder",
+	"dryad_essence":        "adder",
+	"void_essence":         "kobold",
+}
 # [zoom-agent] pinch gesture + UI zoom buttons.
 const ZOOM_CONTROLLER_SCRIPT: Script = preload("res://scripts/ui/ZoomController.gd")
 const MAX_DEPTH: int = 25
@@ -611,21 +625,6 @@ func _restore_floor(depth: int) -> void:
 				String(it_info.get("kind", "junk")),
 				it_info.get("color", Color(1, 1, 0)),
 				it_info.get("extra", {}))
-
-
-const _COMPANION_SCENE: PackedScene = preload("res://scenes/entities/Companion.tscn")
-# Essence id → companion archetype (MonsterData tres filename).
-const _ESSENCE_TO_COMPANION: Dictionary = {
-	"boneknight_essence":   "skeleton",
-	"lich_essence":         "skeleton",
-	"ogre_essence":         "goblin",     # placeholder — a beefy orc would be better
-	"titan_essence":        "orc",
-	"fire_sprite_essence":  "fire_sprite",
-	"dragon_essence":       "orc",        # placeholder
-	"snake_essence":        "adder",
-	"dryad_essence":        "adder",
-	"void_essence":         "kobold",
-}
 
 
 ## Spawn a Companion at the first walkable tile adjacent to the player.
