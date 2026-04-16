@@ -56,8 +56,8 @@ const DATA: Dictionary = {
 		"name": "Scroll of Identification",
 		"kind": "scroll",
 		"color": Color(0.70, 0.90, 0.70),
-		"effect": "identify_all",
-		"desc": "Reveals the true name and effect of every unknown potion and scroll in your inventory.",
+		"effect": "identify_one",
+		"desc": "Reveals the true name and effect of a single unknown potion or scroll of your choice.",
 	},
 }
 

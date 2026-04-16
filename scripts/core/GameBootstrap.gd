@@ -102,6 +102,7 @@ func _ready() -> void:
 	# [meta-agent] hook player death → result screen.
 	player.died.connect(_on_player_died)
 	player.leveled_up.connect(_on_player_leveled_up)
+	player.identify_one_requested.connect(_on_identify_one_requested)
 
 	# UI lookup.
 	ui = get_node_or_null("UILayer/UI")
@@ -166,6 +167,16 @@ func _ready() -> void:
 	# BottomHUD REST button.
 	if bottom_hud != null and bottom_hud.has_signal("rest_pressed"):
 		bottom_hud.rest_pressed.connect(_on_rest_pressed)
+
+	# Quickslots: pressed index → player.use_quickslot; player.quickslots_changed
+	# → refresh display.
+	if bottom_hud != null and bottom_hud.has_signal("quickslot_pressed"):
+		bottom_hud.quickslot_pressed.connect(_on_quickslot_pressed)
+	if player.has_signal("quickslots_changed"):
+		player.quickslots_changed.connect(_refresh_quickslots.bind(bottom_hud))
+	if player.has_signal("inventory_changed"):
+		player.inventory_changed.connect(_refresh_quickslots.bind(bottom_hud))
+	_refresh_quickslots(bottom_hud)
 
 	# BottomHUD essence slot tap → swap popup.
 	if bottom_hud != null and popup_mgr != null:
@@ -240,6 +251,38 @@ func _process(_delta: float) -> void:
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	if dmap != null and generator != null:
 		_refresh_actor_visibility(dmap)
+
+
+func _on_quickslot_pressed(index: int) -> void:
+	if player != null:
+		player.use_quickslot(index)
+
+
+## Rebuild the BottomHUD quickslot labels/colours from player.quickslot_ids +
+## current inventory counts. Shows a short label (first 3 chars) tinted with
+## the consumable's colour; empty slots render as "+".
+func _refresh_quickslots(bottom_hud: Node) -> void:
+	if bottom_hud == null or player == null:
+		return
+	for i in player.quickslot_ids.size():
+		var id: String = player.quickslot_ids[i]
+		if id == "":
+			bottom_hud.set_quickslot_display(i, "", Color.WHITE)
+			continue
+		var info: Dictionary = ConsumableRegistry.get_info(id)
+		var color: Color = info.get("color", Color(0.9, 0.9, 0.4))
+		# Count matching items so the label hints at remaining charges.
+		var count: int = 0
+		for inv_it in player.get_items():
+			if String(inv_it.get("id", "")) == id:
+				count += 1
+		var disp_name: String = GameManager.display_name_for_item(
+				id, String(info.get("name", id)), String(info.get("kind", "")))
+		# Short tag — first word or first 3 chars.
+		var tag: String = disp_name.split(" ")[0].substr(0, 6)
+		if count > 1:
+			tag = "%s×%d" % [tag, count]
+		bottom_hud.set_quickslot_display(i, tag, color)
 
 
 func _on_rest_pressed() -> void:
@@ -535,6 +578,52 @@ func _restore_floor(depth: int) -> void:
 				String(it_info.get("kind", "junk")),
 				it_info.get("color", Color(1, 1, 0)),
 				it_info.get("extra", {}))
+
+
+func _on_identify_one_requested() -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null or player == null:
+		return
+	var unidentified: Array = []
+	for it in player.get_items():
+		var iid: String = String(it.get("id", ""))
+		if ConsumableRegistry.has(iid) and not GameManager.is_identified(iid):
+			unidentified.append(it)
+	var dlg := AcceptDialog.new()
+	dlg.title = "Identify Which?"
+	dlg.ok_button_text = "Cancel"
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 8)
+	dlg.add_child(vb)
+	if unidentified.is_empty():
+		var l := Label.new()
+		l.text = "You have nothing left to identify."
+		l.add_theme_font_size_override("font_size", 28)
+		vb.add_child(l)
+	else:
+		var prompt := Label.new()
+		prompt.text = "Choose an item to reveal:"
+		prompt.add_theme_font_size_override("font_size", 28)
+		vb.add_child(prompt)
+		for it in unidentified:
+			var iid: String = String(it.get("id", ""))
+			var kind: String = String(it.get("kind", ""))
+			var disp: String = GameManager.display_name_for_item(iid, String(it.get("name", "?")), kind)
+			var btn := Button.new()
+			btn.text = "%s [%s]" % [disp, kind]
+			btn.custom_minimum_size = Vector2(0, 80)
+			btn.add_theme_font_size_override("font_size", 26)
+			btn.pressed.connect(_on_identify_pick.bind(iid, dlg))
+			vb.add_child(btn)
+	popup_mgr.add_child(dlg)
+	dlg.confirmed.connect(dlg.queue_free)
+	dlg.canceled.connect(dlg.queue_free)
+	dlg.popup_centered(Vector2i(800, 1000))
+
+
+func _on_identify_pick(id: String, dlg: AcceptDialog) -> void:
+	GameManager.identify(id)
+	dlg.queue_free()
 
 
 func _on_player_leveled_up(new_level: int) -> void:

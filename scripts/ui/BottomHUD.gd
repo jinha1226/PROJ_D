@@ -28,6 +28,11 @@ func set_quickslot(i: int, icon: Texture2D, text: String) -> void:
 	if i >= 0 and i < quick_slots.size():
 		quick_slots[i].set_item(icon, text)
 
+
+func set_quickslot_display(i: int, txt: String, color: Color) -> void:
+	if i >= 0 and i < quick_slots.size():
+		quick_slots[i].set_slot_display(txt, color)
+
 func set_essence(id: String, type_color: Color) -> void:
 	if essence_slot and essence_slot.has_method("set_essence"):
 		essence_slot.set_essence(id, type_color)

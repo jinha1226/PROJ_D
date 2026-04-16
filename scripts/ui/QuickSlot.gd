@@ -10,7 +10,9 @@ signal pressed_slot(slot_index: int)
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(112, 112)
+	add_theme_font_size_override("font_size", 22)
 	pressed.connect(func(): pressed_slot.emit(slot_index))
+
 
 func set_item(icon: Texture2D, text: String) -> void:
 	if icon_rect:
@@ -18,3 +20,18 @@ func set_item(icon: Texture2D, text: String) -> void:
 		icon_rect.visible = icon != null
 	if label:
 		label.text = text
+
+
+## New API used for consumable quickslots: show a short label tinted with
+## the consumable's colour. Empty string clears back to "+".
+func set_slot_display(txt: String, color: Color) -> void:
+	if icon_rect:
+		icon_rect.visible = false
+	if label:
+		label.text = ""  # hide bottom label; use button text instead
+	if txt == "":
+		text = "+"
+		self_modulate = Color(1, 1, 1, 1)
+	else:
+		text = txt
+		self_modulate = Color(color.r, color.g, color.b, 1.0).lerp(Color(1, 1, 1, 1), 0.3)

@@ -7,6 +7,9 @@ signal died
 signal attacked(target)
 signal stats_changed
 signal leveled_up(new_level: int)
+## Emitted when Scroll of Identification is used. GameBootstrap shows a
+## picker popup that lets the player choose which inventory item to reveal.
+signal identify_one_requested
 
 @export var generator: DungeonGenerator
 
@@ -36,6 +39,11 @@ var skill_state: Dictionary = {}
 # M1 dummy inventory — Array of Dictionary (FloorItem.as_dict()).
 var items: Array = []
 signal inventory_changed
+# 4 quickslot ids — "" means empty. Filled automatically on pickup of
+# the first unique consumable id, cleared when no matching inventory item
+# remains. Drives BottomHUD's four quickslot buttons.
+var quickslot_ids: Array[String] = ["", "", "", ""]
+signal quickslots_changed
 
 const _CHAR_SPRITE_SCENE := preload("res://scenes/entities/CharacterSprite.tscn")
 const _MOVE_TWEEN_DUR: float = 0.12
@@ -337,8 +345,52 @@ func _pickup_items_here() -> void:
 			var shown: String = GameManager.display_name_for_item(
 					it.item_id, it.display_name, it.kind) if GameManager != null else it.display_name
 			print("Picked up: %s" % shown)
+			_try_assign_quickslot(it.item_id, it.kind)
 			it.queue_free()
 	inventory_changed.emit()
+
+
+## Fill the first empty quickslot with this consumable id, unless it's
+## already quickslotted. Weapons/armor/junk don't go into quickslots.
+func _try_assign_quickslot(id: String, kind: String) -> void:
+	if kind != "potion" and kind != "scroll":
+		return
+	if quickslot_ids.has(id):
+		return
+	for i in quickslot_ids.size():
+		if quickslot_ids[i] == "":
+			quickslot_ids[i] = id
+			quickslots_changed.emit()
+			return
+
+
+## Use the quickslotted consumable in the given slot. Returns true if an
+## item was found and consumed. Auto-clears the slot when the last matching
+## item is used.
+func use_quickslot(index: int) -> bool:
+	if index < 0 or index >= quickslot_ids.size():
+		return false
+	var id: String = quickslot_ids[index]
+	if id == "":
+		return false
+	for i in items.size():
+		if String(items[i].get("id", "")) == id:
+			use_item(i)
+			if not _inventory_contains(id):
+				quickslot_ids[index] = ""
+				quickslots_changed.emit()
+			return true
+	# No item of this id left — clear the stale slot.
+	quickslot_ids[index] = ""
+	quickslots_changed.emit()
+	return false
+
+
+func _inventory_contains(id: String) -> bool:
+	for it in items:
+		if String(it.get("id", "")) == id:
+			return true
+	return false
 
 
 func use_item(index: int) -> void:
@@ -399,16 +451,9 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 				dmap.reveal_all()
 				return true
 			return false
-		"identify_all":
-			if GameManager == null:
-				return false
-			var newly_identified: int = 0
-			for inv_it in items:
-				var iid: String = String(inv_it.get("id", ""))
-				if ConsumableRegistry.has(iid) and not GameManager.is_identified(iid):
-					GameManager.identify(iid)
-					newly_identified += 1
-			print("Identified %d item(s)." % newly_identified)
+		"identify_one":
+			# Hand the choice off to the UI — GameBootstrap opens a picker.
+			identify_one_requested.emit()
 			return true
 		_:
 			print("Unknown consumable effect: %s" % info.get("effect"))
