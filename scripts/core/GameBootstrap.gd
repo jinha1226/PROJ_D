@@ -40,6 +40,10 @@ var run_over: bool = false
 # Fixed per-run seed. generator.generate(depth, _base_seed) adds depth*1000
 # internally so each depth has a stable, distinct map.
 var _base_seed: int = 0
+# Per-depth snapshot of monsters/items captured when the player leaves that
+# floor. Restored on revisit so killed enemies stay dead and picked-up items
+# stay gone. Keyed by int depth.
+var _floor_state: Dictionary = {}
 
 
 func _ready() -> void:
@@ -282,6 +286,10 @@ func _on_stairs_up_tapped(_pos: Vector2i) -> void:
 ## when descending). _base_seed is fixed per run so the same depth yields
 ## the same map on every revisit.
 func _regenerate_dungeon(going_up: bool) -> void:
+	# Snapshot the floor we're leaving so monsters/items are exactly as left
+	# when the player returns. Done BEFORE the clear loops below.
+	_save_current_floor()
+
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if is_instance_valid(m):
 			TurnManager.unregister_actor(m)
@@ -308,8 +316,71 @@ func _regenerate_dungeon(going_up: bool) -> void:
 	if _top_hud_ref != null and _top_hud_ref.has_method("set_depth"):
 		_top_hud_ref.set_depth(GameManager.current_depth)
 	await get_tree().process_frame
-	_spawn_monsters_for_current_depth()
-	_spawn_dummy_items(5)
+	if _floor_state.has(GameManager.current_depth):
+		_restore_floor(GameManager.current_depth)
+	else:
+		_spawn_monsters_for_current_depth()
+		_spawn_dummy_items(5)
+
+
+func _save_current_floor() -> void:
+	if generator == null:
+		return
+	var snapshot: Dictionary = {"monsters": [], "items": []}
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if not is_instance_valid(m) or not (m is Monster):
+			continue
+		if not m.is_alive:
+			continue
+		var mid: String = String(m.data.id) if m.data != null else ""
+		if mid == "":
+			continue
+		snapshot.monsters.append({
+			"id": mid,
+			"pos": m.grid_pos,
+			"hp": m.hp,
+		})
+	for it in get_tree().get_nodes_in_group("floor_items"):
+		if not is_instance_valid(it) or not (it is FloorItem):
+			continue
+		snapshot.items.append({
+			"pos": it.grid_pos,
+			"id": it.item_id,
+			"name": it.display_name,
+			"kind": it.kind,
+			"color": it.color,
+		})
+	_floor_state[GameManager.current_depth] = snapshot
+
+
+func _restore_floor(depth: int) -> void:
+	var snapshot: Dictionary = _floor_state.get(depth, {})
+	if snapshot.is_empty():
+		return
+	var monster_scene: PackedScene = load("res://scenes/entities/Monster.tscn")
+	var entity_layer: Node = $EntityLayer
+	if monster_scene != null:
+		for m_info in snapshot.get("monsters", []):
+			var mid: String = String(m_info.get("id", ""))
+			if mid == "":
+				continue
+			var tres: Resource = load("res://resources/monsters/%s.tres" % mid)
+			if tres == null:
+				continue
+			var m: Monster = monster_scene.instantiate()
+			entity_layer.add_child(m)
+			m.setup(generator, m_info.get("pos", Vector2i.ZERO), tres)
+			m.hp = int(m_info.get("hp", m.hp))
+			if not m.died.is_connected(_on_monster_died):
+				m.died.connect(_on_monster_died)
+	for it_info in snapshot.get("items", []):
+		var fi := FloorItem.new()
+		entity_layer.add_child(fi)
+		fi.setup(it_info.get("pos", Vector2i.ZERO),
+				String(it_info.get("id", "")),
+				String(it_info.get("name", "")),
+				String(it_info.get("kind", "junk")),
+				it_info.get("color", Color(1, 1, 0)))
 
 
 func _on_player_died() -> void:
