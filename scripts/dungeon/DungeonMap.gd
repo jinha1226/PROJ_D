@@ -42,7 +42,11 @@ func update_fov(center: Vector2i, radius: int = EXPLORE_RADIUS) -> void:
 	queue_redraw()
 
 
-func is_visible(tile: Vector2i) -> bool:
+## Renamed from is_visible() to avoid shadowing CanvasItem's zero-arg
+## is_visible() getter — that conflict made every call resolve to the
+## node's own .visible property (always true), leaking actors into
+## unexplored tiles.
+func is_tile_visible(tile: Vector2i) -> bool:
 	return _visible_tiles.has(tile)
 
 
@@ -128,7 +132,7 @@ func _draw() -> void:
 				DungeonGenerator.TileType.STAIRS_DOWN: c = stairs_color
 				DungeonGenerator.TileType.STAIRS_UP: c = stairs_up_color
 				_: c = floor_color
-			if not is_visible(tile):
+			if not is_tile_visible(tile):
 				c = c.darkened(0.55)  # explored but outside current sight
 			draw_rect(rect, c, true)
 	# Path overlay dots (only draw on explored tiles so hidden paths aren't spoilery).

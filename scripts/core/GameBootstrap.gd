@@ -276,7 +276,7 @@ func _visible_monster_nearby() -> bool:
 		return false
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if is_instance_valid(m) and m is Monster and m.is_alive:
-			if dmap.is_visible(m.grid_pos):
+			if dmap.is_tile_visible(m.grid_pos):
 				return true
 	return false
 
@@ -390,10 +390,10 @@ func _on_player_moved(new_pos: Vector2i) -> void:
 func _refresh_actor_visibility(dmap: DungeonMap) -> void:
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if is_instance_valid(m) and m is Monster:
-			m.visible = dmap.is_visible(m.grid_pos)
+			m.visible = dmap.is_tile_visible(m.grid_pos)
 	for it in get_tree().get_nodes_in_group("floor_items"):
 		if is_instance_valid(it) and it is FloorItem:
-			it.visible = dmap.is_visible(it.grid_pos)
+			it.visible = dmap.is_tile_visible(it.grid_pos)
 
 
 func _on_stairs_tapped(_pos: Vector2i) -> void:
@@ -709,12 +709,16 @@ func _on_bag_pressed() -> void:
 			var kind: String = String(it.get("kind", ""))
 			var row := HBoxContainer.new()
 			row.add_theme_constant_override("separation", 8)
-			var lab := Label.new()
-			lab.text = "%s [%s]" % [it.get("name", "?"), kind]
-			lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			lab.mouse_filter = Control.MOUSE_FILTER_STOP
-			lab.tooltip_text = _build_item_tooltip(it)
-			row.add_child(lab)
+			# Name acts as an Info button — taps open the comparison popup.
+			# Tooltip stays for desktop hover; the button works on touch too.
+			var info_btn := Button.new()
+			info_btn.text = "%s [%s]" % [it.get("name", "?"), kind]
+			info_btn.flat = true
+			info_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			info_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			info_btn.tooltip_text = _build_item_tooltip(it)
+			info_btn.pressed.connect(_on_bag_info.bind(it))
+			row.add_child(info_btn)
 			if kind == "weapon" or kind == "armor":
 				var eq_btn := Button.new()
 				eq_btn.text = "Equip"
@@ -773,6 +777,20 @@ func _build_item_tooltip(it: Dictionary) -> String:
 			return "%s\nRead to trigger its effect." % name_s
 		_:
 			return "%s\nMiscellaneous junk." % name_s
+
+
+func _on_bag_info(it: Dictionary) -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null:
+		return
+	var dlg := AcceptDialog.new()
+	dlg.title = String(it.get("name", "Item"))
+	dlg.ok_button_text = "Close"
+	dlg.dialog_text = _build_item_tooltip(it)
+	popup_mgr.add_child(dlg)
+	dlg.confirmed.connect(dlg.queue_free)
+	dlg.canceled.connect(dlg.queue_free)
+	dlg.popup_centered(Vector2i(640, 600))
 
 
 func _on_bag_use(idx: int, dlg: AcceptDialog) -> void:
