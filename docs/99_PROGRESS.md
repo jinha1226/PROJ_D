@@ -10,185 +10,125 @@
 
 ---
 
+## 현재 브랜치 / 세션 핸드오프 노트
+
+**HEAD**: 보라색 UI 재배치 작업 중 (TopHUD 가로 bars + 미니맵 / BottomHUD 2 rows).
+**다음 커밋 대기 중인 변경사항**:
+- `scenes/ui/TopHUD.tscn` 전면 재작성 — HBox[Minimap 200×200 | VBox[HP row, MP row, XP row]] 각 row 60px 얇은 bar + 260px 라벨
+- `scripts/ui/TopHUD.gd` 전면 재작성 — `minimap_pressed` signal, `set_hp/set_mp/set_xp(cur,to_next,lv)/set_depth/set_minimap_texture(tex)` API; 구 button 시그널 제거, weapon_skill_label stub만 남김
+- `scenes/ui/BottomHUD.tscn` — 2 rows: Row1 [QS×4 + Spacer + REST 160×112], Row2 [BAG / SKILLS / STATUS 각 expand 112]. 위치 y=2060, size (1080, 280). EssenceSlot 제거됨
+- `scripts/ui/BottomHUD.gd` — `bag_pressed`/`skills_pressed`/`status_pressed` 추가, `set_essence` stub (역호환)
+- `scripts/entities/Player.gd` — `xp_changed(cur,to_next,level)` signal 추가, `grant_xp`에서 emit
+- `scripts/core/GameBootstrap.gd` — bag/skills/status를 bottom_hud에서 connect, 기존 top_hud essence_slot_tapped wiring 제거. `_refresh_minimap_preview(dmap, player_pos)` 도입 — 초기 spawn, `_on_player_moved`, `_regenerate_dungeon` 세 시점에서 `TopHUD.set_minimap_texture(tex)` 호출. Status 팝업에 essence 섹션 + Swap 버튼 + 명시적 Close 버튼 (AcceptDialog OK 외 추가)
+- `scripts/ui/ZoomController.gd` — DEFAULT_ZOOM 2.0 → 2.6
+
+**검증 필요 (이번 배치)**:
+1. 상단 HP/MP/XP 3바 + 좌측 미니맵 프리뷰 (탭하면 확장)
+2. 하단 quickslots + REST 한 줄, BAG/SKILLS/STATUS 한 줄
+3. STATUS 팝업에 Essence 섹션 + Swap 버튼 + Close 버튼
+4. 시작 장비 (Fighter 등) 플레이어 스프라이트에 첫 턴부터 표시
+5. 핀치 줌인/줌아웃 양방향 반응
+6. MAP 팝업 탭 → 자동이동
+7. Identify 스크롤: 미식별 아이템 목록 팝업 → 하나만 선택 감정
+8. 포션/스크롤 주우면 하단 quickslot에 자동 배치, 탭하면 사용
+9. 벽이 타일 중앙 얇은 띠로 그려지는지
+
+---
+
 ## ✅ 검증 완료
 
-- ✅ 웹 빌드 + GitHub Pages 배포 (브라우저 접속)
+- ✅ 웹 빌드 + GitHub Pages 배포
 - ✅ 상단 HUD 렌더 (HP/MP 바)
 - ✅ 던전 맵 렌더
-- ✅ ULPC PNG 임포트 통과
+- ✅ ULPC PNG 임포트
 - ✅ CREDITS_LPC.md 커밋
 
 ---
 
-## 🐛 사용자 플레이 후 보고된 이슈 (최근 세션에서 수정 — 재검증 대기)
+## 🔧 최근 세션 커밋 요약 (검증 대기)
 
-모두 코드 수정 완료, 배포됨. 재플레이로 재확인 필요.
+### 종족/직업/선택 플로우
+- `MainMenu` → `RaceSelect` → `JobSelect` → `Game.tscn` 플로우
+- 8 종족 (Human/Hill Orc/Minotaur/Deep Elf/Troll/Spriggan/Catfolk/Draconian)
+- 20 직업 (DCSS 백그라운드 기반)
+- RaceData/JobData 리소스 필드 확장 (body_def/skin/hair/beard/horns/ears/base_ac/racial_trait, starting_equipment, starting_skills)
+- Player._compose_preset 실시간 race+장비 조합 (160 combo JSON 없이)
+- 카드에 SubViewport CharacterSprite 실시간 프리뷰
 
-### 레이아웃 / UI
-- 🐛→🔧 BottomHUD 미노출 (+ + + + 퀵슬롯/정수/REST)
-  - 원인: UI CanvasLayer가 UILayer CanvasLayer 안에 중첩 → Control 자식의
-    `anchor_top=1.0` resolve 실패 (parent size 0으로 계산) → 원점(0,0)에 size 0
-  - 수정: BottomHUD.tscn을 `position=(0,2196) size=(1080,144)` 하드코딩
-  - 같은 이슈로 ZoomControls도 앵커 대신 explicit position/size 적용
-- 🐛→🔧 SkillsScreen 닫기/목록 표시
-  - 원인 1: Dim(ColorRect) + Panel이 중첩 CanvasLayer 안에서 앵커 resolve 실패
-    → Panel이 (-460,-1000)에 배치, X 버튼이 화면 밖
-  - 원인 2: `queue_free()` 타이밍으로 재빌드 시 stale 자식 남음
-  - 수정: Dim/Panel/Margin 모두 explicit position+size, `free()`로 즉시 삭제,
-    `_on_bg_input`의 panel_rect 하드코딩
-- 🐛→🔧 TopHUD 깊이 라벨이 계단 이동에도 B1F 고정
-  - 원인: `TopHUD.set_depth()` 메서드는 있었으나 `GameBootstrap`에서 호출 없음
-  - 수정: `_ready()` 및 `_regenerate_dungeon()`에서 호출
+### 종족 특성 실장
+- Troll Regeneration (턴당 +1 HP)
+- Spriggan 2× 이동 속도 (move_speed_mod 카운터)
+- Draconian +2 AC (race.base_ac, `_recompute_defense` 합산)
+- Minotaur Headbutt (근접 25% 확률 +2~5 dmg)
+- Catfolk Claws (맨손 +3 dmg)
 
-### 기능 / 입력
-- 🐛→🔧 MAP 버튼 무반응 (시그널 바인딩 없음)
-  - 수정: `GameBootstrap._on_minimap_pressed` 추가 → AcceptDialog placeholder
-- 🐛→🔧 BAG 버튼 무반응
-  - 수정: `_on_bag_pressed` → 인벤토리 리스트 + Use/Drop 버튼
-- 🐛→🔧 STAIRS_UP 상호작용 불가 ("You can't go back up." print 스텁)
-  - 수정: `stairs_up_tapped` 시그널 추가, `_on_stairs_up_tapped` 핸들러
-    (`GameManager.current_depth -= 1` + 재생성)
-- 🐛→🔧 계단 올라가면 "새로운" B1F 생성
-  - 원인: `_regenerate_dungeon`이 매번 `randi()`로 새 시드 사용
-  - 수정: `_base_seed` 런 시작 시 1회 확정 → depth당 고정 맵.
-    `_regenerate_dungeon(going_up: bool)`: 올라갈 때 `stairs_down_pos`에 배치
-    (원래 내려갔던 위치로 복귀)
-- 🐛→🔧 자동이동 중 멀리 있는 적 때문에 취소됨
-  - 원인: SIGHT_RANGE=6칸, 화면 대부분이 범위 안 (fog-of-war 없음)
-  - 수정: SIGHT_RANGE=3칸
+### 아이템 시스템
+- `WeaponRegistry.display_name_for` — 깔끔한 이름 (Arming Sword 등)
+- `ArmorRegistry` 5슬롯 × 12항목 (chest/legs/boots/helm/gloves, alias 포함)
+- Player 멀티 슬롯 (equipped_armor: slot→info 딕셔너리)
+- 장착 시 즉시 LPC 스프라이트 갱신
+- FloorItem `extra` 필드 slot/ac 저장 (floor persist 포함)
+- `ConsumableRegistry` — 7종 (healing/mana potion, teleport/magic_map/blink/identify scroll)
+- Scroll of Identification = 한 장에 한 아이템만 (picker 팝업)
 
-### 스프라이트
-- 🐛→🔧 캐릭터 팔 없음
-  - 원인: ULPC 미러 스크립트가 인간 body 스프라이트 누락 → body/bodies/ 에
-    skeleton/zombie만 존재
-  - 수정: PROJ_B에서 `body/bodies/{male,female}/*.png` 복사
+### 식별 시스템
+- `GameManager.identified` dict + `_pseudonyms` (Red Potion / Scroll labeled ZUN TAB 식)
+- 사용 시 자동 식별
+- Retry/New Run 시 pseudonyms 재할당
 
----
-
-## 🔧 신규 구현 (검증 대기)
-
-### 자동이동 시각화
-- `DungeonMap.show_path(path)` / `clear_path()`: 예정 경로를 청록 점으로 표시
-- `TouchInput`: 경로 오버레이 갱신 + 150ms 스텝 간격 (`create_timer`)
-
-### 더미 아이템 시스템 (M1 최소 버전)
-- `FloorItem` 엔티티: 다이아몬드 픽업, `floor_items` 그룹
-- `Player.items` 인벤토리 Array + `inventory_changed` 시그널
-- 이동 시 자동 픽업 (`_pickup_items_here`)
-- `use_item` (potion → HP +20, scroll → 로그), `drop_item` (현재 위치에 재배치)
-- `GameBootstrap._spawn_dummy_items(5)`: potion/scroll/junk 5종 랜덤 배치
-  (재생성 시 floor_items 그룹 전체 제거 후 재배치)
-- BAG 팝업: 아이템별 Use/Drop 버튼, 선택 시 팝업 재오픈 (즉시 갱신)
-
-### 테스트 튜닝
-- `MonsterData.xp_value` 기본값 10 → 100
-- `xp_value == 0` fallback: `tier * 3` → `tier * 30`
-  → 첫 킬로 Fighting/Weapon 스킬 Lv.1+ 진입 가능
-- `MAX_DEPTH` 15 → 2 (계단 상/하 테스트 집중)
-
----
-
-## 🔧 구현됨 (이전 세션, 여전히 검증 대기)
-
-### 코어
-- Godot 4.6 프로젝트, 자동로드 7개, 턴 매니저, JSON 세이브
+### 전투 / 턴 시스템
+- 이동/공격 tween (120ms 이동, 카메라 follow 140ms, 공격 lunge는 제거)
+- FOV Bresenham LOS (시야/탐색/미탐색 3상태)
+- Floor persistence (map seed + 몬스터/아이템 스냅샷)
+- 계단 상승 시 원래 stairs_down_pos에 배치
+- Player level up + stat choice popup
+- REST 버튼 (HP/MP regen, 적 시야 진입 시 중단)
+- QuickSlot 자동 배정 (포션/스크롤 픽업 시 첫 빈 슬롯)
 
 ### 던전
-- BSP 분할 + 복도 + 도달성 보정
-- 깊이 스케일 몬스터 스폰
+- BSP_MAX_DEPTH 5 → 3 (≤8 방), MAP 40×60
+- 벽 얇게 (타일 중앙 40% 높이 띠)
+- DungeonMap `is_tile_visible` (CanvasItem.is_visible 충돌 해결)
+- 미니맵 탭 → A* 자동이동
 
-### 전투
-- Player 8방향 이동, HP/MP/스탯
-- Monster AI (greedy 추격)
-- CombatSystem (DCSS식 + 스킬 보정)
-- 3 몬스터 종 (rat/goblin/orc)
+### UI 크기/가독성
+- 모든 메뉴 폰트 확대 (iPhone 15 Pro 기준)
+- Race/Job 카드 540×520~540, 폰트 32~36
+- Skills/Status/BAG 폰트 28~32
+- STATUS 버튼 추가 (race+job/레벨/HP/MP/스탯/AC 분해/장비 슬롯/trait)
+- Credits는 MainMenu 전용 (BuildVersionLabel은 버전만)
 
-### 정수 시스템
-- 슬롯 1, 장착/해제, 스탯 합산, 드롭/교체 팝업
-
-### 메타 진행
-- 룬 조각, 사망·클리어 결과, 재도전
-
-### LPC 스프라이트
-- LPCSpriteLoader / LPCDefLoader 포트
-- def 80개, 프리셋 16개
-- walk/slash/hurt/idle 애니메이션
-
-### DCSS 스킬 시스템
-- 26 스킬 카탈로그 + XP 커브 (30 × 1.5^(L-1))
-- WeaponRegistry, 장착 무기 XP
-- 훈련 on/off, 레벨업 토스트
-- SkillsScreen UI, TopHUD 힌트
-
-### 인프라
-- GitHub Actions: Godot 4.6.2 web export + Pages
+### 핀치 줌
+- MIN_ZOOM 0.25 (확장), damping 제거
+- Wheel 1.20/0.83
+- DEFAULT_ZOOM 2.6 (대기 중인 변경분)
 
 ---
 
-## 🔜 검증 대기 시나리오 (재플레이 체크리스트)
+## ❌ 아직 미구현 / 보류
 
-1. 상단 HUD: MAP/HP/MP/B*F/BAG/SKILLS 한 줄에 정렬
-2. 하단 HUD: 퀵슬롯 4 + 정수 + REST 노출
-3. ZoomControls(+/−): 화면 우측 중단
-4. MAP 버튼 → placeholder 팝업
-5. BAG 버튼 → 아이템 리스트, Use 시 HP 회복/로그, Drop 시 바닥 배치
-6. SKILLS 버튼 → 스킬 리스트 26개, X/바깥 탭으로 닫힘, ESC 닫힘
-7. 장거리 탭 → 경로 점 표시 + 스텝별 이동
-8. 주변(3칸) 몬스터 접근 시 자동이동 취소
-9. 몬스터 킬 시 XP 획득 → 스킬 Lv 상승 토스트
-10. 아이템 줍기 → 이동 시 자동 픽업, 픽업 로그 출력
-11. B1F 계단 하강 → B2F
-12. B2F 계단 상승 → **같은** B1F 맵, 원래 내려갔던 위치에 등장
-13. B2F에서 계단 하강 → 클리어 결과 화면 (MAX_DEPTH=2)
-14. 캐릭터 팔 / 몸 보임 확인 (barbarian)
-
----
-
-## ❌ 미구현 (M1 범위 외 또는 보류)
-
-- **몬스터/아이템 상태 persist**: 맵 지형만 유지, 몬스터·아이템은 재방문 시 재생성
-- FOV / 시야 제한 (fog of war)
-- 이동/공격 스프라이트 트윈 (현재 즉시 점프)
-- 레벨업 실제 발화 (플레이어 항상 Lv.1)
-- 인게임 Credits 화면
-- 휴식 버튼 자동 회복 로직
-- 원거리 공격 UI
-- 허기/식량
-- 실제 아이템 데이터베이스 (현재 5종 하드코딩 더미)
-
----
-
-## 🎯 다음 우선순위
-
-### 즉시
-0. 배포 완료 후 재플레이 → 🔧 → ✅ 전환
-
-### 단기
-1. 재검증 중 추가 버그 수정
-2. 몬스터/아이템 층 persist (현재 지형만 유지)
-3. FOV / 시야 제한
-4. 레벨업 실연동
-
-### 중기 (M2 진입)
-5. 정수 슬롯 3개 + 2계열 시너지 + 보관함 UI
-6. 메타 업그레이드 트리 UI
-7. 직업 해금 2종 (마법사/신관) + 주문
-8. 브랜치 2개 (숲/광산)
-9. 타일셋 실제 적용
-10. 이동/공격 애니메이션 트윈
+- FOV 원추형 / shadowcasting (현재 Bresenham 원형)
+- 원거리 공격 UI (조준선 표시 + 탭 확정)
+- 주문 시전 시스템 (MP 소모)
+- 메타 업그레이드 트리 UI
+- 정수 슬롯 3개 + 2계열 시너지
+- 브랜치 2개 (Forest/Mine)
+- 실제 타일셋 적용 (현재 단색 rect)
+- 세이브/로드 실장
+- MAX_DEPTH 2 → 15 복구
+- ULPC body 변형 에셋 (muscular/teen/child)
+- LPC def 9개 stub (club/katana/scimitar/boomerang 등)
+- rat 비휴머노이드 프리셋
 
 ---
 
 ## 알려진 기술 부채
 
-- LPC def 9개 stub (club/katana/scimitar/boomerang/legion_chest/body_skeleton/
-  body_zombie/horns_small/tail_snake/wings_dragon/beard_braided)
-- `greatsword.json` = longsword 복사본 (PROJ_B 기존)
-- rat 비휴머노이드 프리셋 없음
-- 플레이어 레벨 공식 없음 (항상 Lv.1)
-- ULPC 중첩 CanvasLayer + Control 앵커 조합이 부분적으로 깨지는 이슈
-  → 현재 문제 지점마다 explicit position/size로 우회 중. 리팩터 후보.
-- `MAX_DEPTH=2`는 테스트용 임시값 — M1 릴리즈 전 15로 복귀
+- 중첩 CanvasLayer anchor 워크어라운드 (Game.tscn의 UI 계층, Bottom/TopHUD explicit position 하드코딩)
+- `MAX_DEPTH = 2` 테스트용 임시값
+- `_XP_PER_LEVEL = 100` 레벨업 너무 빠름 (밸런스 튜닝 필요)
+- `barbarian.tres` legacy 파일 남아있음
+- LPC def 일부 stub
 
 ---
 
@@ -197,3 +137,17 @@
 - GitHub: https://github.com/jinha1226/PROJ_D
 - Pages: https://jinha1226.github.io/PROJ_D/
 - 빌드 시간: 5~10분
+
+---
+
+## 다른 Claude 세션 이어가는 법
+
+1. `git pull origin main` 후 최신 커밋 확인
+2. `docs/99_PROGRESS.md` 상단 "핸드오프 노트" 섹션 참고
+3. 사용자 요청에 따라 작업하되, 주요 루틴:
+   - **TopHUD/BottomHUD 수정**: 두 HUD 모두 `anchor` 대신 explicit `position`/`size` 씀 (중첩 CanvasLayer 이슈 회피). 수정 시 유지
+   - **아이템 추가**: WeaponRegistry / ArmorRegistry / ConsumableRegistry에 엔트리 추가 → Player가 자동 픽업/장착
+   - **종족 추가**: `resources/races/{id}.tres` + `RaceSelect.gd`의 `RACE_IDS`에 id 추가
+   - **트레잇 추가**: `racial_trait` 문자열 + GameBootstrap._apply_passive_racial_traits 또는 CombatSystem.melee_attack에 분기
+4. 커밋은 **실제 테스트 후에만** ✅로 문서 업데이트 (사용자 강조사항). 구현만 됐으면 🔧
+5. 푸시는 자동으로 — GitHub Actions가 빌드/배포 (5~10분)

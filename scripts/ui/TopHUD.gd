@@ -1,28 +1,25 @@
 extends Control
 class_name TopHUD
 
-@onready var hp_bar: ProgressBar = $Margin/VBox/HBox/HPBar
-@onready var mp_bar: ProgressBar = $Margin/VBox/HBox/MPBar
-@onready var depth_label: Label = $Margin/VBox/HBox/DepthLabel
-@onready var bag_button: Button = $Margin/VBox/HBox/BagButton
-@onready var minimap_button: Button = $Margin/VBox/HBox/MinimapButton
-@onready var skills_button: Button = $Margin/VBox/HBox/SkillsButton
-@onready var status_button: Button = $Margin/VBox/HBox/StatusButton
-@onready var weapon_skill_label: Label = $Margin/VBox/WeaponSkillLabel
+@onready var hp_bar: ProgressBar = $Margin/HBox/Bars/HPRow/HPBar
+@onready var hp_label: Label = $Margin/HBox/Bars/HPRow/HPLabel
+@onready var mp_bar: ProgressBar = $Margin/HBox/Bars/MPRow/MPBar
+@onready var mp_label: Label = $Margin/HBox/Bars/MPRow/MPLabel
+@onready var xp_bar: ProgressBar = $Margin/HBox/Bars/XPRow/XPBar
+@onready var xp_label: Label = $Margin/HBox/Bars/XPRow/XPLabel
+@onready var minimap_button: Button = $Margin/HBox/MinimapButton
 
-signal bag_pressed
 signal minimap_pressed
-signal skills_button_pressed
-signal status_pressed
 
 var _pulse_t: float = 0.0
 var _pulsing: bool = false
+var _depth: int = 1
+var _level: int = 1
+
 
 func _ready() -> void:
-	bag_button.pressed.connect(func(): bag_pressed.emit())
 	minimap_button.pressed.connect(func(): minimap_pressed.emit())
-	skills_button.pressed.connect(func(): skills_button_pressed.emit())
-	status_button.pressed.connect(func(): status_pressed.emit())
+
 
 func _process(delta: float) -> void:
 	if _pulsing:
@@ -32,28 +29,48 @@ func _process(delta: float) -> void:
 	else:
 		hp_bar.modulate = Color.WHITE
 
+
 func set_hp(cur: int, max_: int) -> void:
 	hp_bar.max_value = max(1, max_)
 	hp_bar.value = cur
+	if hp_label:
+		hp_label.text = "HP %d / %d" % [cur, max_]
 	var ratio: float = float(cur) / float(max(1, max_))
 	_pulsing = ratio < 0.3
+
 
 func set_mp(cur: int, max_: int) -> void:
 	mp_bar.max_value = max(1, max_)
 	mp_bar.value = cur
+	if mp_label:
+		mp_label.text = "MP %d / %d" % [cur, max_]
+
+
+func set_xp(cur: int, to_next: int, level: int) -> void:
+	_level = level
+	xp_bar.max_value = max(1, to_next)
+	xp_bar.value = cur
+	_update_xp_label()
+
 
 func set_depth(d: int) -> void:
-	depth_label.text = "B%dF" % d
+	_depth = d
+	_update_xp_label()
 
-func set_weapon_skill_info(skill_display_name: String, level: int, xp_cur: float, xp_max: float) -> void:
-	if weapon_skill_label == null:
-		return
-	if skill_display_name == "":
-		weapon_skill_label.text = "Equipped: Unarmed"
-		return
-	if level >= 27:
-		weapon_skill_label.text = "Equipped: %s (MASTER)" % skill_display_name
-	else:
-		weapon_skill_label.text = "Equipped: %s (Lv.%d, %d/%d XP)" % [
-			skill_display_name, level, int(xp_cur), int(xp_max),
-		]
+
+func _update_xp_label() -> void:
+	if xp_label:
+		xp_label.text = "Lv.%d   B%dF" % [_level, _depth]
+
+
+## GameBootstrap feeds the rebuilt minimap ImageTexture in here whenever
+## the player moves or reveals new tiles.
+func set_minimap_texture(tex: Texture2D) -> void:
+	if minimap_button:
+		minimap_button.icon = tex
+
+
+# Compatibility stub — WeaponSkillLabel used to live here; the Status
+# popup owns that info now. Left so existing GameBootstrap callers don't crash.
+func set_weapon_skill_info(_skill_display_name: String, _level: int, _xp_cur: float, _xp_max: float) -> void:
+	pass

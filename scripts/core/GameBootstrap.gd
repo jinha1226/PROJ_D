@@ -72,6 +72,7 @@ func _ready() -> void:
 	var dmap: DungeonMap = dungeon_layer.get_node("DungeonMap")
 	dmap.render(generator)
 	dmap.update_fov(generator.spawn_pos)
+	# Initial minimap preview feed — set_xp below also triggers a label refresh.
 
 	var cam: Camera2D = $Camera2D
 	cam.position = Vector2(generator.spawn_pos.x * TILE_SIZE + TILE_SIZE / 2.0, generator.spawn_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
@@ -123,18 +124,26 @@ func _ready() -> void:
 			top_hud.set_hp(player.stats.HP, player.stats.hp_max)
 			top_hud.set_mp(player.stats.MP, player.stats.mp_max)
 
-	# [skill-ui-agent] TopHUD skills-button → spawn SkillsScreen.
+	# TopHUD keeps HP/MP/XP bars + minimap preview; all other buttons moved
+	# to BottomHUD. Wire depth, XP updates, minimap preview + click.
 	_top_hud_ref = top_hud
 	if top_hud != null and top_hud.has_method("set_depth"):
 		top_hud.set_depth(GameManager.current_depth)
-	if top_hud != null and top_hud.has_signal("skills_button_pressed"):
-		top_hud.skills_button_pressed.connect(_on_skills_button_pressed)
-	if top_hud != null and top_hud.has_signal("bag_pressed"):
-		top_hud.bag_pressed.connect(_on_bag_pressed)
+	if top_hud != null and top_hud.has_method("set_xp"):
+		top_hud.set_xp(player.xp, player.xp_for_next_level(), player.level)
 	if top_hud != null and top_hud.has_signal("minimap_pressed"):
 		top_hud.minimap_pressed.connect(_on_minimap_pressed)
-	if top_hud != null and top_hud.has_signal("status_pressed"):
-		top_hud.status_pressed.connect(_on_status_pressed)
+	if player.has_signal("xp_changed"):
+		player.xp_changed.connect(_on_player_xp_changed.bind(top_hud))
+	_refresh_minimap_preview(dmap, generator.spawn_pos)
+
+	# BottomHUD is where the action buttons live now.
+	if bottom_hud != null and bottom_hud.has_signal("bag_pressed"):
+		bottom_hud.bag_pressed.connect(_on_bag_pressed)
+	if bottom_hud != null and bottom_hud.has_signal("skills_pressed"):
+		bottom_hud.skills_pressed.connect(_on_skills_button_pressed)
+	if bottom_hud != null and bottom_hud.has_signal("status_pressed"):
+		bottom_hud.status_pressed.connect(_on_status_pressed)
 
 	# [skill-ui-agent] persistent level-up toast layer.
 	skill_toast = SKILL_TOAST_SCENE.instantiate()
@@ -178,22 +187,9 @@ func _ready() -> void:
 		player.inventory_changed.connect(_refresh_quickslots.bind(bottom_hud))
 	_refresh_quickslots(bottom_hud)
 
-	# BottomHUD essence slot tap → swap popup.
-	if bottom_hud != null and popup_mgr != null:
-		bottom_hud.essence_slot_tapped.connect(func():
-			var current: EssenceData = essence_system.slots[0]
-			var current_id: String = current.id if current != null else ""
-			var inv_ids: Array = []
-			for e in essence_system.inventory:
-				if e != null:
-					inv_ids.append(e.id)
-			popup_mgr.show_essence_swap_popup(0, current_id, inv_ids, func(selected_id):
-				if selected_id == "":
-					essence_system.unequip(0)
-				else:
-					var target: EssenceData = essence_system.find_essence_by_id(selected_id)
-					if target != null:
-						essence_system.equip(0, target)))
+	# Essence management moved into the Status popup; BottomHUD no longer
+	# hosts an essence slot. The swap UI is still available via the button
+	# inside Status → _show_essence_swap().
 
 	# Touch input.
 	touch_input = Node.new()
@@ -444,6 +440,19 @@ func _on_player_moved(new_pos: Vector2i) -> void:
 	if dmap != null:
 		dmap.update_fov(new_pos)
 		_refresh_actor_visibility(dmap)
+		_refresh_minimap_preview(dmap, new_pos)
+
+
+func _refresh_minimap_preview(dmap: DungeonMap, player_pos: Vector2i) -> void:
+	if _top_hud_ref == null or not _top_hud_ref.has_method("set_minimap_texture"):
+		return
+	var tex: ImageTexture = _build_minimap_texture(dmap, player_pos)
+	_top_hud_ref.set_minimap_texture(tex)
+
+
+func _on_player_xp_changed(cur: int, to_next: int, lv: int, top_hud: Node) -> void:
+	if top_hud != null and top_hud.has_method("set_xp"):
+		top_hud.set_xp(cur, to_next, lv)
 
 
 func _refresh_actor_visibility(dmap: DungeonMap) -> void:
@@ -509,6 +518,7 @@ func _regenerate_dungeon(going_up: bool) -> void:
 		touch_input.generator = generator
 	if _top_hud_ref != null and _top_hud_ref.has_method("set_depth"):
 		_top_hud_ref.set_depth(GameManager.current_depth)
+	_refresh_minimap_preview(dmap, entry_pos)
 	await get_tree().process_frame
 	if _floor_state.has(GameManager.current_depth):
 		_restore_floor(GameManager.current_depth)
@@ -986,17 +996,85 @@ func _on_status_pressed() -> void:
 	var dlg := AcceptDialog.new()
 	dlg.title = "Status"
 	dlg.ok_button_text = "Close"
+
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.custom_minimum_size = Vector2(800, 1200)
+	dlg.add_child(scroll)
+
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 12)
+	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(vb)
+
 	var lab := Label.new()
 	lab.text = _build_status_text()
 	lab.add_theme_font_size_override("font_size", 30)
 	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	lab.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	dlg.add_child(lab)
+	vb.add_child(lab)
+
+	# Essence row + swap button (moved here from BottomHUD).
+	if essence_system != null:
+		var ess_lab := Label.new()
+		ess_lab.text = _build_essence_text()
+		ess_lab.add_theme_font_size_override("font_size", 28)
+		vb.add_child(ess_lab)
+		var swap_btn := Button.new()
+		swap_btn.text = "Swap Essence"
+		swap_btn.add_theme_font_size_override("font_size", 28)
+		swap_btn.custom_minimum_size = Vector2(0, 88)
+		swap_btn.pressed.connect(_on_swap_essence.bind(dlg))
+		vb.add_child(swap_btn)
+
+	# Explicit Close at the bottom in case the OK footer is hard to reach.
+	var close_btn := Button.new()
+	close_btn.text = "Close"
+	close_btn.add_theme_font_size_override("font_size", 32)
+	close_btn.custom_minimum_size = Vector2(0, 96)
+	close_btn.pressed.connect(dlg.queue_free)
+	vb.add_child(close_btn)
+
 	popup_mgr.add_child(dlg)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(800, 1500))
+	dlg.popup_centered(Vector2i(880, 1600))
+
+
+func _build_essence_text() -> String:
+	if essence_system == null:
+		return ""
+	var current: EssenceData = essence_system.slots[0] if essence_system.slots.size() > 0 else null
+	var inv_names: Array = []
+	for e in essence_system.inventory:
+		if e != null:
+			inv_names.append(e.display_name if "display_name" in e else e.id)
+	var lines: Array = ["", "--- Essence ---"]
+	lines.append("Slot 1: %s" % (current.display_name if current != null and "display_name" in current else "(empty)"))
+	if inv_names.size() > 0:
+		lines.append("In bag: %s" % ", ".join(PackedStringArray(inv_names)))
+	return "\n".join(PackedStringArray(lines))
+
+
+func _on_swap_essence(status_dlg: AcceptDialog) -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null or essence_system == null:
+		return
+	status_dlg.queue_free()
+	var current: EssenceData = essence_system.slots[0] if essence_system.slots.size() > 0 else null
+	var current_id: String = current.id if current != null else ""
+	var inv_ids: Array = []
+	for e in essence_system.inventory:
+		if e != null:
+			inv_ids.append(e.id)
+	popup_mgr.show_essence_swap_popup(0, current_id, inv_ids, func(selected_id):
+		if selected_id == "":
+			essence_system.unequip(0)
+		else:
+			var target: EssenceData = essence_system.find_essence_by_id(selected_id)
+			if target != null:
+				essence_system.equip(0, target))
 
 
 func _build_status_text() -> String:

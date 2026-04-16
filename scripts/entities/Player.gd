@@ -7,6 +7,7 @@ signal died
 signal attacked(target)
 signal stats_changed
 signal leveled_up(new_level: int)
+signal xp_changed(cur: int, to_next: int, level: int)
 ## Emitted when Scroll of Identification is used. GameBootstrap shows a
 ## picker popup that lets the player choose which inventory item to reveal.
 signal identify_one_requested
@@ -543,6 +544,7 @@ func grant_xp(amount: int) -> void:
 		level += 1
 		_apply_level_up_growth()
 		leveled_up.emit(level)
+	xp_changed.emit(xp, xp_for_next_level(), level)
 
 
 func xp_for_next_level() -> int:
