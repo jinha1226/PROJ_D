@@ -52,6 +52,7 @@ func _ready() -> void:
 	var dungeon_layer: Node2D = $DungeonLayer
 	var dmap: DungeonMap = dungeon_layer.get_node("DungeonMap")
 	dmap.render(generator)
+	dmap.mark_explored(generator.spawn_pos)
 
 	var cam: Camera2D = $Camera2D
 	cam.position = Vector2(generator.spawn_pos.x * TILE_SIZE + TILE_SIZE / 2.0, generator.spawn_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
@@ -246,6 +247,9 @@ func _on_monster_died(monster: Monster) -> void:
 func _on_player_moved(new_pos: Vector2i) -> void:
 	var cam: Camera2D = $Camera2D
 	cam.position = Vector2(new_pos.x * TILE_SIZE + TILE_SIZE / 2.0, new_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	if dmap != null:
+		dmap.mark_explored(new_pos)
 
 
 func _on_stairs_tapped(_pos: Vector2i) -> void:
@@ -291,6 +295,7 @@ func _regenerate_dungeon(going_up: bool) -> void:
 	var entry_pos: Vector2i = generator.stairs_down_pos if going_up else generator.spawn_pos
 	player.grid_pos = entry_pos
 	player.position = Vector2(entry_pos.x * TILE_SIZE + TILE_SIZE / 2.0, entry_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
+	dmap.mark_explored(entry_pos)
 	var cam: Camera2D = $Camera2D
 	cam.position = player.position
 	if touch_input:
@@ -348,17 +353,121 @@ func _end_run(victory: bool, killer: String) -> void:
 # [skill-ui-agent] ---- skill UI wiring ------------------------------------
 
 func _on_skills_button_pressed() -> void:
-	var ui_layer: Node = get_node_or_null("UILayer")
-	if ui_layer == null or player == null:
+	# Built on AcceptDialog so close/ESC/click-outside all work natively —
+	# same pattern as Bag/Map. Avoids the nested-CanvasLayer anchor issues
+	# that plagued the old custom SkillsScreen.tscn.
+	_open_skills_dialog("all")
+
+
+var _current_skills_cat: String = "all"
+const _SKILL_CATEGORIES: Array = ["all", "weapon", "defense", "magic", "misc"]
+const _SKILL_CATEGORY_LABELS: Dictionary = {
+	"all": "ALL", "weapon": "WEAPON", "defense": "DEFENSE",
+	"magic": "MAGIC", "misc": "MISC",
+}
+
+
+func _open_skills_dialog(category: String) -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null or player == null:
 		return
-	# Avoid duplicates.
-	var existing: Node = ui_layer.get_node_or_null("SkillsScreen")
-	if existing != null:
-		return
-	var screen: CanvasLayer = SKILLS_SCREEN_SCENE.instantiate()
-	screen.name = "SkillsScreen"
-	ui_layer.add_child(screen)
-	screen.show_for_player(player)
+	_current_skills_cat = category
+	var dlg := AcceptDialog.new()
+	dlg.title = "Skills"
+	dlg.ok_button_text = "Close"
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 8)
+	dlg.add_child(vb)
+
+	var tabs_hbox := HBoxContainer.new()
+	tabs_hbox.add_theme_constant_override("separation", 4)
+	for cat in _SKILL_CATEGORIES:
+		var tb := Button.new()
+		tb.text = _SKILL_CATEGORY_LABELS.get(cat, cat)
+		tb.custom_minimum_size = Vector2(0, 48)
+		tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tb.toggle_mode = true
+		tb.button_pressed = (cat == category)
+		var cat_cap := cat
+		tb.pressed.connect(func():
+			dlg.queue_free()
+			_open_skills_dialog(cat_cap))
+		tabs_hbox.add_child(tb)
+	vb.add_child(tabs_hbox)
+
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0, 1500)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	vb.add_child(scroll)
+
+	var rows := VBoxContainer.new()
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rows.add_theme_constant_override("separation", 6)
+	scroll.add_child(rows)
+
+	var state: Dictionary = {}
+	if "skill_state" in player and player.skill_state is Dictionary:
+		state = player.skill_state
+	for skill_id in SkillSystem.SKILL_IDS:
+		var cat: String = String(SkillSystem.SKILL_CATEGORY.get(skill_id, ""))
+		if category != "all" and cat != category:
+			continue
+		rows.add_child(_build_skill_row(skill_id, cat, state.get(skill_id, {})))
+
+	var footer := Label.new()
+	footer.text = "Uncheck to stop training. Defeat enemies to gain XP."
+	footer.add_theme_font_size_override("font_size", 18)
+	footer.modulate = Color(0.7, 0.7, 0.8, 1)
+	vb.add_child(footer)
+
+	popup_mgr.add_child(dlg)
+	dlg.confirmed.connect(func(): dlg.queue_free())
+	dlg.canceled.connect(func(): dlg.queue_free())
+	dlg.popup_centered(Vector2i(900, 1800))
+
+
+func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> Control:
+	var row := HBoxContainer.new()
+	row.custom_minimum_size = Vector2(0, 64)
+	row.add_theme_constant_override("separation", 10)
+
+	var chk := CheckBox.new()
+	chk.button_pressed = bool(entry.get("training", false))
+	chk.custom_minimum_size = Vector2(48, 48)
+	chk.toggled.connect(func(pressed: bool):
+		if skill_system != null:
+			skill_system.set_training(player, skill_id, pressed))
+	row.add_child(chk)
+
+	var name_lab := Label.new()
+	name_lab.text = String(SkillRow.SKILL_NAMES.get(skill_id, skill_id))
+	if category == "magic":
+		name_lab.text += "  (M2)"
+	name_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_lab.add_theme_font_size_override("font_size", 22)
+	row.add_child(name_lab)
+
+	var level: int = int(entry.get("level", 0))
+	var xp: float = float(entry.get("xp", 0.0))
+	var need: float = SkillSystem.xp_for_level(level + 1)
+	var lv_lab := Label.new()
+	if level >= SkillSystem.MAX_LEVEL:
+		lv_lab.text = "MASTER"
+	else:
+		lv_lab.text = "Lv.%d  (%d/%d)" % [level, int(xp), int(need)]
+	lv_lab.add_theme_font_size_override("font_size", 22)
+	lv_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	row.add_child(lv_lab)
+
+	var cat_lab := Label.new()
+	cat_lab.text = category.to_upper()
+	cat_lab.custom_minimum_size = Vector2(100, 0)
+	cat_lab.add_theme_font_size_override("font_size", 18)
+	cat_lab.modulate = Color(0.6, 0.65, 0.75, 1)
+	cat_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	row.add_child(cat_lab)
+	return row
 
 
 func _on_bag_pressed() -> void:
@@ -412,14 +521,54 @@ func _on_minimap_pressed() -> void:
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null:
 		return
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	if dmap == null or generator == null:
+		return
 	var dlg := AcceptDialog.new()
-	dlg.title = "Map"
 	var depth: int = GameManager.current_depth if GameManager != null else 1
-	dlg.dialog_text = "Floor B%dF\nExplore to reveal the map." % depth
+	dlg.title = "Map — B%dF" % depth
+	dlg.ok_button_text = "Close"
+
+	var vb := VBoxContainer.new()
+	dlg.add_child(vb)
+	var tex_rect := TextureRect.new()
+	tex_rect.texture = _build_minimap_texture(dmap, player.grid_pos if player else Vector2i.ZERO)
+	tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	tex_rect.custom_minimum_size = Vector2(600, 960)
+	vb.add_child(tex_rect)
+
 	popup_mgr.add_child(dlg)
 	dlg.confirmed.connect(func(): dlg.queue_free())
 	dlg.canceled.connect(func(): dlg.queue_free())
-	dlg.popup_centered(Vector2i(640, 400))
+	dlg.popup_centered(Vector2i(700, 1200))
+
+
+func _build_minimap_texture(dmap: DungeonMap, player_pos: Vector2i) -> ImageTexture:
+	const MM_SCALE: int = 8
+	var mw: int = DungeonGenerator.MAP_WIDTH
+	var mh: int = DungeonGenerator.MAP_HEIGHT
+	var img: Image = Image.create(mw * MM_SCALE, mh * MM_SCALE, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0.02, 0.02, 0.04, 1))  # unseen = near-black
+	var wall_col := Color(0.25, 0.25, 0.3)
+	var floor_col := Color(0.55, 0.55, 0.6)
+	var down_col := Color(0.95, 0.82, 0.15)
+	var up_col := Color(0.55, 0.78, 0.95)
+	for x in mw:
+		for y in mh:
+			if not dmap.is_explored(Vector2i(x, y)):
+				continue
+			var t: int = generator.map[x][y]
+			var c: Color = floor_col
+			match t:
+				DungeonGenerator.TileType.WALL: c = wall_col
+				DungeonGenerator.TileType.STAIRS_DOWN: c = down_col
+				DungeonGenerator.TileType.STAIRS_UP: c = up_col
+			img.fill_rect(Rect2i(x * MM_SCALE, y * MM_SCALE, MM_SCALE, MM_SCALE), c)
+	# Player marker (bright red, 2× tile).
+	var px: int = player_pos.x * MM_SCALE
+	var py: int = player_pos.y * MM_SCALE
+	img.fill_rect(Rect2i(px - MM_SCALE / 2, py - MM_SCALE / 2, MM_SCALE * 2, MM_SCALE * 2), Color(1, 0.2, 0.2))
+	return ImageTexture.create_from_image(img)
 
 
 func _on_skill_leveled_up_toast(p: Node, skill_id: String, new_level: int) -> void:

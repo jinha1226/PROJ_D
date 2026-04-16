@@ -1,14 +1,43 @@
 class_name DungeonMap extends Node2D
 
 const TILE_SIZE: int = 32
+const EXPLORE_RADIUS: int = 6
 
 var generator: DungeonGenerator = null
 var _path_tiles: Array[Vector2i] = []
+# Flat-indexed byte array: 1 = explored, 0 = unseen. Resized on render().
+var explored: PackedByteArray = PackedByteArray()
+
 
 func render(gen: DungeonGenerator) -> void:
 	generator = gen
 	_path_tiles.clear()
+	explored.resize(DungeonGenerator.MAP_WIDTH * DungeonGenerator.MAP_HEIGHT)
+	explored.fill(0)
 	queue_redraw()
+
+
+func mark_explored(center: Vector2i, radius: int = EXPLORE_RADIUS) -> void:
+	if generator == null:
+		return
+	var mw: int = DungeonGenerator.MAP_WIDTH
+	var mh: int = DungeonGenerator.MAP_HEIGHT
+	for dy in range(-radius, radius + 1):
+		for dx in range(-radius, radius + 1):
+			if max(abs(dx), abs(dy)) > radius:
+				continue
+			var x: int = center.x + dx
+			var y: int = center.y + dy
+			if x < 0 or x >= mw or y < 0 or y >= mh:
+				continue
+			explored[y * mw + x] = 1
+
+
+func is_explored(tile: Vector2i) -> bool:
+	var mw: int = DungeonGenerator.MAP_WIDTH
+	if tile.x < 0 or tile.x >= mw or tile.y < 0 or tile.y >= DungeonGenerator.MAP_HEIGHT:
+		return false
+	return explored[tile.y * mw + tile.x] == 1
 
 ## Show the planned auto-move path as blue-green dots.
 func show_path(path: Array[Vector2i]) -> void:
