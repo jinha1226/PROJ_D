@@ -214,8 +214,21 @@ func _on_turn_refresh_visibility() -> void:
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	if dmap != null:
 		_refresh_actor_visibility(dmap)
+	_apply_passive_racial_traits()
 	if _resting:
 		_rest_tick()
+
+
+## Per-turn racial passives (Troll regen for now; extend with new traits).
+func _apply_passive_racial_traits() -> void:
+	if player == null or player.race_res == null or player.stats == null:
+		return
+	if not player.is_alive:
+		return
+	if player.race_res.racial_trait == "trollregen":
+		if player.stats.HP < player.stats.hp_max:
+			player.stats.HP = min(player.stats.hp_max, player.stats.HP + 1)
+			player.stats_changed.emit()
 
 
 ## Every frame make sure monsters/items don't leak into unexplored tiles.
@@ -522,6 +535,16 @@ func _restore_floor(depth: int) -> void:
 
 
 func _on_player_leveled_up(new_level: int) -> void:
+	# Demonspawn skips the popup — every level-up auto-rolls 2 random
+	# distinct stats (the species's mutation flavour).
+	if player != null and player.race_res != null \
+			and player.race_res.racial_trait == "demonspawn_mutations":
+		var pool: Array[String] = ["STR", "DEX", "INT"]
+		pool.shuffle()
+		player.apply_level_up_stat(pool[0])
+		player.apply_level_up_stat(pool[1])
+		print("Demonspawn mutation Lv.%d: %s + %s" % [new_level, pool[0], pool[1]])
+		return
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null or not popup_mgr.has_method("show_levelup_popup"):
 		return

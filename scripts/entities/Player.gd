@@ -41,6 +41,10 @@ const _ATTACK_LUNGE_DUR: float = 0.08
 var _sprite: CharacterSprite = null
 var _walk_idle_timer: SceneTreeTimer = null
 var _move_tween: Tween = null
+# Spriggan-style free-move counter: increments on each move, resets when
+# the turn actually ends. With race.move_speed_mod=1, every other move
+# is "free" (doesn't end the turn) — effectively double speed.
+var _free_move_counter: int = 0
 
 
 func _ready() -> void:
@@ -172,12 +176,17 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 
 	# [skill-agent] pick first weapon from starting_equipment.
 	equipped_weapon_id = ""
+	equipped_armor = {}
 	if job != null:
 		for eq_id in job.starting_equipment:
 			var sid: String = String(eq_id)
-			if WeaponRegistry.is_weapon(sid):
+			if WeaponRegistry.is_weapon(sid) and equipped_weapon_id == "":
 				equipped_weapon_id = sid
-				break
+			elif ArmorRegistry.is_armor(sid) and equipped_armor.is_empty():
+				equipped_armor = ArmorRegistry.get_info(sid)
+	# Now that armor (if any) is set, recompute AC. _recompute_defense reads
+	# race_res.base_ac so Draconian's intrinsic +2 stacks here.
+	_recompute_defense()
 
 	stats_changed.emit()
 	queue_redraw()
@@ -206,7 +215,10 @@ func equip_armor(armor: Dictionary) -> Dictionary:
 func _recompute_defense() -> void:
 	if stats == null:
 		return
-	stats.AC = int(equipped_armor.get("ac", 0))
+	var ac: int = int(equipped_armor.get("ac", 0))
+	if race_res != null:
+		ac += race_res.base_ac
+	stats.AC = ac
 	stats_changed.emit()
 
 
@@ -268,7 +280,17 @@ func try_move(delta: Vector2i) -> bool:
 		_walk_idle_timer = get_tree().create_timer(0.2)
 		_walk_idle_timer.timeout.connect(_return_to_idle)
 	moved.emit(grid_pos)
-	TurnManager.end_player_turn()
+	# Spriggan / fast races: every move_speed_mod-th step is "free" — does
+	# not end the player turn, so monsters don't get to act yet.
+	var should_end_turn: bool = true
+	if race_res != null and race_res.move_speed_mod > 0:
+		_free_move_counter += 1
+		if _free_move_counter <= race_res.move_speed_mod:
+			should_end_turn = false
+		else:
+			_free_move_counter = 0
+	if should_end_turn:
+		TurnManager.end_player_turn()
 	return true
 
 

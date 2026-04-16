@@ -52,6 +52,11 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	var effective_ac: int = def_ac + armour_skill_level / 4
 
 	var dmg: int = roll_damage(atk, effective_ac)
+	# Minotaur racial: 25% chance of a headbutt for +2..5 bonus damage.
+	if "race_res" in attacker and attacker.race_res != null \
+			and attacker.race_res.racial_trait == "minotaur_headbutt":
+		if randf() < 0.25:
+			dmg += randi_range(2, 5)
 	if defender.has_method("take_damage"):
 		defender.take_damage(dmg)
 	return dmg
