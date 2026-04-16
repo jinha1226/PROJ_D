@@ -19,7 +19,6 @@ const _SKILL_CATEGORY_LABELS: Dictionary = {
 }
 # [zoom-agent] pinch gesture + UI zoom buttons.
 const ZOOM_CONTROLLER_SCRIPT: Script = preload("res://scripts/ui/ZoomController.gd")
-const ZOOM_CONTROLS_SCRIPT: Script = preload("res://scripts/ui/ZoomControls.gd")
 const MAX_DEPTH: int = 2  # M1 testing: 2 floors only for stair-flow validation.
 
 var generator: DungeonGenerator
@@ -191,18 +190,11 @@ func _ready() -> void:
 	touch_input.stairs_tapped.connect(_on_stairs_tapped)
 	touch_input.stairs_up_tapped.connect(_on_stairs_up_tapped)
 
-	# [zoom-agent] ZoomController attached under Game so it sees unhandled input,
-	# and ZoomControls added to UI layer on the right edge above BottomHUD.
+	# Pinch-zoom (mobile) / wheel (desktop). No on-screen +/- buttons.
 	var zoom_ctrl: Node = ZOOM_CONTROLLER_SCRIPT.new()
 	zoom_ctrl.name = "ZoomController"
 	zoom_ctrl.camera = cam
 	add_child(zoom_ctrl)
-	if ui != null:
-		var zoom_ui: Control = ZOOM_CONTROLS_SCRIPT.new()
-		zoom_ui.name = "ZoomControls"
-		ui.add_child(zoom_ui)
-		zoom_ui.zoom_in_pressed.connect(func(): zoom_ctrl.zoom_in())
-		zoom_ui.zoom_out_pressed.connect(func(): zoom_ctrl.zoom_out())
 
 	await get_tree().process_frame
 	_spawn_monsters_for_current_depth()

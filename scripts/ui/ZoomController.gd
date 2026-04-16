@@ -1,20 +1,24 @@
 extends Node
 class_name ZoomController
-## Handles pinch/magnify gestures and exposes step-zoom for UI buttons.
-## Modifies a target Camera2D's zoom uniformly. Persists to user://settings.json
-## via SaveManager autoload.
+## Pinch-zoom + mouse-wheel camera zoom for the dungeon view.
+## Mobile: two-finger pinch (with ScreenDrag fallback since browsers
+## don't always deliver InputEventMagnifyGesture). While 2+ fingers are
+## down we mark ALL touch input as handled so TouchInput doesn't get
+## confused and fire taps/auto-move mid-pinch.
+## Desktop: mouse wheel or trackpad magnify gesture.
+## Persists to user://settings.json via SaveManager autoload.
 
 const MIN_ZOOM: float = 0.5
 const MAX_ZOOM: float = 4.0
-const STEP_IN: float = 1.25
-const STEP_OUT: float = 0.8
+const WHEEL_STEP_IN: float = 1.15
+const WHEEL_STEP_OUT: float = 0.87
 const DEFAULT_ZOOM: float = 2.0
 
 @export var camera: Camera2D
 
 var _current_zoom: float = DEFAULT_ZOOM
-# Two-finger drag fallback state (if the platform doesn't deliver magnify events).
-var _active_touches: Dictionary = {} # index -> Vector2 position
+# Two-finger drag fallback state.
+var _active_touches: Dictionary = {}  # index -> Vector2 position
 var _last_pinch_dist: float = -1.0
 
 
@@ -52,29 +56,35 @@ func _apply_zoom() -> void:
 	camera.zoom = Vector2(_current_zoom, _current_zoom)
 
 
-func zoom_in() -> void:
-	_set_zoom(_current_zoom * STEP_IN)
-
-
-func zoom_out() -> void:
-	_set_zoom(_current_zoom * STEP_OUT)
-
-
 func _set_zoom(z: float) -> void:
-	_current_zoom = clamp(z, MIN_ZOOM, MAX_ZOOM)
+	var clamped: float = clamp(z, MIN_ZOOM, MAX_ZOOM)
+	if abs(clamped - _current_zoom) < 0.001:
+		return
+	_current_zoom = clamped
 	_apply_zoom()
 	_persist_zoom()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	# Native pinch/magnify (desktop trackpads / some mobile setups).
+	# Desktop trackpad magnify gesture.
 	if event is InputEventMagnifyGesture:
-		var mg: InputEventMagnifyGesture = event
-		_set_zoom(_current_zoom * mg.factor)
+		_set_zoom(_current_zoom * event.factor)
 		get_viewport().set_input_as_handled()
 		return
 
-	# Two-finger drag fallback using ScreenTouch + ScreenDrag.
+	# Desktop mouse wheel.
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_set_zoom(_current_zoom * WHEEL_STEP_IN)
+			get_viewport().set_input_as_handled()
+			return
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_set_zoom(_current_zoom * WHEEL_STEP_OUT)
+			get_viewport().set_input_as_handled()
+			return
+
+	# Mobile: track touches; when 2+ fingers are down, consume events so
+	# the tap/auto-move handler stays out of the way.
 	if event is InputEventScreenTouch:
 		var st: InputEventScreenTouch = event
 		if st.pressed:
@@ -83,6 +93,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			_active_touches.erase(st.index)
 			if _active_touches.size() < 2:
 				_last_pinch_dist = -1.0
+		if _active_touches.size() >= 2:
+			get_viewport().set_input_as_handled()
 		return
 
 	if event is InputEventScreenDrag:
@@ -95,6 +107,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			var dist: float = a.distance_to(b)
 			if _last_pinch_dist > 0.0 and dist > 0.0:
 				var factor: float = dist / _last_pinch_dist
+				# Damp slightly so a quick spread doesn't blow past MAX_ZOOM.
+				factor = lerp(1.0, factor, 0.85)
 				_set_zoom(_current_zoom * factor)
-				get_viewport().set_input_as_handled()
 			_last_pinch_dist = dist
+			get_viewport().set_input_as_handled()
