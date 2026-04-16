@@ -15,7 +15,7 @@ const SKILL_TOAST_SCENE: PackedScene = preload("res://scenes/ui/SkillLevelUpToas
 # [zoom-agent] pinch gesture + UI zoom buttons.
 const ZOOM_CONTROLLER_SCRIPT: Script = preload("res://scripts/ui/ZoomController.gd")
 const ZOOM_CONTROLS_SCRIPT: Script = preload("res://scripts/ui/ZoomControls.gd")
-const MAX_DEPTH: int = 15
+const MAX_DEPTH: int = 2  # M1 testing: 2 floors only for stair-flow validation.
 
 var generator: DungeonGenerator
 var player: Player
@@ -154,6 +154,7 @@ func _ready() -> void:
 	touch_input.generator = generator
 	touch_input.player = player
 	touch_input.camera = cam
+	touch_input.dmap = dmap
 	add_child(touch_input)
 	touch_input.stairs_tapped.connect(_on_stairs_tapped)
 	touch_input.stairs_up_tapped.connect(_on_stairs_up_tapped)
@@ -173,6 +174,7 @@ func _ready() -> void:
 
 	await get_tree().process_frame
 	_spawn_monsters_for_current_depth()
+	_spawn_dummy_items(5)
 
 	TurnManager.start_player_turn()
 
@@ -185,6 +187,34 @@ func _spawn_monsters_for_current_depth() -> void:
 			m.died.connect(_on_monster_died)
 
 
+func _spawn_dummy_items(count: int) -> void:
+	# M1 dummy item spawn: scatter a few potions/scrolls on walkable tiles.
+	const DUMMY_ITEMS: Array = [
+		{"id": "minor_potion",  "name": "Minor Healing Potion", "kind": "potion", "color": Color(0.9, 0.3, 0.3)},
+		{"id": "scroll_mag",    "name": "Scroll of Magic",      "kind": "scroll", "color": Color(0.8, 0.7, 0.4)},
+		{"id": "gold_coin",     "name": "Gold Coin",            "kind": "junk",   "color": Color(1.0, 0.85, 0.2)},
+		{"id": "mystery_herb",  "name": "Mystery Herb",         "kind": "potion", "color": Color(0.3, 0.8, 0.4)},
+		{"id": "rusty_key",     "name": "Rusty Key",            "kind": "junk",   "color": Color(0.6, 0.5, 0.3)},
+	]
+	var entity_layer: Node = $EntityLayer
+	var placed: int = 0
+	var attempts: int = 0
+	while placed < count and attempts < 200:
+		attempts += 1
+		var x: int = randi() % DungeonGenerator.MAP_WIDTH
+		var y: int = randi() % DungeonGenerator.MAP_HEIGHT
+		var gp: Vector2i = Vector2i(x, y)
+		if not generator.is_walkable(gp):
+			continue
+		if gp == player.grid_pos:
+			continue
+		var template: Dictionary = DUMMY_ITEMS[placed % DUMMY_ITEMS.size()]
+		var fi: FloorItem = FloorItem.new()
+		entity_layer.add_child(fi)
+		fi.setup(gp, template.id, template.name, template.kind, template.color)
+		placed += 1
+
+
 func _on_monster_died(monster: Monster) -> void:
 	# [meta-agent] track kills for result screen.
 	kill_count += 1
@@ -194,7 +224,7 @@ func _on_monster_died(monster: Monster) -> void:
 	if skill_system != null and player != null and monster != null and monster.data != null:
 		var xp_gain: int = int(monster.data.xp_value)
 		if xp_gain <= 0:
-			xp_gain = max(1, int(monster.data.tier) * 3)
+			xp_gain = max(1, int(monster.data.tier) * 30)
 		var tags: Array = []
 		var wskill: String = player.get_current_weapon_skill()
 		if wskill != "":
@@ -238,6 +268,9 @@ func _regenerate_dungeon() -> void:
 		if is_instance_valid(m):
 			TurnManager.unregister_actor(m)
 			m.queue_free()
+	for it in get_tree().get_nodes_in_group("floor_items"):
+		if is_instance_valid(it):
+			it.queue_free()
 	if is_instance_valid(generator):
 		generator.queue_free()
 	generator = DungeonGenerator.new()
@@ -254,6 +287,7 @@ func _regenerate_dungeon() -> void:
 		touch_input.generator = generator
 	await get_tree().process_frame
 	_spawn_monsters_for_current_depth()
+	_spawn_dummy_items(5)
 
 
 func _on_player_died() -> void:
@@ -321,18 +355,45 @@ func _on_bag_pressed() -> void:
 		return
 	var dlg := AcceptDialog.new()
 	dlg.title = "Bag"
-	dlg.dialog_text = "Inventory is empty."
-	if player != null and player.has_method("get_items"):
-		var items: Array = player.get_items()
-		if items.size() > 0:
-			var lines: Array = []
-			for item in items:
-				lines.append(str(item))
-			dlg.dialog_text = "\n".join(lines)
+	dlg.ok_button_text = "Close"
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 8)
+	dlg.add_child(vb)
+	var items: Array = player.get_items() if player != null else []
+	if items.is_empty():
+		var empty := Label.new()
+		empty.text = "Inventory is empty. Walk over items to pick them up."
+		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		vb.add_child(empty)
+	else:
+		for i in range(items.size()):
+			var it: Dictionary = items[i]
+			var row := HBoxContainer.new()
+			row.add_theme_constant_override("separation", 8)
+			var lab := Label.new()
+			lab.text = "%s [%s]" % [it.get("name", "?"), it.get("kind", "?")]
+			lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			row.add_child(lab)
+			var use_btn := Button.new()
+			use_btn.text = "Use"
+			var idx := i
+			use_btn.pressed.connect(func():
+				player.use_item(idx)
+				dlg.queue_free()
+				_on_bag_pressed())
+			row.add_child(use_btn)
+			var drop_btn := Button.new()
+			drop_btn.text = "Drop"
+			drop_btn.pressed.connect(func():
+				player.drop_item(idx)
+				dlg.queue_free()
+				_on_bag_pressed())
+			row.add_child(drop_btn)
+			vb.add_child(row)
 	popup_mgr.add_child(dlg)
 	dlg.confirmed.connect(func(): dlg.queue_free())
 	dlg.canceled.connect(func(): dlg.queue_free())
-	dlg.popup_centered(Vector2i(640, 800))
+	dlg.popup_centered(Vector2i(720, 900))
 
 
 func _on_minimap_pressed() -> void:

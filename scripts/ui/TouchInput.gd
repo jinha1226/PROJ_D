@@ -13,6 +13,7 @@ const SIGHT_RANGE: int = 6
 @export var generator: DungeonGenerator
 @export var player: Player
 @export var camera: Camera2D
+@export var dmap: DungeonMap  # optional — used for path overlay
 
 var _press_pos_screen: Vector2 = Vector2.ZERO
 var _press_grid: Vector2i = Vector2i.ZERO
@@ -120,6 +121,7 @@ func _on_tap(grid: Vector2i) -> void:
 	_auto_move_path = path
 	_is_auto_moving = true
 	_auto_steps = 0
+	_update_path_overlay()
 	_step_auto_move()
 
 
@@ -136,6 +138,7 @@ func _on_longpress(grid: Vector2i) -> void:
 	_auto_move_path = path
 	_is_auto_moving = true
 	_auto_steps = 0
+	_update_path_overlay()
 	_step_auto_move()
 
 
@@ -164,8 +167,8 @@ func _farthest_floor_from(start: Vector2i) -> Vector2i:
 
 func _on_player_turn_started() -> void:
 	if _is_auto_moving:
-		# Defer one frame so the turn sequence settles before stepping.
-		call_deferred("_step_auto_move")
+		# 150 ms delay so each step is visually distinct.
+		get_tree().create_timer(0.15).timeout.connect(_step_auto_move, CONNECT_ONE_SHOT)
 
 
 func _step_auto_move() -> void:
@@ -184,6 +187,7 @@ func _step_auto_move() -> void:
 		return
 	var next_tile: Vector2i = _auto_move_path[0]
 	_auto_move_path.remove_at(0)
+	_update_path_overlay()
 	var delta: Vector2i = next_tile - player.grid_pos
 	var moved_ok: bool = player.try_move(delta)
 	if not moved_ok:
@@ -194,6 +198,14 @@ func _cancel_auto_move() -> void:
 	_is_auto_moving = false
 	_auto_move_path.clear()
 	_auto_steps = 0
+	if dmap != null:
+		dmap.clear_path()
+
+
+func _update_path_overlay() -> void:
+	if dmap == null:
+		return
+	dmap.show_path(_auto_move_path)
 
 
 func _monster_in_sight() -> bool:

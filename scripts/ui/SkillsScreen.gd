@@ -82,7 +82,8 @@ func _on_bg_input(event: InputEvent) -> void:
 		is_click = true
 	if not is_click:
 		return
-	var panel_rect: Rect2 = Rect2(_panel.global_position, _panel.size)
+	# Panel is hardcoded at position (80,170) size (920,2000) in the tscn.
+	var panel_rect: Rect2 = Rect2(Vector2(80, 170), Vector2(920, 2000))
 	var pos: Vector2 = event.position if "position" in event else Vector2.ZERO
 	if not panel_rect.has_point(pos):
 		_force_close()
@@ -116,7 +117,7 @@ func _on_tab_pressed(cat: String) -> void:
 func _rebuild_rows() -> void:
 	_rows.clear()
 	for child in _rows_vbox.get_children():
-		child.queue_free()
+		child.free()  # immediate — queue_free can leave stale children during same-frame rebuild
 	if _player == null:
 		return
 	var state: Dictionary = {}

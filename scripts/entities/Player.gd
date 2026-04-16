@@ -22,6 +22,10 @@ var level: int = 1
 var equipped_weapon_id: String = ""
 var skill_state: Dictionary = {}
 
+# M1 dummy inventory — Array of Dictionary (FloorItem.as_dict()).
+var items: Array = []
+signal inventory_changed
+
 const _CHAR_SPRITE_SCENE := preload("res://scenes/entities/CharacterSprite.tscn")
 var _sprite: CharacterSprite = null
 var _walk_idle_timer: SceneTreeTimer = null
@@ -176,6 +180,7 @@ func try_move(delta: Vector2i) -> bool:
 		return false
 	grid_pos = target
 	position = Vector2(grid_pos.x * tile_size + tile_size / 2.0, grid_pos.y * tile_size + tile_size / 2.0)
+	_pickup_items_here()
 	if _sprite:
 		_sprite.face_toward(delta)
 		_sprite.play_anim("walk", true)
@@ -184,6 +189,53 @@ func try_move(delta: Vector2i) -> bool:
 	moved.emit(grid_pos)
 	TurnManager.end_player_turn()
 	return true
+
+
+func _pickup_items_here() -> void:
+	for it in get_tree().get_nodes_in_group("floor_items"):
+		if not is_instance_valid(it):
+			continue
+		if it is FloorItem and it.grid_pos == grid_pos:
+			items.append(it.as_dict())
+			print("Picked up: %s" % it.display_name)
+			it.queue_free()
+	inventory_changed.emit()
+
+
+func use_item(index: int) -> void:
+	if index < 0 or index >= items.size():
+		return
+	var it: Dictionary = items[index]
+	match String(it.get("kind", "")):
+		"potion":
+			if stats != null:
+				stats.HP = min(stats.hp_max, stats.HP + 20)
+				stats_changed.emit()
+		"scroll":
+			print("Read scroll: %s" % it.get("name", ""))
+		_:
+			print("Used: %s" % it.get("name", ""))
+	items.remove_at(index)
+	inventory_changed.emit()
+
+
+func drop_item(index: int) -> void:
+	if index < 0 or index >= items.size():
+		return
+	var it: Dictionary = items[index]
+	items.remove_at(index)
+	inventory_changed.emit()
+	var parent: Node = get_parent()
+	if parent == null:
+		return
+	var fi: FloorItem = FloorItem.new()
+	parent.add_child(fi)
+	fi.setup(grid_pos, String(it.get("id", "")), String(it.get("name", "")),
+			String(it.get("kind", "junk")), it.get("color", Color(0.9, 0.9, 0.4)))
+
+
+func get_items() -> Array:
+	return items
 
 
 func _return_to_idle() -> void:

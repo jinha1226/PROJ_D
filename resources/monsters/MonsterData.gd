@@ -11,5 +11,5 @@ extends Resource
 @export var ev: int = 0
 @export var sight_range: int = 6
 @export var essence_drop_id: String = ""
-@export var xp_value: int = 10
+@export var xp_value: int = 100
 @export var sprite: Texture2D
