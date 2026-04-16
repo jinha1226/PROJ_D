@@ -5,7 +5,10 @@
 [ext_resource type="PackedScene" uid="uid://bbothudroot01" path="res://scenes/ui/BottomHUD.tscn" id="3_bot"]
 [ext_resource type="PackedScene" uid="uid://bpopupmgr001" path="res://scenes/ui/PopupManager.tscn" id="4_pop"]
 
-[node name="UI" type="CanvasLayer"]
+[node name="UI" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
 script = ExtResource("1_ui")
 
 [node name="TopHUD" parent="." instance=ExtResource("2_top")]

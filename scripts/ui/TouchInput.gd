@@ -21,6 +21,10 @@ var _longpress_fired: bool = false
 
 var _auto_move_path: Array[Vector2i] = []
 var _is_auto_moving: bool = false
+# Hard cap on consecutive auto-move steps to defend against a runaway loop
+# (e.g. monster-sight check missing a monster, or a path that re-fills).
+const MAX_AUTO_STEPS: int = 200
+var _auto_steps: int = 0
 
 
 func _ready() -> void:
@@ -111,6 +115,7 @@ func _on_tap(grid: Vector2i) -> void:
 		return
 	_auto_move_path = path
 	_is_auto_moving = true
+	_auto_steps = 0
 	_step_auto_move()
 
 
@@ -126,6 +131,7 @@ func _on_longpress(grid: Vector2i) -> void:
 		return
 	_auto_move_path = path
 	_is_auto_moving = true
+	_auto_steps = 0
 	_step_auto_move()
 
 
@@ -167,6 +173,11 @@ func _step_auto_move() -> void:
 	if _monster_in_sight():
 		_cancel_auto_move()
 		return
+	_auto_steps += 1
+	if _auto_steps > MAX_AUTO_STEPS:
+		push_warning("TouchInput: auto-move exceeded MAX_AUTO_STEPS; cancelling")
+		_cancel_auto_move()
+		return
 	var next_tile: Vector2i = _auto_move_path[0]
 	_auto_move_path.remove_at(0)
 	var delta: Vector2i = next_tile - player.grid_pos
@@ -178,6 +189,7 @@ func _step_auto_move() -> void:
 func _cancel_auto_move() -> void:
 	_is_auto_moving = false
 	_auto_move_path.clear()
+	_auto_steps = 0
 
 
 func _monster_in_sight() -> bool:

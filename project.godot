@@ -36,6 +36,10 @@ window/handheld/orientation=1
 window/stretch/mode="canvas_items"
 window/stretch/aspect="keep"
 
+[gui]
+
+theme/custom="res://assets/theme/default_theme.tres"
+
 [input]
 
 ui_accept={

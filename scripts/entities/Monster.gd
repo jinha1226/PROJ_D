@@ -18,6 +18,7 @@ var tile_size: int = 32
 
 var _sprite: CharacterSprite = null
 var _has_preset: bool = false
+var _walk_timer: SceneTreeTimer = null
 
 
 func _ready() -> void:
@@ -88,8 +89,17 @@ func take_turn() -> void:
 	if _sprite and grid_pos != prev_pos:
 		_sprite.face_toward(grid_pos - prev_pos)
 		_sprite.play_anim("walk", true)
-		var t := get_tree().create_timer(0.2)
-		t.timeout.connect(func(): if _sprite: _sprite.play_anim("idle", true))
+		# Reuse a single SceneTreeTimer reference per monster — each turn
+		# overwrites the previous one. Connecting only when not already
+		# connected avoids piling up lambdas (was a per-turn allocation that
+		# kept _sprite captured and could fire after queue_free).
+		_walk_timer = get_tree().create_timer(0.2)
+		_walk_timer.timeout.connect(_return_to_idle, CONNECT_ONE_SHOT)
+
+
+func _return_to_idle() -> void:
+	if is_alive and _sprite:
+		_sprite.play_anim("idle", true)
 
 
 func get_player() -> Node:

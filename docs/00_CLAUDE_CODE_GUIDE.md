@@ -145,11 +145,11 @@ docs/[관련문서.md] 참고해서."
 
 배포 전 반드시 확인:
 
-- [ ] 인게임 Credits 화면에 CREDITS.csv 내용 표시
-- [ ] 배포 패키지에 CREDITS.csv 포함
+- [ ] 인게임 Credits 화면에 CREDITS.csv 내용 표시 (CREDITS_LPC.md 있음, 화면 미구현)
+- [x] 배포 패키지에 CREDITS.csv 포함 (CREDITS_LPC.md 커밋됨)
 - [ ] credits 화면 또는 링크: "Sprites by: Johannes Sjölund (wulax), ..."
-- [ ] GPL v3 / CC-BY-SA 3.0 라이선스 텍스트 포함
-- [ ] 수정된 LPC 에셋이 있다면 동일 라이선스로 공개
+- [x] GPL v3 / CC-BY-SA 3.0 라이선스 텍스트 포함 (CREDITS_LPC.md)
+- [ ] 수정된 LPC 에셋이 있다면 동일 라이선스로 공개 (미수정 상태)
 
 ---
 

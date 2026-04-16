@@ -1,5 +1,10 @@
-extends CanvasLayer
+extends Control
 class_name UIRoot
+## Root UI container. Was previously a CanvasLayer, but UI.tscn is already
+## instanced inside `UILayer` (a CanvasLayer) in Game.tscn — nesting CanvasLayers
+## broke layout reference for child Controls (BottomHUD became invisible). Now a
+## plain full-rect Control so anchors resolve against the parent CanvasLayer's
+## viewport correctly.
 
 @onready var top_hud: Control = $TopHUD
 @onready var bottom_hud: Control = $BottomHUD
