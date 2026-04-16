@@ -470,6 +470,12 @@ func _refresh_actor_visibility(dmap: DungeonMap) -> void:
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if is_instance_valid(m) and m is Monster:
 			m.visible = dmap.is_tile_visible(m.grid_pos)
+	for c in get_tree().get_nodes_in_group("companions"):
+		if is_instance_valid(c) and c is Companion:
+			# Companions stay visible whenever their tile is explored — even
+			# if the player turns their back, the player knows their ally
+			# is there.
+			c.visible = dmap.is_explored(c.grid_pos)
 	for it in get_tree().get_nodes_in_group("floor_items"):
 		if is_instance_valid(it) and it is FloorItem:
 			it.visible = dmap.is_tile_visible(it.grid_pos)
@@ -508,6 +514,12 @@ func _regenerate_dungeon(going_up: bool) -> void:
 		if is_instance_valid(m):
 			TurnManager.unregister_actor(m)
 			m.queue_free()
+	# Summoned companions don't follow between floors — they unravel back
+	# into the essence until the player re-invokes.
+	for c in get_tree().get_nodes_in_group("companions"):
+		if is_instance_valid(c):
+			TurnManager.unregister_actor(c)
+			c.queue_free()
 	for it in get_tree().get_nodes_in_group("floor_items"):
 		if is_instance_valid(it):
 			it.queue_free()
@@ -601,10 +613,73 @@ func _restore_floor(depth: int) -> void:
 				it_info.get("extra", {}))
 
 
-## Stub — Phase B will spawn a real Companion node here. For now we just
-## log so the essence ability doesn't silently fail.
+const _COMPANION_SCENE: PackedScene = preload("res://scenes/entities/Companion.tscn")
+# Essence id → companion archetype (MonsterData tres filename).
+const _ESSENCE_TO_COMPANION: Dictionary = {
+	"boneknight_essence":   "skeleton",
+	"lich_essence":         "skeleton",
+	"ogre_essence":         "goblin",     # placeholder — a beefy orc would be better
+	"titan_essence":        "orc",
+	"fire_sprite_essence":  "fire_sprite",
+	"dragon_essence":       "orc",        # placeholder
+	"snake_essence":        "adder",
+	"dryad_essence":        "adder",
+	"void_essence":         "kobold",
+}
+
+
+## Spawn a Companion at the first walkable tile adjacent to the player.
+## Uses the MonsterData resource keyed by essence id as the companion's
+## stat block + visual.
 func _on_summon_companion_requested(essence_id: String) -> void:
-	print("(companion summon pending — essence %s)" % essence_id)
+	if player == null or generator == null:
+		return
+	var companion_id: String = String(_ESSENCE_TO_COMPANION.get(essence_id, ""))
+	if companion_id == "":
+		print("(no companion template for essence %s)" % essence_id)
+		return
+	var tres_path: String = "res://resources/monsters/%s.tres" % companion_id
+	if not ResourceLoader.exists(tres_path):
+		print("(companion template missing: %s)" % tres_path)
+		return
+	var mdata: MonsterData = load(tres_path)
+	var spawn_pos: Vector2i = _find_free_adjacent_tile(player.grid_pos)
+	if spawn_pos == player.grid_pos:  # no room found
+		print("(no free tile next to you to summon on)")
+		return
+	var c: Companion = _COMPANION_SCENE.instantiate()
+	$EntityLayer.add_child(c)
+	c.setup(generator, spawn_pos, mdata)
+	c.lifetime = 60  # ~60 turns before despawning
+	print("Summoned %s." % companion_id)
+
+
+## First walkable, unoccupied 8-neighbour of `center`. Returns center itself
+## if nothing is free (caller should treat that as failure).
+func _find_free_adjacent_tile(center: Vector2i) -> Vector2i:
+	for dy in [-1, 0, 1]:
+		for dx in [-1, 0, 1]:
+			if dx == 0 and dy == 0:
+				continue
+			var p: Vector2i = center + Vector2i(dx, dy)
+			if not generator.is_walkable(p):
+				continue
+			if _tile_occupied_any(p):
+				continue
+			return p
+	return center
+
+
+func _tile_occupied_any(pos: Vector2i) -> bool:
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if m is Monster and m.grid_pos == pos:
+			return true
+	for c in get_tree().get_nodes_in_group("companions"):
+		if c is Companion and c.grid_pos == pos:
+			return true
+	if player != null and player.grid_pos == pos:
+		return true
+	return false
 
 
 func _on_identify_one_requested() -> void:

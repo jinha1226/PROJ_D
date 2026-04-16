@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/monsters/MonsterData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "fire_sprite"
+display_name = "Fire Sprite"
+tier = 2
+hp = 10
+str = 3
+dex = 7
+ac = 1
+ev = 12
+sight_range = 6
+essence_drop_id = ""
+xp_value = 15

@@ -65,19 +65,22 @@ const BRANCH_TILESETS: Dictionary = {
 }
 
 const MONSTERS: Dictionary = {
-	"rat":         "mon/animals/rat.png",
-	"bat":         "mon/animals/bat.png",
-	"goblin":      "mon/humanoids/goblin.png",
-	"hobgoblin":   "mon/humanoids/hobgoblin.png",
-	"kobold":      "mon/humanoids/kobold.png",
-	"orc":         "mon/humanoids/orcs/orc.png",
-	"orc_warrior": "mon/humanoids/orcs/orc_warrior.png",
-	"orc_priest":  "mon/humanoids/orcs/orc_priest.png",
-	"orc_wizard":  "mon/humanoids/orcs/orc_wizard.png",
-	"adder":       "mon/animals/adder.png",
-	"wolf":        "mon/animals/wolf.png",
-	"jackal":      "mon/animals/jackal.png",
-	"ball_python": "mon/animals/ball_python.png",
+	"rat":              "mon/animals/rat.png",
+	"bat":              "mon/animals/bat.png",
+	"goblin":           "mon/humanoids/goblin.png",
+	"hobgoblin":        "mon/humanoids/hobgoblin.png",
+	"kobold":           "mon/humanoids/kobold.png",
+	"orc":              "mon/humanoids/orcs/orc.png",
+	"orc_warrior":      "mon/humanoids/orcs/orc_warrior.png",
+	"orc_priest":       "mon/humanoids/orcs/orc_priest.png",
+	"orc_wizard":       "mon/humanoids/orcs/orc_wizard.png",
+	"adder":            "mon/animals/adder.png",
+	"wolf":             "mon/animals/wolf.png",
+	"jackal":           "mon/animals/jackal.png",
+	"ball_python":      "mon/animals/ball_python.png",
+	# Companion tiles.
+	"skeleton":         "mon/undead/skeletal_warrior.png",
+	"fire_sprite":      "mon/animals/fire_bat.png",
 }
 
 const ITEMS: Dictionary = {
