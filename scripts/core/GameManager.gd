@@ -15,6 +15,10 @@ var selected_job_id: String = ""
 # Art mode — 0 = LPC (composed), 1 = DCSS tiles. Read via TileRenderer.mode().
 # DCSS is now the default since the tile mapping is complete.
 var render_mode: int = 1
+# Current dungeon branch id (for tile theming). "main" / "forest" / "mine" /
+# "crypt" / "volcano" / "swamp" / "crystal" / "sandstone". TileRenderer.feature
+# picks the right floor/wall texture based on this.
+var current_branch: String = "main"
 
 # --- Item identification (per-run) ---
 # identified[id] == true once the player has drunk/read/identified a consumable.
