@@ -135,7 +135,7 @@ func end_run(victory: bool) -> void:
 ## stretch of run feels distinct (also drives boss-floor tile selection).
 ##   D:1-5   main      D:6-10  mine    D:11-15 forest
 ##   D:16-20 swamp     D:21-25 volcano
-static func branch_for_depth(d: int) -> String:
+func branch_for_depth(d: int) -> String:
 	if d <= 5:
 		return "main"
 	if d <= 10:

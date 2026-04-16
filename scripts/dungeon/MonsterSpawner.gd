@@ -83,7 +83,7 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 ## raw depth — keeps theming consistent within a segment.
 static func _load_pool(depth: int) -> Array[MonsterData]:
 	var pool: Array[MonsterData] = []
-	var branch: String = GameManager.branch_for_depth(depth)
+	var branch: String = _branch_for(depth)
 	var ids: Array = _BRANCH_REGULARS.get(branch, ["rat", "goblin"])
 	for id in ids:
 		var d: MonsterData = _load_monster(String(id))
@@ -117,6 +117,18 @@ static func _pick_boss_tile(gen: DungeonGenerator, used: Dictionary, fallback: A
 		if not used.has(tile):
 			return tile
 	return Vector2i(-1, -1)
+
+
+static func _branch_for(d: int) -> String:
+	if d <= 5:
+		return "main"
+	if d <= 10:
+		return "mine"
+	if d <= 15:
+		return "forest"
+	if d <= 20:
+		return "swamp"
+	return "volcano"
 
 
 static func _collect_floor_tiles(gen: DungeonGenerator) -> Array[Vector2i]:
