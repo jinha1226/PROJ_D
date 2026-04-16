@@ -35,28 +35,28 @@ func _build_cards() -> void:
 func _make_card(r: RaceData) -> Button:
 	var btn := Button.new()
 	btn.toggle_mode = true
-	btn.custom_minimum_size = Vector2(510, 340)
+	btn.custom_minimum_size = Vector2(510, 480)
 	btn.pressed.connect(_on_card_pressed.bind(r.id))
 
 	var hbox := HBoxContainer.new()
 	hbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	hbox.add_theme_constant_override("separation", 8)
+	hbox.add_theme_constant_override("separation", 16)
 	hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hbox.offset_left = 12
-	hbox.offset_top = 12
-	hbox.offset_right = -12
-	hbox.offset_bottom = -12
+	hbox.offset_left = 20
+	hbox.offset_top = 20
+	hbox.offset_right = -20
+	hbox.offset_bottom = -20
 	btn.add_child(hbox)
 
 	# Live-rendered character preview via SubViewport.
 	var vpc := SubViewportContainer.new()
-	vpc.custom_minimum_size = Vector2(160, 200)
+	vpc.custom_minimum_size = Vector2(200, 300)
 	vpc.stretch = true
 	vpc.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hbox.add_child(vpc)
 
 	var vp := SubViewport.new()
-	vp.size = Vector2i(160, 200)
+	vp.size = Vector2i(200, 300)
 	vp.transparent_bg = true
 	vp.disable_3d = true
 	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
@@ -67,15 +67,15 @@ func _make_card(r: RaceData) -> Button:
 	cs.load_character(_race_to_preset(r))
 	cs.set_direction("down")
 	cs.play_anim("idle", true)
-	cs.position = Vector2(80, 130)  # viewport-local, ~centered
-	cs.scale = Vector2(1.6, 1.6)
+	cs.position = Vector2(100, 190)  # viewport-local, feet near bottom
+	cs.scale = Vector2(2.4, 2.4)
 
 	var label := Label.new()
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
-	label.add_theme_font_size_override("font_size", 20)
+	label.add_theme_font_size_override("font_size", 32)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.text = "%s\n\nSTR %d  DEX %d  INT %d\nHP/lv %d  MP/lv %d\n\n%s" % [
 		r.display_name, r.base_str, r.base_dex, r.base_int,

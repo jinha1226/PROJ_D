@@ -42,28 +42,28 @@ func _build_cards() -> void:
 func _make_card(j: JobData) -> Button:
 	var btn := Button.new()
 	btn.toggle_mode = true
-	btn.custom_minimum_size = Vector2(510, 360)
+	btn.custom_minimum_size = Vector2(510, 500)
 	btn.pressed.connect(_on_card_pressed.bind(j.id))
 
 	var hbox := HBoxContainer.new()
 	hbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	hbox.add_theme_constant_override("separation", 8)
+	hbox.add_theme_constant_override("separation", 16)
 	hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hbox.offset_left = 12
-	hbox.offset_top = 12
-	hbox.offset_right = -12
-	hbox.offset_bottom = -12
+	hbox.offset_left = 20
+	hbox.offset_top = 20
+	hbox.offset_right = -20
+	hbox.offset_bottom = -20
 	btn.add_child(hbox)
 
 	# Live preview: race body + job equipment.
 	var vpc := SubViewportContainer.new()
-	vpc.custom_minimum_size = Vector2(160, 220)
+	vpc.custom_minimum_size = Vector2(200, 320)
 	vpc.stretch = true
 	vpc.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hbox.add_child(vpc)
 
 	var vp := SubViewport.new()
-	vp.size = Vector2i(160, 220)
+	vp.size = Vector2i(200, 320)
 	vp.transparent_bg = true
 	vp.disable_3d = true
 	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
@@ -74,15 +74,15 @@ func _make_card(j: JobData) -> Button:
 	cs.load_character(_compose_preset(j))
 	cs.set_direction("down")
 	cs.play_anim("idle", true)
-	cs.position = Vector2(80, 140)
-	cs.scale = Vector2(1.6, 1.6)
+	cs.position = Vector2(100, 210)
+	cs.scale = Vector2(2.4, 2.4)
 
 	var label := Label.new()
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
-	label.add_theme_font_size_override("font_size", 18)
+	label.add_theme_font_size_override("font_size", 28)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var stat_line := "STR%s%d  DEX%s%d  INT%s%d" % [
 		"+" if j.str_bonus >= 0 else "", j.str_bonus,
