@@ -728,7 +728,10 @@ func _on_bag_pressed() -> void:
 			# Name acts as an Info button — taps open the comparison popup.
 			# Tooltip stays for desktop hover; the button works on touch too.
 			var info_btn := Button.new()
-			info_btn.text = "%s [%s]" % [it.get("name", "?"), kind]
+			var iid_row: String = String(it.get("id", ""))
+			var disp_name: String = GameManager.display_name_for_item(
+					iid_row, String(it.get("name", "?")), kind)
+			info_btn.text = "%s [%s]" % [disp_name, kind]
 			info_btn.flat = true
 			info_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			info_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -761,7 +764,10 @@ func _on_bag_pressed() -> void:
 func _build_item_tooltip(it: Dictionary) -> String:
 	var kind: String = String(it.get("kind", ""))
 	var id: String = String(it.get("id", ""))
-	var name_s: String = String(it.get("name", WeaponRegistry.display_name_for(id)))
+	# Unidentified consumables show their pseudonym; weapons/armor always
+	# show their real name.
+	var raw_name: String = String(it.get("name", WeaponRegistry.display_name_for(id)))
+	var name_s: String = GameManager.display_name_for_item(id, raw_name, kind)
 	match kind:
 		"weapon":
 			var new_dmg: int = WeaponRegistry.weapon_damage_for(id)
@@ -791,9 +797,13 @@ func _build_item_tooltip(it: Dictionary) -> String:
 				name_s, slot, new_ac, sign_a, diff_ac, cur_name,
 			]
 		"potion", "scroll":
-			var desc: String = ConsumableRegistry.description_for(id)
+			# Description hidden until identified — "?" keeps the mystery
+			# so the player has to experiment or read an identify scroll.
+			var desc: String = ""
+			if GameManager.is_identified(id):
+				desc = ConsumableRegistry.description_for(id)
 			if desc == "":
-				desc = ("Drink." if kind == "potion" else "Read aloud.")
+				desc = ("Drink to find out." if kind == "potion" else "Read aloud to find out.")
 			return "%s\n%s" % [name_s, desc]
 		_:
 			return "%s\nMiscellaneous junk." % name_s

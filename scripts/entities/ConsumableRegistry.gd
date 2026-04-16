@@ -52,6 +52,13 @@ const DATA: Dictionary = {
 		"effect": "blink",
 		"desc": "Short-range teleport — up to 4 tiles in any direction.",
 	},
+	"scroll_identify": {
+		"name": "Scroll of Identification",
+		"kind": "scroll",
+		"color": Color(0.70, 0.90, 0.70),
+		"effect": "identify_all",
+		"desc": "Reveals the true name and effect of every unknown potion and scroll in your inventory.",
+	},
 }
 
 

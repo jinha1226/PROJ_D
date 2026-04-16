@@ -334,7 +334,9 @@ func _pickup_items_here() -> void:
 			continue
 		if it is FloorItem and it.grid_pos == grid_pos:
 			items.append(it.as_dict())
-			print("Picked up: %s" % it.display_name)
+			var shown: String = GameManager.display_name_for_item(
+					it.item_id, it.display_name, it.kind) if GameManager != null else it.display_name
+			print("Picked up: %s" % shown)
 			it.queue_free()
 	inventory_changed.emit()
 
@@ -363,6 +365,10 @@ func use_item(index: int) -> void:
 	else:
 		consumed = _apply_consumable_effect(info)
 	if consumed:
+		# Auto-identify on use so the player learns what each unknown
+		# potion/scroll was.
+		if GameManager != null:
+			GameManager.identify(item_id)
 		items.remove_at(index)
 		inventory_changed.emit()
 		# Using an item costs a turn.
@@ -393,6 +399,17 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 				dmap.reveal_all()
 				return true
 			return false
+		"identify_all":
+			if GameManager == null:
+				return false
+			var newly_identified: int = 0
+			for inv_it in items:
+				var iid: String = String(inv_it.get("id", ""))
+				if ConsumableRegistry.has(iid) and not GameManager.is_identified(iid):
+					GameManager.identify(iid)
+					newly_identified += 1
+			print("Identified %d item(s)." % newly_identified)
+			return true
 		_:
 			print("Unknown consumable effect: %s" % info.get("effect"))
 			return false

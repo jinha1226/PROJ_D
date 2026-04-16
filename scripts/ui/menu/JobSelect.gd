@@ -148,6 +148,6 @@ func _on_back() -> void:
 func _on_start() -> void:
 	if _selected_id == "":
 		return
-	GameManager.selected_job_id = _selected_id
-	GameManager.current_depth = 1
+	# start_new_run resets depth, identified items, pseudonyms, etc.
+	GameManager.start_new_run(_selected_id, GameManager.selected_race_id)
 	get_tree().change_scene_to_file(GAME_PATH)

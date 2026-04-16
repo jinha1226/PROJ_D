@@ -57,7 +57,7 @@ func _on_meta_pressed() -> void:
 
 func _on_retry_pressed() -> void:
 	retry_pressed.emit()
-	# Fresh run — same race/job, depth back to 1.
+	# Fresh run — same race/job, but depth/identified/pseudonyms reset.
 	if GameManager != null:
-		GameManager.current_depth = 1
+		GameManager.start_new_run(GameManager.selected_job_id, GameManager.selected_race_id)
 	get_tree().reload_current_scene()
