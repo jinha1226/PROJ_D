@@ -10,6 +10,6 @@ description = "Grow claws, spit poison, become the weapon. Unarmed combat fueled
 str_bonus = 1
 dex_bonus = 1
 int_bonus = 1
-starting_equipment = Array[String]([])
+starting_equipment = Array[String](["robe"])
 starting_skills = {"fighting": 2, "unarmed": 2, "spellcasting": 2, "translocations": 1}
 unique_ability = ""

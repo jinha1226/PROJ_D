@@ -129,6 +129,7 @@ const ITEMS: Dictionary = {
 	"lightning_staff": "item/staff/i-staff_air.png",
 	"crystal_staff":   "item/staff/i-staff_power.png",
 	# Armor — chest
+	"robe":            "item/armour/robe1.png",
 	"leather_chest":   "item/armour/leather_armour1.png",
 	"chain_chest":     "item/armour/chain_mail1.png",
 	"plate_chest":     "item/armour/plate1.png",
@@ -209,6 +210,7 @@ const PLAYER_DOLL: Dictionary = {
 		"crystal_staff":   "player/hand1/great_staff.png",
 	},
 	"chest": {
+		"robe":            "player/body/robe_blue.png",
 		"leather_chest":   "player/body/leather_armour.png",
 		"chain_chest":     "player/body/chainmail.png",
 		"plate_chest":     "player/body/plate.png",
