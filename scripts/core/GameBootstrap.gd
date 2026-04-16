@@ -109,6 +109,8 @@ func _ready() -> void:
 	player.died.connect(_on_player_died)
 	player.leveled_up.connect(_on_player_leveled_up)
 	player.identify_one_requested.connect(_on_identify_one_requested)
+	if player.has_signal("summon_companion_requested"):
+		player.summon_companion_requested.connect(_on_summon_companion_requested)
 
 	# UI lookup.
 	ui = get_node_or_null("UILayer/UI")
@@ -231,6 +233,8 @@ func _on_turn_refresh_visibility() -> void:
 	if dmap != null:
 		_refresh_actor_visibility(dmap)
 	_apply_passive_racial_traits()
+	if essence_system != null:
+		essence_system.on_turn_tick()
 	if _resting:
 		_rest_tick()
 
@@ -595,6 +599,12 @@ func _restore_floor(depth: int) -> void:
 				String(it_info.get("kind", "junk")),
 				it_info.get("color", Color(1, 1, 0)),
 				it_info.get("extra", {}))
+
+
+## Stub — Phase B will spawn a real Companion node here. For now we just
+## log so the essence ability doesn't silently fail.
+func _on_summon_companion_requested(essence_id: String) -> void:
+	print("(companion summon pending — essence %s)" % essence_id)
 
 
 func _on_identify_one_requested() -> void:
@@ -1284,18 +1294,16 @@ func _on_status_pressed() -> void:
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	vb.add_child(lab)
 
-	# Essence row + swap button (moved here from BottomHUD).
+	# Essence slots (3) — each row shows name, stat summary, and a Cast
+	# button if the essence carries an active ability.
 	if essence_system != null:
-		var ess_lab := Label.new()
-		ess_lab.text = _build_essence_text()
-		ess_lab.add_theme_font_size_override("font_size", 28)
-		vb.add_child(ess_lab)
-		var swap_btn := Button.new()
-		swap_btn.text = "Swap Essence"
-		swap_btn.add_theme_font_size_override("font_size", 28)
-		swap_btn.custom_minimum_size = Vector2(0, 88)
-		swap_btn.pressed.connect(_on_swap_essence.bind(dlg))
-		vb.add_child(swap_btn)
+		var hdr := Label.new()
+		hdr.text = "--- Essences ---"
+		hdr.add_theme_font_size_override("font_size", 28)
+		hdr.modulate = Color(0.85, 0.85, 1.0)
+		vb.add_child(hdr)
+		for i in essence_system.slots.size():
+			vb.add_child(_build_essence_row(i, dlg))
 
 	# Explicit Close at the bottom in case the OK footer is hard to reach.
 	var close_btn := Button.new()
@@ -1314,39 +1322,89 @@ func _on_status_pressed() -> void:
 	dlg.popup_centered(Vector2i(880, 1600))
 
 
-func _build_essence_text() -> String:
+## One row in the Status popup per essence slot. Shows the slotted essence's
+## name + stat summary, a Swap button, and (when the essence has an active
+## ability) a Cast button that funnels through EssenceSystem.invoke.
+func _build_essence_row(slot_idx: int, status_dlg: AcceptDialog) -> Control:
+	var row := VBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	row.custom_minimum_size = Vector2(0, 120)
+	var e: EssenceData = essence_system.slots[slot_idx] if essence_system != null else null
+	var title := Label.new()
+	if e == null:
+		title.text = "Slot %d: (empty)" % (slot_idx + 1)
+		title.modulate = Color(0.6, 0.6, 0.6)
+	else:
+		var stat_parts: Array = []
+		if e.str_bonus != 0: stat_parts.append("STR %+d" % e.str_bonus)
+		if e.dex_bonus != 0: stat_parts.append("DEX %+d" % e.dex_bonus)
+		if e.int_bonus != 0: stat_parts.append("INT %+d" % e.int_bonus)
+		if e.hp_bonus != 0:  stat_parts.append("HP %+d" % e.hp_bonus)
+		if e.armor_bonus != 0: stat_parts.append("AC %+d" % e.armor_bonus)
+		title.text = "Slot %d: %s  (%s)" % [
+			slot_idx + 1, e.display_name, " ".join(PackedStringArray(stat_parts)),
+		]
+	title.add_theme_font_size_override("font_size", 26)
+	row.add_child(title)
+	var btns := HBoxContainer.new()
+	btns.add_theme_constant_override("separation", 8)
+	var swap_btn := Button.new()
+	swap_btn.text = "Swap"
+	swap_btn.custom_minimum_size = Vector2(160, 72)
+	swap_btn.add_theme_font_size_override("font_size", 24)
+	swap_btn.pressed.connect(_on_swap_essence_slot.bind(slot_idx, status_dlg))
+	btns.add_child(swap_btn)
+	if e != null and e.ability_id != "":
+		var cd: int = essence_system.cooldowns[slot_idx]
+		var cast_btn := Button.new()
+		cast_btn.custom_minimum_size = Vector2(260, 72)
+		cast_btn.add_theme_font_size_override("font_size", 24)
+		if cd > 0:
+			cast_btn.text = "Cast (CD %d)" % cd
+			cast_btn.disabled = true
+		else:
+			cast_btn.text = "Cast (%d MP)" % e.ability_mp
+		cast_btn.pressed.connect(_on_cast_essence_ability.bind(slot_idx, status_dlg))
+		btns.add_child(cast_btn)
+		var desc := Label.new()
+		desc.text = e.ability_desc
+		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc.add_theme_font_size_override("font_size", 20)
+		desc.modulate = Color(0.75, 0.75, 0.85)
+		row.add_child(btns)
+		row.add_child(desc)
+		return row
+	row.add_child(btns)
+	return row
+
+
+func _on_cast_essence_ability(slot_idx: int, status_dlg: AcceptDialog) -> void:
 	if essence_system == null:
-		return ""
-	var current: EssenceData = essence_system.slots[0] if essence_system.slots.size() > 0 else null
-	var inv_names: Array = []
-	for e in essence_system.inventory:
-		if e != null:
-			inv_names.append(e.display_name if "display_name" in e else e.id)
-	var lines: Array = ["", "--- Essence ---"]
-	lines.append("Slot 1: %s" % (current.display_name if current != null and "display_name" in current else "(empty)"))
-	if inv_names.size() > 0:
-		lines.append("In bag: %s" % ", ".join(PackedStringArray(inv_names)))
-	return "\n".join(PackedStringArray(lines))
+		return
+	var ok: bool = essence_system.invoke(slot_idx)
+	status_dlg.queue_free()
+	if ok:
+		TurnManager.end_player_turn()
 
 
-func _on_swap_essence(status_dlg: AcceptDialog) -> void:
+func _on_swap_essence_slot(slot_idx: int, status_dlg: AcceptDialog) -> void:
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null or essence_system == null:
 		return
 	status_dlg.queue_free()
-	var current: EssenceData = essence_system.slots[0] if essence_system.slots.size() > 0 else null
+	var current: EssenceData = essence_system.slots[slot_idx]
 	var current_id: String = current.id if current != null else ""
 	var inv_ids: Array = []
 	for e in essence_system.inventory:
 		if e != null:
 			inv_ids.append(e.id)
-	popup_mgr.show_essence_swap_popup(0, current_id, inv_ids, func(selected_id):
+	popup_mgr.show_essence_swap_popup(slot_idx, current_id, inv_ids, func(selected_id):
 		if selected_id == "":
-			essence_system.unequip(0)
+			essence_system.unequip(slot_idx)
 		else:
 			var target: EssenceData = essence_system.find_essence_by_id(selected_id)
 			if target != null:
-				essence_system.equip(0, target))
+				essence_system.equip(slot_idx, target))
 
 
 func _build_status_text() -> String:

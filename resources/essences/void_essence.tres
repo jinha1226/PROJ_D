@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EssenceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/essences/EssenceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "void_essence"
+display_name = "Void Essence"
+description = "A shard torn from the Abyss. Bends space and thought."
+essence_type = 4
+rarity = 2
+int_bonus = 3
+dex_bonus = 2
+evasion_bonus = 2
+source_monsters = Array[String](["abyss_imp", "shadow_demon"])
+drop_chance = 0.15
+ability_id = "essence_blink"
+ability_mp = 5
+ability_cooldown = 8
+ability_desc = "Slip through the void — short-range teleport (4 tiles)."

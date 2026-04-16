@@ -11,6 +11,9 @@ signal xp_changed(cur: int, to_next: int, level: int)
 ## Emitted when Scroll of Identification is used. GameBootstrap shows a
 ## picker popup that lets the player choose which inventory item to reveal.
 signal identify_one_requested
+## Emitted when an essence's "summon" ability fires. Carries the essence id
+## so GameBootstrap knows which Companion template to spawn.
+signal summon_companion_requested(essence_id: String)
 
 @export var generator: DungeonGenerator
 
@@ -322,7 +325,64 @@ func get_current_weapon_skill() -> String:
 	return WeaponRegistry.weapon_skill_for(equipped_weapon_id)
 
 
-func apply_essence_bonuses(essences: Array) -> void:
+## Dispatcher for essence active abilities — called from EssenceSystem.invoke
+## after it has validated MP and cooldown. Must return true on success so
+## the system knows to deduct MP / start cooldown.
+func _invoke_essence_ability(e: EssenceData) -> bool:
+	match e.ability_id:
+		"essence_heal":
+			if stats == null:
+				return false
+			stats.HP = min(stats.hp_max, stats.HP + 20)
+			stats_changed.emit()
+			return true
+		"essence_blink":
+			return _teleport_blink(4)
+		"essence_stomp":
+			# Hit every monster within 1 tile (Chebyshev) for 6 damage.
+			var hit_count: int = 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not m.is_alive:
+					continue
+				if "grid_pos" in m and max(abs(m.grid_pos.x - grid_pos.x), abs(m.grid_pos.y - grid_pos.y)) <= 1:
+					m.take_damage(6)
+					hit_count += 1
+			print("Stomp hit %d enemies." % hit_count)
+			return true
+		"essence_breath":
+			# Line attack — 4 tiles ahead facing player's last move dir (down default).
+			return _fire_breath_line()
+		"essence_regen":
+			# Modest heal over time — for M1, immediate +12 HP heal.
+			if stats == null:
+				return false
+			stats.HP = min(stats.hp_max, stats.HP + 12)
+			stats_changed.emit()
+			return true
+		"essence_summon":
+			# Phase B companion summon — stub for now, handled in GameBootstrap.
+			summon_companion_requested.emit(e.id)
+			return true
+		_:
+			print("Unknown essence ability: %s" % e.ability_id)
+			return false
+
+
+## Breath weapon: deals 10 damage to every monster in a 4-tile cone below.
+func _fire_breath_line() -> bool:
+	var hit_count: int = 0
+	for d in range(1, 5):
+		for m in get_tree().get_nodes_in_group("monsters"):
+			if not is_instance_valid(m) or not m.is_alive:
+				continue
+			if "grid_pos" in m and m.grid_pos == grid_pos + Vector2i(0, d):
+				m.take_damage(10)
+				hit_count += 1
+	print("Breath line hit %d enemies." % hit_count)
+	return true
+
+
+func apply_essence_bonuses(essences: Array, synergy: Dictionary = {}) -> void:
 	# Snapshot pre-recompute HP/MP to preserve current/max deltas.
 	if base_stats == null:
 		base_stats = stats.clone() if stats != null else Stats.new()
@@ -339,6 +399,13 @@ func apply_essence_bonuses(essences: Array) -> void:
 		new_stats.hp_max += e.hp_bonus
 		new_stats.AC += e.armor_bonus
 		new_stats.EV += e.evasion_bonus
+	# Synergy (2+ same type in slots).
+	new_stats.STR += int(synergy.get("str", 0))
+	new_stats.DEX += int(synergy.get("dex", 0))
+	new_stats.INT += int(synergy.get("int", 0))
+	new_stats.hp_max += int(synergy.get("hp", 0))
+	new_stats.AC += int(synergy.get("armor", 0))
+	new_stats.EV += int(synergy.get("evasion", 0))
 	# HP delta handling: grow current hp on hp_max increase; clamp on decrease.
 	var hp_delta: int = new_stats.hp_max - prev_hp_max
 	var new_hp: int = prev_hp + max(0, hp_delta)
