@@ -48,6 +48,11 @@ func setup(gen: DungeonGenerator, pos: Vector2i, mdata: MonsterData) -> void:
 func _load_sprite() -> void:
 	if data == null:
 		return
+	# DCSS mode: skip LPC entirely and let _draw() render the DCSS tile.
+	if TileRenderer.is_dcss():
+		_has_preset = false
+		queue_redraw()
+		return
 	var preset := LPCPresetLoader.load_preset(data.id)
 	if preset.is_empty():
 		# No preset yet for this monster — keep primitive _draw() fallback.
@@ -130,6 +135,14 @@ func move_to_grid(pos: Vector2i) -> void:
 func _draw() -> void:
 	if _has_preset:
 		return
+	# DCSS mode: render the monster's tile texture centred on the entity.
+	if TileRenderer.is_dcss() and data != null:
+		var tex: Texture2D = TileRenderer.monster(String(data.id))
+		if tex != null:
+			var sz: Vector2 = tex.get_size()
+			draw_texture(tex, -sz * 0.5)
+			return
+	# LPC fallback / generic colored disc.
 	var color: Color
 	var tier: int = data.tier if data != null else 1
 	if tier <= 1:

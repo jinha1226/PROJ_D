@@ -120,6 +120,57 @@ func clear_path() -> void:
 func _draw() -> void:
 	if generator == null or generator.map.is_empty():
 		return
+	if TileRenderer.is_dcss():
+		_draw_dcss()
+	else:
+		_draw_lpc()
+	# Path overlay dots — drawn on top in both modes.
+	var path_color: Color = Color(0.2, 0.85, 0.85, 0.55)
+	var dot_size: float = TILE_SIZE * 0.35
+	for tile in _path_tiles:
+		if not is_explored(tile):
+			continue
+		var cx: float = tile.x * TILE_SIZE + TILE_SIZE * 0.5
+		var cy: float = tile.y * TILE_SIZE + TILE_SIZE * 0.5
+		draw_circle(Vector2(cx, cy), dot_size, path_color)
+
+
+func _draw_dcss() -> void:
+	var floor_tex: Texture2D = TileRenderer.feature("floor")
+	var wall_tex: Texture2D = TileRenderer.feature("wall")
+	var stairs_dn_tex: Texture2D = TileRenderer.feature("stairs_down")
+	var stairs_up_tex: Texture2D = TileRenderer.feature("stairs_up")
+	var unseen_color := Color(0.02, 0.02, 0.04)
+	var dim := Color(0.45, 0.45, 0.45)  # mod for explored-but-not-visible
+	for x in DungeonGenerator.MAP_WIDTH:
+		for y in DungeonGenerator.MAP_HEIGHT:
+			var tile := Vector2i(x, y)
+			var rect := Rect2(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+			if not is_explored(tile):
+				draw_rect(rect, unseen_color, true)
+				continue
+			var t: int = generator.map[x][y]
+			var modulate: Color = Color.WHITE if is_tile_visible(tile) else dim
+			var tex: Texture2D = floor_tex
+			if t == DungeonGenerator.TileType.WALL:
+				tex = wall_tex
+			elif t == DungeonGenerator.TileType.STAIRS_DOWN:
+				# Floor under stairs so the stairs glyph reads cleanly.
+				if floor_tex != null:
+					draw_texture_rect(floor_tex, rect, false, modulate)
+				tex = stairs_dn_tex
+			elif t == DungeonGenerator.TileType.STAIRS_UP:
+				if floor_tex != null:
+					draw_texture_rect(floor_tex, rect, false, modulate)
+				tex = stairs_up_tex
+			if tex != null:
+				draw_texture_rect(tex, rect, false, modulate)
+			else:
+				# Last-resort solid fill if the tile asset is missing.
+				draw_rect(rect, Color(0.4, 0.4, 0.4) * modulate, true)
+
+
+func _draw_lpc() -> void:
 	var wall_color: Color = Color(0.18, 0.18, 0.2)
 	var floor_color: Color = Color(0.55, 0.55, 0.58)
 	var stairs_color: Color = Color(0.95, 0.82, 0.15)
@@ -133,8 +184,6 @@ func _draw() -> void:
 				draw_rect(rect, unseen_color, true)
 				continue
 			var t: int = generator.map[x][y]
-			# Base-layer (floor) always drawn under walls so wall tiles can
-			# show a slimmer wall slab and still look connected.
 			var base: Color = floor_color
 			match t:
 				DungeonGenerator.TileType.STAIRS_DOWN: base = stairs_color
@@ -148,12 +197,3 @@ func _draw() -> void:
 				draw_rect(rect, wc, true)
 			else:
 				draw_rect(rect, base, true)
-	# Path overlay dots (only draw on explored tiles so hidden paths aren't spoilery).
-	var path_color: Color = Color(0.2, 0.85, 0.85, 0.55)
-	var dot_size: float = TILE_SIZE * 0.35
-	for tile in _path_tiles:
-		if not is_explored(tile):
-			continue
-		var cx: float = tile.x * TILE_SIZE + TILE_SIZE * 0.5
-		var cy: float = tile.y * TILE_SIZE + TILE_SIZE * 0.5
-		draw_circle(Vector2(cx, cy), dot_size, path_color)

@@ -13,8 +13,8 @@ var dungeon: Node = null
 var selected_race_id: String = ""
 var selected_job_id: String = ""
 # Art mode — 0 = LPC (composed), 1 = DCSS tiles. Read via TileRenderer.mode().
-# Defaults to LPC until the DCSS mapping is complete.
-var render_mode: int = 0
+# DCSS is now the default since the tile mapping is complete.
+var render_mode: int = 1
 
 # --- Item identification (per-run) ---
 # identified[id] == true once the player has drunk/read/identified a consumable.

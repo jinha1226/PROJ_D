@@ -72,6 +72,11 @@ func _ready() -> void:
 
 
 func _ensure_sprite() -> void:
+	# DCSS mode renders the player via Player._draw() (texture-blit), so we
+	# don't need the LPC AnimatedSprite child at all.
+	if TileRenderer.is_dcss():
+		queue_redraw()
+		return
 	if _sprite != null:
 		return
 	_sprite = _CHAR_SPRITE_SCENE.instantiate() as CharacterSprite
@@ -80,6 +85,9 @@ func _ensure_sprite() -> void:
 
 
 func _load_sprite_preset() -> void:
+	if TileRenderer.is_dcss():
+		queue_redraw()  # texture pulled lazily in _draw()
+		return
 	if _sprite == null:
 		return
 	var preset: Dictionary = _compose_preset()
@@ -93,6 +101,19 @@ func _load_sprite_preset() -> void:
 	_sprite.load_character(preset)
 	_sprite.set_direction("down")
 	_sprite.play_anim("idle", true)
+
+
+## DCSS player rendering: draw the race tile centred on the entity.
+func _draw() -> void:
+	if not TileRenderer.is_dcss():
+		return
+	if race_id == "":
+		return
+	var tex: Texture2D = TileRenderer.player_race(race_id)
+	if tex == null:
+		return
+	var sz: Vector2 = tex.get_size()
+	draw_texture(tex, -sz * 0.5)
 
 
 ## Build a CharacterSprite preset dict reflecting the player's CURRENT

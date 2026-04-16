@@ -43,7 +43,14 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var bob: float = sin(_bob_phase) * _BOB_AMP
-	# All sub-functions receive the bob offset and draw in local space.
+	# DCSS mode: draw the item's tile texture (centred, with bob).
+	if TileRenderer.is_dcss():
+		var tex: Texture2D = TileRenderer.item(item_id)
+		if tex != null:
+			var sz: Vector2 = tex.get_size()
+			draw_texture(tex, Vector2(-sz.x * 0.5, -sz.y * 0.5 + bob))
+			return
+	# Otherwise fall back to the LPC-style hand-drawn shapes.
 	match kind:
 		"potion": _draw_potion(bob)
 		"scroll": _draw_scroll(bob)
