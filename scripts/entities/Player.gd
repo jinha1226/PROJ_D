@@ -40,6 +40,11 @@ var weapon_bonus_dmg: int = 0
 # Missing key = nothing in that slot.
 var equipped_armor: Dictionary = {}
 var skill_state: Dictionary = {}
+# Memorised spell ids. Seeded from job.starting_spells at setup and
+# extended by reading spellbooks. Drives the MAGIC menu and what the
+# player is allowed to cast.
+var learned_spells: Array[String] = []
+signal spells_learned
 
 # M1 dummy inventory — Array of Dictionary (FloorItem.as_dict()).
 var items: Array = []
@@ -235,6 +240,14 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 	stats = s
 	base_stats = s.clone()
 
+	# Seed memorised spells from the job.
+	learned_spells.clear()
+	if job != null:
+		for sid in job.starting_spells:
+			var s: String = String(sid)
+			if s != "" and not learned_spells.has(s):
+				learned_spells.append(s)
+
 	# Pick first weapon from starting_equipment. Every armor piece slots
 	# itself by ArmorRegistry.slot_for so a job can start with chest+legs+
 	# boots (or more) and they all stack.
@@ -399,7 +412,7 @@ func _pickup_items_here() -> void:
 ## Fill the first empty quickslot with this consumable id, unless it's
 ## already quickslotted. Weapons/armor/junk don't go into quickslots.
 func _try_assign_quickslot(id: String, kind: String) -> void:
-	if kind != "potion" and kind != "scroll":
+	if kind != "potion" and kind != "scroll" and kind != "book":
 		return
 	if quickslot_ids.has(id):
 		return
@@ -523,6 +536,19 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 			weapon_bonus_dmg += int(info.get("amount", 1))
 			print("Weapon enchanted (+%d damage)." % weapon_bonus_dmg)
 			stats_changed.emit()
+			return true
+		"learn_spells":
+			var newly: Array[String] = []
+			for s in info.get("spells", []):
+				var sid: String = String(s)
+				if sid != "" and not learned_spells.has(sid):
+					learned_spells.append(sid)
+					newly.append(sid)
+			if newly.is_empty():
+				print("You already know these spells.")
+			else:
+				print("Learned: %s" % ", ".join(newly))
+			spells_learned.emit()
 			return true
 		_:
 			print("Unknown consumable effect: %s" % info.get("effect"))

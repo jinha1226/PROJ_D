@@ -12,4 +12,5 @@ dex_bonus = 0
 int_bonus = 3
 starting_equipment = Array[String](["dagger"])
 starting_skills = {"conjurations": 3, "spellcasting": 3, "short_blade": 1}
+starting_spells = Array[String](["magic_dart"])
 unique_ability = ""

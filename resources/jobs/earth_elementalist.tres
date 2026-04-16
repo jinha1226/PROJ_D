@@ -12,4 +12,5 @@ dex_bonus = 0
 int_bonus = 2
 starting_equipment = Array[String](["crystal_staff"])
 starting_skills = {"earth": 3, "conjurations": 2, "spellcasting": 2}
+starting_spells = Array[String](["stone_arrow"])
 unique_ability = ""
