@@ -26,5 +26,8 @@ Thumbs.db
 # Save data (local only)
 *.dat
 
+# CI-generated build version tag
+/version.txt
+
 # NOTE: *.import files ARE committed — they carry stable Godot UIDs.
 # NOTE: assets/ulpc/ IS committed so CI can build without the generator repo.

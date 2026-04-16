@@ -47,6 +47,13 @@ jobs:
           unzip -q Godot_v${GODOT_VERSION}-stable_export_templates.tpz
           mv templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
 
+      - name: Write build version
+        run: |
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          DATE=$(date -u +%Y%m%d-%H%M)
+          printf "%s @ %s" "$SHA_SHORT" "$DATE" > version.txt
+          cat version.txt
+
       - name: Import assets
         run: |
           # Run twice to settle UID cache for ~5,331 ULPC PNGs on first run.
