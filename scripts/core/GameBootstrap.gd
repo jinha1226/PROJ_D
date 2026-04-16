@@ -132,6 +132,8 @@ func _ready() -> void:
 		top_hud.bag_pressed.connect(_on_bag_pressed)
 	if top_hud != null and top_hud.has_signal("minimap_pressed"):
 		top_hud.minimap_pressed.connect(_on_minimap_pressed)
+	if top_hud != null and top_hud.has_signal("status_pressed"):
+		top_hud.status_pressed.connect(_on_status_pressed)
 
 	# [skill-ui-agent] persistent level-up toast layer.
 	skill_toast = SKILL_TOAST_SCENE.instantiate()
@@ -305,9 +307,11 @@ func _spawn_monsters_for_current_depth() -> void:
 const _LOOT_DROP_CHANCE: float = 0.35
 const _WEAPON_POOL: Array = ["dagger", "short_sword", "arming_sword", "axe", "mace", "club"]
 const _ARMOR_POOL: Array = [
-	{"id": "leather_armor", "name": "Leather Armor", "ac": 2, "color": Color(0.55, 0.35, 0.20)},
-	{"id": "chain_mail",    "name": "Chain Mail",    "ac": 4, "color": Color(0.70, 0.72, 0.78)},
-	{"id": "plate_armor",   "name": "Plate Armor",   "ac": 6, "color": Color(0.85, 0.85, 0.90)},
+	"leather_chest", "chain_chest", "plate_chest",
+	"leather_legs", "chain_legs", "plate_legs",
+	"leather_boots", "plate_boots",
+	"leather_helm", "plate_helm",
+	"leather_gloves", "plate_gloves",
 ]
 
 
@@ -322,11 +326,14 @@ func _maybe_drop_loot(monster: Monster) -> void:
 	if randf() < 0.6:
 		# Weapon drop — picks from a tier-1-ish pool for M1.
 		var wid: String = _WEAPON_POOL[randi() % _WEAPON_POOL.size()]
-		fi.setup(monster.grid_pos, wid, wid.capitalize(), "weapon", Color(0.75, 0.75, 0.85))
+		fi.setup(monster.grid_pos, wid, WeaponRegistry.display_name_for(wid),
+				"weapon", Color(0.75, 0.75, 0.85))
 	else:
-		var a: Dictionary = _ARMOR_POOL[randi() % _ARMOR_POOL.size()]
-		fi.setup(monster.grid_pos, String(a.id), String(a.name), "armor", a.color,
-				{"ac": int(a.ac)})
+		var aid: String = _ARMOR_POOL[randi() % _ARMOR_POOL.size()]
+		var info: Dictionary = ArmorRegistry.get_info(aid)
+		fi.setup(monster.grid_pos, aid, String(info.get("name", aid)),
+				"armor", info.get("color", Color(0.6, 0.6, 0.7)),
+				{"ac": int(info.get("ac", 0)), "slot": String(info.get("slot", "chest"))})
 
 
 func _spawn_dummy_items(count: int) -> void:
@@ -758,7 +765,7 @@ func _on_bag_pressed() -> void:
 func _build_item_tooltip(it: Dictionary) -> String:
 	var kind: String = String(it.get("kind", ""))
 	var id: String = String(it.get("id", ""))
-	var name_s: String = String(it.get("name", id))
+	var name_s: String = String(it.get("name", WeaponRegistry.display_name_for(id)))
 	match kind:
 		"weapon":
 			var new_dmg: int = WeaponRegistry.weapon_damage_for(id)
@@ -767,22 +774,25 @@ func _build_item_tooltip(it: Dictionary) -> String:
 			var cur_id: String = player.equipped_weapon_id if player else ""
 			var cur_dmg: int = WeaponRegistry.weapon_damage_for(cur_id)
 			var cur_delay: float = WeaponRegistry.weapon_delay_for(cur_id)
+			var cur_name: String = WeaponRegistry.display_name_for(cur_id) if cur_id != "" else "unarmed"
 			var diff_dmg: int = new_dmg - cur_dmg
 			var sign_d: String = "+" if diff_dmg >= 0 else ""
 			return "%s\nDamage: %d (%s%d vs %s)\nDelay: %.2f (cur %.2f)\nSkill: %s" % [
-				name_s, new_dmg, sign_d, diff_dmg,
-				cur_id if cur_id != "" else "unarmed",
-				new_delay, cur_delay, new_skill,
+				name_s, new_dmg, sign_d, diff_dmg, cur_name, new_delay, cur_delay, new_skill,
 			]
 		"armor":
 			var new_ac: int = int(it.get("ac", 0))
-			var cur_ac: int = int(player.equipped_armor.get("ac", 0)) if player else 0
-			var cur_name: String = String(player.equipped_armor.get("name", "")) if player else ""
+			# Slot-aware comparison: look up what's worn in this item's slot.
+			var slot: String = String(it.get("slot", ArmorRegistry.slot_for(id)))
+			var cur: Dictionary = {}
+			if player != null and player.equipped_armor.has(slot):
+				cur = player.equipped_armor[slot]
+			var cur_ac: int = int(cur.get("ac", 0))
+			var cur_name: String = String(cur.get("name", "(empty)"))
 			var diff_ac: int = new_ac - cur_ac
 			var sign_a: String = "+" if diff_ac >= 0 else ""
-			return "%s\nAC: %d (%s%d vs %s)" % [
-				name_s, new_ac, sign_a, diff_ac,
-				cur_name if cur_name != "" else "none",
+			return "%s [%s slot]\nAC: %d (%s%d vs %s)" % [
+				name_s, slot, new_ac, sign_a, diff_ac, cur_name,
 			]
 		"potion":
 			return "%s\nDrink to restore 20 HP." % name_s
@@ -819,25 +829,38 @@ func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
 		if idx >= 0 and idx < items.size():
 			var it: Dictionary = items[idx]
 			var kind: String = String(it.get("kind", ""))
-			# Remove picked item from inventory first.
 			items.remove_at(idx)
 			if kind == "weapon":
-				var prev_id: String = player.equip_weapon(String(it.get("id", "")))
+				var wid: String = String(it.get("id", ""))
+				var prev_id: String = player.equip_weapon(wid)
 				if prev_id != "":
 					items.append({
 						"id": prev_id,
-						"name": prev_id.capitalize(),
+						"name": WeaponRegistry.display_name_for(prev_id),
 						"kind": "weapon",
 						"color": Color(0.75, 0.75, 0.85),
 					})
 			elif kind == "armor":
-				var prev_armor: Dictionary = player.equip_armor(it)
+				# Always rehydrate from ArmorRegistry so the slot info is
+				# correct even for older floor items missing it in extra.
+				var aid: String = String(it.get("id", ""))
+				var armor_info: Dictionary = ArmorRegistry.get_info(aid)
+				if armor_info.is_empty():
+					armor_info = {
+						"id": aid,
+						"name": String(it.get("name", aid)),
+						"ac": int(it.get("ac", 0)),
+						"color": it.get("color", Color(0.6, 0.6, 0.7)),
+						"slot": String(it.get("slot", "chest")),
+					}
+				var prev_armor: Dictionary = player.equip_armor(armor_info)
 				if not prev_armor.is_empty():
 					items.append({
 						"id": String(prev_armor.get("id", "")),
 						"name": String(prev_armor.get("name", "")),
 						"kind": "armor",
-						"ac": prev_armor.get("ac", 0),
+						"ac": int(prev_armor.get("ac", 0)),
+						"slot": String(prev_armor.get("slot", "chest")),
 						"color": prev_armor.get("color", Color(0.6, 0.6, 0.7)),
 					})
 			player.inventory_changed.emit()
@@ -850,6 +873,78 @@ func _on_bag_drop(idx: int, dlg: AcceptDialog) -> void:
 		player.drop_item(idx)
 	dlg.queue_free()
 	_on_bag_pressed()
+
+
+func _on_status_pressed() -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null or player == null:
+		return
+	var dlg := AcceptDialog.new()
+	dlg.title = "Status"
+	dlg.ok_button_text = "Close"
+	var lab := Label.new()
+	lab.text = _build_status_text()
+	lab.add_theme_font_size_override("font_size", 24)
+	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lab.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	dlg.add_child(lab)
+	popup_mgr.add_child(dlg)
+	dlg.confirmed.connect(dlg.queue_free)
+	dlg.canceled.connect(dlg.queue_free)
+	dlg.popup_centered(Vector2i(800, 1500))
+
+
+func _build_status_text() -> String:
+	var s = player.stats
+	var race_name: String = player.race_res.display_name if player.race_res else "?"
+	var job_name: String = player.job_res.display_name if player.job_res else "?"
+	var trait_id: String = player.race_res.racial_trait if player.race_res else ""
+	var hp_text: String = "%d / %d" % [s.HP, s.hp_max] if s != null else "?"
+	var mp_text: String = "%d / %d" % [s.MP, s.mp_max] if s != null else "?"
+	var ac_breakdown: String = ""
+	var race_ac: int = player.race_res.base_ac if player.race_res else 0
+	var armor_ac: int = 0
+	for slot_dict in player.equipped_armor.values():
+		armor_ac += int(slot_dict.get("ac", 0))
+	ac_breakdown = "AC %d  (race +%d, armor +%d)" % [s.AC if s != null else 0, race_ac, armor_ac]
+
+	var lines: Array = []
+	lines.append("=== %s %s ===" % [race_name, job_name])
+	lines.append("Lv.%d   XP %d / %d" % [player.level, player.xp, player.xp_for_next_level()])
+	lines.append("")
+	lines.append("HP   %s" % hp_text)
+	lines.append("MP   %s" % mp_text)
+	if s != null:
+		lines.append("STR %d   DEX %d   INT %d" % [s.STR, s.DEX, s.INT])
+	lines.append(ac_breakdown)
+	lines.append("")
+	lines.append("--- Equipped ---")
+	var w_id: String = player.equipped_weapon_id
+	lines.append("Weapon : %s" % (WeaponRegistry.display_name_for(w_id) if w_id != "" else "(unarmed)"))
+	for slot in ["helm", "chest", "legs", "boots", "gloves"]:
+		var name_s: String = "(empty)"
+		if player.equipped_armor.has(slot):
+			name_s = "%s  (+%d AC)" % [
+				String(player.equipped_armor[slot].get("name", "")),
+				int(player.equipped_armor[slot].get("ac", 0)),
+			]
+		lines.append("%-7s: %s" % [slot.capitalize(), name_s])
+	if trait_id != "":
+		lines.append("")
+		lines.append("--- Trait ---")
+		lines.append(_describe_trait(trait_id))
+	return "\n".join(PackedStringArray(lines))
+
+
+func _describe_trait(trait_id: String) -> String:
+	match trait_id:
+		"trollregen":     return "Troll Regeneration — recovers 1 HP every turn."
+		"spriggan_speed": return "Spriggan Speed — moves twice per enemy turn."
+		"draconian_resist": return "Draconian Scales — bonus AC and (M2) elemental resistance."
+		"minotaur_headbutt": return "Minotaur Headbutt — 25% chance for bonus melee damage."
+		"catfolk_claws":  return "Catfolk Claws — +3 damage when fighting unarmed."
+		_: return trait_id
 
 
 func _on_minimap_pressed() -> void:

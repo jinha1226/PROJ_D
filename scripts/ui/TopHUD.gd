@@ -7,11 +7,13 @@ class_name TopHUD
 @onready var bag_button: Button = $Margin/VBox/HBox/BagButton
 @onready var minimap_button: Button = $Margin/VBox/HBox/MinimapButton
 @onready var skills_button: Button = $Margin/VBox/HBox/SkillsButton
+@onready var status_button: Button = $Margin/VBox/HBox/StatusButton
 @onready var weapon_skill_label: Label = $Margin/VBox/WeaponSkillLabel
 
 signal bag_pressed
 signal minimap_pressed
 signal skills_button_pressed
+signal status_pressed
 
 var _pulse_t: float = 0.0
 var _pulsing: bool = false
@@ -20,6 +22,7 @@ func _ready() -> void:
 	bag_button.pressed.connect(func(): bag_pressed.emit())
 	minimap_button.pressed.connect(func(): minimap_pressed.emit())
 	skills_button.pressed.connect(func(): skills_button_pressed.emit())
+	status_button.pressed.connect(func(): status_pressed.emit())
 
 func _process(delta: float) -> void:
 	if _pulsing:

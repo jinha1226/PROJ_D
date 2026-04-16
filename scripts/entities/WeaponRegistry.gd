@@ -72,3 +72,44 @@ static func weapon_delay_for(id: String) -> float:
 
 static func all_weapon_ids() -> Array:
 	return DATA.keys()
+
+
+## Human-readable name. Falls back to id.capitalize() if missing.
+const DISPLAY_NAMES: Dictionary = {
+	"axe":        "Axe",
+	"axe_medium": "Battle Axe",
+	"waraxe":     "War Axe",
+	"club":       "Club",
+	"mace":       "Mace",
+	"flail":      "Flail",
+	"dagger":     "Dagger",
+	"short_sword":"Short Sword",
+	"rapier":     "Rapier",
+	"saber":      "Saber",
+	"arming_sword": "Arming Sword",
+	"longsword":  "Longsword",
+	"katana":     "Katana",
+	"scimitar":   "Scimitar",
+	"greatsword": "Greatsword",
+	"spear":      "Spear",
+	"longspear":  "Longspear",
+	"halberd":    "Halberd",
+	"scythe":     "Scythe",
+	"trident":    "Trident",
+	"short_bow":  "Short Bow",
+	"long_bow":   "Long Bow",
+	"bow":        "Bow",
+	"crossbow":   "Crossbow",
+	"slingshot":  "Slingshot",
+	"boomerang":  "Boomerang",
+	"fire_staff": "Fire Staff",
+	"ice_staff":  "Ice Staff",
+	"lightning_staff": "Lightning Staff",
+	"gnarled_staff":   "Gnarled Staff",
+	"crystal_staff":   "Crystal Staff",
+	"wand_simple":     "Simple Wand",
+}
+
+
+static func display_name_for(id: String) -> String:
+	return DISPLAY_NAMES.get(id, id.capitalize().replace("_", " "))

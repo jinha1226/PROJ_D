@@ -10,6 +10,6 @@ description = "Norse battle-poet. Longsword in one hand, charms on the lips."
 str_bonus = 1
 dex_bonus = 0
 int_bonus = 2
-starting_equipment = Array[String](["longsword", "leather_armor", "leather_legs"])
+starting_equipment = Array[String](["longsword", "leather_chest", "leather_legs"])
 starting_skills = {"long_blade": 2, "fighting": 2, "spellcasting": 1, "translocations": 2}
 unique_ability = ""

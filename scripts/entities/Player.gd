@@ -28,7 +28,9 @@ const _MP_PER_LEVEL: int = 3
 
 # [skill-agent] equipped weapon + per-skill state (level/xp/training).
 var equipped_weapon_id: String = ""
-var equipped_armor: Dictionary = {}  # {"id", "name", "ac", "color"} or empty
+# Slot-keyed Dict: "chest"/"legs"/"boots"/"helm"/"gloves" → {id,name,ac,color,slot}
+# Missing key = nothing in that slot.
+var equipped_armor: Dictionary = {}
 var skill_state: Dictionary = {}
 
 # M1 dummy inventory — Array of Dictionary (FloorItem.as_dict()).
@@ -84,9 +86,10 @@ func _load_sprite_preset() -> void:
 	_sprite.play_anim("idle", true)
 
 
-## Build a CharacterSprite preset dict from the live race/job Resource refs.
-## Replaces the old one-JSON-per-(job,race) combination approach — now
-## 8 races × 20 jobs = 160 combos are composed at runtime.
+## Build a CharacterSprite preset dict reflecting the player's CURRENT
+## state (race + currently equipped weapon/armor), not their starting
+## loadout. Called both at setup and whenever equipment changes so the
+## sprite always matches what's worn.
 func _compose_preset() -> Dictionary:
 	if race_res == null and race_id != "":
 		race_res = load("res://resources/races/%s.tres" % race_id) as RaceData
@@ -95,7 +98,7 @@ func _compose_preset() -> Dictionary:
 	if race_res == null:
 		return {}
 	var equipment: Array = []
-	# Racial visual: hair / beard / horns.
+	# Racial visual: hair / beard / horns / ears.
 	if race_res.hair_def != "":
 		equipment.append({"def": race_res.hair_def, "variant": race_res.hair_color})
 	if race_res.beard_def != "":
@@ -104,10 +107,14 @@ func _compose_preset() -> Dictionary:
 		equipment.append({"def": race_res.horns_def, "variant": race_res.horns_color})
 	if race_res.ears_def != "":
 		equipment.append({"def": race_res.ears_def, "variant": race_res.ears_color})
-	# Job starting equipment — simple string ids.
-	if job_res != null:
-		for item_id in job_res.starting_equipment:
-			equipment.append(_item_id_to_preset_entry(String(item_id)))
+	# Currently equipped weapon (if any).
+	if equipped_weapon_id != "":
+		equipment.append(_item_id_to_preset_entry(equipped_weapon_id))
+	# Currently equipped armor pieces, slot by slot.
+	for slot_dict in equipped_armor.values():
+		var aid: String = String(slot_dict.get("id", ""))
+		if aid != "":
+			equipment.append(_item_id_to_preset_entry(aid))
 	return {
 		"id": "%s_%s" % [job_id, race_id],
 		"body_def": race_res.body_def,
@@ -176,7 +183,9 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 	stats = s
 	base_stats = s.clone()
 
-	# [skill-agent] pick first weapon from starting_equipment.
+	# Pick first weapon from starting_equipment. Every armor piece slots
+	# itself by ArmorRegistry.slot_for so a job can start with chest+legs+
+	# boots (or more) and they all stack.
 	equipped_weapon_id = ""
 	equipped_armor = {}
 	if job != null:
@@ -184,10 +193,11 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 			var sid: String = String(eq_id)
 			if WeaponRegistry.is_weapon(sid) and equipped_weapon_id == "":
 				equipped_weapon_id = sid
-			elif ArmorRegistry.is_armor(sid) and equipped_armor.is_empty():
-				equipped_armor = ArmorRegistry.get_info(sid)
-	# Now that armor (if any) is set, recompute AC. _recompute_defense reads
-	# race_res.base_ac so Draconian's intrinsic +2 stacks here.
+			elif ArmorRegistry.is_armor(sid):
+				var info: Dictionary = ArmorRegistry.get_info(sid)
+				var slot: String = String(info.get("slot", "chest"))
+				if not equipped_armor.has(slot):
+					equipped_armor[slot] = info
 	_recompute_defense()
 
 	stats_changed.emit()
@@ -196,30 +206,45 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 
 # [skill-agent] Swap the current weapon. Skill id update happens implicitly via
 # WeaponRegistry lookup on next attack; we just re-emit stats_changed so HUDs
-# refresh. Returns the previously-equipped weapon id ("" if none).
+# refresh. Returns the previously-equipped weapon id ("" if none). Also
+# triggers a sprite-preset reload so the on-screen LPC layers update.
 func equip_weapon(weapon_id: String) -> String:
 	var prev: String = equipped_weapon_id
 	equipped_weapon_id = weapon_id
 	stats_changed.emit()
+	_load_sprite_preset()
 	return prev
 
 
-## Equip armor Dictionary (id, name, ac, color). Returns previously equipped
-## armor dict (may be empty). Caller is responsible for returning the previous
-## item to inventory.
+## Equip an armor dict that includes a "slot" key. Replaces the prior armor
+## in that slot, returning the displaced dict (empty if the slot was empty).
+## Caller is responsible for putting the previous item back into inventory.
 func equip_armor(armor: Dictionary) -> Dictionary:
-	var prev: Dictionary = equipped_armor
-	equipped_armor = armor
+	var slot: String = String(armor.get("slot", "chest"))
+	var prev: Dictionary = equipped_armor.get(slot, {})
+	equipped_armor[slot] = armor
 	_recompute_defense()
+	_load_sprite_preset()
+	return prev
+
+
+## Remove an armor slot's entry (e.g. for unequip). Returns the dict.
+func unequip_armor_slot(slot: String) -> Dictionary:
+	var prev: Dictionary = equipped_armor.get(slot, {})
+	equipped_armor.erase(slot)
+	_recompute_defense()
+	_load_sprite_preset()
 	return prev
 
 
 func _recompute_defense() -> void:
 	if stats == null:
 		return
-	var ac: int = int(equipped_armor.get("ac", 0))
+	var ac: int = 0
 	if race_res != null:
 		ac += race_res.base_ac
+	for slot_dict in equipped_armor.values():
+		ac += int(slot_dict.get("ac", 0))
 	stats.AC = ac
 	stats_changed.emit()
 

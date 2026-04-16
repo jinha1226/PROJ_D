@@ -10,6 +10,6 @@ description = "Arena champion. Trident + net. High fighting skill, loud and prou
 str_bonus = 2
 dex_bonus = 1
 int_bonus = 0
-starting_equipment = Array[String](["trident", "leather_armor", "leather_legs", "leather_boots"])
+starting_equipment = Array[String](["trident", "leather_chest", "leather_legs", "leather_boots"])
 starting_skills = {"polearm": 3, "fighting": 3, "throwing": 1, "dodging": 1}
 unique_ability = ""

@@ -60,6 +60,10 @@ vertical_alignment = 1
 custom_minimum_size = Vector2(72, 72)
 text = "BAG"
 
+[node name="StatusButton" type="Button" parent="Margin/VBox/HBox"]
+custom_minimum_size = Vector2(72, 72)
+text = "ME"
+
 [node name="SkillsButton" type="Button" parent="Margin/VBox/HBox"]
 custom_minimum_size = Vector2(72, 72)
 text = "SKILLS"
