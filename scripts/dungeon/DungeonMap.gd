@@ -14,6 +14,7 @@ func _draw() -> void:
 	var wall_color: Color = Color(0.18, 0.18, 0.2)
 	var floor_color: Color = Color(0.55, 0.55, 0.58)
 	var stairs_color: Color = Color(0.95, 0.82, 0.15)
+	var stairs_up_color: Color = Color(0.55, 0.78, 0.95)
 	for x in DungeonGenerator.MAP_WIDTH:
 		for y in DungeonGenerator.MAP_HEIGHT:
 			var t: int = generator.map[x][y]
@@ -25,5 +26,7 @@ func _draw() -> void:
 					draw_rect(rect, floor_color, true)
 				DungeonGenerator.TileType.STAIRS_DOWN:
 					draw_rect(rect, stairs_color, true)
+				DungeonGenerator.TileType.STAIRS_UP:
+					draw_rect(rect, stairs_up_color, true)
 				_:
 					draw_rect(rect, floor_color, true)

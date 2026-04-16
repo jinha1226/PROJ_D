@@ -43,7 +43,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="Dim/Panel/VBox"]
-text = "결과"
+text = "Result"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 22
 
@@ -51,23 +51,23 @@ theme_override_font_sizes/font_size = 22
 theme_override_constants/separation = 4
 
 [node name="DepthLabel" type="Label" parent="Dim/Panel/VBox/Stats"]
-text = "도달 층수: B1F"
+text = "Depth: B1F"
 
 [node name="KillsLabel" type="Label" parent="Dim/Panel/VBox/Stats"]
-text = "처치 몬스터: 0마리"
+text = "Kills: 0"
 
 [node name="TurnsLabel" type="Label" parent="Dim/Panel/VBox/Stats"]
-text = "소요 턴: 0턴"
+text = "Turns: 0"
 
 [node name="KillerLabel" type="Label" parent="Dim/Panel/VBox/Stats"]
-text = "킬러: -"
+text = "Killer: -"
 
 [node name="ShardsGained" type="Label" parent="Dim/Panel/VBox"]
-text = "💎 룬 조각 획득: +0"
+text = "Rune Shards +0"
 horizontal_alignment = 1
 
 [node name="ShardsTotal" type="Label" parent="Dim/Panel/VBox"]
-text = "총 보유: 0 💎"
+text = "Total: 0"
 horizontal_alignment = 1
 
 [node name="Buttons" type="HBoxContainer" parent="Dim/Panel/VBox"]
@@ -75,7 +75,7 @@ alignment = 1
 theme_override_constants/separation = 12
 
 [node name="MetaButton" type="Button" parent="Dim/Panel/VBox/Buttons"]
-text = "[메타 업그레이드]"
+text = "[Meta Upgrades]"
 
 [node name="RetryButton" type="Button" parent="Dim/Panel/VBox/Buttons"]
-text = "[다시 도전]"
+text = "[Retry]"

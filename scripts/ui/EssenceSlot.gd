@@ -40,7 +40,7 @@ func set_essence(id: String, type_color: Color) -> void:
 func _update_empty() -> void:
 	essence_id = ""
 	if label:
-		label.text = "○"
+		label.text = "—"
 	if icon_rect:
 		icon_rect.visible = false
 	border_style.border_color = Color(0.4, 0.4, 0.4)

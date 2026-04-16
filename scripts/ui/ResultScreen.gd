@@ -32,21 +32,21 @@ func show_result(data: Dictionary) -> void:
 	var killer: String = String(data.get("killer", ""))
 
 	if victory:
-		_title.text = "⚔️ 던전 클리어!"
+		_title.text = "Dungeon Cleared!"
 		_killer_label.visible = false
 	else:
-		_title.text = "💀 B%dF에서 쓰러졌습니다" % depth
+		_title.text = "Defeated on B%dF" % depth
 		if killer != "":
-			_killer_label.text = "킬러: %s" % killer
+			_killer_label.text = "Killer: %s" % killer
 			_killer_label.visible = true
 		else:
 			_killer_label.visible = false
 
-	_depth_label.text = "도달 층수: B%dF" % depth
-	_kills_label.text = "처치 몬스터: %d마리" % kills
-	_turns_label.text = "소요 턴: %d턴" % turns
-	_gain_label.text = "💎 룬 조각 획득: +%d" % shards_gained
-	_total_label.text = "총 보유: %d 💎" % shards_total
+	_depth_label.text = "Depth: B%dF" % depth
+	_kills_label.text = "Kills: %d" % kills
+	_turns_label.text = "Turns: %d" % turns
+	_gain_label.text = "Rune Shards +%d" % shards_gained
+	_total_label.text = "Total: %d" % shards_total
 	visible = true
 
 

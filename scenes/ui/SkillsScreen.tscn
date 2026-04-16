@@ -55,7 +55,7 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 36
 
 [node name="CloseButton" type="Button" parent="Dim/Panel/Margin/VBox/Header"]
-text = "×"
+text = "X"
 custom_minimum_size = Vector2(72, 72)
 theme_override_font_sizes/font_size = 36
 
@@ -71,7 +71,7 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
 [node name="Footer" type="Label" parent="Dim/Panel/Margin/VBox"]
-text = "훈련 OFF된 스킬에는 XP가 배분되지 않습니다. 적을 처치해 XP를 얻으세요."
+text = "Unchecked skills receive no XP. Defeat enemies to train."
 autowrap_mode = 2
 theme_override_font_sizes/font_size = 16
 modulate = Color(0.75, 0.75, 0.8, 1)

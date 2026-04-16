@@ -99,8 +99,11 @@ func _on_tap(grid: Vector2i) -> void:
 	var cheb: int = max(abs(delta.x), abs(delta.y))
 	# Tap on self → if on stairs, emit.
 	if cheb == 0:
-		if generator.get_tile(grid) == DungeonGenerator.TileType.STAIRS_DOWN:
+		var tile_here: int = generator.get_tile(grid)
+		if tile_here == DungeonGenerator.TileType.STAIRS_DOWN:
 			stairs_tapped.emit(grid)
+		elif tile_here == DungeonGenerator.TileType.STAIRS_UP:
+			print("You can't go back up.")
 		return
 	if cheb == 1:
 		# Adjacent: move (or attack if monster there — handled in try_move).

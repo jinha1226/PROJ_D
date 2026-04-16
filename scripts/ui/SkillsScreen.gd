@@ -35,6 +35,16 @@ func _ready() -> void:
 func show_for_player(player: Node) -> void:
 	_player = player
 	_skill_system = get_tree().root.get_node_or_null("Game/SkillSystem") as SkillSystem
+	if _skill_system == null:
+		var cs: Node = get_tree().current_scene
+		if cs != null:
+			_skill_system = cs.get_node_or_null("SkillSystem") as SkillSystem
+	if _skill_system == null:
+		# Broad fallback: search the whole tree for any SkillSystem node.
+		for n in get_tree().get_nodes_in_group("skill_system"):
+			if n is SkillSystem:
+				_skill_system = n
+				break
 	if _skill_system != null:
 		if not _skill_system.skill_leveled_up.is_connected(_on_skill_leveled_up):
 			_skill_system.skill_leveled_up.connect(_on_skill_leveled_up)

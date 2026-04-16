@@ -44,4 +44,4 @@ alignment = 1
 
 [node name="RestButton" type="Button" parent="Margin/HBox"]
 custom_minimum_size = Vector2(80, 112)
-text = "💤"
+text = "REST"

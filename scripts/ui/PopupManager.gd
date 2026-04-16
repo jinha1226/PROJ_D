@@ -8,9 +8,9 @@ func show_item_popup(item_name: String, desc: String, callbacks: Dictionary) -> 
 	var dlg := ConfirmationDialog.new()
 	dlg.title = item_name
 	dlg.dialog_text = desc
-	dlg.ok_button_text = "줍기"
-	dlg.add_cancel_button("무시")
-	var use_btn: Button = dlg.add_button("사용", true, "use")
+	dlg.ok_button_text = "Take"
+	dlg.add_cancel_button("Ignore")
+	var use_btn: Button = dlg.add_button("Use", true, "use")
 	add_child(dlg)
 	dlg.confirmed.connect(func():
 		if callbacks.has("pickup"): callbacks["pickup"].call()
@@ -25,10 +25,10 @@ func show_item_popup(item_name: String, desc: String, callbacks: Dictionary) -> 
 
 func show_essence_swap_popup(slot_index: int, current_id: String, inventory: Array, callback: Callable) -> void:
 	var dlg := AcceptDialog.new()
-	dlg.title = "슬롯 %d 교체" % slot_index
+	dlg.title = "Swap Slot %d" % slot_index
 	var vb := VBoxContainer.new()
 	var cur := Label.new()
-	cur.text = "현재: %s" % (current_id if current_id != "" else "(비어있음)")
+	cur.text = "Current: %s" % (current_id if current_id != "" else "(empty)")
 	vb.add_child(cur)
 	vb.add_child(HSeparator.new())
 	for essence_id in inventory:
@@ -39,13 +39,13 @@ func show_essence_swap_popup(slot_index: int, current_id: String, inventory: Arr
 			dlg.queue_free())
 		vb.add_child(b)
 	var clear_btn := Button.new()
-	clear_btn.text = "[비우기]"
+	clear_btn.text = "[Empty slot]"
 	clear_btn.pressed.connect(func():
 		if callback.is_valid(): callback.call("")
 		dlg.queue_free())
 	vb.add_child(clear_btn)
 	dlg.add_child(vb)
-	dlg.ok_button_text = "취소"
+	dlg.ok_button_text = "Cancel"
 	add_child(dlg)
 	dlg.confirmed.connect(func(): dlg.queue_free())
 	dlg.canceled.connect(func(): dlg.queue_free())
@@ -57,7 +57,7 @@ func show_levelup_popup(level: int, callback: Callable) -> void:
 	dlg.dialog_hide_on_ok = false
 	var vb := VBoxContainer.new()
 	var lab := Label.new()
-	lab.text = "스탯 +1 선택:"
+	lab.text = "Choose a stat bonus:"
 	vb.add_child(lab)
 	for stat in ["STR", "DEX", "INT"]:
 		var b := Button.new()

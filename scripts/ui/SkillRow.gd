@@ -4,39 +4,39 @@ class_name SkillRow
 signal training_toggled(skill_id: String, enabled: bool)
 
 const SKILL_NAMES: Dictionary = {
-	"axe": "도끼",
-	"short_blade": "단검",
-	"long_blade": "장검",
-	"mace": "둔기",
-	"polearm": "창",
-	"staff": "지팡이",
-	"bow": "활",
-	"crossbow": "석궁",
-	"sling": "투석",
-	"throwing": "투척",
-	"fighting": "격투",
-	"armour": "갑옷",
-	"dodging": "회피",
-	"shields": "방패",
-	"spellcasting": "주문",
-	"conjurations": "소환",
-	"fire": "화염마법",
-	"cold": "냉기마법",
-	"earth": "대지마법",
-	"air": "바람마법",
-	"necromancy": "사령술",
-	"hexes": "저주",
-	"translocations": "이동술",
-	"summonings": "소환술",
-	"stealth": "은신",
-	"evocations": "발동술",
+	"axe": "Axe",
+	"short_blade": "Short Blades",
+	"long_blade": "Long Blades",
+	"mace": "Maces & Flails",
+	"polearm": "Polearms",
+	"staff": "Staves",
+	"bow": "Bows",
+	"crossbow": "Crossbows",
+	"sling": "Slings",
+	"throwing": "Throwing",
+	"fighting": "Fighting",
+	"armour": "Armour",
+	"dodging": "Dodging",
+	"shields": "Shields",
+	"spellcasting": "Spellcasting",
+	"conjurations": "Conjurations",
+	"fire": "Fire Magic",
+	"cold": "Cold Magic",
+	"earth": "Earth Magic",
+	"air": "Air Magic",
+	"necromancy": "Necromancy",
+	"hexes": "Hexes",
+	"translocations": "Translocations",
+	"summonings": "Summonings",
+	"stealth": "Stealth",
+	"evocations": "Evocations",
 }
 
 const CATEGORY_NAMES: Dictionary = {
-	"weapon": "무기",
-	"defense": "방어",
-	"magic": "마법",
-	"misc": "기타",
+	"weapon": "Weapon",
+	"defense": "Defense",
+	"magic": "Magic",
+	"misc": "Misc",
 }
 
 const MAX_LEVEL: int = 27
@@ -123,7 +123,7 @@ func bind(p_skill_id: String, state: Dictionary, category: String) -> void:
 		_level_label.text = "MASTER"
 		_xp_bar.visible = false
 		_xp_status_label.visible = true
-		_xp_status_label.text = "최대 레벨 달성"
+		_xp_status_label.text = "Max level reached"
 	elif level == 0 and not training:
 		_level_label.text = "Lv.0"
 		_xp_bar.visible = false

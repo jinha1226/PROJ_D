@@ -46,11 +46,11 @@ func set_weapon_skill_info(skill_display_name: String, level: int, xp_cur: float
 	if weapon_skill_label == null:
 		return
 	if skill_display_name == "":
-		weapon_skill_label.text = "장착: 맨손"
+		weapon_skill_label.text = "Equipped: Unarmed"
 		return
 	if level >= 27:
-		weapon_skill_label.text = "장착: %s (MASTER)" % skill_display_name
+		weapon_skill_label.text = "Equipped: %s (MASTER)" % skill_display_name
 	else:
-		weapon_skill_label.text = "장착: %s (Lv.%d, %d/%d XP)" % [
+		weapon_skill_label.text = "Equipped: %s (Lv.%d, %d/%d XP)" % [
 			skill_display_name, level, int(xp_cur), int(xp_max),
 		]

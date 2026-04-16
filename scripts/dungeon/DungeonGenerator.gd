@@ -170,6 +170,9 @@ func _place_stairs() -> void:
 			farthest_room = rooms[i]
 	stairs_down_pos = _room_center(farthest_room)
 	map[stairs_down_pos.x][stairs_down_pos.y] = TileType.STAIRS_DOWN
+	# Place STAIRS_UP at spawn tile so players always see an upstair on arrival.
+	if spawn_pos != stairs_down_pos:
+		map[spawn_pos.x][spawn_pos.y] = TileType.STAIRS_UP
 
 func _in_bounds(p: Vector2i) -> bool:
 	return p.x >= 0 and p.x < MAP_WIDTH and p.y >= 0 and p.y < MAP_HEIGHT
