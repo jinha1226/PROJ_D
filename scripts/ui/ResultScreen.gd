@@ -57,4 +57,7 @@ func _on_meta_pressed() -> void:
 
 func _on_retry_pressed() -> void:
 	retry_pressed.emit()
+	# Fresh run — same race/job, depth back to 1.
+	if GameManager != null:
+		GameManager.current_depth = 1
 	get_tree().reload_current_scene()

@@ -1,0 +1,57 @@
+[gd_scene load_steps=2 format=3 uid="uid://bmainmenu0001"]
+
+[ext_resource type="Script" path="res://scripts/ui/menu/MainMenu.gd" id="1_mm"]
+
+[node name="MainMenu" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_mm")
+
+[node name="BG" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.04, 0.03, 0.08, 1)
+
+[node name="Title" type="Label" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -400.0
+offset_top = 320.0
+offset_right = 400.0
+offset_bottom = 460.0
+text = "STONE & DEPTH"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 96
+theme_override_colors/font_color = Color(0.95, 0.92, 0.82, 1)
+
+[node name="Subtitle" type="Label" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -400.0
+offset_top = 470.0
+offset_right = 400.0
+offset_bottom = 530.0
+text = "Portrait Roguelite RPG"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(0.7, 0.7, 0.82, 1)
+
+[node name="Buttons" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -240.0
+offset_top = 900.0
+offset_right = 240.0
+offset_bottom = 1400.0
+theme_override_constants/separation = 32
+
+[node name="NewRunButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(0, 120)
+text = "New Run"
+theme_override_font_sizes/font_size = 44
+
+[node name="CreditsButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(0, 96)
+text = "Credits"
+theme_override_font_sizes/font_size = 32

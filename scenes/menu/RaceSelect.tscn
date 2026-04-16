@@ -1,0 +1,59 @@
+[gd_scene load_steps=2 format=3 uid="uid://braceselect001"]
+
+[ext_resource type="Script" path="res://scripts/ui/menu/RaceSelect.gd" id="1_rs"]
+
+[node name="RaceSelect" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_rs")
+
+[node name="BG" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.04, 0.03, 0.08, 1)
+
+[node name="Title" type="Label" parent="."]
+anchor_right = 1.0
+offset_top = 48.0
+offset_bottom = 160.0
+text = "Choose Your Race"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 52
+theme_override_colors/font_color = Color(0.95, 0.92, 0.82, 1)
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 180.0
+offset_right = -24.0
+offset_bottom = -180.0
+horizontal_scroll_mode = 0
+
+[node name="Grid" type="GridContainer" parent="Scroll"]
+size_flags_horizontal = 3
+columns = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+
+[node name="Footer" type="HBoxContainer" parent="."]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -160.0
+offset_right = -24.0
+offset_bottom = -40.0
+theme_override_constants/separation = 24
+
+[node name="BackButton" type="Button" parent="Footer"]
+custom_minimum_size = Vector2(300, 0)
+text = "Back"
+theme_override_font_sizes/font_size = 32
+
+[node name="NextButton" type="Button" parent="Footer"]
+custom_minimum_size = Vector2(300, 0)
+size_flags_horizontal = 3
+text = "Next"
+theme_override_font_sizes/font_size = 32
