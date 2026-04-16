@@ -4,6 +4,7 @@ extends Node
 ## longpress auto-explore, and monster-sight interruption.
 
 signal stairs_tapped(pos: Vector2i)
+signal stairs_up_tapped(pos: Vector2i)
 
 const TILE_SIZE: int = 32
 const LONGPRESS_TIME: float = 0.5
@@ -103,7 +104,7 @@ func _on_tap(grid: Vector2i) -> void:
 		if tile_here == DungeonGenerator.TileType.STAIRS_DOWN:
 			stairs_tapped.emit(grid)
 		elif tile_here == DungeonGenerator.TileType.STAIRS_UP:
-			print("You can't go back up.")
+			stairs_up_tapped.emit(grid)
 		return
 	if cheb == 1:
 		# Adjacent: move (or attack if monster there — handled in try_move).

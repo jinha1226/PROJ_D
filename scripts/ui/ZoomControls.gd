@@ -12,14 +12,18 @@ var _minus_btn: Button
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_PASS
-	anchor_left = 1.0
-	anchor_right = 1.0
-	anchor_top = 0.5
-	anchor_bottom = 0.5
-	offset_left = -88.0
-	offset_right = -8.0
-	offset_top = -90.0
-	offset_bottom = 90.0
+	# Use explicit position/size — anchors are unreliable inside nested CanvasLayers.
+	# Viewport is always 1080×2340 (canvas_items stretch mode).
+	# Place on right edge, vertically centred between TopHUD (148px) and BottomHUD (144px).
+	const VP_W := 1080
+	const VP_H := 2340
+	const TOP_H := 148
+	const BOT_H := 144
+	const BTN_W := 80
+	const MARGIN := 8
+	var mid_y := TOP_H + (VP_H - TOP_H - BOT_H) / 2
+	position = Vector2(VP_W - BTN_W - MARGIN, mid_y - 90)
+	size = Vector2(BTN_W, 180)
 
 	var vbox: VBoxContainer = VBoxContainer.new()
 	vbox.anchor_right = 1.0

@@ -97,6 +97,10 @@ func _ready() -> void:
 	_top_hud_ref = top_hud
 	if top_hud != null and top_hud.has_signal("skills_button_pressed"):
 		top_hud.skills_button_pressed.connect(_on_skills_button_pressed)
+	if top_hud != null and top_hud.has_signal("bag_pressed"):
+		top_hud.bag_pressed.connect(_on_bag_pressed)
+	if top_hud != null and top_hud.has_signal("minimap_pressed"):
+		top_hud.minimap_pressed.connect(_on_minimap_pressed)
 
 	# [skill-ui-agent] persistent level-up toast layer.
 	skill_toast = SKILL_TOAST_SCENE.instantiate()
@@ -152,6 +156,7 @@ func _ready() -> void:
 	touch_input.camera = cam
 	add_child(touch_input)
 	touch_input.stairs_tapped.connect(_on_stairs_tapped)
+	touch_input.stairs_up_tapped.connect(_on_stairs_up_tapped)
 
 	# [zoom-agent] ZoomController attached under Game so it sees unhandled input,
 	# and ZoomControls added to UI layer on the right edge above BottomHUD.
@@ -215,6 +220,15 @@ func _on_stairs_tapped(_pos: Vector2i) -> void:
 		_end_run(true, "")
 		return
 	GameManager.current_depth += 1
+	_regenerate_dungeon()
+
+
+func _on_stairs_up_tapped(_pos: Vector2i) -> void:
+	if run_over:
+		return
+	if GameManager.current_depth <= 1:
+		return  # Already at shallowest floor.
+	GameManager.current_depth -= 1
 	_regenerate_dungeon()
 
 
@@ -299,6 +313,40 @@ func _on_skills_button_pressed() -> void:
 	screen.name = "SkillsScreen"
 	ui_layer.add_child(screen)
 	screen.show_for_player(player)
+
+
+func _on_bag_pressed() -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null:
+		return
+	var dlg := AcceptDialog.new()
+	dlg.title = "Bag"
+	dlg.dialog_text = "Inventory is empty."
+	if player != null and player.has_method("get_items"):
+		var items: Array = player.get_items()
+		if items.size() > 0:
+			var lines: Array = []
+			for item in items:
+				lines.append(str(item))
+			dlg.dialog_text = "\n".join(lines)
+	popup_mgr.add_child(dlg)
+	dlg.confirmed.connect(func(): dlg.queue_free())
+	dlg.canceled.connect(func(): dlg.queue_free())
+	dlg.popup_centered(Vector2i(640, 800))
+
+
+func _on_minimap_pressed() -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null:
+		return
+	var dlg := AcceptDialog.new()
+	dlg.title = "Map"
+	var depth: int = GameManager.current_depth if GameManager != null else 1
+	dlg.dialog_text = "Floor B%dF\nExplore to reveal the map." % depth
+	popup_mgr.add_child(dlg)
+	dlg.confirmed.connect(func(): dlg.queue_free())
+	dlg.canceled.connect(func(): dlg.queue_free())
+	dlg.popup_centered(Vector2i(640, 400))
 
 
 func _on_skill_leveled_up_toast(p: Node, skill_id: String, new_level: int) -> void:
