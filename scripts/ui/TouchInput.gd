@@ -8,7 +8,9 @@ signal stairs_up_tapped(pos: Vector2i)
 
 const TILE_SIZE: int = 32
 const LONGPRESS_TIME: float = 0.5
-const SIGHT_RANGE: int = 6
+# Chebyshev distance within which an enemy halts auto-move. Small so that
+# just "seeing an enemy on screen" (no fog-of-war yet) doesn't cancel travel.
+const SIGHT_RANGE: int = 3
 
 @export var generator: DungeonGenerator
 @export var player: Player

@@ -32,6 +32,9 @@ var _top_hud_ref: Node = null
 var kill_count: int = 0
 var last_killer_name: String = ""
 var run_over: bool = false
+# Fixed per-run seed. generator.generate(depth, _base_seed) adds depth*1000
+# internally so each depth has a stable, distinct map.
+var _base_seed: int = 0
 
 
 func _ready() -> void:
@@ -41,9 +44,10 @@ func _ready() -> void:
 	add_child(meta)
 	meta.load_from_disk()
 
+	_base_seed = randi()
 	generator = DungeonGenerator.new()
 	add_child(generator)
-	generator.generate(GameManager.current_depth)
+	generator.generate(GameManager.current_depth, _base_seed)
 
 	var dungeon_layer: Node2D = $DungeonLayer
 	var dmap: DungeonMap = dungeon_layer.get_node("DungeonMap")
@@ -252,7 +256,7 @@ func _on_stairs_tapped(_pos: Vector2i) -> void:
 		_end_run(true, "")
 		return
 	GameManager.current_depth += 1
-	_regenerate_dungeon()
+	_regenerate_dungeon(false)
 
 
 func _on_stairs_up_tapped(_pos: Vector2i) -> void:
@@ -261,11 +265,14 @@ func _on_stairs_up_tapped(_pos: Vector2i) -> void:
 	if GameManager.current_depth <= 1:
 		return  # Already at shallowest floor.
 	GameManager.current_depth -= 1
-	_regenerate_dungeon()
+	_regenerate_dungeon(true)
 
 
-func _regenerate_dungeon() -> void:
-	# [meta-agent] rebuild dungeon + monsters for the new depth; keep player instance.
+## going_up=true places the player at the new floor's stairs_down (where they
+## originally descended). Otherwise spawn_pos (= stairs_up, natural entry
+## when descending). _base_seed is fixed per run so the same depth yields
+## the same map on every revisit.
+func _regenerate_dungeon(going_up: bool) -> void:
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if is_instance_valid(m):
 			TurnManager.unregister_actor(m)
@@ -277,12 +284,13 @@ func _regenerate_dungeon() -> void:
 		generator.queue_free()
 	generator = DungeonGenerator.new()
 	add_child(generator)
-	generator.generate(GameManager.current_depth, randi())
+	generator.generate(GameManager.current_depth, _base_seed)
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	dmap.render(generator)
 	player.generator = generator
-	player.grid_pos = generator.spawn_pos
-	player.position = Vector2(generator.spawn_pos.x * TILE_SIZE + TILE_SIZE / 2.0, generator.spawn_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
+	var entry_pos: Vector2i = generator.stairs_down_pos if going_up else generator.spawn_pos
+	player.grid_pos = entry_pos
+	player.position = Vector2(entry_pos.x * TILE_SIZE + TILE_SIZE / 2.0, entry_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
 	var cam: Camera2D = $Camera2D
 	cam.position = player.position
 	if touch_input:
