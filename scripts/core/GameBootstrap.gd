@@ -12,10 +12,10 @@ const RESULT_SCREEN_SCENE: PackedScene = preload("res://scenes/ui/ResultScreen.t
 # [skill-ui-agent] level-up toast prefab.
 const SKILL_TOAST_SCENE: PackedScene = preload("res://scenes/ui/SkillLevelUpToast.tscn")
 
-const _SKILL_CATEGORIES: Array = ["all", "weapon", "defense", "magic", "misc"]
+const _SKILL_CATEGORIES: Array = ["all", "weapon", "defense", "magic", "misc", "spells"]
 const _SKILL_CATEGORY_LABELS: Dictionary = {
 	"all": "ALL", "weapon": "WEAPON", "defense": "DEFENSE",
-	"magic": "MAGIC", "misc": "MISC",
+	"magic": "MAGIC", "misc": "MISC", "spells": "CAST",
 }
 # [zoom-agent] pinch gesture + UI zoom buttons.
 const ZOOM_CONTROLLER_SCRIPT: Script = preload("res://scripts/ui/ZoomController.gd")
@@ -741,11 +741,14 @@ func _open_skills_dialog(category: String) -> void:
 	var state: Dictionary = {}
 	if "skill_state" in player and player.skill_state is Dictionary:
 		state = player.skill_state
-	for skill_id in SkillSystem.SKILL_IDS:
-		var cat_id: String = String(SkillSystem.SKILL_CATEGORY.get(skill_id, ""))
-		if category != "all" and cat_id != category:
-			continue
-		rows.add_child(_build_skill_row(skill_id, cat_id, state.get(skill_id, {})))
+	if category == "spells":
+		_build_spell_panel(rows, dlg)
+	else:
+		for skill_id in SkillSystem.SKILL_IDS:
+			var cat_id: String = String(SkillSystem.SKILL_CATEGORY.get(skill_id, ""))
+			if category != "all" and cat_id != category:
+				continue
+			rows.add_child(_build_skill_row(skill_id, cat_id, state.get(skill_id, {})))
 
 	var footer := Label.new()
 	footer.text = "Uncheck to stop training. Defeat enemies to gain XP."
@@ -813,6 +816,213 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 	row.add_child(cat_lab)
 	return row
 
+
+## ---- SPELL CASTING -------------------------------------------------------
+
+## Builds the spell panel for the CAST tab of the skills dialog.
+func _build_spell_panel(container: VBoxContainer, dlg: AcceptDialog) -> void:
+	# MP header.
+	var mp_lab := Label.new()
+	var cur_mp: int = player.stats.MP if player.stats != null else 0
+	var max_mp: int = player.stats.mp_max if player.stats != null else 0
+	mp_lab.text = "MP  %d / %d" % [cur_mp, max_mp]
+	mp_lab.add_theme_font_size_override("font_size", 30)
+	mp_lab.modulate = Color(0.45, 0.7, 1.0)
+	container.add_child(mp_lab)
+	container.add_child(HSeparator.new())
+
+	var known: Array[String] = SpellRegistry.get_known_for_player(player, skill_system)
+	if known.is_empty():
+		var hint := Label.new()
+		hint.text = "No spells known.\nTrain conjurations, fire, cold, earth, air,\nnecromancy, hexes, or translocations (lv 1+)\nto unlock spells."
+		hint.add_theme_font_size_override("font_size", 28)
+		hint.modulate = Color(0.7, 0.7, 0.8)
+		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		container.add_child(hint)
+		return
+
+	for spell_id in known:
+		var info: Dictionary = SpellRegistry.get_spell(spell_id)
+		if info.is_empty():
+			continue
+
+		var row := HBoxContainer.new()
+		row.custom_minimum_size = Vector2(0, 96)
+		row.add_theme_constant_override("separation", 12)
+
+		# Colour swatch + name + MP cost.
+		var name_vb := VBoxContainer.new()
+		name_vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var name_lab := Label.new()
+		name_lab.text = "%s  [%d MP]" % [String(info.get("name", spell_id)), int(info.get("mp", 0))]
+		name_lab.add_theme_font_size_override("font_size", 30)
+		name_lab.modulate = info.get("color", Color.WHITE)
+		name_vb.add_child(name_lab)
+		var desc_lab := Label.new()
+		desc_lab.text = String(info.get("desc", ""))
+		desc_lab.add_theme_font_size_override("font_size", 22)
+		desc_lab.modulate = Color(0.75, 0.75, 0.85)
+		desc_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		name_vb.add_child(desc_lab)
+		row.add_child(name_vb)
+
+		var cast_btn := Button.new()
+		cast_btn.text = "Cast"
+		cast_btn.custom_minimum_size = Vector2(130, 0)
+		cast_btn.add_theme_font_size_override("font_size", 28)
+		cast_btn.disabled = (player.stats == null or player.stats.MP < int(info.get("mp", 1)))
+		cast_btn.pressed.connect(_on_cast_pressed.bind(spell_id, dlg))
+		row.add_child(cast_btn)
+
+		container.add_child(row)
+		container.add_child(HSeparator.new())
+
+
+func _on_cast_pressed(spell_id: String, dlg: AcceptDialog) -> void:
+	dlg.queue_free()
+	var result: Dictionary = _execute_cast(spell_id)
+	print("[Spell] %s" % result.get("message", spell_id))
+	if result.get("success", false):
+		# Train school + spellcasting on successful cast.
+		if skill_system != null:
+			var info: Dictionary = SpellRegistry.get_spell(spell_id)
+			var school: String = String(info.get("school", "spellcasting"))
+			var xp_gain: float = float(info.get("mp", 1)) * 8.0
+			skill_system.grant_xp(player, xp_gain, [school, "spellcasting"])
+		TurnManager.end_player_turn()
+
+
+func _execute_cast(spell_id: String) -> Dictionary:
+	if player == null or player.stats == null:
+		return {"success": false, "message": "No player"}
+	var info: Dictionary = SpellRegistry.get_spell(spell_id)
+	if info.is_empty():
+		return {"success": false, "message": "Unknown spell: %s" % spell_id}
+
+	var mp_cost: int = int(info.get("mp", 1))
+	if player.stats.MP < mp_cost:
+		return {"success": false, "message": "Not enough MP (%d/%d)" % [player.stats.MP, mp_cost]}
+
+	player.stats.MP -= mp_cost
+	player.stats_changed.emit()
+
+	var school: String = String(info.get("school", "spellcasting"))
+	var school_lv: int = skill_system.get_level(player, school) if skill_system else 0
+	var sc_lv: int = skill_system.get_level(player, "spellcasting") if skill_system else 0
+	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
+	var power: int = school_lv * 2 + sc_lv + int_bonus
+
+	var targeting: String = String(info.get("targeting", "single"))
+	match targeting:
+		"self":   return _cast_self_spell(spell_id, info, power)
+		"single": return _cast_single_target(spell_id, info, power)
+		"area":   return _cast_area_spell(spell_id, info, power)
+		_:        return {"success": true, "message": "Spell fizzles."}
+
+
+func _cast_single_target(spell_id: String, info: Dictionary, power: int) -> Dictionary:
+	var target: Monster = _find_nearest_visible_monster(int(info.get("range", 6)))
+	if target == null:
+		# Refund MP — no valid target.
+		player.stats.MP = min(player.stats.mp_max, player.stats.MP + int(info.get("mp", 1)))
+		player.stats_changed.emit()
+		return {"success": false, "message": "No visible target in range."}
+
+	var tname: String = ""
+	if target.data != null and "display_name" in target.data:
+		tname = String(target.data.display_name)
+	else:
+		tname = target.name
+
+	var effect: String = String(info.get("effect", "damage"))
+	if effect == "slow":
+		target.slowed_turns = 4
+		return {"success": true, "message": "%s is slowed for 4 turns!" % tname}
+
+	# Damage spell.
+	var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
+	target.take_damage(dmg)
+	return {"success": true, "message": "%s → %s: %d dmg" % [String(info.get("name", spell_id)), tname, dmg], "damage": dmg}
+
+
+func _cast_area_spell(spell_id: String, info: Dictionary, power: int) -> Dictionary:
+	var center_m: Monster = _find_nearest_visible_monster(int(info.get("range", 8)))
+	if center_m == null:
+		player.stats.MP = min(player.stats.mp_max, player.stats.MP + int(info.get("mp", 1)))
+		player.stats_changed.emit()
+		return {"success": false, "message": "No visible target in range."}
+
+	var center: Vector2i = center_m.grid_pos
+	var radius: int = int(info.get("radius", 2))
+	var total_dmg: int = 0
+	var hits: int = 0
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+			continue
+		var dist: int = max(abs(m.grid_pos.x - center.x), abs(m.grid_pos.y - center.y))
+		if dist > radius:
+			continue
+		var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
+		if dist > 0:
+			dmg = max(1, dmg - dist * 3)  # damage falloff from epicentre
+		m.take_damage(dmg)
+		total_dmg += dmg
+		hits += 1
+
+	if hits == 0:
+		return {"success": true, "message": "%s hits nothing." % String(info.get("name", spell_id))}
+	return {"success": true, "message": "%s: %d hit(s), %d total dmg" % [String(info.get("name", spell_id)), hits, total_dmg]}
+
+
+func _cast_self_spell(spell_id: String, _info: Dictionary, _power: int) -> Dictionary:
+	if spell_id == "blink":
+		for _i in 60:
+			var dx: int = randi_range(-6, 6)
+			var dy: int = randi_range(-6, 6)
+			if abs(dx) + abs(dy) < 2:
+				continue
+			var dest: Vector2i = player.grid_pos + Vector2i(dx, dy)
+			if generator == null or not generator.is_walkable(dest):
+				continue
+			# Make sure no monster is at destination.
+			var blocked: bool = false
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if is_instance_valid(m) and m is Monster and m.grid_pos == dest:
+					blocked = true
+					break
+			if blocked:
+				continue
+			player.grid_pos = dest
+			player.position = Vector2(dest.x * 32 + 16, dest.y * 32 + 16)
+			var dmap: DungeonMap = $DungeonLayer/DungeonMap
+			dmap.update_fov(dest)
+			_refresh_minimap_preview(dmap, dest)
+			var cam: Camera2D = $Camera2D
+			cam.position = player.position
+			return {"success": true, "message": "You blink to a new location."}
+		return {"success": true, "message": "Blink fizzles — nowhere safe nearby."}
+	return {"success": true, "message": ""}
+
+
+func _find_nearest_visible_monster(range_tiles: int = 99) -> Monster:
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	if dmap == null or player == null:
+		return null
+	var best: Monster = null
+	var best_dist: float = INF
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+			continue
+		if not dmap.is_tile_visible(m.grid_pos):
+			continue
+		var d: float = float(player.grid_pos.distance_to(m.grid_pos))
+		if d <= float(range_tiles) and d < best_dist:
+			best_dist = d
+			best = m
+	return best
+
+
+## ---- BAG -----------------------------------------------------------------
 
 func _on_bag_pressed() -> void:
 	if _bag_dlg != null and is_instance_valid(_bag_dlg):

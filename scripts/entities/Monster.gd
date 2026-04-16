@@ -15,6 +15,8 @@ var dex: int = 0
 var sight_range: int = 6
 var is_alive: bool = true
 var tile_size: int = 32
+# Hex effect: remaining turns where this monster skips its action.
+var slowed_turns: int = 0
 
 var _sprite: CharacterSprite = null
 var _has_preset: bool = false

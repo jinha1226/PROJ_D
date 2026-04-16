@@ -5,6 +5,10 @@ class_name MonsterAI
 static func act(m: Monster) -> void:
 	if not m.is_alive:
 		return
+	# Slow hex: skip this turn and count down.
+	if m.slowed_turns > 0:
+		m.slowed_turns -= 1
+		return
 	var player: Node = m.get_player()
 	if player == null:
 		_maybe_wander(m)

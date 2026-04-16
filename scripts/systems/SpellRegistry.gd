@@ -1,0 +1,107 @@
+class_name SpellRegistry
+extends Object
+## Static spell database. No scene node needed — reference via SpellRegistry.SPELLS etc.
+##
+## targeting: "single" | "area" | "self"
+## effect:    "damage" (default) | "slow" | "teleport"
+## school:    matches SkillSystem.SKILL_IDS magic entries
+
+const SPELLS: Dictionary = {
+	"magic_dart": {
+		"name": "Magic Dart", "school": "conjurations",
+		"mp": 1, "min_dmg": 2, "max_dmg": 6,
+		"targeting": "single", "range": 9, "effect": "damage",
+		"color": Color(0.75, 0.75, 1.0),
+		"desc": "A conjured dart. Never misses.",
+	},
+	"flame_tongue": {
+		"name": "Flame Tongue", "school": "fire",
+		"mp": 2, "min_dmg": 4, "max_dmg": 10,
+		"targeting": "single", "range": 5, "effect": "damage",
+		"color": Color(1.0, 0.4, 0.0),
+		"desc": "A short-range gout of flame.",
+	},
+	"fireball": {
+		"name": "Fireball", "school": "fire",
+		"mp": 6, "min_dmg": 8, "max_dmg": 22,
+		"targeting": "area", "range": 8, "radius": 2, "effect": "damage",
+		"color": Color(1.0, 0.6, 0.0),
+		"desc": "Explosive fire damage in an area.",
+	},
+	"freeze": {
+		"name": "Freeze", "school": "cold",
+		"mp": 2, "min_dmg": 4, "max_dmg": 10,
+		"targeting": "single", "range": 6, "effect": "damage",
+		"color": Color(0.5, 0.85, 1.0),
+		"desc": "Crystallises moisture around the target.",
+	},
+	"stone_arrow": {
+		"name": "Stone Arrow", "school": "earth",
+		"mp": 3, "min_dmg": 5, "max_dmg": 14,
+		"targeting": "single", "range": 7, "effect": "damage",
+		"color": Color(0.75, 0.65, 0.45),
+		"desc": "A sharp shard of conjured stone.",
+	},
+	"lightning_bolt": {
+		"name": "Lightning Bolt", "school": "air",
+		"mp": 3, "min_dmg": 5, "max_dmg": 14,
+		"targeting": "single", "range": 8, "effect": "damage",
+		"color": Color(1.0, 1.0, 0.4),
+		"desc": "An arc of electricity to the target.",
+	},
+	"pain": {
+		"name": "Pain", "school": "necromancy",
+		"mp": 2, "min_dmg": 3, "max_dmg": 9,
+		"targeting": "single", "range": 6, "effect": "damage",
+		"color": Color(0.55, 0.0, 0.75),
+		"desc": "Channels death-energy into raw agony.",
+	},
+	"slow": {
+		"name": "Slow", "school": "hexes",
+		"mp": 3, "min_dmg": 0, "max_dmg": 0,
+		"targeting": "single", "range": 6, "effect": "slow",
+		"color": Color(0.4, 0.9, 0.5),
+		"desc": "Halves target speed for 4 turns.",
+	},
+	"blink": {
+		"name": "Blink", "school": "translocations",
+		"mp": 2, "min_dmg": 0, "max_dmg": 0,
+		"targeting": "self", "range": 0, "effect": "teleport",
+		"color": Color(0.8, 0.55, 1.0),
+		"desc": "Randomly teleports you a short distance.",
+	},
+}
+
+## School → list of {id, min_level} pairs.
+const SCHOOL_SPELLS: Dictionary = {
+	"conjurations": [{"id": "magic_dart",    "min_level": 1}],
+	"fire":         [{"id": "flame_tongue",  "min_level": 1},
+	                 {"id": "fireball",      "min_level": 3}],
+	"cold":         [{"id": "freeze",        "min_level": 1}],
+	"earth":        [{"id": "stone_arrow",   "min_level": 1}],
+	"air":          [{"id": "lightning_bolt","min_level": 1}],
+	"necromancy":   [{"id": "pain",          "min_level": 1}],
+	"hexes":        [{"id": "slow",          "min_level": 1}],
+	"translocations":[{"id": "blink",        "min_level": 1}],
+}
+
+
+static func get_spell(id: String) -> Dictionary:
+	return SPELLS.get(id, {})
+
+
+## Returns spell ids the player currently qualifies for based on skill levels.
+static func get_known_for_player(player: Node, skill_sys: Node) -> Array[String]:
+	var known: Array[String] = []
+	if player == null or skill_sys == null:
+		return known
+	for school in SCHOOL_SPELLS:
+		var level: int = skill_sys.get_level(player, school)
+		if level <= 0:
+			continue
+		for entry in SCHOOL_SPELLS[school]:
+			var sid: String = String(entry.get("id", ""))
+			var min_lv: int = int(entry.get("min_level", 1))
+			if level >= min_lv and not known.has(sid):
+				known.append(sid)
+	return known
