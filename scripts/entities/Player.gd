@@ -171,7 +171,9 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 	job_res = job
 	race_res = race
 	_ensure_sprite()
-	_load_sprite_preset()
+	# Sprite preset is composed AFTER equipped_* fields are set below so the
+	# starting gear actually appears. _load_sprite_preset call lives at the
+	# end of setup().
 
 	var s := Stats.new()
 	var base_str: int = (race.base_str if race else 10) + (job.str_bonus if job else 0)
@@ -210,6 +212,8 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 
 	stats_changed.emit()
 	queue_redraw()
+	# Now compose the sprite preset with the starting weapon + armor applied.
+	_load_sprite_preset()
 
 
 # [skill-agent] Swap the current weapon. Skill id update happens implicitly via
