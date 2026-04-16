@@ -45,6 +45,14 @@ var _base_seed: int = 0
 # stay gone. Keyed by int depth.
 var _floor_state: Dictionary = {}
 
+# REST mode — advances turns while regenerating HP/MP. Interrupts when any
+# monster enters player FOV or caps reached.
+var _resting: bool = false
+var _rest_turns: int = 0
+const _REST_MAX_TURNS: int = 50
+const _REST_HP_PER_TURN: int = 2
+const _REST_MP_PER_TURN: int = 1
+
 
 func _ready() -> void:
 	# [meta-agent] Instantiate MetaProgression (M1: child of Game root; autoload later).
@@ -146,6 +154,10 @@ func _ready() -> void:
 	essence_system.inventory_full.connect(func(pending):
 		print("Inventory full; dropped: %s" % pending.display_name))
 
+	# BottomHUD REST button.
+	if bottom_hud != null and bottom_hud.has_signal("rest_pressed"):
+		bottom_hud.rest_pressed.connect(_on_rest_pressed)
+
 	# BottomHUD essence slot tap → swap popup.
 	if bottom_hud != null and popup_mgr != null:
 		bottom_hud.essence_slot_tapped.connect(func():
@@ -202,6 +214,62 @@ func _on_turn_refresh_visibility() -> void:
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	if dmap != null:
 		_refresh_actor_visibility(dmap)
+	if _resting:
+		_rest_tick()
+
+
+func _on_rest_pressed() -> void:
+	if player == null or player.stats == null:
+		return
+	if _resting:
+		_cancel_rest("cancelled")
+		return
+	if player.stats.HP >= player.stats.hp_max and player.stats.MP >= player.stats.mp_max:
+		print("Already at full health.")
+		return
+	if _visible_monster_nearby():
+		print("Can't rest — enemy in sight.")
+		return
+	_resting = true
+	_rest_turns = 0
+	_rest_tick()
+
+
+func _rest_tick() -> void:
+	if not _resting or player == null or player.stats == null:
+		return
+	if _visible_monster_nearby():
+		_cancel_rest("interrupted by enemy")
+		return
+	var s = player.stats
+	s.HP = min(s.hp_max, s.HP + _REST_HP_PER_TURN)
+	s.MP = min(s.mp_max, s.MP + _REST_MP_PER_TURN)
+	player.stats_changed.emit()
+	_rest_turns += 1
+	var full: bool = s.HP >= s.hp_max and s.MP >= s.mp_max
+	if full or _rest_turns >= _REST_MAX_TURNS:
+		_cancel_rest("fully rested" if full else "rest limit reached")
+		return
+	TurnManager.end_player_turn()
+
+
+func _cancel_rest(reason: String) -> void:
+	if not _resting:
+		return
+	_resting = false
+	print("Rest: %s (%d turns)" % [reason, _rest_turns])
+	_rest_turns = 0
+
+
+func _visible_monster_nearby() -> bool:
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	if dmap == null:
+		return false
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if is_instance_valid(m) and m is Monster and m.is_alive:
+			if dmap.is_visible(m.grid_pos):
+				return true
+	return false
 
 
 func _spawn_monsters_for_current_depth() -> void:
@@ -263,6 +331,9 @@ func _on_monster_died(monster: Monster) -> void:
 
 
 func _on_player_moved(new_pos: Vector2i) -> void:
+	# Any deliberate movement cancels an in-progress rest.
+	if _resting:
+		_cancel_rest("movement")
 	var cam: Camera2D = $Camera2D
 	cam.position = Vector2(new_pos.x * TILE_SIZE + TILE_SIZE / 2.0, new_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
