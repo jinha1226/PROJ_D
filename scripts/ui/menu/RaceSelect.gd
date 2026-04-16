@@ -1,8 +1,8 @@
 extends Control
 ## Race-selection screen. Loads all resources/races/*.tres, renders a
-## 2-column scrollable card grid. Tap a card to select, tap Next to
-## move to JobSelect.
+## 2-column scrollable card grid with live LPC-composited previews.
 
+const CHAR_SPRITE_SCENE := preload("res://scenes/entities/CharacterSprite.tscn")
 const JOB_SELECT_PATH := "res://scenes/menu/JobSelect.tscn"
 const MAIN_MENU_PATH := "res://scenes/menu/MainMenu.tscn"
 const RACE_IDS: Array[String] = [
@@ -36,18 +36,71 @@ func _make_card(r: RaceData) -> Button:
 	var btn := Button.new()
 	btn.toggle_mode = true
 	btn.custom_minimum_size = Vector2(510, 340)
-	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	btn.pressed.connect(_on_card_pressed.bind(r.id))
-	var body: String = "%s\n\nSTR %d  DEX %d  INT %d\nHP/lv %d  MP/lv %d\n\n%s" % [
+
+	var hbox := HBoxContainer.new()
+	hbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	hbox.add_theme_constant_override("separation", 8)
+	hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hbox.offset_left = 12
+	hbox.offset_top = 12
+	hbox.offset_right = -12
+	hbox.offset_bottom = -12
+	btn.add_child(hbox)
+
+	# Live-rendered character preview via SubViewport.
+	var vpc := SubViewportContainer.new()
+	vpc.custom_minimum_size = Vector2(160, 200)
+	vpc.stretch = true
+	vpc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hbox.add_child(vpc)
+
+	var vp := SubViewport.new()
+	vp.size = Vector2i(160, 200)
+	vp.transparent_bg = true
+	vp.disable_3d = true
+	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	vpc.add_child(vp)
+
+	var cs: CharacterSprite = CHAR_SPRITE_SCENE.instantiate() as CharacterSprite
+	vp.add_child(cs)
+	cs.load_character(_race_to_preset(r))
+	cs.set_direction("down")
+	cs.play_anim("idle", true)
+	cs.position = Vector2(80, 130)  # viewport-local, ~centered
+	cs.scale = Vector2(1.6, 1.6)
+
+	var label := Label.new()
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+	label.add_theme_font_size_override("font_size", 20)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.text = "%s\n\nSTR %d  DEX %d  INT %d\nHP/lv %d  MP/lv %d\n\n%s" % [
 		r.display_name, r.base_str, r.base_dex, r.base_int,
-		r.hp_per_level, r.mp_per_level,
-		r.description,
+		r.hp_per_level, r.mp_per_level, r.description,
 	]
-	btn.text = body
-	btn.clip_text = false
-	btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	btn.add_theme_font_size_override("font_size", 22)
+	hbox.add_child(label)
 	return btn
+
+
+## Race-only preset (no job equipment) for the preview sprite.
+func _race_to_preset(r: RaceData) -> Dictionary:
+	var equipment: Array = []
+	if r.hair_def != "":
+		equipment.append({"def": r.hair_def, "variant": r.hair_color})
+	if r.beard_def != "":
+		equipment.append({"def": r.beard_def, "variant": r.beard_color})
+	if r.horns_def != "":
+		equipment.append({"def": r.horns_def, "variant": r.horns_color})
+	return {
+		"id": r.id,
+		"body_def": r.body_def,
+		"body_variant": "",
+		"skin_tint": r.skin_tint,
+		"equipment": equipment,
+	}
 
 
 func _on_card_pressed(race_id: String) -> void:
