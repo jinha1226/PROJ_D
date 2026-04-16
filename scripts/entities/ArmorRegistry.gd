@@ -3,11 +3,14 @@ extends RefCounted
 ## Static armor catalog. Each entry has a slot id so Player can track
 ## chest/legs/boots/helm/gloves independently and sum AC across them.
 
+# AC values follow DCSS body-armour table:
+#   leather armour 3, chain mail 6, plate armour 10
+#   helmet 1, boots 1, gloves 1, (greaves/pants 3)
 const DATA: Dictionary = {
-	# --- Chest (body torso) ---
-	"leather_chest": {"name": "Leather Chest", "slot": "chest", "ac": 2, "color": Color(0.55, 0.35, 0.20)},
-	"chain_chest":   {"name": "Chain Chest",   "slot": "chest", "ac": 4, "color": Color(0.70, 0.72, 0.78)},
-	"plate_chest":   {"name": "Plate Chest",   "slot": "chest", "ac": 6, "color": Color(0.85, 0.85, 0.90)},
+	# --- Chest ---
+	"leather_chest": {"name": "Leather Chest", "slot": "chest", "ac": 3,  "color": Color(0.55, 0.35, 0.20)},
+	"chain_chest":   {"name": "Chain Chest",   "slot": "chest", "ac": 6,  "color": Color(0.70, 0.72, 0.78)},
+	"plate_chest":   {"name": "Plate Chest",   "slot": "chest", "ac": 10, "color": Color(0.85, 0.85, 0.90)},
 	# --- Legs ---
 	"leather_legs": {"name": "Leather Legs", "slot": "legs", "ac": 1, "color": Color(0.55, 0.35, 0.20)},
 	"chain_legs":   {"name": "Chain Legs",   "slot": "legs", "ac": 2, "color": Color(0.70, 0.72, 0.78)},
@@ -22,9 +25,9 @@ const DATA: Dictionary = {
 	"leather_gloves": {"name": "Leather Gloves", "slot": "gloves", "ac": 1, "color": Color(0.55, 0.35, 0.20)},
 	"plate_gloves":   {"name": "Plate Gloves",   "slot": "gloves", "ac": 2, "color": Color(0.85, 0.85, 0.90)},
 	# --- Legacy aliases (kept so old job/spawn data still loads) ---
-	"leather_armor": {"name": "Leather Chest", "slot": "chest", "ac": 2, "color": Color(0.55, 0.35, 0.20)},
-	"chain_mail":    {"name": "Chain Chest",   "slot": "chest", "ac": 4, "color": Color(0.70, 0.72, 0.78)},
-	"plate_armor":   {"name": "Plate Chest",   "slot": "chest", "ac": 6, "color": Color(0.85, 0.85, 0.90)},
+	"leather_armor": {"name": "Leather Chest", "slot": "chest", "ac": 3,  "color": Color(0.55, 0.35, 0.20)},
+	"chain_mail":    {"name": "Chain Chest",   "slot": "chest", "ac": 6,  "color": Color(0.70, 0.72, 0.78)},
+	"plate_armor":   {"name": "Plate Chest",   "slot": "chest", "ac": 10, "color": Color(0.85, 0.85, 0.90)},
 }
 
 

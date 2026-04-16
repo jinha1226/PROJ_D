@@ -417,7 +417,7 @@ func _on_monster_died(monster: Monster) -> void:
 	if skill_system != null and player != null and monster != null and monster.data != null:
 		var xp_gain: int = int(monster.data.xp_value)
 		if xp_gain <= 0:
-			xp_gain = max(1, int(monster.data.tier) * 30)
+			xp_gain = max(1, int(monster.data.tier) * 8)
 		var tags: Array = []
 		var wskill: String = player.get_current_weapon_skill()
 		if wskill != "":

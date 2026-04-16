@@ -26,8 +26,9 @@ var is_alive: bool = true
 var level: int = 1
 var xp: int = 0
 # XP required to reach (level+1) from current level. Linear ramp.
-const _XP_PER_LEVEL: int = 100
-const _HP_PER_LEVEL: int = 5
+# With tier-1 monsters giving 4–25 XP, level 2 lands around the 5th kill.
+const _XP_PER_LEVEL: int = 50
+const _HP_PER_LEVEL: int = 5  # fallback if race_res missing
 const _MP_PER_LEVEL: int = 3
 
 # [skill-agent] equipped weapon + per-skill state (level/xp/training).
@@ -617,9 +618,13 @@ func xp_for_next_level() -> int:
 func _apply_level_up_growth() -> void:
 	if stats == null:
 		return
-	stats.hp_max += _HP_PER_LEVEL
+	# Scale HP/MP gains by the race's per-level aptitude so Trolls grow
+	# beefy fast and Deep Elves stay fragile.
+	var hp_gain: int = race_res.hp_per_level if race_res != null else _HP_PER_LEVEL
+	var mp_gain: int = race_res.mp_per_level if race_res != null else _MP_PER_LEVEL
+	stats.hp_max += hp_gain
 	stats.HP = stats.hp_max  # full heal on level up
-	stats.mp_max += _MP_PER_LEVEL
+	stats.mp_max += mp_gain
 	stats.MP = stats.mp_max
 	stats_changed.emit()
 

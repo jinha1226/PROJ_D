@@ -5,11 +5,13 @@
 [resource]
 script = ExtResource("1")
 id = "goblin"
-display_name = "고블린"
+display_name = "Goblin"
 tier = 1
-hp = 12
+hp = 9
 str = 5
 dex = 4
-ac = 1
-ev = 4
+ac = 0
+ev = 10
+sight_range = 6
 essence_drop_id = ""
+xp_value = 10
