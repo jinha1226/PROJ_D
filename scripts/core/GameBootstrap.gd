@@ -95,6 +95,8 @@ func _ready() -> void:
 
 	# [skill-ui-agent] TopHUD skills-button → spawn SkillsScreen.
 	_top_hud_ref = top_hud
+	if top_hud != null and top_hud.has_method("set_depth"):
+		top_hud.set_depth(GameManager.current_depth)
 	if top_hud != null and top_hud.has_signal("skills_button_pressed"):
 		top_hud.skills_button_pressed.connect(_on_skills_button_pressed)
 	if top_hud != null and top_hud.has_signal("bag_pressed"):
@@ -285,6 +287,8 @@ func _regenerate_dungeon() -> void:
 	cam.position = player.position
 	if touch_input:
 		touch_input.generator = generator
+	if _top_hud_ref != null and _top_hud_ref.has_method("set_depth"):
+		_top_hud_ref.set_depth(GameManager.current_depth)
 	await get_tree().process_frame
 	_spawn_monsters_for_current_depth()
 	_spawn_dummy_items(5)
