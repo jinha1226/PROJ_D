@@ -26,6 +26,7 @@ const _MP_PER_LEVEL: int = 3
 
 # [skill-agent] equipped weapon + per-skill state (level/xp/training).
 var equipped_weapon_id: String = ""
+var equipped_armor: Dictionary = {}  # {"id", "name", "ac", "color"} or empty
 var skill_state: Dictionary = {}
 
 # M1 dummy inventory — Array of Dictionary (FloorItem.as_dict()).
@@ -133,9 +134,28 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 
 # [skill-agent] Swap the current weapon. Skill id update happens implicitly via
 # WeaponRegistry lookup on next attack; we just re-emit stats_changed so HUDs
-# refresh.
-func equip_weapon(weapon_id: String) -> void:
+# refresh. Returns the previously-equipped weapon id ("" if none).
+func equip_weapon(weapon_id: String) -> String:
+	var prev: String = equipped_weapon_id
 	equipped_weapon_id = weapon_id
+	stats_changed.emit()
+	return prev
+
+
+## Equip armor Dictionary (id, name, ac, color). Returns previously equipped
+## armor dict (may be empty). Caller is responsible for returning the previous
+## item to inventory.
+func equip_armor(armor: Dictionary) -> Dictionary:
+	var prev: Dictionary = equipped_armor
+	equipped_armor = armor
+	_recompute_defense()
+	return prev
+
+
+func _recompute_defense() -> void:
+	if stats == null:
+		return
+	stats.AC = int(equipped_armor.get("ac", 0))
 	stats_changed.emit()
 
 
@@ -247,8 +267,14 @@ func drop_item(index: int) -> void:
 		return
 	var fi: FloorItem = FloorItem.new()
 	parent.add_child(fi)
+	var extra: Dictionary = {}
+	for k in it.keys():
+		if k in ["id", "name", "kind", "color"]:
+			continue
+		extra[k] = it[k]
 	fi.setup(grid_pos, String(it.get("id", "")), String(it.get("name", "")),
-			String(it.get("kind", "junk")), it.get("color", Color(0.9, 0.9, 0.4)))
+			String(it.get("kind", "junk")), it.get("color", Color(0.9, 0.9, 0.4)),
+			extra)
 
 
 func get_items() -> Array:

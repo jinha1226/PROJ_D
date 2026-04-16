@@ -281,6 +281,33 @@ func _spawn_monsters_for_current_depth() -> void:
 			m.died.connect(_on_monster_died)
 
 
+const _LOOT_DROP_CHANCE: float = 0.35
+const _WEAPON_POOL: Array = ["dagger", "short_sword", "arming_sword", "axe", "mace", "club"]
+const _ARMOR_POOL: Array = [
+	{"id": "leather_armor", "name": "Leather Armor", "ac": 2, "color": Color(0.55, 0.35, 0.20)},
+	{"id": "chain_mail",    "name": "Chain Mail",    "ac": 4, "color": Color(0.70, 0.72, 0.78)},
+	{"id": "plate_armor",   "name": "Plate Armor",   "ac": 6, "color": Color(0.85, 0.85, 0.90)},
+]
+
+
+func _maybe_drop_loot(monster: Monster) -> void:
+	if monster == null or not ("grid_pos" in monster):
+		return
+	if randf() > _LOOT_DROP_CHANCE:
+		return
+	var entity_layer: Node = $EntityLayer
+	var fi: FloorItem = FloorItem.new()
+	entity_layer.add_child(fi)
+	if randf() < 0.6:
+		# Weapon drop — picks from a tier-1-ish pool for M1.
+		var wid: String = _WEAPON_POOL[randi() % _WEAPON_POOL.size()]
+		fi.setup(monster.grid_pos, wid, wid.capitalize(), "weapon", Color(0.75, 0.75, 0.85))
+	else:
+		var a: Dictionary = _ARMOR_POOL[randi() % _ARMOR_POOL.size()]
+		fi.setup(monster.grid_pos, String(a.id), String(a.name), "armor", a.color,
+				{"ac": int(a.ac)})
+
+
 func _spawn_dummy_items(count: int) -> void:
 	# M1 dummy item spawn: scatter a few potions/scrolls on walkable tiles.
 	const DUMMY_ITEMS: Array = [
@@ -314,6 +341,8 @@ func _on_monster_died(monster: Monster) -> void:
 	kill_count += 1
 	if essence_system != null:
 		essence_system.try_drop_from_monster(monster)
+	# M1: small chance of loot drop at death tile.
+	_maybe_drop_loot(monster)
 	# [skill-agent] award XP to trained skills matching weapon + passive tags.
 	if skill_system != null and player != null and monster != null and monster.data != null:
 		var xp_gain: int = int(monster.data.xp_value)
@@ -444,6 +473,7 @@ func _save_current_floor() -> void:
 			"name": it.display_name,
 			"kind": it.kind,
 			"color": it.color,
+			"extra": it.extra.duplicate(),
 		})
 	_floor_state[GameManager.current_depth] = snapshot
 
@@ -475,7 +505,8 @@ func _restore_floor(depth: int) -> void:
 				String(it_info.get("id", "")),
 				String(it_info.get("name", "")),
 				String(it_info.get("kind", "junk")),
-				it_info.get("color", Color(1, 1, 0)))
+				it_info.get("color", Color(1, 1, 0)),
+				it_info.get("extra", {}))
 
 
 func _on_player_leveled_up(new_level: int) -> void:
@@ -663,16 +694,23 @@ func _on_bag_pressed() -> void:
 	else:
 		for i in range(items.size()):
 			var it: Dictionary = items[i]
+			var kind: String = String(it.get("kind", ""))
 			var row := HBoxContainer.new()
 			row.add_theme_constant_override("separation", 8)
 			var lab := Label.new()
-			lab.text = "%s [%s]" % [it.get("name", "?"), it.get("kind", "?")]
+			lab.text = "%s [%s]" % [it.get("name", "?"), kind]
 			lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			row.add_child(lab)
-			var use_btn := Button.new()
-			use_btn.text = "Use"
-			use_btn.pressed.connect(_on_bag_use.bind(i, dlg))
-			row.add_child(use_btn)
+			if kind == "weapon" or kind == "armor":
+				var eq_btn := Button.new()
+				eq_btn.text = "Equip"
+				eq_btn.pressed.connect(_on_bag_equip.bind(i, dlg))
+				row.add_child(eq_btn)
+			else:
+				var use_btn := Button.new()
+				use_btn.text = "Use"
+				use_btn.pressed.connect(_on_bag_use.bind(i, dlg))
+				row.add_child(use_btn)
 			var drop_btn := Button.new()
 			drop_btn.text = "Drop"
 			drop_btn.pressed.connect(_on_bag_drop.bind(i, dlg))
@@ -687,6 +725,38 @@ func _on_bag_pressed() -> void:
 func _on_bag_use(idx: int, dlg: AcceptDialog) -> void:
 	if player != null:
 		player.use_item(idx)
+	dlg.queue_free()
+	_on_bag_pressed()
+
+
+func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
+	if player != null:
+		var items: Array = player.get_items()
+		if idx >= 0 and idx < items.size():
+			var it: Dictionary = items[idx]
+			var kind: String = String(it.get("kind", ""))
+			# Remove picked item from inventory first.
+			items.remove_at(idx)
+			if kind == "weapon":
+				var prev_id: String = player.equip_weapon(String(it.get("id", "")))
+				if prev_id != "":
+					items.append({
+						"id": prev_id,
+						"name": prev_id.capitalize(),
+						"kind": "weapon",
+						"color": Color(0.75, 0.75, 0.85),
+					})
+			elif kind == "armor":
+				var prev_armor: Dictionary = player.equip_armor(it)
+				if not prev_armor.is_empty():
+					items.append({
+						"id": String(prev_armor.get("id", "")),
+						"name": String(prev_armor.get("name", "")),
+						"kind": "armor",
+						"ac": prev_armor.get("ac", 0),
+						"color": prev_armor.get("color", Color(0.6, 0.6, 0.7)),
+					})
+			player.inventory_changed.emit()
 	dlg.queue_free()
 	_on_bag_pressed()
 
