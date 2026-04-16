@@ -102,5 +102,4 @@ static func _maybe_wander(m: Monster) -> void:
 
 
 static func _move_to(m: Monster, pos: Vector2i) -> void:
-	m.grid_pos = pos
-	m.position = Vector2(pos.x * m.tile_size + m.tile_size / 2.0, pos.y * m.tile_size + m.tile_size / 2.0)
+	m.move_to_grid(pos)

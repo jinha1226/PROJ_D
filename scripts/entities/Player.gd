@@ -27,8 +27,11 @@ var items: Array = []
 signal inventory_changed
 
 const _CHAR_SPRITE_SCENE := preload("res://scenes/entities/CharacterSprite.tscn")
+const _MOVE_TWEEN_DUR: float = 0.12
+const _ATTACK_LUNGE_DUR: float = 0.08
 var _sprite: CharacterSprite = null
 var _walk_idle_timer: SceneTreeTimer = null
+var _move_tween: Tween = null
 
 
 func _ready() -> void:
@@ -179,7 +182,8 @@ func try_move(delta: Vector2i) -> bool:
 	if not generator.is_walkable(target):
 		return false
 	grid_pos = target
-	position = Vector2(grid_pos.x * tile_size + tile_size / 2.0, grid_pos.y * tile_size + tile_size / 2.0)
+	var target_px: Vector2 = Vector2(grid_pos.x * tile_size + tile_size / 2.0, grid_pos.y * tile_size + tile_size / 2.0)
+	_tween_visual_to(target_px, _MOVE_TWEEN_DUR)
 	_pickup_items_here()
 	if _sprite:
 		_sprite.face_toward(delta)
@@ -189,6 +193,13 @@ func try_move(delta: Vector2i) -> bool:
 	moved.emit(grid_pos)
 	TurnManager.end_player_turn()
 	return true
+
+
+func _tween_visual_to(target_px: Vector2, duration: float) -> void:
+	if _move_tween != null and _move_tween.is_valid():
+		_move_tween.kill()
+	_move_tween = create_tween()
+	_move_tween.tween_property(self, "position", target_px, duration)
 
 
 func _pickup_items_here() -> void:
@@ -254,15 +265,26 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 	var dy: int = abs(target_pos.y - grid_pos.y)
 	if max(dx, dy) > 1:
 		return null
+	var delta := Vector2i(sign(target_pos.x - grid_pos.x), sign(target_pos.y - grid_pos.y))
 	if _sprite:
-		var delta := Vector2i(sign(target_pos.x - grid_pos.x), sign(target_pos.y - grid_pos.y))
 		_sprite.face_toward(delta)
+	_lunge_toward(delta)
 	# [skill-agent] route through CombatSystem so skill levels are factored in.
 	var skill_sys: Node = get_tree().root.get_node_or_null("Game/SkillSystem")
 	CombatSystem.melee_attack(self, monster, skill_sys)
 	attacked.emit(monster)
 	TurnManager.end_player_turn()
 	return monster
+
+
+func _lunge_toward(delta: Vector2i) -> void:
+	if _move_tween != null and _move_tween.is_valid():
+		_move_tween.kill()
+	var home: Vector2 = Vector2(grid_pos.x * tile_size + tile_size / 2.0, grid_pos.y * tile_size + tile_size / 2.0)
+	var push: Vector2 = Vector2(delta) * float(tile_size) * 0.35
+	_move_tween = create_tween()
+	_move_tween.tween_property(self, "position", home + push, _ATTACK_LUNGE_DUR)
+	_move_tween.tween_property(self, "position", home, _ATTACK_LUNGE_DUR)
 
 
 func take_damage(amount: int) -> void:

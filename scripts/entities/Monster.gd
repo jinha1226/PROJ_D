@@ -19,6 +19,9 @@ var tile_size: int = 32
 var _sprite: CharacterSprite = null
 var _has_preset: bool = false
 var _walk_timer: SceneTreeTimer = null
+var _move_tween: Tween = null
+const _MOVE_TWEEN_DUR: float = 0.12
+const _ATTACK_LUNGE_DUR: float = 0.08
 
 
 func _ready() -> void:
@@ -107,10 +110,28 @@ func get_player() -> Node:
 
 
 func attack_animation_toward(target_grid: Vector2i) -> void:
-	if _sprite == null:
-		return
-	_sprite.face_toward(target_grid - grid_pos)
-	_sprite.play_anim("slash", false)
+	var delta: Vector2i = target_grid - grid_pos
+	if _sprite != null:
+		_sprite.face_toward(delta)
+		_sprite.play_anim("slash", false)
+	# Short lunge so the attack is visually readable even without sprite anims.
+	if _move_tween != null and _move_tween.is_valid():
+		_move_tween.kill()
+	var home: Vector2 = Vector2(grid_pos.x * tile_size + tile_size / 2.0, grid_pos.y * tile_size + tile_size / 2.0)
+	var push: Vector2 = Vector2(delta) * float(tile_size) * 0.35
+	_move_tween = create_tween()
+	_move_tween.tween_property(self, "position", home + push, _ATTACK_LUNGE_DUR)
+	_move_tween.tween_property(self, "position", home, _ATTACK_LUNGE_DUR)
+
+
+## Used by MonsterAI._move_to — updates grid_pos AND tweens the visual.
+func move_to_grid(pos: Vector2i) -> void:
+	grid_pos = pos
+	var target_px: Vector2 = Vector2(pos.x * tile_size + tile_size / 2.0, pos.y * tile_size + tile_size / 2.0)
+	if _move_tween != null and _move_tween.is_valid():
+		_move_tween.kill()
+	_move_tween = create_tween()
+	_move_tween.tween_property(self, "position", target_px, _MOVE_TWEEN_DUR)
 
 
 func _draw() -> void:
