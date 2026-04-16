@@ -29,6 +29,7 @@ const _ATTACK_LUNGE_DUR: float = 0.08
 func _ready() -> void:
 	add_to_group("monsters")
 	TurnManager.register_actor(self)
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
 
 func setup(gen: DungeonGenerator, pos: Vector2i, mdata: MonsterData) -> void:
@@ -123,12 +124,15 @@ func attack_animation_toward(target_grid: Vector2i) -> void:
 
 
 ## Used by MonsterAI._move_to — updates grid_pos AND tweens the visual.
+## Tween starts after a small interval so the monster's slide doesn't visually
+## overlap with the player's still-finishing move tween.
 func move_to_grid(pos: Vector2i) -> void:
 	grid_pos = pos
 	var target_px: Vector2 = Vector2(pos.x * tile_size + tile_size / 2.0, pos.y * tile_size + tile_size / 2.0)
 	if _move_tween != null and _move_tween.is_valid():
 		_move_tween.kill()
 	_move_tween = create_tween()
+	_move_tween.tween_interval(0.08)  # let player tween finish first
 	_move_tween.tween_property(self, "position", target_px, _MOVE_TWEEN_DUR)
 
 

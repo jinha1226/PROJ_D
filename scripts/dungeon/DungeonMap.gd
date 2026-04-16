@@ -18,6 +18,7 @@ func render(gen: DungeonGenerator) -> void:
 	explored.resize(DungeonGenerator.MAP_WIDTH * DungeonGenerator.MAP_HEIGHT)
 	explored.fill(0)
 	_visible_tiles.clear()
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	queue_redraw()
 
 

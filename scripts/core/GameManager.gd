@@ -25,6 +25,9 @@ var current_branch: String = "main"
 var identified: Dictionary = {}
 # Randomised pseudonyms for unidentified potions/scrolls. Stable within a run.
 var _pseudonyms: Dictionary = {}
+# Per-id DCSS base image filename (without extension). Drives the visible
+# colour/look of unidentified consumables in DCSS render mode.
+var _consumable_bases: Dictionary = {}
 var _pseudonyms_assigned: bool = false
 
 const _POTION_DESCRIPTORS: Array = [
@@ -38,6 +41,18 @@ const _SCROLL_LABELS: Array = [
 	"NEMIS", "PRUX", "GOROM",
 ]
 
+# DCSS base-tile filenames (stem only; TileRenderer prepends item/potion/ etc).
+const _POTION_BASE_TILES: Array = [
+	"black", "brilliant_blue", "brown", "bubbly", "cloudy", "cyan", "dark",
+	"effervescent", "emerald", "fizzy", "golden", "magenta", "murky",
+	"orange", "pink", "puce", "purple_red", "ruby", "silver", "sky_blue",
+	"white", "yellow",
+]
+const _SCROLL_BASE_TILES: Array = [
+	"scroll-blue", "scroll-brown", "scroll-cyan", "scroll-green",
+	"scroll-grey", "scroll-purple", "scroll-red", "scroll-yellow",
+]
+
 
 func start_new_run(job_id: String = "fighter", race_id: String = "human", run_seed: int = -1) -> void:
 	current_depth = 1
@@ -46,6 +61,7 @@ func start_new_run(job_id: String = "fighter", race_id: String = "human", run_se
 	selected_job_id = job_id
 	identified.clear()
 	_pseudonyms.clear()
+	_consumable_bases.clear()
 	_pseudonyms_assigned = false
 	run_started.emit()
 
@@ -84,12 +100,32 @@ func _ensure_pseudonyms() -> void:
 			scroll_ids.append(cid)
 	var pd: Array = _POTION_DESCRIPTORS.duplicate()
 	pd.shuffle()
+	var pb: Array = _POTION_BASE_TILES.duplicate()
+	pb.shuffle()
 	for i in potion_ids.size():
 		_pseudonyms[potion_ids[i]] = "%s Potion" % pd[i % pd.size()]
+		_consumable_bases[potion_ids[i]] = pb[i % pb.size()]
 	var sl: Array = _SCROLL_LABELS.duplicate()
 	sl.shuffle()
+	var sb: Array = _SCROLL_BASE_TILES.duplicate()
+	sb.shuffle()
 	for i in scroll_ids.size():
 		_pseudonyms[scroll_ids[i]] = "Scroll labeled %s" % sl[i % sl.size()]
+		_consumable_bases[scroll_ids[i]] = sb[i % sb.size()]
+
+
+## DCSS base tile filename (stem) for a consumable id, paired with the kind.
+## Returns "" if not a known consumable.
+func consumable_base_path(id: String, kind: String) -> String:
+	_ensure_pseudonyms()
+	var stem: String = String(_consumable_bases.get(id, ""))
+	if stem == "":
+		return ""
+	if kind == "potion":
+		return "item/potion/%s.png" % stem
+	elif kind == "scroll":
+		return "item/scroll/%s.png" % stem
+	return ""
 
 func end_run(victory: bool) -> void:
 	run_ended.emit(victory)

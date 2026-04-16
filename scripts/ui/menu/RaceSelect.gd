@@ -54,27 +54,35 @@ func _make_card(r: RaceData) -> Button:
 	vbox.offset_bottom = -16
 	btn.add_child(vbox)
 
-	# Live-rendered character preview via SubViewport — larger than before.
-	var vpc := SubViewportContainer.new()
-	vpc.custom_minimum_size = Vector2(504, 460)
-	vpc.stretch = true
-	vpc.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vbox.add_child(vpc)
-
-	var vp := SubViewport.new()
-	vp.size = Vector2i(504, 460)
-	vp.transparent_bg = true
-	vp.disable_3d = true
-	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	vpc.add_child(vp)
-
-	var cs: CharacterSprite = CHAR_SPRITE_SCENE.instantiate() as CharacterSprite
-	vp.add_child(cs)
-	cs.load_character(_race_to_preset(r))
-	cs.set_direction("down")
-	cs.play_anim("idle", true)
-	cs.position = Vector2(252, 400)
-	cs.scale = Vector2(5.5, 5.5)
+	# Preview: DCSS tile in DCSS mode, SubViewport+LPC otherwise.
+	if TileRenderer.is_dcss():
+		var trect := TextureRect.new()
+		trect.custom_minimum_size = Vector2(504, 460)
+		trect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		trect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+		trect.texture = TileRenderer.player_race(r.id)
+		trect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		trect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		vbox.add_child(trect)
+	else:
+		var vpc := SubViewportContainer.new()
+		vpc.custom_minimum_size = Vector2(504, 460)
+		vpc.stretch = true
+		vpc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		vbox.add_child(vpc)
+		var vp := SubViewport.new()
+		vp.size = Vector2i(504, 460)
+		vp.transparent_bg = true
+		vp.disable_3d = true
+		vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+		vpc.add_child(vp)
+		var cs: CharacterSprite = CHAR_SPRITE_SCENE.instantiate() as CharacterSprite
+		vp.add_child(cs)
+		cs.load_character(_race_to_preset(r))
+		cs.set_direction("down")
+		cs.play_anim("idle", true)
+		cs.position = Vector2(252, 400)
+		cs.scale = Vector2(5.5, 5.5)
 
 	# Race name — always visible.
 	var name_lbl := Label.new()

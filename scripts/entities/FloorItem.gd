@@ -21,6 +21,7 @@ func _ready() -> void:
 	z_index = 5
 	add_to_group("floor_items")
 	_bob_phase = randf() * TAU
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
 
 func setup(p_grid_pos: Vector2i, p_id: String, p_name: String,
@@ -43,8 +44,23 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var bob: float = sin(_bob_phase) * _BOB_AMP
-	# DCSS mode: draw the item's tile texture (centred, with bob).
 	if TileRenderer.is_dcss():
+		# Potions/scrolls: base colour tile always shown, effect overlay
+		# only after identification.
+		if kind == "potion" or kind == "scroll":
+			var base_tex: Texture2D = TileRenderer.consumable_base(item_id, kind)
+			if base_tex != null:
+				var bsz: Vector2 = base_tex.get_size()
+				var ofs: Vector2 = Vector2(-bsz.x * 0.5, -bsz.y * 0.5 + bob)
+				draw_texture(base_tex, ofs)
+				if GameManager != null and GameManager.is_identified(item_id):
+					var overlay: Texture2D = TileRenderer.item(item_id)
+					if overlay != null:
+						# DCSS overlay PNGs already encode the corner placement
+						# with transparency, so we draw at the same offset.
+						draw_texture(overlay, ofs)
+				return
+		# Weapons / armor / junk: single tile blit.
 		var tex: Texture2D = TileRenderer.item(item_id)
 		if tex != null:
 			var sz: Vector2 = tex.get_size()

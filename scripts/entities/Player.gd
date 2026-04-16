@@ -63,6 +63,8 @@ func _ready() -> void:
 	if TurnManager and not TurnManager.player_turn_started.is_connected(_on_player_turn_started):
 		TurnManager.player_turn_started.connect(_on_player_turn_started)
 	z_index = 10
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	add_to_group("player")
 	_ensure_sprite()
 	_load_sprite_preset()
 	if not attacked.is_connected(_on_self_attacked):
@@ -631,6 +633,11 @@ func take_damage(amount: int) -> void:
 		died.emit()
 	elif _sprite:
 		_sprite.play_anim("hurt", false)
+	else:
+		# DCSS / sprite-less mode: brief red flash so the hit is visible.
+		modulate = Color(1.6, 0.5, 0.5, 1)
+		var tw := create_tween()
+		tw.tween_property(self, "modulate", Color.WHITE, 0.18)
 	stats_changed.emit()
 
 

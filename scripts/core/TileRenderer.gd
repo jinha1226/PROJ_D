@@ -219,6 +219,18 @@ static func item(id: String) -> Texture2D:
 	return _load(String(ITEMS.get(id, "")))
 
 
+## Base potion / scroll tile (the colour the player sees before identifying).
+## Path picked from a per-run shuffled pool by GameManager.
+static func consumable_base(id: String, kind: String) -> Texture2D:
+	if Engine.get_main_loop() == null:
+		return null
+	var gm: Object = Engine.get_main_loop().root.get_node_or_null("GameManager")
+	if gm == null:
+		return null
+	var path: String = String(gm.consumable_base_path(id, kind))
+	return _load(path)
+
+
 static func player_race(id: String) -> Texture2D:
 	return _load(String(PLAYER_RACES.get(id, "")))
 

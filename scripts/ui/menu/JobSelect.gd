@@ -61,27 +61,51 @@ func _make_card(j: JobData) -> Button:
 	vbox.offset_bottom = -16
 	btn.add_child(vbox)
 
-	# Live preview: race body + job equipment — larger sprite.
-	var vpc := SubViewportContainer.new()
-	vpc.custom_minimum_size = Vector2(504, 460)
-	vpc.stretch = true
-	vpc.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vbox.add_child(vpc)
-
-	var vp := SubViewport.new()
-	vp.size = Vector2i(504, 460)
-	vp.transparent_bg = true
-	vp.disable_3d = true
-	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	vpc.add_child(vp)
-
-	var cs: CharacterSprite = CHAR_SPRITE_SCENE.instantiate() as CharacterSprite
-	vp.add_child(cs)
-	cs.load_character(_compose_preset(j))
-	cs.set_direction("down")
-	cs.play_anim("idle", true)
-	cs.position = Vector2(252, 400)
-	cs.scale = Vector2(5.5, 5.5)
+	if TileRenderer.is_dcss():
+		# Race tile + this job's first weapon icon shown side-by-side.
+		var preview := HBoxContainer.new()
+		preview.custom_minimum_size = Vector2(504, 460)
+		preview.alignment = BoxContainer.ALIGNMENT_CENTER
+		preview.add_theme_constant_override("separation", 16)
+		preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var race_rect := TextureRect.new()
+		race_rect.custom_minimum_size = Vector2(220, 380)
+		race_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		race_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+		race_rect.texture = TileRenderer.player_race(_preview_race.id if _preview_race else "human")
+		race_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		race_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		preview.add_child(race_rect)
+		var weapon_id: String = _first_weapon_id(j)
+		if weapon_id != "":
+			var w_rect := TextureRect.new()
+			w_rect.custom_minimum_size = Vector2(220, 380)
+			w_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			w_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+			w_rect.texture = TileRenderer.item(weapon_id)
+			w_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			w_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			preview.add_child(w_rect)
+		vbox.add_child(preview)
+	else:
+		var vpc := SubViewportContainer.new()
+		vpc.custom_minimum_size = Vector2(504, 460)
+		vpc.stretch = true
+		vpc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		vbox.add_child(vpc)
+		var vp := SubViewport.new()
+		vp.size = Vector2i(504, 460)
+		vp.transparent_bg = true
+		vp.disable_3d = true
+		vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+		vpc.add_child(vp)
+		var cs: CharacterSprite = CHAR_SPRITE_SCENE.instantiate() as CharacterSprite
+		vp.add_child(cs)
+		cs.load_character(_compose_preset(j))
+		cs.set_direction("down")
+		cs.play_anim("idle", true)
+		cs.position = Vector2(252, 400)
+		cs.scale = Vector2(5.5, 5.5)
 
 	# Job name — always visible.
 	var name_lbl := Label.new()
@@ -146,6 +170,15 @@ func _make_card(j: JobData) -> Button:
 
 	_detail_nodes[j.id] = {"sep": sep, "detail": detail}
 	return btn
+
+
+## First weapon id in the job's starting equipment, or "" if none.
+func _first_weapon_id(j: JobData) -> String:
+	for it in j.starting_equipment:
+		var sid: String = String(it)
+		if WeaponRegistry.is_weapon(sid):
+			return sid
+	return ""
 
 
 ## Build a preset combining the selected race with this job's starting gear.
