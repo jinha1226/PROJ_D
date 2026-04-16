@@ -9,10 +9,10 @@ class_name ZoomController
 ## Persists to user://settings.json via SaveManager autoload.
 
 const MIN_ZOOM: float = 0.25
-const MAX_ZOOM: float = 4.0
+const MAX_ZOOM: float = 8.0
 const WHEEL_STEP_IN: float = 1.20
 const WHEEL_STEP_OUT: float = 0.83
-const DEFAULT_ZOOM: float = 3.5
+const DEFAULT_ZOOM: float = 5.5
 
 @export var camera: Camera2D
 

@@ -607,6 +607,7 @@ func _on_identify_one_requested() -> void:
 		if ConsumableRegistry.has(iid) and not GameManager.is_identified(iid):
 			unidentified.append(it)
 	var dlg := AcceptDialog.new()
+	dlg.exclusive = false
 	dlg.title = "Identify Which?"
 	dlg.ok_button_text = "Cancel"
 	var vb := VBoxContainer.new()
@@ -718,6 +719,7 @@ func _open_skills_dialog(category: String) -> void:
 	if popup_mgr == null or player == null:
 		return
 	var dlg := AcceptDialog.new()
+	dlg.exclusive = false
 	dlg.title = "Skills"
 	dlg.ok_button_text = "Close"
 	var vb := VBoxContainer.new()
@@ -1061,6 +1063,7 @@ func _on_bag_pressed() -> void:
 	if popup_mgr == null:
 		return
 	var dlg := AcceptDialog.new()
+	dlg.exclusive = false
 	dlg.title = "Bag"
 	dlg.ok_button_text = "Close"
 	var vb := VBoxContainer.new()
@@ -1178,6 +1181,7 @@ func _on_bag_info(it: Dictionary) -> void:
 	if popup_mgr == null:
 		return
 	var dlg := AcceptDialog.new()
+	dlg.exclusive = false
 	dlg.title = String(it.get("name", "Item"))
 	dlg.ok_button_text = "Close"
 	dlg.dialog_text = _build_item_tooltip(it)
@@ -1190,6 +1194,7 @@ func _on_bag_info(it: Dictionary) -> void:
 func _on_bag_use(idx: int, dlg: AcceptDialog) -> void:
 	if player != null:
 		player.use_item(idx)
+	_bag_dlg = null  # Clear BEFORE reopening so toggle check doesn't see stale ref.
 	dlg.queue_free()
 	_on_bag_pressed()
 
@@ -1235,6 +1240,7 @@ func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
 						"color": prev_armor.get("color", Color(0.6, 0.6, 0.7)),
 					})
 			player.inventory_changed.emit()
+	_bag_dlg = null
 	dlg.queue_free()
 	_on_bag_pressed()
 
@@ -1242,6 +1248,7 @@ func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
 func _on_bag_drop(idx: int, dlg: AcceptDialog) -> void:
 	if player != null:
 		player.drop_item(idx)
+	_bag_dlg = null
 	dlg.queue_free()
 	_on_bag_pressed()
 
@@ -1255,6 +1262,7 @@ func _on_status_pressed() -> void:
 	if popup_mgr == null or player == null:
 		return
 	var dlg := AcceptDialog.new()
+	dlg.exclusive = false
 	dlg.title = "Status"
 	dlg.ok_button_text = "Close"
 
@@ -1408,6 +1416,7 @@ func _on_minimap_pressed() -> void:
 	if dmap == null or generator == null:
 		return
 	var dlg := AcceptDialog.new()
+	dlg.exclusive = false
 	var depth: int = GameManager.current_depth if GameManager != null else 1
 	dlg.title = "Map — B%dF (tap to travel)" % depth
 	dlg.ok_button_text = "Close"

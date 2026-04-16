@@ -163,18 +163,27 @@ func _on_longpress(grid: Vector2i) -> void:
 
 
 func _farthest_floor_from(start: Vector2i) -> Vector2i:
-	# BFS over 4-connected walkable tiles; return the one with max steps.
+	# BFS over 4-connected walkable tiles.
+	# Priority 1: nearest unexplored tile (reveals new map area).
+	# Priority 2: farthest reachable explored tile (keep moving when fully explored).
 	var visited: Dictionary = {start: 0}
 	var queue: Array[Vector2i] = [start]
-	var best: Vector2i = start
-	var best_d: int = 0
+	var nearest_unexplored: Vector2i = start
+	var nearest_unexplored_d: int = 999999
+	var farthest: Vector2i = start
+	var farthest_d: int = 0
+	var dirs: Array[Vector2i] = [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 	while not queue.is_empty():
 		var cur: Vector2i = queue.pop_front()
 		var d: int = visited[cur]
-		if d > best_d:
-			best_d = d
-			best = cur
-		for nd in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+		if d > farthest_d:
+			farthest_d = d
+			farthest = cur
+		# Track nearest unexplored tile (uses dmap fog-of-war if available).
+		if dmap != null and not dmap.is_explored(cur) and d < nearest_unexplored_d:
+			nearest_unexplored_d = d
+			nearest_unexplored = cur
+		for nd in dirs:
 			var nb: Vector2i = cur + nd
 			if visited.has(nb):
 				continue
@@ -182,7 +191,7 @@ func _farthest_floor_from(start: Vector2i) -> Vector2i:
 				continue
 			visited[nb] = d + 1
 			queue.append(nb)
-	return best
+	return nearest_unexplored if nearest_unexplored_d < 999999 else farthest
 
 
 func _on_player_turn_started() -> void:
