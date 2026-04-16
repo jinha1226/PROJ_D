@@ -934,14 +934,19 @@ func _cast_single_target(spell_id: String, info: Dictionary, power: int) -> Dict
 	else:
 		tname = target.name
 
+	var spell_color: Color = info.get("color", Color.WHITE)
+	var fx_layer: Node2D = $EntityLayer
 	var effect: String = String(info.get("effect", "damage"))
+
 	if effect == "slow":
 		target.slowed_turns = 4
+		SpellFX.cast_slow(fx_layer, target.position, spell_color)
 		return {"success": true, "message": "%s is slowed for 4 turns!" % tname}
 
 	# Damage spell.
 	var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
 	target.take_damage(dmg)
+	SpellFX.cast_single(fx_layer, player.position, target, dmg, spell_color)
 	return {"success": true, "message": "%s → %s: %d dmg" % [String(info.get("name", spell_id)), tname, dmg], "damage": dmg}
 
 
@@ -953,9 +958,14 @@ func _cast_area_spell(spell_id: String, info: Dictionary, power: int) -> Diction
 		return {"success": false, "message": "No visible target in range."}
 
 	var center: Vector2i = center_m.grid_pos
+	var center_px: Vector2 = center_m.position
 	var radius: int = int(info.get("radius", 2))
+	var spell_color: Color = info.get("color", Color.WHITE)
+	var fx_layer: Node2D = $EntityLayer
+
 	var total_dmg: int = 0
 	var hits: int = 0
+	var hit_positions: Array = []
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
 			continue
@@ -964,10 +974,16 @@ func _cast_area_spell(spell_id: String, info: Dictionary, power: int) -> Diction
 			continue
 		var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
 		if dist > 0:
-			dmg = max(1, dmg - dist * 3)  # damage falloff from epicentre
+			dmg = max(1, dmg - dist * 3)
+		hit_positions.append(m.position)
 		m.take_damage(dmg)
 		total_dmg += dmg
 		hits += 1
+
+	var tile_r_px: float = float(radius) * 32.0 + 16.0
+	SpellFX.cast_area(fx_layer, player.position, center_px, hit_positions, spell_color, tile_r_px)
+	SpellFX.float_text(fx_layer, center_px + Vector2(0, -24),
+			"%d dmg" % total_dmg, spell_color)
 
 	if hits == 0:
 		return {"success": true, "message": "%s hits nothing." % String(info.get("name", spell_id))}
@@ -976,6 +992,8 @@ func _cast_area_spell(spell_id: String, info: Dictionary, power: int) -> Diction
 
 func _cast_self_spell(spell_id: String, _info: Dictionary, _power: int) -> Dictionary:
 	if spell_id == "blink":
+		var old_px: Vector2 = player.position
+		var fx_layer: Node2D = $EntityLayer
 		for _i in 60:
 			var dx: int = randi_range(-6, 6)
 			var dy: int = randi_range(-6, 6)
@@ -984,7 +1002,6 @@ func _cast_self_spell(spell_id: String, _info: Dictionary, _power: int) -> Dicti
 			var dest: Vector2i = player.grid_pos + Vector2i(dx, dy)
 			if generator == null or not generator.is_walkable(dest):
 				continue
-			# Make sure no monster is at destination.
 			var blocked: bool = false
 			for m in get_tree().get_nodes_in_group("monsters"):
 				if is_instance_valid(m) and m is Monster and m.grid_pos == dest:
@@ -999,6 +1016,7 @@ func _cast_self_spell(spell_id: String, _info: Dictionary, _power: int) -> Dicti
 			_refresh_minimap_preview(dmap, dest)
 			var cam: Camera2D = $Camera2D
 			cam.position = player.position
+			SpellFX.cast_blink(fx_layer, old_px, player.position)
 			return {"success": true, "message": "You blink to a new location."}
 		return {"success": true, "message": "Blink fizzles — nowhere safe nearby."}
 	return {"success": true, "message": ""}
