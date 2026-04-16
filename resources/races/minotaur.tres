@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "minotaur"
+display_name = "Minotaur"
+description = "The archetypal melee bruiser. Terrible at magic, devastating in a fight. Horns give a free headbutt in adjacent combat."
+base_str = 14
+base_dex = 9
+base_int = 7
+hp_per_level = 7
+mp_per_level = 2
+move_speed_mod = 0
+body_def = "body_male"
+skin_tint = "tan"
+hair_def = "hair_curly_short"
+hair_color = "brown"
+horns_def = "horns_curved"
+horns_color = "brown"
+base_ac = 0
+racial_trait = "minotaur_headbutt"

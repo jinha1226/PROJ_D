@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "earth_elementalist"
+display_name = "Earth Elementalist"
+description = "Stone and iron. Crystal staff, slow and devastating."
+str_bonus = 1
+dex_bonus = 0
+int_bonus = 2
+starting_equipment = Array[String](["crystal_staff"])
+starting_skills = {"earth": 3, "conjurations": 2, "spellcasting": 2}
+unique_ability = ""

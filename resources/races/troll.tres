@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "troll"
+display_name = "Troll"
+description = "Enormous HP pool, passive regeneration, can't cast spells worth a damn. Punches dragons."
+base_str = 15
+base_dex = 7
+base_int = 6
+hp_per_level = 9
+mp_per_level = 2
+move_speed_mod = 0
+body_def = "body_male"
+skin_tint = "brown"
+hair_def = "hair_buzzcut"
+hair_color = "brown"
+beard_def = "beard_braided"
+beard_color = "brown"
+base_ac = 0
+racial_trait = "trollregen"

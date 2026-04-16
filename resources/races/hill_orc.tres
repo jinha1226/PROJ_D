@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "hill_orc"
+display_name = "Hill Orc"
+description = "Bred for melee. Huge HP, thick skin, poor magic aptitude. The go-to pick for shove-through-the-dungeon runs."
+base_str = 12
+base_dex = 9
+base_int = 8
+hp_per_level = 6
+mp_per_level = 2
+move_speed_mod = 0
+body_def = "body_male"
+skin_tint = "honey"
+hair_def = "hair_buzzcut"
+hair_color = "black"
+beard_def = "beard_full"
+beard_color = "black"
+base_ac = 1
+racial_trait = ""

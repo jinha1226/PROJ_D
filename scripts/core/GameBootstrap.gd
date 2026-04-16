@@ -80,8 +80,12 @@ func _ready() -> void:
 	var entity_layer: Node2D = $EntityLayer
 	player = PLAYER_SCENE.instantiate()
 	entity_layer.add_child(player)
-	var race: RaceData = load("res://resources/races/human.tres")
-	var job: JobData = load("res://resources/jobs/barbarian.tres")
+	# Default loadout until MainMenu selection is implemented.
+	# GameManager.selected_race_id / selected_job_id can override later.
+	var race_id: String = GameManager.selected_race_id if GameManager.selected_race_id != "" else "human"
+	var job_id: String = GameManager.selected_job_id if GameManager.selected_job_id != "" else "fighter"
+	var race: RaceData = load("res://resources/races/%s.tres" % race_id)
+	var job: JobData = load("res://resources/jobs/%s.tres" % job_id)
 	player.setup(generator, generator.spawn_pos, job, race)
 
 	# [skill-agent] SkillSystem must exist before first attack; attach as child

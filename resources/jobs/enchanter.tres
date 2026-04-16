@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "enchanter"
+display_name = "Enchanter"
+description = "Charm, sleep, confuse. Turn enemies against each other while you slip past."
+str_bonus = 0
+dex_bonus = 1
+int_bonus = 2
+starting_equipment = Array[String](["dagger"])
+starting_skills = {"hexes": 3, "spellcasting": 2, "short_blade": 2, "stealth": 1}
+unique_ability = ""

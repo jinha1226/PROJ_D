@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "berserker"
+display_name = "Berserker"
+description = "Trog's chosen. Big axe, no magic, rage in your veins."
+str_bonus = 3
+dex_bonus = 0
+int_bonus = -2
+starting_equipment = Array[String](["waraxe", "leather_armor", "leather_legs", "leather_boots"])
+starting_skills = {"axe": 3, "fighting": 3, "armour": 2}
+unique_ability = "berserk"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "ice_elementalist"
+display_name = "Ice Elementalist"
+description = "Freeze and shatter. Ice staff, cold nerves."
+str_bonus = 0
+dex_bonus = 0
+int_bonus = 3
+starting_equipment = Array[String](["ice_staff"])
+starting_skills = {"cold": 3, "conjurations": 2, "spellcasting": 2}
+unique_ability = ""

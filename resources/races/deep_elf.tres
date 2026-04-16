@@ -4,18 +4,18 @@
 
 [resource]
 script = ExtResource("1")
-id = "human"
-display_name = "Human"
-description = "Balanced all-rounder. No bonuses, no penalties — the baseline every other race is measured against."
-base_str = 10
+id = "deep_elf"
+display_name = "Deep Elf"
+description = "Glass-cannon caster. Lowest HP in the game but the best INT and MP pool. Will die to a stiff breeze, but kills everything first."
+base_str = 7
 base_dex = 10
-base_int = 10
-hp_per_level = 5
-mp_per_level = 3
+base_int = 14
+hp_per_level = 3
+mp_per_level = 5
 move_speed_mod = 0
 body_def = "body_male"
-skin_tint = "peach"
-hair_def = "hair_parted"
+skin_tint = "ivory"
+hair_def = "hair_curly_medium"
 hair_color = "brown"
 base_ac = 0
 racial_trait = ""

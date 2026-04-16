@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "spriggan"
+display_name = "Spriggan"
+description = "Tiny fey. Near-zero HP, blazing speed, unmatched stealth. Plays like a puzzle — dodge or die."
+base_str = 5
+base_dex = 14
+base_int = 10
+hp_per_level = 2
+mp_per_level = 4
+move_speed_mod = 1
+body_def = "body_male"
+skin_tint = "ivory"
+hair_def = "hair_bob"
+hair_color = "carrot"
+base_ac = 0
+racial_trait = "spriggan_speed"

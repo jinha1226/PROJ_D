@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "air_elementalist"
+display_name = "Air Elementalist"
+description = "Lightning, swiftness. The glass cannon of the elementals."
+str_bonus = 0
+dex_bonus = 1
+int_bonus = 2
+starting_equipment = Array[String](["lightning_staff"])
+starting_skills = {"air": 3, "conjurations": 2, "spellcasting": 2}
+unique_ability = ""

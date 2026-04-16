@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "hunter"
+display_name = "Hunter"
+description = "Ranger with a short bow. Kite, pick off, reposition."
+str_bonus = 1
+dex_bonus = 2
+int_bonus = 0
+starting_equipment = Array[String](["short_bow", "dagger", "leather_legs", "leather_boots"])
+starting_skills = {"bow": 3, "fighting": 1, "dodging": 2}
+unique_ability = ""

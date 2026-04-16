@@ -14,4 +14,19 @@ extends Resource
 @export var move_speed_mod: int = 0
 
 @export var essence_affinity: Dictionary = {}
-@export var lpc_asset: String = ""
+@export var lpc_asset: String = ""  # legacy, unused after preset composition refactor
+
+# --- LPC composition ---
+# Used by Player._compose_preset to build a CharacterSprite-ready dict.
+@export var body_def: String = "body_male"
+@export var skin_tint: String = "peach"
+@export var hair_def: String = "hair_parted"
+@export var hair_color: String = "brown"
+@export var beard_def: String = ""          # "" = no beard
+@export var beard_color: String = "brown"
+@export var horns_def: String = ""          # "" = no horns
+@export var horns_color: String = "brown"
+@export var base_ac: int = 0                # racial intrinsic AC
+# Freeform trait id for racial abilities (implemented in M2+).
+# Examples: "trollregen", "demonspawn_mutations", "spriggan_speed".
+@export var racial_trait: String = ""

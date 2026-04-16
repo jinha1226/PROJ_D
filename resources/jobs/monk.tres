@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "monk"
+display_name = "Monk"
+description = "Staff and robes. Trades armor for mobility and martial discipline."
+str_bonus = 1
+dex_bonus = 2
+int_bonus = 0
+starting_equipment = Array[String](["gnarled_staff"])
+starting_skills = {"staff": 3, "fighting": 2, "dodging": 3, "stealth": 1}
+unique_ability = ""

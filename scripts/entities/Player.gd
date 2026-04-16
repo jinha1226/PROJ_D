@@ -15,6 +15,8 @@ var stats: Stats
 var base_stats: Stats
 var job_id: String = ""
 var race_id: String = ""
+var job_res: JobData = null
+var race_res: RaceData = null
 var tile_size: int = 32
 var is_alive: bool = true
 var level: int = 1
@@ -65,14 +67,61 @@ func _ensure_sprite() -> void:
 func _load_sprite_preset() -> void:
 	if _sprite == null:
 		return
-	var preset_id := "%s_%s" % [job_id if job_id != "" else "barbarian", race_id if race_id != "" else "human"]
-	var preset := LPCPresetLoader.load_with_fallback(preset_id, "barbarian_human")
+	var preset: Dictionary = _compose_preset()
+	if preset.is_empty():
+		# Fallback to disk-based preset if composition failed.
+		var fallback_id := "%s_%s" % [job_id if job_id != "" else "barbarian", race_id if race_id != "" else "human"]
+		preset = LPCPresetLoader.load_with_fallback(fallback_id, "barbarian_human")
 	if preset.is_empty():
 		push_error("Player: no preset available, sprite will be blank")
 		return
 	_sprite.load_character(preset)
 	_sprite.set_direction("down")
 	_sprite.play_anim("idle", true)
+
+
+## Build a CharacterSprite preset dict from the live race/job Resource refs.
+## Replaces the old one-JSON-per-(job,race) combination approach — now
+## 8 races × 20 jobs = 160 combos are composed at runtime.
+func _compose_preset() -> Dictionary:
+	if race_res == null and race_id != "":
+		race_res = load("res://resources/races/%s.tres" % race_id) as RaceData
+	if job_res == null and job_id != "":
+		job_res = load("res://resources/jobs/%s.tres" % job_id) as JobData
+	if race_res == null:
+		return {}
+	var equipment: Array = []
+	# Racial visual: hair / beard / horns.
+	if race_res.hair_def != "":
+		equipment.append({"def": race_res.hair_def, "variant": race_res.hair_color})
+	if race_res.beard_def != "":
+		equipment.append({"def": race_res.beard_def, "variant": race_res.beard_color})
+	if race_res.horns_def != "":
+		equipment.append({"def": race_res.horns_def, "variant": race_res.horns_color})
+	# Job starting equipment — simple string ids.
+	if job_res != null:
+		for item_id in job_res.starting_equipment:
+			equipment.append(_item_id_to_preset_entry(String(item_id)))
+	return {
+		"id": "%s_%s" % [job_id, race_id],
+		"body_def": race_res.body_def,
+		"body_variant": "",
+		"skin_tint": race_res.skin_tint,
+		"equipment": equipment,
+	}
+
+
+func _item_id_to_preset_entry(item_id: String) -> Dictionary:
+	# Weapons: no material variant; the weapon def has no variants.
+	if WeaponRegistry.is_weapon(item_id):
+		return {"def": item_id, "variant": ""}
+	# Armor / clothing: default to brown material for leather tones.
+	# Specific job tres files can override by embedding a "{id}|{color}" form
+	# (e.g., "leather_chest|steel") which we split here.
+	if "|" in item_id:
+		var parts: PackedStringArray = item_id.split("|")
+		return {"def": parts[0], "variant": parts[1]}
+	return {"def": item_id, "variant": "brown"}
 
 
 func _on_self_attacked(_target) -> void:
@@ -98,6 +147,8 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 	position = Vector2(grid_pos.x * tile_size + tile_size / 2.0, grid_pos.y * tile_size + tile_size / 2.0)
 	job_id = job.id if job else ""
 	race_id = race.id if race else ""
+	job_res = job
+	race_res = race
 	_ensure_sprite()
 	_load_sprite_preset()
 
