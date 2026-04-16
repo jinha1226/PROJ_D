@@ -95,6 +95,7 @@ func _ready() -> void:
 	player.moved.connect(_on_player_moved)
 	# [meta-agent] hook player death → result screen.
 	player.died.connect(_on_player_died)
+	player.leveled_up.connect(_on_player_leveled_up)
 
 	# UI lookup.
 	ui = get_node_or_null("UILayer/UI")
@@ -328,6 +329,9 @@ func _on_monster_died(monster: Monster) -> void:
 		var leveled: Array = skill_system.grant_xp(player, float(xp_gain), tags)
 		for entry in leveled:
 			print("%s trained to %d" % [entry["skill_id"], entry["new_level"]])
+		# Player-level XP: same magnitude as skill grant. Player.grant_xp handles
+		# rollover and emits leveled_up for the popup flow.
+		player.grant_xp(xp_gain)
 
 
 func _on_player_moved(new_pos: Vector2i) -> void:
@@ -472,6 +476,13 @@ func _restore_floor(depth: int) -> void:
 				String(it_info.get("name", "")),
 				String(it_info.get("kind", "junk")),
 				it_info.get("color", Color(1, 1, 0)))
+
+
+func _on_player_leveled_up(new_level: int) -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null or not popup_mgr.has_method("show_levelup_popup"):
+		return
+	popup_mgr.show_levelup_popup(new_level, Callable(player, "apply_level_up_stat"))
 
 
 func _on_player_died() -> void:

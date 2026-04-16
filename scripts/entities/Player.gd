@@ -6,6 +6,7 @@ signal moved(new_grid_pos: Vector2i)
 signal died
 signal attacked(target)
 signal stats_changed
+signal leveled_up(new_level: int)
 
 @export var generator: DungeonGenerator
 
@@ -17,6 +18,11 @@ var race_id: String = ""
 var tile_size: int = 32
 var is_alive: bool = true
 var level: int = 1
+var xp: int = 0
+# XP required to reach (level+1) from current level. Linear ramp.
+const _XP_PER_LEVEL: int = 100
+const _HP_PER_LEVEL: int = 5
+const _MP_PER_LEVEL: int = 3
 
 # [skill-agent] equipped weapon + per-skill state (level/xp/training).
 var equipped_weapon_id: String = ""
@@ -247,6 +253,45 @@ func drop_item(index: int) -> void:
 
 func get_items() -> Array:
 	return items
+
+
+## Called on monster kill. Grants raw XP to the player level pool and
+## promotes as many levels as the running total allows. Each level-up
+## emits leveled_up so UI can pop the stat-choice dialog.
+func grant_xp(amount: int) -> void:
+	if amount <= 0 or not is_alive:
+		return
+	xp += amount
+	while xp >= xp_for_next_level():
+		xp -= xp_for_next_level()
+		level += 1
+		_apply_level_up_growth()
+		leveled_up.emit(level)
+
+
+func xp_for_next_level() -> int:
+	return _XP_PER_LEVEL * level
+
+
+func _apply_level_up_growth() -> void:
+	if stats == null:
+		return
+	stats.hp_max += _HP_PER_LEVEL
+	stats.HP = stats.hp_max  # full heal on level up
+	stats.mp_max += _MP_PER_LEVEL
+	stats.MP = stats.mp_max
+	stats_changed.emit()
+
+
+## Called by the level-up popup with a chosen stat id ("STR"/"DEX"/"INT").
+func apply_level_up_stat(stat: String) -> void:
+	if stats == null:
+		return
+	match stat:
+		"STR": stats.STR += 2
+		"DEX": stats.DEX += 2
+		"INT": stats.INT += 2
+	stats_changed.emit()
 
 
 func _return_to_idle() -> void:
