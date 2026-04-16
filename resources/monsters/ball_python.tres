@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/monsters/MonsterData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "ball_python"
+display_name = "Ball Python"
+tier = 3
+hp = 16
+str = 7
+dex = 7
+ac = 2
+ev = 10
+sight_range = 6
+essence_drop_id = ""
+xp_value = 40
+is_boss = false

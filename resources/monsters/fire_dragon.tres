@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/monsters/MonsterData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "fire_dragon"
+display_name = "Ancient Fire Dragon"
+tier = 5
+hp = 200
+str = 32
+dex = 9
+ac = 16
+ev = 8
+sight_range = 8
+essence_drop_id = ""
+xp_value = 650
+is_boss = true

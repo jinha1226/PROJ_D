@@ -83,6 +83,7 @@ func _ready() -> void:
 	meta.load_from_disk()
 
 	_base_seed = randi()
+	GameManager.current_branch = GameManager.branch_for_depth(GameManager.current_depth)
 	generator = DungeonGenerator.new()
 	add_child(generator)
 	generator.generate(GameManager.current_depth, _base_seed)
@@ -539,6 +540,7 @@ func _regenerate_dungeon(going_up: bool) -> void:
 			it.queue_free()
 	if is_instance_valid(generator):
 		generator.queue_free()
+	GameManager.current_branch = GameManager.branch_for_depth(GameManager.current_depth)
 	generator = DungeonGenerator.new()
 	add_child(generator)
 	generator.generate(GameManager.current_depth, _base_seed)
