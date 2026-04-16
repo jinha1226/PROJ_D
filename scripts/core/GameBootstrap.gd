@@ -9,9 +9,14 @@ const SKILL_SYSTEM_SCRIPT: Script = preload("res://scripts/systems/SkillSystem.g
 # [meta-agent] M1 meta progression + result screen.
 const META_SCRIPT: Script = preload("res://scripts/systems/MetaProgression.gd")
 const RESULT_SCREEN_SCENE: PackedScene = preload("res://scenes/ui/ResultScreen.tscn")
-# [skill-ui-agent] skill screen + level-up toast prefabs.
-const SKILLS_SCREEN_SCENE: PackedScene = preload("res://scenes/ui/SkillsScreen.tscn")
+# [skill-ui-agent] level-up toast prefab.
 const SKILL_TOAST_SCENE: PackedScene = preload("res://scenes/ui/SkillLevelUpToast.tscn")
+
+const _SKILL_CATEGORIES: Array = ["all", "weapon", "defense", "magic", "misc"]
+const _SKILL_CATEGORY_LABELS: Dictionary = {
+	"all": "ALL", "weapon": "WEAPON", "defense": "DEFENSE",
+	"magic": "MAGIC", "misc": "MISC",
+}
 # [zoom-agent] pinch gesture + UI zoom buttons.
 const ZOOM_CONTROLLER_SCRIPT: Script = preload("res://scripts/ui/ZoomController.gd")
 const ZOOM_CONTROLS_SCRIPT: Script = preload("res://scripts/ui/ZoomControls.gd")
@@ -354,24 +359,14 @@ func _end_run(victory: bool, killer: String) -> void:
 
 func _on_skills_button_pressed() -> void:
 	# Built on AcceptDialog so close/ESC/click-outside all work natively —
-	# same pattern as Bag/Map. Avoids the nested-CanvasLayer anchor issues
-	# that plagued the old custom SkillsScreen.tscn.
+	# same pattern as Bag/Map.
 	_open_skills_dialog("all")
-
-
-var _current_skills_cat: String = "all"
-const _SKILL_CATEGORIES: Array = ["all", "weapon", "defense", "magic", "misc"]
-const _SKILL_CATEGORY_LABELS: Dictionary = {
-	"all": "ALL", "weapon": "WEAPON", "defense": "DEFENSE",
-	"magic": "MAGIC", "misc": "MISC",
-}
 
 
 func _open_skills_dialog(category: String) -> void:
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null or player == null:
 		return
-	_current_skills_cat = category
 	var dlg := AcceptDialog.new()
 	dlg.title = "Skills"
 	dlg.ok_button_text = "Close"
@@ -388,10 +383,7 @@ func _open_skills_dialog(category: String) -> void:
 		tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		tb.toggle_mode = true
 		tb.button_pressed = (cat == category)
-		var cat_cap := cat
-		tb.pressed.connect(func():
-			dlg.queue_free()
-			_open_skills_dialog(cat_cap))
+		tb.pressed.connect(_on_skills_tab.bind(cat, dlg))
 		tabs_hbox.add_child(tb)
 	vb.add_child(tabs_hbox)
 
@@ -410,10 +402,10 @@ func _open_skills_dialog(category: String) -> void:
 	if "skill_state" in player and player.skill_state is Dictionary:
 		state = player.skill_state
 	for skill_id in SkillSystem.SKILL_IDS:
-		var cat: String = String(SkillSystem.SKILL_CATEGORY.get(skill_id, ""))
-		if category != "all" and cat != category:
+		var cat_id: String = String(SkillSystem.SKILL_CATEGORY.get(skill_id, ""))
+		if category != "all" and cat_id != category:
 			continue
-		rows.add_child(_build_skill_row(skill_id, cat, state.get(skill_id, {})))
+		rows.add_child(_build_skill_row(skill_id, cat_id, state.get(skill_id, {})))
 
 	var footer := Label.new()
 	footer.text = "Uncheck to stop training. Defeat enemies to gain XP."
@@ -422,9 +414,20 @@ func _open_skills_dialog(category: String) -> void:
 	vb.add_child(footer)
 
 	popup_mgr.add_child(dlg)
-	dlg.confirmed.connect(func(): dlg.queue_free())
-	dlg.canceled.connect(func(): dlg.queue_free())
+	dlg.confirmed.connect(dlg.queue_free)
+	dlg.canceled.connect(dlg.queue_free)
 	dlg.popup_centered(Vector2i(900, 1800))
+
+
+func _on_skills_tab(cat: String, dlg: AcceptDialog) -> void:
+	dlg.queue_free()
+	_open_skills_dialog(cat)
+
+
+func _on_skill_training_toggled(pressed: bool, skill_id: String) -> void:
+	if skill_system == null or player == null:
+		return
+	skill_system.set_training(player, skill_id, pressed)
 
 
 func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> Control:
@@ -435,9 +438,7 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 	var chk := CheckBox.new()
 	chk.button_pressed = bool(entry.get("training", false))
 	chk.custom_minimum_size = Vector2(48, 48)
-	chk.toggled.connect(func(pressed: bool):
-		if skill_system != null:
-			skill_system.set_training(player, skill_id, pressed))
+	chk.toggled.connect(_on_skill_training_toggled.bind(skill_id))
 	row.add_child(chk)
 
 	var name_lab := Label.new()
@@ -497,24 +498,31 @@ func _on_bag_pressed() -> void:
 			row.add_child(lab)
 			var use_btn := Button.new()
 			use_btn.text = "Use"
-			var idx := i
-			use_btn.pressed.connect(func():
-				player.use_item(idx)
-				dlg.queue_free()
-				_on_bag_pressed())
+			use_btn.pressed.connect(_on_bag_use.bind(i, dlg))
 			row.add_child(use_btn)
 			var drop_btn := Button.new()
 			drop_btn.text = "Drop"
-			drop_btn.pressed.connect(func():
-				player.drop_item(idx)
-				dlg.queue_free()
-				_on_bag_pressed())
+			drop_btn.pressed.connect(_on_bag_drop.bind(i, dlg))
 			row.add_child(drop_btn)
 			vb.add_child(row)
 	popup_mgr.add_child(dlg)
-	dlg.confirmed.connect(func(): dlg.queue_free())
-	dlg.canceled.connect(func(): dlg.queue_free())
+	dlg.confirmed.connect(dlg.queue_free)
+	dlg.canceled.connect(dlg.queue_free)
 	dlg.popup_centered(Vector2i(720, 900))
+
+
+func _on_bag_use(idx: int, dlg: AcceptDialog) -> void:
+	if player != null:
+		player.use_item(idx)
+	dlg.queue_free()
+	_on_bag_pressed()
+
+
+func _on_bag_drop(idx: int, dlg: AcceptDialog) -> void:
+	if player != null:
+		player.drop_item(idx)
+	dlg.queue_free()
+	_on_bag_pressed()
 
 
 func _on_minimap_pressed() -> void:
@@ -538,8 +546,8 @@ func _on_minimap_pressed() -> void:
 	vb.add_child(tex_rect)
 
 	popup_mgr.add_child(dlg)
-	dlg.confirmed.connect(func(): dlg.queue_free())
-	dlg.canceled.connect(func(): dlg.queue_free())
+	dlg.confirmed.connect(dlg.queue_free)
+	dlg.canceled.connect(dlg.queue_free)
 	dlg.popup_centered(Vector2i(700, 1200))
 
 
