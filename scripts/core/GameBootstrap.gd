@@ -43,6 +43,11 @@ var _base_seed: int = 0
 # floor. Restored on revisit so killed enemies stay dead and picked-up items
 # stay gone. Keyed by int depth.
 var _floor_state: Dictionary = {}
+# Toggle tracking — pressing the same HUD button again closes its popup.
+var _bag_dlg: AcceptDialog = null
+var _skills_dlg: AcceptDialog = null
+var _status_dlg: AcceptDialog = null
+var _map_dlg: AcceptDialog = null
 # Camera follow tween so the view doesn't snap.
 var _cam_tween: Tween = null
 const _CAM_FOLLOW_DUR: float = 0.14
@@ -144,6 +149,8 @@ func _ready() -> void:
 		bottom_hud.skills_pressed.connect(_on_skills_button_pressed)
 	if bottom_hud != null and bottom_hud.has_signal("status_pressed"):
 		bottom_hud.status_pressed.connect(_on_status_pressed)
+	if bottom_hud != null and bottom_hud.has_signal("map_pressed"):
+		bottom_hud.map_pressed.connect(_on_minimap_pressed)
 
 	# [skill-ui-agent] persistent level-up toast layer.
 	skill_toast = SKILL_TOAST_SCENE.instantiate()
@@ -689,8 +696,10 @@ func _end_run(victory: bool, killer: String) -> void:
 # [skill-ui-agent] ---- skill UI wiring ------------------------------------
 
 func _on_skills_button_pressed() -> void:
-	# Built on AcceptDialog so close/ESC/click-outside all work natively —
-	# same pattern as Bag/Map.
+	if _skills_dlg != null and is_instance_valid(_skills_dlg):
+		_skills_dlg.queue_free()
+		_skills_dlg = null
+		return
 	_open_skills_dialog("all")
 
 
@@ -745,6 +754,9 @@ func _open_skills_dialog(category: String) -> void:
 	vb.add_child(footer)
 
 	popup_mgr.add_child(dlg)
+	_skills_dlg = dlg
+	dlg.tree_exited.connect(func():
+		if _skills_dlg == dlg: _skills_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
 	dlg.popup_centered(Vector2i(900, 1800))
@@ -803,6 +815,10 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 
 
 func _on_bag_pressed() -> void:
+	if _bag_dlg != null and is_instance_valid(_bag_dlg):
+		_bag_dlg.queue_free()
+		_bag_dlg = null
+		return
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null:
 		return
@@ -861,6 +877,9 @@ func _on_bag_pressed() -> void:
 			row.add_child(drop_btn)
 			vb.add_child(row)
 	popup_mgr.add_child(dlg)
+	_bag_dlg = dlg
+	dlg.tree_exited.connect(func():
+		if _bag_dlg == dlg: _bag_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
 	dlg.popup_centered(Vector2i(960, 1400))
@@ -990,6 +1009,10 @@ func _on_bag_drop(idx: int, dlg: AcceptDialog) -> void:
 
 
 func _on_status_pressed() -> void:
+	if _status_dlg != null and is_instance_valid(_status_dlg):
+		_status_dlg.queue_free()
+		_status_dlg = null
+		return
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null or player == null:
 		return
@@ -1037,6 +1060,9 @@ func _on_status_pressed() -> void:
 	vb.add_child(close_btn)
 
 	popup_mgr.add_child(dlg)
+	_status_dlg = dlg
+	dlg.tree_exited.connect(func():
+		if _status_dlg == dlg: _status_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
 	dlg.popup_centered(Vector2i(880, 1600))
@@ -1133,6 +1159,10 @@ const _MM_SCALE: int = 12  # pixels per tile in the minimap texture
 
 
 func _on_minimap_pressed() -> void:
+	if _map_dlg != null and is_instance_valid(_map_dlg):
+		_map_dlg.queue_free()
+		_map_dlg = null
+		return
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null:
 		return
@@ -1157,6 +1187,9 @@ func _on_minimap_pressed() -> void:
 	vb.add_child(tex_rect)
 
 	popup_mgr.add_child(dlg)
+	_map_dlg = dlg
+	dlg.tree_exited.connect(func():
+		if _map_dlg == dlg: _map_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
 	dlg.popup_centered(Vector2i(mm_w + 80, mm_h + 240))

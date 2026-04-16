@@ -35,7 +35,7 @@ func _build_cards() -> void:
 func _make_card(r: RaceData) -> Button:
 	var btn := Button.new()
 	btn.toggle_mode = true
-	btn.custom_minimum_size = Vector2(540, 520)
+	btn.custom_minimum_size = Vector2(540, 620)
 	btn.pressed.connect(_on_card_pressed.bind(r.id))
 
 	var hbox := HBoxContainer.new()
@@ -50,13 +50,13 @@ func _make_card(r: RaceData) -> Button:
 
 	# Live-rendered character preview via SubViewport.
 	var vpc := SubViewportContainer.new()
-	vpc.custom_minimum_size = Vector2(200, 300)
+	vpc.custom_minimum_size = Vector2(260, 460)
 	vpc.stretch = true
 	vpc.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hbox.add_child(vpc)
 
 	var vp := SubViewport.new()
-	vp.size = Vector2i(200, 300)
+	vp.size = Vector2i(260, 460)
 	vp.transparent_bg = true
 	vp.disable_3d = true
 	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
@@ -67,8 +67,8 @@ func _make_card(r: RaceData) -> Button:
 	cs.load_character(_race_to_preset(r))
 	cs.set_direction("down")
 	cs.play_anim("idle", true)
-	cs.position = Vector2(100, 190)  # viewport-local, feet near bottom
-	cs.scale = Vector2(2.4, 2.4)
+	cs.position = Vector2(130, 380)  # viewport-local, feet near bottom
+	cs.scale = Vector2(3.5, 3.5)
 
 	var label := Label.new()
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL

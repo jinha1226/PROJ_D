@@ -143,14 +143,11 @@ func _draw() -> void:
 			var dim_base: bool = not is_tile_visible(tile)
 			if dim_base:
 				base = base.darkened(0.55)
-			draw_rect(rect, base, true)
 			if t == DungeonGenerator.TileType.WALL:
-				# Wall as a thinner slab centred in the tile (40% tall, full
-				# width) so connected walls still look continuous horizontally.
 				var wc: Color = wall_color if not dim_base else wall_color.darkened(0.55)
-				var wh: float = TILE_SIZE * 0.4
-				var wy: float = rect.position.y + (TILE_SIZE - wh) * 0.5
-				draw_rect(Rect2(rect.position.x, wy, TILE_SIZE, wh), wc, true)
+				draw_rect(rect, wc, true)
+			else:
+				draw_rect(rect, base, true)
 	# Path overlay dots (only draw on explored tiles so hidden paths aren't spoilery).
 	var path_color: Color = Color(0.2, 0.85, 0.85, 0.55)
 	var dot_size: float = TILE_SIZE * 0.35

@@ -42,7 +42,7 @@ func _build_cards() -> void:
 func _make_card(j: JobData) -> Button:
 	var btn := Button.new()
 	btn.toggle_mode = true
-	btn.custom_minimum_size = Vector2(540, 540)
+	btn.custom_minimum_size = Vector2(540, 620)
 	btn.pressed.connect(_on_card_pressed.bind(j.id))
 
 	var hbox := HBoxContainer.new()
@@ -57,13 +57,13 @@ func _make_card(j: JobData) -> Button:
 
 	# Live preview: race body + job equipment.
 	var vpc := SubViewportContainer.new()
-	vpc.custom_minimum_size = Vector2(200, 320)
+	vpc.custom_minimum_size = Vector2(260, 460)
 	vpc.stretch = true
 	vpc.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hbox.add_child(vpc)
 
 	var vp := SubViewport.new()
-	vp.size = Vector2i(200, 320)
+	vp.size = Vector2i(260, 460)
 	vp.transparent_bg = true
 	vp.disable_3d = true
 	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
@@ -74,8 +74,8 @@ func _make_card(j: JobData) -> Button:
 	cs.load_character(_compose_preset(j))
 	cs.set_direction("down")
 	cs.play_anim("idle", true)
-	cs.position = Vector2(100, 210)
-	cs.scale = Vector2(2.4, 2.4)
+	cs.position = Vector2(130, 380)
+	cs.scale = Vector2(3.5, 3.5)
 
 	var label := Label.new()
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
