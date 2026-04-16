@@ -1,7 +1,0 @@
-[gd_resource type="Theme" load_steps=2 format=3 uid="uid://btheme0korean1"]
-
-[ext_resource type="FontFile" path="res://assets/fonts/Pretendard-Regular.otf" id="1_font"]
-
-[resource]
-default_font = ExtResource("1_font")
-default_font_size = 22

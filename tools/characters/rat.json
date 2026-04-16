@@ -1,5 +1,0 @@
-{
-  "id": "rat",
-  "skip": true,
-  "notes": "SKIP: rat is a non-humanoid monster and cannot be built from LPC humanoid defs. Requires dedicated sprite sheet outside the LPC generator."
-}
