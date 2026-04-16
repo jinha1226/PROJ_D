@@ -1,0 +1,38 @@
+{
+  "name": "Gnarled Staff",
+  "layer_1": {
+    "zPos": 140,
+    "male": "weapon/magic/gnarled/universal/foreground/",
+    "muscular": "weapon/magic/gnarled/universal/foreground/",
+    "female": "weapon/magic/gnarled/universal/foreground/",
+    "pregnant": "weapon/magic/gnarled/universal/foreground/"
+  },
+  "layer_2": {
+    "zPos": 9,
+    "male": "weapon/magic/gnarled/universal/background/",
+    "muscular": "weapon/magic/gnarled/universal/background/",
+    "female": "weapon/magic/gnarled/universal/background/",
+    "pregnant": "weapon/magic/gnarled/universal/background/"
+  },
+  "layer_3": {
+    "zPos": 150,
+    "custom_animation": "thrust",
+    "male": "weapon/magic/gnarled/thrust/foreground/",
+    "muscular": "weapon/magic/gnarled/thrust/foreground/",
+    "female": "weapon/magic/gnarled/thrust/foreground/",
+    "pregnant": "weapon/magic/gnarled/thrust/foreground/"
+  },
+  "layer_4": {
+    "zPos": 8,
+    "custom_animation": "thrust",
+    "male": "weapon/magic/gnarled/thrust/background/",
+    "muscular": "weapon/magic/gnarled/thrust/background/",
+    "female": "weapon/magic/gnarled/thrust/background/",
+    "pregnant": "weapon/magic/gnarled/thrust/background/"
+  },
+  "variants": ["brass", "bronze", "ceramic", "copper", "dark", "gnarled", "gold", "iron", "light", "medium", "red", "silver", "steel"],
+  "default_variant": "gnarled",
+  "animations": ["walk", "hurt", "thrust"],
+  "path": ["weapons", "magic", "weapon_magic_gnarled"],
+  "type_name": "weapon"
+}

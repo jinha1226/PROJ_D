@@ -1,0 +1,14 @@
+{
+  "name": "Body (Female)",
+  "tags": ["human", "adult", "female"],
+  "layer_1": {
+    "zPos": 10,
+    "female": "body/bodies/female/"
+  },
+  "variants": [""],
+  "default_variant": "",
+  "animations": ["walk", "slash", "thrust", "shoot", "hurt", "spellcast", "idle", "combat_idle", "run", "jump", "sit", "emote", "climb", "backslash", "halfslash"],
+  "notes": "Body PNGs are flat per-animation sheets. Recoloring handled at runtime via palette.",
+  "path": ["body", "bodies", "body_female"],
+  "type_name": "body"
+}

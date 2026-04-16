@@ -1,0 +1,16 @@
+{
+  "name": "Boomerang",
+  "layer_1": {
+    "zPos": 140,
+    "male": "weapon/ranged/boomerang/",
+    "muscular": "weapon/ranged/boomerang/",
+    "female": "weapon/ranged/boomerang/",
+    "pregnant": "weapon/ranged/boomerang/"
+  },
+  "variants": ["boomerang"],
+  "animations": [],
+  "stub": true,
+  "notes": "ULPC boomerang has only a single static boomerang.png (no animation dirs). Loader may need to handle static-only items.",
+  "path": ["weapons", "ranged", "weapon_ranged_boomerang"],
+  "type_name": "weapon"
+}

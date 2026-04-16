@@ -1,0 +1,37 @@
+{
+  "name": "War Axe",
+  "layer_1": {
+    "zPos": 140,
+    "male": "weapon/blunt/waraxe/",
+    "muscular": "weapon/blunt/waraxe/",
+    "female": "weapon/blunt/waraxe/",
+    "pregnant": "weapon/blunt/waraxe/"
+  },
+  "layer_2": {
+    "zPos": 9,
+    "male": "weapon/blunt/waraxe/behind/",
+    "muscular": "weapon/blunt/waraxe/behind/",
+    "female": "weapon/blunt/waraxe/behind/",
+    "pregnant": "weapon/blunt/waraxe/behind/"
+  },
+  "layer_3": {
+    "zPos": -1,
+    "custom_animation": "slash_oversize",
+    "male": "weapon/blunt/waraxe/attack_slash/behind/",
+    "muscular": "weapon/blunt/waraxe/attack_slash/behind/",
+    "female": "weapon/blunt/waraxe/attack_slash/behind/",
+    "pregnant": "weapon/blunt/waraxe/attack_slash/behind/"
+  },
+  "layer_4": {
+    "zPos": 150,
+    "custom_animation": "slash_oversize",
+    "male": "weapon/blunt/waraxe/attack_slash/",
+    "muscular": "weapon/blunt/waraxe/attack_slash/",
+    "female": "weapon/blunt/waraxe/attack_slash/",
+    "pregnant": "weapon/blunt/waraxe/attack_slash/"
+  },
+  "variants": ["waraxe"],
+  "animations": ["walk", "hurt", "slash_oversize"],
+  "path": ["weapons", "blunt", "weapon_blunt_waraxe"],
+  "type_name": "weapon"
+}

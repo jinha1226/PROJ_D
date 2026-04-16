@@ -1,0 +1,26 @@
+{
+  "name": "Cat Ears",
+  "layer_1": {
+    "zPos": 106,
+    "male": "head/ears/cat/adult_front/",
+    "muscular": "head/ears/cat/adult_front/",
+    "female": "head/ears/cat/adult_front/",
+    "pregnant": "head/ears/cat/adult_front/",
+    "teen": "head/ears/cat/adult_front/",
+    "child": "head/ears/cat/child_front/"
+  },
+  "layer_2": {
+    "zPos": 7,
+    "male": "head/ears/cat/adult_back/",
+    "muscular": "head/ears/cat/adult_back/",
+    "female": "head/ears/cat/adult_back/",
+    "pregnant": "head/ears/cat/adult_back/",
+    "teen": "head/ears/cat/adult_back/",
+    "child": "head/ears/cat/child_back/"
+  },
+  "variants": ["ash", "black", "blonde", "blue", "carrot", "chestnut", "dark_brown", "dark_gray", "fur_black", "fur_brown", "fur_copper", "fur_gold", "fur_grey", "fur_tan", "fur_white", "ginger", "gold", "gray", "green", "light_brown", "navy", "orange", "pink", "platinum", "purple", "raven", "red", "redhead", "rose", "sandy", "strawberry", "violet", "white"],
+  "default_variant": "fur_brown",
+  "animations": ["walk", "slash", "thrust", "shoot", "hurt", "spellcast", "idle"],
+  "path": ["head", "ears", "ears_cat"],
+  "type_name": "ears"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Vest",
+  "layer_1": {
+    "zPos": 60,
+    "male": "torso/clothes/vest/male/",
+    "muscular": "torso/clothes/vest/male/"
+  },
+  "variants": ["black", "blue", "bluegray", "brown", "charcoal", "forest", "gray", "gray_striped", "green", "green_striped", "lavender", "leather", "maroon", "navy", "orange", "pink", "purple", "red", "rose", "sky", "slate", "tan", "teal", "walnut", "white", "yellow"],
+  "default_variant": "brown",
+  "animations": ["walk", "slash", "shoot", "hurt", "idle"],
+  "notes": "Vest is male-only in ULPC source.",
+  "path": ["torso", "clothes", "torso_clothes_vest"],
+  "type_name": "clothes"
+}

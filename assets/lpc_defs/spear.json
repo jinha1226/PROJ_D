@@ -1,0 +1,22 @@
+{
+  "name": "Spear",
+  "layer_1": {
+    "zPos": 140,
+    "male": "weapon/polearm/spear/foreground/",
+    "muscular": "weapon/polearm/spear/foreground/",
+    "female": "weapon/polearm/spear/foreground/",
+    "pregnant": "weapon/polearm/spear/foreground/"
+  },
+  "layer_2": {
+    "zPos": 9,
+    "male": "weapon/polearm/spear/background/",
+    "muscular": "weapon/polearm/spear/background/",
+    "female": "weapon/polearm/spear/background/",
+    "pregnant": "weapon/polearm/spear/background/"
+  },
+  "variants": ["brass", "bronze", "ceramic", "copper", "dark", "gold", "iron", "light", "medium", "red", "silver", "spear", "steel"],
+  "default_variant": "steel",
+  "animations": ["walk", "hurt", "thrust"],
+  "path": ["weapons", "polearm", "weapon_polearm_spear"],
+  "type_name": "weapon"
+}

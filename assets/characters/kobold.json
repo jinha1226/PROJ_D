@@ -1,0 +1,11 @@
+{
+  "id": "kobold",
+  "body_def": "body_child",
+  "body_variant": "",
+  "skin_tint": "#a05a2c",
+  "equipment": [
+    {"def": "spear", "variant": "iron"},
+    {"def": "horns_curved", "variant": "horns"}
+  ],
+  "notes": "Kobold: child body + spear + horns. Brown-reddish skin tint."
+}

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://2tq2d4iw6465"]
+
+[ext_resource type="Script" path="res://scripts/ui/BuildVersionLabel.gd" id="1_bvl"]
+
+[node name="BuildVersionLabel" type="CanvasLayer"]
+script = ExtResource("1_bvl")

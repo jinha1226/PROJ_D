@@ -1,0 +1,15 @@
+{
+  "name": "Body (Child)",
+  "tags": ["child", "small"],
+  "layer_1": {
+    "zPos": 10,
+    "child": "body/bodies/child/",
+    "male": "body/bodies/child/"
+  },
+  "variants": [""],
+  "default_variant": "",
+  "animations": ["walk", "slash", "hurt", "idle", "jump", "sit"],
+  "notes": "Child body has reduced animation set; used as base for small monsters (goblin/kobold).",
+  "path": ["body", "bodies", "body_child"],
+  "type_name": "body"
+}

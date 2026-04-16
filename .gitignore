@@ -1,0 +1,33 @@
+# Godot 4+
+.godot/
+/android/
+
+# Build output
+build/
+export/
+
+# Godot editor binaries / Windows SDK crumbs (never commit)
+Godot_v*.exe
+Godot_v*.exe.zip
+Godot_v*.zip
+Microsoft.Services.Store.winmd
+
+# Node (ULPC generator tooling, if anyone runs it locally)
+node_modules/
+
+# Raw ULPC generator repo — huge; we commit the mirrored output under assets/ulpc/ instead.
+# See CREDITS_LPC.md for license attribution.
+Universal-LPC-Spritesheet-Character-Generator/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Save data (local only)
+*.dat
+
+# CI-generated build version tag
+/version.txt
+
+# NOTE: *.import files ARE committed — they carry stable Godot UIDs.
+# NOTE: assets/ulpc/ IS committed so CI can build without the generator repo.

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EssenceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/essences/EssenceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "snake_essence"
+display_name = "뱀 정수"
+essence_type = 2
+rarity = 0
+dex_bonus = 4
+source_monsters = Array[String](["snake"])
+drop_chance = 0.35

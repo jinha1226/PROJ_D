@@ -1,0 +1,15 @@
+{
+  "name": "Legion Armor",
+  "layer_1": {
+    "zPos": 60,
+    "male": "torso/armour/legion/male/",
+    "female": "torso/armour/legion/female/",
+    "teen": "torso/armour/legion/teen/"
+  },
+  "variants": [""],
+  "animations": ["walk", "slash", "thrust", "shoot", "hurt", "spellcast", "idle", "combat_idle", "run", "jump", "sit", "emote", "climb", "backslash", "halfslash"],
+  "stub": true,
+  "notes": "Legion armour PNGs are per-animation flat sheets (no color variants); variants array is empty-string placeholder for loader path composition.",
+  "path": ["torso", "armour", "torso_armour_legion"],
+  "type_name": "armour"
+}

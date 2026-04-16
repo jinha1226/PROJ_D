@@ -1,0 +1,12 @@
+{
+  "id": "lich",
+  "body_def": "body_skeleton",
+  "body_variant": "skeleton",
+  "skin_tint": null,
+  "equipment": [
+    {"def": "gnarled_staff", "variant": "gnarled"},
+    {"def": "robe", "variant": "dark_gray"},
+    {"def": "wizard_hat", "variant": "black"}
+  ],
+  "notes": "Lich: skeleton body + gnarled staff + dark robe + wizard hat. Robe is female-only in ULPC; may need male variant adaptation."
+}

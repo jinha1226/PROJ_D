@@ -1,0 +1,13 @@
+{
+  "name": "Pantaloons",
+  "layer_1": {
+    "zPos": 50,
+    "male": "legs/pantaloons/male/",
+    "muscular": "legs/pantaloons/male/"
+  },
+  "variants": ["black", "blue", "bluegray", "brown", "charcoal", "forest", "gray", "green", "lavender", "leather", "maroon", "navy", "orange", "pink", "purple", "red", "rose", "sky", "slate", "tan", "teal", "walnut", "white", "yellow"],
+  "default_variant": "brown",
+  "animations": ["walk", "backslash", "climb", "combat_idle", "emote"],
+  "path": ["legs", "legs_pantaloons"],
+  "type_name": "legs"
+}

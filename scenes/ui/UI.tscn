@@ -1,0 +1,15 @@
+[gd_scene load_steps=5 format=3 uid="uid://buiroot00001"]
+
+[ext_resource type="Script" path="res://scripts/ui/UI.gd" id="1_ui"]
+[ext_resource type="PackedScene" uid="uid://btophudroot1" path="res://scenes/ui/TopHUD.tscn" id="2_top"]
+[ext_resource type="PackedScene" uid="uid://bbothudroot01" path="res://scenes/ui/BottomHUD.tscn" id="3_bot"]
+[ext_resource type="PackedScene" uid="uid://bpopupmgr001" path="res://scenes/ui/PopupManager.tscn" id="4_pop"]
+
+[node name="UI" type="CanvasLayer"]
+script = ExtResource("1_ui")
+
+[node name="TopHUD" parent="." instance=ExtResource("2_top")]
+
+[node name="BottomHUD" parent="." instance=ExtResource("3_bot")]
+
+[node name="PopupManager" parent="." instance=ExtResource("4_pop")]

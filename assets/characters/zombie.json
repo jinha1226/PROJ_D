@@ -1,0 +1,11 @@
+{
+  "id": "zombie",
+  "body_def": "body_zombie",
+  "body_variant": "zombie",
+  "skin_tint": null,
+  "equipment": [
+    {"def": "vest", "variant": "brown"},
+    {"def": "pantaloons", "variant": "brown"}
+  ],
+  "notes": "Zombie body is a stub (only walk). Ragged clothing approximated with vest + pantaloons."
+}
