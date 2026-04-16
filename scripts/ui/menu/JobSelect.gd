@@ -2,6 +2,7 @@ extends Control
 ## Background (job) selection. Loads all 20 job tres files, renders a
 ## 2-column scrollable card grid with live previews of the picked race
 ## wearing each job's starting equipment.
+## Cards show compact info; tapping expands to reveal full details.
 
 const CHAR_SPRITE_SCENE := preload("res://scenes/entities/CharacterSprite.tscn")
 const RACE_SELECT_PATH := "res://scenes/menu/RaceSelect.tscn"
@@ -14,9 +15,14 @@ const JOB_IDS: Array[String] = [
 	"assassin", "warper", "wizard",
 ]
 
+const _CARD_W: float = 540.0
+const _CARD_H_COMPACT: float = 680.0
+const _CARD_H_EXPANDED: float = 1060.0
+
 var _selected_id: String = ""
-var _cards: Dictionary = {}  # job_id -> Button
-var _preview_race: RaceData = null  # race chosen on prior screen; default human
+var _cards: Dictionary = {}        # job_id -> Button
+var _detail_nodes: Dictionary = {} # job_id -> {sep, detail}
+var _preview_race: RaceData = null
 
 
 func _ready() -> void:
@@ -42,28 +48,28 @@ func _build_cards() -> void:
 func _make_card(j: JobData) -> Button:
 	var btn := Button.new()
 	btn.toggle_mode = true
-	btn.custom_minimum_size = Vector2(540, 620)
+	btn.custom_minimum_size = Vector2(_CARD_W, _CARD_H_COMPACT)
 	btn.pressed.connect(_on_card_pressed.bind(j.id))
 
-	var hbox := HBoxContainer.new()
-	hbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	hbox.add_theme_constant_override("separation", 16)
-	hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hbox.offset_left = 20
-	hbox.offset_top = 20
-	hbox.offset_right = -20
-	hbox.offset_bottom = -20
-	btn.add_child(hbox)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 10)
+	vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.offset_left = 16
+	vbox.offset_top = 16
+	vbox.offset_right = -16
+	vbox.offset_bottom = -16
+	btn.add_child(vbox)
 
-	# Live preview: race body + job equipment.
+	# Live preview: race body + job equipment — larger sprite.
 	var vpc := SubViewportContainer.new()
-	vpc.custom_minimum_size = Vector2(260, 460)
+	vpc.custom_minimum_size = Vector2(504, 460)
 	vpc.stretch = true
 	vpc.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hbox.add_child(vpc)
+	vbox.add_child(vpc)
 
 	var vp := SubViewport.new()
-	vp.size = Vector2i(260, 460)
+	vp.size = Vector2i(504, 460)
 	vp.transparent_bg = true
 	vp.disable_3d = true
 	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
@@ -74,31 +80,71 @@ func _make_card(j: JobData) -> Button:
 	cs.load_character(_compose_preset(j))
 	cs.set_direction("down")
 	cs.play_anim("idle", true)
-	cs.position = Vector2(130, 380)
-	cs.scale = Vector2(3.5, 3.5)
+	cs.position = Vector2(252, 400)
+	cs.scale = Vector2(5.5, 5.5)
 
-	var label := Label.new()
-	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
-	label.add_theme_font_size_override("font_size", 32)
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var stat_line := "STR%s%d  DEX%s%d  INT%s%d" % [
+	# Job name — always visible.
+	var name_lbl := Label.new()
+	name_lbl.text = j.display_name
+	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.add_theme_font_size_override("font_size", 44)
+	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(name_lbl)
+
+	# Stat bonuses — always visible.
+	var stat_line := "STR%s%d   DEX%s%d   INT%s%d" % [
 		"+" if j.str_bonus >= 0 else "", j.str_bonus,
 		"+" if j.dex_bonus >= 0 else "", j.dex_bonus,
 		"+" if j.int_bonus >= 0 else "", j.int_bonus,
 	]
-	var eq_line: String = "Starts with: " + ("(none)" if j.starting_equipment.is_empty()
-			else ", ".join(PackedStringArray(j.starting_equipment)))
+	var stats_lbl := Label.new()
+	stats_lbl.text = stat_line
+	stats_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	stats_lbl.add_theme_font_size_override("font_size", 30)
+	stats_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(stats_lbl)
+
+	# --- Detail section (hidden until card is selected) ---
+	var sep := HSeparator.new()
+	sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sep.visible = false
+	vbox.add_child(sep)
+
+	var detail := VBoxContainer.new()
+	detail.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	detail.visible = false
+	detail.add_theme_constant_override("separation", 6)
+	vbox.add_child(detail)
+
+	var eq_names: String = "(none)" if j.starting_equipment.is_empty() \
+		else ", ".join(PackedStringArray(j.starting_equipment))
+	var eq_lbl := Label.new()
+	eq_lbl.text = "Starts with: %s" % eq_names
+	eq_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	eq_lbl.add_theme_font_size_override("font_size", 26)
+	eq_lbl.add_theme_color_override("font_color", Color(0.85, 0.85, 1.0))
+	eq_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	detail.add_child(eq_lbl)
+
 	var skill_lines: Array = []
 	for sk in j.starting_skills.keys():
 		skill_lines.append("%s Lv.%d" % [sk, int(j.starting_skills[sk])])
-	var skill_line: String = "Skills: " + ", ".join(PackedStringArray(skill_lines))
-	label.text = "%s\n\n%s\n%s\n%s\n\n%s" % [
-		j.display_name, stat_line, eq_line, skill_line, j.description,
-	]
-	hbox.add_child(label)
+	var skills_lbl := Label.new()
+	skills_lbl.text = "Skills: %s" % (", ".join(PackedStringArray(skill_lines)) if skill_lines.size() > 0 else "(none)")
+	skills_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	skills_lbl.add_theme_font_size_override("font_size", 26)
+	skills_lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
+	skills_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	detail.add_child(skills_lbl)
+
+	var desc_lbl := Label.new()
+	desc_lbl.text = j.description
+	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	desc_lbl.add_theme_font_size_override("font_size", 26)
+	desc_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	detail.add_child(desc_lbl)
+
+	_detail_nodes[j.id] = {"sep": sep, "detail": detail}
 	return btn
 
 
@@ -133,12 +179,25 @@ func _compose_preset(j: JobData) -> Dictionary:
 
 
 func _on_card_pressed(job_id: String) -> void:
-	_selected_id = job_id
+	var toggling_off: bool = (_selected_id == job_id)
+	if toggling_off:
+		_selected_id = ""
+		$Footer/StartButton.disabled = true
+	else:
+		_selected_id = job_id
+		$Footer/StartButton.disabled = false
+
 	for jid in _cards.keys():
 		var b: Button = _cards[jid]
-		if b != null:
-			b.button_pressed = (jid == job_id)
-	$Footer/StartButton.disabled = false
+		if b == null:
+			continue
+		var is_sel: bool = (jid == _selected_id)
+		b.button_pressed = is_sel
+		b.custom_minimum_size = Vector2(_CARD_W, _CARD_H_EXPANDED if is_sel else _CARD_H_COMPACT)
+		if _detail_nodes.has(jid):
+			var d: Dictionary = _detail_nodes[jid]
+			d["sep"].visible = is_sel
+			d["detail"].visible = is_sel
 
 
 func _on_back() -> void:
@@ -148,6 +207,5 @@ func _on_back() -> void:
 func _on_start() -> void:
 	if _selected_id == "":
 		return
-	# start_new_run resets depth, identified items, pseudonyms, etc.
 	GameManager.start_new_run(_selected_id, GameManager.selected_race_id)
 	get_tree().change_scene_to_file(GAME_PATH)

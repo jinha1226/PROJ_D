@@ -22,9 +22,12 @@ theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
 [node name="VBox" type="VBoxContainer" parent="Margin"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 10
 
 [node name="Row1" type="HBoxContainer" parent="Margin/VBox"]
+size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
 [node name="QuickSlot0" type="Button" parent="Margin/VBox/Row1" instance=ExtResource("2_qs")]
@@ -51,6 +54,7 @@ text = "REST"
 theme_override_font_sizes/font_size = 32
 
 [node name="Row2" type="HBoxContainer" parent="Margin/VBox"]
+size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
 [node name="BagButton" type="Button" parent="Margin/VBox/Row2"]
@@ -65,10 +69,10 @@ size_flags_horizontal = 3
 text = "SKILLS"
 theme_override_font_sizes/font_size = 36
 
-[node name="MapButton" type="Button" parent="Margin/VBox/Row2"]
+[node name="MagicButton" type="Button" parent="Margin/VBox/Row2"]
 custom_minimum_size = Vector2(0, 112)
 size_flags_horizontal = 3
-text = "MAP"
+text = "MAGIC"
 theme_override_font_sizes/font_size = 36
 
 [node name="StatusButton" type="Button" parent="Margin/VBox/Row2"]

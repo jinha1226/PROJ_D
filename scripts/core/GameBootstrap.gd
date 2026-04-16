@@ -149,8 +149,8 @@ func _ready() -> void:
 		bottom_hud.skills_pressed.connect(_on_skills_button_pressed)
 	if bottom_hud != null and bottom_hud.has_signal("status_pressed"):
 		bottom_hud.status_pressed.connect(_on_status_pressed)
-	if bottom_hud != null and bottom_hud.has_signal("map_pressed"):
-		bottom_hud.map_pressed.connect(_on_minimap_pressed)
+	if bottom_hud != null and bottom_hud.has_signal("magic_pressed"):
+		bottom_hud.magic_pressed.connect(_on_magic_pressed)
 
 	# [skill-ui-agent] persistent level-up toast layer.
 	skill_toast = SKILL_TOAST_SCENE.instantiate()
@@ -694,6 +694,16 @@ func _end_run(victory: bool, killer: String) -> void:
 
 
 # [skill-ui-agent] ---- skill UI wiring ------------------------------------
+
+func _on_magic_pressed() -> void:
+	# MAGIC button opens the skills dialog directly on the CAST (spells) tab.
+	# If the dialog is already open on any tab, close it (toggle behaviour).
+	if _skills_dlg != null and is_instance_valid(_skills_dlg):
+		_skills_dlg.queue_free()
+		_skills_dlg = null
+		return
+	_open_skills_dialog("spells")
+
 
 func _on_skills_button_pressed() -> void:
 	if _skills_dlg != null and is_instance_valid(_skills_dlg):

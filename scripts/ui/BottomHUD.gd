@@ -5,7 +5,7 @@ signal quickslot_pressed(index: int)
 signal rest_pressed
 signal bag_pressed
 signal skills_pressed
-signal map_pressed
+signal magic_pressed
 signal status_pressed
 
 @onready var quick_slots: Array = [
@@ -19,7 +19,7 @@ signal status_pressed
 @onready var rest_button: Button = $Margin/VBox/Row1/RestButton
 @onready var bag_button: Button = $Margin/VBox/Row2/BagButton
 @onready var skills_button: Button = $Margin/VBox/Row2/SkillsButton
-@onready var map_button: Button = $Margin/VBox/Row2/MapButton
+@onready var magic_button: Button = $Margin/VBox/Row2/MagicButton
 @onready var status_button: Button = $Margin/VBox/Row2/StatusButton
 
 
@@ -32,7 +32,7 @@ func _ready() -> void:
 	rest_button.pressed.connect(func(): rest_pressed.emit())
 	bag_button.pressed.connect(func(): bag_pressed.emit())
 	skills_button.pressed.connect(func(): skills_pressed.emit())
-	map_button.pressed.connect(func(): map_pressed.emit())
+	magic_button.pressed.connect(func(): magic_pressed.emit())
 	status_button.pressed.connect(func(): status_pressed.emit())
 
 
