@@ -59,6 +59,51 @@ const DATA: Dictionary = {
 		"effect": "identify_one",
 		"desc": "Reveals the true name and effect of a single unknown potion or scroll of your choice.",
 	},
+	# --- Stat-boost potions (permanent) ---
+	"potion_might": {
+		"name": "Potion of Might",
+		"kind": "potion",
+		"color": Color(0.85, 0.30, 0.20),
+		"effect": "buff_stat",
+		"stat": "STR",
+		"amount": 3,
+		"desc": "Permanently raises Strength by 3.",
+	},
+	"potion_agility": {
+		"name": "Potion of Agility",
+		"kind": "potion",
+		"color": Color(0.40, 0.80, 0.40),
+		"effect": "buff_stat",
+		"stat": "DEX",
+		"amount": 3,
+		"desc": "Permanently raises Dexterity by 3.",
+	},
+	"potion_brilliance": {
+		"name": "Potion of Brilliance",
+		"kind": "potion",
+		"color": Color(0.85, 0.60, 0.95),
+		"effect": "buff_stat",
+		"stat": "INT",
+		"amount": 3,
+		"desc": "Permanently raises Intelligence by 3.",
+	},
+	"potion_poison": {
+		"name": "Potion of Poison",
+		"kind": "potion",
+		"color": Color(0.35, 0.50, 0.25),
+		"effect": "harm",
+		"amount": 10,
+		"desc": "Bitter, foul — inflicts 10 damage when drunk.",
+	},
+	# --- Enchant weapon scroll ---
+	"scroll_enchant_weapon": {
+		"name": "Scroll of Enchant Weapon",
+		"kind": "scroll",
+		"color": Color(0.90, 0.85, 0.40),
+		"effect": "enchant_weapon",
+		"amount": 2,
+		"desc": "Permanently adds +2 damage to the currently equipped weapon.",
+	},
 }
 
 

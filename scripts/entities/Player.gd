@@ -32,6 +32,9 @@ const _MP_PER_LEVEL: int = 3
 
 # [skill-agent] equipped weapon + per-skill state (level/xp/training).
 var equipped_weapon_id: String = ""
+# Bonus damage from Scroll of Enchant Weapon etc. Applied on top of the
+# base WeaponRegistry damage inside CombatSystem.melee_attack.
+var weapon_bonus_dmg: int = 0
 # Slot-keyed Dict: "chest"/"legs"/"boots"/"helm"/"gloves" → {id,name,ac,color,slot}
 # Missing key = nothing in that slot.
 var equipped_armor: Dictionary = {}
@@ -105,17 +108,31 @@ func _load_sprite_preset() -> void:
 	_sprite.play_anim("idle", true)
 
 
-## DCSS player rendering: draw the race tile centred on the entity.
+## DCSS player rendering: race body + equipped doll layers stacked.
+## Order matters: base → legs → chest → boots → gloves → helm → weapon.
 func _draw() -> void:
-	if not TileRenderer.is_dcss():
+	if not TileRenderer.is_dcss() or race_id == "":
 		return
-	if race_id == "":
+	var base: Texture2D = TileRenderer.player_race(race_id)
+	if base == null:
 		return
-	var tex: Texture2D = TileRenderer.player_race(race_id)
-	if tex == null:
-		return
-	var sz: Vector2 = tex.get_size()
-	draw_texture(tex, -sz * 0.5)
+	var sz: Vector2 = base.get_size()
+	var ofs: Vector2 = -sz * 0.5
+	draw_texture(base, ofs)
+	# Armor layers, slot by slot.
+	for slot in ["legs", "chest", "boots", "gloves", "helm"]:
+		var piece: Dictionary = equipped_armor.get(slot, {})
+		var piece_id: String = String(piece.get("id", ""))
+		if piece_id == "":
+			continue
+		var layer: Texture2D = TileRenderer.doll_layer(slot, piece_id)
+		if layer != null:
+			draw_texture(layer, ofs)
+	# Weapon last so it sits on top of everything.
+	if equipped_weapon_id != "":
+		var wpn: Texture2D = TileRenderer.doll_layer("weapon", equipped_weapon_id)
+		if wpn != null:
+			draw_texture(wpn, ofs)
 
 
 ## Build a CharacterSprite preset dict reflecting the player's CURRENT
@@ -482,6 +499,29 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 		"identify_one":
 			# Hand the choice off to the UI — GameBootstrap opens a picker.
 			identify_one_requested.emit()
+			return true
+		"buff_stat":
+			if stats == null:
+				return false
+			var amt: int = int(info.get("amount", 2))
+			match String(info.get("stat", "")):
+				"STR": stats.STR += amt
+				"DEX": stats.DEX += amt
+				"INT": stats.INT += amt
+			stats_changed.emit()
+			return true
+		"harm":
+			if stats == null:
+				return false
+			take_damage(int(info.get("amount", 5)))
+			return true
+		"enchant_weapon":
+			if equipped_weapon_id == "":
+				print("No weapon equipped to enchant.")
+				return false
+			weapon_bonus_dmg += int(info.get("amount", 1))
+			print("Weapon enchanted (+%d damage)." % weapon_bonus_dmg)
+			stats_changed.emit()
 			return true
 		_:
 			print("Unknown consumable effect: %s" % info.get("effect"))

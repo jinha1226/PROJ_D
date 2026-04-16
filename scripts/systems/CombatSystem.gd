@@ -22,6 +22,9 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	var weapon_dmg: int = UNARMED_DAMAGE
 	if weapon_id != "" and WeaponRegistry.is_weapon(weapon_id):
 		weapon_dmg = WeaponRegistry.weapon_damage_for(weapon_id)
+	# Scroll of Enchant Weapon stacks: attacker.weapon_bonus_dmg adds directly.
+	if "weapon_bonus_dmg" in attacker:
+		weapon_dmg += int(attacker.weapon_bonus_dmg)
 	# Catfolk claws: bonus to unarmed damage only.
 	if weapon_id == "" and "race_res" in attacker and attacker.race_res != null \
 			and attacker.race_res.racial_trait == "catfolk_claws":

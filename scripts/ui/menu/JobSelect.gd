@@ -62,30 +62,20 @@ func _make_card(j: JobData) -> Button:
 	btn.add_child(vbox)
 
 	if TileRenderer.is_dcss():
-		# Race tile + this job's first weapon icon shown side-by-side.
-		var preview := HBoxContainer.new()
+		# Composited doll: race body + legs + chest + boots + gloves + helm
+		# + weapon, all stacked at the same rect so it reads as one figure.
+		var preview := Control.new()
 		preview.custom_minimum_size = Vector2(504, 460)
-		preview.alignment = BoxContainer.ALIGNMENT_CENTER
-		preview.add_theme_constant_override("separation", 16)
 		preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var race_rect := TextureRect.new()
-		race_rect.custom_minimum_size = Vector2(220, 380)
-		race_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		race_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-		race_rect.texture = TileRenderer.player_race(_preview_race.id if _preview_race else "human")
-		race_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		race_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		preview.add_child(race_rect)
+		var race_id: String = _preview_race.id if _preview_race else "human"
+		_add_doll_layer(preview, TileRenderer.player_race(race_id))
+		for slot in ["legs", "chest", "boots", "gloves", "helm"]:
+			var aid: String = _find_armor_in_slot(j, slot)
+			if aid != "":
+				_add_doll_layer(preview, TileRenderer.doll_layer(slot, aid))
 		var weapon_id: String = _first_weapon_id(j)
 		if weapon_id != "":
-			var w_rect := TextureRect.new()
-			w_rect.custom_minimum_size = Vector2(220, 380)
-			w_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			w_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-			w_rect.texture = TileRenderer.item(weapon_id)
-			w_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			w_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-			preview.add_child(w_rect)
+			_add_doll_layer(preview, TileRenderer.doll_layer("weapon", weapon_id))
 		vbox.add_child(preview)
 	else:
 		var vpc := SubViewportContainer.new()
@@ -179,6 +169,29 @@ func _first_weapon_id(j: JobData) -> String:
 		if WeaponRegistry.is_weapon(sid):
 			return sid
 	return ""
+
+
+## First armor id in the given slot within starting_equipment, or "" if none.
+func _find_armor_in_slot(j: JobData, slot: String) -> String:
+	for it in j.starting_equipment:
+		var sid: String = String(it)
+		if ArmorRegistry.is_armor(sid) and ArmorRegistry.slot_for(sid) == slot:
+			return sid
+	return ""
+
+
+## Add one layer TextureRect filling `parent` at its full rect, nearest-neighbour.
+func _add_doll_layer(parent: Control, tex: Texture2D) -> void:
+	if tex == null:
+		return
+	var tr := TextureRect.new()
+	tr.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	tr.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	tr.texture = tex
+	tr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(tr)
 
 
 ## Build a preset combining the selected race with this job's starting gear.

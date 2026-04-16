@@ -19,7 +19,7 @@ const _SKILL_CATEGORY_LABELS: Dictionary = {
 }
 # [zoom-agent] pinch gesture + UI zoom buttons.
 const ZOOM_CONTROLLER_SCRIPT: Script = preload("res://scripts/ui/ZoomController.gd")
-const MAX_DEPTH: int = 2  # M1 testing: 2 floors only for stair-flow validation.
+const MAX_DEPTH: int = 25
 
 var generator: DungeonGenerator
 var player: Player
