@@ -42,18 +42,23 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 	return result
 
 
+## Depth-tiered pool mirroring docs/06_DUNGEON_GENERATION.md:
+##   Tier 1 (D:1~3): rat, bat, goblin, kobold
+##   Tier 2 (D:4~6): orc (+ planned: zombie, snake, lizard)
+##   Tier 3+        : TBD
 static func _load_pool(depth: int) -> Array[MonsterData]:
 	var pool: Array[MonsterData] = []
-	var rat: Resource = load("res://resources/monsters/rat.tres")
-	var goblin: Resource = load("res://resources/monsters/goblin.tres")
-	if rat != null:
-		pool.append(rat)
-	if goblin != null:
-		pool.append(goblin)
-	if depth >= 4:
-		var orc: Resource = load("res://resources/monsters/orc.tres")
-		if orc != null:
-			pool.append(orc)
+	var ids: Array[String] = []
+	if depth <= 3:
+		ids = ["rat", "bat", "goblin", "kobold"]
+	elif depth <= 6:
+		ids = ["orc", "goblin", "kobold"]
+	else:
+		ids = ["orc", "goblin"]
+	for id in ids:
+		var res: Resource = load("res://resources/monsters/%s.tres" % id)
+		if res != null:
+			pool.append(res)
 	return pool
 
 

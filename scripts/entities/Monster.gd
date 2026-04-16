@@ -110,18 +110,9 @@ func get_player() -> Node:
 
 
 func attack_animation_toward(target_grid: Vector2i) -> void:
-	var delta: Vector2i = target_grid - grid_pos
 	if _sprite != null:
-		_sprite.face_toward(delta)
+		_sprite.face_toward(target_grid - grid_pos)
 		_sprite.play_anim("slash", false)
-	# Short lunge so the attack is visually readable even without sprite anims.
-	if _move_tween != null and _move_tween.is_valid():
-		_move_tween.kill()
-	var home: Vector2 = Vector2(grid_pos.x * tile_size + tile_size / 2.0, grid_pos.y * tile_size + tile_size / 2.0)
-	var push: Vector2 = Vector2(delta) * float(tile_size) * 0.35
-	_move_tween = create_tween()
-	_move_tween.tween_property(self, "position", home + push, _ATTACK_LUNGE_DUR)
-	_move_tween.tween_property(self, "position", home, _ATTACK_LUNGE_DUR)
 
 
 ## Used by MonsterAI._move_to — updates grid_pos AND tweens the visual.

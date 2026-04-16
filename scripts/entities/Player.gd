@@ -339,23 +339,13 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 	var delta := Vector2i(sign(target_pos.x - grid_pos.x), sign(target_pos.y - grid_pos.y))
 	if _sprite:
 		_sprite.face_toward(delta)
-	_lunge_toward(delta)
+	# Sprite slash animation carries the attack feel — no position lunge.
 	# [skill-agent] route through CombatSystem so skill levels are factored in.
 	var skill_sys: Node = get_tree().root.get_node_or_null("Game/SkillSystem")
 	CombatSystem.melee_attack(self, monster, skill_sys)
 	attacked.emit(monster)
 	TurnManager.end_player_turn()
 	return monster
-
-
-func _lunge_toward(delta: Vector2i) -> void:
-	if _move_tween != null and _move_tween.is_valid():
-		_move_tween.kill()
-	var home: Vector2 = Vector2(grid_pos.x * tile_size + tile_size / 2.0, grid_pos.y * tile_size + tile_size / 2.0)
-	var push: Vector2 = Vector2(delta) * float(tile_size) * 0.35
-	_move_tween = create_tween()
-	_move_tween.tween_property(self, "position", home + push, _ATTACK_LUNGE_DUR)
-	_move_tween.tween_property(self, "position", home, _ATTACK_LUNGE_DUR)
 
 
 func take_damage(amount: int) -> void:

@@ -15,6 +15,7 @@ static func act(m: Monster) -> void:
 	var dist: int = _cheb(m.grid_pos, ppos)
 
 	if dist <= 1:
+		m.attack_animation_toward(ppos)
 		CombatSystem.melee_attack_from_monster(m, player)
 		return
 

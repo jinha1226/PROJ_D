@@ -44,6 +44,9 @@ var _base_seed: int = 0
 # floor. Restored on revisit so killed enemies stay dead and picked-up items
 # stay gone. Keyed by int depth.
 var _floor_state: Dictionary = {}
+# Camera follow tween so the view doesn't snap.
+var _cam_tween: Tween = null
+const _CAM_FOLLOW_DUR: float = 0.14
 
 # REST mode — advances turns while regenerating HP/MP. Interrupts when any
 # monster enters player FOV or caps reached.
@@ -219,6 +222,15 @@ func _on_turn_refresh_visibility() -> void:
 		_rest_tick()
 
 
+## Every frame make sure monsters/items don't leak into unexplored tiles.
+## Cheap — ~30 nodes max, single dict lookup each. Catches tween-mid
+## movement where grid_pos changed but no signal fired yet.
+func _process(_delta: float) -> void:
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	if dmap != null and generator != null:
+		_refresh_actor_visibility(dmap)
+
+
 func _on_rest_pressed() -> void:
 	if player == null or player.stats == null:
 		return
@@ -368,7 +380,11 @@ func _on_player_moved(new_pos: Vector2i) -> void:
 	if _resting:
 		_cancel_rest("movement")
 	var cam: Camera2D = $Camera2D
-	cam.position = Vector2(new_pos.x * TILE_SIZE + TILE_SIZE / 2.0, new_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
+	var cam_target: Vector2 = Vector2(new_pos.x * TILE_SIZE + TILE_SIZE / 2.0, new_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
+	if _cam_tween != null and _cam_tween.is_valid():
+		_cam_tween.kill()
+	_cam_tween = create_tween()
+	_cam_tween.tween_property(cam, "position", cam_target, _CAM_FOLLOW_DUR)
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	if dmap != null:
 		dmap.update_fov(new_pos)
@@ -700,6 +716,8 @@ func _on_bag_pressed() -> void:
 			var lab := Label.new()
 			lab.text = "%s [%s]" % [it.get("name", "?"), kind]
 			lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			lab.mouse_filter = Control.MOUSE_FILTER_STOP
+			lab.tooltip_text = _build_item_tooltip(it)
 			row.add_child(lab)
 			if kind == "weapon" or kind == "armor":
 				var eq_btn := Button.new()
@@ -720,6 +738,45 @@ func _on_bag_pressed() -> void:
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
 	dlg.popup_centered(Vector2i(720, 900))
+
+
+## Build a multi-line tooltip string comparing this item to what the
+## player currently has equipped in the same slot.
+func _build_item_tooltip(it: Dictionary) -> String:
+	var kind: String = String(it.get("kind", ""))
+	var id: String = String(it.get("id", ""))
+	var name_s: String = String(it.get("name", id))
+	match kind:
+		"weapon":
+			var new_dmg: int = WeaponRegistry.weapon_damage_for(id)
+			var new_delay: float = WeaponRegistry.weapon_delay_for(id)
+			var new_skill: String = WeaponRegistry.weapon_skill_for(id)
+			var cur_id: String = player.equipped_weapon_id if player else ""
+			var cur_dmg: int = WeaponRegistry.weapon_damage_for(cur_id)
+			var cur_delay: float = WeaponRegistry.weapon_delay_for(cur_id)
+			var diff_dmg: int = new_dmg - cur_dmg
+			var sign_d: String = "+" if diff_dmg >= 0 else ""
+			return "%s\nDamage: %d (%s%d vs %s)\nDelay: %.2f (cur %.2f)\nSkill: %s" % [
+				name_s, new_dmg, sign_d, diff_dmg,
+				cur_id if cur_id != "" else "unarmed",
+				new_delay, cur_delay, new_skill,
+			]
+		"armor":
+			var new_ac: int = int(it.get("ac", 0))
+			var cur_ac: int = int(player.equipped_armor.get("ac", 0)) if player else 0
+			var cur_name: String = String(player.equipped_armor.get("name", "")) if player else ""
+			var diff_ac: int = new_ac - cur_ac
+			var sign_a: String = "+" if diff_ac >= 0 else ""
+			return "%s\nAC: %d (%s%d vs %s)" % [
+				name_s, new_ac, sign_a, diff_ac,
+				cur_name if cur_name != "" else "none",
+			]
+		"potion":
+			return "%s\nDrink to restore 20 HP." % name_s
+		"scroll":
+			return "%s\nRead to trigger its effect." % name_s
+		_:
+			return "%s\nMiscellaneous junk." % name_s
 
 
 func _on_bag_use(idx: int, dlg: AcceptDialog) -> void:
