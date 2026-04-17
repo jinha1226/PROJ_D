@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EssenceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/essences/EssenceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "fire_sprite_essence"
+display_name = "Fire Sprite Essence"
+description = "Dancing flame spirit. Aids fire magic and blasts enemies."
+essence_type = 3
+rarity = 1
+int_bonus = 3
+hp_bonus = 2
+source_monsters = Array[String](["fire_sprite", "fire_elemental"])
+drop_chance = 0.22
+ability_id = "essence_breath"
+ability_mp = 7
+ability_cooldown = 12
+ability_desc = "Unleash a fiery line — 10 damage to each enemy up to 4 tiles ahead."

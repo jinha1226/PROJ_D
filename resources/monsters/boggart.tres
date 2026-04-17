@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/monsters/MonsterData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "boggart"
+display_name = "Boggart"
+tier = 3
+hp = 14
+str = 5
+dex = 9
+ac = 1
+ev = 13
+sight_range = 7
+essence_drop_id = ""
+xp_value = 45
+is_boss = false

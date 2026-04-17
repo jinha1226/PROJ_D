@@ -10,6 +10,6 @@ description = "Fight through proxies. Call allies, let them die in your place."
 str_bonus = 0
 dex_bonus = 0
 int_bonus = 3
-starting_equipment = Array[String](["dagger"])
+starting_equipment = Array[String](["dagger", "robe"])
 starting_skills = {"summonings": 3, "spellcasting": 3, "short_blade": 1}
 unique_ability = ""

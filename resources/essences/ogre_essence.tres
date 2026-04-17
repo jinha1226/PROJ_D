@@ -5,9 +5,15 @@
 [resource]
 script = ExtResource("1")
 id = "ogre_essence"
-display_name = "오우거 정수"
+display_name = "Ogre Essence"
+description = "A chunk of raw muscle — grants brute strength."
 essence_type = 0
 rarity = 0
-str_bonus = 8
-source_monsters = Array[String](["ogre"])
+str_bonus = 3
+hp_bonus = 6
+source_monsters = Array[String](["ogre", "orc"])
 drop_chance = 0.3
+ability_id = "essence_stomp"
+ability_mp = 5
+ability_cooldown = 8
+ability_desc = "Slam the ground — 6 damage to every adjacent enemy."

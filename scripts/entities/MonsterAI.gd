@@ -9,17 +9,24 @@ static func act(m: Monster) -> void:
 	if m.slowed_turns > 0:
 		m.slowed_turns -= 1
 		return
-	var player: Node = m.get_player()
-	if player == null:
+	# Choose the nearest hostile (player OR companion). Companions count as
+	# enemies to monsters, so a monster next to a summoned skeleton will
+	# whack the skeleton instead of running past it toward the player.
+	var target: Node = _nearest_hostile(m)
+	if target == null:
 		_maybe_wander(m)
 		return
-	if "is_alive" in player and not player.is_alive:
+	if "is_alive" in target and not target.is_alive:
 		return
-	var ppos: Vector2i = player.grid_pos
+	var ppos: Vector2i = target.grid_pos
 	var dist: int = _cheb(m.grid_pos, ppos)
+	# Keep the local `player` reference for the melee path below.
+	var player: Node = target
 
 	if dist <= 1:
 		m.attack_animation_toward(ppos)
+		# Companions use the same damage shape (take_damage + ac) as monsters,
+		# so melee_attack_from_monster works for either target.
 		CombatSystem.melee_attack_from_monster(m, player)
 		return
 
@@ -34,6 +41,29 @@ static func _cheb(a: Vector2i, b: Vector2i) -> int:
 	return max(abs(a.x - b.x), abs(a.y - b.y))
 
 
+## Pick the nearest hostile — player or any companion. Monsters treat both
+## as enemies.
+static func _nearest_hostile(m: Monster) -> Node:
+	var best: Node = null
+	var best_d: int = 999999
+	var tree: SceneTree = m.get_tree()
+	if tree == null:
+		return null
+	var player: Node = tree.get_first_node_in_group("player")
+	if player != null and "grid_pos" in player and "is_alive" in player and player.is_alive:
+		var pd: int = _cheb(m.grid_pos, player.grid_pos)
+		if pd < best_d:
+			best_d = pd
+			best = player
+	for c in tree.get_nodes_in_group("companions"):
+		if c is Companion and c.is_alive and "grid_pos" in c:
+			var cd: int = _cheb(m.grid_pos, c.grid_pos)
+			if cd < best_d:
+				best_d = cd
+				best = c
+	return best
+
+
 static func _tile_occupied(pos: Vector2i, self_ref: Monster) -> bool:
 	var tree: SceneTree = self_ref.get_tree()
 	if tree == null:
@@ -42,6 +72,9 @@ static func _tile_occupied(pos: Vector2i, self_ref: Monster) -> bool:
 		if n == self_ref:
 			continue
 		if n is Monster and n.grid_pos == pos:
+			return true
+	for n in tree.get_nodes_in_group("companions"):
+		if n is Companion and n.grid_pos == pos:
 			return true
 	var player: Node = tree.get_first_node_in_group("player")
 	if player != null and "grid_pos" in player and player.grid_pos == pos:

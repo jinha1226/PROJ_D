@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/monsters/MonsterData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "ogre"
+display_name = "Ogre Chieftain"
+tier = 1
+hp = 45
+str = 18
+dex = 6
+ac = 4
+ev = 5
+sight_range = 6
+essence_drop_id = ""
+xp_value = 90
+is_boss = true

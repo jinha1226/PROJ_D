@@ -11,6 +11,9 @@ signal xp_changed(cur: int, to_next: int, level: int)
 ## Emitted when Scroll of Identification is used. GameBootstrap shows a
 ## picker popup that lets the player choose which inventory item to reveal.
 signal identify_one_requested
+## Emitted when an essence's "summon" ability fires. Carries the essence id
+## so GameBootstrap knows which Companion template to spawn.
+signal summon_companion_requested(essence_id: String)
 
 @export var generator: DungeonGenerator
 
@@ -322,7 +325,73 @@ func get_current_weapon_skill() -> String:
 	return WeaponRegistry.weapon_skill_for(equipped_weapon_id)
 
 
-func apply_essence_bonuses(essences: Array) -> void:
+## Dispatcher for essence active abilities — called from EssenceSystem.invoke
+## after it has validated MP and cooldown. All numbers scale with the
+## essence_channeling skill so investing in it matters late-game.
+func _invoke_essence_ability(e: EssenceData) -> bool:
+	var lv: int = _essence_channeling_level()
+	match e.ability_id:
+		"essence_heal":
+			if stats == null:
+				return false
+			stats.HP = min(stats.hp_max, stats.HP + 20 + lv * 2)
+			stats_changed.emit()
+			return true
+		"essence_blink":
+			return _teleport_blink(4 + lv / 6)
+		"essence_stomp":
+			# Hit every monster within 1 tile (Chebyshev). Damage scales.
+			var dmg: int = 6 + lv / 2
+			var hit_count: int = 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not m.is_alive:
+					continue
+				if "grid_pos" in m and max(abs(m.grid_pos.x - grid_pos.x), abs(m.grid_pos.y - grid_pos.y)) <= 1:
+					m.take_damage(dmg)
+					hit_count += 1
+			print("Stomp hit %d enemies (%d dmg each)." % [hit_count, dmg])
+			return true
+		"essence_breath":
+			return _fire_breath_line(lv)
+		"essence_regen":
+			if stats == null:
+				return false
+			stats.HP = min(stats.hp_max, stats.HP + 12 + lv)
+			stats_changed.emit()
+			return true
+		"essence_summon":
+			# GameBootstrap listens and spawns the actual Companion node.
+			summon_companion_requested.emit(e.id)
+			return true
+		_:
+			print("Unknown essence ability: %s" % e.ability_id)
+			return false
+
+
+func _essence_channeling_level() -> int:
+	var sk: Node = get_tree().root.get_node_or_null("Game/SkillSystem")
+	if sk == null:
+		return 0
+	return sk.get_level(self, "essence_channeling")
+
+
+## Breath line: every monster in the 4-tile southward line takes damage
+## that scales with essence channeling.
+func _fire_breath_line(lv: int) -> bool:
+	var dmg: int = 10 + lv / 2
+	var hit_count: int = 0
+	for d in range(1, 5):
+		for m in get_tree().get_nodes_in_group("monsters"):
+			if not is_instance_valid(m) or not m.is_alive:
+				continue
+			if "grid_pos" in m and m.grid_pos == grid_pos + Vector2i(0, d):
+				m.take_damage(dmg)
+				hit_count += 1
+	print("Breath line hit %d enemies (%d dmg each)." % [hit_count, dmg])
+	return true
+
+
+func apply_essence_bonuses(essences: Array, synergy: Dictionary = {}) -> void:
 	# Snapshot pre-recompute HP/MP to preserve current/max deltas.
 	if base_stats == null:
 		base_stats = stats.clone() if stats != null else Stats.new()
@@ -339,6 +408,13 @@ func apply_essence_bonuses(essences: Array) -> void:
 		new_stats.hp_max += e.hp_bonus
 		new_stats.AC += e.armor_bonus
 		new_stats.EV += e.evasion_bonus
+	# Synergy (2+ same type in slots).
+	new_stats.STR += int(synergy.get("str", 0))
+	new_stats.DEX += int(synergy.get("dex", 0))
+	new_stats.INT += int(synergy.get("int", 0))
+	new_stats.hp_max += int(synergy.get("hp", 0))
+	new_stats.AC += int(synergy.get("armor", 0))
+	new_stats.EV += int(synergy.get("evasion", 0))
 	# HP delta handling: grow current hp on hp_max increase; clamp on decrease.
 	var hp_delta: int = new_stats.hp_max - prev_hp_max
 	var new_hp: int = prev_hp + max(0, hp_delta)

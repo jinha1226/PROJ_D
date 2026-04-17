@@ -5,9 +5,15 @@
 [resource]
 script = ExtResource("1")
 id = "snake_essence"
-display_name = "뱀 정수"
+display_name = "Snake Essence"
+description = "Sinuous, alert — sharpens reflexes and steps."
 essence_type = 2
 rarity = 0
-dex_bonus = 4
-source_monsters = Array[String](["snake"])
+dex_bonus = 3
+evasion_bonus = 2
+source_monsters = Array[String](["adder", "ball_python", "snake"])
 drop_chance = 0.35
+ability_id = "essence_blink"
+ability_mp = 4
+ability_cooldown = 10
+ability_desc = "Blink up to 4 tiles in any direction."

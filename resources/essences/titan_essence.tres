@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EssenceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/essences/EssenceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "titan_essence"
+display_name = "Titan Essence"
+description = "The echo of a giant's heart — immense toughness."
+essence_type = 0
+rarity = 2
+str_bonus = 5
+hp_bonus = 12
+armor_bonus = 2
+source_monsters = Array[String](["titan", "stone_giant"])
+drop_chance = 0.2

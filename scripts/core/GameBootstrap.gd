@@ -17,6 +17,20 @@ const _SKILL_CATEGORY_LABELS: Dictionary = {
 	"all": "ALL", "weapon": "WEAPON", "defense": "DEFENSE",
 	"magic": "MAGIC", "misc": "MISC", "spells": "CAST",
 }
+
+const _COMPANION_SCENE: PackedScene = preload("res://scenes/entities/Companion.tscn")
+# Essence id → companion archetype (MonsterData tres filename).
+const _ESSENCE_TO_COMPANION: Dictionary = {
+	"boneknight_essence":   "skeleton",
+	"lich_essence":         "skeleton",
+	"ogre_essence":         "goblin",     # placeholder — a beefy orc would be better
+	"titan_essence":        "orc",
+	"fire_sprite_essence":  "fire_sprite",
+	"dragon_essence":       "orc",        # placeholder
+	"snake_essence":        "adder",
+	"dryad_essence":        "adder",
+	"void_essence":         "kobold",
+}
 # [zoom-agent] pinch gesture + UI zoom buttons.
 const ZOOM_CONTROLLER_SCRIPT: Script = preload("res://scripts/ui/ZoomController.gd")
 const MAX_DEPTH: int = 25
@@ -69,6 +83,7 @@ func _ready() -> void:
 	meta.load_from_disk()
 
 	_base_seed = randi()
+	GameManager.current_branch = GameManager.branch_for_depth(GameManager.current_depth)
 	generator = DungeonGenerator.new()
 	add_child(generator)
 	generator.generate(GameManager.current_depth, _base_seed)
@@ -109,6 +124,8 @@ func _ready() -> void:
 	player.died.connect(_on_player_died)
 	player.leveled_up.connect(_on_player_leveled_up)
 	player.identify_one_requested.connect(_on_identify_one_requested)
+	if player.has_signal("summon_companion_requested"):
+		player.summon_companion_requested.connect(_on_summon_companion_requested)
 
 	# UI lookup.
 	ui = get_node_or_null("UILayer/UI")
@@ -231,6 +248,8 @@ func _on_turn_refresh_visibility() -> void:
 	if dmap != null:
 		_refresh_actor_visibility(dmap)
 	_apply_passive_racial_traits()
+	if essence_system != null:
+		essence_system.on_turn_tick()
 	if _resting:
 		_rest_tick()
 
@@ -466,6 +485,12 @@ func _refresh_actor_visibility(dmap: DungeonMap) -> void:
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if is_instance_valid(m) and m is Monster:
 			m.visible = dmap.is_tile_visible(m.grid_pos)
+	for c in get_tree().get_nodes_in_group("companions"):
+		if is_instance_valid(c) and c is Companion:
+			# Companions stay visible whenever their tile is explored — even
+			# if the player turns their back, the player knows their ally
+			# is there.
+			c.visible = dmap.is_explored(c.grid_pos)
 	for it in get_tree().get_nodes_in_group("floor_items"):
 		if is_instance_valid(it) and it is FloorItem:
 			it.visible = dmap.is_tile_visible(it.grid_pos)
@@ -504,11 +529,18 @@ func _regenerate_dungeon(going_up: bool) -> void:
 		if is_instance_valid(m):
 			TurnManager.unregister_actor(m)
 			m.queue_free()
+	# Summoned companions don't follow between floors — they unravel back
+	# into the essence until the player re-invokes.
+	for c in get_tree().get_nodes_in_group("companions"):
+		if is_instance_valid(c):
+			TurnManager.unregister_actor(c)
+			c.queue_free()
 	for it in get_tree().get_nodes_in_group("floor_items"):
 		if is_instance_valid(it):
 			it.queue_free()
 	if is_instance_valid(generator):
 		generator.queue_free()
+	GameManager.current_branch = GameManager.branch_for_depth(GameManager.current_depth)
 	generator = DungeonGenerator.new()
 	add_child(generator)
 	generator.generate(GameManager.current_depth, _base_seed)
@@ -595,6 +627,60 @@ func _restore_floor(depth: int) -> void:
 				String(it_info.get("kind", "junk")),
 				it_info.get("color", Color(1, 1, 0)),
 				it_info.get("extra", {}))
+
+
+## Spawn a Companion at the first walkable tile adjacent to the player.
+## Uses the MonsterData resource keyed by essence id as the companion's
+## stat block + visual.
+func _on_summon_companion_requested(essence_id: String) -> void:
+	if player == null or generator == null:
+		return
+	var companion_id: String = String(_ESSENCE_TO_COMPANION.get(essence_id, ""))
+	if companion_id == "":
+		print("(no companion template for essence %s)" % essence_id)
+		return
+	var tres_path: String = "res://resources/monsters/%s.tres" % companion_id
+	if not ResourceLoader.exists(tres_path):
+		print("(companion template missing: %s)" % tres_path)
+		return
+	var mdata: MonsterData = load(tres_path)
+	var spawn_pos: Vector2i = _find_free_adjacent_tile(player.grid_pos)
+	if spawn_pos == player.grid_pos:  # no room found
+		print("(no free tile next to you to summon on)")
+		return
+	var c: Companion = _COMPANION_SCENE.instantiate()
+	$EntityLayer.add_child(c)
+	c.setup(generator, spawn_pos, mdata)
+	c.lifetime = 60  # ~60 turns before despawning
+	print("Summoned %s." % companion_id)
+
+
+## First walkable, unoccupied 8-neighbour of `center`. Returns center itself
+## if nothing is free (caller should treat that as failure).
+func _find_free_adjacent_tile(center: Vector2i) -> Vector2i:
+	for dy in [-1, 0, 1]:
+		for dx in [-1, 0, 1]:
+			if dx == 0 and dy == 0:
+				continue
+			var p: Vector2i = center + Vector2i(dx, dy)
+			if not generator.is_walkable(p):
+				continue
+			if _tile_occupied_any(p):
+				continue
+			return p
+	return center
+
+
+func _tile_occupied_any(pos: Vector2i) -> bool:
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if m is Monster and m.grid_pos == pos:
+			return true
+	for c in get_tree().get_nodes_in_group("companions"):
+		if c is Companion and c.grid_pos == pos:
+			return true
+	if player != null and player.grid_pos == pos:
+		return true
+	return false
 
 
 func _on_identify_one_requested() -> void:
@@ -1284,18 +1370,16 @@ func _on_status_pressed() -> void:
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	vb.add_child(lab)
 
-	# Essence row + swap button (moved here from BottomHUD).
+	# Essence slots (3) — each row shows name, stat summary, and a Cast
+	# button if the essence carries an active ability.
 	if essence_system != null:
-		var ess_lab := Label.new()
-		ess_lab.text = _build_essence_text()
-		ess_lab.add_theme_font_size_override("font_size", 28)
-		vb.add_child(ess_lab)
-		var swap_btn := Button.new()
-		swap_btn.text = "Swap Essence"
-		swap_btn.add_theme_font_size_override("font_size", 28)
-		swap_btn.custom_minimum_size = Vector2(0, 88)
-		swap_btn.pressed.connect(_on_swap_essence.bind(dlg))
-		vb.add_child(swap_btn)
+		var hdr := Label.new()
+		hdr.text = "--- Essences ---"
+		hdr.add_theme_font_size_override("font_size", 28)
+		hdr.modulate = Color(0.85, 0.85, 1.0)
+		vb.add_child(hdr)
+		for i in essence_system.slots.size():
+			vb.add_child(_build_essence_row(i, dlg))
 
 	# Explicit Close at the bottom in case the OK footer is hard to reach.
 	var close_btn := Button.new()
@@ -1314,39 +1398,89 @@ func _on_status_pressed() -> void:
 	dlg.popup_centered(Vector2i(880, 1600))
 
 
-func _build_essence_text() -> String:
+## One row in the Status popup per essence slot. Shows the slotted essence's
+## name + stat summary, a Swap button, and (when the essence has an active
+## ability) a Cast button that funnels through EssenceSystem.invoke.
+func _build_essence_row(slot_idx: int, status_dlg: AcceptDialog) -> Control:
+	var row := VBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	row.custom_minimum_size = Vector2(0, 120)
+	var e: EssenceData = essence_system.slots[slot_idx] if essence_system != null else null
+	var title := Label.new()
+	if e == null:
+		title.text = "Slot %d: (empty)" % (slot_idx + 1)
+		title.modulate = Color(0.6, 0.6, 0.6)
+	else:
+		var stat_parts: Array = []
+		if e.str_bonus != 0: stat_parts.append("STR %+d" % e.str_bonus)
+		if e.dex_bonus != 0: stat_parts.append("DEX %+d" % e.dex_bonus)
+		if e.int_bonus != 0: stat_parts.append("INT %+d" % e.int_bonus)
+		if e.hp_bonus != 0:  stat_parts.append("HP %+d" % e.hp_bonus)
+		if e.armor_bonus != 0: stat_parts.append("AC %+d" % e.armor_bonus)
+		title.text = "Slot %d: %s  (%s)" % [
+			slot_idx + 1, e.display_name, " ".join(PackedStringArray(stat_parts)),
+		]
+	title.add_theme_font_size_override("font_size", 26)
+	row.add_child(title)
+	var btns := HBoxContainer.new()
+	btns.add_theme_constant_override("separation", 8)
+	var swap_btn := Button.new()
+	swap_btn.text = "Swap"
+	swap_btn.custom_minimum_size = Vector2(160, 72)
+	swap_btn.add_theme_font_size_override("font_size", 24)
+	swap_btn.pressed.connect(_on_swap_essence_slot.bind(slot_idx, status_dlg))
+	btns.add_child(swap_btn)
+	if e != null and e.ability_id != "":
+		var cd: int = essence_system.cooldowns[slot_idx]
+		var cast_btn := Button.new()
+		cast_btn.custom_minimum_size = Vector2(260, 72)
+		cast_btn.add_theme_font_size_override("font_size", 24)
+		if cd > 0:
+			cast_btn.text = "Cast (CD %d)" % cd
+			cast_btn.disabled = true
+		else:
+			cast_btn.text = "Cast (%d MP)" % e.ability_mp
+		cast_btn.pressed.connect(_on_cast_essence_ability.bind(slot_idx, status_dlg))
+		btns.add_child(cast_btn)
+		var desc := Label.new()
+		desc.text = e.ability_desc
+		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc.add_theme_font_size_override("font_size", 20)
+		desc.modulate = Color(0.75, 0.75, 0.85)
+		row.add_child(btns)
+		row.add_child(desc)
+		return row
+	row.add_child(btns)
+	return row
+
+
+func _on_cast_essence_ability(slot_idx: int, status_dlg: AcceptDialog) -> void:
 	if essence_system == null:
-		return ""
-	var current: EssenceData = essence_system.slots[0] if essence_system.slots.size() > 0 else null
-	var inv_names: Array = []
-	for e in essence_system.inventory:
-		if e != null:
-			inv_names.append(e.display_name if "display_name" in e else e.id)
-	var lines: Array = ["", "--- Essence ---"]
-	lines.append("Slot 1: %s" % (current.display_name if current != null and "display_name" in current else "(empty)"))
-	if inv_names.size() > 0:
-		lines.append("In bag: %s" % ", ".join(PackedStringArray(inv_names)))
-	return "\n".join(PackedStringArray(lines))
+		return
+	var ok: bool = essence_system.invoke(slot_idx)
+	status_dlg.queue_free()
+	if ok:
+		TurnManager.end_player_turn()
 
 
-func _on_swap_essence(status_dlg: AcceptDialog) -> void:
+func _on_swap_essence_slot(slot_idx: int, status_dlg: AcceptDialog) -> void:
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null or essence_system == null:
 		return
 	status_dlg.queue_free()
-	var current: EssenceData = essence_system.slots[0] if essence_system.slots.size() > 0 else null
+	var current: EssenceData = essence_system.slots[slot_idx]
 	var current_id: String = current.id if current != null else ""
 	var inv_ids: Array = []
 	for e in essence_system.inventory:
 		if e != null:
 			inv_ids.append(e.id)
-	popup_mgr.show_essence_swap_popup(0, current_id, inv_ids, func(selected_id):
+	popup_mgr.show_essence_swap_popup(slot_idx, current_id, inv_ids, func(selected_id):
 		if selected_id == "":
-			essence_system.unequip(0)
+			essence_system.unequip(slot_idx)
 		else:
 			var target: EssenceData = essence_system.find_essence_by_id(selected_id)
 			if target != null:
-				essence_system.equip(0, target))
+				essence_system.equip(slot_idx, target))
 
 
 func _build_status_text() -> String:
