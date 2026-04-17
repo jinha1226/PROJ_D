@@ -854,6 +854,9 @@ func _save_current_floor() -> void:
 			"color": it.color,
 			"extra": it.extra.duplicate(),
 		})
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	if dmap != null:
+		snapshot["explored"] = dmap.explored.duplicate()
 	_floor_state[GameManager.current_depth] = snapshot
 
 
@@ -886,6 +889,10 @@ func _restore_floor(depth: int) -> void:
 				String(it_info.get("kind", "junk")),
 				it_info.get("color", Color(1, 1, 0)),
 				it_info.get("extra", {}))
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	if dmap != null and snapshot.has("explored"):
+		dmap.explored = snapshot["explored"].duplicate()
+		dmap.queue_redraw()
 
 
 ## Spawn a Companion at the first walkable tile adjacent to the player.
