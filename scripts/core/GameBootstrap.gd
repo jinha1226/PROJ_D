@@ -1126,8 +1126,6 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 
 	var name_lab := Label.new()
 	name_lab.text = String(SkillRow.SKILL_NAMES.get(skill_id, skill_id))
-	if category == "magic":
-		name_lab.text += "  (M2)"
 	name_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_lab.add_theme_font_size_override("font_size", 32)
 	row.add_child(name_lab)
@@ -2040,7 +2038,7 @@ func _describe_trait(trait_id: String) -> String:
 	match trait_id:
 		"trollregen":     return "Troll Regeneration — recovers 1 HP every turn."
 		"spriggan_speed": return "Spriggan Speed — moves twice per enemy turn."
-		"draconian_resist": return "Draconian Scales — bonus AC and (M2) elemental resistance."
+		"draconian_resist": return "Draconian Scales — bonus AC and elemental resistance."
 		"minotaur_headbutt": return "Minotaur Headbutt — 25% chance for bonus melee damage."
 		"catfolk_claws":  return "Catfolk Claws — +3 damage when fighting unarmed."
 		_: return trait_id
