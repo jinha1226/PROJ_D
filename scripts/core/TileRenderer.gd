@@ -36,7 +36,7 @@ const BRANCH_TILESETS: Dictionary = {
 	},
 	"forest": {
 		"floor": "dngn/floor/grass0.png",
-		"wall":  "dngn/wall/tree1.png",
+		"wall":  "dngn/trees/tree1.png",
 	},
 	"mine": {
 		"floor": "dngn/floor/cage0.png",
@@ -48,15 +48,15 @@ const BRANCH_TILESETS: Dictionary = {
 	},
 	"volcano": {
 		"floor": "dngn/floor/volcanic_floor0.png",
-		"wall":  "dngn/wall/cocytus0.png",
+		"wall":  "dngn/wall/hell01.png",
 	},
 	"swamp": {
 		"floor": "dngn/floor/swamp0.png",
-		"wall":  "dngn/wall/marble_wall0.png",
+		"wall":  "dngn/wall/marble_wall1.png",
 	},
 	"crystal": {
 		"floor": "dngn/floor/crystal_floor0.png",
-		"wall":  "dngn/wall/crystal_wall_blue0.png",
+		"wall":  "dngn/wall/crystal_wall_blue.png",
 	},
 	"sandstone": {
 		"floor": "dngn/floor/sandstone_floor0.png",

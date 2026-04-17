@@ -12,7 +12,9 @@ enum TileType { WALL, FLOOR, DOOR_OPEN, DOOR_CLOSED, STAIRS_DOWN, STAIRS_UP, WAT
 var map: Array = []
 var rooms: Array[Rect2i] = []
 var stairs_down_pos: Vector2i = Vector2i.ZERO
+var stairs_down_pos2: Vector2i = Vector2i.ZERO
 var spawn_pos: Vector2i = Vector2i.ZERO
+var spawn_pos2: Vector2i = Vector2i.ZERO
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
@@ -176,21 +178,40 @@ func _place_stairs() -> void:
 	if rooms.is_empty():
 		spawn_pos = Vector2i(MAP_WIDTH / 2, MAP_HEIGHT / 2)
 		stairs_down_pos = spawn_pos
+		stairs_down_pos2 = spawn_pos
+		spawn_pos2 = spawn_pos
 		return
+	# Sort rooms by distance from room[0] center.
 	spawn_pos = _room_center(rooms[0])
-	var farthest_room: Rect2i = rooms[0]
-	var best_d: int = -1
-	for i in range(1, rooms.size()):
+	var dists: Array = []
+	for i in range(rooms.size()):
 		var c: Vector2i = _room_center(rooms[i])
-		var d: int = abs(c.x - spawn_pos.x) + abs(c.y - spawn_pos.y)
-		if d > best_d:
-			best_d = d
-			farthest_room = rooms[i]
-	stairs_down_pos = _room_center(farthest_room)
+		dists.append({"idx": i, "d": abs(c.x - spawn_pos.x) + abs(c.y - spawn_pos.y)})
+	dists.sort_custom(func(a, b): return a["d"] > b["d"])
+	# Farthest room → stairs_down #1
+	var far1_idx: int = dists[0]["idx"]
+	stairs_down_pos = _room_center(rooms[far1_idx])
 	map[stairs_down_pos.x][stairs_down_pos.y] = TileType.STAIRS_DOWN
-	# Place STAIRS_UP at spawn tile so players always see an upstair on arrival.
-	if spawn_pos != stairs_down_pos:
-		map[spawn_pos.x][spawn_pos.y] = TileType.STAIRS_UP
+	# Second farthest → stairs_down #2
+	if dists.size() >= 3:
+		var far2_idx: int = dists[1]["idx"]
+		if far2_idx == 0:
+			far2_idx = dists[2]["idx"] if dists.size() > 2 else far1_idx
+		stairs_down_pos2 = _room_center(rooms[far2_idx])
+		map[stairs_down_pos2.x][stairs_down_pos2.y] = TileType.STAIRS_DOWN
+	else:
+		stairs_down_pos2 = stairs_down_pos
+	# Stairs up #1 at spawn
+	map[spawn_pos.x][spawn_pos.y] = TileType.STAIRS_UP
+	# Stairs up #2 in a different room (second closest to spawn)
+	if rooms.size() >= 3:
+		var near2_idx: int = dists[dists.size() - 2]["idx"]
+		if near2_idx == 0:
+			near2_idx = dists[dists.size() - 3]["idx"] if dists.size() > 2 else 0
+		spawn_pos2 = _room_center(rooms[near2_idx])
+		map[spawn_pos2.x][spawn_pos2.y] = TileType.STAIRS_UP
+	else:
+		spawn_pos2 = spawn_pos
 
 func _in_bounds(p: Vector2i) -> bool:
 	return p.x >= 0 and p.x < MAP_WIDTH and p.y >= 0 and p.y < MAP_HEIGHT

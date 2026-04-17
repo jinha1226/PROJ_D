@@ -497,12 +497,12 @@ func _refresh_actor_visibility(dmap: DungeonMap) -> void:
 
 
 func _on_stairs_tapped(_pos: Vector2i) -> void:
-	# [meta-agent] descend or trigger clear-result.
 	if run_over:
 		return
 	if GameManager.current_depth >= MAX_DEPTH:
 		_end_run(true, "")
 		return
+	_save_current_floor()
 	GameManager.current_depth += 1
 	_regenerate_dungeon(false)
 
@@ -511,7 +511,8 @@ func _on_stairs_up_tapped(_pos: Vector2i) -> void:
 	if run_over:
 		return
 	if GameManager.current_depth <= 1:
-		return  # Already at shallowest floor.
+		return
+	_save_current_floor()
 	GameManager.current_depth -= 1
 	_regenerate_dungeon(true)
 
@@ -521,10 +522,6 @@ func _on_stairs_up_tapped(_pos: Vector2i) -> void:
 ## when descending). _base_seed is fixed per run so the same depth yields
 ## the same map on every revisit.
 func _regenerate_dungeon(going_up: bool) -> void:
-	# Snapshot the floor we're leaving so monsters/items are exactly as left
-	# when the player returns. Done BEFORE the clear loops below.
-	_save_current_floor()
-
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if is_instance_valid(m):
 			TurnManager.unregister_actor(m)

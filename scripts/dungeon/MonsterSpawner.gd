@@ -60,8 +60,10 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 			b.setup(gen, boss_tile, boss_data)
 			result.append(b)
 
+	if is_boss_floor:
+		return result
 	var base_count: int = min(MAX_COUNT, 4 + depth * 2)
-	var count: int = base_count / 2 if is_boss_floor else base_count
+	var count: int = base_count
 
 	var spawned: int = 0
 	for tile in floor_tiles:
