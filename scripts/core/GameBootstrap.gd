@@ -1121,37 +1121,24 @@ func _open_skills_dialog(category: String) -> void:
 	vb.add_child(tabs_hbox)
 
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, 1500)
+	scroll.custom_minimum_size = Vector2(0, 1200)
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	vb.add_child(scroll)
 
 	var rows := VBoxContainer.new()
 	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	rows.add_theme_constant_override("separation", 6)
+	rows.add_theme_constant_override("separation", 4)
 	scroll.add_child(rows)
 
 	var state: Dictionary = {}
 	if "skill_state" in player and player.skill_state is Dictionary:
 		state = player.skill_state
-	if category == "spells":
-		_build_spell_panel(rows, dlg)
-	else:
-		for skill_id in SkillSystem.SKILL_IDS:
-			var cat_id: String = String(SkillSystem.SKILL_CATEGORY.get(skill_id, ""))
-			if category != "all" and cat_id != category:
-				continue
-			rows.add_child(_build_skill_row(skill_id, cat_id, state.get(skill_id, {})))
-
-	var footer := Label.new()
-	if skill_system.auto_training:
-		footer.text = "AUTO: XP goes to skills you actually use. Switch to MANUAL for full control."
-	else:
-		footer.text = "MANUAL: Check skills to train. Uncheck to stop. Defeat enemies to gain XP."
-	footer.add_theme_font_size_override("font_size", 18)
-	footer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	footer.modulate = Color(0.7, 0.7, 0.8, 1)
-	vb.add_child(footer)
+	for skill_id in SkillSystem.SKILL_IDS:
+		var cat_id: String = String(SkillSystem.SKILL_CATEGORY.get(skill_id, ""))
+		if category != "" and cat_id != category:
+			continue
+		rows.add_child(_build_skill_row(skill_id, cat_id, state.get(skill_id, {})))
 
 	popup_mgr.add_child(dlg)
 	_skills_dlg = dlg
@@ -1159,7 +1146,7 @@ func _open_skills_dialog(category: String) -> void:
 		if _skills_dlg == dlg: _skills_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(900, 1700))
+	dlg.popup_centered(Vector2i(960, 1700))
 
 
 func _on_skills_tab(cat: String, dlg: AcceptDialog) -> void:
@@ -1173,10 +1160,43 @@ func _on_skill_training_toggled(pressed: bool, skill_id: String) -> void:
 	skill_system.set_training(player, skill_id, pressed)
 
 
+const _SKILL_DESCS: Dictionary = {
+	"axe": "Increases damage with axes and war axes.",
+	"short_blade": "Increases damage with daggers and short swords.",
+	"long_blade": "Increases damage with long swords and katanas.",
+	"mace": "Increases damage with maces, flails, and hammers.",
+	"polearm": "Increases damage with spears, halberds, and tridents.",
+	"staff": "Increases damage with staves.",
+	"bow": "Increases damage with bows.",
+	"crossbow": "Increases damage with crossbows.",
+	"sling": "Increases damage with slings.",
+	"throwing": "Increases damage with throwing weapons.",
+	"fighting": "Increases melee accuracy and base damage.",
+	"armour": "Reduces incoming damage. Heavier armour benefits more.",
+	"dodging": "Chance to evade attacks entirely.",
+	"shields": "Chance to block attacks with a shield.",
+	"spellcasting": "Reduces spell failure rate. Increases MP.",
+	"conjurations": "Improves conjuration spell power and accuracy.",
+	"fire": "Improves fire spell power. Reduces fire spell failure.",
+	"cold": "Improves ice spell power. Reduces ice spell failure.",
+	"earth": "Improves earth spell power. Reduces earth spell failure.",
+	"air": "Improves air spell power. Reduces air spell failure.",
+	"necromancy": "Improves necromancy power. Unlocks dark spells.",
+	"hexes": "Improves hex effectiveness. Unlocks control spells.",
+	"translocations": "Improves blink range. Unlocks movement spells.",
+	"summonings": "Improves summoned creature power and duration.",
+	"stealth": "Reduces enemy detection range.",
+	"evocations": "Improves wand and device effectiveness.",
+	"essence_channeling": "Improves essence ability power.",
+}
+
 func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> Control:
+	var outer := VBoxContainer.new()
+	outer.add_theme_constant_override("separation", 2)
+
 	var row := HBoxContainer.new()
-	row.custom_minimum_size = Vector2(0, 80)
-	row.add_theme_constant_override("separation", 10)
+	row.custom_minimum_size = Vector2(0, 72)
+	row.add_theme_constant_override("separation", 8)
 
 	var chk := CheckBox.new()
 	chk.button_pressed = bool(entry.get("training", false))
@@ -1187,7 +1207,7 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 	var name_lab := Label.new()
 	name_lab.text = String(SkillRow.SKILL_NAMES.get(skill_id, skill_id))
 	name_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_lab.add_theme_font_size_override("font_size", 32)
+	name_lab.add_theme_font_size_override("font_size", 36)
 	row.add_child(name_lab)
 
 	var level: int = int(entry.get("level", 0))
@@ -1195,21 +1215,30 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 	var need: float = SkillSystem.xp_for_level(level + 1)
 	var lv_lab := Label.new()
 	if level >= SkillSystem.MAX_LEVEL:
-		lv_lab.text = "MASTER"
+		lv_lab.text = "MAX"
 	else:
-		lv_lab.text = "Lv.%d  (%d/%d)" % [level, int(xp), int(need)]
-	lv_lab.add_theme_font_size_override("font_size", 30)
+		lv_lab.text = "Lv.%d" % level
+	lv_lab.add_theme_font_size_override("font_size", 36)
 	lv_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	row.add_child(lv_lab)
+	outer.add_child(row)
 
-	var cat_lab := Label.new()
-	cat_lab.text = category.to_upper()
-	cat_lab.custom_minimum_size = Vector2(120, 0)
-	cat_lab.add_theme_font_size_override("font_size", 24)
-	cat_lab.modulate = Color(0.6, 0.65, 0.75, 1)
-	cat_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	row.add_child(cat_lab)
-	return row
+	var desc_lab := Label.new()
+	desc_lab.text = String(_SKILL_DESCS.get(skill_id, ""))
+	desc_lab.add_theme_font_size_override("font_size", 22)
+	desc_lab.modulate = Color(0.65, 0.65, 0.75)
+	desc_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	outer.add_child(desc_lab)
+
+	if level > 0 and level < SkillSystem.MAX_LEVEL:
+		var xp_lab := Label.new()
+		xp_lab.text = "  XP: %d / %d" % [int(xp), int(need)]
+		xp_lab.add_theme_font_size_override("font_size", 20)
+		xp_lab.modulate = Color(0.5, 0.7, 0.5)
+		outer.add_child(xp_lab)
+
+	outer.add_child(HSeparator.new())
+	return outer
 
 
 ## ---- MAGIC DIALOG (separate from Skills) ---------------------------------
