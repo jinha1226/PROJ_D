@@ -5,6 +5,7 @@ extends Node
 
 signal stairs_tapped(pos: Vector2i)
 signal stairs_up_tapped(pos: Vector2i)
+signal target_selected(pos: Vector2i)
 
 const TILE_SIZE: int = 32
 const LONGPRESS_TIME: float = 0.5
@@ -96,8 +97,14 @@ func _screen_to_grid(screen_pos: Vector2) -> Vector2i:
 	return Vector2i(int(floor(world.x / TILE_SIZE)), int(floor(world.y / TILE_SIZE)))
 
 
+var targeting_mode: bool = false
+
 func _on_tap(grid: Vector2i) -> void:
 	if not player.is_alive:
+		return
+	if targeting_mode:
+		target_selected.emit(grid)
+		targeting_mode = false
 		return
 	var delta: Vector2i = grid - player.grid_pos
 	var cheb: int = max(abs(delta.x), abs(delta.y))

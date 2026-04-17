@@ -62,6 +62,8 @@ var _bag_dlg: AcceptDialog = null
 var _skills_dlg: AcceptDialog = null
 var _status_dlg: AcceptDialog = null
 var _map_dlg: AcceptDialog = null
+var _magic_dlg: AcceptDialog = null
+var _targeting_spell: String = ""
 # Camera follow tween so the view doesn't snap.
 var _cam_tween: Tween = null
 const _CAM_FOLLOW_DUR: float = 0.14
@@ -226,6 +228,7 @@ func _ready() -> void:
 	add_child(touch_input)
 	touch_input.stairs_tapped.connect(_on_stairs_tapped)
 	touch_input.stairs_up_tapped.connect(_on_stairs_up_tapped)
+	touch_input.target_selected.connect(_on_target_selected)
 
 	# Pinch-zoom (mobile) / wheel (desktop). No on-screen +/- buttons.
 	var zoom_ctrl: Node = ZOOM_CONTROLLER_SCRIPT.new()
@@ -289,8 +292,30 @@ func _process(_delta: float) -> void:
 
 
 func _on_quickslot_pressed(index: int) -> void:
-	if player != null:
-		player.use_quickslot(index)
+	if player == null:
+		return
+	var id: String = player.quickslot_ids[index] if index < player.quickslot_ids.size() else ""
+	if id.begins_with("spell:"):
+		var spell_id: String = id.substr(6)
+		var info: Dictionary = SpellRegistry.get_spell(spell_id)
+		if info.is_empty():
+			return
+		var targeting_type: String = String(info.get("targeting", "single"))
+		if targeting_type == "self":
+			var result: Dictionary = _execute_cast(spell_id)
+			print("[Spell] %s" % result.get("message", spell_id))
+			if result.get("success", false):
+				if skill_system != null:
+					var school: String = String(info.get("school", "spellcasting"))
+					skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, [school, "spellcasting"])
+				TurnManager.end_player_turn()
+		else:
+			_targeting_spell = spell_id
+			if touch_input != null:
+				touch_input.targeting_mode = true
+			_show_targeting_hint()
+		return
+	player.use_quickslot(index)
 
 
 ## Rebuild the BottomHUD quickslot labels/colours from player.quickslot_ids +
@@ -304,16 +329,22 @@ func _refresh_quickslots(bottom_hud: Node) -> void:
 		if id == "":
 			bottom_hud.set_quickslot_display(i, "", Color.WHITE)
 			continue
+		if id.begins_with("spell:"):
+			var spell_id: String = id.substr(6)
+			var spell_info: Dictionary = SpellRegistry.get_spell(spell_id)
+			var spell_name: String = String(spell_info.get("name", spell_id))
+			var tag: String = spell_name.substr(0, 6)
+			var spell_color: Color = spell_info.get("color", Color(0.6, 0.6, 1.0))
+			bottom_hud.set_quickslot_display(i, tag, spell_color)
+			continue
 		var info: Dictionary = ConsumableRegistry.get_info(id)
 		var color: Color = info.get("color", Color(0.9, 0.9, 0.4))
-		# Count matching items so the label hints at remaining charges.
 		var count: int = 0
 		for inv_it in player.get_items():
 			if String(inv_it.get("id", "")) == id:
 				count += 1
 		var disp_name: String = GameManager.display_name_for_item(
 				id, String(info.get("name", id)), String(info.get("kind", "")))
-		# Short tag — first word or first 3 chars.
 		var tag: String = disp_name.split(" ")[0].substr(0, 6)
 		if count > 1:
 			tag = "%s×%d" % [tag, count]
@@ -796,13 +827,11 @@ func _end_run(victory: bool, killer: String) -> void:
 # [skill-ui-agent] ---- skill UI wiring ------------------------------------
 
 func _on_magic_pressed() -> void:
-	# MAGIC button opens the skills dialog directly on the CAST (spells) tab.
-	# If the dialog is already open on any tab, close it (toggle behaviour).
-	if _skills_dlg != null and is_instance_valid(_skills_dlg):
-		_skills_dlg.queue_free()
-		_skills_dlg = null
+	if _magic_dlg != null and is_instance_valid(_magic_dlg):
+		_magic_dlg.queue_free()
+		_magic_dlg = null
 		return
-	_open_skills_dialog("spells")
+	_open_magic_dialog()
 
 
 func _on_skills_button_pressed() -> void:
@@ -946,6 +975,246 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 	cat_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	row.add_child(cat_lab)
 	return row
+
+
+## ---- MAGIC DIALOG (separate from Skills) ---------------------------------
+
+func _open_magic_dialog() -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null or player == null:
+		return
+	var dlg := AcceptDialog.new()
+	dlg.exclusive = false
+	dlg.title = "Magic"
+	dlg.ok_button_text = "Close"
+
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 8)
+	dlg.add_child(vb)
+
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 8)
+	var mp_lab := Label.new()
+	var cur_mp: int = player.stats.MP if player.stats != null else 0
+	var max_mp: int = player.stats.mp_max if player.stats != null else 0
+	mp_lab.text = "MP  %d / %d" % [cur_mp, max_mp]
+	mp_lab.add_theme_font_size_override("font_size", 32)
+	mp_lab.modulate = Color(0.45, 0.7, 1.0)
+	mp_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(mp_lab)
+	var close_btn := Button.new()
+	close_btn.text = "X"
+	close_btn.custom_minimum_size = Vector2(72, 72)
+	close_btn.add_theme_font_size_override("font_size", 36)
+	close_btn.pressed.connect(dlg.queue_free)
+	header.add_child(close_btn)
+	vb.add_child(header)
+	vb.add_child(HSeparator.new())
+
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0, 1400)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	vb.add_child(scroll)
+
+	var rows := VBoxContainer.new()
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rows.add_theme_constant_override("separation", 6)
+	scroll.add_child(rows)
+
+	var known: Array[String] = SpellRegistry.get_known_for_player(player, skill_system)
+	if known.is_empty():
+		var hint := Label.new()
+		hint.text = "No spells known.\nRead spellbooks or pick a magic job to learn spells."
+		hint.add_theme_font_size_override("font_size", 28)
+		hint.modulate = Color(0.7, 0.7, 0.8)
+		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		rows.add_child(hint)
+	else:
+		for spell_id in known:
+			rows.add_child(_build_magic_row(spell_id, dlg))
+
+	popup_mgr.add_child(dlg)
+	_magic_dlg = dlg
+	dlg.tree_exited.connect(func():
+		if _magic_dlg == dlg: _magic_dlg = null)
+	dlg.confirmed.connect(dlg.queue_free)
+	dlg.canceled.connect(dlg.queue_free)
+	dlg.popup_centered(Vector2i(900, 1800))
+
+
+func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
+	var info: Dictionary = SpellRegistry.get_spell(spell_id)
+	if info.is_empty():
+		return Control.new()
+
+	var row := HBoxContainer.new()
+	row.custom_minimum_size = Vector2(0, 110)
+	row.add_theme_constant_override("separation", 8)
+
+	var name_vb := VBoxContainer.new()
+	name_vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var name_lab := Label.new()
+	name_lab.text = "%s  [%d MP]" % [String(info.get("name", spell_id)), int(info.get("mp", 0))]
+	name_lab.add_theme_font_size_override("font_size", 30)
+	name_lab.modulate = info.get("color", Color.WHITE)
+	name_vb.add_child(name_lab)
+	var desc_lab := Label.new()
+	desc_lab.text = String(info.get("desc", ""))
+	desc_lab.add_theme_font_size_override("font_size", 22)
+	desc_lab.modulate = Color(0.75, 0.75, 0.85)
+	desc_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_vb.add_child(desc_lab)
+	row.add_child(name_vb)
+
+	var btns := VBoxContainer.new()
+	btns.add_theme_constant_override("separation", 4)
+
+	var cast_btn := Button.new()
+	cast_btn.text = "Cast"
+	cast_btn.custom_minimum_size = Vector2(130, 48)
+	cast_btn.add_theme_font_size_override("font_size", 26)
+	cast_btn.disabled = (player.stats == null or player.stats.MP < int(info.get("mp", 1)))
+	var targeting_type: String = String(info.get("targeting", "single"))
+	if targeting_type == "self":
+		cast_btn.pressed.connect(_on_cast_pressed.bind(spell_id, dlg))
+	else:
+		cast_btn.pressed.connect(_on_cast_with_targeting.bind(spell_id, dlg))
+	btns.add_child(cast_btn)
+
+	var qs_btn := Button.new()
+	qs_btn.text = "Quickslot"
+	qs_btn.custom_minimum_size = Vector2(130, 40)
+	qs_btn.add_theme_font_size_override("font_size", 20)
+	qs_btn.pressed.connect(_assign_spell_quickslot.bind(spell_id, dlg))
+	btns.add_child(qs_btn)
+
+	row.add_child(btns)
+	return row
+
+
+func _on_cast_with_targeting(spell_id: String, dlg: AcceptDialog) -> void:
+	dlg.queue_free()
+	_targeting_spell = spell_id
+	if touch_input != null:
+		touch_input.targeting_mode = true
+	_show_targeting_hint()
+
+
+func _on_target_selected(pos: Vector2i) -> void:
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	if dmap != null:
+		dmap.danger_tiles.clear()
+		dmap.queue_redraw()
+	if _targeting_spell == "":
+		return
+	var target_monster: Monster = null
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if is_instance_valid(m) and m is Monster and m.is_alive and m.grid_pos == pos:
+			target_monster = m
+			break
+	if target_monster == null:
+		print("Targeting cancelled.")
+		_targeting_spell = ""
+		return
+	var spell_id: String = _targeting_spell
+	_targeting_spell = ""
+	_execute_targeted_cast(spell_id, target_monster)
+
+
+func _show_targeting_hint() -> void:
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	if dmap == null or player == null:
+		return
+	var info: Dictionary = SpellRegistry.get_spell(_targeting_spell)
+	var spell_range: int = int(info.get("range", 6))
+	var targets: Array[Vector2i] = []
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+			continue
+		if not dmap.is_tile_visible(m.grid_pos):
+			continue
+		if player.grid_pos.distance_to(m.grid_pos) <= float(spell_range):
+			targets.append(m.grid_pos)
+	dmap.danger_tiles = targets
+	dmap.queue_redraw()
+	print("Tap a target to cast %s. Tap empty tile to cancel." % String(info.get("name", _targeting_spell)))
+
+
+func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
+	if player == null or player.stats == null:
+		return
+	var info: Dictionary = SpellRegistry.get_spell(spell_id)
+	if info.is_empty():
+		return
+	var mp_cost: int = int(info.get("mp", 1))
+	if player.stats.MP < mp_cost:
+		print("Not enough MP.")
+		return
+	player.stats.MP -= mp_cost
+	player.stats_changed.emit()
+	var school: String = String(info.get("school", "spellcasting"))
+	var school_lv: int = skill_system.get_level(player, school) if skill_system else 0
+	var sc_lv: int = skill_system.get_level(player, "spellcasting") if skill_system else 0
+	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
+	var power: int = school_lv * 2 + sc_lv + int_bonus
+	var spell_color: Color = info.get("color", Color.WHITE)
+	var fx_layer: Node2D = $EntityLayer
+	var targeting_type: String = String(info.get("targeting", "single"))
+	if targeting_type == "area":
+		var radius: int = int(info.get("radius", 2))
+		var total_dmg: int = 0
+		var hits: int = 0
+		var hit_positions: Array = []
+		for m in get_tree().get_nodes_in_group("monsters"):
+			if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+				continue
+			var dist: int = max(abs(m.grid_pos.x - target.grid_pos.x), abs(m.grid_pos.y - target.grid_pos.y))
+			if dist > radius:
+				continue
+			var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
+			if dist > 0:
+				dmg = max(1, dmg - dist * 3)
+			hit_positions.append(m.position)
+			m.take_damage(dmg)
+			total_dmg += dmg
+			hits += 1
+		SpellFX.cast_area(fx_layer, player.position, target.position, hit_positions, spell_color, float(radius) * 32.0 + 16.0)
+		print("%s: %d hit(s), %d total dmg" % [String(info.get("name", spell_id)), hits, total_dmg])
+	else:
+		var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
+		var effect_type: String = String(info.get("effect", "damage"))
+		if effect_type == "slow":
+			target.slowed_turns = 4
+			SpellFX.cast_slow(fx_layer, target.position, spell_color)
+			print("%s is slowed!" % String(target.data.display_name if target.data else "enemy"))
+		else:
+			target.take_damage(dmg)
+			SpellFX.cast_single(fx_layer, player.position, target, dmg, spell_color)
+			print("%s → %d dmg" % [String(info.get("name", spell_id)), dmg])
+	if skill_system != null:
+		skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, [school, "spellcasting"])
+	TurnManager.end_player_turn()
+
+
+func _assign_spell_quickslot(spell_id: String, dlg: AcceptDialog) -> void:
+	if player == null:
+		return
+	for i in player.quickslot_ids.size():
+		if player.quickslot_ids[i] == "":
+			player.quickslot_ids[i] = "spell:" + spell_id
+			player.quickslots_changed.emit()
+			dlg.queue_free()
+			_on_magic_pressed()
+			return
+	for i in player.quickslot_ids.size():
+		if player.quickslot_ids[i].begins_with("spell:"):
+			player.quickslot_ids[i] = "spell:" + spell_id
+			player.quickslots_changed.emit()
+			dlg.queue_free()
+			_on_magic_pressed()
+			return
+	print("No empty quickslot.")
 
 
 ## ---- SPELL CASTING -------------------------------------------------------
