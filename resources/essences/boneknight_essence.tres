@@ -5,16 +5,9 @@
 [resource]
 script = ExtResource("1")
 id = "boneknight_essence"
-display_name = "Bone Knight Essence"
-description = "Animate-bone memory. Grants death magic and a skeleton ally."
+display_name = "본나이트 정수"
 essence_type = 1
 rarity = 1
-int_bonus = 2
-hp_bonus = 4
-armor_bonus = 1
-source_monsters = Array[String](["boneknight", "lich"])
+armor_bonus = 4
+source_monsters = Array[String](["boneknight"])
 drop_chance = 0.25
-ability_id = "essence_summon"
-ability_mp = 8
-ability_cooldown = 15
-ability_desc = "Summon a skeletal companion to fight at your side."
