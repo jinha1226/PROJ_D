@@ -22,6 +22,7 @@ var _sprite: CharacterSprite = null
 var _has_preset: bool = false
 var _walk_timer: SceneTreeTimer = null
 var _move_tween: Tween = null
+var boss_ai: BossAI = null
 const _MOVE_TWEEN_DUR: float = 0.12
 const _ATTACK_LUNGE_DUR: float = 0.08
 
@@ -41,9 +42,12 @@ func setup(gen: DungeonGenerator, pos: Vector2i, mdata: MonsterData) -> void:
 	sight_range = mdata.sight_range if mdata.sight_range > 0 else 6
 	grid_pos = pos
 	position = Vector2(pos.x * tile_size + tile_size / 2.0, pos.y * tile_size + tile_size / 2.0)
+	if mdata.is_boss and BossAI.PATTERNS.has(mdata.id):
+		boss_ai = BossAI.new()
+		boss_ai.setup(mdata.id)
 	_load_sprite()
 	if not _has_preset:
-		queue_redraw()  # keep colored-circle fallback
+		queue_redraw()
 
 
 func _load_sprite() -> void:
@@ -96,7 +100,11 @@ func take_turn() -> void:
 	if not is_alive:
 		return
 	var prev_pos: Vector2i = grid_pos
-	MonsterAI.act(self)
+	if boss_ai != null:
+		var p: Node = get_tree().get_first_node_in_group("player")
+		boss_ai.act(self, p)
+	else:
+		MonsterAI.act(self)
 	if _sprite and grid_pos != prev_pos:
 		_sprite.face_toward(grid_pos - prev_pos)
 		_sprite.play_anim("walk", true)

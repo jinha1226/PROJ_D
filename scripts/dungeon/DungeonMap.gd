@@ -10,6 +10,7 @@ var explored: PackedByteArray = PackedByteArray()
 # Current-frame visible set (tiles the player can see from their position
 # with line-of-sight through walls blocked). Recomputed on update_fov().
 var _visible_tiles: Dictionary = {}
+var danger_tiles: Array[Vector2i] = []
 
 
 func render(gen: DungeonGenerator) -> void:
@@ -125,6 +126,13 @@ func _draw() -> void:
 		_draw_dcss()
 	else:
 		_draw_lpc()
+	# Danger tile overlay — red pulsing squares for boss telegraphed attacks.
+	var danger_color: Color = Color(1.0, 0.15, 0.1, 0.35)
+	for tile in danger_tiles:
+		if not is_explored(tile):
+			continue
+		var rect := Rect2(tile.x * TILE_SIZE, tile.y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+		draw_rect(rect, danger_color, true)
 	# Path overlay dots — drawn on top in both modes.
 	var path_color: Color = Color(0.2, 0.85, 0.85, 0.55)
 	var dot_size: float = TILE_SIZE * 0.35

@@ -247,11 +247,24 @@ func _on_turn_refresh_visibility() -> void:
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	if dmap != null:
 		_refresh_actor_visibility(dmap)
+		_refresh_danger_tiles(dmap)
 	_apply_passive_racial_traits()
 	if essence_system != null:
 		essence_system.on_turn_tick()
 	if _resting:
 		_rest_tick()
+
+
+func _refresh_danger_tiles(dmap: DungeonMap) -> void:
+	dmap.danger_tiles.clear()
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if not is_instance_valid(m) or not (m is Monster):
+			continue
+		if m.boss_ai == null:
+			continue
+		if m.boss_ai.shows_danger_tiles():
+			dmap.danger_tiles.append_array(m.boss_ai.danger_tiles)
+	dmap.queue_redraw()
 
 
 ## Per-turn racial passives (Troll regen for now; extend with new traits).
