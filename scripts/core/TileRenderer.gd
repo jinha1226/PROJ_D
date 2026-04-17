@@ -157,7 +157,7 @@ const PLAYER_RACES: Dictionary = {
 	"rogue":      "players/rogue.png",
 	"mage":       "players/mage.png",
 	"cleric":     "players/cleric.png",
-	"warlock":    "players/cleric.png",
+	"warlock":    "players/warlock.png",
 	"knight":     "players/knight.png",
 }
 
