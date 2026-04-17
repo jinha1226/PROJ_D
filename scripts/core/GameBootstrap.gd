@@ -1618,8 +1618,36 @@ func _cast_single_target(spell_id: String, info: Dictionary, power: int) -> Dict
 		target.slowed_turns = 4
 		SpellFX.cast_slow(fx_layer, target.position, spell_color)
 		return {"success": true, "message": "%s is slowed for 4 turns!" % tname}
+	if effect == "confuse":
+		target.slowed_turns = 4
+		SpellFX.cast_slow(fx_layer, target.position, spell_color)
+		return {"success": true, "message": "%s is confused for 4 turns!" % tname}
+	if effect == "petrify":
+		target.slowed_turns = 5
+		SpellFX.cast_slow(fx_layer, target.position, spell_color)
+		return {"success": true, "message": "%s is petrified for 5 turns!" % tname}
+	if effect == "agony":
+		var half_hp: int = max(1, target.hp / 2)
+		target.take_damage(half_hp)
+		SpellFX.cast_single(fx_layer, player.position, target, half_hp, spell_color)
+		return {"success": true, "message": "%s: HP halved! (%d dmg)" % [tname, half_hp]}
+	if effect == "vampiric":
+		var dmg_v: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
+		target.take_damage(dmg_v)
+		player.stats.HP = min(player.stats.hp_max, player.stats.HP + dmg_v)
+		player.stats_changed.emit()
+		SpellFX.cast_single(fx_layer, player.position, target, dmg_v, spell_color)
+		return {"success": true, "message": "Drained %d HP from %s!" % [dmg_v, tname]}
+	if effect == "dot_fire":
+		var dmg_f: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 4
+		target.take_damage(dmg_f)
+		target.slowed_turns = 0
+		if target.has_method("set_meta"):
+			target.set_meta("burn_turns", 4)
+			target.set_meta("burn_dmg", max(1, dmg_f / 2))
+		SpellFX.cast_single(fx_layer, player.position, target, dmg_f, spell_color)
+		return {"success": true, "message": "%s is burning! (%d + %d/turn)" % [tname, dmg_f, max(1, dmg_f / 2)]}
 
-	# Damage spell.
 	var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
 	target.take_damage(dmg)
 	SpellFX.cast_single(fx_layer, player.position, target, dmg, spell_color)
