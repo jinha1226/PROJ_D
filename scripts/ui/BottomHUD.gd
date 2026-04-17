@@ -28,6 +28,7 @@ signal menu_pressed
 
 
 func _ready() -> void:
+	theme = GameTheme.create()
 	for i in quick_slots.size():
 		var qs = quick_slots[i]
 		qs.slot_index = i

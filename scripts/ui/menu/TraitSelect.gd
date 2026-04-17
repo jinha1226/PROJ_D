@@ -17,6 +17,7 @@ var _cards: Dictionary = {}
 
 
 func _ready() -> void:
+	theme = GameTheme.create()
 	$Footer/BackButton.pressed.connect(_on_back)
 	$Footer/StartButton.pressed.connect(_on_start)
 	$Footer/StartButton.disabled = true

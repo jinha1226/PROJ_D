@@ -11,6 +11,7 @@ func _ready() -> void:
 	$Buttons/NewRunButton.pressed.connect(_on_new_run)
 	$Buttons/UpgradesButton.pressed.connect(_on_upgrades)
 	$Buttons/CreditsButton.pressed.connect(_on_credits)
+	theme = GameTheme.create()
 	_ensure_meta()
 
 

@@ -78,7 +78,11 @@ const _REST_MP_PER_TURN: int = 1
 
 
 func _ready() -> void:
-	# [meta-agent] Instantiate MetaProgression (M1: child of Game root; autoload later).
+	var ui_layer: Node = get_node_or_null("UILayer")
+	if ui_layer:
+		var ui_ctrl: Node = ui_layer.get_node_or_null("UI")
+		if ui_ctrl and ui_ctrl is CanvasItem:
+			ui_ctrl.theme = GameTheme.create()
 	meta = META_SCRIPT.new()
 	meta.name = "MetaProgression"
 	add_child(meta)
