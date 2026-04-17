@@ -1,6 +1,6 @@
 extends Node2D
 
-const TILE_SIZE: int = 64
+const TILE_SIZE: int = 32
 const PLAYER_SCENE: PackedScene = preload("res://scenes/entities/Player.tscn")
 const TOUCH_INPUT_SCRIPT: Script = preload("res://scripts/ui/TouchInput.gd")
 const ESSENCE_SYSTEM_SCRIPT: Script = preload("res://scripts/systems/EssenceSystem.gd")

@@ -14,7 +14,7 @@ extends Node2D
 ##   ]
 ## }
 
-@export var tile_size: int = 64
+@export var tile_size: int = 32
 
 @onready var _anim: AnimatedSprite2D = $Anim
 

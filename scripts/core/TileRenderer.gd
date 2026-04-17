@@ -3,7 +3,7 @@ class_name TileRenderer
 
 enum Mode { LPC, DCSS }
 
-const TILE: int = 64
+const TILE: int = 32
 const _BASE_DIR: String = "res://assets/tiles/"
 
 const FEATURES: Dictionary = {
