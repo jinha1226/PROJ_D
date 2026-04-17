@@ -4,7 +4,7 @@ class_name CompanionAI
 const FOLLOW_RADIUS: int = 4  # step toward player when farther than this
 
 
-static func act(c: Companion) -> void:
+static func act(c: Node2D) -> void:
 	if not c.is_alive:
 		return
 	var target: Node = _find_nearest_monster(c)
@@ -25,11 +25,11 @@ static func act(c: Companion) -> void:
 	# Otherwise idle in place — no wander.
 
 
-static func _get_player(c: Companion) -> Node:
+static func _get_player(c: Node2D) -> Node:
 	return c.get_tree().get_first_node_in_group("player")
 
 
-static func _find_nearest_monster(c: Companion) -> Monster:
+static func _find_nearest_monster(c: Node2D) -> Monster:
 	var best: Monster = null
 	var best_d: int = 999999
 	for m in c.get_tree().get_nodes_in_group("monsters"):
@@ -44,7 +44,7 @@ static func _find_nearest_monster(c: Companion) -> Monster:
 	return best
 
 
-static func _melee(c: Companion, target: Monster) -> void:
+static func _melee(c: Node2D, target: Monster) -> void:
 	# Simple damage formula: base_atk = str/2 + 3 (matches monster formula).
 	var base_atk: int = int(c.data.str) / 2 + 3 if c.data != null else 4
 	var def_ac: int = target.ac if target != null else 0
@@ -52,7 +52,7 @@ static func _melee(c: Companion, target: Monster) -> void:
 	target.take_damage(dmg)
 
 
-static func _step_toward(c: Companion, target_pos: Vector2i) -> void:
+static func _step_toward(c: Node2D, target_pos: Vector2i) -> void:
 	var dx: int = sign(target_pos.x - c.grid_pos.x)
 	var dy: int = sign(target_pos.y - c.grid_pos.y)
 	var candidates: Array[Vector2i] = []
@@ -69,7 +69,7 @@ static func _step_toward(c: Companion, target_pos: Vector2i) -> void:
 			return
 
 
-static func _can_enter(c: Companion, pos: Vector2i) -> bool:
+static func _can_enter(c: Node2D, pos: Vector2i) -> bool:
 	if c.generator == null or not c.generator.is_walkable(pos):
 		return false
 	# Blocked by monsters, player, or other companions.
