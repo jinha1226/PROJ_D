@@ -1161,33 +1161,33 @@ func _on_skill_training_toggled(pressed: bool, skill_id: String) -> void:
 
 
 const _SKILL_DESCS: Dictionary = {
-	"axe": "Increases damage with axes and war axes.",
-	"short_blade": "Increases damage with daggers and short swords.",
-	"long_blade": "Increases damage with long swords and katanas.",
-	"mace": "Increases damage with maces, flails, and hammers.",
-	"polearm": "Increases damage with spears, halberds, and tridents.",
-	"staff": "Increases damage with staves.",
-	"bow": "Increases damage with bows.",
-	"crossbow": "Increases damage with crossbows.",
-	"sling": "Increases damage with slings.",
-	"throwing": "Increases damage with throwing weapons.",
-	"fighting": "Increases melee accuracy and base damage.",
-	"armour": "Reduces incoming damage. Heavier armour benefits more.",
-	"dodging": "Chance to evade attacks entirely.",
-	"shields": "Chance to block attacks with a shield.",
-	"spellcasting": "Reduces spell failure rate. Increases MP.",
-	"conjurations": "Improves conjuration spell power and accuracy.",
-	"fire": "Improves fire spell power. Reduces fire spell failure.",
-	"cold": "Improves ice spell power. Reduces ice spell failure.",
-	"earth": "Improves earth spell power. Reduces earth spell failure.",
-	"air": "Improves air spell power. Reduces air spell failure.",
-	"necromancy": "Improves necromancy power. Unlocks dark spells.",
-	"hexes": "Improves hex effectiveness. Unlocks control spells.",
-	"translocations": "Improves blink range. Unlocks movement spells.",
-	"summonings": "Improves summoned creature power and duration.",
-	"stealth": "Reduces enemy detection range.",
-	"evocations": "Improves wand and device effectiveness.",
-	"essence_channeling": "Improves essence ability power.",
+	"axe": "Axe DMG +5%/lv",
+	"short_blade": "Dagger DMG +5%/lv",
+	"long_blade": "Sword DMG +5%/lv",
+	"mace": "Mace DMG +5%/lv",
+	"polearm": "Polearm DMG +5%/lv",
+	"staff": "Staff DMG +5%/lv",
+	"bow": "Bow DMG +5%/lv",
+	"crossbow": "Crossbow DMG +5%/lv",
+	"sling": "Sling DMG +5%/lv",
+	"throwing": "Throw DMG +5%/lv",
+	"fighting": "Melee DMG +2/lv",
+	"armour": "AC +1 per 4 lv",
+	"dodging": "EV +1 per 3 lv",
+	"shields": "Block 5%/lv",
+	"spellcasting": "Fail rate -3%/lv, MP +1/lv",
+	"conjurations": "Conj power +2/lv",
+	"fire": "Fire power +2/lv",
+	"cold": "Ice power +2/lv",
+	"earth": "Earth power +2/lv",
+	"air": "Air power +2/lv",
+	"necromancy": "Necro power +2/lv",
+	"hexes": "Hex power +2/lv",
+	"translocations": "Blink range +1/lv",
+	"summonings": "Summon power +2/lv",
+	"stealth": "Detect range -1/lv",
+	"evocations": "Wand power +2/lv",
+	"essence_channeling": "Essence power +2/lv",
 }
 
 func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> Control:
@@ -1223,19 +1223,15 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 	row.add_child(lv_lab)
 	outer.add_child(row)
 
-	var desc_lab := Label.new()
-	desc_lab.text = String(_SKILL_DESCS.get(skill_id, ""))
-	desc_lab.add_theme_font_size_override("font_size", 22)
-	desc_lab.modulate = Color(0.65, 0.65, 0.75)
-	desc_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	outer.add_child(desc_lab)
-
+	var info_line := Label.new()
+	var desc_text: String = String(_SKILL_DESCS.get(skill_id, ""))
 	if level > 0 and level < SkillSystem.MAX_LEVEL:
-		var xp_lab := Label.new()
-		xp_lab.text = "  XP: %d / %d" % [int(xp), int(need)]
-		xp_lab.add_theme_font_size_override("font_size", 20)
-		xp_lab.modulate = Color(0.5, 0.7, 0.5)
-		outer.add_child(xp_lab)
+		info_line.text = "%s  |  XP %d/%d" % [desc_text, int(xp), int(need)]
+	else:
+		info_line.text = desc_text
+	info_line.add_theme_font_size_override("font_size", 28)
+	info_line.modulate = Color(0.6, 0.75, 0.6)
+	outer.add_child(info_line)
 
 	outer.add_child(HSeparator.new())
 	return outer
