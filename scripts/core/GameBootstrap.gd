@@ -1,6 +1,6 @@
 extends Node2D
 
-const TILE_SIZE: int = 32
+const TILE_SIZE: int = 64
 const PLAYER_SCENE: PackedScene = preload("res://scenes/entities/Player.tscn")
 const TOUCH_INPUT_SCRIPT: Script = preload("res://scripts/ui/TouchInput.gd")
 const ESSENCE_SYSTEM_SCRIPT: Script = preload("res://scripts/systems/EssenceSystem.gd")
@@ -1370,7 +1370,7 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 			m.take_damage(dmg)
 			total_dmg += dmg
 			hits += 1
-		SpellFX.cast_area(fx_layer, player.position, target.position, hit_positions, spell_color, float(radius) * 32.0 + 16.0)
+		SpellFX.cast_area(fx_layer, player.position, target.position, hit_positions, spell_color, float(radius) * float(TILE_SIZE) + float(TILE_SIZE) / 2.0)
 		print("%s: %d hit(s), %d total dmg" % [String(info.get("name", spell_id)), hits, total_dmg])
 	else:
 		var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
@@ -1571,7 +1571,7 @@ func _cast_area_spell(spell_id: String, info: Dictionary, power: int) -> Diction
 		total_dmg += dmg
 		hits += 1
 
-	var tile_r_px: float = float(radius) * 32.0 + 16.0
+	var tile_r_px: float = float(radius) * float(TILE_SIZE) + float(TILE_SIZE) / 2.0
 	SpellFX.cast_area(fx_layer, player.position, center_px, hit_positions, spell_color, tile_r_px)
 	SpellFX.float_text(fx_layer, center_px + Vector2(0, -24),
 			"%d dmg" % total_dmg, spell_color)
@@ -1601,7 +1601,7 @@ func _cast_self_spell(spell_id: String, _info: Dictionary, _power: int) -> Dicti
 			if blocked:
 				continue
 			player.grid_pos = dest
-			player.position = Vector2(dest.x * 32 + 16, dest.y * 32 + 16)
+			player.position = Vector2(dest.x * TILE_SIZE + TILE_SIZE / 2, dest.y * TILE_SIZE + TILE_SIZE / 2)
 			var dmap: DungeonMap = $DungeonLayer/DungeonMap
 			dmap.update_fov(dest)
 			_refresh_minimap_preview(dmap, dest)

@@ -7,7 +7,7 @@ signal stairs_tapped(pos: Vector2i)
 signal stairs_up_tapped(pos: Vector2i)
 signal target_selected(pos: Vector2i)
 
-const TILE_SIZE: int = 32
+const TILE_SIZE: int = 64
 const LONGPRESS_TIME: float = 0.5
 # Chebyshev distance within which an enemy halts auto-move. Small so that
 # just "seeing an enemy on screen" (no fog-of-war yet) doesn't cancel travel.

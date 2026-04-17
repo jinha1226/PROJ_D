@@ -1,6 +1,6 @@
 class_name DungeonMap extends Node2D
 
-const TILE_SIZE: int = 32
+const TILE_SIZE: int = 64
 const EXPLORE_RADIUS: int = 6
 
 var generator: DungeonGenerator = null

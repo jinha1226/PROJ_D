@@ -2,7 +2,7 @@ class_name Monster extends Node2D
 
 signal died(monster: Monster)
 
-const TILE_SIZE: int = 32
+const TILE_SIZE: int = 64
 const _CHAR_SPRITE_SCENE := preload("res://scenes/entities/CharacterSprite.tscn")
 
 @export var generator: DungeonGenerator
@@ -14,7 +14,7 @@ var ac: int = 0
 var dex: int = 0
 var sight_range: int = 6
 var is_alive: bool = true
-var tile_size: int = 32
+var tile_size: int = 64
 # Hex effect: remaining turns where this monster skips its action.
 var slowed_turns: int = 0
 

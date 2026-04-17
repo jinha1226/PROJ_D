@@ -2,7 +2,7 @@ class_name FloorItem extends Node2D
 ## Floor-item visual. Draws kind-specific shapes with a gentle bob.
 ## Kinds: "potion" | "scroll" | "weapon" | "armor" | "junk"
 
-const TILE_SIZE: int = 32
+const TILE_SIZE: int = 64
 
 var grid_pos: Vector2i = Vector2i.ZERO
 var item_id: String = ""

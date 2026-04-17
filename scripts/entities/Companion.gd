@@ -9,7 +9,7 @@ class_name Companion extends Node2D
 
 signal died(c: Companion)
 
-const TILE_SIZE: int = 32
+const TILE_SIZE: int = 64
 
 @export var generator: DungeonGenerator
 
@@ -20,7 +20,7 @@ var ac: int = 0
 var dex: int = 0
 var sight_range: int = 6
 var is_alive: bool = true
-var tile_size: int = 32
+var tile_size: int = 64
 # Optional "expire in N turns" — 0 = permanent.
 var lifetime: int = 0
 var _move_tween: Tween = null
