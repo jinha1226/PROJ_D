@@ -120,28 +120,16 @@ func _load_sprite_preset() -> void:
 ## DCSS player rendering: race body + equipped doll layers stacked.
 ## Order matters: base → legs → chest → boots → gloves → helm → weapon.
 func _draw() -> void:
-	if not TileRenderer.is_dcss() or race_id == "":
+	if not TileRenderer.is_dcss():
 		return
-	var base: Texture2D = TileRenderer.player_race(race_id)
+	var base: Texture2D = TileRenderer.player_race(job_id)
 	if base == null:
+		base = TileRenderer.player_race("fighter")
+	if base == null:
+		draw_circle(Vector2.ZERO, 10.0, Color(0.2, 0.6, 1.0))
 		return
 	var sz: Vector2 = base.get_size()
-	var ofs: Vector2 = -sz * 0.5
-	draw_texture(base, ofs)
-	# Armor layers, slot by slot.
-	for slot in ["legs", "chest", "boots", "gloves", "helm"]:
-		var piece: Dictionary = equipped_armor.get(slot, {})
-		var piece_id: String = String(piece.get("id", ""))
-		if piece_id == "":
-			continue
-		var layer: Texture2D = TileRenderer.doll_layer(slot, piece_id)
-		if layer != null:
-			draw_texture(layer, ofs)
-	# Weapon last so it sits on top of everything.
-	if equipped_weapon_id != "":
-		var wpn: Texture2D = TileRenderer.doll_layer("weapon", equipped_weapon_id)
-		if wpn != null:
-			draw_texture(wpn, ofs)
+	draw_texture_rect(base, Rect2(-sz * 0.5, sz), false)
 
 
 ## Build a CharacterSprite preset dict reflecting the player's CURRENT
@@ -212,7 +200,9 @@ func _on_player_turn_started() -> void:
 	pass
 
 
-func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceData) -> void:
+var trait_res: TraitData = null
+
+func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceData = null, p_trait: TraitData = null) -> void:
 	generator = gen
 	grid_pos = start_pos
 	position = Vector2(grid_pos.x * tile_size + tile_size / 2.0, grid_pos.y * tile_size + tile_size / 2.0)
@@ -220,33 +210,41 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 	race_id = race.id if race else ""
 	job_res = job
 	race_res = race
+	trait_res = p_trait
 	_ensure_sprite()
-	# Sprite preset is composed AFTER equipped_* fields are set below so the
-	# starting gear actually appears. _load_sprite_preset call lives at the
-	# end of setup().
 
 	var s := Stats.new()
-	var base_str: int = (race.base_str if race else 10) + (job.str_bonus if job else 0)
-	var base_dex: int = (race.base_dex if race else 10) + (job.dex_bonus if job else 0)
-	var base_int: int = (race.base_int if race else 10) + (job.int_bonus if job else 0)
+	var trait_str: int = p_trait.str_bonus if p_trait else 0
+	var trait_dex: int = p_trait.dex_bonus if p_trait else 0
+	var trait_int: int = p_trait.int_bonus if p_trait else 0
+	var base_str: int = 8 + (job.str_bonus if job else 0) + trait_str
+	var base_dex: int = 8 + (job.dex_bonus if job else 0) + trait_dex
+	var base_int: int = 8 + (job.int_bonus if job else 0) + trait_int
 	s.STR = base_str
 	s.DEX = base_dex
 	s.INT = base_int
-	var hp_total: int = (race.hp_per_level if race else 5) * level + 10
-	var mp_total: int = (race.mp_per_level if race else 3) * level + 5
+	var hp_pct: float = 1.0 + (p_trait.hp_bonus_pct if p_trait else 0.0)
+	var mp_pct: float = 1.0 + (p_trait.mp_bonus_pct if p_trait else 0.0)
+	var hp_total: int = int((5 * level + 30) * hp_pct)
+	var mp_total: int = int((3 * level + 10) * mp_pct)
 	s.hp_max = hp_total
 	s.HP = hp_total
 	s.mp_max = mp_total
 	s.MP = mp_total
-	s.AC = 0
+	s.AC = p_trait.ac_bonus if p_trait else 0
 	s.EV = 0
 	stats = s
 	base_stats = s.clone()
 
-	# Seed memorised spells from the job.
+	# Seed memorised spells from job + trait.
 	learned_spells.clear()
 	if job != null:
 		for spell_id in job.starting_spells:
+			var sp: String = String(spell_id)
+			if sp != "" and not learned_spells.has(sp):
+				learned_spells.append(sp)
+	if p_trait != null:
+		for spell_id in p_trait.starting_spells:
 			var sp: String = String(spell_id)
 			if sp != "" and not learned_spells.has(sp):
 				learned_spells.append(sp)
@@ -450,12 +448,15 @@ func try_move(delta: Vector2i) -> bool:
 		_walk_idle_timer = get_tree().create_timer(0.2)
 		_walk_idle_timer.timeout.connect(_return_to_idle)
 	moved.emit(grid_pos)
-	# Spriggan / fast races: every move_speed_mod-th step is "free" — does
-	# not end the player turn, so monsters don't get to act yet.
 	var should_end_turn: bool = true
-	if race_res != null and race_res.move_speed_mod > 0:
+	var speed_mod: int = 0
+	if trait_res != null and trait_res.special == "swift":
+		speed_mod = 3
+	elif race_res != null and race_res.move_speed_mod > 0:
+		speed_mod = race_res.move_speed_mod
+	if speed_mod > 0:
 		_free_move_counter += 1
-		if _free_move_counter <= race_res.move_speed_mod:
+		if _free_move_counter < speed_mod:
 			should_end_turn = false
 		else:
 			_free_move_counter = 0

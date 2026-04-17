@@ -6,10 +6,10 @@
 script = ExtResource("1")
 id = "fighter"
 display_name = "Fighter"
-description = "Balanced melee: sword, chain mail, shield. Reliable from turn 1."
-str_bonus = 2
-dex_bonus = 0
+description = "Balanced melee warrior. Strong and reliable."
+str_bonus = 3
+dex_bonus = 1
 int_bonus = 0
-starting_equipment = Array[String](["arming_sword", "chain_chest", "leather_legs", "leather_boots"])
-starting_skills = {"long_blade": 3, "fighting": 2, "armour": 2, "shields": 2}
-unique_ability = ""
+starting_equipment = ["arming_sword", "leather_chest", "leather_boots"]
+starting_skills = {"long_blade": 2, "fighting": 2, "armour": 1}
+starting_spells = []

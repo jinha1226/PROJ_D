@@ -59,11 +59,23 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	var effective_ac: int = def_ac + armour_skill_level / 4
 
 	var dmg: int = roll_damage(atk, effective_ac)
-	# Minotaur racial: 25% chance of a headbutt for +2..5 bonus damage.
-	if "race_res" in attacker and attacker.race_res != null \
-			and attacker.race_res.racial_trait == "minotaur_headbutt":
+	var trait_special: String = ""
+	if "trait_res" in attacker and attacker.trait_res != null:
+		trait_special = attacker.trait_res.special
+	elif "race_res" in attacker and attacker.race_res != null:
+		trait_special = attacker.race_res.racial_trait
+	if trait_special == "fierce" or trait_special == "minotaur_headbutt":
 		if randf() < 0.25:
 			dmg += randi_range(2, 5)
+	if trait_special == "war_cry" and "stats" in attacker and attacker.stats != null:
+		if attacker.stats.HP < attacker.stats.hp_max * 0.5:
+			dmg = int(dmg * 1.5)
+	if trait_special == "backstab" and "has_meta" in attacker:
+		if not attacker.has_meta("_backstab_used"):
+			dmg *= 3
+			attacker.set_meta("_backstab_used", true)
+		else:
+			dmg = int(dmg * 1.15)
 	if defender.has_method("take_damage"):
 		defender.take_damage(dmg)
 	_show_hit_feedback(defender, dmg, Color(1.0, 1.0, 0.3))
@@ -81,6 +93,11 @@ static func melee_attack_from_monster(m, defender) -> int:
 	elif "ac" in defender:
 		def_ac = int(defender.ac)
 	var dmg: int = roll_damage(base_atk, def_ac)
+	var def_trait: String = ""
+	if "trait_res" in defender and defender.trait_res != null:
+		def_trait = defender.trait_res.special
+	if def_trait == "iron_will" and randf() < 0.3:
+		dmg = max(1, dmg / 2)
 	if defender.has_method("take_damage"):
 		defender.take_damage(dmg)
 	_show_hit_feedback(defender, dmg, Color(1.0, 0.3, 0.3))

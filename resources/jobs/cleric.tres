@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "cleric"
+display_name = "Cleric"
+description = "Divine warrior. Blends combat and magic."
+str_bonus = 2
+dex_bonus = 0
+int_bonus = 2
+starting_equipment = ["mace", "leather_chest", "leather_boots"]
+starting_skills = {"mace": 1, "fighting": 1, "spellcasting": 1, "necromancy": 1}
+starting_spells = []

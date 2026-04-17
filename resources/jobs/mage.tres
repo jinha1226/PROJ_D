@@ -4,12 +4,12 @@
 
 [resource]
 script = ExtResource("1")
-id = "barbarian"
-display_name = "Barbarian"
-description = "Raw power. High damage, light armor."
-str_bonus = 5
+id = "mage"
+display_name = "Mage"
+description = "Master of arcane arts. Element chosen by trait."
+str_bonus = -1
 dex_bonus = 0
-int_bonus = -1
-starting_equipment = ["axe", "leather_chest"]
-starting_skills = {"axe": 3, "fighting": 2}
+int_bonus = 5
+starting_equipment = ["gnarled_staff", "robe"]
+starting_skills = {"spellcasting": 2, "staff": 1}
 starting_spells = []

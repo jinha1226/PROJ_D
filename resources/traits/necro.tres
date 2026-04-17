@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TraitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/traits/TraitData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "necro"
+display_name = "Necromancy"
+description = "Start with Pain. Dark magic XP +50%."
+category = "cleric"
+str_bonus = 0
+dex_bonus = 0
+int_bonus = 1
+hp_bonus_pct = 0.0
+mp_bonus_pct = 0.1
+ac_bonus = 0
+special = ""
+starting_spells = ["pain"]

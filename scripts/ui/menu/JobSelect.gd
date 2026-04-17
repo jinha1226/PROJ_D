@@ -5,14 +5,10 @@ extends Control
 ## Cards show compact info; tapping expands to reveal full details.
 
 const CHAR_SPRITE_SCENE := preload("res://scenes/entities/CharacterSprite.tscn")
-const RACE_SELECT_PATH := "res://scenes/menu/RaceSelect.tscn"
-const GAME_PATH := "res://scenes/main/Game.tscn"
+const TRAIT_SELECT_PATH := "res://scenes/menu/TraitSelect.tscn"
+const MAIN_MENU_PATH := "res://scenes/menu/MainMenu.tscn"
 const JOB_IDS: Array[String] = [
-	"fighter", "gladiator", "monk", "berserker", "brigand", "skald",
-	"hunter", "arcane_marksman",
-	"fire_elementalist", "ice_elementalist", "earth_elementalist", "air_elementalist",
-	"conjurer", "summoner", "necromancer", "enchanter", "transmuter",
-	"assassin", "warper", "wizard",
+	"fighter", "barbarian", "ranger", "rogue", "mage", "cleric",
 ]
 
 const _CARD_W: float = 540.0
@@ -247,11 +243,11 @@ func _on_card_pressed(job_id: String) -> void:
 
 
 func _on_back() -> void:
-	get_tree().change_scene_to_file(RACE_SELECT_PATH)
+	get_tree().change_scene_to_file(MAIN_MENU_PATH)
 
 
 func _on_start() -> void:
 	if _selected_id == "":
 		return
-	GameManager.start_new_run(_selected_id, GameManager.selected_race_id)
-	get_tree().change_scene_to_file(GAME_PATH)
+	GameManager.selected_job_id = _selected_id
+	get_tree().change_scene_to_file(TRAIT_SELECT_PATH)

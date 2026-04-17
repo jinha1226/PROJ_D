@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TraitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/traits/TraitData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "backstab"
+display_name = "Backstab"
+description = "First hit per fight: 3x damage. All hits +15%."
+category = "rogue"
+str_bonus = 0
+dex_bonus = 2
+int_bonus = 0
+hp_bonus_pct = 0.0
+mp_bonus_pct = 0.0
+ac_bonus = 0
+special = "backstab"
+starting_spells = []

@@ -1,0 +1,57 @@
+[gd_scene load_steps=2 format=3 uid="uid://btraitselect01"]
+
+[ext_resource type="Script" path="res://scripts/ui/menu/TraitSelect.gd" id="1_ts"]
+
+[node name="TraitSelect" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_ts")
+
+[node name="BG" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.04, 0.03, 0.08, 1)
+
+[node name="Title" type="Label" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -520.0
+offset_top = 60.0
+offset_right = 520.0
+offset_bottom = 160.0
+text = "Choose a Trait"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 72
+theme_override_colors/font_color = Color(0.95, 0.92, 0.82, 1)
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+anchor_left = 0.05
+anchor_right = 0.95
+offset_top = 180.0
+anchor_bottom = 0.88
+horizontal_scroll_mode = 0
+
+[node name="Grid" type="GridContainer" parent="Scroll"]
+size_flags_horizontal = 3
+columns = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+
+[node name="Footer" type="HBoxContainer" parent="."]
+anchor_left = 0.1
+anchor_right = 0.9
+anchor_bottom = 1.0
+offset_top = -160.0
+theme_override_constants/separation = 32
+
+[node name="BackButton" type="Button" parent="Footer"]
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 120)
+text = "Back"
+theme_override_font_sizes/font_size = 52
+
+[node name="StartButton" type="Button" parent="Footer"]
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 120)
+text = "Start"
+theme_override_font_sizes/font_size = 52

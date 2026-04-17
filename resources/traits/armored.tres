@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TraitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/traits/TraitData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "armored"
+display_name = "Armored"
+description = "AC +3. Natural toughness."
+category = "general"
+str_bonus = 0
+dex_bonus = 0
+int_bonus = 0
+hp_bonus_pct = 0.0
+mp_bonus_pct = 0.0
+ac_bonus = 3
+special = ""
+starting_spells = []

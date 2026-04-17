@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TraitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/traits/TraitData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "war_cry"
+display_name = "War Cry"
+description = "Below 50% HP: +50% attack damage."
+category = "barbarian"
+str_bonus = 2
+dex_bonus = 0
+int_bonus = 0
+hp_bonus_pct = 0.0
+mp_bonus_pct = 0.0
+ac_bonus = 0
+special = "war_cry"
+starting_spells = []

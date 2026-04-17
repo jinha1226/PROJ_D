@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TraitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/traits/TraitData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "fierce"
+display_name = "Fierce"
+description = "25% chance bonus melee damage."
+category = "general"
+str_bonus = 1
+dex_bonus = 1
+int_bonus = 0
+hp_bonus_pct = 0.0
+mp_bonus_pct = 0.0
+ac_bonus = 0
+special = "fierce"
+starting_spells = []

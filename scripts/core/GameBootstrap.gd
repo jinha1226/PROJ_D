@@ -105,11 +105,12 @@ func _ready() -> void:
 	entity_layer.add_child(player)
 	# Default loadout until MainMenu selection is implemented.
 	# GameManager.selected_race_id / selected_job_id can override later.
-	var race_id: String = GameManager.selected_race_id if GameManager.selected_race_id != "" else "human"
+	var trait_id: String = GameManager.selected_race_id if GameManager.selected_race_id != "" else "tough"
 	var job_id: String = GameManager.selected_job_id if GameManager.selected_job_id != "" else "fighter"
-	var race: RaceData = load("res://resources/races/%s.tres" % race_id)
+	GameManager.start_new_run(job_id, trait_id)
 	var job: JobData = load("res://resources/jobs/%s.tres" % job_id)
-	player.setup(generator, generator.spawn_pos, job, race)
+	var trait_res: TraitData = load("res://resources/traits/%s.tres" % trait_id)
+	player.setup(generator, generator.spawn_pos, job, null, trait_res)
 
 	# [skill-agent] SkillSystem must exist before first attack; attach as child
 	# of Game root with node name "SkillSystem" so Player.try_attack_at can
@@ -276,11 +277,14 @@ func _refresh_danger_tiles(dmap: DungeonMap) -> void:
 
 ## Per-turn racial passives (Troll regen for now; extend with new traits).
 func _apply_passive_racial_traits() -> void:
-	if player == null or player.race_res == null or player.stats == null:
+	if player == null or player.stats == null or not player.is_alive:
 		return
-	if not player.is_alive:
-		return
-	if player.race_res.racial_trait == "trollregen":
+	var special: String = ""
+	if player.trait_res != null:
+		special = player.trait_res.special
+	elif player.race_res != null:
+		special = player.race_res.racial_trait
+	if special == "regen":
 		if player.stats.HP < player.stats.hp_max:
 			player.stats.HP = min(player.stats.hp_max, player.stats.HP + 1)
 			player.stats_changed.emit()
@@ -620,6 +624,11 @@ func _on_monster_died(monster: Monster) -> void:
 	kill_count += 1
 	if meta != null and monster != null and monster.data != null:
 		meta.record_kill(String(monster.data.id))
+	if player != null and player.trait_res != null and player.trait_res.special == "holy_light":
+		if player.stats != null and player.is_alive:
+			var heal: int = max(1, int(player.stats.hp_max * 0.2))
+			player.stats.HP = min(player.stats.hp_max, player.stats.HP + heal)
+			player.stats_changed.emit()
 	if essence_system != null:
 		essence_system.try_drop_from_monster(monster)
 	# M1: small chance of loot drop at death tile.

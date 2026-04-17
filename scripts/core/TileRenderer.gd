@@ -150,14 +150,13 @@ const ITEMS: Dictionary = {
 }
 
 const PLAYER_RACES: Dictionary = {
-	"human":      "players/fighter.png",
-	"hill_orc":   "players/barbarian.png",
-	"minotaur":   "players/barbarian.png",
-	"deep_elf":   "players/mage.png",
-	"troll":      "players/barbarian.png",
-	"spriggan":   "players/rogue.png",
-	"catfolk":    "players/rogue.png",
-	"draconian":  "players/knight.png",
+	"fighter":    "players/fighter.png",
+	"barbarian":  "players/barbarian.png",
+	"ranger":     "players/ranger.png",
+	"rogue":      "players/rogue.png",
+	"mage":       "players/mage.png",
+	"cleric":     "players/cleric.png",
+	"knight":     "players/knight.png",
 }
 
 const PLAYER_DOLL: Dictionary = {}
