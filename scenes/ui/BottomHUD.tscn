@@ -59,7 +59,7 @@ size_flags_vertical = 3
 custom_minimum_size = Vector2(180, 0)
 size_flags_vertical = 3
 text = "REST"
-theme_override_font_sizes/font_size = 38
+theme_override_font_sizes/font_size = 43
 
 [node name="Row2" type="HBoxContainer" parent="Margin/VBox"]
 size_flags_horizontal = 3
@@ -70,34 +70,34 @@ theme_override_constants/separation = 6
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "BAG"
-theme_override_font_sizes/font_size = 44
+theme_override_font_sizes/font_size = 49
 
 [node name="SkillsButton" type="Button" parent="Margin/VBox/Row2"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "SKILLS"
-theme_override_font_sizes/font_size = 44
+theme_override_font_sizes/font_size = 49
 
 [node name="MagicButton" type="Button" parent="Margin/VBox/Row2"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "MAGIC"
-theme_override_font_sizes/font_size = 44
+theme_override_font_sizes/font_size = 49
 
 [node name="StatusButton" type="Button" parent="Margin/VBox/Row2"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "STATUS"
-theme_override_font_sizes/font_size = 44
+theme_override_font_sizes/font_size = 49
 
 [node name="WaitButton" type="Button" parent="Margin/VBox/Row2"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "WAIT"
-theme_override_font_sizes/font_size = 44
+theme_override_font_sizes/font_size = 49
 
 [node name="MenuButton" type="Button" parent="Margin/VBox/Row2"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "MENU"
-theme_override_font_sizes/font_size = 44
+theme_override_font_sizes/font_size = 49

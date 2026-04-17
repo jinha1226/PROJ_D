@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "evoker"
 display_name = "Evoker"
-description = "Start with Wand. Evocations skill +3."
+description = "Wand. Evocations +3."
 category = "rogue"
 str_bonus = 0
 dex_bonus = 1

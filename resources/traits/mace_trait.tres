@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "mace_trait"
 display_name = "Crusher"
-description = "Start with Mace. Mace skill +3."
+description = "Mace. Mace +3."
 category = "barbarian"
 str_bonus = 2
 dex_bonus = 0

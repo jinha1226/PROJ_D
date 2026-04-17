@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "earth"
 display_name = "Earth"
-description = "Start with Stone Arrow. Earth skill +3."
+description = "Stone Arrow. Earth +3."
 category = "mage"
 str_bonus = 0
 dex_bonus = 0

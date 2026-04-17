@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "polearm_trait"
 display_name = "Polearm"
-description = "Start with Halberd. Polearm skill +3."
+description = "Halberd. Polearm +3."
 category = "fighter"
 str_bonus = 2
 dex_bonus = 0

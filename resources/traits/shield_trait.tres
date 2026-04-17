@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "shield_trait"
 display_name = "Shield Bearer"
-description = "Start with Sword + Shield. Block 15% of hits."
+description = "Sword+Shield. Block 15%."
 category = "fighter"
 str_bonus = 1
 dex_bonus = 0

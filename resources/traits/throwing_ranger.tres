@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "throwing_ranger"
 display_name = "Throwing"
-description = "Start with Slingshot. Throwing skill +3."
+description = "Slingshot. Throwing +3."
 category = "ranger"
 str_bonus = 0
 dex_bonus = 2

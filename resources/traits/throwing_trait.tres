@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "throwing_trait"
 display_name = "Throwing"
-description = "Start with Throwing Axes. Throwing skill +3."
+description = "Throwing Axe. Throwing +3."
 category = "barbarian"
 str_bonus = 1
 dex_bonus = 1

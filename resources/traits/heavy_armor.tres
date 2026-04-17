@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "heavy_armor"
 display_name = "Heavy Armor"
-description = "Start with Plate Armor. AC +4, Armour skill +3."
+description = "Plate armor. AC+4, Armour +3."
 category = "fighter"
 str_bonus = 1
 dex_bonus = -1

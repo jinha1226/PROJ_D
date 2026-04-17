@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "dagger_trait"
 display_name = "Dagger"
-description = "Start with Magic Dagger. Short Blade skill +3. First hit 3x."
+description = "Dagger. First hit 3x. Blade +3."
 category = "rogue"
 str_bonus = 0
 dex_bonus = 2

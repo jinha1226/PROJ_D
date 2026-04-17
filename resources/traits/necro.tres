@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "necro"
 display_name = "Necromancy"
-description = "Start with Pain. Necromancy skill +3."
+description = "Pain. Necromancy +3."
 category = "warlock"
 str_bonus = 0
 dex_bonus = 0

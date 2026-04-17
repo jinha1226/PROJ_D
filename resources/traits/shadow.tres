@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "shadow"
 display_name = "Shadow"
-description = "Stealth skill +3. First hit 2x. Unseen by sleeping enemies."
+description = "Dagger. Stealth +3. First hit 2x."
 category = "rogue"
 str_bonus = 0
 dex_bonus = 1

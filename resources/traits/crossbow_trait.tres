@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "crossbow_trait"
 display_name = "Crossbow"
-description = "Start with Crossbow. Crossbow skill +3."
+description = "Crossbow. Crossbow +3."
 category = "ranger"
 str_bonus = 1
 dex_bonus = 1

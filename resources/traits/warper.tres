@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "warper"
 display_name = "Warper"
-description = "Start with Blink. Translocations skill +3."
+description = "Blink. Translocations +3."
 category = "warlock"
 str_bonus = 0
 dex_bonus = 1

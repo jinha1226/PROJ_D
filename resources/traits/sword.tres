@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "sword"
 display_name = "Swordsman"
-description = "Start with Longsword. Long Blade skill +3."
+description = "Longsword. Blade +3."
 category = "fighter"
 str_bonus = 1
 dex_bonus = 1

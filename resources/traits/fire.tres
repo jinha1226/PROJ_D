@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "fire"
 display_name = "Fire"
-description = "Start with Flame Tongue + Fireball. Fire skill +3."
+description = "Flame Tongue+Fireball. Fire +3."
 category = "mage"
 str_bonus = 0
 dex_bonus = 0

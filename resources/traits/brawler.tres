@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "brawler"
 display_name = "Brawler"
-description = "Unarmed combat. STR +3, fist damage doubled."
+description = "Unarmed 2x DMG. Fighting +3."
 category = "barbarian"
 str_bonus = 3
 dex_bonus = 1

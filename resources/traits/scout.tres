@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "scout"
 display_name = "Scout"
-description = "Start with Short Bow + Dagger. Stealth skill +3, Sight +2."
+description = "Short Bow+Dagger. Stealth +3, Sight +2."
 category = "ranger"
 str_bonus = 0
 dex_bonus = 1

@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "acrobat"
 display_name = "Acrobat"
-description = "Dodging skill +3. DEX +3."
+description = "DEX+3. Dodging +3."
 category = "rogue"
 str_bonus = 0
 dex_bonus = 3

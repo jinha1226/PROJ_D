@@ -68,7 +68,7 @@ func _make_card(t: TraitData) -> Button:
 		parts.append("Spells: %s" % ", ".join(PackedStringArray(t.starting_spells)))
 
 	btn.text = "\n".join(PackedStringArray(parts))
-	btn.add_theme_font_size_override("font_size", 32)
+	btn.add_theme_font_size_override("font_size", 40)
 	return btn
 
 

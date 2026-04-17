@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "arcane"
 display_name = "Arcane"
-description = "Start with Magic Dart + Blink. Conjurations skill +3."
+description = "Magic Dart+Blink. Conjurations +3."
 category = "warlock"
 str_bonus = 0
 dex_bonus = 0

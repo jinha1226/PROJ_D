@@ -9,7 +9,7 @@ signal pressed_slot(slot_index: int)
 @onready var label: Label = $Label
 
 func _ready() -> void:
-	add_theme_font_size_override("font_size", 34)
+	add_theme_font_size_override("font_size", 39)
 	pressed.connect(func(): pressed_slot.emit(slot_index))
 
 

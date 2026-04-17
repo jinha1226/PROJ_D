@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "hexer"
 display_name = "Hexes"
-description = "Start with Slow. Hexes skill +3."
+description = "Slow. Hexes +3."
 category = "warlock"
 str_bonus = 0
 dex_bonus = 0

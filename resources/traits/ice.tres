@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "ice"
 display_name = "Ice"
-description = "Start with Freeze. Cold skill +3."
+description = "Freeze. Cold +3."
 category = "mage"
 str_bonus = 0
 dex_bonus = 0
