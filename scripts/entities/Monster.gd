@@ -153,6 +153,7 @@ func _draw() -> void:
 		if tex != null:
 			var sz: Vector2 = tex.get_size()
 			draw_texture(tex, -sz * 0.5)
+			_draw_hp_bar(sz)
 			return
 	# LPC fallback / generic colored disc.
 	var color: Color
@@ -165,3 +166,26 @@ func _draw() -> void:
 		color = Color(0.85, 0.15, 0.15)
 	draw_circle(Vector2.ZERO, 10.0, color)
 	draw_arc(Vector2.ZERO, 10.0, 0.0, TAU, 16, Color.BLACK, 1.0)
+
+
+func _draw_hp_bar(sprite_sz: Vector2) -> void:
+	if data == null or data.hp <= 0:
+		return
+	var meta_node: Node = get_tree().root.get_node_or_null("MetaProgression")
+	if meta_node == null:
+		meta_node = get_tree().root.get_node_or_null("Game/MetaProgression")
+	if meta_node == null or not meta_node.has_method("shows_monster_hp"):
+		return
+	if not meta_node.shows_monster_hp():
+		return
+	if not meta_node.is_registered(String(data.id)):
+		return
+	var bar_w: float = sprite_sz.x * 0.8
+	var bar_h: float = 3.0
+	var bar_y: float = sprite_sz.y * 0.5 + 2.0
+	var ratio: float = clampf(float(hp) / float(data.hp), 0.0, 1.0)
+	var bg_rect := Rect2(-bar_w * 0.5, bar_y, bar_w, bar_h)
+	draw_rect(bg_rect, Color(0.15, 0.15, 0.15, 0.8), true)
+	var fill_rect := Rect2(-bar_w * 0.5, bar_y, bar_w * ratio, bar_h)
+	var bar_color: Color = Color(0.2, 0.9, 0.2) if ratio > 0.5 else (Color(1.0, 0.8, 0.1) if ratio > 0.25 else Color(1.0, 0.15, 0.1))
+	draw_rect(fill_rect, bar_color, true)

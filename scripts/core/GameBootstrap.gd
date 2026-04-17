@@ -439,8 +439,9 @@ func _spawn_dummy_items(count: int) -> void:
 
 
 func _on_monster_died(monster: Monster) -> void:
-	# [meta-agent] track kills for result screen.
 	kill_count += 1
+	if meta != null and monster != null and monster.data != null:
+		meta.record_kill(String(monster.data.id))
 	if essence_system != null:
 		essence_system.try_drop_from_monster(monster)
 	# M1: small chance of loot drop at death tile.
@@ -498,6 +499,8 @@ func _refresh_actor_visibility(dmap: DungeonMap) -> void:
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if is_instance_valid(m) and m is Monster:
 			m.visible = dmap.is_tile_visible(m.grid_pos)
+			if m.visible and meta != null and m.data != null:
+				meta.register_monster(String(m.data.id))
 	for c in get_tree().get_nodes_in_group("companions"):
 		if is_instance_valid(c) and c is Companion:
 			# Companions stay visible whenever their tile is explored — even
