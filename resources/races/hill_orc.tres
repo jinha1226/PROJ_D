@@ -21,3 +21,10 @@ beard_def = "beard_full"
 beard_color = "black"
 base_ac = 1
 racial_trait = ""
+skill_aptitudes = {
+	"fighting": 2, "axe": 1, "mace": 2, "polearm": 1, "long_blade": 1,
+	"armour": 1, "shields": 1,
+	"spellcasting": -2, "conjurations": 0, "hexes": -1, "translocations": -1,
+	"fire": 0, "cold": -1, "earth": 0, "air": -1, "necromancy": 0,
+	"dodging": -1, "stealth": -1,
+}
