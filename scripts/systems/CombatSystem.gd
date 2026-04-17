@@ -66,6 +66,7 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 			dmg += randi_range(2, 5)
 	if defender.has_method("take_damage"):
 		defender.take_damage(dmg)
+	_show_hit_feedback(defender, dmg, Color(1.0, 1.0, 0.3))
 	return dmg
 
 
@@ -74,7 +75,6 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 static func melee_attack_from_monster(m, defender) -> int:
 	var base_atk: int = int(m.data.str) / 2 + 3
 	var def_ac: int = 0
-	# Player has stats.AC; Companion carries ac directly.
 	if "stats" in defender and defender.stats != null:
 		def_ac = defender.stats.AC
 	elif "ac" in defender:
@@ -82,4 +82,32 @@ static func melee_attack_from_monster(m, defender) -> int:
 	var dmg: int = roll_damage(base_atk, def_ac)
 	if defender.has_method("take_damage"):
 		defender.take_damage(dmg)
+	_show_hit_feedback(defender, dmg, Color(1.0, 0.3, 0.3))
 	return dmg
+
+
+static func _show_hit_feedback(target: Node, dmg: int, color: Color) -> void:
+	if target == null or not is_instance_valid(target):
+		return
+	if not (target is Node2D):
+		return
+	var target_2d: Node2D = target as Node2D
+	# Flash white
+	var prev_mod: Color = target_2d.modulate
+	target_2d.modulate = Color(3.0, 3.0, 3.0, 1.0)
+	var tw: Tween = target_2d.create_tween()
+	tw.tween_property(target_2d, "modulate", prev_mod, 0.15)
+	# Floating damage number
+	var label := Label.new()
+	label.text = str(dmg)
+	label.add_theme_font_size_override("font_size", 28)
+	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	label.add_theme_constant_override("outline_size", 3)
+	label.position = Vector2(-12, -24)
+	label.z_index = 100
+	target_2d.add_child(label)
+	var tw2: Tween = label.create_tween()
+	tw2.tween_property(label, "position:y", label.position.y - 32, 0.5)
+	tw2.parallel().tween_property(label, "modulate:a", 0.0, 0.5)
+	tw2.tween_callback(label.queue_free)

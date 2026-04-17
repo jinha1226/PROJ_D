@@ -78,10 +78,12 @@ func act(monster: Node, player: Node) -> void:
 
 	if cycle_pos == cycle - 1:
 		phase = Phase.TELEGRAPH
+		_step_toward_player(monster, player)
 		_do_telegraph(monster, player)
 	elif cycle_pos == 0:
 		phase = Phase.EXECUTE
 		_do_execute(monster, player)
+		_step_toward_player(monster, player)
 	else:
 		phase = Phase.NORMAL
 		danger_tiles.clear()
