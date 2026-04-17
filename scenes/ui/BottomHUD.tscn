@@ -89,3 +89,15 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "STATUS"
 theme_override_font_sizes/font_size = 44
+
+[node name="WaitButton" type="Button" parent="Margin/VBox/Row2"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "WAIT"
+theme_override_font_sizes/font_size = 44
+
+[node name="MenuButton" type="Button" parent="Margin/VBox/Row2"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "MENU"
+theme_override_font_sizes/font_size = 44

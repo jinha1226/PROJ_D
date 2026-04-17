@@ -12,10 +12,10 @@ const RESULT_SCREEN_SCENE: PackedScene = preload("res://scenes/ui/ResultScreen.t
 # [skill-ui-agent] level-up toast prefab.
 const SKILL_TOAST_SCENE: PackedScene = preload("res://scenes/ui/SkillLevelUpToast.tscn")
 
-const _SKILL_CATEGORIES: Array = ["all", "weapon", "defense", "magic", "misc", "spells"]
+const _SKILL_CATEGORIES: Array = ["weapon", "defense", "magic", "misc"]
 const _SKILL_CATEGORY_LABELS: Dictionary = {
-	"all": "ALL", "weapon": "WEAPON", "defense": "DEFENSE",
-	"magic": "MAGIC", "misc": "MISC", "spells": "CAST",
+	"weapon": "WEAPON", "defense": "DEFENSE",
+	"magic": "MAGIC", "misc": "MISC",
 }
 
 const _COMPANION_SCENE: PackedScene = preload("res://scenes/entities/Companion.tscn")
@@ -170,6 +170,10 @@ func _ready() -> void:
 		bottom_hud.status_pressed.connect(_on_status_pressed)
 	if bottom_hud != null and bottom_hud.has_signal("magic_pressed"):
 		bottom_hud.magic_pressed.connect(_on_magic_pressed)
+	if bottom_hud != null and bottom_hud.has_signal("wait_pressed"):
+		bottom_hud.wait_pressed.connect(_on_wait_pressed)
+	if bottom_hud != null and bottom_hud.has_signal("menu_pressed"):
+		bottom_hud.menu_pressed.connect(_on_menu_pressed)
 
 	# [skill-ui-agent] persistent level-up toast layer.
 	skill_toast = SKILL_TOAST_SCENE.instantiate()
@@ -395,7 +399,7 @@ func _open_quickslot_picker(slot_index: int) -> void:
 	popup_mgr.add_child(dlg)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(800, 1500))
+	dlg.popup_centered(Vector2i(800, 1400))
 
 
 func _assign_quickslot_item(slot_index: int, id: String, dlg: AcceptDialog) -> void:
@@ -436,6 +440,62 @@ func _refresh_quickslots(bottom_hud: Node) -> void:
 		if count > 1:
 			tag = "%s×%d" % [tag, count]
 		bottom_hud.set_quickslot_display(i, tag, color)
+
+
+func _on_wait_pressed() -> void:
+	if player == null or not player.is_alive or run_over:
+		return
+	TurnManager.end_player_turn()
+
+
+func _on_menu_pressed() -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null:
+		return
+	var dlg := AcceptDialog.new()
+	dlg.exclusive = false
+	dlg.title = "Menu"
+	dlg.ok_button_text = "Close"
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 16)
+	dlg.add_child(vb)
+
+	var save_btn := Button.new()
+	save_btn.text = "Save & Continue"
+	save_btn.custom_minimum_size = Vector2(0, 96)
+	save_btn.add_theme_font_size_override("font_size", 36)
+	save_btn.pressed.connect(func():
+		if meta != null:
+			meta.save_to_disk()
+		print("Game saved.")
+		dlg.queue_free())
+	vb.add_child(save_btn)
+
+	var restart_btn := Button.new()
+	restart_btn.text = "Restart Run"
+	restart_btn.custom_minimum_size = Vector2(0, 96)
+	restart_btn.add_theme_font_size_override("font_size", 36)
+	restart_btn.pressed.connect(func():
+		dlg.queue_free()
+		GameManager.current_depth = 1
+		get_tree().change_scene_to_file("res://scenes/main/Game.tscn"))
+	vb.add_child(restart_btn)
+
+	var quit_btn := Button.new()
+	quit_btn.text = "Quit to Title"
+	quit_btn.custom_minimum_size = Vector2(0, 96)
+	quit_btn.add_theme_font_size_override("font_size", 36)
+	quit_btn.pressed.connect(func():
+		if meta != null:
+			meta.save_to_disk()
+		dlg.queue_free()
+		get_tree().change_scene_to_file("res://scenes/menu/MainMenu.tscn"))
+	vb.add_child(quit_btn)
+
+	popup_mgr.add_child(dlg)
+	dlg.confirmed.connect(dlg.queue_free)
+	dlg.canceled.connect(dlg.queue_free)
+	dlg.popup_centered(Vector2i(700, 700))
 
 
 func _on_rest_pressed() -> void:
@@ -932,7 +992,7 @@ func _on_skills_button_pressed() -> void:
 		_skills_dlg.queue_free()
 		_skills_dlg = null
 		return
-	_open_skills_dialog("all")
+	_open_skills_dialog("weapon")
 
 
 func _open_skills_dialog(category: String) -> void:
@@ -946,6 +1006,21 @@ func _open_skills_dialog(category: String) -> void:
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 8)
 	dlg.add_child(vb)
+
+	var skill_header := HBoxContainer.new()
+	skill_header.add_theme_constant_override("separation", 8)
+	var skill_title := Label.new()
+	skill_title.text = "Skills"
+	skill_title.add_theme_font_size_override("font_size", 32)
+	skill_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	skill_header.add_child(skill_title)
+	var skill_close := Button.new()
+	skill_close.text = "X"
+	skill_close.custom_minimum_size = Vector2(72, 72)
+	skill_close.add_theme_font_size_override("font_size", 36)
+	skill_close.pressed.connect(dlg.queue_free)
+	skill_header.add_child(skill_close)
+	vb.add_child(skill_header)
 
 	var mode_hbox := HBoxContainer.new()
 	mode_hbox.add_theme_constant_override("separation", 8)
@@ -1015,7 +1090,7 @@ func _open_skills_dialog(category: String) -> void:
 		if _skills_dlg == dlg: _skills_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(900, 1800))
+	dlg.popup_centered(Vector2i(900, 1700))
 
 
 func _on_skills_tab(cat: String, dlg: AcceptDialog) -> void:
@@ -1133,7 +1208,7 @@ func _open_magic_dialog() -> void:
 		if _magic_dlg == dlg: _magic_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(900, 1800))
+	dlg.popup_centered(Vector2i(900, 1700))
 
 
 func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
@@ -1813,7 +1888,7 @@ func _on_status_pressed() -> void:
 		if _status_dlg == dlg: _status_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(880, 1600))
+	dlg.popup_centered(Vector2i(880, 1700))
 
 
 ## One row in the Status popup per essence slot. Shows the slotted essence's

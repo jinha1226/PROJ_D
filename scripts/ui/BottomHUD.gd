@@ -7,6 +7,8 @@ signal bag_pressed
 signal skills_pressed
 signal magic_pressed
 signal status_pressed
+signal wait_pressed
+signal menu_pressed
 
 @onready var quick_slots: Array = [
 	$Margin/VBox/Row1/QuickSlot0,
@@ -21,6 +23,8 @@ signal status_pressed
 @onready var skills_button: Button = $Margin/VBox/Row2/SkillsButton
 @onready var magic_button: Button = $Margin/VBox/Row2/MagicButton
 @onready var status_button: Button = $Margin/VBox/Row2/StatusButton
+@onready var wait_button: Button = $Margin/VBox/Row2/WaitButton
+@onready var menu_button: Button = $Margin/VBox/Row2/MenuButton
 
 
 func _ready() -> void:
@@ -34,6 +38,8 @@ func _ready() -> void:
 	skills_button.pressed.connect(func(): skills_pressed.emit())
 	magic_button.pressed.connect(func(): magic_pressed.emit())
 	status_button.pressed.connect(func(): status_pressed.emit())
+	wait_button.pressed.connect(func(): wait_pressed.emit())
+	menu_button.pressed.connect(func(): menu_pressed.emit())
 
 
 func set_quickslot(i: int, icon: Texture2D, text: String) -> void:
@@ -46,9 +52,7 @@ func set_quickslot_display(i: int, txt: String, color: Color) -> void:
 		quick_slots[i].set_slot_display(txt, color)
 
 
-# Compatibility stubs so existing code that still calls these doesn't crash.
-# EssenceSlot moved into the Status popup.
 func set_essence(_id: String, _type_color: Color) -> void:
 	pass
 
-signal essence_slot_tapped  # unused, kept for signal wiring compatibility
+signal essence_slot_tapped
