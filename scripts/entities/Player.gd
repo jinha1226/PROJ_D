@@ -292,9 +292,12 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 				})
 	_recompute_defense()
 
+	if job != null and (job.id == "mage" or job.id == "warlock"):
+		GameManager.identify("mana_potion")
+		GameManager.identify("scroll_identify")
+
 	stats_changed.emit()
 	queue_redraw()
-	# Now compose the sprite preset with the starting weapon + armor applied.
 	_load_sprite_preset()
 
 
