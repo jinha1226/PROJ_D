@@ -9,6 +9,7 @@ signal skill_leveled_up(player, skill_id: String, new_level: int)
 signal xp_gained(player, skill_id: String, amount: float)
 
 const MAX_LEVEL: int = 27
+var auto_training: bool = true
 
 const SKILL_IDS: Array = [
 	# Weapons
@@ -163,18 +164,20 @@ func grant_xp(player: Node, amount: float, usage_tags: Array) -> Array:
 
 	var matched: Array = []
 	for tag in usage_tags:
-		var s: String = String(tag)
-		if s == "":
+		var tag_s: String = String(tag)
+		if tag_s == "":
 			continue
-		if st.has(s) and bool(st[s].get("training", false)):
-			if not matched.has(s):
-				matched.append(s)
+		if not st.has(tag_s):
+			continue
+		if auto_training or bool(st[tag_s].get("training", false)):
+			if not matched.has(tag_s):
+				matched.append(tag_s)
 
 	if matched.is_empty():
-		# Passive fallback: trained defense skills.
 		for id in st.keys():
-			if SKILL_CATEGORY.get(id, "") == "defense" and bool(st[id].get("training", false)):
-				matched.append(id)
+			if SKILL_CATEGORY.get(id, "") == "defense":
+				if auto_training or bool(st[id].get("training", false)):
+					matched.append(id)
 
 	if matched.is_empty():
 		return results

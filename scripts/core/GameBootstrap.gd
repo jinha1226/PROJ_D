@@ -812,6 +812,22 @@ func _open_skills_dialog(category: String) -> void:
 	vb.add_theme_constant_override("separation", 8)
 	dlg.add_child(vb)
 
+	var mode_hbox := HBoxContainer.new()
+	mode_hbox.add_theme_constant_override("separation", 8)
+	var mode_label := Label.new()
+	mode_label.text = "Training:"
+	mode_label.add_theme_font_size_override("font_size", 26)
+	mode_hbox.add_child(mode_label)
+	var mode_btn := Button.new()
+	mode_btn.text = "AUTO" if skill_system.auto_training else "MANUAL"
+	mode_btn.custom_minimum_size = Vector2(200, 56)
+	mode_btn.add_theme_font_size_override("font_size", 26)
+	mode_btn.pressed.connect(func():
+		skill_system.auto_training = not skill_system.auto_training
+		mode_btn.text = "AUTO" if skill_system.auto_training else "MANUAL")
+	mode_hbox.add_child(mode_btn)
+	vb.add_child(mode_hbox)
+
 	var tabs_hbox := HBoxContainer.new()
 	tabs_hbox.add_theme_constant_override("separation", 4)
 	for cat in _SKILL_CATEGORIES:
@@ -849,8 +865,12 @@ func _open_skills_dialog(category: String) -> void:
 			rows.add_child(_build_skill_row(skill_id, cat_id, state.get(skill_id, {})))
 
 	var footer := Label.new()
-	footer.text = "Uncheck to stop training. Defeat enemies to gain XP."
+	if skill_system.auto_training:
+		footer.text = "AUTO: XP goes to skills you actually use. Switch to MANUAL for full control."
+	else:
+		footer.text = "MANUAL: Check skills to train. Uncheck to stop. Defeat enemies to gain XP."
 	footer.add_theme_font_size_override("font_size", 18)
+	footer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	footer.modulate = Color(0.7, 0.7, 0.8, 1)
 	vb.add_child(footer)
 
