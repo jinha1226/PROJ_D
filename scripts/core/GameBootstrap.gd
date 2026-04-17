@@ -1292,7 +1292,12 @@ func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
 	name_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	name_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var spell_name: String = String(info.get("name", spell_id))
-	name_btn.text = "%s  [%d MP]" % [spell_name, int(info.get("mp", 0))]
+	var sch_id: String = String(info.get("school", ""))
+	var s_lv: int = skill_system.get_level(player, sch_id) if skill_system and player else 0
+	var s_sc: int = skill_system.get_level(player, "spellcasting") if skill_system and player else 0
+	var fail_p: int = int(SpellRegistry.failure_chance(spell_id, s_lv, s_sc) * 100)
+	var fail_txt: String = " (%d%%)" % fail_p if fail_p > 0 else ""
+	name_btn.text = "%s  [%d MP]%s" % [spell_name, int(info.get("mp", 0)), fail_txt]
 	name_btn.add_theme_font_size_override("font_size", 34)
 	name_btn.add_theme_color_override("font_color", info.get("color", Color.WHITE))
 	name_btn.pressed.connect(_show_spell_info.bind(spell_id))
@@ -1335,14 +1340,19 @@ func _show_spell_info(spell_id: String) -> void:
 	dlg.exclusive = false
 	dlg.title = String(info.get("name", spell_id))
 	dlg.ok_button_text = "Close"
-	var text: String = "%s\n\nMP Cost: %d\nSchool: %s\nTargeting: %s\nRange: %d" % [
+	var sch: String = String(info.get("school", "?"))
+	var sch_lv: int = skill_system.get_level(player, sch) if skill_system and player else 0
+	var sc_lv: int = skill_system.get_level(player, "spellcasting") if skill_system and player else 0
+	var fail_pct: int = int(SpellRegistry.failure_chance(spell_id, sch_lv, sc_lv) * 100)
+	var text: String = "%s\n\nMP Cost: %d\nSchool: %s (Lv.%d)\nDifficulty: %d\nFailure: %d%%\nRange: %d" % [
 		String(info.get("desc", "")),
 		int(info.get("mp", 0)),
-		String(info.get("school", "?")),
-		String(info.get("targeting", "single")),
+		sch, sch_lv,
+		int(info.get("difficulty", 1)),
+		fail_pct,
 		int(info.get("range", 6)),
 	]
-	if info.has("min_dmg"):
+	if info.has("min_dmg") and int(info.get("min_dmg", 0)) > 0:
 		text += "\nDamage: %d-%d + power" % [int(info.get("min_dmg", 0)), int(info.get("max_dmg", 0))]
 	dlg.dialog_text = text
 	popup_mgr.add_child(dlg)
@@ -1414,6 +1424,11 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 	var school: String = String(info.get("school", "spellcasting"))
 	var school_lv: int = skill_system.get_level(player, school) if skill_system else 0
 	var sc_lv: int = skill_system.get_level(player, "spellcasting") if skill_system else 0
+	var fail: float = SpellRegistry.failure_chance(spell_id, school_lv, sc_lv)
+	if randf() < fail:
+		print("Spell fizzles! (%d%% fail)" % int(fail * 100))
+		TurnManager.end_player_turn()
+		return
 	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
 	var power: int = school_lv * 2 + sc_lv + int_bonus
 	var spell_color: Color = info.get("color", Color.WHITE)
@@ -1567,8 +1582,11 @@ func _execute_cast(spell_id: String) -> Dictionary:
 	var school: String = String(info.get("school", "spellcasting"))
 	var school_lv: int = skill_system.get_level(player, school) if skill_system else 0
 	var sc_lv: int = skill_system.get_level(player, "spellcasting") if skill_system else 0
+	var fail: float = SpellRegistry.failure_chance(spell_id, school_lv, sc_lv)
+	if randf() < fail:
+		return {"success": false, "message": "Spell fizzles! (%d%% fail)" % int(fail * 100)}
 	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
-	var power: int = school_lv * 2 + sc_lv + int_bonus
+	var power: int = school_lv + sc_lv / 2 + int_bonus
 
 	var targeting: String = String(info.get("targeting", "single"))
 	match targeting:

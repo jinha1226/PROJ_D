@@ -110,8 +110,6 @@ func bind(p_skill_id: String, state: Dictionary, category: String) -> void:
 	skill_id = p_skill_id
 	_is_magic = (category == "magic")
 	_name_label.text = SKILL_NAMES.get(skill_id, skill_id)
-	if _is_magic:
-		_name_label.text += "  (M2)"
 	_cat_label.text = CATEGORY_NAMES.get(category, category)
 
 	var level: int = int(state.get("level", 0))
