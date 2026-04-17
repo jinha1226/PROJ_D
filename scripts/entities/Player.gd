@@ -767,9 +767,16 @@ func apply_level_up_stat(stat: String) -> void:
 	if stats == null:
 		return
 	match stat:
-		"STR": stats.STR += 2
-		"DEX": stats.DEX += 2
-		"INT": stats.INT += 2
+		"STR":
+			stats.STR += 2
+			stats.hp_max += 3
+			stats.HP += 3
+		"DEX":
+			stats.DEX += 2
+		"INT":
+			stats.INT += 2
+			stats.mp_max += 3
+			stats.MP += 3
 	stats_changed.emit()
 
 

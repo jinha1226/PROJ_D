@@ -86,6 +86,7 @@ func _ready() -> void:
 
 	_base_seed = randi()
 	GameManager.current_branch = GameManager.branch_for_depth(GameManager.current_depth)
+	TileRenderer._cache.clear()
 	generator = DungeonGenerator.new()
 	add_child(generator)
 	generator.generate(GameManager.current_depth, _base_seed)
@@ -234,6 +235,7 @@ func _ready() -> void:
 	touch_input.stairs_tapped.connect(_on_stairs_tapped)
 	touch_input.stairs_up_tapped.connect(_on_stairs_up_tapped)
 	touch_input.target_selected.connect(_on_target_selected)
+	touch_input.inspect_requested.connect(_on_inspect_requested)
 
 	# Pinch-zoom (mobile) / wheel (desktop). No on-screen +/- buttons.
 	var zoom_ctrl: Node = ZOOM_CONTROLLER_SCRIPT.new()
@@ -444,6 +446,56 @@ func _refresh_quickslots(bottom_hud: Node) -> void:
 		if count > 1:
 			tag = "%s×%d" % [tag, count]
 		bottom_hud.set_quickslot_display(i, tag, color)
+
+
+func _on_inspect_requested(pos: Vector2i) -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null:
+		return
+	var lines: Array = []
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	# Tile info
+	if generator != null:
+		var t: int = generator.get_tile(pos)
+		var tile_names: Dictionary = {
+			0: "Wall", 1: "Floor", 2: "Open Door", 3: "Closed Door",
+			4: "Stairs Down", 5: "Stairs Up", 6: "Water", 7: "Lava",
+		}
+		lines.append("Tile: %s (%d,%d)" % [tile_names.get(t, "Unknown"), pos.x, pos.y])
+	# Monster info
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if is_instance_valid(m) and m is Monster and m.grid_pos == pos:
+			var mname: String = String(m.data.display_name) if m.data else "?"
+			lines.append("")
+			lines.append("--- %s ---" % mname)
+			lines.append("HP: %d / %d" % [m.hp, m.data.hp if m.data else 0])
+			lines.append("STR: %d  DEX: %d" % [m.data.str if m.data else 0, m.data.dex if m.data else 0])
+			lines.append("AC: %d  EV: %d" % [m.ac, m.data.ev if m.data else 0])
+			if m.data != null and m.data.is_boss:
+				lines.append("** BOSS **")
+			break
+	# Floor item info
+	for it in get_tree().get_nodes_in_group("floor_items"):
+		if is_instance_valid(it) and it is FloorItem and it.grid_pos == pos:
+			lines.append("")
+			lines.append("Item: %s [%s]" % [it.display_name, it.kind])
+			break
+	# Player info
+	if player != null and player.grid_pos == pos:
+		lines.append("")
+		lines.append("--- You ---")
+		lines.append("Turn: %d" % TurnManager.turn_number)
+	if lines.is_empty():
+		return
+	var dlg := AcceptDialog.new()
+	dlg.exclusive = false
+	dlg.title = "Inspect"
+	dlg.ok_button_text = "Close"
+	dlg.dialog_text = "\n".join(PackedStringArray(lines))
+	popup_mgr.add_child(dlg)
+	dlg.confirmed.connect(dlg.queue_free)
+	dlg.canceled.connect(dlg.queue_free)
+	dlg.popup_centered(Vector2i(700, 600))
 
 
 func _on_wait_pressed() -> void:
@@ -743,6 +795,7 @@ func _regenerate_dungeon(going_up: bool, secondary: bool = false) -> void:
 	if is_instance_valid(generator):
 		generator.queue_free()
 	GameManager.current_branch = GameManager.branch_for_depth(GameManager.current_depth)
+	TileRenderer._cache.clear()
 	generator = DungeonGenerator.new()
 	add_child(generator)
 	generator.generate(GameManager.current_depth, _base_seed)
@@ -1998,8 +2051,12 @@ func _build_status_text() -> String:
 	ac_breakdown = "AC %d  (race +%d, armor +%d)" % [s.AC if s != null else 0, race_ac, armor_ac]
 
 	var lines: Array = []
-	lines.append("=== %s %s ===" % [race_name, job_name])
-	lines.append("Lv.%d   XP %d / %d" % [player.level, player.xp, player.xp_for_next_level()])
+	var trait_name: String = player.trait_res.display_name if player.trait_res else ""
+	var title: String = job_name
+	if trait_name != "":
+		title = "%s — %s" % [job_name, trait_name]
+	lines.append("=== %s ===" % title)
+	lines.append("Lv.%d   XP %d / %d   Turn %d" % [player.level, player.xp, player.xp_for_next_level(), TurnManager.turn_number])
 	lines.append("")
 	lines.append("HP   %s" % hp_text)
 	lines.append("MP   %s" % mp_text)

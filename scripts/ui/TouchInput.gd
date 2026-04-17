@@ -6,6 +6,7 @@ extends Node
 signal stairs_tapped(pos: Vector2i)
 signal stairs_up_tapped(pos: Vector2i)
 signal target_selected(pos: Vector2i)
+signal inspect_requested(pos: Vector2i)
 
 const TILE_SIZE: int = 32
 const LONGPRESS_TIME: float = 0.5
@@ -26,10 +27,9 @@ var _longpress_fired: bool = false
 
 var _auto_move_path: Array[Vector2i] = []
 var _is_auto_moving: bool = false
-# Hard cap on consecutive auto-move steps to defend against a runaway loop
-# (e.g. monster-sight check missing a monster, or a path that re-fills).
 const MAX_AUTO_STEPS: int = 200
 var _auto_steps: int = 0
+var _auto_move_grace: float = 0.0
 
 
 func _ready() -> void:
@@ -38,6 +38,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if _auto_move_grace > 0:
+		_auto_move_grace -= delta
 	if _pressing and not _longpress_fired:
 		_longpress_timer += delta
 		if _longpress_timer >= LONGPRESS_TIME:
@@ -79,7 +81,8 @@ func _end_press(screen_pos: Vector2) -> void:
 		return
 	var grid: Vector2i = _screen_to_grid(screen_pos)
 	if _is_auto_moving:
-		_cancel_auto_move()
+		if _auto_move_grace <= 0:
+			_cancel_auto_move()
 		return
 	_on_tap(grid)
 
@@ -128,6 +131,7 @@ func _on_tap(grid: Vector2i) -> void:
 		return
 	_auto_move_path = path
 	_is_auto_moving = true
+	_auto_move_grace = 0.5
 	_auto_steps = 0
 	_update_path_overlay()
 	_step_auto_move()
@@ -145,6 +149,7 @@ func begin_auto_move_to(target: Vector2i) -> bool:
 		return false
 	_auto_move_path = path
 	_is_auto_moving = true
+	_auto_move_grace = 0.5
 	_auto_steps = 0
 	_update_path_overlay()
 	_step_auto_move()
@@ -154,18 +159,7 @@ func begin_auto_move_to(target: Vector2i) -> bool:
 func _on_longpress(grid: Vector2i) -> void:
 	if not player.is_alive:
 		return
-	# Simplified auto-explore: BFS-walk toward the farthest reachable FLOOR tile.
-	var goal: Vector2i = _farthest_floor_from(player.grid_pos)
-	if goal == player.grid_pos:
-		return
-	var path: Array[Vector2i] = Pathfinding.find_path(generator, player.grid_pos, goal)
-	if path.is_empty():
-		return
-	_auto_move_path = path
-	_is_auto_moving = true
-	_auto_steps = 0
-	_update_path_overlay()
-	_step_auto_move()
+	inspect_requested.emit(grid)
 
 
 func _farthest_floor_from(start: Vector2i) -> Vector2i:
