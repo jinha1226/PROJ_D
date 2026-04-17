@@ -64,10 +64,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _begin_press(screen_pos: Vector2) -> void:
-	# Cancel in-progress auto-move on any tap.
-	if _is_auto_moving:
-		_cancel_auto_move()
-		return
 	_press_pos_screen = screen_pos
 	_press_grid = _screen_to_grid(screen_pos)
 	_pressing = true
@@ -82,6 +78,9 @@ func _end_press(screen_pos: Vector2) -> void:
 	if _longpress_fired:
 		return
 	var grid: Vector2i = _screen_to_grid(screen_pos)
+	if _is_auto_moving:
+		_cancel_auto_move()
+		return
 	_on_tap(grid)
 
 

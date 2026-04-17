@@ -480,7 +480,6 @@ func _pickup_items_here() -> void:
 			var shown: String = GameManager.display_name_for_item(
 					it.item_id, it.display_name, it.kind) if GameManager != null else it.display_name
 			print("Picked up: %s" % shown)
-			_try_assign_quickslot(it.item_id, it.kind)
 			it.queue_free()
 	inventory_changed.emit()
 

@@ -549,9 +549,10 @@ func _on_stairs_tapped(_pos: Vector2i) -> void:
 	if GameManager.current_depth >= MAX_DEPTH:
 		_end_run(true, "")
 		return
+	var used_secondary: bool = (player.grid_pos == generator.stairs_down_pos2)
 	_save_current_floor()
 	GameManager.current_depth += 1
-	_regenerate_dungeon(false)
+	_regenerate_dungeon(false, used_secondary)
 
 
 func _on_stairs_up_tapped(_pos: Vector2i) -> void:
@@ -559,16 +560,17 @@ func _on_stairs_up_tapped(_pos: Vector2i) -> void:
 		return
 	if GameManager.current_depth <= 1:
 		return
+	var used_secondary: bool = (player.grid_pos == generator.spawn_pos2)
 	_save_current_floor()
 	GameManager.current_depth -= 1
-	_regenerate_dungeon(true)
+	_regenerate_dungeon(true, used_secondary)
 
 
 ## going_up=true places the player at the new floor's stairs_down (where they
 ## originally descended). Otherwise spawn_pos (= stairs_up, natural entry
 ## when descending). _base_seed is fixed per run so the same depth yields
 ## the same map on every revisit.
-func _regenerate_dungeon(going_up: bool) -> void:
+func _regenerate_dungeon(going_up: bool, secondary: bool = false) -> void:
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if is_instance_valid(m):
 			TurnManager.unregister_actor(m)
@@ -591,7 +593,11 @@ func _regenerate_dungeon(going_up: bool) -> void:
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	dmap.render(generator)
 	player.generator = generator
-	var entry_pos: Vector2i = generator.stairs_down_pos if going_up else generator.spawn_pos
+	var entry_pos: Vector2i
+	if going_up:
+		entry_pos = generator.stairs_down_pos2 if secondary else generator.stairs_down_pos
+	else:
+		entry_pos = generator.spawn_pos2 if secondary else generator.spawn_pos
 	player.grid_pos = entry_pos
 	player.position = Vector2(entry_pos.x * TILE_SIZE + TILE_SIZE / 2.0, entry_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
 	dmap.update_fov(entry_pos)
@@ -1052,28 +1058,24 @@ func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
 	row.custom_minimum_size = Vector2(0, 110)
 	row.add_theme_constant_override("separation", 8)
 
-	var name_vb := VBoxContainer.new()
-	name_vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var name_lab := Label.new()
-	name_lab.text = "%s  [%d MP]" % [String(info.get("name", spell_id)), int(info.get("mp", 0))]
-	name_lab.add_theme_font_size_override("font_size", 30)
-	name_lab.modulate = info.get("color", Color.WHITE)
-	name_vb.add_child(name_lab)
-	var desc_lab := Label.new()
-	desc_lab.text = String(info.get("desc", ""))
-	desc_lab.add_theme_font_size_override("font_size", 22)
-	desc_lab.modulate = Color(0.75, 0.75, 0.85)
-	desc_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	name_vb.add_child(desc_lab)
-	row.add_child(name_vb)
+	var name_btn := Button.new()
+	name_btn.flat = true
+	name_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	name_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var spell_name: String = String(info.get("name", spell_id))
+	name_btn.text = "%s  [%d MP]" % [spell_name, int(info.get("mp", 0))]
+	name_btn.add_theme_font_size_override("font_size", 34)
+	name_btn.add_theme_color_override("font_color", info.get("color", Color.WHITE))
+	name_btn.pressed.connect(_show_spell_info.bind(spell_id))
+	row.add_child(name_btn)
 
 	var btns := VBoxContainer.new()
 	btns.add_theme_constant_override("separation", 4)
 
 	var cast_btn := Button.new()
 	cast_btn.text = "Cast"
-	cast_btn.custom_minimum_size = Vector2(130, 48)
-	cast_btn.add_theme_font_size_override("font_size", 26)
+	cast_btn.custom_minimum_size = Vector2(140, 56)
+	cast_btn.add_theme_font_size_override("font_size", 30)
 	cast_btn.disabled = (player.stats == null or player.stats.MP < int(info.get("mp", 1)))
 	var targeting_type: String = String(info.get("targeting", "single"))
 	if targeting_type == "self":
@@ -1084,13 +1086,40 @@ func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
 
 	var qs_btn := Button.new()
 	qs_btn.text = "Quickslot"
-	qs_btn.custom_minimum_size = Vector2(130, 40)
-	qs_btn.add_theme_font_size_override("font_size", 20)
+	qs_btn.custom_minimum_size = Vector2(140, 48)
+	qs_btn.add_theme_font_size_override("font_size", 24)
 	qs_btn.pressed.connect(_assign_spell_quickslot.bind(spell_id, dlg))
 	btns.add_child(qs_btn)
 
 	row.add_child(btns)
 	return row
+
+
+func _show_spell_info(spell_id: String) -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null:
+		return
+	var info: Dictionary = SpellRegistry.get_spell(spell_id)
+	if info.is_empty():
+		return
+	var dlg := AcceptDialog.new()
+	dlg.exclusive = false
+	dlg.title = String(info.get("name", spell_id))
+	dlg.ok_button_text = "Close"
+	var text: String = "%s\n\nMP Cost: %d\nSchool: %s\nTargeting: %s\nRange: %d" % [
+		String(info.get("desc", "")),
+		int(info.get("mp", 0)),
+		String(info.get("school", "?")),
+		String(info.get("targeting", "single")),
+		int(info.get("range", 6)),
+	]
+	if info.has("min_dmg"):
+		text += "\nDamage: %d-%d + power" % [int(info.get("min_dmg", 0)), int(info.get("max_dmg", 0))]
+	dlg.dialog_text = text
+	popup_mgr.add_child(dlg)
+	dlg.confirmed.connect(dlg.queue_free)
+	dlg.canceled.connect(dlg.queue_free)
+	dlg.popup_centered(Vector2i(700, 600))
 
 
 func _on_cast_with_targeting(spell_id: String, dlg: AcceptDialog) -> void:
@@ -1667,7 +1696,7 @@ func _on_status_pressed() -> void:
 
 	var lab := Label.new()
 	lab.text = _build_status_text()
-	lab.add_theme_font_size_override("font_size", 30)
+	lab.add_theme_font_size_override("font_size", 34)
 	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	vb.add_child(lab)
@@ -1808,6 +1837,15 @@ func _build_status_text() -> String:
 	if s != null:
 		lines.append("STR %d   DEX %d   INT %d" % [s.STR, s.DEX, s.INT])
 	lines.append(ac_breakdown)
+	var w_dmg: int = WeaponRegistry.weapon_damage_for(player.equipped_weapon_id)
+	var str_bonus: int = s.STR / 3 if s != null else 0
+	var total_atk: int = w_dmg + str_bonus + player.weapon_bonus_dmg
+	var total_ev: int = s.DEX / 2 if s != null else 0
+	lines.append("")
+	lines.append("--- Combat ---")
+	lines.append("ATK %d  (weapon %d + STR %d + bonus %d)" % [total_atk, w_dmg, str_bonus, player.weapon_bonus_dmg])
+	lines.append("DEF %d  (AC)" % [s.AC if s != null else 0])
+	lines.append("EV  %d  (DEX/2)" % total_ev)
 	lines.append("")
 	lines.append("--- Equipped ---")
 	var w_id: String = player.equipped_weapon_id
