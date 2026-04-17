@@ -849,6 +849,8 @@ func _regenerate_dungeon(going_up: bool, secondary: bool = false) -> void:
 		entry_pos = generator.spawn_pos2 if secondary else generator.spawn_pos
 	player.grid_pos = entry_pos
 	player.position = Vector2(entry_pos.x * TILE_SIZE + TILE_SIZE / 2.0, entry_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
+	player.visible = true
+	player.queue_redraw()
 	dmap.update_fov(entry_pos)
 	var cam: Camera2D = $Camera2D
 	cam.position = player.position
@@ -1088,19 +1090,30 @@ func _end_run(victory: bool, killer: String) -> void:
 
 # [skill-ui-agent] ---- skill UI wiring ------------------------------------
 
+func _close_all_dialogs() -> void:
+	for d in [_bag_dlg, _skills_dlg, _magic_dlg, _status_dlg, _map_dlg]:
+		if d != null and is_instance_valid(d):
+			d.queue_free()
+	_bag_dlg = null
+	_skills_dlg = null
+	_magic_dlg = null
+	_status_dlg = null
+	_map_dlg = null
+
+
 func _on_magic_pressed() -> void:
 	if _magic_dlg != null and is_instance_valid(_magic_dlg):
-		_magic_dlg.queue_free()
-		_magic_dlg = null
+		_close_all_dialogs()
 		return
+	_close_all_dialogs()
 	_open_magic_dialog()
 
 
 func _on_skills_button_pressed() -> void:
 	if _skills_dlg != null and is_instance_valid(_skills_dlg):
-		_skills_dlg.queue_free()
-		_skills_dlg = null
+		_close_all_dialogs()
 		return
+	_close_all_dialogs()
 	_open_skills_dialog("weapon")
 
 
@@ -1265,16 +1278,31 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 
 	var info_line := Label.new()
 	var desc_text: String = String(_SKILL_DESCS.get(skill_id, ""))
+	var is_training: bool = bool(entry.get("training", false))
+	var parts: Array = [desc_text]
 	if level > 0 and level < SkillSystem.MAX_LEVEL:
-		info_line.text = "%s  |  XP %d/%d" % [desc_text, int(xp), int(need)]
-	else:
-		info_line.text = desc_text
-	info_line.add_theme_font_size_override("font_size", 40)
+		parts.append("XP %d/%d" % [int(xp), int(need)])
+	if not skill_system.auto_training and is_training:
+		var trained_count: int = _count_trained_skills()
+		if trained_count > 0:
+			parts.append("%d%% XP" % int(100.0 / trained_count))
+	info_line.text = "  |  ".join(PackedStringArray(parts))
+	info_line.add_theme_font_size_override("font_size", 34)
 	info_line.modulate = Color(0.6, 0.75, 0.6)
 	outer.add_child(info_line)
 
 	outer.add_child(HSeparator.new())
 	return outer
+
+
+func _count_trained_skills() -> int:
+	if player == null or not ("skill_state" in player):
+		return 1
+	var count: int = 0
+	for sid in player.skill_state:
+		if bool(player.skill_state[sid].get("training", false)):
+			count += 1
+	return max(1, count)
 
 
 ## ---- MAGIC DIALOG (separate from Skills) ---------------------------------
@@ -1813,9 +1841,9 @@ func _find_nearest_visible_monster(range_tiles: int = 99) -> Monster:
 
 func _on_bag_pressed() -> void:
 	if _bag_dlg != null and is_instance_valid(_bag_dlg):
-		_bag_dlg.queue_free()
-		_bag_dlg = null
+		_close_all_dialogs()
 		return
+	_close_all_dialogs()
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null:
 		return
@@ -1990,15 +2018,20 @@ func _on_bag_info(it: Dictionary) -> void:
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null:
 		return
+	_close_all_dialogs()
 	var dlg := AcceptDialog.new()
 	dlg.exclusive = false
 	dlg.title = String(it.get("name", "Item"))
 	dlg.ok_button_text = "Close"
-	dlg.dialog_text = _build_item_tooltip(it)
+	var lab := Label.new()
+	lab.text = _build_item_tooltip(it)
+	lab.add_theme_font_size_override("font_size", 40)
+	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	dlg.add_child(lab)
 	popup_mgr.add_child(dlg)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(640, 600))
+	dlg.popup_centered(Vector2i(800, 700))
 
 
 func _on_bag_use(idx: int, dlg: AcceptDialog) -> void:
@@ -2065,9 +2098,9 @@ func _on_bag_drop(idx: int, dlg: AcceptDialog) -> void:
 
 func _on_status_pressed() -> void:
 	if _status_dlg != null and is_instance_valid(_status_dlg):
-		_status_dlg.queue_free()
-		_status_dlg = null
+		_close_all_dialogs()
 		return
+	_close_all_dialogs()
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null or player == null:
 		return

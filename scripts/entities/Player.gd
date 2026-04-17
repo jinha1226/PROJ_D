@@ -248,6 +248,13 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 			var sp: String = String(spell_id)
 			if sp != "" and not learned_spells.has(sp):
 				learned_spells.append(sp)
+		var school_id: String = _trait_to_school(p_trait.id)
+		if school_id != "":
+			var school_spells: Array = SpellRegistry.SCHOOL_SPELLS.get(school_id, [])
+			for entry in school_spells:
+				var sid: String = String(entry.get("id", ""))
+				if sid != "" and not learned_spells.has(sid):
+					learned_spells.append(sid)
 
 	# Pick first weapon from starting_equipment. Every armor piece slots
 	# itself by ArmorRegistry.slot_for so a job can start with chest+legs+
@@ -286,6 +293,19 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 # WeaponRegistry lookup on next attack; we just re-emit stats_changed so HUDs
 # refresh. Returns the previously-equipped weapon id ("" if none). Also
 # triggers a sprite-preset reload so the on-screen LPC layers update.
+func _trait_to_school(trait_id: String) -> String:
+	match trait_id:
+		"fire": return "fire"
+		"ice": return "cold"
+		"earth": return "earth"
+		"air": return "air"
+		"necro": return "necromancy"
+		"hexer": return "hexes"
+		"arcane": return "conjurations"
+		"warper": return "translocations"
+	return ""
+
+
 func _get_trait_equipment(trait_id: String) -> Dictionary:
 	match trait_id:
 		"sword": return {"weapon": "longsword"}
