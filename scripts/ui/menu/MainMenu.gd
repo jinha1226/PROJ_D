@@ -9,7 +9,24 @@ const CREDITS_FONTS_PATH := "res://CREDITS_FONTS.md"
 
 func _ready() -> void:
 	$Buttons/NewRunButton.pressed.connect(_on_new_run)
+	$Buttons/UpgradesButton.pressed.connect(_on_upgrades)
 	$Buttons/CreditsButton.pressed.connect(_on_credits)
+	_refresh_shard_label()
+
+
+func _refresh_shard_label() -> void:
+	var meta: Node = get_tree().root.get_node_or_null("MetaProgression")
+	if meta == null:
+		var ms: Script = load("res://scripts/systems/MetaProgression.gd")
+		if ms != null:
+			meta = ms.new()
+			meta.name = "MetaProgression"
+			get_tree().root.add_child(meta)
+			meta.load_from_disk()
+	if meta != null and meta.has_method("load_from_disk"):
+		if not meta.has_meta("_loaded"):
+			meta.load_from_disk()
+			meta.set_meta("_loaded", true)
 
 
 func _on_new_run() -> void:
@@ -17,6 +34,138 @@ func _on_new_run() -> void:
 	GameManager.selected_race_id = ""
 	GameManager.selected_job_id = ""
 	get_tree().change_scene_to_file(RACE_SELECT_PATH)
+
+
+func _on_upgrades() -> void:
+	var meta: Node = get_tree().root.get_node_or_null("MetaProgression")
+	if meta == null:
+		return
+	var dlg := AcceptDialog.new()
+	dlg.exclusive = false
+	dlg.title = "Upgrades"
+	dlg.ok_button_text = "Close"
+
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 10)
+	dlg.add_child(vb)
+
+	var shard_lab := Label.new()
+	shard_lab.text = "Rune Shards: %d" % meta.rune_shards
+	shard_lab.add_theme_font_size_override("font_size", 36)
+	shard_lab.modulate = Color(0.95, 0.82, 0.3)
+	shard_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vb.add_child(shard_lab)
+	vb.add_child(HSeparator.new())
+
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0, 1400)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	vb.add_child(scroll)
+
+	var rows := VBoxContainer.new()
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rows.add_theme_constant_override("separation", 8)
+	scroll.add_child(rows)
+
+	var cats: Array = ["survival", "combat", "insight", "essence"]
+	var cat_labels: Dictionary = {"survival": "SURVIVAL", "combat": "COMBAT", "insight": "INSIGHT", "essence": "ESSENCE"}
+	for cat in cats:
+		var header := Label.new()
+		header.text = "--- %s ---" % cat_labels.get(cat, cat)
+		header.add_theme_font_size_override("font_size", 28)
+		header.modulate = Color(0.7, 0.75, 0.9)
+		header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		rows.add_child(header)
+		for uid in MetaProgression.UPGRADES.keys():
+			var info: Dictionary = MetaProgression.UPGRADES[uid]
+			if String(info.get("cat", "")) != cat:
+				continue
+			rows.add_child(_build_upgrade_row(uid, info, meta, shard_lab, dlg))
+
+	var job_header := Label.new()
+	job_header.text = "--- JOBS ---"
+	job_header.add_theme_font_size_override("font_size", 28)
+	job_header.modulate = Color(0.7, 0.75, 0.9)
+	job_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rows.add_child(job_header)
+	for job_id in MetaProgression.JOB_UNLOCK_COST.keys():
+		var cost: int = int(MetaProgression.JOB_UNLOCK_COST[job_id])
+		var owned: bool = meta.is_job_unlocked(job_id)
+		var row := HBoxContainer.new()
+		row.custom_minimum_size = Vector2(0, 80)
+		row.add_theme_constant_override("separation", 8)
+		var name_lab := Label.new()
+		name_lab.text = job_id.capitalize()
+		name_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		name_lab.add_theme_font_size_override("font_size", 30)
+		row.add_child(name_lab)
+		var btn := Button.new()
+		if owned:
+			btn.text = "Owned"
+			btn.disabled = true
+		else:
+			btn.text = "%d shards" % cost
+			btn.disabled = meta.rune_shards < cost
+		btn.custom_minimum_size = Vector2(200, 64)
+		btn.add_theme_font_size_override("font_size", 26)
+		if not owned:
+			btn.pressed.connect(_on_buy_job.bind("job_" + job_id, meta, shard_lab, btn))
+		row.add_child(btn)
+		rows.add_child(row)
+
+	add_child(dlg)
+	dlg.confirmed.connect(dlg.queue_free)
+	dlg.canceled.connect(dlg.queue_free)
+	dlg.popup_centered(Vector2i(900, 1800))
+
+
+func _build_upgrade_row(uid: String, info: Dictionary, meta: Node, shard_lab: Label, dlg: AcceptDialog) -> Control:
+	var row := HBoxContainer.new()
+	row.custom_minimum_size = Vector2(0, 80)
+	row.add_theme_constant_override("separation", 8)
+
+	var name_lab := Label.new()
+	name_lab.text = String(info.get("name", uid))
+	name_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_lab.add_theme_font_size_override("font_size", 30)
+	row.add_child(name_lab)
+
+	var cost: int = int(info.get("cost", 0))
+	var owned: bool = meta.is_unlocked(uid)
+	var btn := Button.new()
+	if owned:
+		btn.text = "Owned"
+		btn.disabled = true
+	elif not meta.can_unlock(uid):
+		var req: String = String(info.get("requires", ""))
+		if req != "" and not meta.is_unlocked(req):
+			btn.text = "Locked"
+		else:
+			btn.text = "%d shards" % cost
+		btn.disabled = true
+	else:
+		btn.text = "%d shards" % cost
+	btn.custom_minimum_size = Vector2(200, 64)
+	btn.add_theme_font_size_override("font_size", 26)
+	if not owned and meta.can_unlock(uid):
+		btn.pressed.connect(_on_buy_upgrade.bind(uid, meta, shard_lab, btn))
+	row.add_child(btn)
+	return row
+
+
+func _on_buy_upgrade(uid: String, meta: Node, shard_lab: Label, btn: Button) -> void:
+	if meta.purchase(uid):
+		btn.text = "Owned"
+		btn.disabled = true
+		shard_lab.text = "Rune Shards: %d" % meta.rune_shards
+
+
+func _on_buy_job(uid: String, meta: Node, shard_lab: Label, btn: Button) -> void:
+	if meta.purchase(uid):
+		btn.text = "Owned"
+		btn.disabled = true
+		shard_lab.text = "Rune Shards: %d" % meta.rune_shards
 
 
 func _on_credits() -> void:

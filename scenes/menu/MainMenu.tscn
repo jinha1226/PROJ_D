@@ -51,6 +51,11 @@ custom_minimum_size = Vector2(0, 180)
 text = "New Run"
 theme_override_font_sizes/font_size = 72
 
+[node name="UpgradesButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(0, 160)
+text = "Upgrades"
+theme_override_font_sizes/font_size = 64
+
 [node name="CreditsButton" type="Button" parent="Buttons"]
 custom_minimum_size = Vector2(0, 140)
 text = "Credits"

@@ -295,6 +295,9 @@ func _on_quickslot_pressed(index: int) -> void:
 	if player == null:
 		return
 	var id: String = player.quickslot_ids[index] if index < player.quickslot_ids.size() else ""
+	if id == "":
+		_open_quickslot_picker(index)
+		return
 	if id.begins_with("spell:"):
 		var spell_id: String = id.substr(6)
 		var info: Dictionary = SpellRegistry.get_spell(spell_id)
@@ -316,6 +319,90 @@ func _on_quickslot_pressed(index: int) -> void:
 			_show_targeting_hint()
 		return
 	player.use_quickslot(index)
+
+
+func _open_quickslot_picker(slot_index: int) -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null or player == null:
+		return
+	var dlg := AcceptDialog.new()
+	dlg.exclusive = false
+	dlg.title = "Assign Quickslot %d" % (slot_index + 1)
+	dlg.ok_button_text = "Cancel"
+
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 6)
+	dlg.add_child(vb)
+
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0, 1200)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	vb.add_child(scroll)
+
+	var rows := VBoxContainer.new()
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rows.add_theme_constant_override("separation", 6)
+	scroll.add_child(rows)
+
+	var items_header := Label.new()
+	items_header.text = "--- Items ---"
+	items_header.add_theme_font_size_override("font_size", 28)
+	items_header.modulate = Color(0.8, 0.8, 0.6)
+	rows.add_child(items_header)
+
+	var seen_ids: Dictionary = {}
+	for it in player.get_items():
+		var iid: String = String(it.get("id", ""))
+		var kind: String = String(it.get("kind", ""))
+		if kind != "potion" and kind != "scroll" and kind != "book":
+			continue
+		if seen_ids.has(iid):
+			continue
+		seen_ids[iid] = true
+		var btn := Button.new()
+		var disp: String = GameManager.display_name_for_item(iid, String(it.get("name", iid)), kind)
+		btn.text = "%s [%s]" % [disp, kind]
+		btn.custom_minimum_size = Vector2(0, 72)
+		btn.add_theme_font_size_override("font_size", 28)
+		btn.pressed.connect(_assign_quickslot_item.bind(slot_index, iid, dlg))
+		rows.add_child(btn)
+
+	var known: Array[String] = SpellRegistry.get_known_for_player(player, skill_system)
+	if not known.is_empty():
+		var spell_header := Label.new()
+		spell_header.text = "--- Spells ---"
+		spell_header.add_theme_font_size_override("font_size", 28)
+		spell_header.modulate = Color(0.6, 0.7, 1.0)
+		rows.add_child(spell_header)
+		for spell_id in known:
+			var info: Dictionary = SpellRegistry.get_spell(spell_id)
+			var btn := Button.new()
+			btn.text = "%s [%d MP]" % [String(info.get("name", spell_id)), int(info.get("mp", 0))]
+			btn.custom_minimum_size = Vector2(0, 72)
+			btn.add_theme_font_size_override("font_size", 28)
+			btn.add_theme_color_override("font_color", info.get("color", Color.WHITE))
+			btn.pressed.connect(_assign_quickslot_item.bind(slot_index, "spell:" + spell_id, dlg))
+			rows.add_child(btn)
+
+	var clear_btn := Button.new()
+	clear_btn.text = "Clear Slot"
+	clear_btn.custom_minimum_size = Vector2(0, 72)
+	clear_btn.add_theme_font_size_override("font_size", 28)
+	clear_btn.modulate = Color(1.0, 0.5, 0.5)
+	clear_btn.pressed.connect(_assign_quickslot_item.bind(slot_index, "", dlg))
+	vb.add_child(clear_btn)
+
+	popup_mgr.add_child(dlg)
+	dlg.confirmed.connect(dlg.queue_free)
+	dlg.canceled.connect(dlg.queue_free)
+	dlg.popup_centered(Vector2i(800, 1500))
+
+
+func _assign_quickslot_item(slot_index: int, id: String, dlg: AcceptDialog) -> void:
+	if player != null and slot_index < player.quickslot_ids.size():
+		player.quickslot_ids[slot_index] = id
+		player.quickslots_changed.emit()
+	dlg.queue_free()
 
 
 ## Rebuild the BottomHUD quickslot labels/colours from player.quickslot_ids +
