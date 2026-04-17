@@ -333,14 +333,6 @@ func _get_trait_equipment(trait_id: String) -> Dictionary:
 		"acrobat": return {"weapon": "short_sword"}
 		"shadow": return {"weapon": "dagger"}
 		"evoker": return {"weapon": "wand_simple"}
-		"fire": return {"extra_items": ["fire_staff"]}
-		"ice": return {"extra_items": ["ice_staff"]}
-		"earth": return {"extra_items": ["crystal_staff"]}
-		"air": return {"extra_items": ["lightning_staff"]}
-		"necro": return {"extra_items": ["gnarled_staff"]}
-		"hexer": return {"extra_items": ["gnarled_staff"]}
-		"arcane": return {"extra_items": ["gnarled_staff"]}
-		"warper": return {"extra_items": ["gnarled_staff"]}
 	return {}
 
 
