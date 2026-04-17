@@ -246,10 +246,10 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 	# Seed memorised spells from the job.
 	learned_spells.clear()
 	if job != null:
-		for sid in job.starting_spells:
-			var s: String = String(sid)
-			if s != "" and not learned_spells.has(s):
-				learned_spells.append(s)
+		for spell_id in job.starting_spells:
+			var sp: String = String(spell_id)
+			if sp != "" and not learned_spells.has(sp):
+				learned_spells.append(sp)
 
 	# Pick first weapon from starting_equipment. Every armor piece slots
 	# itself by ArmorRegistry.slot_for so a job can start with chest+legs+
@@ -615,11 +615,11 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 			return true
 		"learn_spells":
 			var newly: Array[String] = []
-			for s in info.get("spells", []):
-				var sid: String = String(s)
-				if sid != "" and not learned_spells.has(sid):
-					learned_spells.append(sid)
-					newly.append(sid)
+			for sp in info.get("spells", []):
+				var spell_id: String = String(sp)
+				if spell_id != "" and not learned_spells.has(spell_id):
+					learned_spells.append(spell_id)
+					newly.append(spell_id)
 			if newly.is_empty():
 				print("You already know these spells.")
 			else:
