@@ -4,15 +4,15 @@
 
 [resource]
 script = ExtResource("1")
-id = "iron_will"
-display_name = "Iron Will"
-description = "30% chance to halve incoming damage."
+id = "shield_trait"
+display_name = "Shield Bearer"
+description = "Start with Sword + Shield. Block 15% of hits."
 category = "fighter"
 str_bonus = 1
 dex_bonus = 0
 int_bonus = 0
-hp_bonus_pct = 0.1
+hp_bonus_pct = 0.0
 mp_bonus_pct = 0.0
-ac_bonus = 0
-special = "iron_will"
+ac_bonus = 2
+special = "shield_block"
 starting_spells = []

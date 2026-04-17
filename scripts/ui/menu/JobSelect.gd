@@ -3,7 +3,7 @@ extends Control
 const TRAIT_SELECT_PATH := "res://scenes/menu/TraitSelect.tscn"
 const MAIN_MENU_PATH := "res://scenes/menu/MainMenu.tscn"
 const JOB_IDS: Array[String] = [
-	"fighter", "barbarian", "ranger", "rogue", "mage", "cleric",
+	"fighter", "barbarian", "ranger", "rogue", "mage", "warlock",
 ]
 
 const _CARD_W: float = 480.0

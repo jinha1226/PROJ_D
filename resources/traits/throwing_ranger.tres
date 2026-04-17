@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1")
-id = "eagle_eye"
-display_name = "Eagle Eye"
-description = "Sight +3, ranged damage +30%."
+id = "throwing_ranger"
+display_name = "Throwing"
+description = "Start with Slingshot. Throwing skill +3."
 category = "ranger"
 str_bonus = 0
 dex_bonus = 2
@@ -14,5 +14,5 @@ int_bonus = 0
 hp_bonus_pct = 0.0
 mp_bonus_pct = 0.0
 ac_bonus = 0
-special = "eagle_eye"
+special = ""
 starting_spells = []

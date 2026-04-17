@@ -25,8 +25,10 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	# Scroll of Enchant Weapon stacks: attacker.weapon_bonus_dmg adds directly.
 	if "weapon_bonus_dmg" in attacker:
 		weapon_dmg += int(attacker.weapon_bonus_dmg)
-	# Catfolk claws: bonus to unarmed damage only.
-	if weapon_id == "" and "race_res" in attacker and attacker.race_res != null \
+	if weapon_id == "" and "trait_res" in attacker and attacker.trait_res != null \
+			and attacker.trait_res.special == "brawler":
+		weapon_dmg *= 2
+	elif weapon_id == "" and "race_res" in attacker and attacker.race_res != null \
 			and attacker.race_res.racial_trait == "catfolk_claws":
 		weapon_dmg += 3
 

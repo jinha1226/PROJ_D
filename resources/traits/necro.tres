@@ -6,11 +6,11 @@
 script = ExtResource("1")
 id = "necro"
 display_name = "Necromancy"
-description = "Start with Pain. Dark magic XP +50%."
-category = "cleric"
+description = "Start with Pain. Necromancy skill +3."
+category = "warlock"
 str_bonus = 0
 dex_bonus = 0
-int_bonus = 1
+int_bonus = 2
 hp_bonus_pct = 0.0
 mp_bonus_pct = 0.1
 ac_bonus = 0

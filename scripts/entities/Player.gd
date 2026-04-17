@@ -264,6 +264,16 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 				var slot: String = String(info.get("slot", "chest"))
 				if not equipped_armor.has(slot):
 					equipped_armor[slot] = info
+	# Trait-based weapon/armor override
+	if p_trait != null:
+		var trait_equip: Dictionary = _get_trait_equipment(p_trait.id)
+		if trait_equip.has("weapon"):
+			equipped_weapon_id = String(trait_equip["weapon"])
+		if trait_equip.has("armor"):
+			for aid in trait_equip["armor"]:
+				var ainfo: Dictionary = ArmorRegistry.get_info(String(aid))
+				var aslot: String = String(ainfo.get("slot", "chest"))
+				equipped_armor[aslot] = ainfo
 	_recompute_defense()
 
 	stats_changed.emit()
@@ -276,6 +286,27 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 # WeaponRegistry lookup on next attack; we just re-emit stats_changed so HUDs
 # refresh. Returns the previously-equipped weapon id ("" if none). Also
 # triggers a sprite-preset reload so the on-screen LPC layers update.
+func _get_trait_equipment(trait_id: String) -> Dictionary:
+	match trait_id:
+		"sword": return {"weapon": "longsword"}
+		"polearm_trait": return {"weapon": "halberd"}
+		"shield_trait": return {"weapon": "short_sword"}
+		"heavy_armor": return {"weapon": "arming_sword", "armor": ["plate_chest", "plate_helm"]}
+		"axe_trait": return {"weapon": "waraxe"}
+		"mace_trait": return {"weapon": "mace"}
+		"brawler": return {}
+		"throwing_trait": return {"weapon": "throwing_axe"}
+		"bow_trait": return {"weapon": "long_bow"}
+		"crossbow_trait": return {"weapon": "crossbow"}
+		"throwing_ranger": return {"weapon": "slingshot"}
+		"scout": return {"weapon": "short_bow"}
+		"dagger_trait": return {"weapon": "dagger"}
+		"acrobat": return {"weapon": "short_sword"}
+		"shadow": return {"weapon": "dagger"}
+		"evoker": return {"weapon": "wand_simple"}
+	return {}
+
+
 func equip_weapon(weapon_id: String) -> String:
 	var prev: String = equipped_weapon_id
 	equipped_weapon_id = weapon_id

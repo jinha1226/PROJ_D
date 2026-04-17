@@ -4,15 +4,15 @@
 
 [resource]
 script = ExtResource("1")
-id = "air"
-display_name = "Air"
-description = "Start with Lightning Bolt. Air skill +3."
-category = "mage"
+id = "acrobat"
+display_name = "Acrobat"
+description = "Dodging skill +3. DEX +3."
+category = "rogue"
 str_bonus = 0
-dex_bonus = 0
-int_bonus = 2
+dex_bonus = 3
+int_bonus = 0
 hp_bonus_pct = 0.0
-mp_bonus_pct = 0.1
+mp_bonus_pct = 0.0
 ac_bonus = 0
 special = ""
-starting_spells = ["lightning_bolt"]
+starting_spells = []

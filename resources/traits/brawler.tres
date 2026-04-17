@@ -4,15 +4,15 @@
 
 [resource]
 script = ExtResource("1")
-id = "holy_light"
-display_name = "Holy Light"
-description = "Heal 20% HP on kill. 2x vs undead."
-category = "cleric"
-str_bonus = 0
-dex_bonus = 0
-int_bonus = 1
-hp_bonus_pct = 0.0
-mp_bonus_pct = 0.1
+id = "brawler"
+display_name = "Brawler"
+description = "Unarmed combat. STR +3, fist damage doubled."
+category = "barbarian"
+str_bonus = 3
+dex_bonus = 1
+int_bonus = 0
+hp_bonus_pct = 0.1
+mp_bonus_pct = 0.0
 ac_bonus = 0
-special = "holy_light"
+special = "brawler"
 starting_spells = []

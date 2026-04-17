@@ -4,15 +4,15 @@
 
 [resource]
 script = ExtResource("1")
-id = "clever"
-display_name = "Clever"
-description = "INT +3, MP +20%."
-category = "general"
+id = "shadow"
+display_name = "Shadow"
+description = "Stealth skill +3. First hit 2x. Unseen by sleeping enemies."
+category = "rogue"
 str_bonus = 0
-dex_bonus = 0
-int_bonus = 3
+dex_bonus = 1
+int_bonus = 1
 hp_bonus_pct = 0.0
-mp_bonus_pct = 0.2
+mp_bonus_pct = 0.0
 ac_bonus = 0
-special = ""
+special = "backstab"
 starting_spells = []

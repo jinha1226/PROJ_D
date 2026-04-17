@@ -4,12 +4,12 @@ const GAME_PATH := "res://scenes/main/Game.tscn"
 const JOB_SELECT_PATH := "res://scenes/menu/JobSelect.tscn"
 
 const JOB_TRAITS: Dictionary = {
-	"fighter":   ["iron_will", "tough", "fierce", "armored"],
-	"barbarian": ["war_cry", "fierce", "tough", "resilient"],
-	"ranger":    ["eagle_eye", "swift", "clever", "armored"],
-	"rogue":     ["backstab", "swift", "fierce", "clever"],
+	"fighter":   ["sword", "polearm_trait", "shield_trait", "heavy_armor"],
+	"barbarian": ["axe_trait", "mace_trait", "brawler", "throwing_trait"],
+	"ranger":    ["bow_trait", "crossbow_trait", "throwing_ranger", "scout"],
+	"rogue":     ["dagger_trait", "acrobat", "shadow", "evoker"],
 	"mage":      ["fire", "ice", "earth", "air"],
-	"cleric":    ["holy_light", "necro", "arcane", "resilient"],
+	"warlock":   ["necro", "hexer", "arcane", "warper"],
 }
 
 var _selected_id: String = ""

@@ -4,15 +4,15 @@
 
 [resource]
 script = ExtResource("1")
-id = "armored"
-display_name = "Armored"
-description = "AC +3. Natural toughness."
-category = "general"
+id = "hexer"
+display_name = "Hexes"
+description = "Start with Slow. Hexes skill +3."
+category = "warlock"
 str_bonus = 0
 dex_bonus = 0
-int_bonus = 0
+int_bonus = 2
 hp_bonus_pct = 0.0
-mp_bonus_pct = 0.0
-ac_bonus = 3
+mp_bonus_pct = 0.1
+ac_bonus = 0
 special = ""
-starting_spells = []
+starting_spells = ["slow"]

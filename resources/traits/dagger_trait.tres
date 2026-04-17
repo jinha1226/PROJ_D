@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1")
-id = "backstab"
-display_name = "Backstab"
-description = "First hit per fight: 3x damage. All hits +15%."
+id = "dagger_trait"
+display_name = "Dagger"
+description = "Start with Magic Dagger. Short Blade skill +3. First hit 3x."
 category = "rogue"
 str_bonus = 0
 dex_bonus = 2

@@ -4,15 +4,15 @@
 
 [resource]
 script = ExtResource("1")
-id = "resilient"
-display_name = "Resilient"
-description = "Regenerate 1 HP per turn. HP +10%."
-category = "general"
-str_bonus = 0
+id = "polearm_trait"
+display_name = "Polearm"
+description = "Start with Halberd. Polearm skill +3."
+category = "fighter"
+str_bonus = 2
 dex_bonus = 0
 int_bonus = 0
-hp_bonus_pct = 0.1
+hp_bonus_pct = 0.0
 mp_bonus_pct = 0.0
 ac_bonus = 0
-special = "regen"
+special = ""
 starting_spells = []

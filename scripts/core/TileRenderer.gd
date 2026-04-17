@@ -117,6 +117,7 @@ const ITEMS: Dictionary = {
 	"crossbow":         "items/crossbow.png",
 	"slingshot":        "items/sling.png",
 	"boomerang":        "items/sling.png",
+	"throwing_axe":     "items/axe.png",
 	"gnarled_staff":    "items/staff.png",
 	"fire_staff":       "items/fire_staff.png",
 	"ice_staff":        "items/ice_staff.png",
@@ -156,6 +157,7 @@ const PLAYER_RACES: Dictionary = {
 	"rogue":      "players/rogue.png",
 	"mage":       "players/mage.png",
 	"cleric":     "players/cleric.png",
+	"warlock":    "players/cleric.png",
 	"knight":     "players/knight.png",
 }
 

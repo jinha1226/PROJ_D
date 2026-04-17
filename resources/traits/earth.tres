@@ -5,12 +5,12 @@
 [resource]
 script = ExtResource("1")
 id = "earth"
-display_name = "Earth Affinity"
-description = "Start with Stone Arrow. Earth XP +50%."
+display_name = "Earth"
+description = "Start with Stone Arrow. Earth skill +3."
 category = "mage"
 str_bonus = 0
 dex_bonus = 0
-int_bonus = 1
+int_bonus = 2
 hp_bonus_pct = 0.0
 mp_bonus_pct = 0.1
 ac_bonus = 0

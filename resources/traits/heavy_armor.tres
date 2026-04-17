@@ -4,15 +4,15 @@
 
 [resource]
 script = ExtResource("1")
-id = "tough"
-display_name = "Tough"
-description = "HP +20%, STR +2."
-category = "general"
-str_bonus = 2
-dex_bonus = 0
+id = "heavy_armor"
+display_name = "Heavy Armor"
+description = "Start with Plate Armor. AC +4, Armour skill +3."
+category = "fighter"
+str_bonus = 1
+dex_bonus = -1
 int_bonus = 0
-hp_bonus_pct = 0.2
+hp_bonus_pct = 0.1
 mp_bonus_pct = 0.0
-ac_bonus = 0
+ac_bonus = 4
 special = ""
 starting_spells = []
