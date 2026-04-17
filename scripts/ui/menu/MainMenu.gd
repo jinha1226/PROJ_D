@@ -11,22 +11,18 @@ func _ready() -> void:
 	$Buttons/NewRunButton.pressed.connect(_on_new_run)
 	$Buttons/UpgradesButton.pressed.connect(_on_upgrades)
 	$Buttons/CreditsButton.pressed.connect(_on_credits)
-	_refresh_shard_label()
+	_ensure_meta()
 
 
-func _refresh_shard_label() -> void:
+func _ensure_meta() -> MetaProgression:
 	var meta: Node = get_tree().root.get_node_or_null("MetaProgression")
-	if meta == null:
-		var ms: Script = load("res://scripts/systems/MetaProgression.gd")
-		if ms != null:
-			meta = ms.new()
-			meta.name = "MetaProgression"
-			get_tree().root.add_child(meta)
-			meta.load_from_disk()
-	if meta != null and meta.has_method("load_from_disk"):
-		if not meta.has_meta("_loaded"):
-			meta.load_from_disk()
-			meta.set_meta("_loaded", true)
+	if meta != null:
+		return meta as MetaProgression
+	var m := MetaProgression.new()
+	m.name = "MetaProgression"
+	get_tree().root.add_child(m)
+	m.load_from_disk()
+	return m
 
 
 func _on_new_run() -> void:
@@ -37,9 +33,7 @@ func _on_new_run() -> void:
 
 
 func _on_upgrades() -> void:
-	var meta: Node = get_tree().root.get_node_or_null("MetaProgression")
-	if meta == null:
-		return
+	var meta: MetaProgression = _ensure_meta()
 	var dlg := AcceptDialog.new()
 	dlg.exclusive = false
 	dlg.title = "Upgrades"
