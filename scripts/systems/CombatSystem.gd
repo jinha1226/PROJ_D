@@ -71,15 +71,12 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 
 ## Monster → player melee. Monsters don't have skills in M1, so this path
 ## keeps the legacy formula.
-static func melee_attack_from_monster(m, defender) -> int:
+static func melee_attack_from_monster(m, player) -> int:
 	var base_atk: int = int(m.data.str) / 2 + 3
 	var def_ac: int = 0
-	# Player has stats.AC; Companion carries ac directly.
-	if "stats" in defender and defender.stats != null:
-		def_ac = defender.stats.AC
-	elif "ac" in defender:
-		def_ac = int(defender.ac)
+	if player.stats != null:
+		def_ac = player.stats.AC
 	var dmg: int = roll_damage(base_atk, def_ac)
-	if defender.has_method("take_damage"):
-		defender.take_damage(dmg)
+	if player.has_method("take_damage"):
+		player.take_damage(dmg)
 	return dmg

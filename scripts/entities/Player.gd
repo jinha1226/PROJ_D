@@ -326,41 +326,41 @@ func get_current_weapon_skill() -> String:
 
 
 ## Dispatcher for essence active abilities — called from EssenceSystem.invoke
-## after it has validated MP and cooldown. All numbers scale with the
-## essence_channeling skill so investing in it matters late-game.
+## after it has validated MP and cooldown. Must return true on success so
+## the system knows to deduct MP / start cooldown.
 func _invoke_essence_ability(e: EssenceData) -> bool:
-	var lv: int = _essence_channeling_level()
 	match e.ability_id:
 		"essence_heal":
 			if stats == null:
 				return false
-			stats.HP = min(stats.hp_max, stats.HP + 20 + lv * 2)
+			stats.HP = min(stats.hp_max, stats.HP + 20)
 			stats_changed.emit()
 			return true
 		"essence_blink":
-			return _teleport_blink(4 + lv / 6)
+			return _teleport_blink(4)
 		"essence_stomp":
-			# Hit every monster within 1 tile (Chebyshev). Damage scales.
-			var dmg: int = 6 + lv / 2
+			# Hit every monster within 1 tile (Chebyshev) for 6 damage.
 			var hit_count: int = 0
 			for m in get_tree().get_nodes_in_group("monsters"):
 				if not is_instance_valid(m) or not m.is_alive:
 					continue
 				if "grid_pos" in m and max(abs(m.grid_pos.x - grid_pos.x), abs(m.grid_pos.y - grid_pos.y)) <= 1:
-					m.take_damage(dmg)
+					m.take_damage(6)
 					hit_count += 1
-			print("Stomp hit %d enemies (%d dmg each)." % [hit_count, dmg])
+			print("Stomp hit %d enemies." % hit_count)
 			return true
 		"essence_breath":
-			return _fire_breath_line(lv)
+			# Line attack — 4 tiles ahead facing player's last move dir (down default).
+			return _fire_breath_line()
 		"essence_regen":
+			# Modest heal over time — for M1, immediate +12 HP heal.
 			if stats == null:
 				return false
-			stats.HP = min(stats.hp_max, stats.HP + 12 + lv)
+			stats.HP = min(stats.hp_max, stats.HP + 12)
 			stats_changed.emit()
 			return true
 		"essence_summon":
-			# GameBootstrap listens and spawns the actual Companion node.
+			# Phase B companion summon — stub for now, handled in GameBootstrap.
 			summon_companion_requested.emit(e.id)
 			return true
 		_:
@@ -368,26 +368,17 @@ func _invoke_essence_ability(e: EssenceData) -> bool:
 			return false
 
 
-func _essence_channeling_level() -> int:
-	var sk: Node = get_tree().root.get_node_or_null("Game/SkillSystem")
-	if sk == null:
-		return 0
-	return sk.get_level(self, "essence_channeling")
-
-
-## Breath line: every monster in the 4-tile southward line takes damage
-## that scales with essence channeling.
-func _fire_breath_line(lv: int) -> bool:
-	var dmg: int = 10 + lv / 2
+## Breath weapon: deals 10 damage to every monster in a 4-tile cone below.
+func _fire_breath_line() -> bool:
 	var hit_count: int = 0
 	for d in range(1, 5):
 		for m in get_tree().get_nodes_in_group("monsters"):
 			if not is_instance_valid(m) or not m.is_alive:
 				continue
 			if "grid_pos" in m and m.grid_pos == grid_pos + Vector2i(0, d):
-				m.take_damage(dmg)
+				m.take_damage(10)
 				hit_count += 1
-	print("Breath line hit %d enemies (%d dmg each)." % [hit_count, dmg])
+	print("Breath line hit %d enemies." % hit_count)
 	return true
 
 

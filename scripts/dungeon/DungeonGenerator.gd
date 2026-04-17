@@ -84,30 +84,13 @@ func _place_room(region: Rect2i) -> void:
 			map[rx][ry] = TileType.FLOOR
 	rooms.append(room)
 
-## Minimum-spanning-tree style: each new room joins to its nearest already-
-## connected neighbour rather than the next-by-index room. Cuts long
-## diagonal corridors that the old sequential pairing produced.
 func _connect_rooms() -> void:
 	if rooms.size() < 2:
 		return
-	var connected: Array[int] = [0]
-	while connected.size() < rooms.size():
-		var best_pair: Array[int] = [0, 0]
-		var best_d: int = 0x3fffffff
-		for i in connected:
-			var ca: Vector2i = _room_center(rooms[i])
-			for j in range(rooms.size()):
-				if connected.has(j):
-					continue
-				var cb: Vector2i = _room_center(rooms[j])
-				var d: int = abs(ca.x - cb.x) + abs(ca.y - cb.y)
-				if d < best_d:
-					best_d = d
-					best_pair = [i, j]
-		var ia: int = best_pair[0]
-		var ib: int = best_pair[1]
-		_carve_corridor(_room_center(rooms[ia]), _room_center(rooms[ib]))
-		connected.append(ib)
+	for i in range(1, rooms.size()):
+		var a: Vector2i = _room_center(rooms[i - 1])
+		var b: Vector2i = _room_center(rooms[i])
+		_carve_corridor(a, b)
 
 func _room_center(r: Rect2i) -> Vector2i:
 	return Vector2i(r.position.x + r.size.x / 2, r.position.y + r.size.y / 2)
