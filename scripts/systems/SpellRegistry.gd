@@ -90,31 +90,18 @@ static func get_spell(id: String) -> Dictionary:
 	return SPELLS.get(id, {})
 
 
-## Returns spell ids the player currently knows. With the DCSS-style
-## spellbook flow, memorisation is explicit: spells come from
-## player.learned_spells (seeded by job.starting_spells, extended by
-## reading spellbooks) — skill level only affects casting power, not
-## availability. Falls back to the old skill-gated derivation if
-## learned_spells isn't present (e.g. test doubles).
+## Returns spell ids the player currently qualifies for based on skill levels.
 static func get_known_for_player(player: Node, skill_sys: Node) -> Array[String]:
 	var known: Array[String] = []
-	if player == null:
-		return known
-	if "learned_spells" in player:
-		for sid in player.learned_spells:
-			var s: String = String(sid)
-			if s != "" and not known.has(s):
-				known.append(s)
-		return known
-	if skill_sys == null:
+	if player == null or skill_sys == null:
 		return known
 	for school in SCHOOL_SPELLS:
 		var level: int = skill_sys.get_level(player, school)
 		if level <= 0:
 			continue
 		for entry in SCHOOL_SPELLS[school]:
-			var sid2: String = String(entry.get("id", ""))
+			var sid: String = String(entry.get("id", ""))
 			var min_lv: int = int(entry.get("min_level", 1))
-			if level >= min_lv and not known.has(sid2):
-				known.append(sid2)
+			if level >= min_lv and not known.has(sid):
+				known.append(sid)
 	return known

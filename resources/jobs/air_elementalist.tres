@@ -12,5 +12,4 @@ dex_bonus = 1
 int_bonus = 2
 starting_equipment = Array[String](["lightning_staff"])
 starting_skills = {"air": 3, "conjurations": 2, "spellcasting": 2}
-starting_spells = Array[String](["lightning_bolt"])
 unique_ability = ""

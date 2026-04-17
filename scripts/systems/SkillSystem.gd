@@ -99,18 +99,6 @@ func init_for_player(player: Node, starting_skills: Dictionary) -> void:
 		player.set_meta("skills", state)
 
 
-## Aptitude for this player + skill. Reads Player.race_res.skill_aptitudes
-## so racial specialisation (Deep Elf +3 fire, Minotaur -3 spellcasting,
-## etc.) translates into XP-per-kill modifiers. Returns 0 if not set.
-func _aptitude_for(player: Node, skill_id: String) -> int:
-	if player == null:
-		return 0
-	if not ("race_res" in player) or player.race_res == null:
-		return 0
-	var apts: Dictionary = player.race_res.skill_aptitudes
-	return int(apts.get(skill_id, 0))
-
-
 func _state_for(player: Node) -> Dictionary:
 	if player == null:
 		return {}
@@ -185,12 +173,8 @@ func grant_xp(player: Node, amount: float, usage_tags: Array) -> Array:
 		var old_level: int = int(entry.get("level", 0))
 		if old_level >= MAX_LEVEL:
 			continue
-		# Aptitude modifier: DCSS formula — each +1 apt multiplies the
-		# effective XP gained by ~1.41× (faster levelling). -1 halves it.
-		var apt: int = _aptitude_for(player, skill_id)
-		var effective: float = share * pow(2.0, float(apt) / 2.0)
-		entry["xp"] = float(entry.get("xp", 0.0)) + effective
-		xp_gained.emit(player, skill_id, effective)
+		entry["xp"] = float(entry.get("xp", 0.0)) + share
+		xp_gained.emit(player, skill_id, share)
 		var new_level: int = old_level
 		while new_level < MAX_LEVEL:
 			var needed: float = xp_for_level(new_level + 1)

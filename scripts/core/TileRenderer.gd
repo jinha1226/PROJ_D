@@ -149,16 +149,6 @@ const ITEMS: Dictionary = {
 	"leather_armor":   "item/armour/leather_armour1.png",
 	"chain_mail":      "item/armour/chain_mail1.png",
 	"plate_armor":     "item/armour/plate1.png",
-	# Spellbooks — cover colour picked per school for flavour.
-	"book_conjurations":  "item/book/dark_blue.png",
-	"book_flames":        "item/book/red.png",
-	"book_frost":         "item/book/light_blue.png",
-	"book_earth":         "item/book/dark_brown.png",
-	"book_air":           "item/book/cyan.png",
-	"book_necromancy":    "item/book/book_of_the_dead.png",
-	"book_hexes":         "item/book/magenta.png",
-	"book_translocations":"item/book/purple.png",
-	"book_minor_magic":   "item/book/parchment.png",
 }
 
 const PLAYER_RACES: Dictionary = {

@@ -21,11 +21,3 @@ beard_def = "beard_braided"
 beard_color = "brown"
 base_ac = 0
 racial_trait = "trollregen"
-skill_aptitudes = {
-	"fighting": 2, "axe": 1, "mace": 1, "polearm": 1, "long_blade": 1,
-	"short_blade": 1, "throwing": 2,
-	"armour": 0, "shields": 0, "dodging": -2, "stealth": -5,
-	"spellcasting": -4, "conjurations": -3, "hexes": -3, "translocations": -3,
-	"fire": -3, "cold": -3, "earth": -3, "air": -3, "necromancy": -3,
-	"summonings": -3, "evocations": -2,
-}

@@ -32,7 +32,3 @@ extends Resource
 # Freeform trait id for racial abilities (implemented in M2+).
 # Examples: "trollregen", "demonspawn_mutations", "spriggan_speed".
 @export var racial_trait: String = ""
-# DCSS-style skill aptitudes. Keys are SkillSystem.SKILL_IDS entries.
-# Each value is an int (-5 to +5) — higher = learns faster. Missing keys
-# default to 0. SkillSystem multiplies incoming XP by 2^(apt/2).
-@export var skill_aptitudes: Dictionary = {}
