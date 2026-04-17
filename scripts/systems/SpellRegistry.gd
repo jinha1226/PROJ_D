@@ -273,13 +273,18 @@ static func failure_chance(spell_id: String, school_level: int, spellcasting_lev
 	var eff_school: int = school_level
 	if school2_level >= 0:
 		eff_school = min(school_level, school2_level)
-	var effective: int = eff_school + spellcasting_level / 2
-	if effective >= diff * 3:
+	var effective: float = float(eff_school) + float(spellcasting_level) * 0.5
+	var ratio: float = effective / float(max(1, diff))
+	if ratio >= 3.0:
 		return 0.0
-	if effective >= diff * 2:
-		return 0.1
-	if effective >= diff:
-		return 0.25
-	if effective >= 1:
+	if ratio >= 2.0:
+		return 0.05
+	if ratio >= 1.5:
+		return 0.15
+	if ratio >= 1.0:
+		return 0.3
+	if ratio >= 0.7:
 		return 0.5
-	return 0.75
+	if ratio >= 0.4:
+		return 0.75
+	return 0.95
