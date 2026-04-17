@@ -39,20 +39,18 @@ theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 16
 
 [node name="Footer" type="HBoxContainer" parent="."]
-anchor_left = 0.1
-anchor_right = 0.9
-anchor_bottom = 1.0
-offset_top = -160.0
+anchor_left = 0.15
+anchor_right = 0.85
+offset_top = 2180.0
+offset_bottom = 2280.0
 theme_override_constants/separation = 32
 
 [node name="BackButton" type="Button" parent="Footer"]
-size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 120)
+custom_minimum_size = Vector2(200, 80)
 text = "Back"
-theme_override_font_sizes/font_size = 52
+theme_override_font_sizes/font_size = 44
 
 [node name="StartButton" type="Button" parent="Footer"]
-size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 120)
+custom_minimum_size = Vector2(200, 80)
 text = "Start"
-theme_override_font_sizes/font_size = 52
+theme_override_font_sizes/font_size = 44
