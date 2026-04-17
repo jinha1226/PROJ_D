@@ -88,7 +88,7 @@ func _make_card(r: RaceData) -> Button:
 	var name_lbl := Label.new()
 	name_lbl.text = r.display_name
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_lbl.add_theme_font_size_override("font_size", 44)
+	name_lbl.add_theme_font_size_override("font_size", 56)
 	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(name_lbl)
 
@@ -96,7 +96,7 @@ func _make_card(r: RaceData) -> Button:
 	var stats_lbl := Label.new()
 	stats_lbl.text = "STR %d   DEX %d   INT %d" % [r.base_str, r.base_dex, r.base_int]
 	stats_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	stats_lbl.add_theme_font_size_override("font_size", 30)
+	stats_lbl.add_theme_font_size_override("font_size", 38)
 	stats_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(stats_lbl)
 
@@ -115,7 +115,7 @@ func _make_card(r: RaceData) -> Button:
 	var hp_lbl := Label.new()
 	hp_lbl.text = "HP/lv %d   MP/lv %d" % [r.hp_per_level, r.mp_per_level]
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hp_lbl.add_theme_font_size_override("font_size", 28)
+	hp_lbl.add_theme_font_size_override("font_size", 34)
 	hp_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	detail.add_child(hp_lbl)
 
@@ -123,7 +123,7 @@ func _make_card(r: RaceData) -> Button:
 	var trait_lbl := Label.new()
 	trait_lbl.text = "Trait: %s" % trait_name
 	trait_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	trait_lbl.add_theme_font_size_override("font_size", 28)
+	trait_lbl.add_theme_font_size_override("font_size", 34)
 	trait_lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
 	trait_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	detail.add_child(trait_lbl)
@@ -131,7 +131,7 @@ func _make_card(r: RaceData) -> Button:
 	var desc_lbl := Label.new()
 	desc_lbl.text = r.description
 	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_lbl.add_theme_font_size_override("font_size", 26)
+	desc_lbl.add_theme_font_size_override("font_size", 32)
 	desc_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	detail.add_child(desc_lbl)
 

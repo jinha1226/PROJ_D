@@ -238,11 +238,10 @@ func _update_path_overlay() -> void:
 
 
 func _monster_in_sight() -> bool:
-	# Use FOV (line-of-sight) — a monster behind a wall shouldn't break
-	# auto-move just because it's geometrically close. Falls back to a
-	# Chebyshev SIGHT_RANGE check if dmap isn't wired (e.g. unit tests).
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if not is_instance_valid(m) or not ("grid_pos" in m):
+			continue
+		if "is_alive" in m and not m.is_alive:
 			continue
 		if dmap != null:
 			if dmap.is_tile_visible(m.grid_pos):

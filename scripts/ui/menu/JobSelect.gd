@@ -101,7 +101,7 @@ func _make_card(j: JobData) -> Button:
 	var name_lbl := Label.new()
 	name_lbl.text = j.display_name
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_lbl.add_theme_font_size_override("font_size", 44)
+	name_lbl.add_theme_font_size_override("font_size", 56)
 	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(name_lbl)
 
@@ -114,7 +114,7 @@ func _make_card(j: JobData) -> Button:
 	var stats_lbl := Label.new()
 	stats_lbl.text = stat_line
 	stats_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	stats_lbl.add_theme_font_size_override("font_size", 30)
+	stats_lbl.add_theme_font_size_override("font_size", 38)
 	stats_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(stats_lbl)
 
@@ -135,7 +135,7 @@ func _make_card(j: JobData) -> Button:
 	var eq_lbl := Label.new()
 	eq_lbl.text = "Starts with: %s" % eq_names
 	eq_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	eq_lbl.add_theme_font_size_override("font_size", 26)
+	eq_lbl.add_theme_font_size_override("font_size", 32)
 	eq_lbl.add_theme_color_override("font_color", Color(0.85, 0.85, 1.0))
 	eq_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	detail.add_child(eq_lbl)
@@ -146,7 +146,7 @@ func _make_card(j: JobData) -> Button:
 	var skills_lbl := Label.new()
 	skills_lbl.text = "Skills: %s" % (", ".join(PackedStringArray(skill_lines)) if skill_lines.size() > 0 else "(none)")
 	skills_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	skills_lbl.add_theme_font_size_override("font_size", 26)
+	skills_lbl.add_theme_font_size_override("font_size", 32)
 	skills_lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
 	skills_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	detail.add_child(skills_lbl)
@@ -154,7 +154,7 @@ func _make_card(j: JobData) -> Button:
 	var desc_lbl := Label.new()
 	desc_lbl.text = j.description
 	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_lbl.add_theme_font_size_override("font_size", 26)
+	desc_lbl.add_theme_font_size_override("font_size", 32)
 	desc_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	detail.add_child(desc_lbl)
 
