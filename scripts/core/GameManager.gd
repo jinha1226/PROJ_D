@@ -43,14 +43,11 @@ const _SCROLL_LABELS: Array = [
 
 # DCSS base-tile filenames (stem only; TileRenderer prepends item/potion/ etc).
 const _POTION_BASE_TILES: Array = [
-	"black", "brilliant_blue", "brown", "bubbly", "cloudy", "cyan", "dark",
-	"effervescent", "emerald", "fizzy", "golden", "magenta", "murky",
-	"orange", "pink", "puce", "purple_red", "ruby", "silver", "sky_blue",
-	"white", "yellow",
+	"red", "blue", "green", "yellow", "purple", "orange",
+	"cyan", "white", "black", "pink",
 ]
 const _SCROLL_BASE_TILES: Array = [
-	"scroll-blue", "scroll-brown", "scroll-cyan", "scroll-green",
-	"scroll-grey", "scroll-purple", "scroll-red", "scroll-yellow",
+	"plain", "blue", "red", "green", "purple", "gold",
 ]
 
 
@@ -122,9 +119,9 @@ func consumable_base_path(id: String, kind: String) -> String:
 	if stem == "":
 		return ""
 	if kind == "potion":
-		return "item/potion/%s.png" % stem
+		return "items/potion_%s.png" % stem
 	elif kind == "scroll":
-		return "item/scroll/%s.png" % stem
+		return "items/scroll_%s.png" % stem
 	return ""
 
 func end_run(victory: bool) -> void:
