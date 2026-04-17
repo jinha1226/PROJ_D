@@ -41,11 +41,11 @@ const DATA: Dictionary = {
 	"boomerang":    {"dmg": 5,  "skill": "throwing",  "delay": 1.0},
 	"throwing_axe": {"dmg": 8,  "skill": "throwing",  "delay": 1.1},
 	# Staves (DCSS quarterstaff: 10)
-	"gnarled_staff":   {"dmg": 10, "skill": "staff", "delay": 1.3},
-	"fire_staff":      {"dmg": 8,  "skill": "staff", "delay": 1.3},
-	"ice_staff":       {"dmg": 8,  "skill": "staff", "delay": 1.3},
-	"lightning_staff": {"dmg": 8,  "skill": "staff", "delay": 1.3},
-	"crystal_staff":   {"dmg": 8,  "skill": "staff", "delay": 1.3},
+	"gnarled_staff":   {"dmg": 10, "skill": "staff", "delay": 1.3, "spell_school": "", "spell_bonus": 2},
+	"fire_staff":      {"dmg": 8,  "skill": "staff", "delay": 1.3, "spell_school": "fire", "spell_bonus": 3},
+	"ice_staff":       {"dmg": 8,  "skill": "staff", "delay": 1.3, "spell_school": "cold", "spell_bonus": 3},
+	"lightning_staff": {"dmg": 8,  "skill": "staff", "delay": 1.3, "spell_school": "air", "spell_bonus": 3},
+	"crystal_staff":   {"dmg": 8,  "skill": "staff", "delay": 1.3, "spell_school": "earth", "spell_bonus": 3},
 	# Evocables
 	"wand_simple": {"dmg": 3, "skill": "evocations", "delay": 1.0},
 }
@@ -117,3 +117,13 @@ const DISPLAY_NAMES: Dictionary = {
 
 static func display_name_for(id: String) -> String:
 	return DISPLAY_NAMES.get(id, id.capitalize().replace("_", " "))
+
+
+static func staff_spell_school(weapon_id: String) -> String:
+	var info: Dictionary = WEAPONS.get(weapon_id, {})
+	return String(info.get("spell_school", ""))
+
+
+static func staff_spell_bonus(weapon_id: String) -> int:
+	var info: Dictionary = WEAPONS.get(weapon_id, {})
+	return int(info.get("spell_bonus", 0))

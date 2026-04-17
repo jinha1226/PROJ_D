@@ -271,7 +271,7 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 				var slot: String = String(info.get("slot", "chest"))
 				if not equipped_armor.has(slot):
 					equipped_armor[slot] = info
-	# Trait-based weapon/armor override
+	# Trait-based weapon/armor/item override
 	if p_trait != null:
 		var trait_equip: Dictionary = _get_trait_equipment(p_trait.id)
 		if trait_equip.has("weapon"):
@@ -281,6 +281,15 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 				var ainfo: Dictionary = ArmorRegistry.get_info(String(aid))
 				var aslot: String = String(ainfo.get("slot", "chest"))
 				equipped_armor[aslot] = ainfo
+		if trait_equip.has("extra_items"):
+			for eid in trait_equip["extra_items"]:
+				var item_id: String = String(eid)
+				items.append({
+					"id": item_id,
+					"name": WeaponRegistry.display_name_for(item_id),
+					"kind": "weapon",
+					"color": Color(0.75, 0.75, 0.85),
+				})
 	_recompute_defense()
 
 	stats_changed.emit()
@@ -324,6 +333,14 @@ func _get_trait_equipment(trait_id: String) -> Dictionary:
 		"acrobat": return {"weapon": "short_sword"}
 		"shadow": return {"weapon": "dagger"}
 		"evoker": return {"weapon": "wand_simple"}
+		"fire": return {"extra_items": ["fire_staff"]}
+		"ice": return {"extra_items": ["ice_staff"]}
+		"earth": return {"extra_items": ["crystal_staff"]}
+		"air": return {"extra_items": ["lightning_staff"]}
+		"necro": return {"extra_items": ["gnarled_staff"]}
+		"hexer": return {"extra_items": ["gnarled_staff"]}
+		"arcane": return {"extra_items": ["gnarled_staff"]}
+		"warper": return {"extra_items": ["gnarled_staff"]}
 	return {}
 
 

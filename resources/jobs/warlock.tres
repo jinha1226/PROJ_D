@@ -10,6 +10,6 @@ description = "Dark magic wielder. Commands death, curses, and space."
 str_bonus = -1
 dex_bonus = 0
 int_bonus = 5
-starting_equipment = ["gnarled_staff", "robe"]
+starting_equipment = ["dagger", "robe"]
 starting_skills = {"spellcasting": 2, "staff": 1}
 starting_spells = []

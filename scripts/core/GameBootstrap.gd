@@ -1517,13 +1517,18 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 	var school: String = String(info.get("school", "spellcasting"))
 	var school_lv: int = skill_system.get_level(player, school) if skill_system else 0
 	var sc_lv: int = skill_system.get_level(player, "spellcasting") if skill_system else 0
-	var fail: float = SpellRegistry.failure_chance(spell_id, school_lv, sc_lv)
+	var staff_school2: String = WeaponRegistry.staff_spell_school(player.equipped_weapon_id)
+	var staff_bonus2: int = 0
+	if staff_school2 == school or staff_school2 == "":
+		staff_bonus2 = WeaponRegistry.staff_spell_bonus(player.equipped_weapon_id)
+	var eff_school2: int = school_lv + staff_bonus2
+	var fail: float = SpellRegistry.failure_chance(spell_id, eff_school2, sc_lv)
 	if randf() < fail:
 		print("Spell fizzles! (%d%% fail)" % int(fail * 100))
 		TurnManager.end_player_turn()
 		return
 	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
-	var power: int = school_lv * 2 + sc_lv + int_bonus
+	var power: int = eff_school2 + sc_lv / 2 + int_bonus
 	var spell_color: Color = info.get("color", Color.WHITE)
 	var fx_layer: Node2D = $EntityLayer
 	var targeting_type: String = String(info.get("targeting", "single"))
@@ -1675,11 +1680,16 @@ func _execute_cast(spell_id: String) -> Dictionary:
 	var school: String = String(info.get("school", "spellcasting"))
 	var school_lv: int = skill_system.get_level(player, school) if skill_system else 0
 	var sc_lv: int = skill_system.get_level(player, "spellcasting") if skill_system else 0
-	var fail: float = SpellRegistry.failure_chance(spell_id, school_lv, sc_lv)
+	var staff_school: String = WeaponRegistry.staff_spell_school(player.equipped_weapon_id)
+	var staff_bonus: int = 0
+	if staff_school == school or staff_school == "":
+		staff_bonus = WeaponRegistry.staff_spell_bonus(player.equipped_weapon_id)
+	var eff_school: int = school_lv + staff_bonus
+	var fail: float = SpellRegistry.failure_chance(spell_id, eff_school, sc_lv)
 	if randf() < fail:
 		return {"success": false, "message": "Spell fizzles! (%d%% fail)" % int(fail * 100)}
 	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
-	var power: int = school_lv + sc_lv / 2 + int_bonus
+	var power: int = eff_school + sc_lv / 2 + int_bonus
 
 	var targeting: String = String(info.get("targeting", "single"))
 	match targeting:
