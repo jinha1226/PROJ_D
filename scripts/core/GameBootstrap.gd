@@ -1733,61 +1733,114 @@ func _on_bag_pressed() -> void:
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 8)
 	dlg.add_child(vb)
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 8)
+	var bag_title := Label.new()
+	bag_title.text = "Bag"
+	bag_title.add_theme_font_size_override("font_size", 32)
+	bag_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(bag_title)
+	var bag_close := Button.new()
+	bag_close.text = "X"
+	bag_close.custom_minimum_size = Vector2(72, 72)
+	bag_close.add_theme_font_size_override("font_size", 36)
+	bag_close.pressed.connect(dlg.queue_free)
+	header.add_child(bag_close)
+	vb.add_child(header)
+
+	var cat_tabs := HBoxContainer.new()
+	cat_tabs.add_theme_constant_override("separation", 4)
+	for cat in ["all", "weapon", "armor", "potion", "scroll", "book"]:
+		var tab_btn := Button.new()
+		tab_btn.text = cat.to_upper()
+		tab_btn.custom_minimum_size = Vector2(0, 48)
+		tab_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tab_btn.add_theme_font_size_override("font_size", 24)
+		tab_btn.pressed.connect(func():
+			_bag_dlg = null
+			dlg.queue_free()
+			_open_bag_filtered(cat))
+		cat_tabs.add_child(tab_btn)
+	vb.add_child(cat_tabs)
+
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0, 1300)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	vb.add_child(scroll)
+	var rows := VBoxContainer.new()
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rows.add_theme_constant_override("separation", 6)
+	scroll.add_child(rows)
+
 	var items: Array = player.get_items() if player != null else []
 	if items.is_empty():
 		var empty := Label.new()
-		empty.text = "Inventory is empty. Walk over items to pick them up."
-		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		empty.add_theme_font_size_override("font_size", 28)
-		vb.add_child(empty)
+		empty.text = "Inventory is empty."
+		empty.add_theme_font_size_override("font_size", 32)
+		rows.add_child(empty)
 	else:
 		for i in range(items.size()):
 			var it: Dictionary = items[i]
 			var kind: String = String(it.get("kind", ""))
 			var row := HBoxContainer.new()
+			row.custom_minimum_size = Vector2(0, 80)
 			row.add_theme_constant_override("separation", 8)
-			# Name acts as an Info button — taps open the comparison popup.
-			# Tooltip stays for desktop hover; the button works on touch too.
-			var info_btn := Button.new()
 			var iid_row: String = String(it.get("id", ""))
+			var tex: Texture2D = TileRenderer.item(iid_row)
+			if tex != null:
+				var icon := TextureRect.new()
+				icon.texture = tex
+				icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+				icon.custom_minimum_size = Vector2(48, 48)
+				icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+				icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				row.add_child(icon)
+			var info_btn := Button.new()
 			var disp_name: String = GameManager.display_name_for_item(
 					iid_row, String(it.get("name", "?")), kind)
-			info_btn.text = "%s [%s]" % [disp_name, kind]
+			info_btn.text = disp_name
 			info_btn.flat = true
 			info_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			info_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			info_btn.tooltip_text = _build_item_tooltip(it)
-			info_btn.add_theme_font_size_override("font_size", 28)
+			info_btn.add_theme_font_size_override("font_size", 32)
 			info_btn.pressed.connect(_on_bag_info.bind(it))
 			row.add_child(info_btn)
 			if kind == "weapon" or kind == "armor":
 				var eq_btn := Button.new()
 				eq_btn.text = "Equip"
-				eq_btn.add_theme_font_size_override("font_size", 26)
-				eq_btn.custom_minimum_size = Vector2(140, 80)
+				eq_btn.add_theme_font_size_override("font_size", 28)
+				eq_btn.custom_minimum_size = Vector2(130, 64)
 				eq_btn.pressed.connect(_on_bag_equip.bind(i, dlg))
 				row.add_child(eq_btn)
 			else:
 				var use_btn := Button.new()
 				use_btn.text = "Use"
-				use_btn.add_theme_font_size_override("font_size", 26)
-				use_btn.custom_minimum_size = Vector2(140, 80)
+				use_btn.add_theme_font_size_override("font_size", 28)
+				use_btn.custom_minimum_size = Vector2(100, 64)
 				use_btn.pressed.connect(_on_bag_use.bind(i, dlg))
 				row.add_child(use_btn)
 			var drop_btn := Button.new()
 			drop_btn.text = "Drop"
-			drop_btn.add_theme_font_size_override("font_size", 26)
-			drop_btn.custom_minimum_size = Vector2(140, 80)
+			drop_btn.add_theme_font_size_override("font_size", 28)
+			drop_btn.custom_minimum_size = Vector2(100, 64)
 			drop_btn.pressed.connect(_on_bag_drop.bind(i, dlg))
 			row.add_child(drop_btn)
-			vb.add_child(row)
+			rows.add_child(row)
 	popup_mgr.add_child(dlg)
 	_bag_dlg = dlg
 	dlg.tree_exited.connect(func():
 		if _bag_dlg == dlg: _bag_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(960, 1400))
+	dlg.popup_centered(Vector2i(960, 1700))
+
+
+func _open_bag_filtered(category: String) -> void:
+	if category == "all":
+		_on_bag_pressed()
+		return
+	_on_bag_pressed()
 
 
 ## Build a multi-line tooltip string comparing this item to what the

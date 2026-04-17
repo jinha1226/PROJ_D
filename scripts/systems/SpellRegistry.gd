@@ -18,10 +18,10 @@ const SPELLS: Dictionary = {
 	},
 	"fireball": {
 		"name": "Fireball", "school": "fire",
-		"mp": 6, "min_dmg": 4, "max_dmg": 10, "difficulty": 5,
-		"targeting": "area", "range": 8, "radius": 2, "effect": "damage",
+		"mp": 6, "min_dmg": 3, "max_dmg": 30, "difficulty": 5,
+		"targeting": "area", "range": 5, "radius": 2, "effect": "damage",
 		"color": Color(1.0, 0.6, 0.0),
-		"desc": "Explosive fire damage in an area. High difficulty.",
+		"desc": "Explosive fire. Lv5, high power + high failure.",
 	},
 	"freeze": {
 		"name": "Freeze", "school": "cold",
@@ -32,17 +32,17 @@ const SPELLS: Dictionary = {
 	},
 	"stone_arrow": {
 		"name": "Stone Arrow", "school": "earth",
-		"mp": 3, "min_dmg": 3, "max_dmg": 7, "difficulty": 2,
-		"targeting": "single", "range": 7, "effect": "damage",
+		"mp": 3, "min_dmg": 3, "max_dmg": 21, "difficulty": 3,
+		"targeting": "single", "range": 4, "effect": "damage",
 		"color": Color(0.75, 0.65, 0.45),
-		"desc": "A sharp shard of conjured stone.",
+		"desc": "A sharp shard of stone. Lv3, physical damage.",
 	},
 	"lightning_bolt": {
 		"name": "Lightning Bolt", "school": "air",
-		"mp": 3, "min_dmg": 3, "max_dmg": 7, "difficulty": 2,
+		"mp": 5, "min_dmg": 1, "max_dmg": 33, "difficulty": 5,
 		"targeting": "single", "range": 8, "effect": "damage",
 		"color": Color(1.0, 1.0, 0.4),
-		"desc": "An arc of electricity to the target.",
+		"desc": "A bolt of lightning. Lv5, ignores half AC.",
 	},
 	"pain": {
 		"name": "Pain", "school": "necromancy",
@@ -53,7 +53,7 @@ const SPELLS: Dictionary = {
 	},
 	"slow": {
 		"name": "Slow", "school": "hexes",
-		"mp": 3, "min_dmg": 0, "max_dmg": 0, "difficulty": 2,
+		"mp": 2, "min_dmg": 0, "max_dmg": 0, "difficulty": 1,
 		"targeting": "single", "range": 6, "effect": "slow",
 		"color": Color(0.4, 0.9, 0.5),
 		"desc": "Halves target speed for 4 turns.",
