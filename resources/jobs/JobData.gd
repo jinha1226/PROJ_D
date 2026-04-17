@@ -12,6 +12,9 @@ extends Resource
 
 @export var starting_equipment: Array[String] = []
 @export var starting_skills: Dictionary = {}
+# Spell ids pre-learned at character creation. Magic backgrounds start
+# already knowing one or two school spells so they can cast from turn 1.
+@export var starting_spells: Array[String] = []
 
 @export var unique_ability: String = ""
 @export var essence_affinity: Dictionary = {}

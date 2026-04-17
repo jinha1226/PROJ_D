@@ -12,4 +12,5 @@ dex_bonus = 0
 int_bonus = 3
 starting_equipment = Array[String](["ice_staff"])
 starting_skills = {"cold": 3, "conjurations": 2, "spellcasting": 2}
+starting_spells = Array[String](["freeze"])
 unique_ability = ""
