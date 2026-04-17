@@ -67,6 +67,7 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	if defender.has_method("take_damage"):
 		defender.take_damage(dmg)
 	_show_hit_feedback(defender, dmg, Color(1.0, 1.0, 0.3))
+	_show_slash_fx(defender)
 	return dmg
 
 
@@ -83,6 +84,7 @@ static func melee_attack_from_monster(m, defender) -> int:
 	if defender.has_method("take_damage"):
 		defender.take_damage(dmg)
 	_show_hit_feedback(defender, dmg, Color(1.0, 0.3, 0.3))
+	_show_slash_fx(defender)
 	return dmg
 
 
@@ -111,3 +113,25 @@ static func _show_hit_feedback(target: Node, dmg: int, color: Color) -> void:
 	tw2.tween_property(label, "position:y", label.position.y - 32, 0.5)
 	tw2.parallel().tween_property(label, "modulate:a", 0.0, 0.5)
 	tw2.tween_callback(label.queue_free)
+
+
+static func _show_slash_fx(target: Node) -> void:
+	if target == null or not is_instance_valid(target) or not (target is Node2D):
+		return
+	var fx := Node2D.new()
+	fx.z_index = 99
+	(target as Node2D).add_child(fx)
+	fx.set_script(_SlashDraw)
+	var tw: Tween = fx.create_tween()
+	tw.tween_property(fx, "modulate:a", 0.0, 0.15)
+	tw.tween_callback(fx.queue_free)
+
+
+class _SlashDraw extends Node2D:
+	func _draw() -> void:
+		var sz: float = 14.0
+		# Diagonal slash lines
+		draw_line(Vector2(-sz, -sz), Vector2(sz, sz), Color(1.0, 1.0, 1.0, 0.9), 2.5, true)
+		draw_line(Vector2(sz, -sz), Vector2(-sz, sz), Color(1.0, 1.0, 1.0, 0.7), 2.0, true)
+		# Short cross cuts
+		draw_line(Vector2(-sz * 0.5, 0), Vector2(sz * 0.5, 0), Color(1.0, 1.0, 0.8, 0.6), 1.5, true)
