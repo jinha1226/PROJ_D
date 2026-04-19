@@ -87,10 +87,13 @@ const ITEMS: Dictionary = {
 	"minor_potion":     "items/potion_red.png",
 	"major_potion":     "items/potion_blue.png",
 	"mana_potion":      "items/potion_purple.png",
-	"scroll_teleport":  "items/scroll_blue.png",
-	"scroll_blink":     "items/scroll_purple.png",
-	"scroll_magic_map": "items/scroll_green.png",
-	"scroll_identify":  "items/scroll_plain.png",
+	"scroll_teleport":      "items/scroll_blue.png",
+	"scroll_blink":         "items/scroll_purple.png",
+	"scroll_magic_map":     "items/scroll_green.png",
+	"scroll_identify":      "items/scroll_plain.png",
+	"scroll_remove_curse":  "items/scroll_gold.png",
+	"scroll_enchant_armor": "items/scroll_red.png",
+	"scroll_enchant_weapon":"items/scroll_plain.png",
 	"dagger":           "items/dagger.png",
 	"short_sword":      "items/short_sword.png",
 	"rapier":           "items/short_sword2.png",
@@ -151,6 +154,7 @@ const ITEMS: Dictionary = {
 }
 
 const PLAYER_RACES: Dictionary = {
+	# Job sprites (used in-game and on job select screen)
 	"fighter":    "players/fighter.png",
 	"barbarian":  "players/barbarian.png",
 	"ranger":     "players/ranger.png",
@@ -159,6 +163,15 @@ const PLAYER_RACES: Dictionary = {
 	"cleric":     "players/cleric.png",
 	"warlock":    "players/warlock.png",
 	"knight":     "players/knight.png",
+	# Race sprites (mapped to closest job tile for now)
+	"human":      "players/fighter.png",
+	"hill_orc":   "players/barbarian.png",
+	"minotaur":   "players/barbarian.png",
+	"troll":      "players/barbarian.png",
+	"spriggan":   "players/rogue.png",
+	"catfolk":    "players/rogue.png",
+	"draconian":  "players/fighter.png",
+	"deep_elf":   "players/mage.png",
 }
 
 const PLAYER_DOLL: Dictionary = {}

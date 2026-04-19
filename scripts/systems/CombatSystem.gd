@@ -80,6 +80,11 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 			dmg = int(dmg * 1.15)
 	if defender.has_method("take_damage"):
 		defender.take_damage(dmg)
+	var def_name: String = ""
+	if "data" in defender and defender.data != null and "display_name" in defender.data:
+		def_name = String(defender.data.display_name)
+	if def_name != "":
+		CombatLog.add("You hit the %s for %d." % [def_name, dmg])
 	_show_hit_feedback(defender, dmg, Color(1.0, 1.0, 0.3))
 	_show_slash_fx(defender)
 	return dmg
@@ -102,6 +107,11 @@ static func melee_attack_from_monster(m, defender) -> int:
 		dmg = max(1, dmg / 2)
 	if defender.has_method("take_damage"):
 		defender.take_damage(dmg)
+	var atk_name: String = ""
+	if "data" in m and m.data != null and "display_name" in m.data:
+		atk_name = String(m.data.display_name)
+	if atk_name != "":
+		CombatLog.add("The %s hits you for %d!" % [atk_name, dmg])
 	_show_hit_feedback(defender, dmg, Color(1.0, 0.3, 0.3))
 	_show_slash_fx(defender)
 	return dmg

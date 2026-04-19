@@ -95,6 +95,22 @@ const DATA: Dictionary = {
 		"amount": 10,
 		"desc": "Bitter, foul — inflicts 10 damage when drunk.",
 	},
+	# --- Curse-related scrolls ---
+	"scroll_remove_curse": {
+		"name": "Scroll of Remove Curse",
+		"kind": "scroll",
+		"color": Color(0.90, 0.75, 0.40),
+		"effect": "remove_curse",
+		"desc": "Removes curses from all equipped items.",
+	},
+	"scroll_enchant_armor": {
+		"name": "Scroll of Enchant Armour",
+		"kind": "scroll",
+		"color": Color(0.45, 0.85, 0.75),
+		"effect": "enchant_armor",
+		"amount": 1,
+		"desc": "Permanently improves the AC of your equipped chest armour by 1.",
+	},
 	# --- Enchant weapon scroll ---
 	"scroll_enchant_weapon": {
 		"name": "Scroll of Enchant Weapon",

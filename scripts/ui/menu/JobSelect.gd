@@ -1,16 +1,18 @@
 extends Control
 
 const TRAIT_SELECT_PATH := "res://scenes/menu/TraitSelect.tscn"
-const MAIN_MENU_PATH := "res://scenes/menu/MainMenu.tscn"
+const RACE_SELECT_PATH := "res://scenes/menu/RaceSelect.tscn"
 const JOB_IDS: Array[String] = [
 	"fighter", "barbarian", "ranger", "rogue", "mage", "warlock",
 ]
 
 const _CARD_W: float = 480.0
-const _CARD_H: float = 600.0
+const _CARD_H_COMPACT: float = 560.0
+const _CARD_H_EXPANDED: float = 860.0
 
 var _selected_id: String = ""
 var _cards: Dictionary = {}
+var _detail_nodes: Dictionary = {}  # job_id -> {sep, detail}
 
 
 func _ready() -> void:
@@ -35,12 +37,12 @@ func _build_cards() -> void:
 func _make_card(j: JobData) -> Button:
 	var btn := Button.new()
 	btn.toggle_mode = true
-	btn.custom_minimum_size = Vector2(_CARD_W, _CARD_H)
+	btn.custom_minimum_size = Vector2(_CARD_W, _CARD_H_COMPACT)
 	btn.pressed.connect(_on_card_pressed.bind(j.id))
 
 	var vbox := VBoxContainer.new()
 	vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	vbox.add_theme_constant_override("separation", 12)
+	vbox.add_theme_constant_override("separation", 10)
 	vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.offset_left = 16
 	vbox.offset_top = 16
@@ -48,17 +50,19 @@ func _make_card(j: JobData) -> Button:
 	vbox.offset_bottom = -16
 	btn.add_child(vbox)
 
+	# Job preview icon (DCSS tile if available).
 	var tex: Texture2D = TileRenderer.player_race(j.id)
 	if tex != null:
 		var preview := TextureRect.new()
 		preview.texture = tex
 		preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		preview.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-		preview.custom_minimum_size = Vector2(0, 300)
+		preview.custom_minimum_size = Vector2(0, 280)
 		preview.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		vbox.add_child(preview)
 
+	# Name — always visible.
 	var name_lbl := Label.new()
 	name_lbl.text = j.display_name
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -66,7 +70,8 @@ func _make_card(j: JobData) -> Button:
 	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(name_lbl)
 
-	var stat_line := "STR%+d  DEX%+d  INT%+d" % [j.str_bonus, j.dex_bonus, j.int_bonus]
+	# Stat bonuses — always visible.
+	var stat_line: String = "STR%+d  DEX%+d  INT%+d" % [j.str_bonus, j.dex_bonus, j.int_bonus]
 	var stats_lbl := Label.new()
 	stats_lbl.text = stat_line
 	stats_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -75,32 +80,67 @@ func _make_card(j: JobData) -> Button:
 	stats_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(stats_lbl)
 
+	# --- Detail section (hidden until card selected) ---
+	var sep := HSeparator.new()
+	sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sep.visible = false
+	vbox.add_child(sep)
+
+	var detail := VBoxContainer.new()
+	detail.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	detail.visible = false
+	detail.add_theme_constant_override("separation", 6)
+	vbox.add_child(detail)
+
 	var desc_lbl := Label.new()
 	desc_lbl.text = j.description
 	desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_lbl.add_theme_font_size_override("font_size", 28)
-	desc_lbl.modulate = Color(0.8, 0.8, 0.9)
+	desc_lbl.add_theme_font_size_override("font_size", 30)
+	desc_lbl.modulate = Color(0.85, 0.85, 0.95)
 	desc_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vbox.add_child(desc_lbl)
+	detail.add_child(desc_lbl)
 
+	if not j.starting_equipment.is_empty():
+		var equip_lbl := Label.new()
+		var equip_names: Array = []
+		for eid in j.starting_equipment:
+			equip_names.append(String(eid).replace("_", " ").capitalize())
+		equip_lbl.text = "Starts with: " + ", ".join(PackedStringArray(equip_names))
+		equip_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		equip_lbl.add_theme_font_size_override("font_size", 28)
+		equip_lbl.modulate = Color(0.75, 0.90, 0.75)
+		equip_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		detail.add_child(equip_lbl)
+
+	_detail_nodes[j.id] = {"sep": sep, "detail": detail}
 	return btn
 
 
 func _on_card_pressed(job_id: String) -> void:
-	if _selected_id == job_id:
+	var toggling_off: bool = (_selected_id == job_id)
+	if toggling_off:
 		_selected_id = ""
 		$Footer/StartButton.disabled = true
 	else:
 		_selected_id = job_id
 		$Footer/StartButton.disabled = false
+
 	for jid in _cards.keys():
 		var b: Button = _cards[jid]
-		b.button_pressed = (jid == _selected_id)
+		if b == null:
+			continue
+		var is_sel: bool = (jid == _selected_id)
+		b.button_pressed = is_sel
+		b.custom_minimum_size = Vector2(_CARD_W, _CARD_H_EXPANDED if is_sel else _CARD_H_COMPACT)
+		if _detail_nodes.has(jid):
+			var d: Dictionary = _detail_nodes[jid]
+			d["sep"].visible = is_sel
+			d["detail"].visible = is_sel
 
 
 func _on_back() -> void:
-	get_tree().change_scene_to_file(MAIN_MENU_PATH)
+	get_tree().change_scene_to_file(RACE_SELECT_PATH)
 
 
 func _on_start() -> void:

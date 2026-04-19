@@ -36,6 +36,8 @@ const _MP_PER_LEVEL: int = 3
 
 # [skill-agent] equipped weapon + per-skill state (level/xp/training).
 var equipped_weapon_id: String = ""
+# True while the equipped weapon is cursed — cannot unequip or drop.
+var equipped_weapon_cursed: bool = false
 # Bonus damage from Scroll of Enchant Weapon etc. Applied on top of the
 # base WeaponRegistry damage inside CombatSystem.melee_attack.
 var weapon_bonus_dmg: int = 0
@@ -340,8 +342,12 @@ func _get_trait_equipment(trait_id: String) -> Dictionary:
 
 
 func equip_weapon(weapon_id: String) -> String:
+	if equipped_weapon_cursed and equipped_weapon_id != "":
+		CombatLog.add("The %s is cursed and won't come off!" % WeaponRegistry.display_name_for(equipped_weapon_id))
+		return equipped_weapon_id
 	var prev: String = equipped_weapon_id
 	equipped_weapon_id = weapon_id
+	equipped_weapon_cursed = false
 	stats_changed.emit()
 	_load_sprite_preset()
 	return prev
@@ -543,7 +549,7 @@ func _pickup_items_here() -> void:
 			items.append(it.as_dict())
 			var shown: String = GameManager.display_name_for_item(
 					it.item_id, it.display_name, it.kind) if GameManager != null else it.display_name
-			print("Picked up: %s" % shown)
+			CombatLog.add("Picked up: %s" % shown)
 			it.queue_free()
 	inventory_changed.emit()
 
@@ -670,12 +676,33 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 			return true
 		"enchant_weapon":
 			if equipped_weapon_id == "":
-				print("No weapon equipped to enchant.")
+				CombatLog.add("No weapon equipped to enchant.")
 				return false
 			weapon_bonus_dmg += int(info.get("amount", 1))
-			print("Weapon enchanted (+%d damage)." % weapon_bonus_dmg)
+			CombatLog.add("Your weapon glows brightly! (+%d damage)" % weapon_bonus_dmg)
 			stats_changed.emit()
 			return true
+		"remove_curse":
+			var removed: bool = false
+			if equipped_weapon_cursed and equipped_weapon_id != "":
+				equipped_weapon_cursed = false
+				CombatLog.add("The curse lifts from your %s!" % WeaponRegistry.display_name_for(equipped_weapon_id))
+				removed = true
+			for slot_key in equipped_armor:
+				if bool(equipped_armor[slot_key].get("cursed", false)):
+					equipped_armor[slot_key]["cursed"] = false
+					removed = true
+			if not removed:
+				CombatLog.add("You feel briefly cleansed (nothing was cursed).")
+			return true
+		"enchant_armor":
+			if equipped_armor.has("chest"):
+				equipped_armor["chest"]["ac"] = int(equipped_armor["chest"].get("ac", 0)) + int(info.get("amount", 1))
+				CombatLog.add("Your armour shimmers and feels stronger!")
+				_recompute_defense()
+				return true
+			CombatLog.add("You have no chest armour to enchant.")
+			return false
 		"learn_spells":
 			var newly: Array[String] = []
 			for sp in info.get("spells", []):
@@ -684,9 +711,9 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 					learned_spells.append(spell_id)
 					newly.append(spell_id)
 			if newly.is_empty():
-				print("You already know these spells.")
+				CombatLog.add("You already know these spells.")
 			else:
-				print("Learned: %s" % ", ".join(newly))
+				CombatLog.add("Learned: %s" % ", ".join(newly))
 			spells_learned.emit()
 			return true
 		_:
@@ -740,6 +767,10 @@ func drop_item(index: int) -> void:
 	if index < 0 or index >= items.size():
 		return
 	var it: Dictionary = items[index]
+	var iid: String = String(it.get("id", ""))
+	if equipped_weapon_cursed and iid == equipped_weapon_id:
+		CombatLog.add("You can't drop a cursed weapon!")
+		return
 	items.remove_at(index)
 	inventory_changed.emit()
 	var parent: Node = get_parent()

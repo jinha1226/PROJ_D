@@ -62,6 +62,7 @@ var _skills_dlg: AcceptDialog = null
 var _status_dlg: AcceptDialog = null
 var _map_dlg: AcceptDialog = null
 var _magic_dlg: AcceptDialog = null
+var _combat_log_label: Label = null
 var _targeting_spell: String = ""
 # Camera follow tween so the view doesn't snap.
 var _cam_tween: Tween = null
@@ -107,14 +108,20 @@ func _ready() -> void:
 	var entity_layer: Node2D = $EntityLayer
 	player = PLAYER_SCENE.instantiate()
 	entity_layer.add_child(player)
-	# Default loadout until MainMenu selection is implemented.
-	# GameManager.selected_race_id / selected_job_id can override later.
-	var trait_id: String = GameManager.selected_race_id if GameManager.selected_race_id != "" else "tough"
 	var job_id: String = GameManager.selected_job_id if GameManager.selected_job_id != "" else "fighter"
-	GameManager.start_new_run(job_id, trait_id)
+	var race_id: String = GameManager.selected_race_id if GameManager.selected_race_id != "" else "human"
+	var trait_id: String = GameManager.selected_trait_id if GameManager.selected_trait_id != "" else "tough"
+	GameManager.start_new_run(job_id, race_id)
 	var job: JobData = load("res://resources/jobs/%s.tres" % job_id)
-	var trait_res: TraitData = load("res://resources/traits/%s.tres" % trait_id)
-	player.setup(generator, generator.spawn_pos, job, null, trait_res)
+	var race_res: RaceData = null
+	var race_path: String = "res://resources/races/%s.tres" % race_id
+	if ResourceLoader.exists(race_path):
+		race_res = load(race_path) as RaceData
+	var trait_res: TraitData = null
+	var trait_path: String = "res://resources/traits/%s.tres" % trait_id
+	if ResourceLoader.exists(trait_path):
+		trait_res = load(trait_path) as TraitData
+	player.setup(generator, generator.spawn_pos, job, race_res, trait_res)
 
 	# [skill-agent] SkillSystem must exist before first attack; attach as child
 	# of Game root with node name "SkillSystem" so Player.try_attack_at can
@@ -260,7 +267,37 @@ func _ready() -> void:
 
 	if not TurnManager.player_turn_started.is_connected(_on_turn_refresh_visibility):
 		TurnManager.player_turn_started.connect(_on_turn_refresh_visibility)
+
+	_setup_combat_log(ui)
 	TurnManager.start_player_turn()
+
+
+func _setup_combat_log(ui_root: Node) -> void:
+	if ui_root == null:
+		return
+	var panel := PanelContainer.new()
+	panel.name = "CombatLogPanel"
+	# Anchor to lower portion of screen, above BottomHUD (~72-82% down).
+	panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	panel.anchor_top = 0.72
+	panel.anchor_bottom = 0.82
+	panel.offset_top = 0
+	panel.offset_bottom = 0
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var label := Label.new()
+	label.name = "LogLabel"
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.add_theme_font_size_override("font_size", 26)
+	label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(label)
+	ui_root.add_child(panel)
+	_combat_log_label = label
+	CombatLog.message_added.connect(func(_m: String) -> void:
+		if _combat_log_label != null and is_instance_valid(_combat_log_label):
+			var recent := CombatLog.get_recent(3)
+			_combat_log_label.text = "\n".join(PackedStringArray(recent)))
 
 
 func _on_turn_refresh_visibility() -> void:
@@ -326,7 +363,8 @@ func _on_quickslot_pressed(index: int) -> void:
 		var targeting_type: String = String(info.get("targeting", "single"))
 		if targeting_type == "self":
 			var result: Dictionary = _execute_cast(spell_id)
-			print("[Spell] %s" % result.get("message", spell_id))
+			if result.get("message", "") != "":
+				CombatLog.add(result.get("message", ""))
 			if result.get("success", false):
 				if skill_system != null:
 					skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, ["magic", "spellcasting"])
@@ -591,10 +629,10 @@ func _on_rest_pressed() -> void:
 		_cancel_rest("cancelled")
 		return
 	if player.stats.HP >= player.stats.hp_max and player.stats.MP >= player.stats.mp_max:
-		print("Already at full health.")
+		CombatLog.add("You are already at full health.")
 		return
 	if _visible_monster_nearby():
-		print("Can't rest — enemy in sight.")
+		CombatLog.add("Can't rest — enemy nearby!")
 		return
 	_resting = true
 	_rest_turns = 0
@@ -623,7 +661,7 @@ func _cancel_rest(reason: String) -> void:
 	if not _resting:
 		return
 	_resting = false
-	print("Rest: %s (%d turns)" % [reason, _rest_turns])
+	CombatLog.add("Rest: %s." % reason)
 	_rest_turns = 0
 
 
@@ -657,6 +695,8 @@ const _ARMOR_POOL: Array = [
 ]
 
 
+const _CURSE_CHANCE: float = 0.15
+
 func _maybe_drop_loot(monster: Monster) -> void:
 	if monster == null or not ("grid_pos" in monster):
 		return
@@ -665,17 +705,24 @@ func _maybe_drop_loot(monster: Monster) -> void:
 	var entity_layer: Node = $EntityLayer
 	var fi: FloorItem = FloorItem.new()
 	entity_layer.add_child(fi)
+	var is_cursed: bool = randf() < _CURSE_CHANCE
 	if randf() < 0.6:
-		# Weapon drop — picks from a tier-1-ish pool for M1.
+		# Weapon drop — picks from a tier-1-ish pool.
 		var wid: String = _WEAPON_POOL[randi() % _WEAPON_POOL.size()]
-		fi.setup(monster.grid_pos, wid, WeaponRegistry.display_name_for(wid),
-				"weapon", Color(0.75, 0.75, 0.85))
+		var wname: String = WeaponRegistry.display_name_for(wid)
+		if is_cursed:
+			wname = "Cursed " + wname
+		fi.setup(monster.grid_pos, wid, wname, "weapon", Color(0.75, 0.75, 0.85),
+				{"cursed": is_cursed})
 	else:
 		var aid: String = _ARMOR_POOL[randi() % _ARMOR_POOL.size()]
 		var info: Dictionary = ArmorRegistry.get_info(aid)
-		fi.setup(monster.grid_pos, aid, String(info.get("name", aid)),
+		var aname: String = String(info.get("name", aid))
+		if is_cursed:
+			aname = "Cursed " + aname
+		fi.setup(monster.grid_pos, aid, aname,
 				"armor", info.get("color", Color(0.6, 0.6, 0.7)),
-				{"ac": int(info.get("ac", 0)), "slot": String(info.get("slot", "chest"))})
+				{"ac": int(info.get("ac", 0)), "slot": String(info.get("slot", "chest")), "cursed": is_cursed})
 
 
 func _spawn_dummy_items(count: int) -> void:
@@ -704,6 +751,8 @@ func _spawn_dummy_items(count: int) -> void:
 
 func _on_monster_died(monster: Monster) -> void:
 	kill_count += 1
+	if monster != null and monster.data != null:
+		CombatLog.add("You kill the %s!" % String(monster.data.display_name))
 	if meta != null and monster != null and monster.data != null:
 		meta.record_kill(String(monster.data.id))
 	if player != null and player.trait_res != null and player.trait_res.special == "holy_light":
@@ -1448,7 +1497,7 @@ func _on_target_selected(pos: Vector2i) -> void:
 			target_monster = m
 			break
 	if target_monster == null:
-		print("Targeting cancelled.")
+		CombatLog.add("Targeting cancelled.")
 		_targeting_spell = ""
 		return
 	var spell_id: String = _targeting_spell
@@ -1472,7 +1521,7 @@ func _show_targeting_hint() -> void:
 			targets.append(m.grid_pos)
 	dmap.danger_tiles = targets
 	dmap.queue_redraw()
-	print("Tap a target to cast %s. Tap empty tile to cancel." % String(info.get("name", _targeting_spell)))
+	CombatLog.add("Target a tile to cast %s. Tap empty space to cancel." % String(info.get("name", _targeting_spell)))
 
 
 func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
@@ -1483,7 +1532,7 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 		return
 	var mp_cost: int = int(info.get("mp", 1))
 	if player.stats.MP < mp_cost:
-		print("Not enough MP.")
+		CombatLog.add("Not enough MP!")
 		return
 	player.stats.MP -= mp_cost
 	player.stats_changed.emit()
@@ -1493,7 +1542,7 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 	var eff_school2: int = magic_lv + staff_bonus2
 	var fail: float = SpellRegistry.failure_chance(spell_id, eff_school2, sc_lv)
 	if randf() < fail:
-		print("Spell fizzles! (%d%% fail)" % int(fail * 100))
+		CombatLog.add("Spell fizzles! (%d%% fail)" % int(fail * 100))
 		TurnManager.end_player_turn()
 		return
 	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
@@ -1520,18 +1569,18 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 			total_dmg += dmg
 			hits += 1
 		SpellFX.cast_area(fx_layer, player.position, target.position, hit_positions, spell_color, float(radius) * float(TILE_SIZE) + float(TILE_SIZE) / 2.0)
-		print("%s: %d hit(s), %d total dmg" % [String(info.get("name", spell_id)), hits, total_dmg])
+		CombatLog.add("%s: %d hit(s), %d total dmg" % [String(info.get("name", spell_id)), hits, total_dmg])
 	else:
 		var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
 		var effect_type: String = String(info.get("effect", "damage"))
 		if effect_type == "slow":
 			target.slowed_turns = 4
 			SpellFX.cast_slow(fx_layer, target.position, spell_color)
-			print("%s is slowed!" % String(target.data.display_name if target.data else "enemy"))
+			CombatLog.add("%s is slowed!" % String(target.data.display_name if target.data else "enemy"))
 		else:
 			target.take_damage(dmg)
 			SpellFX.cast_single(fx_layer, player.position, target, dmg, spell_color)
-			print("%s → %d dmg" % [String(info.get("name", spell_id)), dmg])
+			CombatLog.add("%s → %d dmg" % [String(info.get("name", spell_id)), dmg])
 	if skill_system != null:
 		skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, ["magic", "spellcasting"])
 	TurnManager.end_player_turn()
@@ -1621,7 +1670,8 @@ func _build_spell_panel(container: VBoxContainer, dlg: AcceptDialog) -> void:
 func _on_cast_pressed(spell_id: String, dlg: AcceptDialog) -> void:
 	dlg.queue_free()
 	var result: Dictionary = _execute_cast(spell_id)
-	print("[Spell] %s" % result.get("message", spell_id))
+	if result.get("message", "") != "":
+		CombatLog.add(result.get("message", ""))
 	if result.get("success", false):
 		# Train magic + spellcasting on successful cast.
 		if skill_system != null:
@@ -2026,13 +2076,20 @@ func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
 			if kind == "weapon":
 				var wid: String = String(it.get("id", ""))
 				var prev_id: String = player.equip_weapon(wid)
-				if prev_id != "":
-					items.append({
-						"id": prev_id,
-						"name": WeaponRegistry.display_name_for(prev_id),
-						"kind": "weapon",
-						"color": Color(0.75, 0.75, 0.85),
-					})
+				if prev_id == wid:
+					# equip_weapon returned same id → was blocked (cursed).
+					items.insert(idx, it)
+				else:
+					if bool(it.get("cursed", false)):
+						player.equipped_weapon_cursed = true
+						CombatLog.add("The %s is cursed!" % WeaponRegistry.display_name_for(wid))
+					if prev_id != "":
+						items.append({
+							"id": prev_id,
+							"name": WeaponRegistry.display_name_for(prev_id),
+							"kind": "weapon",
+							"color": Color(0.75, 0.75, 0.85),
+						})
 			elif kind == "armor":
 				# Always rehydrate from ArmorRegistry so the slot info is
 				# correct even for older floor items missing it in extra.
@@ -2046,7 +2103,11 @@ func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
 						"color": it.get("color", Color(0.6, 0.6, 0.7)),
 						"slot": String(it.get("slot", "chest")),
 					}
+				if bool(it.get("cursed", false)):
+					armor_info["cursed"] = true
 				var prev_armor: Dictionary = player.equip_armor(armor_info)
+				if bool(it.get("cursed", false)):
+					CombatLog.add("The %s is cursed!" % String(armor_info.get("name", aid)))
 				if not prev_armor.is_empty():
 					items.append({
 						"id": String(prev_armor.get("id", "")),

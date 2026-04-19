@@ -12,6 +12,7 @@ var dungeon: Node = null
 # "" means: use GameBootstrap defaults.
 var selected_race_id: String = ""
 var selected_job_id: String = ""
+var selected_trait_id: String = ""
 # Art mode — 0 = LPC (composed), 1 = DCSS tiles. Read via TileRenderer.mode().
 # DCSS is now the default since the tile mapping is complete.
 var render_mode: int = 1

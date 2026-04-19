@@ -92,5 +92,5 @@ func _on_back() -> void:
 func _on_start() -> void:
 	if _selected_id == "":
 		return
-	GameManager.selected_race_id = _selected_id
+	GameManager.selected_trait_id = _selected_id
 	get_tree().change_scene_to_file(GAME_PATH)

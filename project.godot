@@ -25,6 +25,7 @@ BodyParts="*res://scripts/core/BodyParts.gd"
 ItemDatabase="*res://scripts/core/ItemDatabase.gd"
 PlayerData="*res://scripts/core/PlayerData.gd"
 SpriteGenerator="*res://scripts/core/SpriteGenerator.gd"
+CombatLog="*res://scripts/core/CombatLog.gd"
 
 [display]
 
