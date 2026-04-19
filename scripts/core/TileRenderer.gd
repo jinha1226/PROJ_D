@@ -1,243 +1,254 @@
 extends Node
 class_name TileRenderer
+## Central lookup for which art asset renders a given in-game id.
+## Modes:
+##   LPC  — composed LPC sprites
+##   DCSS — Dungeon Crawl Stone Soup individual tile PNGs (default)
+##
+## All DCSS tiles live under res://assets/dcss_tiles/individual/ — the full
+## crawl rltiles tree (~6055 PNGs across dngn/, mon/, item/, player/) is
+## bundled, so adding new monsters/items/branches is just a matter of
+## extending the mapping dictionaries below.
 
 enum Mode { LPC, DCSS }
 
 const TILE: int = 32
-const _BASE_DIR: String = "res://assets/tiles/"
+const _BASE_DIR: String = "res://assets/dcss_tiles/individual/"
 
+# Dungeon features keyed by canonical id. Branch overrides via BRANCH_TILESETS.
 const FEATURES: Dictionary = {
-	"floor":       "dungeon/floor_stone1.png",
-	"wall":        "dungeon/wall_brick_side.png",
-	"stairs_up":   "dungeon/stairs_up.png",
-	"stairs_down": "dungeon/stairs_down.png",
-	"door_open":   "dungeon/door_open.png",
-	"door_closed": "dungeon/door_closed.png",
-	"water":       "dungeon/floor_blue_stone1.png",
-	"lava":        "dungeon/floor_red_stone1.png",
+	"floor":       "dngn/floor/grey_dirt0.png",
+	"wall":        "dngn/wall/stone2_gray0.png",
+	"stairs_up":   "dngn/gateways/stone_stairs_up.png",
+	"stairs_down": "dngn/gateways/stone_stairs_down.png",
+	"door_open":   "dngn/doors/open_door.png",
+	"door_closed": "dngn/doors/closed_door.png",
+	"water":       "dngn/floor/swamp0.png",
+	"lava":        "dngn/floor/volcanic_floor0.png",
 }
 
+## Per-branch overrides. DungeonMap picks the right floor/wall/etc. by
+## passing the current branch id; missing keys fall back to FEATURES.
 const BRANCH_TILESETS: Dictionary = {
 	"main": {
-		"floor": "dungeon/floor_stone1.png",
-		"wall":  "dungeon/wall_brick_side.png",
+		"floor": "dngn/floor/grey_dirt0.png",
+		"wall":  "dngn/wall/stone2_gray0.png",
 	},
 	"forest": {
-		"floor": "dungeon/floor_grass1.png",
-		"wall":  "dungeon/wall_dirt_side.png",
+		"floor": "dngn/floor/grass/grass0.png",
+		"wall":  "dngn/trees/tree1.png",
 	},
 	"mine": {
-		"floor": "dungeon/floor_stonebrick1.png",
-		"wall":  "dungeon/wall_rough_side.png",
+		"floor": "dngn/floor/cage0.png",
+		"wall":  "dngn/wall/iron0-0.png",
 	},
 	"crypt": {
-		"floor": "dungeon/floor_bone1.png",
-		"wall":  "dungeon/wall_catacombs_side.png",
+		"floor": "dngn/floor/crypt0.png",
+		"wall":  "dngn/wall/tomb0.png",
 	},
 	"volcano": {
-		"floor": "dungeon/floor_red_stone1.png",
-		"wall":  "dungeon/wall_igneous_side.png",
+		"floor": "dngn/floor/volcanic_floor0.png",
+		"wall":  "dngn/wall/hell01.png",
 	},
 	"swamp": {
-		"floor": "dungeon/floor_green_grass1.png",
-		"wall":  "dungeon/wall_large_side.png",
+		"floor": "dngn/floor/swamp0.png",
+		"wall":  "dngn/wall/marble_wall1.png",
 	},
 	"crystal": {
-		"floor": "dungeon/floor_blue_stone1.png",
-		"wall":  "dungeon/wall_large_side.png",
+		"floor": "dngn/floor/crystal_floor0.png",
+		"wall":  "dngn/wall/crystal_wall_blue.png",
 	},
 	"sandstone": {
-		"floor": "dungeon/floor_dirt1.png",
-		"wall":  "dungeon/wall_dirt_side.png",
+		"floor": "dngn/floor/sandstone_floor0.png",
+		"wall":  "dngn/wall/sandstone_wall0.png",
 	},
 }
 
 const MONSTERS: Dictionary = {
-	"rat":              "monsters/rat.png",
-	"bat":              "monsters/bat.png",
-	"goblin":           "monsters/goblin.png",
-	"hobgoblin":        "monsters/hobgoblin.png",
-	"kobold":           "monsters/kobold.png",
-	"orc":              "monsters/orc.png",
-	"orc_warrior":      "monsters/orc_warrior.png",
-	"orc_priest":       "monsters/orc_wizard.png",
-	"orc_wizard":       "monsters/orc_wizard.png",
-	"adder":            "monsters/salamander.png",
-	"wolf":             "monsters/wolf.png",
-	"jackal":           "monsters/wolf.png",
-	"ball_python":      "monsters/worm.png",
-	"gnoll":            "monsters/kobold_big.png",
-	"boggart":          "monsters/hag.png",
-	"ghoul":            "monsters/ghoul.png",
-	"bog_body":         "monsters/zombie.png",
-	"alligator":        "monsters/salamander.png",
-	"hell_hound":       "monsters/wolf.png",
-	"lich":             "monsters/lich.png",
-	"fire_giant":       "monsters/ogre.png",
-	"ogre":             "monsters/ogre.png",
-	"orc_knight":       "monsters/orc_knight.png",
-	"dryad":            "monsters/dryad.png",
-	"swamp_dragon":     "monsters/drake.png",
-	"fire_dragon":      "monsters/dragon.png",
-	"skeleton":         "monsters/skeleton.png",
-	"fire_sprite":      "monsters/imp.png",
+	"rat":              "mon/animals/rat.png",
+	"bat":              "mon/animals/bat.png",
+	"goblin":           "mon/humanoids/goblin.png",
+	"hobgoblin":        "mon/humanoids/hobgoblin.png",
+	"kobold":           "mon/humanoids/kobold.png",
+	"orc":              "mon/humanoids/orcs/orc.png",
+	"orc_warrior":      "mon/humanoids/orcs/orc_warrior.png",
+	"orc_priest":       "mon/humanoids/orcs/orc_priest.png",
+	"orc_wizard":       "mon/humanoids/orcs/orc_wizard.png",
+	"adder":            "mon/animals/adder.png",
+	"wolf":             "mon/animals/wolf.png",
+	"jackal":           "mon/animals/jackal.png",
+	"ball_python":      "mon/animals/ball_python.png",
+	"gnoll":            "mon/humanoids/gnoll.png",
+	"boggart":          "mon/humanoids/boggart.png",
+	"ghoul":            "mon/undead/ghoul.png",
+	"bog_body":         "mon/undead/bog_body.png",
+	"alligator":        "mon/animals/alligator.png",
+	"hell_hound":       "mon/animals/hell_hound.png",
+	"lich":             "mon/undead/lich.png",
+	"fire_giant":       "mon/humanoids/giants/fire_giant.png",
+	"ogre":             "mon/humanoids/ogre.png",
+	"orc_knight":       "mon/humanoids/orcs/orc_knight.png",
+	"dryad":            "mon/humanoids/dryad.png",
+	"swamp_dragon":     "mon/dragons/swamp_dragon.png",
+	"fire_dragon":      "mon/dragons/fire_dragon.png",
+	"skeleton":         "mon/undead/skeletal_warrior.png",
+	"fire_sprite":      "mon/animals/fire_bat.png",
 }
 
 const ITEMS: Dictionary = {
-	"minor_potion":     "items/potion_red.png",
-	"major_potion":     "items/potion_blue.png",
-	"mana_potion":      "items/potion_purple.png",
-	"scroll_teleport":      "items/scroll_blue.png",
-	"scroll_blink":         "items/scroll_purple.png",
-	"scroll_magic_map":     "items/scroll_green.png",
-	"scroll_identify":      "items/scroll_plain.png",
-	"scroll_remove_curse":     "items/scroll_gold.png",
-	"scroll_enchant_armor":    "items/scroll_red.png",
-	"scroll_enchant_weapon":   "items/scroll_plain.png",
-	"potion_curing":           "items/potion_green.png",
-	"potion_resistance":       "items/potion_blue.png",
-	"potion_haste":            "items/potion_yellow.png",
-	"potion_degeneration":     "items/potion_black.png",
-	"potion_restore":          "items/potion_white.png",
-	"potion_magic":            "items/potion_purple.png",
-	"scroll_fear":             "items/scroll_red.png",
-	"scroll_immolation":       "items/scroll_plain.png",
-	"scroll_holy_word":        "items/scroll_gold.png",
-	"scroll_vulnerability":    "items/scroll_purple.png",
-	"scroll_fog":              "items/scroll_blue.png",
-	"scroll_acquirement":      "items/scroll_green.png",
-	"dagger":           "items/dagger.png",
-	"short_sword":      "items/short_sword.png",
-	"rapier":           "items/short_sword2.png",
-	"saber":            "items/short_sword2.png",
-	"arming_sword":     "items/longsword.png",
-	"longsword":        "items/longsword.png",
-	"katana":           "items/katana.png",
-	"greatsword":       "items/greatsword.png",
-	"scimitar":         "items/longsword.png",
-	"axe":              "items/axe.png",
-	"axe_medium":       "items/battleaxe.png",
-	"waraxe":           "items/waraxe.png",
-	"club":             "items/mace.png",
-	"mace":             "items/mace.png",
-	"flail":            "items/flail.png",
-	"spear":            "items/spear.png",
-	"longspear":        "items/spear.png",
-	"halberd":          "items/halberd.png",
-	"scythe":           "items/scythe.png",
-	"trident":          "items/trident.png",
-	"short_bow":        "items/short_bow.png",
-	"long_bow":         "items/long_bow.png",
-	"bow":              "items/long_bow.png",
-	"crossbow":         "items/crossbow.png",
-	"slingshot":        "items/sling.png",
-	"boomerang":        "items/sling.png",
-	"throwing_axe":     "items/axe.png",
-	"gnarled_staff":    "items/staff.png",
-	"fire_staff":       "items/fire_staff.png",
-	"ice_staff":        "items/ice_staff.png",
-	"lightning_staff":  "items/lightning_staff.png",
-	"crystal_staff":    "items/crystal_staff.png",
-	"robe":             "items/robe.png",
-	"leather_chest":    "items/leather_armor.png",
-	"chain_chest":      "items/chain_mail.png",
-	"plate_chest":      "items/plate_armor.png",
-	"leather_legs":     "items/leather_armor.png",
-	"chain_legs":       "items/chain_mail.png",
-	"plate_legs":       "items/plate_armor.png",
-	"leather_boots":    "items/leather_boots.png",
-	"plate_boots":      "items/plate_boots.png",
-	"leather_helm":     "items/leather_helm.png",
-	"plate_helm":       "items/plate_helm.png",
-	"leather_gloves":   "items/leather_gloves.png",
-	"plate_gloves":     "items/plate_gloves.png",
-	"leather_armor":    "items/leather_armor.png",
-	"chain_mail":       "items/chain_mail.png",
-	"plate_armor":      "items/plate_armor.png",
-	"book_conjurations":"items/book_blue.png",
-	"book_flames":      "items/book_red.png",
-	"book_frost":       "items/book_blue.png",
-	"book_earth":       "items/book_brown.png",
-	"book_air":         "items/book_green.png",
-	"book_necromancy":  "items/book_black.png",
-	"book_hexes":       "items/book_purple.png",
-	"book_translocations":"items/book_purple.png",
-	"book_minor_magic": "items/book_brown.png",
+	# --- Potions (effect-themed tiles for identified items) ---
+	"minor_potion":          "item/potion/i-curing.png",
+	"major_potion":          "item/potion/i-heal-wounds.png",
+	"mana_potion":           "item/potion/i-magic.png",
+	"potion_curing":         "item/potion/i-curing.png",
+	"potion_resistance":     "item/potion/i-resistance.png",
+	"potion_haste":          "item/potion/i-haste.png",
+	"potion_degeneration":   "item/potion/i-degeneration.png",
+	"potion_restore":        "item/potion/i-restore-abilities.png",
+	"potion_magic":          "item/potion/i-magic.png",
+	# --- Scrolls ---
+	"scroll_teleport":       "item/scroll/i-teleportation.png",
+	"scroll_blink":          "item/scroll/i-blinking.png",
+	"scroll_magic_map":      "item/scroll/i-magic_mapping.png",
+	"scroll_identify":       "item/scroll/i-identify.png",
+	"scroll_remove_curse":   "item/scroll/i-remove_curse.png",
+	"scroll_enchant_armor":  "item/scroll/i-enchant_armour.png",
+	"scroll_enchant_weapon": "item/scroll/i-enchant-weapon.png",
+	"scroll_fear":           "item/scroll/i-fear.png",
+	"scroll_immolation":     "item/scroll/i-immolation.png",
+	"scroll_holy_word":      "item/scroll/i-holy_word.png",
+	"scroll_vulnerability":  "item/scroll/i-vulnerability.png",
+	"scroll_fog":            "item/scroll/i-fog.png",
+	"scroll_acquirement":    "item/scroll/i-acquirement.png",
+	# --- Weapons: short blades ---
+	"dagger":           "item/weapon/dagger.png",
+	"short_sword":      "item/weapon/short_sword1.png",
+	"rapier":           "item/weapon/short_sword2.png",
+	"saber":            "item/weapon/short_sword3.png",
+	# Long blades
+	"arming_sword":     "item/weapon/long_sword1.png",
+	"longsword":        "item/weapon/long_sword2.png",
+	"katana":           "item/weapon/long_sword3.png",
+	"greatsword":       "item/weapon/long_sword2.png",
+	"scimitar":         "item/weapon/scimitar1.png",
+	# Axes
+	"axe":              "item/weapon/hand_axe1.png",
+	"axe_medium":       "item/weapon/battle_axe1.png",
+	"waraxe":           "item/weapon/war_axe1.png",
+	"throwing_axe":     "item/weapon/hand_axe2.png",
+	# Maces / clubs
+	"club":             "item/weapon/club.png",
+	"mace":             "item/weapon/mace1.png",
+	"flail":            "item/weapon/flail1.png",
+	# Polearms
+	"spear":            "item/weapon/spear1.png",
+	"longspear":        "item/weapon/spear1.png",
+	"halberd":          "item/weapon/halberd1.png",
+	"scythe":           "item/weapon/scythe1.png",
+	"trident":          "item/weapon/trident1.png",
+	# Ranged
+	"short_bow":        "item/weapon/ranged/shortbow1.png",
+	"long_bow":         "item/weapon/ranged/longbow1.png",
+	"bow":              "item/weapon/ranged/longbow1.png",
+	"crossbow":         "item/weapon/ranged/arbalest1.png",
+	"slingshot":        "item/weapon/ranged/sling1.png",
+	"boomerang":        "item/weapon/ranged/boomerang1.png",
+	# Staves
+	"gnarled_staff":    "item/weapon/quarterstaff.png",
+	"fire_staff":       "item/staff/i-staff_fire.png",
+	"ice_staff":        "item/staff/i-staff_cold.png",
+	"lightning_staff":  "item/staff/i-staff_air.png",
+	"crystal_staff":    "item/staff/i-staff_energy.png",
+	# Armor — chest
+	"robe":             "item/armour/robe1.png",
+	"leather_chest":    "item/armour/leather_armour1.png",
+	"chain_chest":      "item/armour/chain_mail1.png",
+	"plate_chest":      "item/armour/plate1.png",
+	# Legs (DCSS doesn't split — reuse second variants)
+	"leather_legs":     "item/armour/leather_armour2.png",
+	"chain_legs":       "item/armour/chain_mail2.png",
+	"plate_legs":       "item/armour/plate2.png",
+	# Boots
+	"leather_boots":    "item/armour/boots1.png",
+	"plate_boots":      "item/armour/boots2.png",
+	# Helms (under headgear/)
+	"leather_helm":     "item/armour/headgear/helmet1.png",
+	"plate_helm":       "item/armour/headgear/helmet2.png",
+	# Gloves
+	"leather_gloves":   "item/armour/glove1.png",
+	"plate_gloves":     "item/armour/glove2.png",
+	# Aliases for legacy ids
+	"leather_armor":    "item/armour/leather_armour1.png",
+	"chain_mail":       "item/armour/chain_mail1.png",
+	"plate_armor":      "item/armour/plate1.png",
+	# Spellbooks — cover colour picked per school for flavour
+	"book_conjurations":   "item/book/dark_blue.png",
+	"book_flames":         "item/book/red.png",
+	"book_frost":          "item/book/light_blue.png",
+	"book_earth":          "item/book/dark_brown.png",
+	"book_air":            "item/book/cyan.png",
+	"book_necromancy":     "item/book/book_of_the_dead.png",
+	"book_hexes":          "item/book/magenta.png",
+	"book_translocations": "item/book/purple.png",
+	"book_minor_magic":    "item/book/parchment.png",
 }
 
 const PLAYER_RACES: Dictionary = {
 	# --- Warrior jobs ---
-	"fighter":            "players/fighter.png",
-	"gladiator":          "players/fighter.png",
-	"berserker":          "players/barbarian.png",
-	"barbarian":          "players/barbarian.png",
-	"monk":               "players/fighter.png",
+	"fighter":            "player/base/human_m.png",
+	"gladiator":          "mon/humanoids/humans/imperial_myrmidon.png",
+	"berserker":          "player/base/orc_m.png",
+	"barbarian":          "player/base/orc_m.png",
+	"monk":               "player/base/human2_m.png",
 	# --- Ranged jobs ---
-	"ranger":             "players/ranger.png",
-	"hunter":             "players/ranger.png",
-	"arcane_marksman":    "players/ranger.png",
+	"ranger":             "player/base/elf_m.png",
+	"hunter":             "player/base/elf_m.png",
+	"arcane_marksman":    "player/base/deep_elf_m.png",
 	# --- Rogue jobs ---
-	"rogue":              "players/rogue.png",
-	"assassin":           "players/rogue.png",
-	"brigand":            "players/rogue.png",
+	"rogue":              "player/base/halfling_m.png",
+	"assassin":           "player/base/halfling_m.png",
+	"brigand":            "player/base/halfling_m.png",
 	# --- Hybrid ---
-	"skald":              "players/fighter.png",
+	"skald":              "player/base/human_m.png",
 	# --- Divine ---
-	"cleric":             "players/cleric.png",
+	"cleric":             "mon/humanoids/humans/human.png",
 	# --- Mage jobs ---
-	"mage":               "players/mage.png",
-	"warlock":            "players/warlock.png",
-	"wizard":             "players/mage.png",
-	"conjurer":           "players/mage.png",
-	"necromancer":        "players/warlock.png",
-	"fire_elementalist":  "players/mage.png",
-	"ice_elementalist":   "players/mage.png",
-	"earth_elementalist": "players/mage.png",
-	"air_elementalist":   "players/mage.png",
-	"enchanter":          "players/mage.png",
-	"summoner":           "players/warlock.png",
-	"transmuter":         "players/mage.png",
-	"warper":             "players/mage.png",
+	"mage":               "player/base/deep_elf_m.png",
+	"warlock":            "mon/humanoids/humans/death_knight.png",
+	"wizard":             "mon/humanoids/humans/arcanist.png",
+	"conjurer":           "player/base/deep_elf_m.png",
+	"necromancer":        "mon/humanoids/humans/necromancer.png",
+	"fire_elementalist":  "mon/humanoids/elves/deep_elf_elementalist1.png",
+	"ice_elementalist":   "mon/humanoids/elves/deep_elf_elementalist2.png",
+	"earth_elementalist": "mon/humanoids/elves/deep_elf_elementalist3.png",
+	"air_elementalist":   "mon/humanoids/elves/deep_elf_elementalist4.png",
+	"enchanter":          "player/base/deep_elf_m.png",
+	"summoner":           "mon/humanoids/elves/deep_elf_demonologist.png",
+	"transmuter":         "player/base/deep_elf_m.png",
+	"warper":             "player/base/deep_elf_m.png",
 	# --- Legacy ---
-	"knight":             "players/knight.png",
-	# --- Race sprites (mapped to closest job tile) ---
-	"human":              "players/fighter.png",
-	"hill_orc":           "players/barbarian.png",
-	"minotaur":           "players/barbarian.png",
-	"troll":              "players/barbarian.png",
-	"spriggan":           "players/rogue.png",
-	"catfolk":            "players/rogue.png",
-	"draconian":          "players/fighter.png",
-	"deep_elf":           "players/mage.png",
+	"knight":             "mon/humanoids/humans/hell_knight.png",
+	# --- Race sprites ---
+	"human":              "player/base/human_m.png",
+	"hill_orc":           "player/base/orc_m.png",
+	"minotaur":           "player/base/minotaur_m.png",
+	"troll":              "player/base/troll_m.png",
+	"spriggan":           "player/base/spriggan_m.png",
+	"catfolk":            "player/felids/cat1.png",
+	"draconian":          "player/base/draconian.png",
+	"deep_elf":           "player/base/deep_elf_m.png",
 }
 
+## Doll overlay layers (weapon / chest / legs / boots / helm / gloves).
+## Currently unused by renderers — kept as an infra hook for future per-slot
+## compositing on the DCSS player sprite.
 const PLAYER_DOLL: Dictionary = {}
 
-const _POTION_BASE_TILES: Dictionary = {
-	"red": "items/potion_red.png",
-	"blue": "items/potion_blue.png",
-	"green": "items/potion_green.png",
-	"yellow": "items/potion_yellow.png",
-	"purple": "items/potion_purple.png",
-	"orange": "items/potion_orange.png",
-	"cyan": "items/potion_cyan.png",
-	"white": "items/potion_white.png",
-	"black": "items/potion_black.png",
-	"pink": "items/potion_pink.png",
-}
-
-const _SCROLL_BASE_TILES: Dictionary = {
-	"plain": "items/scroll_plain.png",
-	"blue": "items/scroll_blue.png",
-	"red": "items/scroll_red.png",
-	"green": "items/scroll_green.png",
-	"purple": "items/scroll_purple.png",
-	"gold": "items/scroll_gold.png",
-}
-
+# In-process texture cache so repeated lookups don't re-load.
 static var _cache: Dictionary = {}
 
 
+## Current render mode as stored on GameManager.
 static func mode() -> int:
 	if Engine.get_main_loop() == null:
 		return Mode.DCSS
@@ -269,6 +280,7 @@ static func _load(path_rel: String) -> Texture2D:
 	return tex
 
 
+## Texture for a feature id — uses the active branch override when present.
 static func feature(id: String, branch: String = "") -> Texture2D:
 	if branch == "" and Engine.get_main_loop() != null:
 		var gm: Object = Engine.get_main_loop().root.get_node_or_null("GameManager")
@@ -289,6 +301,8 @@ static func item(id: String) -> Texture2D:
 	return _load(String(ITEMS.get(id, "")))
 
 
+## Base potion / scroll tile (the colour the player sees before identifying).
+## Path picked from a per-run shuffled pool by GameManager.
 static func consumable_base(id: String, kind: String) -> Texture2D:
 	if Engine.get_main_loop() == null:
 		return null
@@ -303,9 +317,15 @@ static func player_race(id: String) -> Texture2D:
 	return _load(String(PLAYER_RACES.get(id, "")))
 
 
+## Doll overlay texture for a slot/item — currently always null (PLAYER_DOLL
+## is empty). Callers should handle null by skipping that layer.
 static func doll_layer(slot: String, item_id: String) -> Texture2D:
-	return null
+	if item_id == "":
+		return null
+	var slot_map: Dictionary = PLAYER_DOLL.get(slot, {})
+	return _load(String(slot_map.get(item_id, "")))
 
 
+## All known branch ids; useful for menus / debug.
 static func known_branches() -> Array:
 	return BRANCH_TILESETS.keys()
