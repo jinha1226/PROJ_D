@@ -91,9 +91,21 @@ const ITEMS: Dictionary = {
 	"scroll_blink":         "items/scroll_purple.png",
 	"scroll_magic_map":     "items/scroll_green.png",
 	"scroll_identify":      "items/scroll_plain.png",
-	"scroll_remove_curse":  "items/scroll_gold.png",
-	"scroll_enchant_armor": "items/scroll_red.png",
-	"scroll_enchant_weapon":"items/scroll_plain.png",
+	"scroll_remove_curse":     "items/scroll_gold.png",
+	"scroll_enchant_armor":    "items/scroll_red.png",
+	"scroll_enchant_weapon":   "items/scroll_plain.png",
+	"potion_curing":           "items/potion_green.png",
+	"potion_resistance":       "items/potion_blue.png",
+	"potion_haste":            "items/potion_yellow.png",
+	"potion_degeneration":     "items/potion_black.png",
+	"potion_restore":          "items/potion_white.png",
+	"potion_magic":            "items/potion_purple.png",
+	"scroll_fear":             "items/scroll_red.png",
+	"scroll_immolation":       "items/scroll_plain.png",
+	"scroll_holy_word":        "items/scroll_gold.png",
+	"scroll_vulnerability":    "items/scroll_purple.png",
+	"scroll_fog":              "items/scroll_blue.png",
+	"scroll_acquirement":      "items/scroll_green.png",
 	"dagger":           "items/dagger.png",
 	"short_sword":      "items/short_sword.png",
 	"rapier":           "items/short_sword2.png",
@@ -154,24 +166,49 @@ const ITEMS: Dictionary = {
 }
 
 const PLAYER_RACES: Dictionary = {
-	# Job sprites (used in-game and on job select screen)
-	"fighter":    "players/fighter.png",
-	"barbarian":  "players/barbarian.png",
-	"ranger":     "players/ranger.png",
-	"rogue":      "players/rogue.png",
-	"mage":       "players/mage.png",
-	"cleric":     "players/cleric.png",
-	"warlock":    "players/warlock.png",
-	"knight":     "players/knight.png",
-	# Race sprites (mapped to closest job tile for now)
-	"human":      "players/fighter.png",
-	"hill_orc":   "players/barbarian.png",
-	"minotaur":   "players/barbarian.png",
-	"troll":      "players/barbarian.png",
-	"spriggan":   "players/rogue.png",
-	"catfolk":    "players/rogue.png",
-	"draconian":  "players/fighter.png",
-	"deep_elf":   "players/mage.png",
+	# --- Warrior jobs ---
+	"fighter":            "players/fighter.png",
+	"gladiator":          "players/fighter.png",
+	"berserker":          "players/barbarian.png",
+	"barbarian":          "players/barbarian.png",
+	"monk":               "players/fighter.png",
+	# --- Ranged jobs ---
+	"ranger":             "players/ranger.png",
+	"hunter":             "players/ranger.png",
+	"arcane_marksman":    "players/ranger.png",
+	# --- Rogue jobs ---
+	"rogue":              "players/rogue.png",
+	"assassin":           "players/rogue.png",
+	"brigand":            "players/rogue.png",
+	# --- Hybrid ---
+	"skald":              "players/fighter.png",
+	# --- Divine ---
+	"cleric":             "players/cleric.png",
+	# --- Mage jobs ---
+	"mage":               "players/mage.png",
+	"warlock":            "players/warlock.png",
+	"wizard":             "players/mage.png",
+	"conjurer":           "players/mage.png",
+	"necromancer":        "players/warlock.png",
+	"fire_elementalist":  "players/mage.png",
+	"ice_elementalist":   "players/mage.png",
+	"earth_elementalist": "players/mage.png",
+	"air_elementalist":   "players/mage.png",
+	"enchanter":          "players/mage.png",
+	"summoner":           "players/warlock.png",
+	"transmuter":         "players/mage.png",
+	"warper":             "players/mage.png",
+	# --- Legacy ---
+	"knight":             "players/knight.png",
+	# --- Race sprites (mapped to closest job tile) ---
+	"human":              "players/fighter.png",
+	"hill_orc":           "players/barbarian.png",
+	"minotaur":           "players/barbarian.png",
+	"troll":              "players/barbarian.png",
+	"spriggan":           "players/rogue.png",
+	"catfolk":            "players/rogue.png",
+	"draconian":          "players/fighter.png",
+	"deep_elf":           "players/mage.png",
 }
 
 const PLAYER_DOLL: Dictionary = {}

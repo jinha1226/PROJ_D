@@ -60,6 +60,11 @@ signal inventory_changed
 var quickslot_ids: Array[String] = ["", "", "", "", "", "", "", ""]
 signal quickslots_changed
 
+# Temporary resistance: reduces damage for N more player turns.
+var resist_turns: int = 0
+# Vulnerability stacks applied to visible monsters (turns remaining).
+var _vuln_applied: bool = false
+
 const _CHAR_SPRITE_SCENE := preload("res://scenes/entities/CharacterSprite.tscn")
 const _MOVE_TWEEN_DUR: float = 0.12
 const _ATTACK_LUNGE_DUR: float = 0.08
@@ -198,8 +203,9 @@ func _on_self_died() -> void:
 
 
 func _on_player_turn_started() -> void:
-	# No-op: player turn is driven by TouchInput.
-	pass
+	# Decrement temporary buffs.
+	if resist_turns > 0:
+		resist_turns -= 1
 
 
 var trait_res: TraitData = null
@@ -716,6 +722,124 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 				CombatLog.add("Learned: %s" % ", ".join(newly))
 			spells_learned.emit()
 			return true
+		"curing":
+			if stats == null:
+				return false
+			var amt: int = int(info.get("amount", 15))
+			stats.HP = min(stats.hp_max, stats.HP + amt)
+			stats_changed.emit()
+			CombatLog.add("You feel much better! (+%d HP)" % amt)
+			return true
+		"resistance":
+			resist_turns = int(info.get("turns", 5))
+			CombatLog.add("You feel resistant to damage! (%d turns)" % resist_turns)
+			return true
+		"haste":
+			# Skip monster action this turn by ending and immediately starting a new player turn.
+			TurnManager.end_player_turn()
+			CombatLog.add("Time seems to slow around you!")
+			return true
+		"degenerate":
+			if stats == null:
+				return false
+			var amt: int = int(info.get("amount", 8))
+			stats.hp_max = max(1, stats.hp_max - amt)
+			stats.HP = min(stats.HP, stats.hp_max)
+			stats_changed.emit()
+			CombatLog.add("You feel your life force drain away! (-%d max HP)" % amt)
+			return true
+		"restore_all":
+			if stats == null:
+				return false
+			stats.HP = stats.hp_max
+			stats.MP = stats.mp_max
+			stats_changed.emit()
+			CombatLog.add("You are fully restored!")
+			return true
+		"fear_monsters":
+			var count: int = 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not ("is_alive" in m) or not m.is_alive:
+					continue
+				m.set_meta("_flee_turns", 4)
+				count += 1
+			CombatLog.add("Monsters flee in terror! (%d affected)" % count)
+			return true
+		"immolation":
+			var count: int = 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not ("is_alive" in m) or not m.is_alive:
+					continue
+				if not ("grid_pos" in m):
+					continue
+				var dist: int = max(abs(m.grid_pos.x - grid_pos.x), abs(m.grid_pos.y - grid_pos.y))
+				if dist <= 10:
+					var fire_dmg: int = randi_range(15, 30)
+					m.take_damage(fire_dmg)
+					count += 1
+			CombatLog.add("Flames engulf the dungeon! (%d monsters scorched)" % count)
+			return true
+		"holy_word":
+			const _UNDEAD_IDS: Array = ["skeleton", "ghoul", "lich", "bog_body", "zombie", "wraith"]
+			var count: int = 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not ("is_alive" in m) or not m.is_alive:
+					continue
+				if not ("data" in m) or m.data == null:
+					continue
+				if not _UNDEAD_IDS.has(String(m.data.id)):
+					continue
+				var dist: int = max(abs(m.grid_pos.x - grid_pos.x), abs(m.grid_pos.y - grid_pos.y))
+				if dist <= 12:
+					m.take_damage(randi_range(20, 40))
+					count += 1
+			CombatLog.add("Holy light smites the undead! (%d struck)" % count)
+			return true
+		"vulnerability":
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not ("is_alive" in m) or not m.is_alive:
+					continue
+				m.set_meta("_vuln_turns", 4)
+			CombatLog.add("Monsters' defences crumble!")
+			return true
+		"fog":
+			var all_tiles: Array = []
+			if generator != null:
+				for x in DungeonGenerator.MAP_WIDTH:
+					for y in DungeonGenerator.MAP_HEIGHT:
+						var p: Vector2i = Vector2i(x, y)
+						if generator.is_walkable(p):
+							all_tiles.append(p)
+			var count: int = 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not ("is_alive" in m) or not m.is_alive:
+					continue
+				if all_tiles.is_empty():
+					break
+				var idx: int = randi() % all_tiles.size()
+				if m.has_method("move_to_grid"):
+					m.move_to_grid(all_tiles[idx])
+					count += 1
+			CombatLog.add("A thick fog scatters your foes! (%d displaced)" % count)
+			return true
+		"acquirement":
+			if generator == null:
+				return false
+			var _acq_weapons: Array = ["longsword", "arming_sword", "waraxe", "mace", "short_bow",
+					"halberd", "rapier", "gnarled_staff", "crystal_staff"]
+			var _acq_armor: Array = ["chain_chest", "plate_chest", "leather_chest",
+					"plate_helm", "leather_helm", "plate_boots"]
+			var pool: Array = _acq_weapons + _acq_armor
+			var chosen: String = pool[randi() % pool.size()]
+			# Emit a pickup-like event: drop item at player position for auto-pickup.
+			var fi_script = load("res://scripts/entities/FloorItem.gd")
+			if fi_script != null:
+				var fi: Node2D = Node2D.new()
+				fi.set_script(fi_script)
+				get_tree().get_first_node_in_group("entity_layer").add_child(fi)
+				fi.setup(generator, grid_pos, {"id": chosen, "cursed": false})
+				CombatLog.add("An item appears: %s!" % chosen.replace("_", " ").capitalize())
+			return true
 		_:
 			print("Unknown consumable effect: %s" % info.get("effect"))
 			return false
@@ -874,6 +998,8 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 func take_damage(amount: int) -> void:
 	if not is_alive:
 		return
+	if resist_turns > 0:
+		amount = max(1, amount / 2)
 	stats.HP -= amount
 	if stats.HP <= 0:
 		stats.HP = 0

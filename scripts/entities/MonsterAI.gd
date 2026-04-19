@@ -9,6 +9,26 @@ static func act(m: Monster) -> void:
 	if m.slowed_turns > 0:
 		m.slowed_turns -= 1
 		return
+	# Fear: flee from the nearest hostile.
+	if m.has_meta("_flee_turns"):
+		var ft: int = int(m.get_meta("_flee_turns", 0))
+		if ft > 0:
+			m.set_meta("_flee_turns", ft - 1)
+			if ft <= 1:
+				m.remove_meta("_flee_turns")
+			var flee_from: Node = _nearest_hostile(m)
+			if flee_from != null:
+				_step_away_from(m, flee_from.grid_pos)
+			return
+		else:
+			m.remove_meta("_flee_turns")
+	# Vulnerability countdown.
+	if m.has_meta("_vuln_turns"):
+		var vt: int = int(m.get_meta("_vuln_turns", 0))
+		if vt <= 1:
+			m.remove_meta("_vuln_turns")
+		else:
+			m.set_meta("_vuln_turns", vt - 1)
 	# Choose the nearest hostile (player OR companion). Companions count as
 	# enemies to monsters, so a monster next to a summoned skeleton will
 	# whack the skeleton instead of running past it toward the player.
@@ -122,6 +142,27 @@ static func _step_toward(m: Monster, target: Vector2i) -> void:
 		if _can_enter(m, nxt):
 			_move_to(m, nxt)
 			return
+
+
+static func _step_away_from(m: Monster, threat: Vector2i) -> void:
+	var dx: int = sign(m.grid_pos.x - threat.x)
+	var dy: int = sign(m.grid_pos.y - threat.y)
+	var candidates: Array[Vector2i] = []
+	if dx != 0 and dy != 0:
+		candidates.append(Vector2i(dx, dy))
+	if dx != 0:
+		candidates.append(Vector2i(dx, 0))
+	if dy != 0:
+		candidates.append(Vector2i(0, dy))
+	# Perpendicular fallbacks
+	candidates.append(Vector2i(-dy, dx))
+	candidates.append(Vector2i(dy, -dx))
+	for delta in candidates:
+		var nxt: Vector2i = m.grid_pos + delta
+		if _can_enter(m, nxt):
+			_move_to(m, nxt)
+			return
+	_maybe_wander(m)
 
 
 static func _maybe_wander(m: Monster) -> void:

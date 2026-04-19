@@ -1,17 +1,15 @@
 class_name MonsterSpawner
 
 const MONSTER_SCENE_PATH: String = "res://scenes/entities/Monster.tscn"
-const MAX_COUNT: int = 12
+const MAX_COUNT: int = 14
 
-## Branch → regular monster ids. Each branch covers one 5-floor segment, so
-## the pool deliberately stays narrow — variety comes from rotating branches,
-## not from huge per-floor lists.
+## Branch → regular monster ids, ordered roughly easiest→hardest within the branch.
 const _BRANCH_REGULARS: Dictionary = {
-	"main":    ["rat", "bat", "goblin", "kobold", "jackal"],
-	"mine":    ["hobgoblin", "gnoll", "orc", "orc_warrior", "kobold"],
-	"forest":  ["adder", "wolf", "ball_python", "boggart", "jackal"],
-	"swamp":   ["ghoul", "bog_body", "alligator", "adder", "boggart"],
-	"volcano": ["hell_hound", "fire_giant", "lich", "orc_warrior", "ghoul"],
+	"main":    ["rat", "bat", "goblin", "kobold", "jackal", "hobgoblin"],
+	"mine":    ["hobgoblin", "kobold", "gnoll", "orc", "orc_warrior", "skeleton"],
+	"forest":  ["jackal", "adder", "wolf", "ball_python", "boggart", "fire_sprite"],
+	"swamp":   ["adder", "boggart", "ghoul", "bog_body", "alligator", "skeleton"],
+	"volcano": ["hell_hound", "fire_sprite", "ghoul", "orc_warrior", "fire_giant", "lich"],
 }
 
 ## Boss-floor (depth % 5 == 0) → boss id. One named monster per segment.
@@ -60,9 +58,10 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 			b.setup(gen, boss_tile, boss_data)
 			result.append(b)
 
+	# Boss floors also get a handful of normal regulars as guards.
+	var base_count: int = clamp(3 + depth, 5, MAX_COUNT)
 	if is_boss_floor:
-		return result
-	var base_count: int = min(MAX_COUNT, 4 + depth * 2)
+		base_count = clamp(base_count / 2, 2, 5)
 	var count: int = base_count
 
 	var spawned: int = 0

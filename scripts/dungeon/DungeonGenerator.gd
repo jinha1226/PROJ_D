@@ -1,11 +1,11 @@
 class_name DungeonGenerator extends Node
 
-const MAP_WIDTH: int = 40
-const MAP_HEIGHT: int = 60
+const MAP_WIDTH: int = 50
+const MAP_HEIGHT: int = 72
 const MIN_ROOM_SIZE: int = 5
-const MAX_ROOM_SIZE: int = 14
-# BSP depth 3 → at most 8 leaf rooms. With min-size culling typically 5~8.
-const BSP_MAX_DEPTH: int = 3
+const MAX_ROOM_SIZE: int = 16
+# BSP depth 4 → at most 16 leaf rooms; typically 8–12 after min-size culling.
+const BSP_MAX_DEPTH: int = 4
 
 enum TileType { WALL, FLOOR, DOOR_OPEN, DOOR_CLOSED, STAIRS_DOWN, STAIRS_UP, WATER, LAVA, TRAP, BRANCH_ENTRANCE, SHOP, ALTAR }
 

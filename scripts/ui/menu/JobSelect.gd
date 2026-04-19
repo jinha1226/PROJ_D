@@ -3,12 +3,27 @@ extends Control
 const GAME_PATH := "res://scenes/main/Game.tscn"
 const RACE_SELECT_PATH := "res://scenes/menu/RaceSelect.tscn"
 const JOB_IDS: Array[String] = [
-	"fighter", "barbarian", "ranger", "rogue", "mage", "warlock",
+	# Warriors
+	"fighter", "gladiator", "berserker", "barbarian", "monk",
+	# Adventurers
+	"ranger", "hunter", "arcane_marksman",
+	# Rogues
+	"rogue", "assassin", "brigand",
+	# Hybrid / Skald
+	"skald",
+	# Divine
+	"cleric",
+	# Mages
+	"mage", "warlock", "wizard", "conjurer", "necromancer",
+	"fire_elementalist", "ice_elementalist", "earth_elementalist",
+	"air_elementalist", "enchanter", "summoner",
+	# Transmuters / Warpers
+	"transmuter", "warper",
 ]
 
-const _CARD_W: float = 480.0
-const _CARD_H_COMPACT: float = 560.0
-const _CARD_H_EXPANDED: float = 860.0
+const _CARD_W: float = 380.0
+const _CARD_H_COMPACT: float = 480.0
+const _CARD_H_EXPANDED: float = 780.0
 
 var _selected_id: String = ""
 var _cards: Dictionary = {}

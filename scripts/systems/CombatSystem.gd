@@ -52,6 +52,9 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 		def_ac = defender.ac
 	elif "stats" in defender and defender.stats != null:
 		def_ac = defender.stats.AC
+	# Vulnerability (from Scroll of Vulnerability) strips half AC.
+	if defender.has_method("has_meta") and defender.has_meta("_vuln_turns"):
+		def_ac = def_ac / 2
 
 	# Defender armour skill bonus (monsters don't have one; safe 0 fallback).
 	var armour_skill_level: int = 0

@@ -27,7 +27,8 @@ var _longpress_fired: bool = false
 
 var _auto_move_path: Array[Vector2i] = []
 var _is_auto_moving: bool = false
-const MAX_AUTO_STEPS: int = 200
+var _auto_exploring: bool = false  # continuous explore until done / interrupted
+const MAX_AUTO_STEPS: int = 400
 var _auto_steps: int = 0
 var _auto_move_grace: float = 0.0
 
@@ -138,12 +139,18 @@ func _on_tap(grid: Vector2i) -> void:
 
 
 ## Explore the dungeon automatically: move toward the nearest unexplored tile.
+## Continuous — re-calculates a new target whenever the current path is done.
 func begin_auto_explore() -> bool:
 	if player == null or generator == null or not player.is_alive:
+		return false
+	# If already exploring, stop (toggle).
+	if _auto_exploring:
+		_cancel_auto_move()
 		return false
 	var target: Vector2i = _farthest_floor_from(player.grid_pos)
 	if target == player.grid_pos:
 		return false
+	_auto_exploring = true
 	return begin_auto_move_to(target)
 
 
@@ -213,15 +220,18 @@ func _on_player_turn_started() -> void:
 func _step_auto_move() -> void:
 	if not _is_auto_moving:
 		return
-	if _auto_move_path.is_empty():
-		_cancel_auto_move()
-		return
 	if _monster_in_sight():
 		_cancel_auto_move()
 		return
+	if _auto_move_path.is_empty():
+		# Path done — if exploring, try to continue to next unexplored tile.
+		if _auto_exploring:
+			_continue_auto_explore()
+		else:
+			_cancel_auto_move()
+		return
 	_auto_steps += 1
 	if _auto_steps > MAX_AUTO_STEPS:
-		push_warning("TouchInput: auto-move exceeded MAX_AUTO_STEPS; cancelling")
 		_cancel_auto_move()
 		return
 	var next_tile: Vector2i = _auto_move_path[0]
@@ -230,11 +240,44 @@ func _step_auto_move() -> void:
 	var delta: Vector2i = next_tile - player.grid_pos
 	var moved_ok: bool = player.try_move(delta)
 	if not moved_ok:
+		# Blocked (door/wall changed); retry next target if exploring.
+		if _auto_exploring:
+			_auto_move_path.clear()
+			_continue_auto_explore()
+		else:
+			_cancel_auto_move()
+
+
+## Pick up any floor item on the current tile, then find the next explore target.
+func _continue_auto_explore() -> void:
+	if player == null or generator == null or not player.is_alive:
 		_cancel_auto_move()
+		return
+	# Pick up items on current tile automatically.
+	for fi in get_tree().get_nodes_in_group("floor_items"):
+		if not is_instance_valid(fi) or not ("grid_pos" in fi):
+			continue
+		if fi.grid_pos == player.grid_pos and player.has_method("pick_up_item"):
+			player.pick_up_item(fi)
+			break
+	# Find next unexplored target.
+	var target: Vector2i = _farthest_floor_from(player.grid_pos)
+	if target == player.grid_pos:
+		# Fully explored — stop.
+		_cancel_auto_move()
+		return
+	var path: Array[Vector2i] = Pathfinding.find_path(generator, player.grid_pos, target)
+	if path.is_empty():
+		_cancel_auto_move()
+		return
+	_auto_move_path = path
+	_auto_move_grace = 0.1
+	_update_path_overlay()
 
 
 func _cancel_auto_move() -> void:
 	_is_auto_moving = false
+	_auto_exploring = false
 	_auto_move_path.clear()
 	_auto_steps = 0
 	if dmap != null:
