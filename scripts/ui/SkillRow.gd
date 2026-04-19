@@ -4,25 +4,39 @@ class_name SkillRow
 signal training_toggled(skill_id: String, enabled: bool)
 
 const SKILL_NAMES: Dictionary = {
-	# Attack
-	"melee": "Melee",
-	"ranged": "Ranged",
-	"magic": "Magic",
-	# Support
+	"axe": "Axe",
+	"short_blade": "Short Blades",
+	"long_blade": "Long Blades",
+	"mace": "Maces & Flails",
+	"polearm": "Polearms",
+	"staff": "Staves",
+	"bow": "Bows",
+	"crossbow": "Crossbows",
+	"sling": "Slings",
+	"throwing": "Throwing",
 	"fighting": "Fighting",
-	"spellcasting": "Spellcasting",
 	"armour": "Armour",
 	"dodging": "Dodging",
 	"shields": "Shields",
-	# Misc
+	"spellcasting": "Spellcasting",
+	"conjurations": "Conjurations",
+	"fire": "Fire Magic",
+	"cold": "Cold Magic",
+	"earth": "Earth Magic",
+	"air": "Air Magic",
+	"necromancy": "Necromancy",
+	"hexes": "Hexes",
+	"translocations": "Translocations",
+	"summonings": "Summonings",
 	"stealth": "Stealth",
 	"evocations": "Evocations",
-	"essence_channeling": "Essence",
+	"essence_channeling": "Essence Channeling",
 }
 
 const CATEGORY_NAMES: Dictionary = {
-	"attack": "Attack",
-	"support": "Support",
+	"weapon": "Weapon",
+	"defense": "Defense",
+	"magic": "Magic",
 	"misc": "Misc",
 }
 
@@ -94,7 +108,7 @@ func _ready() -> void:
 
 func bind(p_skill_id: String, state: Dictionary, category: String) -> void:
 	skill_id = p_skill_id
-	_is_magic = false  # All skills are trainable now
+	_is_magic = (category == "magic")
 	_name_label.text = SKILL_NAMES.get(skill_id, skill_id)
 	_cat_label.text = CATEGORY_NAMES.get(category, category)
 

@@ -20,8 +20,10 @@ hair_color = "carrot"
 base_ac = 0
 racial_trait = "spriggan_speed"
 skill_aptitudes = {
-	"fighting": -1, "melee": 2,
+	"fighting": -1, "short_blade": 2, "staff": 1,
 	"armour": -3, "shields": -3, "dodging": 3, "stealth": 3,
-	"spellcasting": 1, "magic": 1,
-	"evocations": 3,
+	"spellcasting": 1, "conjurations": -2, "hexes": 3, "fire": -2,
+	"cold": -2, "earth": -2, "air": 1, "necromancy": 1,
+	"translocations": 3, "summonings": 0,
+	"evocations": 3, "throwing": 0,
 }

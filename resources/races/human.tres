@@ -20,4 +20,5 @@ hair_color = "brown"
 base_ac = 0
 racial_trait = ""
 skill_aptitudes = {
+	"invocations": 1,
 }

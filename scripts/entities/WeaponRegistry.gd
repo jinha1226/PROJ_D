@@ -7,45 +7,45 @@ extends RefCounted
 # Damage / delay calibrated to DCSS base values so combat pacing
 # roughly matches the source game. dmg = max roll of the weapon die.
 const DATA: Dictionary = {
-	# Axes
-	"axe":        {"dmg": 7,  "skill": "melee", "delay": 1.3},
-	"axe_medium": {"dmg": 11, "skill": "melee", "delay": 1.5},
-	"waraxe":     {"dmg": 11, "skill": "melee", "delay": 1.5},
+	# Axes — DCSS: hand axe 7, war axe 11, battleaxe 15
+	"axe":        {"dmg": 7,  "skill": "axe", "delay": 1.3},
+	"axe_medium": {"dmg": 11, "skill": "axe", "delay": 1.5},
+	"waraxe":     {"dmg": 11, "skill": "axe", "delay": 1.5},
 	# Maces / clubs / flails
-	"club":  {"dmg": 5,  "skill": "melee", "delay": 1.3},
-	"mace":  {"dmg": 9,  "skill": "melee", "delay": 1.4},
-	"flail": {"dmg": 11, "skill": "melee", "delay": 1.4},
+	"club":  {"dmg": 5,  "skill": "mace", "delay": 1.3},
+	"mace":  {"dmg": 9,  "skill": "mace", "delay": 1.4},
+	"flail": {"dmg": 11, "skill": "mace", "delay": 1.4},
 	# Short blades
-	"dagger":      {"dmg": 4, "skill": "melee", "delay": 1.0},
-	"short_sword": {"dmg": 6, "skill": "melee", "delay": 1.1},
-	"rapier":      {"dmg": 7, "skill": "melee", "delay": 1.2},
-	"saber":       {"dmg": 7, "skill": "melee", "delay": 1.2},
+	"dagger":      {"dmg": 4, "skill": "short_blade", "delay": 1.0},
+	"short_sword": {"dmg": 6, "skill": "short_blade", "delay": 1.1},
+	"rapier":      {"dmg": 7, "skill": "short_blade", "delay": 1.2},
+	"saber":       {"dmg": 7, "skill": "short_blade", "delay": 1.2},
 	# Long blades
-	"arming_sword": {"dmg": 7,  "skill": "melee", "delay": 1.3},
-	"longsword":    {"dmg": 10, "skill": "melee", "delay": 1.4},
-	"katana":       {"dmg": 10, "skill": "melee", "delay": 1.4},
-	"scimitar":     {"dmg": 11, "skill": "melee", "delay": 1.5},
-	"greatsword":   {"dmg": 17, "skill": "melee", "delay": 1.7},
+	"arming_sword": {"dmg": 7,  "skill": "long_blade", "delay": 1.3},
+	"longsword":    {"dmg": 10, "skill": "long_blade", "delay": 1.4},
+	"katana":       {"dmg": 10, "skill": "long_blade", "delay": 1.4},
+	"scimitar":     {"dmg": 11, "skill": "long_blade", "delay": 1.5},
+	"greatsword":   {"dmg": 17, "skill": "long_blade", "delay": 1.7},
 	# Polearms
-	"spear":     {"dmg": 7,  "skill": "melee", "delay": 1.2},
-	"longspear": {"dmg": 9,  "skill": "melee", "delay": 1.3},
-	"trident":   {"dmg": 9,  "skill": "melee", "delay": 1.3},
-	"halberd":   {"dmg": 13, "skill": "melee", "delay": 1.5},
-	"scythe":    {"dmg": 14, "skill": "melee", "delay": 1.8},
-	# Ranged
-	"short_bow": {"dmg": 9,  "skill": "ranged", "delay": 1.3},
-	"long_bow":  {"dmg": 15, "skill": "ranged", "delay": 1.6},
-	"bow":       {"dmg": 9,  "skill": "ranged", "delay": 1.3},
-	"crossbow":  {"dmg": 18, "skill": "ranged", "delay": 1.9},
-	"slingshot": {"dmg": 5,  "skill": "ranged", "delay": 1.1},
-	"boomerang":    {"dmg": 5,  "skill": "ranged", "delay": 1.0},
-	"throwing_axe": {"dmg": 8,  "skill": "ranged", "delay": 1.1},
-	# Staves (melee + spell bonus)
-	"gnarled_staff":   {"dmg": 10, "skill": "melee", "delay": 1.3, "spell_bonus": 2},
-	"fire_staff":      {"dmg": 8,  "skill": "melee", "delay": 1.3, "spell_bonus": 3},
-	"ice_staff":       {"dmg": 8,  "skill": "melee", "delay": 1.3, "spell_bonus": 3},
-	"lightning_staff": {"dmg": 8,  "skill": "melee", "delay": 1.3, "spell_bonus": 3},
-	"crystal_staff":   {"dmg": 8,  "skill": "melee", "delay": 1.3, "spell_bonus": 3},
+	"spear":     {"dmg": 7,  "skill": "polearm", "delay": 1.2},
+	"longspear": {"dmg": 9,  "skill": "polearm", "delay": 1.3},
+	"trident":   {"dmg": 9,  "skill": "polearm", "delay": 1.3},
+	"halberd":   {"dmg": 13, "skill": "polearm", "delay": 1.5},
+	"scythe":    {"dmg": 14, "skill": "polearm", "delay": 1.8},
+	# Ranged — DCSS: shortbow 9, longbow 15, arbalest 18, sling 5
+	"short_bow": {"dmg": 9,  "skill": "bow",       "delay": 1.3},
+	"long_bow":  {"dmg": 15, "skill": "bow",       "delay": 1.6},
+	"bow":       {"dmg": 9,  "skill": "bow",       "delay": 1.3},
+	"crossbow":  {"dmg": 18, "skill": "crossbow",  "delay": 1.9},
+	"slingshot": {"dmg": 5,  "skill": "sling",     "delay": 1.1},
+	"boomerang":    {"dmg": 5,  "skill": "throwing",  "delay": 1.0},
+	"throwing_axe": {"dmg": 8,  "skill": "throwing",  "delay": 1.1},
+	# Staves (DCSS quarterstaff: 10)
+	"gnarled_staff":   {"dmg": 10, "skill": "staff", "delay": 1.3, "spell_school": "", "spell_bonus": 2},
+	"fire_staff":      {"dmg": 8,  "skill": "staff", "delay": 1.3, "spell_school": "fire", "spell_bonus": 3},
+	"ice_staff":       {"dmg": 8,  "skill": "staff", "delay": 1.3, "spell_school": "cold", "spell_bonus": 3},
+	"lightning_staff": {"dmg": 8,  "skill": "staff", "delay": 1.3, "spell_school": "air", "spell_bonus": 3},
+	"crystal_staff":   {"dmg": 8,  "skill": "staff", "delay": 1.3, "spell_school": "earth", "spell_bonus": 3},
 	# Evocables
 	"wand_simple": {"dmg": 3, "skill": "evocations", "delay": 1.0},
 }
@@ -117,6 +117,11 @@ const DISPLAY_NAMES: Dictionary = {
 
 static func display_name_for(id: String) -> String:
 	return DISPLAY_NAMES.get(id, id.capitalize().replace("_", " "))
+
+
+static func staff_spell_school(weapon_id: String) -> String:
+	var info: Dictionary = DATA.get(weapon_id, {})
+	return String(info.get("spell_school", ""))
 
 
 static func staff_spell_bonus(weapon_id: String) -> int:

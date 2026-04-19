@@ -12,42 +12,50 @@ const MAX_LEVEL: int = 27
 var auto_training: bool = true
 
 const SKILL_IDS: Array = [
-	# Attack (3 categories)
-	"melee", "ranged", "magic",
-	# Support
-	"fighting", "spellcasting", "armour", "dodging", "shields",
+	# Weapons
+	"axe", "short_blade", "long_blade", "mace", "polearm", "staff",
+	"bow", "crossbow", "sling", "throwing",
+	# Defense
+	"fighting", "armour", "dodging", "shields",
+	# Magic (reserved for M2 but defined)
+	"spellcasting", "conjurations", "fire", "cold", "earth", "air",
+	"necromancy", "hexes", "translocations", "summonings",
 	# Misc
 	"stealth", "evocations", "essence_channeling",
 ]
 
 const SKILL_CATEGORY: Dictionary = {
-	"melee": "attack", "ranged": "attack", "magic": "attack",
+	"axe": "weapon", "short_blade": "weapon", "long_blade": "weapon",
+	"mace": "weapon", "polearm": "weapon", "staff": "weapon",
+	"bow": "weapon", "crossbow": "weapon", "sling": "weapon", "throwing": "weapon",
 
-	"fighting": "support", "spellcasting": "support",
-	"armour": "support", "dodging": "support", "shields": "support",
+	"fighting": "defense", "armour": "defense", "dodging": "defense", "shields": "defense",
+
+	"spellcasting": "magic", "conjurations": "magic", "fire": "magic", "cold": "magic",
+	"earth": "magic", "air": "magic", "necromancy": "magic", "hexes": "magic",
+	"translocations": "magic", "summonings": "magic",
 
 	"stealth": "misc", "evocations": "misc", "essence_channeling": "misc",
 }
 
-## Weapon id → skill id. All melee weapons train "melee", ranged train "ranged".
+## Weapon id → skill id. Used by combat to determine which skill a weapon trains.
+## Mirrors WeaponRegistry.weapon_skill_for() but available as a static dict for
+## cheap iteration / defaulting.
 const WEAPON_SKILL: Dictionary = {
-	# Melee
-	"axe": "melee", "axe_medium": "melee", "waraxe": "melee",
-	"club": "melee", "mace": "melee", "flail": "melee",
-	"dagger": "melee", "short_sword": "melee",
-	"rapier": "melee", "saber": "melee",
-	"arming_sword": "melee", "longsword": "melee",
-	"katana": "melee", "scimitar": "melee", "greatsword": "melee",
-	"spear": "melee", "longspear": "melee", "halberd": "melee",
-	"scythe": "melee", "trident": "melee",
-	"fire_staff": "melee", "ice_staff": "melee", "lightning_staff": "melee",
-	"gnarled_staff": "melee", "crystal_staff": "melee",
-	# Ranged
-	"short_bow": "ranged", "long_bow": "ranged", "bow": "ranged",
-	"crossbow": "ranged",
-	"slingshot": "ranged",
-	"boomerang": "ranged", "throwing_axe": "ranged",
-	# Evocations
+	"axe": "axe", "axe_medium": "axe", "waraxe": "axe",
+	"club": "mace", "mace": "mace", "flail": "mace",
+	"dagger": "short_blade", "short_sword": "short_blade",
+	"rapier": "short_blade", "saber": "short_blade",
+	"arming_sword": "long_blade", "longsword": "long_blade",
+	"katana": "long_blade", "scimitar": "long_blade", "greatsword": "long_blade",
+	"spear": "polearm", "longspear": "polearm", "halberd": "polearm",
+	"scythe": "polearm", "trident": "polearm",
+	"short_bow": "bow", "long_bow": "bow", "bow": "bow",
+	"crossbow": "crossbow",
+	"slingshot": "sling",
+	"boomerang": "throwing",
+	"fire_staff": "staff", "ice_staff": "staff", "lightning_staff": "staff",
+	"gnarled_staff": "staff", "crystal_staff": "staff",
 	"wand_simple": "evocations",
 }
 
@@ -77,14 +85,14 @@ func init_for_player(player: Node, starting_skills: Dictionary) -> void:
 			continue
 		state[id]["level"] = int(starting_skills[id])
 		state[id]["training"] = true
-	# Default-training for core support skills.
+	# Default-training for core defense skills.
 	if state.has("fighting"):
 		state["fighting"]["training"] = true
 	if state.has("armour"):
 		state["armour"]["training"] = true
-	# Any attack skill with level > 0 → training.
+	# Any weapon skill with level > 0 → training.
 	for id in state.keys():
-		if SKILL_CATEGORY.get(id, "") == "attack" and state[id]["level"] > 0:
+		if SKILL_CATEGORY.get(id, "") == "weapon" and state[id]["level"] > 0:
 			state[id]["training"] = true
 	if "skill_state" in player:
 		player.skill_state = state
@@ -167,7 +175,7 @@ func grant_xp(player: Node, amount: float, usage_tags: Array) -> Array:
 
 	if matched.is_empty():
 		for id in st.keys():
-			if SKILL_CATEGORY.get(id, "") == "support":
+			if SKILL_CATEGORY.get(id, "") == "defense":
 				if auto_training or bool(st[id].get("training", false)):
 					matched.append(id)
 

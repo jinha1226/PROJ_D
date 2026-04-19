@@ -20,8 +20,10 @@ hair_color = "brown"
 base_ac = 0
 racial_trait = ""
 skill_aptitudes = {
-	"fighting": -1, "melee": 1, "ranged": 2,
-	"armour": -2, "shields": -3, "dodging": 1, "stealth": 2,
-	"spellcasting": 3, "magic": 3,
+	"fighting": -1, "short_blade": 1, "long_blade": 1, "staff": 1,
+	"bow": 2, "armour": -2, "shields": -3, "dodging": 1, "stealth": 2,
+	"spellcasting": 3,
+	"conjurations": 3, "hexes": 3, "fire": 3, "cold": 3, "earth": 2,
+	"air": 3, "necromancy": 3, "translocations": 3, "summonings": 3,
 	"evocations": 1,
 }

@@ -253,23 +253,27 @@ static func get_known_for_player(player: Node, skill_sys: Node) -> Array[String]
 			if sp != "" and not known.has(sp):
 				known.append(sp)
 		return known
-	# Fallback: unlock spells by magic skill level vs difficulty.
 	if skill_sys == null:
 		return known
-	var magic_lv: int = skill_sys.get_level(player, "magic")
-	for spell_id in SPELLS:
-		var diff: int = int(SPELLS[spell_id].get("difficulty", 1))
-		if magic_lv >= diff and not known.has(spell_id):
-			known.append(spell_id)
+	for school in SCHOOL_SPELLS:
+		var level: int = skill_sys.get_level(player, school)
+		if level <= 0:
+			continue
+		for entry in SCHOOL_SPELLS[school]:
+			var sid2: String = String(entry.get("id", ""))
+			var min_lv: int = int(entry.get("min_level", 1))
+			if level >= min_lv and not known.has(sid2):
+				known.append(sid2)
 	return known
 
 
-## failure_chance uses the unified "magic" skill level + spellcasting modifier.
-## Callers pass magic_level (from skill "magic") and spellcasting_level (from "spellcasting").
-static func failure_chance(spell_id: String, magic_level: int, spellcasting_level: int) -> float:
+static func failure_chance(spell_id: String, school_level: int, spellcasting_level: int, school2_level: int = -1) -> float:
 	var info: Dictionary = SPELLS.get(spell_id, {})
 	var diff: int = int(info.get("difficulty", 1))
-	var effective: float = float(magic_level) + float(spellcasting_level) * 0.5
+	var eff_school: int = school_level
+	if school2_level >= 0:
+		eff_school = min(school_level, school2_level)
+	var effective: float = float(eff_school) + float(spellcasting_level) * 0.5
 	var gap: float = effective - float(diff)
 	if gap >= 10:
 		return 0.0

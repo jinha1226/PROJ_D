@@ -22,8 +22,10 @@ ears_color = "ginger"
 base_ac = 0
 racial_trait = "catfolk_claws"
 skill_aptitudes = {
-	"fighting": 0, "melee": 1,
+	"fighting": 0, "short_blade": 1,
 	"armour": -3, "shields": -3, "dodging": 3, "stealth": 3,
-	"spellcasting": 1, "magic": 1,
-	"evocations": 3,
+	"spellcasting": 1, "conjurations": 0, "hexes": 2,
+	"fire": 0, "cold": 0, "earth": 0, "air": 0, "necromancy": 1,
+	"translocations": 2, "summonings": 1,
+	"evocations": 3, "throwing": 0,
 }

@@ -12,9 +12,10 @@ const RESULT_SCREEN_SCENE: PackedScene = preload("res://scenes/ui/ResultScreen.t
 # [skill-ui-agent] level-up toast prefab.
 const SKILL_TOAST_SCENE: PackedScene = preload("res://scenes/ui/SkillLevelUpToast.tscn")
 
-const _SKILL_CATEGORIES: Array = ["attack", "support", "misc"]
+const _SKILL_CATEGORIES: Array = ["weapon", "defense", "magic", "misc"]
 const _SKILL_CATEGORY_LABELS: Dictionary = {
-	"attack": "ATTACK", "support": "SUPPORT", "misc": "MISC",
+	"weapon": "WEAPON", "defense": "DEFENSE",
+	"magic": "MAGIC", "misc": "MISC",
 }
 
 const _COMPANION_SCENE: PackedScene = preload("res://scenes/entities/Companion.tscn")
@@ -362,7 +363,8 @@ func _on_quickslot_pressed(index: int) -> void:
 				CombatLog.add(result.get("message", ""))
 			if result.get("success", false):
 				if skill_system != null:
-					skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, ["magic", "spellcasting"])
+					var school: String = String(info.get("school", "spellcasting"))
+					skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, [school, "spellcasting"])
 				TurnManager.end_player_turn()
 		else:
 			_targeting_spell = spell_id
@@ -542,22 +544,30 @@ func _on_inspect_requested(pos: Vector2i) -> void:
 
 func _get_trait_skills(trait_id: String) -> Dictionary:
 	match trait_id:
-		# Melee traits
-		"sword", "polearm_trait", "axe_trait", "mace_trait", "dagger_trait", "brawler":
-			return {"melee": 3}
-		"shield_trait": return {"shields": 3, "melee": 1}
+		"sword": return {"long_blade": 3}
+		"polearm_trait": return {"polearm": 3}
+		"shield_trait": return {"shields": 3, "short_blade": 1}
 		"heavy_armor": return {"armour": 3}
-		# Ranged traits
-		"throwing_trait", "bow_trait", "crossbow_trait", "throwing_ranger":
-			return {"ranged": 3}
-		"scout": return {"stealth": 3, "ranged": 1}
-		# Utility traits
+		"axe_trait": return {"axe": 3}
+		"mace_trait": return {"mace": 3}
+		"brawler": return {"fighting": 3}
+		"throwing_trait": return {"throwing": 3}
+		"bow_trait": return {"bow": 3}
+		"crossbow_trait": return {"crossbow": 3}
+		"throwing_ranger": return {"throwing": 3}
+		"scout": return {"stealth": 3, "bow": 1}
+		"dagger_trait": return {"short_blade": 3}
 		"acrobat": return {"dodging": 3}
 		"shadow": return {"stealth": 3}
 		"evoker": return {"evocations": 3}
-		# Magic traits — all now train "magic"
-		"fire", "ice", "earth", "air", "necro", "hexer", "arcane", "warper":
-			return {"magic": 3, "spellcasting": 1}
+		"fire": return {"fire": 3, "spellcasting": 1}
+		"ice": return {"cold": 3, "spellcasting": 1}
+		"earth": return {"earth": 3, "spellcasting": 1}
+		"air": return {"air": 3, "spellcasting": 1}
+		"necro": return {"necromancy": 3, "spellcasting": 1}
+		"hexer": return {"hexes": 3, "spellcasting": 1}
+		"arcane": return {"conjurations": 3, "spellcasting": 1}
+		"warper": return {"translocations": 3, "spellcasting": 1}
 	return {}
 
 
@@ -1225,7 +1235,7 @@ func _on_skills_button_pressed() -> void:
 		_close_all_dialogs()
 		return
 	_close_all_dialogs()
-	_open_skills_dialog("attack")
+	_open_skills_dialog("weapon")
 
 
 func _open_skills_dialog(category: String) -> void:
@@ -1309,14 +1319,30 @@ func _on_skill_training_toggled(pressed: bool, skill_id: String) -> void:
 
 
 const _SKILL_DESCS: Dictionary = {
-	"melee": "Melee DMG +5%/lv",
-	"ranged": "Ranged DMG +5%/lv",
-	"magic": "Spell power +2/lv",
-	"fighting": "Combat DMG +2/lv",
+	"axe": "Axe DMG +5%/lv",
+	"short_blade": "Dagger DMG +5%/lv",
+	"long_blade": "Sword DMG +5%/lv",
+	"mace": "Mace DMG +5%/lv",
+	"polearm": "Polearm DMG +5%/lv",
+	"staff": "Staff DMG +5%/lv",
+	"bow": "Bow DMG +5%/lv",
+	"crossbow": "Crossbow DMG +5%/lv",
+	"sling": "Sling DMG +5%/lv",
+	"throwing": "Throw DMG +5%/lv",
+	"fighting": "Melee DMG +2/lv",
 	"armour": "AC +1 per 4 lv",
 	"dodging": "EV +1 per 3 lv",
 	"shields": "Block 5%/lv",
-	"spellcasting": "Fail -3%/lv, MP +1/lv",
+	"spellcasting": "Fail rate -3%/lv, MP +1/lv",
+	"conjurations": "Conj power +2/lv",
+	"fire": "Fire power +2/lv",
+	"cold": "Ice power +2/lv",
+	"earth": "Earth power +2/lv",
+	"air": "Air power +2/lv",
+	"necromancy": "Necro power +2/lv",
+	"hexes": "Hex power +2/lv",
+	"translocations": "Blink range +1/lv",
+	"summonings": "Summon power +2/lv",
 	"stealth": "Detect range -1/lv",
 	"evocations": "Wand power +2/lv",
 	"essence_channeling": "Essence power +2/lv",
@@ -1464,7 +1490,8 @@ func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
 	name_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	name_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var spell_name: String = String(info.get("name", spell_id))
-	var s_lv: int = skill_system.get_level(player, "magic") if skill_system and player else 0
+	var sch_id: String = String(info.get("school", ""))
+	var s_lv: int = skill_system.get_level(player, sch_id) if skill_system and player else 0
 	var s_sc: int = skill_system.get_level(player, "spellcasting") if skill_system and player else 0
 	var fail_p: int = int(SpellRegistry.failure_chance(spell_id, s_lv, s_sc) * 100)
 	var fail_txt: String = " (%d%%)" % fail_p if fail_p > 0 else ""
@@ -1512,10 +1539,10 @@ func _show_spell_info(spell_id: String) -> void:
 	dlg.title = String(info.get("name", spell_id))
 	dlg.ok_button_text = "Close"
 	var sch: String = String(info.get("school", "?"))
-	var sch_lv: int = skill_system.get_level(player, "magic") if skill_system and player else 0
+	var sch_lv: int = skill_system.get_level(player, sch) if skill_system and player else 0
 	var sc_lv: int = skill_system.get_level(player, "spellcasting") if skill_system and player else 0
 	var fail_pct: int = int(SpellRegistry.failure_chance(spell_id, sch_lv, sc_lv) * 100)
-	var text: String = "%s\n\nMP Cost: %d\nSchool: %s  Magic Lv.%d\nDifficulty: %d\nFailure: %d%%\nRange: %d" % [
+	var text: String = "%s\n\nMP Cost: %d\nSchool: %s (Lv.%d)\nDifficulty: %d\nFailure: %d%%\nRange: %d" % [
 		String(info.get("desc", "")),
 		int(info.get("mp", 0)),
 		sch, sch_lv,
@@ -1592,10 +1619,14 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 		return
 	player.stats.MP -= mp_cost
 	player.stats_changed.emit()
-	var magic_lv: int = skill_system.get_level(player, "magic") if skill_system else 0
+	var school: String = String(info.get("school", "spellcasting"))
+	var school_lv: int = skill_system.get_level(player, school) if skill_system else 0
 	var sc_lv: int = skill_system.get_level(player, "spellcasting") if skill_system else 0
-	var staff_bonus2: int = WeaponRegistry.staff_spell_bonus(player.equipped_weapon_id)
-	var eff_school2: int = magic_lv + staff_bonus2
+	var staff_school2: String = WeaponRegistry.staff_spell_school(player.equipped_weapon_id)
+	var staff_bonus2: int = 0
+	if staff_school2 == school or staff_school2 == "":
+		staff_bonus2 = WeaponRegistry.staff_spell_bonus(player.equipped_weapon_id)
+	var eff_school2: int = school_lv + staff_bonus2
 	var fail: float = SpellRegistry.failure_chance(spell_id, eff_school2, sc_lv)
 	if randf() < fail:
 		CombatLog.add("Spell fizzles! (%d%% fail)" % int(fail * 100))
@@ -1638,7 +1669,7 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 			SpellFX.cast_single(fx_layer, player.position, target, dmg, spell_color)
 			CombatLog.add("%s → %d dmg" % [String(info.get("name", spell_id)), dmg])
 	if skill_system != null:
-		skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, ["magic", "spellcasting"])
+		skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, [school, "spellcasting"])
 	TurnManager.end_player_turn()
 
 
@@ -1729,11 +1760,12 @@ func _on_cast_pressed(spell_id: String, dlg: AcceptDialog) -> void:
 	if result.get("message", "") != "":
 		CombatLog.add(result.get("message", ""))
 	if result.get("success", false):
-		# Train magic + spellcasting on successful cast.
+		# Train school + spellcasting on successful cast.
 		if skill_system != null:
 			var info: Dictionary = SpellRegistry.get_spell(spell_id)
+			var school: String = String(info.get("school", "spellcasting"))
 			var xp_gain: float = float(info.get("mp", 1)) * 8.0
-			skill_system.grant_xp(player, xp_gain, ["magic", "spellcasting"])
+			skill_system.grant_xp(player, xp_gain, [school, "spellcasting"])
 		TurnManager.end_player_turn()
 
 
@@ -1751,10 +1783,14 @@ func _execute_cast(spell_id: String) -> Dictionary:
 	player.stats.MP -= mp_cost
 	player.stats_changed.emit()
 
-	var magic_lv2: int = skill_system.get_level(player, "magic") if skill_system else 0
+	var school: String = String(info.get("school", "spellcasting"))
+	var school_lv: int = skill_system.get_level(player, school) if skill_system else 0
 	var sc_lv: int = skill_system.get_level(player, "spellcasting") if skill_system else 0
-	var staff_bonus: int = WeaponRegistry.staff_spell_bonus(player.equipped_weapon_id)
-	var eff_school: int = magic_lv2 + staff_bonus
+	var staff_school: String = WeaponRegistry.staff_spell_school(player.equipped_weapon_id)
+	var staff_bonus: int = 0
+	if staff_school == school or staff_school == "":
+		staff_bonus = WeaponRegistry.staff_spell_bonus(player.equipped_weapon_id)
+	var eff_school: int = school_lv + staff_bonus
 	var fail: float = SpellRegistry.failure_chance(spell_id, eff_school, sc_lv)
 	if randf() < fail:
 		return {"success": false, "message": "Spell fizzles! (%d%% fail)" % int(fail * 100)}
