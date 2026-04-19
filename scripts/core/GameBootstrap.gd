@@ -14,7 +14,7 @@ const SKILL_TOAST_SCENE: PackedScene = preload("res://scenes/ui/SkillLevelUpToas
 
 const _SKILL_CATEGORIES: Array = ["attack", "support", "misc"]
 const _SKILL_CATEGORY_LABELS: Dictionary = {
-	"attack": "공격", "support": "보조", "misc": "기타",
+	"attack": "ATTACK", "support": "SUPPORT", "misc": "MISC",
 }
 
 const _COMPANION_SCENE: PackedScene = preload("res://scenes/entities/Companion.tscn")
@@ -1204,17 +1204,17 @@ func _on_skill_training_toggled(pressed: bool, skill_id: String) -> void:
 
 
 const _SKILL_DESCS: Dictionary = {
-	"melee": "근접 DMG +5%/lv",
-	"ranged": "원거리 DMG +5%/lv",
-	"magic": "마법 위력 +2/lv",
-	"fighting": "근접 DMG +2/lv",
+	"melee": "Melee DMG +5%/lv",
+	"ranged": "Ranged DMG +5%/lv",
+	"magic": "Spell power +2/lv",
+	"fighting": "Combat DMG +2/lv",
 	"armour": "AC +1 per 4 lv",
 	"dodging": "EV +1 per 3 lv",
 	"shields": "Block 5%/lv",
-	"spellcasting": "실패율 -3%/lv, MP +1/lv",
-	"stealth": "탐지범위 -1/lv",
-	"evocations": "에보케이션 위력 +2/lv",
-	"essence_channeling": "에센스 위력 +2/lv",
+	"spellcasting": "Fail -3%/lv, MP +1/lv",
+	"stealth": "Detect range -1/lv",
+	"evocations": "Wand power +2/lv",
+	"essence_channeling": "Essence power +2/lv",
 }
 
 func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> Control:

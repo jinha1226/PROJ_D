@@ -5,25 +5,25 @@ signal training_toggled(skill_id: String, enabled: bool)
 
 const SKILL_NAMES: Dictionary = {
 	# Attack
-	"melee": "근접 전투",
-	"ranged": "원거리",
-	"magic": "마법",
+	"melee": "Melee",
+	"ranged": "Ranged",
+	"magic": "Magic",
 	# Support
-	"fighting": "파이팅",
-	"spellcasting": "스펠캐스팅",
-	"armour": "방어구",
-	"dodging": "회피",
-	"shields": "방패",
+	"fighting": "Fighting",
+	"spellcasting": "Spellcasting",
+	"armour": "Armour",
+	"dodging": "Dodging",
+	"shields": "Shields",
 	# Misc
-	"stealth": "은신",
-	"evocations": "에보케이션",
-	"essence_channeling": "에센스",
+	"stealth": "Stealth",
+	"evocations": "Evocations",
+	"essence_channeling": "Essence",
 }
 
 const CATEGORY_NAMES: Dictionary = {
-	"attack": "공격",
-	"support": "보조",
-	"misc": "기타",
+	"attack": "Attack",
+	"support": "Support",
+	"misc": "Misc",
 }
 
 const MAX_LEVEL: int = 27
