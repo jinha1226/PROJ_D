@@ -9,6 +9,8 @@ signal magic_pressed
 signal status_pressed
 signal wait_pressed
 signal menu_pressed
+signal auto_move_pressed
+signal auto_attack_pressed
 
 @onready var quick_slots: Array = [
 	$Margin/VBox/Row1/QuickSlot0,
@@ -17,6 +19,8 @@ signal menu_pressed
 	$Margin/VBox/Row1/QuickSlot3,
 	$Margin/VBox/Row1/QuickSlot4,
 	$Margin/VBox/Row1/QuickSlot5,
+	$Margin/VBox/Row1/QuickSlot6,
+	$Margin/VBox/Row1/QuickSlot7,
 ]
 @onready var rest_button: Button = $Margin/VBox/Row1/RestButton
 @onready var bag_button: Button = $Margin/VBox/Row2/BagButton
@@ -24,6 +28,8 @@ signal menu_pressed
 @onready var magic_button: Button = $Margin/VBox/Row2/MagicButton
 @onready var status_button: Button = $Margin/VBox/Row2/StatusButton
 @onready var wait_button: Button = $Margin/VBox/Row2/WaitButton
+@onready var auto_move_button: Button = $Margin/VBox/Row2/AutoMoveButton
+@onready var auto_attack_button: Button = $Margin/VBox/Row2/AutoAttackButton
 @onready var menu_button: Button = $Margin/VBox/Row2/MenuButton
 
 
@@ -40,6 +46,8 @@ func _ready() -> void:
 	magic_button.pressed.connect(func(): magic_pressed.emit())
 	status_button.pressed.connect(func(): status_pressed.emit())
 	wait_button.pressed.connect(func(): wait_pressed.emit())
+	auto_move_button.pressed.connect(func(): auto_move_pressed.emit())
+	auto_attack_button.pressed.connect(func(): auto_attack_pressed.emit())
 	menu_button.pressed.connect(func(): menu_pressed.emit())
 
 

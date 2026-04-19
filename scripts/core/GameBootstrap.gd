@@ -184,6 +184,10 @@ func _ready() -> void:
 		bottom_hud.wait_pressed.connect(_on_wait_pressed)
 	if bottom_hud != null and bottom_hud.has_signal("menu_pressed"):
 		bottom_hud.menu_pressed.connect(_on_menu_pressed)
+	if bottom_hud != null and bottom_hud.has_signal("auto_move_pressed"):
+		bottom_hud.auto_move_pressed.connect(_on_auto_move_pressed)
+	if bottom_hud != null and bottom_hud.has_signal("auto_attack_pressed"):
+		bottom_hud.auto_attack_pressed.connect(_on_auto_attack_pressed)
 
 	# [skill-ui-agent] persistent level-up toast layer.
 	skill_toast = SKILL_TOAST_SCENE.instantiate()
@@ -561,6 +565,40 @@ func _on_wait_pressed() -> void:
 	if player == null or not player.is_alive or run_over:
 		return
 	TurnManager.end_player_turn()
+
+
+func _on_auto_move_pressed() -> void:
+	if player == null or not player.is_alive or run_over:
+		return
+	if touch_input != null and touch_input.has_method("begin_auto_explore"):
+		touch_input.begin_auto_explore()
+
+
+func _on_auto_attack_pressed() -> void:
+	if player == null or not player.is_alive or run_over:
+		return
+	# Find nearest visible monster and move/attack toward it.
+	var nearest = null
+	var nearest_dist: int = 999
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if not is_instance_valid(m) or not ("grid_pos" in m):
+			continue
+		if "is_alive" in m and not m.is_alive:
+			continue
+		var d: int = max(abs(m.grid_pos.x - player.grid_pos.x),
+				abs(m.grid_pos.y - player.grid_pos.y))
+		if d < nearest_dist:
+			nearest_dist = d
+			nearest = m
+	if nearest == null:
+		return
+	var delta: Vector2i = nearest.grid_pos - player.grid_pos
+	if nearest_dist <= 1:
+		player.try_move(delta)
+	else:
+		var path: Array[Vector2i] = Pathfinding.find_path(generator, player.grid_pos, nearest.grid_pos)
+		if not path.is_empty():
+			player.try_move(path[0] - player.grid_pos)
 
 
 func _on_menu_pressed() -> void:
@@ -1173,22 +1211,6 @@ func _open_skills_dialog(category: String) -> void:
 	skill_close.pressed.connect(dlg.queue_free)
 	skill_header.add_child(skill_close)
 	vb.add_child(skill_header)
-
-	var mode_hbox := HBoxContainer.new()
-	mode_hbox.add_theme_constant_override("separation", 8)
-	var mode_label := Label.new()
-	mode_label.text = "Training:"
-	mode_label.add_theme_font_size_override("font_size", 40)
-	mode_hbox.add_child(mode_label)
-	var mode_btn := Button.new()
-	mode_btn.text = "AUTO" if skill_system.auto_training else "MANUAL"
-	mode_btn.custom_minimum_size = Vector2(200, 56)
-	mode_btn.add_theme_font_size_override("font_size", 40)
-	mode_btn.pressed.connect(func():
-		skill_system.auto_training = not skill_system.auto_training
-		mode_btn.text = "AUTO" if skill_system.auto_training else "MANUAL")
-	mode_hbox.add_child(mode_btn)
-	vb.add_child(mode_hbox)
 
 	var tabs_hbox := HBoxContainer.new()
 	tabs_hbox.add_theme_constant_override("separation", 4)

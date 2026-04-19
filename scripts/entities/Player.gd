@@ -57,7 +57,7 @@ signal inventory_changed
 # 4 quickslot ids — "" means empty. Filled automatically on pickup of
 # the first unique consumable id, cleared when no matching inventory item
 # remains. Drives BottomHUD's four quickslot buttons.
-var quickslot_ids: Array[String] = ["", "", "", "", "", ""]
+var quickslot_ids: Array[String] = ["", "", "", "", "", "", "", ""]
 signal quickslots_changed
 
 const _CHAR_SPRITE_SCENE := preload("res://scenes/entities/CharacterSprite.tscn")

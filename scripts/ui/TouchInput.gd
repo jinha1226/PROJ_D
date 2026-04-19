@@ -137,6 +137,16 @@ func _on_tap(grid: Vector2i) -> void:
 	_step_auto_move()
 
 
+## Explore the dungeon automatically: move toward the nearest unexplored tile.
+func begin_auto_explore() -> bool:
+	if player == null or generator == null or not player.is_alive:
+		return false
+	var target: Vector2i = _farthest_floor_from(player.grid_pos)
+	if target == player.grid_pos:
+		return false
+	return begin_auto_move_to(target)
+
+
 ## External entrypoint — used by the minimap popup to route a tap on a
 ## distant tile through the same A* auto-move path logic as an in-world tap.
 func begin_auto_move_to(target: Vector2i) -> bool:

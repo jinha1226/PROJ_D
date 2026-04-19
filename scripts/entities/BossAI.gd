@@ -126,7 +126,7 @@ func _do_telegraph(monster: Node, player: Node) -> void:
 					danger_tiles.append(boss_pos + Vector2i(dx, dy))
 
 	var msg: String = String(_pattern.get("telegraph_msg", "The boss prepares an attack!"))
-	print(msg)
+	CombatLog.add(msg)
 
 
 func _do_execute(monster: Node, player: Node) -> void:
@@ -137,15 +137,21 @@ func _do_execute(monster: Node, player: Node) -> void:
 	if danger_tiles.has(player.grid_pos):
 		player.take_damage(dmg)
 		var msg: String = String(_pattern.get("execute_msg", "BOOM!"))
-		print("%s %d damage!" % [msg, dmg])
+		CombatLog.add("%s %d damage!" % [msg, dmg])
 	else:
-		print("You dodged the attack!")
+		CombatLog.add("You dodged the attack!")
 
 	danger_tiles.clear()
 	phase = Phase.NORMAL
 
 
 func _step_toward_player(monster: Node, player: Node) -> void:
+	if player == null:
+		return
+	# If already adjacent, attack immediately — no further recursion.
+	if _cheb(monster.grid_pos, player.grid_pos) <= 1:
+		_attack_player(monster, player)
+		return
 	var dx: int = sign(player.grid_pos.x - monster.grid_pos.x)
 	var dy: int = sign(player.grid_pos.y - monster.grid_pos.y)
 	var candidates: Array[Vector2i] = []
@@ -158,13 +164,8 @@ func _step_toward_player(monster: Node, player: Node) -> void:
 	for delta in candidates:
 		var nxt: Vector2i = monster.grid_pos + delta
 		if monster.generator != null and monster.generator.is_walkable(nxt):
-			if _cheb(nxt, player.grid_pos) <= 1:
-				_basic_melee(monster, player)
-				return
 			monster.move_to_grid(nxt)
 			return
-	if _cheb(monster.grid_pos, player.grid_pos) <= 1:
-		_basic_melee(monster, player)
 
 
 func _basic_melee(monster: Node, player: Node) -> void:
@@ -173,9 +174,11 @@ func _basic_melee(monster: Node, player: Node) -> void:
 	if _cheb(monster.grid_pos, player.grid_pos) > 1:
 		_step_toward_player(monster, player)
 		return
-	var base_atk: int = int(monster.data.str) / 2 + 3 if monster.data != null else 5
-	var dmg: int = max(1, base_atk - player.ac + randi_range(-2, 2))
-	player.take_damage(dmg)
+	_attack_player(monster, player)
+
+
+func _attack_player(monster: Node, player: Node) -> void:
+	CombatSystem.melee_attack_from_monster(monster, player)
 
 
 func shows_danger_tiles() -> bool:

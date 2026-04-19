@@ -55,6 +55,14 @@ size_flags_vertical = 3
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
+[node name="QuickSlot6" type="Button" parent="Margin/VBox/Row1" instance=ExtResource("2_qs")]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="QuickSlot7" type="Button" parent="Margin/VBox/Row1" instance=ExtResource("2_qs")]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
 [node name="RestButton" type="Button" parent="Margin/VBox/Row1"]
 custom_minimum_size = Vector2(180, 0)
 size_flags_vertical = 3
@@ -94,6 +102,18 @@ theme_override_font_sizes/font_size = 49
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "WAIT"
+theme_override_font_sizes/font_size = 49
+
+[node name="AutoMoveButton" type="Button" parent="Margin/VBox/Row2"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "AUTO"
+theme_override_font_sizes/font_size = 49
+
+[node name="AutoAttackButton" type="Button" parent="Margin/VBox/Row2"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "ATCK"
 theme_override_font_sizes/font_size = 49
 
 [node name="MenuButton" type="Button" parent="Margin/VBox/Row2"]
