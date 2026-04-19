@@ -3,13 +3,12 @@ class_name SkillsScreen
 
 const SKILL_ROW_SCENE: PackedScene = preload("res://scenes/ui/SkillRow.tscn")
 
-const CATEGORIES: Array = ["all", "weapon", "defense", "magic", "misc"]
+const CATEGORIES: Array = ["all", "attack", "support", "misc"]
 const CATEGORY_LABELS: Dictionary = {
-	"all": "ALL",
-	"weapon": "WEAPON",
-	"defense": "DEFENSE",
-	"magic": "MAGIC",
-	"misc": "MISC",
+	"all": "전체",
+	"attack": "공격",
+	"support": "보조",
+	"misc": "기타",
 }
 
 var _player: Node = null

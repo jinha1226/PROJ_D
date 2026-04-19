@@ -4,40 +4,26 @@ class_name SkillRow
 signal training_toggled(skill_id: String, enabled: bool)
 
 const SKILL_NAMES: Dictionary = {
-	"axe": "Axe",
-	"short_blade": "Short Blades",
-	"long_blade": "Long Blades",
-	"mace": "Maces & Flails",
-	"polearm": "Polearms",
-	"staff": "Staves",
-	"bow": "Bows",
-	"crossbow": "Crossbows",
-	"sling": "Slings",
-	"throwing": "Throwing",
-	"fighting": "Fighting",
-	"armour": "Armour",
-	"dodging": "Dodging",
-	"shields": "Shields",
-	"spellcasting": "Spellcasting",
-	"conjurations": "Conjurations",
-	"fire": "Fire Magic",
-	"cold": "Cold Magic",
-	"earth": "Earth Magic",
-	"air": "Air Magic",
-	"necromancy": "Necromancy",
-	"hexes": "Hexes",
-	"translocations": "Translocations",
-	"summonings": "Summonings",
-	"stealth": "Stealth",
-	"evocations": "Evocations",
-	"essence_channeling": "Essence Channeling",
+	# Attack
+	"melee": "근접 전투",
+	"ranged": "원거리",
+	"magic": "마법",
+	# Support
+	"fighting": "파이팅",
+	"spellcasting": "스펠캐스팅",
+	"armour": "방어구",
+	"dodging": "회피",
+	"shields": "방패",
+	# Misc
+	"stealth": "은신",
+	"evocations": "에보케이션",
+	"essence_channeling": "에센스",
 }
 
 const CATEGORY_NAMES: Dictionary = {
-	"weapon": "Weapon",
-	"defense": "Defense",
-	"magic": "Magic",
-	"misc": "Misc",
+	"attack": "공격",
+	"support": "보조",
+	"misc": "기타",
 }
 
 const MAX_LEVEL: int = 27
@@ -108,7 +94,7 @@ func _ready() -> void:
 
 func bind(p_skill_id: String, state: Dictionary, category: String) -> void:
 	skill_id = p_skill_id
-	_is_magic = (category == "magic")
+	_is_magic = false  # All skills are trainable now
 	_name_label.text = SKILL_NAMES.get(skill_id, skill_id)
 	_cat_label.text = CATEGORY_NAMES.get(category, category)
 

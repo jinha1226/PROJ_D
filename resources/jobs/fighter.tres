@@ -11,5 +11,5 @@ str_bonus = 3
 dex_bonus = 1
 int_bonus = 0
 starting_equipment = ["arming_sword", "leather_chest", "leather_boots"]
-starting_skills = {"long_blade": 2, "fighting": 2, "armour": 1}
+starting_skills = {"melee": 2, "fighting": 2, "armour": 1}
 starting_spells = []
