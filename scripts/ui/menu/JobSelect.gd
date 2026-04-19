@@ -1,6 +1,6 @@
 extends Control
 
-const TRAIT_SELECT_PATH := "res://scenes/menu/TraitSelect.tscn"
+const GAME_PATH := "res://scenes/main/Game.tscn"
 const RACE_SELECT_PATH := "res://scenes/menu/RaceSelect.tscn"
 const JOB_IDS: Array[String] = [
 	"fighter", "barbarian", "ranger", "rogue", "mage", "warlock",
@@ -147,4 +147,4 @@ func _on_start() -> void:
 	if _selected_id == "":
 		return
 	GameManager.selected_job_id = _selected_id
-	get_tree().change_scene_to_file(TRAIT_SELECT_PATH)
+	get_tree().change_scene_to_file(GAME_PATH)

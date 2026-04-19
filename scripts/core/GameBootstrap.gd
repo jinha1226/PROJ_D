@@ -110,18 +110,13 @@ func _ready() -> void:
 	entity_layer.add_child(player)
 	var job_id: String = GameManager.selected_job_id if GameManager.selected_job_id != "" else "fighter"
 	var race_id: String = GameManager.selected_race_id if GameManager.selected_race_id != "" else "human"
-	var trait_id: String = GameManager.selected_trait_id if GameManager.selected_trait_id != "" else "tough"
 	GameManager.start_new_run(job_id, race_id)
 	var job: JobData = load("res://resources/jobs/%s.tres" % job_id)
 	var race_res: RaceData = null
 	var race_path: String = "res://resources/races/%s.tres" % race_id
 	if ResourceLoader.exists(race_path):
 		race_res = load(race_path) as RaceData
-	var trait_res: TraitData = null
-	var trait_path: String = "res://resources/traits/%s.tres" % trait_id
-	if ResourceLoader.exists(trait_path):
-		trait_res = load(trait_path) as TraitData
-	player.setup(generator, generator.spawn_pos, job, race_res, trait_res)
+	player.setup(generator, generator.spawn_pos, job, race_res, null)
 
 	# [skill-agent] SkillSystem must exist before first attack; attach as child
 	# of Game root with node name "SkillSystem" so Player.try_attack_at can
@@ -134,10 +129,6 @@ func _ready() -> void:
 	if job:
 		for sk in job.starting_skills:
 			starting_skills[sk] = int(job.starting_skills[sk])
-	if trait_res != null:
-		var trait_skills: Dictionary = _get_trait_skills(trait_res.id)
-		for sk in trait_skills:
-			starting_skills[sk] = int(starting_skills.get(sk, 0)) + int(trait_skills[sk])
 	skill_system.init_for_player(player, starting_skills)
 
 	player.moved.connect(_on_player_moved)
