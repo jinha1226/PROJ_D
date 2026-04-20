@@ -1655,18 +1655,18 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 			m.take_damage(dmg)
 			total_dmg += dmg
 			hits += 1
-		SpellFX.cast_area(fx_layer, player.position, target.position, hit_positions, spell_color, float(radius) * float(TILE_SIZE) + float(TILE_SIZE) / 2.0)
+		SpellFX.cast_area(fx_layer, player.position, target.position, hit_positions, spell_color, float(radius) * float(TILE_SIZE) + float(TILE_SIZE) / 2.0, school)
 		CombatLog.add("%s: %d hit(s), %d total dmg" % [String(info.get("name", spell_id)), hits, total_dmg])
 	else:
 		var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
 		var effect_type: String = String(info.get("effect", "damage"))
 		if effect_type == "slow":
 			target.slowed_turns = 4
-			SpellFX.cast_slow(fx_layer, target.position, spell_color)
+			SpellFX.cast_status(fx_layer, target.position, spell_color, school, "SLOW")
 			CombatLog.add("%s is slowed!" % String(target.data.display_name if target.data else "enemy"))
 		else:
 			target.take_damage(dmg)
-			SpellFX.cast_single(fx_layer, player.position, target, dmg, spell_color)
+			SpellFX.cast_single(fx_layer, player.position, target, dmg, spell_color, school)
 			CombatLog.add("%s → %d dmg" % [String(info.get("name", spell_id)), dmg])
 	if skill_system != null:
 		skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, [school, "spellcasting"])
@@ -1820,32 +1820,33 @@ func _cast_single_target(spell_id: String, info: Dictionary, power: int) -> Dict
 		tname = target.name
 
 	var spell_color: Color = info.get("color", Color.WHITE)
+	var school: String = String(info.get("school", ""))
 	var fx_layer: Node2D = $EntityLayer
 	var effect: String = String(info.get("effect", "damage"))
 
 	if effect == "slow":
 		target.slowed_turns = 4
-		SpellFX.cast_slow(fx_layer, target.position, spell_color)
+		SpellFX.cast_status(fx_layer, target.position, spell_color, school, "SLOW")
 		return {"success": true, "message": "%s is slowed for 4 turns!" % tname}
 	if effect == "confuse":
 		target.slowed_turns = 4
-		SpellFX.cast_slow(fx_layer, target.position, spell_color)
+		SpellFX.cast_status(fx_layer, target.position, spell_color, school, "CONFUSE")
 		return {"success": true, "message": "%s is confused for 4 turns!" % tname}
 	if effect == "petrify":
 		target.slowed_turns = 5
-		SpellFX.cast_slow(fx_layer, target.position, spell_color)
+		SpellFX.cast_status(fx_layer, target.position, spell_color, school, "PETRIFY")
 		return {"success": true, "message": "%s is petrified for 5 turns!" % tname}
 	if effect == "agony":
 		var half_hp: int = max(1, target.hp / 2)
 		target.take_damage(half_hp)
-		SpellFX.cast_single(fx_layer, player.position, target, half_hp, spell_color)
+		SpellFX.cast_single(fx_layer, player.position, target, half_hp, spell_color, school)
 		return {"success": true, "message": "%s: HP halved! (%d dmg)" % [tname, half_hp]}
 	if effect == "vampiric":
 		var dmg_v: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
 		target.take_damage(dmg_v)
 		player.stats.HP = min(player.stats.hp_max, player.stats.HP + dmg_v)
 		player.stats_changed.emit()
-		SpellFX.cast_single(fx_layer, player.position, target, dmg_v, spell_color)
+		SpellFX.cast_single(fx_layer, player.position, target, dmg_v, spell_color, school)
 		return {"success": true, "message": "Drained %d HP from %s!" % [dmg_v, tname]}
 	if effect == "dot_fire":
 		var dmg_f: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 4
@@ -1854,12 +1855,12 @@ func _cast_single_target(spell_id: String, info: Dictionary, power: int) -> Dict
 		if target.has_method("set_meta"):
 			target.set_meta("burn_turns", 4)
 			target.set_meta("burn_dmg", max(1, dmg_f / 2))
-		SpellFX.cast_single(fx_layer, player.position, target, dmg_f, spell_color)
+		SpellFX.cast_single(fx_layer, player.position, target, dmg_f, spell_color, school)
 		return {"success": true, "message": "%s is burning! (%d + %d/turn)" % [tname, dmg_f, max(1, dmg_f / 2)]}
 
 	var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
 	target.take_damage(dmg)
-	SpellFX.cast_single(fx_layer, player.position, target, dmg, spell_color)
+	SpellFX.cast_single(fx_layer, player.position, target, dmg, spell_color, school)
 	return {"success": true, "message": "%s → %s: %d dmg" % [String(info.get("name", spell_id)), tname, dmg], "damage": dmg}
 
 
@@ -1874,6 +1875,7 @@ func _cast_area_spell(spell_id: String, info: Dictionary, power: int) -> Diction
 	var center_px: Vector2 = center_m.position
 	var radius: int = int(info.get("radius", 2))
 	var spell_color: Color = info.get("color", Color.WHITE)
+	var school: String = String(info.get("school", ""))
 	var fx_layer: Node2D = $EntityLayer
 
 	var total_dmg: int = 0
@@ -1894,7 +1896,7 @@ func _cast_area_spell(spell_id: String, info: Dictionary, power: int) -> Diction
 		hits += 1
 
 	var tile_r_px: float = float(radius) * float(TILE_SIZE) + float(TILE_SIZE) / 2.0
-	SpellFX.cast_area(fx_layer, player.position, center_px, hit_positions, spell_color, tile_r_px)
+	SpellFX.cast_area(fx_layer, player.position, center_px, hit_positions, spell_color, tile_r_px, school)
 	SpellFX.float_text(fx_layer, center_px + Vector2(0, -24),
 			"%d dmg" % total_dmg, spell_color)
 
