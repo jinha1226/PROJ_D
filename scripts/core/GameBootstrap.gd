@@ -453,8 +453,9 @@ func _on_quickslot_pressed(index: int) -> void:
 				CombatLog.add(result.get("message", ""))
 			if result.get("success", false):
 				if skill_system != null:
-					var school: String = String(info.get("school", "spellcasting"))
-					skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, [school, "spellcasting"])
+					var tags: Array = SpellRegistry.get_schools(spell_id).duplicate()
+					tags.append("spellcasting")
+					skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, tags)
 				TurnManager.end_player_turn()
 		else:
 			_targeting_spell = spell_id
@@ -1017,6 +1018,17 @@ func _apply_racial_spellpower(power: int) -> int:
 	if player.race_res.racial_trait == "oni_magical_might":
 		return int(round(float(power) * 1.2))
 	return power
+
+
+## Roll a spell's damage. Prefers DCSS per-spell zap dice (zap-data.h via
+## assets/dcss_spells/zaps.json); falls back to the legacy flat min/max +
+## power/2 formula when the spell has no zap (e.g. scorch, vampiric drain,
+## most hex-like or buff spells that compute damage procedurally in DCSS).
+func _spell_roll_dmg(spell_id: String, info: Dictionary, power: int) -> int:
+	var zap_dmg: int = SpellRegistry.roll_damage(spell_id, power)
+	if zap_dmg >= 0:
+		return zap_dmg
+	return randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
 
 
 ## Global XP multiplier sourced from the player's racial trait. Applied to
@@ -1974,10 +1986,7 @@ func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
 	name_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	name_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var spell_name: String = String(info.get("name", spell_id))
-	var sch_id: String = String(info.get("school", ""))
-	var s_lv: int = skill_system.get_level(player, sch_id) if skill_system and player else 0
-	var s_sc: int = skill_system.get_level(player, "spellcasting") if skill_system and player else 0
-	var fail_p: int = int(SpellRegistry.failure_chance(spell_id, s_lv, s_sc) * 100)
+	var fail_p: int = SpellRegistry.failure_rate(spell_id, player)
 	var fail_txt: String = " (%d%%)" % fail_p if fail_p > 0 else ""
 	var range_txt: String = ""
 	if int(info.get("range", 0)) > 0:
@@ -2025,15 +2034,23 @@ func _show_spell_info(spell_id: String) -> void:
 	dlg.exclusive = false
 	dlg.title = String(info.get("name", spell_id))
 	dlg.ok_button_text = ""
-	var sch: String = String(info.get("school", "?"))
-	var sch_lv: int = skill_system.get_level(player, sch) if skill_system and player else 0
-	var sc_lv: int = skill_system.get_level(player, "spellcasting") if skill_system and player else 0
-	var fail_pct: int = int(SpellRegistry.failure_chance(spell_id, sch_lv, sc_lv) * 100)
-	var text: String = "%s\n\nMP Cost: %d\nSchool: %s (Lv.%d)\nDifficulty: %d\nFailure: %d%%\nRange: %d" % [
+	# Show all schools (multi-school spells like iron_shot list both).
+	var schools_list: Array = SpellRegistry.get_schools(spell_id)
+	var schools_txt: String = ""
+	if schools_list.size() > 0:
+		var parts: Array = []
+		for sname in schools_list:
+			var lv: int = skill_system.get_level(player, String(sname)) if skill_system and player else 0
+			parts.append("%s Lv.%d" % [String(sname).capitalize(), lv])
+		schools_txt = ", ".join(PackedStringArray(parts))
+	var fail_pct: int = SpellRegistry.failure_rate(spell_id, player)
+	var spell_pow: int = SpellRegistry.calc_spell_power(spell_id, player)
+	var text: String = "%s\n\nMP Cost: %d\nSchools: %s\nDifficulty: %d\nPower: %d\nFailure: %d%%\nRange: %d" % [
 		String(info.get("desc", "")),
 		int(info.get("mp", 0)),
-		sch, sch_lv,
+		schools_txt,
 		int(info.get("difficulty", 1)),
+		spell_pow,
 		fail_pct,
 		int(info.get("range", 6)),
 	]
@@ -2140,24 +2157,22 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 		return
 	player.stats.MP -= mp_cost
 	player.stats_changed.emit()
+	# DCSS-ported fail / power. failure_rate handles multi-school averaging
+	# internally (spl-cast.cc raw_spell_fail + _skill_power). calc_spell_power
+	# runs the full DCSS pipeline (skills → INT → stepdown → cap).
 	var school: String = String(info.get("school", "spellcasting"))
-	var school_lv: int = skill_system.get_level(player, school) if skill_system else 0
-	var sc_lv: int = skill_system.get_level(player, "spellcasting") if skill_system else 0
-	var staff_school2: String = WeaponRegistry.staff_spell_school(player.equipped_weapon_id)
-	var staff_bonus2: int = 0
-	if staff_school2 == school or staff_school2 == "":
-		staff_bonus2 = WeaponRegistry.staff_spell_bonus(player.equipped_weapon_id)
-	var eff_school2: int = school_lv + staff_bonus2
-	var fail: float = SpellRegistry.failure_chance(spell_id, eff_school2, sc_lv)
-	if randf() < fail:
-		CombatLog.add("Spell fizzles! (%d%% fail)" % int(fail * 100))
+	var fail_pct: int = SpellRegistry.failure_rate(spell_id, player)
+	if randi() % 100 < fail_pct:
+		CombatLog.add("Spell fizzles! (%d%% fail)" % fail_pct)
 		var fx_layer_f: Node2D = $EntityLayer
 		var spell_color_f: Color = info.get("color", Color.WHITE)
 		SpellFX.cast_fizzle(fx_layer_f, player.position, school, spell_color_f)
 		TurnManager.end_player_turn()
 		return
-	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
-	var power: int = eff_school2 + sc_lv / 2 + int_bonus
+	var power: int = SpellRegistry.calc_spell_power(spell_id, player)
+	var staff_sch: String = WeaponRegistry.staff_spell_school(player.equipped_weapon_id)
+	if staff_sch == school or staff_sch == "":
+		power += WeaponRegistry.staff_spell_bonus(player.equipped_weapon_id)
 	power = _apply_racial_spellpower(power)
 	if player != null and player.has_method("gear_spell_power_bonus"):
 		power += int(player.gear_spell_power_bonus())
@@ -2175,7 +2190,7 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 			var dist: int = max(abs(m.grid_pos.x - target.grid_pos.x), abs(m.grid_pos.y - target.grid_pos.y))
 			if dist > radius:
 				continue
-			var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
+			var dmg: int = _spell_roll_dmg(spell_id, info, power)
 			if dist > 0:
 				dmg = max(1, dmg - dist * 3)
 			hit_positions.append(m.position)
@@ -2185,7 +2200,7 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 		SpellFX.cast_area(fx_layer, player.position, target.position, hit_positions, spell_color, float(radius) * float(TILE_SIZE) + float(TILE_SIZE) / 2.0, school)
 		CombatLog.add("%s: %d hit(s), %d total dmg" % [String(info.get("name", spell_id)), hits, total_dmg])
 	else:
-		var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
+		var dmg: int = _spell_roll_dmg(spell_id, info, power)
 		var effect_type: String = String(info.get("effect", "damage"))
 		if effect_type == "slow":
 			target.slowed_turns = 4
@@ -2196,7 +2211,9 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 			SpellFX.cast_single(fx_layer, player.position, target, dmg, spell_color, school)
 			CombatLog.add("%s → %d dmg" % [String(info.get("name", spell_id)), dmg])
 	if skill_system != null:
-		skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, [school, "spellcasting"])
+		var tags: Array = SpellRegistry.get_schools(spell_id).duplicate()
+		tags.append("spellcasting")
+		skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, tags)
 	TurnManager.end_player_turn()
 
 
@@ -2287,12 +2304,14 @@ func _on_cast_pressed(spell_id: String, dlg: AcceptDialog) -> void:
 	if result.get("message", "") != "":
 		CombatLog.add(result.get("message", ""))
 	if result.get("success", false):
-		# Train school + spellcasting on successful cast.
+		# Train all schools + spellcasting on successful cast (DCSS trains
+		# every discipline a spell involves, split evenly).
 		if skill_system != null:
 			var info: Dictionary = SpellRegistry.get_spell(spell_id)
-			var school: String = String(info.get("school", "spellcasting"))
+			var tags: Array = SpellRegistry.get_schools(spell_id).duplicate()
+			tags.append("spellcasting")
 			var xp_gain: float = float(info.get("mp", 1)) * 8.0
-			skill_system.grant_xp(player, xp_gain, [school, "spellcasting"])
+			skill_system.grant_xp(player, xp_gain, tags)
 		TurnManager.end_player_turn()
 
 
@@ -2311,21 +2330,16 @@ func _execute_cast(spell_id: String) -> Dictionary:
 	player.stats_changed.emit()
 
 	var school: String = String(info.get("school", "spellcasting"))
-	var school_lv: int = skill_system.get_level(player, school) if skill_system else 0
-	var sc_lv: int = skill_system.get_level(player, "spellcasting") if skill_system else 0
-	var staff_school: String = WeaponRegistry.staff_spell_school(player.equipped_weapon_id)
-	var staff_bonus: int = 0
-	if staff_school == school or staff_school == "":
-		staff_bonus = WeaponRegistry.staff_spell_bonus(player.equipped_weapon_id)
-	var eff_school: int = school_lv + staff_bonus
-	var fail: float = SpellRegistry.failure_chance(spell_id, eff_school, sc_lv)
-	if randf() < fail:
+	var fail_pct: int = SpellRegistry.failure_rate(spell_id, player)
+	if randi() % 100 < fail_pct:
 		var fx_layer_f: Node2D = $EntityLayer
 		var spell_color_f: Color = info.get("color", Color.WHITE)
 		SpellFX.cast_fizzle(fx_layer_f, player.position, school, spell_color_f)
-		return {"success": false, "message": "Spell fizzles! (%d%% fail)" % int(fail * 100)}
-	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
-	var power: int = eff_school + sc_lv / 2 + int_bonus
+		return {"success": false, "message": "Spell fizzles! (%d%% fail)" % fail_pct}
+	var power: int = SpellRegistry.calc_spell_power(spell_id, player)
+	var staff_sch: String = WeaponRegistry.staff_spell_school(player.equipped_weapon_id)
+	if staff_sch == school or staff_sch == "":
+		power += WeaponRegistry.staff_spell_bonus(player.equipped_weapon_id)
 	power = _apply_racial_spellpower(power)
 	if player != null and player.has_method("gear_spell_power_bonus"):
 		power += int(player.gear_spell_power_bonus())
@@ -2375,7 +2389,7 @@ func _cast_single_target(spell_id: String, info: Dictionary, power: int) -> Dict
 		SpellFX.cast_single(fx_layer, player.position, target, half_hp, spell_color, school)
 		return {"success": true, "message": "%s: HP halved! (%d dmg)" % [tname, half_hp]}
 	if effect == "vampiric":
-		var dmg_v: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
+		var dmg_v: int = _spell_roll_dmg(spell_id, info, power)
 		target.take_damage(dmg_v)
 		player.stats.HP = min(player.stats.hp_max, player.stats.HP + dmg_v)
 		player.stats_changed.emit()
@@ -2391,7 +2405,7 @@ func _cast_single_target(spell_id: String, info: Dictionary, power: int) -> Dict
 		SpellFX.cast_single(fx_layer, player.position, target, dmg_f, spell_color, school)
 		return {"success": true, "message": "%s is burning! (%d + %d/turn)" % [tname, dmg_f, max(1, dmg_f / 2)]}
 
-	var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
+	var dmg: int = _spell_roll_dmg(spell_id, info, power)
 	target.take_damage(dmg)
 	SpellFX.cast_single(fx_layer, player.position, target, dmg, spell_color, school)
 	return {"success": true, "message": "%s → %s: %d dmg" % [String(info.get("name", spell_id)), tname, dmg], "damage": dmg}
@@ -2420,7 +2434,7 @@ func _cast_area_spell(spell_id: String, info: Dictionary, power: int) -> Diction
 		var dist: int = max(abs(m.grid_pos.x - center.x), abs(m.grid_pos.y - center.y))
 		if dist > radius:
 			continue
-		var dmg: int = randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
+		var dmg: int = _spell_roll_dmg(spell_id, info, power)
 		if dist > 0:
 			dmg = max(1, dmg - dist * 3)
 		hit_positions.append(m.position)

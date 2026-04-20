@@ -6,8 +6,10 @@ extends Object
 ## SPELLS takes priority on overlap; DCSS data fills in the rest.
 
 const _DCSS_JSON := "res://assets/dcss_spells/spells.json"
+const _ZAPS_JSON := "res://assets/dcss_spells/zaps.json"
 
 static var _dcss: Dictionary = {}   # id → dcss entry
+static var _zaps: Dictionary = {}   # id → zap dice entry
 static var _loaded: bool = false
 
 
@@ -16,16 +18,20 @@ static func _ensure_loaded() -> void:
 		return
 	_loaded = true
 	var f := FileAccess.open(_DCSS_JSON, FileAccess.READ)
-	if f == null:
-		return
-	var parsed = JSON.parse_string(f.get_as_text())
-	f.close()
-	if not (parsed is Array):
-		return
-	for entry in parsed:
-		var sid: String = String(entry.get("id", ""))
-		if sid != "":
-			_dcss[sid] = entry
+	if f != null:
+		var parsed = JSON.parse_string(f.get_as_text())
+		f.close()
+		if parsed is Array:
+			for entry in parsed:
+				var sid: String = String(entry.get("id", ""))
+				if sid != "":
+					_dcss[sid] = entry
+	var zf := FileAccess.open(_ZAPS_JSON, FileAccess.READ)
+	if zf != null:
+		var zparsed = JSON.parse_string(zf.get_as_text())
+		zf.close()
+		if zparsed is Dictionary:
+			_zaps = zparsed
 
 
 ## Merge DCSS data onto a custom entry dict (non-destructive).
@@ -349,26 +355,187 @@ static func get_known_for_player(player: Node, skill_sys: Node) -> Array[String]
 	return known
 
 
-static func failure_chance(spell_id: String, school_level: int, spellcasting_level: int, school2_level: int = -1) -> float:
+# --- DCSS-ported spell math ------------------------------------------------
+#
+# Functions below port spl-cast.cc:
+#   - _skill_power / calc_spell_power  → calc_spell_power()
+#   - raw_spell_fail                   → failure_rate()
+#   - per-zap dice roll (zap-data.h)   → roll_damage()
+
+
+## Return all school ids for a spell. Prefers SPELLS["schools"] (array), then
+## SPELLS["school"]+["school2"] (legacy singletons), then DCSS JSON's
+## `schools` array. Empty array if nothing is known.
+static func get_schools(spell_id: String) -> Array:
+	_ensure_loaded()
 	var info: Dictionary = SPELLS.get(spell_id, {})
-	var diff: int = int(info.get("difficulty", 1))
-	var eff_school: int = school_level
-	if school2_level >= 0:
-		eff_school = min(school_level, school2_level)
-	var effective: float = float(eff_school) + float(spellcasting_level) * 0.5
-	var gap: float = effective - float(diff)
-	if gap >= 10:
-		return 0.0
-	if gap >= 7:
-		return 0.05
-	if gap >= 4:
-		return 0.15
-	if gap >= 2:
-		return 0.3
-	if gap >= 0:
-		return 0.5
-	if gap >= -2:
-		return 0.75
-	if gap >= -4:
-		return 0.9
-	return 0.99
+	if info.has("schools") and info["schools"] is Array:
+		return info["schools"]
+	var out: Array = []
+	if info.has("school"):
+		out.append(info["school"])
+	if info.has("school2") and not out.has(info["school2"]):
+		out.append(info["school2"])
+	if out.is_empty():
+		var dc: Dictionary = _dcss.get(spell_id, {})
+		if dc.has("schools") and dc["schools"] is Array:
+			for s in dc["schools"]:
+				out.append(String(s))
+	return out
+
+
+## DCSS stepdown_value(base, stepping, first_step, _, ceiling) porting
+## stepdown.cc:stepdown_value. Used for spell-power stepdown.
+static func _stepdown(value: float, step: float) -> float:
+	return step * log(1.0 + value / step) / log(2.0)
+
+
+static func _stepdown_value(base_value: int, stepping: int, first_step: int, ceiling_value: int) -> int:
+	if ceiling_value < 0:
+		ceiling_value = 0
+	if ceiling_value > 0 and ceiling_value < first_step:
+		return min(base_value, ceiling_value)
+	if base_value < first_step:
+		return base_value
+	var diff: int = first_step - stepping
+	var ceil_rem: int = 0
+	if ceiling_value > 0:
+		ceil_rem = ceiling_value - diff
+	var stepped: float = _stepdown(float(base_value - diff), float(stepping))
+	if ceil_rem > 0 and stepped > float(ceil_rem):
+		stepped = float(ceil_rem)
+	return int(diff + stepped)
+
+
+## Read the player's effective level for a skill. Prefers skill_state on the
+## player; falls back to 0. Caller is responsible for passing a valid player.
+static func _player_skill(player: Node, skill_id: String) -> int:
+	if player == null:
+		return 0
+	if "skill_state" in player and player.skill_state is Dictionary \
+			and player.skill_state.has(skill_id):
+		return int(player.skill_state[skill_id].get("level", 0))
+	return 0
+
+
+## DCSS _skill_power (spl-cast.cc:428). Averages school skills across all
+## disciplines, then adds spellcasting/4. Returned value is scaled by 100
+## (matching DCSS's internal units, where skill(X, 200) = skill * 2 * 100 /
+## 100 = skill * 200). Intended as input to calc_spell_power.
+static func _skill_power(spell_id: String) -> int:
+	var schools: Array = get_schools(spell_id)
+	var count: int = 0
+	var sum_scaled: int = 0
+	# NOTE: called via calc_spell_power which also passes the player; we look
+	# the player up via the currently-casting player (group-based fallback).
+	var player: Node = _current_casting_player
+	for s in schools:
+		var lv: int = _player_skill(player, String(s))
+		sum_scaled += lv * 200
+		count += 1
+	var power: int = 0
+	if count > 0:
+		power = sum_scaled / count
+	power += _player_skill(player, "spellcasting") * 50
+	return power
+
+
+# Thread-local-ish context: the player whose spell we're about to evaluate.
+# Set inside calc_spell_power / failure_rate, cleared on return.
+static var _current_casting_player: Node = null
+
+
+## DCSS calc_spell_power (spl-cast.cc:550). Runs the spell-power pipeline
+## end-to-end: _skill_power → intel → stepdown → cap. Ignores mutations,
+## wizardry gear, berserk, form bonuses — we'll wire those in later.
+static func calc_spell_power(spell_id: String, player: Node) -> int:
+	_ensure_loaded()
+	if player == null:
+		return 0
+	_current_casting_player = player
+	var sk_power: int = _skill_power(spell_id)
+	_current_casting_player = null
+	var intel: int = 10
+	if "stats" in player and player.stats != null:
+		intel = int(player.stats.INT)
+	var power: int = sk_power * intel / 10
+	power = _stepdown_value(power * 10, 50000, 50000, 200000) / 1000
+	# Apply DCSS spell_power_cap from our JSON when present.
+	var dc: Dictionary = _dcss.get(spell_id, {})
+	var cap: int = int(dc.get("power_cap", 0))
+	if cap > 0:
+		power = min(power, cap)
+	return max(0, power)
+
+
+## DCSS raw_spell_fail (spl-cast.cc:455). Polynomial interpolation of a
+## chance-to-fail curve, clamped to [0, 100]. Multi-school spells use the
+## average school skill via _skill_power above (DCSS does the same).
+## TODO: armour/shield encumbrance penalty, mutations, form vertigo.
+static func failure_rate(spell_id: String, player: Node) -> int:
+	_ensure_loaded()
+	if player == null:
+		return 99
+	_current_casting_player = player
+	var skpow: int = _skill_power(spell_id)
+	_current_casting_player = null
+	var intel: int = 10
+	if "stats" in player and player.stats != null:
+		intel = int(player.stats.INT)
+	var chance: int = 60
+	chance -= skpow * 6 / 100
+	chance -= intel * 2
+	# Difficulty-by-level table from DCSS spl-cast.cc:481.
+	var diff_by_lv: Array = [0, 3, 15, 35, 70, 100, 150, 200, 260, 340]
+	var spell_level: int = _spell_level(spell_id)
+	if spell_level < diff_by_lv.size():
+		chance += int(diff_by_lv[spell_level])
+	chance = min(chance, 400)
+	# DCSS polynomial: ((x+426)*x + 82670)*x + 7245398 / 262144
+	var c2: int = (((chance + 426) * chance) + 82670) * chance + 7245398
+	c2 = c2 / 262144
+	return clampi(c2, 0, 100)
+
+
+static func _spell_level(spell_id: String) -> int:
+	var info: Dictionary = SPELLS.get(spell_id, {})
+	if info.has("difficulty"):
+		return int(info["difficulty"])
+	var dc: Dictionary = _dcss.get(spell_id, {})
+	return int(dc.get("level", 1))
+
+
+## Evaluate the DCSS zap for this spell at the given power. Returns total
+## damage rolled, or -1 if there's no zap data (caller should fall back to
+## the spell's legacy min_dmg/max_dmg entry). Port of beam.cc's
+## dicedef_calculator / calcdice_calculator → roll.
+static func roll_damage(spell_id: String, power: int) -> int:
+	_ensure_loaded()
+	var zap: Dictionary = _zaps.get(spell_id, {})
+	if zap.is_empty():
+		return -1
+	var kind: String = String(zap.get("kind", "dicedef"))
+	var n: int = int(zap.get("n", 1))
+	var a: int = int(zap.get("a", 0))
+	var mn: int = int(zap.get("mn", 0))
+	var md: int = int(zap.get("md", 1))
+	var size: int
+	if kind == "calcdice":
+		var max_dmg: int = a + power * mn / md
+		# calc_dice: split max_dmg across n dice.
+		if n <= 1:
+			n = 1
+			size = max_dmg
+		elif max_dmg <= n:
+			n = max_dmg
+			size = 1
+		else:
+			size = max_dmg / n  # DCSS uses div_rand_round; approximate as floor
+	else:  # dicedef
+		size = a + power * mn / md
+	if size <= 0:
+		return 0
+	var total: int = 0
+	for i in n:
+		total += randi_range(1, size)
+	return total

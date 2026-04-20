@@ -1,0 +1,1130 @@
+{
+ "acid_ball": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 105,
+  "mn": 10,
+  "n": 3,
+  "zap": "ZAP_ACID_BALL"
+ },
+ "all_purpose_tempering": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 12,
+  "mn": 1,
+  "n": 4,
+  "zap": "ZAP_PERCUSSIVE_TEMPERING"
+ },
+ "awaken_flesh": {
+  "a": 5,
+  "kind": "dicedef",
+  "md": 16,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_AWAKEN_FLESH"
+ },
+ "beckoning_gale": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 20,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_BECKONING_GALE"
+ },
+ "blastmote": {
+  "a": 20,
+  "kind": "calcdice",
+  "md": 3,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_BLASTMOTE"
+ },
+ "blinkbolt": {
+  "a": 11,
+  "kind": "dicedef",
+  "md": 5,
+  "mn": 3,
+  "n": 1,
+  "zap": "ZAP_BLINKBOLT"
+ },
+ "bolt_of_cold": {
+  "a": 18,
+  "kind": "calcdice",
+  "md": 3,
+  "mn": 2,
+  "n": 6,
+  "zap": "ZAP_BOLT_OF_COLD"
+ },
+ "bolt_of_devastation": {
+  "a": 24,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 0,
+  "n": 3,
+  "zap": "ZAP_BOLT_OF_DEVASTATION"
+ },
+ "bolt_of_draining": {
+  "a": 15,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 3,
+  "n": 4,
+  "zap": "ZAP_BOLT_OF_DRAINING"
+ },
+ "bolt_of_fire": {
+  "a": 18,
+  "kind": "calcdice",
+  "md": 3,
+  "mn": 2,
+  "n": 6,
+  "zap": "ZAP_BOLT_OF_FIRE"
+ },
+ "bolt_of_flesh": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 10,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_BOLT_OF_FLESH"
+ },
+ "bolt_of_light": {
+  "a": 13,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 3,
+  "n": 4,
+  "zap": "ZAP_BOLT_OF_LIGHT"
+ },
+ "bolt_of_magma": {
+  "a": 16,
+  "kind": "calcdice",
+  "md": 3,
+  "mn": 2,
+  "n": 4,
+  "zap": "ZAP_BOLT_OF_MAGMA"
+ },
+ "bombard": {
+  "a": 13,
+  "kind": "calcdice",
+  "md": 3,
+  "mn": 2,
+  "n": 9,
+  "zap": "ZAP_BOMBARD"
+ },
+ "call_down_damnation": {
+  "a": 15,
+  "kind": "dicedef",
+  "md": 10,
+  "mn": 0,
+  "n": 3,
+  "zap": "ZAP_CALL_DOWN_DAMNATION"
+ },
+ "call_down_lightning": {
+  "a": 11,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 3,
+  "n": 1,
+  "zap": "ZAP_LIGHTNING_BOLT"
+ },
+ "caustic_breath": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_CAUSTIC_BREATH"
+ },
+ "chain_lightning": {
+  "a": 0,
+  "kind": "calcdice",
+  "md": 1,
+  "mn": 2,
+  "n": 3,
+  "zap": "ZAP_CHAIN_LIGHTNING"
+ },
+ "chaos_breath": {
+  "a": 1,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 0,
+  "n": 0,
+  "zap": "ZAP_CHAOS_BREATH"
+ },
+ "cold_breath": {
+  "a": 0,
+  "kind": "dicedef",
+  "md": 6,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_COLD_BREATH"
+ },
+ "combustion_breath": {
+  "a": 0,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 0,
+  "n": 0,
+  "zap": "ZAP_COMBUSTION_BREATH"
+ },
+ "corrosive_bolt": {
+  "a": 13,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 3,
+  "n": 4,
+  "zap": "ZAP_CORROSIVE_BOLT"
+ },
+ "creeping_frost": {
+  "a": 7,
+  "kind": "dicedef",
+  "md": 12,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_CREEPING_FROST"
+ },
+ "creeping_shadow": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 14,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_CREEPING_SHADOW"
+ },
+ "crystallising_shot": {
+  "a": 6,
+  "kind": "dicedef",
+  "md": 10,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_CRYSTALLISING_SHOT"
+ },
+ "deploy_bomblet": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 30,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_DEPLOY_BOMBLET"
+ },
+ "dispel_undead": {
+  "a": 20,
+  "kind": "calcdice",
+  "md": 4,
+  "mn": 3,
+  "n": 3,
+  "zap": "ZAP_DISPEL_UNDEAD"
+ },
+ "dispel_undead_range": {
+  "a": 20,
+  "kind": "calcdice",
+  "md": 4,
+  "mn": 3,
+  "n": 3,
+  "zap": "ZAP_DISPEL_UNDEAD_RANGE"
+ },
+ "doom_bolt": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 9,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_DOOM_BOLT"
+ },
+ "drain_life": {
+  "a": 6,
+  "kind": "dicedef",
+  "md": 10,
+  "mn": 7,
+  "n": 2,
+  "zap": "ZAP_DRAIN_LIFE"
+ },
+ "electrical_bolt": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 12,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_ELECTRICAL_BOLT"
+ },
+ "fire_breath": {
+  "a": 0,
+  "kind": "dicedef",
+  "md": 6,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_FIRE_BREATH"
+ },
+ "fire_storm": {
+  "a": 5,
+  "kind": "calcdice",
+  "md": 1,
+  "mn": 1,
+  "n": 8,
+  "zap": "ZAP_FIRE_STORM"
+ },
+ "fireball": {
+  "a": 10,
+  "kind": "calcdice",
+  "md": 2,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_FIREBALL"
+ },
+ "flame_wave": {
+  "a": 9,
+  "kind": "calcdice",
+  "md": 3,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_FLAME_WAVE"
+ },
+ "flaming_cloud": {
+  "a": 1,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 0,
+  "n": 0,
+  "zap": "ZAP_FLAMING_CLOUD"
+ },
+ "flash_freeze": {
+  "a": 10,
+  "kind": "dicedef",
+  "md": 17,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_FLASH_FREEZE"
+ },
+ "flashing_balestra": {
+  "a": 7,
+  "kind": "dicedef",
+  "md": 12,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_FLASHING_BALESTRA"
+ },
+ "force_lance": {
+  "a": 6,
+  "kind": "dicedef",
+  "md": 6,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_FORCE_LANCE"
+ },
+ "foxfire": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 5,
+  "mn": 1,
+  "n": 1,
+  "zap": "ZAP_FOXFIRE"
+ },
+ "freeze": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 10,
+  "mn": 3,
+  "n": 1,
+  "zap": "ZAP_FREEZE"
+ },
+ "freezing_gust": {
+  "a": 9,
+  "kind": "dicedef",
+  "md": 11,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_FREEZING_GUST"
+ },
+ "fulsome_fusillade": {
+  "a": 5,
+  "kind": "dicedef",
+  "md": 8,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_FULSOME_FUSILLADE"
+ },
+ "galvanic_breath": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 10,
+  "mn": 9,
+  "n": 3,
+  "zap": "ZAP_GALVANIC_BREATH"
+ },
+ "ghostly_fireball": {
+  "a": 6,
+  "kind": "dicedef",
+  "md": 13,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_GHOSTLY_FIREBALL"
+ },
+ "ghostly_sacrifice": {
+  "a": 6,
+  "kind": "dicedef",
+  "md": 13,
+  "mn": 1,
+  "n": 5,
+  "zap": "ZAP_GHOSTLY_SACRIFICE"
+ },
+ "glacial_breath": {
+  "a": 6,
+  "kind": "dicedef",
+  "md": 3,
+  "mn": 4,
+  "n": 3,
+  "zap": "ZAP_GLACIAL_BREATH"
+ },
+ "golden_breath": {
+  "a": 2,
+  "kind": "dicedef",
+  "md": 3,
+  "mn": 4,
+  "n": 3,
+  "zap": "ZAP_GOLDEN_BREATH"
+ },
+ "grave_claw": {
+  "a": 7,
+  "kind": "dicedef",
+  "md": 7,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_GRAVE_CLAW"
+ },
+ "gravitas": {
+  "a": 6,
+  "kind": "dicedef",
+  "md": 14,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_GRAVITAS"
+ },
+ "hailstorm": {
+  "a": 15,
+  "kind": "calcdice",
+  "md": 3,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_HAILSTORM"
+ },
+ "harpoon_shot": {
+  "a": 7,
+  "kind": "dicedef",
+  "md": 20,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_HARPOON_SHOT"
+ },
+ "hoarfrost_bullet": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 16,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_HOARFROST_BULLET"
+ },
+ "holy_breath": {
+  "a": 0,
+  "kind": "dicedef",
+  "md": 12,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_HOLY_BREATH"
+ },
+ "hurl_damnation": {
+  "a": 8,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 3,
+  "n": 3,
+  "zap": "ZAP_HURL_DAMNATION"
+ },
+ "hurl_sludge": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 16,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_HURL_SLUDGE"
+ },
+ "hurl_torchlight": {
+  "a": 7,
+  "kind": "dicedef",
+  "md": 5,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_HURL_TORCHLIGHT"
+ },
+ "iceblast": {
+  "a": 14,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 3,
+  "n": 3,
+  "zap": "ZAP_ICEBLAST"
+ },
+ "ignition": {
+  "a": 10,
+  "kind": "calcdice",
+  "md": 3,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_IGNITION"
+ },
+ "iron_shot": {
+  "a": 15,
+  "kind": "calcdice",
+  "md": 4,
+  "mn": 3,
+  "n": 9,
+  "zap": "ZAP_IRON_SHOT"
+ },
+ "iskenderuns_mystic_blast": {
+  "a": 6,
+  "kind": "calcdice",
+  "md": 3,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_MYSTIC_BLAST"
+ },
+ "kinetic_grapnel": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 25,
+  "mn": 4,
+  "n": 1,
+  "zap": "ZAP_KINETIC_GRAPNEL"
+ },
+ "kiss_of_death": {
+  "a": 11,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 3,
+  "n": 2,
+  "zap": "ZAP_KISS_OF_DEATH"
+ },
+ "landbreaker": {
+  "a": 2,
+  "kind": "dicedef",
+  "md": 23,
+  "mn": 1,
+  "n": 4,
+  "zap": "ZAP_LANDBREAKER"
+ },
+ "lehudibs_crystal_spear": {
+  "a": 23,
+  "kind": "calcdice",
+  "md": 1,
+  "mn": 1,
+  "n": 10,
+  "zap": "ZAP_LEHUDIBS_CRYSTAL_SPEAR"
+ },
+ "lightning_bolt": {
+  "a": 11,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 3,
+  "n": 1,
+  "zap": "ZAP_LIGHTNING_BOLT"
+ },
+ "magic_dart": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 5,
+  "mn": 1,
+  "n": 1,
+  "zap": "ZAP_MAGIC_DART"
+ },
+ "magma_barrage": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 21,
+  "mn": 2,
+  "n": 4,
+  "zap": "ZAP_MAGMA_BARRAGE"
+ },
+ "magnavolt": {
+  "a": 9,
+  "kind": "dicedef",
+  "md": 10,
+  "mn": 1,
+  "n": 4,
+  "zap": "ZAP_MAGNAVOLT"
+ },
+ "malign_offering": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 10,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_MALIGN_OFFERING"
+ },
+ "marshlight": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 5,
+  "mn": 1,
+  "n": 1,
+  "zap": "ZAP_FOXFIRE"
+ },
+ "mercury_arrow": {
+  "a": 11,
+  "kind": "calcdice",
+  "md": 4,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_MERCURY_ARROW"
+ },
+ "metal_splinters": {
+  "a": 20,
+  "kind": "dicedef",
+  "md": 20,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_METAL_SPLINTERS"
+ },
+ "miasma_breath": {
+  "a": 5,
+  "kind": "dicedef",
+  "md": 24,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_MIASMA_BREATH"
+ },
+ "mindburst": {
+  "a": 15,
+  "kind": "calcdice",
+  "md": 4,
+  "mn": 3,
+  "n": 3,
+  "zap": "ZAP_MINDBURST"
+ },
+ "momentum_strike": {
+  "a": 24,
+  "kind": "calcdice",
+  "md": 6,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_MOMENTUM_STRIKE"
+ },
+ "monarch_bomb": {
+  "a": 5,
+  "kind": "dicedef",
+  "md": 8,
+  "mn": 1,
+  "n": 4,
+  "zap": "ZAP_MONARCH_DETONATION"
+ },
+ "mud_breath": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_MUD_BREATH"
+ },
+ "noxious_breath": {
+  "a": 1,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 1,
+  "n": 0,
+  "zap": "ZAP_NOXIOUS_BREATH"
+ },
+ "noxious_cloud": {
+  "a": 1,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 0,
+  "n": 0,
+  "zap": "ZAP_NOXIOUS_CLOUD"
+ },
+ "nullifying_breath": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 3,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_NULLIFYING_BREATH"
+ },
+ "orb_of_electricity": {
+  "a": 13,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 4,
+  "n": 0,
+  "zap": "ZAP_ORB_OF_ELECTRICITY"
+ },
+ "ozocubus_refrigeration": {
+  "a": 30,
+  "kind": "calcdice",
+  "md": 9,
+  "mn": 4,
+  "n": 4,
+  "zap": "ZAP_REFRIGERATE"
+ },
+ "pain": {
+  "a": 7,
+  "kind": "dicedef",
+  "md": 20,
+  "mn": 1,
+  "n": 1,
+  "zap": "ZAP_PAIN"
+ },
+ "percussive_tempering": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 12,
+  "mn": 1,
+  "n": 4,
+  "zap": "ZAP_PERCUSSIVE_TEMPERING"
+ },
+ "permafrost_eruption": {
+  "a": 6,
+  "kind": "calcdice",
+  "md": 8,
+  "mn": 3,
+  "n": 4,
+  "zap": "ZAP_PERMAFROST_ERUPTION_COLD"
+ },
+ "petrifying_cloud": {
+  "a": 6,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 0,
+  "n": 2,
+  "zap": "ZAP_PETRIFYING_CLOUD"
+ },
+ "phantom_blitz": {
+  "a": 9,
+  "kind": "dicedef",
+  "md": 11,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_PHANTOM_BLITZ"
+ },
+ "plasma_beam": {
+  "a": 10,
+  "kind": "dicedef",
+  "md": 20,
+  "mn": 11,
+  "n": 1,
+  "zap": "ZAP_PLASMA"
+ },
+ "platinum_paragon": {
+  "a": 10,
+  "kind": "dicedef",
+  "md": 10,
+  "mn": 1,
+  "n": 4,
+  "zap": "ZAP_PARAGON_IMPACT"
+ },
+ "poison_arrow": {
+  "a": 15,
+  "kind": "calcdice",
+  "md": 1,
+  "mn": 1,
+  "n": 4,
+  "zap": "ZAP_POISON_ARROW"
+ },
+ "poisonous_cloud": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 25,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_POISONOUS_CLOUD"
+ },
+ "primal_wave": {
+  "a": 10,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 1,
+  "n": 4,
+  "zap": "ZAP_PRIMAL_WAVE"
+ },
+ "pyre_arrow": {
+  "a": 0,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 0,
+  "n": 0,
+  "zap": "ZAP_PYRE_ARROW"
+ },
+ "pyroclastic_surge": {
+  "a": 18,
+  "kind": "calcdice",
+  "md": 3,
+  "mn": 2,
+  "n": 6,
+  "zap": "ZAP_BOLT_OF_FIRE"
+ },
+ "quicksilver_bolt": {
+  "a": 15,
+  "kind": "calcdice",
+  "md": 3,
+  "mn": 2,
+  "n": 6,
+  "zap": "ZAP_QUICKSILVER_BOLT"
+ },
+ "ravenous_swarm": {
+  "a": 1,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 1,
+  "n": 0,
+  "zap": "ZAP_RAVENOUS_SWARM"
+ },
+ "rebounding_blaze": {
+  "a": 18,
+  "kind": "calcdice",
+  "md": 3,
+  "mn": 2,
+  "n": 6,
+  "zap": "ZAP_REBOUNDING_BLAZE"
+ },
+ "rebounding_chill": {
+  "a": 18,
+  "kind": "calcdice",
+  "md": 3,
+  "mn": 2,
+  "n": 6,
+  "zap": "ZAP_REBOUNDING_CHILL"
+ },
+ "sandblast": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 3,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_SANDBLAST"
+ },
+ "searing_breath": {
+  "a": 0,
+  "kind": "dicedef",
+  "md": 9,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_SEARING_BREATH"
+ },
+ "searing_ray": {
+  "a": 9,
+  "kind": "calcdice",
+  "md": 7,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_SEARING_RAY"
+ },
+ "seismic_stomp": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 23,
+  "mn": 1,
+  "n": 4,
+  "zap": "ZAP_SEISMIC_STOMP"
+ },
+ "seracfall": {
+  "a": 14,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 3,
+  "n": 3,
+  "zap": "ZAP_ICEBLAST"
+ },
+ "shadow_ball": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 14,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_SHADOWBALL"
+ },
+ "shadow_beam": {
+  "a": 6,
+  "kind": "dicedef",
+  "md": 13,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_SHADOW_BOLT"
+ },
+ "shadow_shard": {
+  "a": 7,
+  "kind": "dicedef",
+  "md": 9,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_SHADOW_SHARD"
+ },
+ "shadow_shot": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 17,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_SHADOW_SHOT"
+ },
+ "shadow_tempest": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 16,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_SHADOW_JOLT"
+ },
+ "shock": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 4,
+  "mn": 1,
+  "n": 1,
+  "zap": "ZAP_SHOCK"
+ },
+ "shred": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 22,
+  "mn": 1,
+  "n": 4,
+  "zap": "ZAP_SHRED"
+ },
+ "slug_dart": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 25,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_SLUG_DART"
+ },
+ "sojourning_bolt": {
+  "a": 7,
+  "kind": "dicedef",
+  "md": 12,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_SOJOURNING"
+ },
+ "sonic_wave": {
+  "a": 5,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_SONIC_WAVE"
+ },
+ "spike_launcher": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 12,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_SPIKE_LAUNCHER"
+ },
+ "spit_acid": {
+  "a": 14,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 0,
+  "n": 3,
+  "zap": "ZAP_SPIT_ACID"
+ },
+ "spit_lava": {
+  "a": 10,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 0,
+  "n": 3,
+  "zap": "ZAP_SPIT_LAVA"
+ },
+ "spit_poison": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 2,
+  "mn": 1,
+  "n": 1,
+  "zap": "ZAP_SPIT_POISON"
+ },
+ "splinterfrost_shell": {
+  "a": 24,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 4,
+  "n": 6,
+  "zap": "ZAP_SPLINTERFROST_FRAGMENT"
+ },
+ "splinterspray": {
+  "a": 15,
+  "kind": "dicedef",
+  "md": 20,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_SPLINTERSPRAY"
+ },
+ "starburst": {
+  "a": 18,
+  "kind": "calcdice",
+  "md": 3,
+  "mn": 2,
+  "n": 6,
+  "zap": "ZAP_BOLT_OF_FIRE"
+ },
+ "steam_ball": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 3,
+  "mn": 2,
+  "n": 3,
+  "zap": "ZAP_BREATHE_STEAM"
+ },
+ "steam_breath": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 3,
+  "mn": 2,
+  "n": 3,
+  "zap": "ZAP_BREATHE_STEAM"
+ },
+ "sticky_flame": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 9,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_STICKY_FLAME"
+ },
+ "sting": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 4,
+  "mn": 1,
+  "n": 1,
+  "zap": "ZAP_STING"
+ },
+ "stone_arrow": {
+  "a": 7,
+  "kind": "dicedef",
+  "md": 8,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_STONE_ARROW"
+ },
+ "stunning_burst": {
+  "a": 8,
+  "kind": "dicedef",
+  "md": 20,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_STUNNING_BURST"
+ },
+ "thorn_volley": {
+  "a": 5,
+  "kind": "dicedef",
+  "md": 13,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_THORN_VOLLEY"
+ },
+ "throw_barbs": {
+  "a": 13,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 0,
+  "n": 2,
+  "zap": "ZAP_THROW_BARBS"
+ },
+ "throw_bolas": {
+  "a": 5,
+  "kind": "dicedef",
+  "md": 20,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_BOLAS"
+ },
+ "throw_flame": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 10,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_THROW_FLAME"
+ },
+ "throw_frost": {
+  "a": 4,
+  "kind": "dicedef",
+  "md": 10,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_THROW_FROST"
+ },
+ "throw_icicle": {
+  "a": 10,
+  "kind": "calcdice",
+  "md": 2,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_THROW_ICICLE"
+ },
+ "throw_pie": {
+  "a": 20,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 0,
+  "n": 3,
+  "zap": "ZAP_THROW_PIE"
+ },
+ "tremorstone": {
+  "a": 6,
+  "kind": "dicedef",
+  "md": 1,
+  "mn": 0,
+  "n": 6,
+  "zap": "ZAP_TREMORSTONE"
+ },
+ "unleash_destruction": {
+  "a": 5,
+  "kind": "dicedef",
+  "md": 2,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_UNLEASH_DESTRUCTION"
+ },
+ "vampiric_draining": {
+  "a": 6,
+  "kind": "dicedef",
+  "md": 14,
+  "mn": 1,
+  "n": 2,
+  "zap": "ZAP_VAMPIRIC_DRAINING"
+ },
+ "venom_bolt": {
+  "a": 16,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 3,
+  "n": 4,
+  "zap": "ZAP_VENOM_BOLT"
+ },
+ "violent_unravelling": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 6,
+  "mn": 1,
+  "n": 3,
+  "zap": "ZAP_UNRAVELLING"
+ },
+ "warp_body": {
+  "a": 3,
+  "kind": "dicedef",
+  "md": 18,
+  "mn": 1,
+  "n": 1,
+  "zap": "ZAP_WARP_BODY"
+ },
+ "warp_space": {
+  "a": 12,
+  "kind": "calcdice",
+  "md": 5,
+  "mn": 3,
+  "n": 3,
+  "zap": "ZAP_WARP_SPACE"
+ }
+}
