@@ -8,6 +8,11 @@ signal stairs_up_tapped(pos: Vector2i)
 signal branch_entrance_tapped(pos: Vector2i)
 signal altar_tapped(pos: Vector2i)
 signal shop_tapped(pos: Vector2i)
+## Desktop/keyboard extras — `key_action` fires for the non-movement
+## commands (inventory, magic menu, auto-explore, rest, pickup, …) so
+## GameBootstrap can wire them to the same handlers the on-screen
+## buttons use. Movement keys route through `try_move` inline.
+signal key_action(action: String)
 signal target_selected(pos: Vector2i)
 signal inspect_requested(pos: Vector2i)
 
@@ -62,6 +67,11 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if player == null or generator == null:
 		return
+	if event is InputEventKey:
+		var k: InputEventKey = event
+		if k.pressed and not k.echo:
+			_handle_key(k)
+		return
 	if event is InputEventMouseButton:
 		var mb: InputEventMouseButton = event
 		if mb.button_index == MOUSE_BUTTON_LEFT:
@@ -75,6 +85,70 @@ func _unhandled_input(event: InputEvent) -> void:
 			_begin_press(st.position)
 		else:
 			_end_press(st.position)
+
+
+## DCSS-style keyboard controls for desktop / "deep" players. Movement
+## uses vi keys (hjkl + yubn diagonals) and arrow keys; everything
+## else emits `key_action` for GameBootstrap to dispatch the same way
+## it handles on-screen button presses. Tapping a movement key while
+## on stairs descends/ascends directly.
+func _handle_key(k: InputEventKey) -> void:
+	if not player.is_alive:
+		return
+	# Cancel auto-move on any keystroke so the player takes back control.
+	if _is_auto_moving and k.keycode != KEY_ESCAPE:
+		_cancel_auto_move()
+	var delta: Vector2i = _key_to_dir(k.keycode)
+	if delta != Vector2i.ZERO:
+		player.try_move(delta)
+		return
+	match k.keycode:
+		KEY_PERIOD, KEY_KP_5:           # "." = wait-a-turn
+			player.try_move(Vector2i.ZERO)
+			TurnManager.end_player_turn()
+		KEY_COMMA:                       # "," = pickup
+			key_action.emit("pickup")
+		KEY_GREATER:                     # ">" = descend
+			stairs_tapped.emit(player.grid_pos)
+		KEY_LESS:                        # "<" = ascend
+			stairs_up_tapped.emit(player.grid_pos)
+		KEY_I:                           # "i" = inventory
+			key_action.emit("inventory")
+		KEY_Z:
+			if k.shift_pressed:
+				key_action.emit("quickspell")
+			else:
+				key_action.emit("magic")
+		KEY_Q:                           # "q" = quaff potion
+			key_action.emit("quaff")
+		KEY_R:                           # "r" = read scroll
+			key_action.emit("read")
+		KEY_E:                           # "e" = evoke
+			key_action.emit("evoke")
+		KEY_O:                           # "o" = auto-explore
+			key_action.emit("auto_explore")
+		KEY_S, KEY_SPACE:                # "s" / space = search/rest
+			key_action.emit("rest")
+		KEY_A:                           # "a" = abilities / invocations
+			key_action.emit("abilities")
+		KEY_X:                           # "x" = examine
+			key_action.emit("examine")
+		KEY_ESCAPE:
+			key_action.emit("cancel")
+
+
+## vi-keys + arrow keys → grid delta. Numpad keys also supported.
+func _key_to_dir(code: int) -> Vector2i:
+	match code:
+		KEY_H, KEY_LEFT, KEY_KP_4:  return Vector2i(-1,  0)
+		KEY_L, KEY_RIGHT, KEY_KP_6: return Vector2i( 1,  0)
+		KEY_K, KEY_UP, KEY_KP_8:    return Vector2i( 0, -1)
+		KEY_J, KEY_DOWN, KEY_KP_2:  return Vector2i( 0,  1)
+		KEY_Y, KEY_KP_7:            return Vector2i(-1, -1)
+		KEY_U, KEY_KP_9:            return Vector2i( 1, -1)
+		KEY_B, KEY_KP_1:            return Vector2i(-1,  1)
+		KEY_N, KEY_KP_3:            return Vector2i( 1,  1)
+	return Vector2i.ZERO
 
 
 func _begin_press(screen_pos: Vector2) -> void:

@@ -277,6 +277,7 @@ func _ready() -> void:
 	touch_input.branch_entrance_tapped.connect(_on_branch_entrance_tapped)
 	touch_input.altar_tapped.connect(_on_altar_tapped)
 	touch_input.shop_tapped.connect(_on_shop_tapped)
+	touch_input.key_action.connect(_on_key_action)
 	touch_input.target_selected.connect(_on_target_selected)
 	touch_input.inspect_requested.connect(_on_inspect_requested)
 
@@ -1216,6 +1217,63 @@ func _on_stairs_up_tapped(_pos: Vector2i) -> void:
 	_save_current_floor()
 	GameManager.current_depth -= 1
 	_regenerate_dungeon(true, used_secondary)
+
+
+## Keyboard command dispatcher. Wires the vi-key / function-key
+## shortcuts (`i`, `z`, `q`, `r`, `,`, `o`, `s`, `a`, …) to the same
+## dialogs the on-screen buttons open. Movement keys route through
+## `try_move` directly in TouchInput; this handler only takes the
+## non-directional actions.
+func _on_key_action(action: String) -> void:
+	if run_over or player == null:
+		return
+	match action:
+		"inventory":
+			_open_bag_filtered("all")
+		"magic":
+			_open_magic_dialog()
+		"quickspell":
+			# Shift-Z: fire the first quickslotted spell, if any.
+			if player.quickslot_ids.size() > 0:
+				var qs: String = String(player.quickslot_ids[0])
+				if qs.begins_with("spell:"):
+					var result: Dictionary = _execute_cast(qs.substr(6))
+					if result.get("message", "") != "":
+						CombatLog.add(result.get("message", ""))
+		"quaff":
+			_open_bag_filtered("potion")
+		"read":
+			_open_bag_filtered("scroll")
+		"evoke":
+			_open_bag_filtered("wand")
+		"pickup":
+			# Movement already auto-picks up; this just triggers a re-scan
+			# of the current tile in case items arrived mid-turn.
+			if player.has_method("_pickup_items_here"):
+				player._pickup_items_here()
+		"auto_explore":
+			if touch_input != null and touch_input.has_method("begin_auto_explore"):
+				touch_input.begin_auto_explore()
+		"rest":
+			if player.has_method("begin_rest"):
+				player.begin_rest()
+			else:
+				# Fallback: spend a single turn in place.
+				player.try_move(Vector2i.ZERO)
+				TurnManager.end_player_turn()
+		"abilities":
+			# If aligned to a god, show invocations; otherwise log a hint.
+			if player.current_god != "":
+				_show_invocations_menu()
+			else:
+				CombatLog.add("You have no abilities to invoke.")
+		"examine":
+			CombatLog.add("Examine mode: tap a tile to inspect. (stub)")
+		"cancel":
+			# Close any active popup. Godot's AcceptDialog auto-closes on
+			# Esc, but the path here also ensures targeting mode releases.
+			if touch_input != null and "targeting_mode" in touch_input:
+				touch_input.targeting_mode = false
 
 
 ## Shop tap: open a buying menu against the shop's rolled inventory.
