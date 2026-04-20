@@ -154,6 +154,15 @@ func _ready() -> void:
 		for sk in job.starting_skills:
 			starting_skills[sk] = int(job.starting_skills[sk])
 	skill_system.init_for_player(player, starting_skills)
+	# Dodging / stealth / armour skills need to be present before EV can
+	# be computed correctly, so refresh defense stats now that the skill
+	# system has populated skill_state.
+	if player.has_method("_recompute_defense"):
+		player._recompute_defense()
+	# Re-run on every skill level-up so dodging gains translate into
+	# EV bumps immediately (instead of waiting for the next equip swap).
+	if not skill_system.skill_leveled_up.is_connected(_on_skill_leveled_up_for_stats):
+		skill_system.skill_leveled_up.connect(_on_skill_leveled_up_for_stats)
 
 	player.moved.connect(_on_player_moved)
 	# [meta-agent] hook player death → result screen.
@@ -1231,6 +1240,17 @@ func _on_stairs_up_tapped(_pos: Vector2i) -> void:
 	_save_current_floor()
 	GameManager.current_depth -= 1
 	_regenerate_dungeon(true, used_secondary)
+
+
+## Skill level-up callback that refreshes defense stats. Dodging /
+## stealth / armour all feed into EV, and a new skill level should
+## propagate to the player's cached `stats.EV` immediately.
+func _on_skill_leveled_up_for_stats(p: Node, skill_id: String, _new_level: int) -> void:
+	if p != player or player == null:
+		return
+	if skill_id == "dodging" or skill_id == "stealth" or skill_id == "armour":
+		if player.has_method("_recompute_defense"):
+			player._recompute_defense()
 
 
 ## Keyboard command dispatcher. Wires the vi-key / function-key

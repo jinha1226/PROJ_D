@@ -618,9 +618,15 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 	var trait_str: int = p_trait.str_bonus if p_trait else 0
 	var trait_dex: int = p_trait.dex_bonus if p_trait else 0
 	var trait_int: int = p_trait.int_bonus if p_trait else 0
-	var base_str: int = 8 + (job.str_bonus if job else 0) + trait_str
-	var base_dex: int = 8 + (job.dex_bonus if job else 0) + trait_dex
-	var base_int: int = 8 + (job.int_bonus if job else 0) + trait_int
+	# DCSS stats = species.base_stat + job_bonus (+ our mobile-layer trait
+	# bonus). Earlier we used a flat 8 which ignored racial stats entirely,
+	# so Gargoyle EE was (8, 15, 13) instead of the DCSS-correct (11, 15, 10).
+	var race_str: int = race.base_str if race != null else 8
+	var race_dex: int = race.base_dex if race != null else 8
+	var race_int: int = race.base_int if race != null else 8
+	var base_str: int = race_str + (job.str_bonus if job else 0) + trait_str
+	var base_dex: int = race_dex + (job.dex_bonus if job else 0) + trait_dex
+	var base_int: int = race_int + (job.int_bonus if job else 0) + trait_int
 	s.STR = base_str
 	s.DEX = base_dex
 	s.INT = base_int
@@ -908,11 +914,17 @@ func _recompute_gear_stats() -> void:
 	if trait_res != null:
 		ac += trait_res.ac_bonus
 	var ev: int = base_ev
+	# Sum up body armour EV-penalty (negative PARM_EVASION). DCSS reduces
+	# EV by evp/10 from body armour only (other slots don't apply).
+	var body_evp_raw: int = 0
 	# Apply armor bonuses (base AC + enchant "plus").
-	for slot_dict in equipped_armor.values():
+	for slot_key in equipped_armor.keys():
+		var slot_dict: Dictionary = equipped_armor[slot_key]
 		ac += int(slot_dict.get("ac", 0))
 		ac += int(slot_dict.get("plus", 0))
 		ev += int(slot_dict.get("ev_bonus", 0))
+		if slot_key == "chest":
+			body_evp_raw = int(slot_dict.get("ev_penalty", 0))
 	# Apply ring bonuses.
 	for ring in equipped_rings:
 		if typeof(ring) != TYPE_DICTIONARY or ring.is_empty():
@@ -923,8 +935,16 @@ func _recompute_gear_stats() -> void:
 		ac += int(ring.get("ac", 0))
 		ev += int(ring.get("ev", 0))
 		stats.mp_max += int(ring.get("mp_max", 0))
+	# DCSS `player_evasion`: base 10, + (dex-10)/2, + dodging skill * 2/3,
+	# + stealth skill / 6, - body armour penalty / 10. Rounded to int.
+	var dodging_lv: int = _skill_level("dodging")
+	var stealth_lv: int = _skill_level("stealth")
+	var dex_bonus: int = (stats.DEX - 10) / 2
+	var evp_evp: int = max(0, -body_evp_raw) / 10
+	var dcss_ev: int = 10 + dex_bonus + dodging_lv * 2 / 3 + stealth_lv / 6 - evp_evp
+	ev += max(0, dcss_ev)
 	stats.AC = ac
-	stats.EV = ev
+	stats.EV = max(0, ev)
 	# Clamp MP if cap dropped below current reading.
 	if stats.MP > stats.mp_max:
 		stats.MP = stats.mp_max

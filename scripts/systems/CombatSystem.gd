@@ -67,8 +67,21 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	if "stats" in attacker and attacker.stats != null:
 		base_stat_atk = attacker.stats.get_attack()
 
-	var atk: int = int(weapon_dmg * (1.0 + float(weapon_skill_level) / 20.0)) \
-			+ base_stat_atk + fighting_level / 4
+	# DCSS melee roll: `1 + random2(weapon_damage)` for the base, plus
+	# STR-derived bonus `(STR-10)/3`, plus a skill bonus rolled through
+	# random2avg for variance, plus fighting skill / 4. This replaces the
+	# old flat `weapon_dmg * (1 + skill/20)` formula which treated every
+	# swing as near-max damage — much too consistent vs DCSS.
+	var base_roll: int = 1 + (randi() % max(weapon_dmg, 1))
+	var str_bonus: int = 0
+	if "stats" in attacker and attacker.stats != null:
+		str_bonus = max(0, (attacker.stats.STR - 10) / 3)
+	var skill_bonus: int = 0
+	if weapon_skill_level > 0:
+		# random2avg(skill+1, 2) ≈ average roll around skill/2.
+		skill_bonus = (randi() % (weapon_skill_level + 1) \
+				+ randi() % (weapon_skill_level + 1)) / 2
+	var atk: int = base_roll + str_bonus + skill_bonus + fighting_level / 4
 
 	var def_ac: int = 0
 	if "ac" in defender:
@@ -79,14 +92,11 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	if defender.has_method("has_meta") and defender.has_meta("_vuln_turns"):
 		def_ac = def_ac / 2
 
-	# Defender armour skill bonus (monsters don't have one; safe 0 fallback).
-	var armour_skill_level: int = 0
-	if skill_sys != null and defender.has_method("get_current_weapon_skill"):
-		# Heuristic: only players expose skill sheets we manage.
-		armour_skill_level = skill_sys.get_level(defender, "armour")
-	var effective_ac: int = def_ac + armour_skill_level / 4
-
-	var dmg: int = roll_damage(atk, effective_ac)
+	# DCSS apply_ac: AC soaks `random2(2*AC+1)` off the hit — average
+	# of AC damage blocked, with a lot of variance. Replaces the old
+	# flat `atk - def_ac` subtraction.
+	var soak: int = (randi() % (2 * def_ac + 1)) if def_ac > 0 else 0
+	var dmg: int = max(1, atk - soak)
 	var trait_special: String = ""
 	if "trait_res" in attacker and attacker.trait_res != null:
 		trait_special = attacker.trait_res.special
@@ -148,41 +158,54 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 ## keeps the legacy formula.
 static func melee_attack_from_monster(m, defender) -> int:
 	# DCSS-faithful damage: every attack entry on the monster rolls a
-	# separate 1..damage swing. Multi-attack beasts (troll has 3, hydra
-	# has 1-per-head) swing each attack with diminishing per-attack odds
-	# (100% / 50% / 33% / …) so their total output tracks DCSS's
-	# `mons_attack_spec` averages without the full roll-vs-EV engine.
+	# separate 1..damage swing, with a proper to-hit roll vs the
+	# defender's EV so high-dodge mages actually evade. Multi-attack
+	# beasts swing each attack with diminishing per-swing odds, matching
+	# the shape of `mons_attack_spec` averages.
 	var def_ac: int = 0
+	var def_ev: int = 0
 	if "stats" in defender and defender.stats != null:
 		def_ac = defender.stats.AC
+		def_ev = defender.stats.EV
 	elif "ac" in defender:
 		def_ac = int(defender.ac)
 
+	var hd: int = int(m.data.hd) if m.data else 1
 	var atks: Array = m.data.attacks if m.data and "attacks" in m.data else []
 	var total: int = 0
 	var dealt_any: bool = false
+	var missed_any: bool = false
 	if atks.is_empty():
-		# Fallback for data-less monsters: keep the old str/2+3 shape so
-		# summons/bosses without YAML stats still swing for something.
-		total = roll_damage(int(m.data.str) / 2 + 3 if m.data else 3, def_ac)
-		dealt_any = total > 0
+		# Fallback for data-less monsters: old str/2+3 shape, single swing.
+		var to_hit: int = 1 + (randi() % (hd * 10 + 1))
+		if to_hit >= def_ev:
+			var raw_f: int = max(1, (int(m.data.str) / 2 + 3) if m.data else 3)
+			total = max(0, raw_f - (randi() % (2 * def_ac + 1)))
+			dealt_any = total > 0
+		else:
+			missed_any = true
 	else:
 		for i in atks.size():
 			var a: Dictionary = atks[i]
 			var base: int = int(a.get("damage", 0))
 			if base <= 0:
 				continue
-			var chance: float = 1.0 / float(1 + i)  # 100% / 50% / 33% / 25% …
+			var chance: float = 1.0 / float(1 + i)
 			if i > 0 and randf() >= chance:
 				continue
-			# Each swing rolls 1 + random2(base), then AC soaks a random
-			# fraction (matches DCSS `apply_ac` shape: flat soak with jitter).
+			# DCSS to-hit: `1 + random2(hd*10+1)` vs EV. Miss if roll < EV.
+			var to_hit_roll: int = 1 + (randi() % (hd * 10 + 1))
+			if to_hit_roll < def_ev:
+				missed_any = true
+				continue
+			# Each connecting swing: 1 + random2(base), then AC soaks
+			# `random2(2*AC+1)` (DCSS apply_ac shape for monsters).
 			var raw: int = 1 + (randi() % base)
-			var after_ac: int = max(1, raw - def_ac + randi_range(-1, 1))
-			total += after_ac
-			dealt_any = true
-			# Flavour riders: poison / drain / fire on melee. Keyed off
-			# the `flavour` field per attack entry.
+			var soak: int = randi() % (2 * def_ac + 1) if def_ac > 0 else 0
+			var after_ac: int = max(0, raw - soak)
+			if after_ac > 0:
+				total += after_ac
+				dealt_any = true
 			var flav: String = String(a.get("flavour", ""))
 			match flav:
 				"poison":
@@ -190,14 +213,17 @@ static func melee_attack_from_monster(m, defender) -> int:
 						defender.set_meta("_poison_turns", 5)
 						defender.set_meta("_poison_dmg", max(1, base / 4))
 				"drain", "drain_xp":
-					# Simplified: clip 3 HP off max while the drain lasts.
 					if defender.has_method("set_meta"):
 						defender.set_meta("_drained_turns", 20)
 				"fire":
-					pass  # resist check handled on defender side if set
+					pass
 
 	if not dealt_any:
-		total = 1  # missed-ish — DCSS still shows a hit-for-1
+		if missed_any:
+			var atk_name_m: String = m.data.display_name if m.data else "monster"
+			CombatLog.add("The %s misses you!" % atk_name_m)
+			return 0
+		total = 1  # glancing hit fallback
 
 	var def_trait: String = ""
 	if "trait_res" in defender and defender.trait_res != null:
