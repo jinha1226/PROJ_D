@@ -675,6 +675,20 @@ static func element_for(spell_id: String) -> String:
 	return String(zap.get("element", "")) if not zap.is_empty() else ""
 
 
+## DCSS div_rand_round (random.cc:313): floor(num/den), +1 with
+## probability (num mod den) / den. Used by calc_dice to keep the
+## per-die size an integer while preserving the total max damage in
+## expectation.
+static func _div_rand_round(num: int, den: int) -> int:
+	if den <= 0:
+		return 0
+	var q: int = num / den
+	var r: int = num - q * den
+	if r > 0 and (randi() % den) < r:
+		q += 1
+	return q
+
+
 static func roll_damage(spell_id: String, power: int) -> int:
 	_ensure_loaded()
 	var zap: Dictionary = _zaps.get(spell_id, {})
@@ -687,8 +701,9 @@ static func roll_damage(spell_id: String, power: int) -> int:
 	var md: int = int(zap.get("md", 1))
 	var size: int
 	if kind == "calcdice":
+		# DCSS calc_dice (random.cc:289): distribute max_dmg across n dice
+		# with randomised rounding on the per-die size.
 		var max_dmg: int = a + power * mn / md
-		# calc_dice: split max_dmg across n dice.
 		if n <= 1:
 			n = 1
 			size = max_dmg
@@ -696,7 +711,7 @@ static func roll_damage(spell_id: String, power: int) -> int:
 			n = max_dmg
 			size = 1
 		else:
-			size = max_dmg / n  # DCSS uses div_rand_round; approximate as floor
+			size = _div_rand_round(max_dmg, n)
 	else:  # dicedef
 		size = a + power * mn / md
 	if size <= 0:

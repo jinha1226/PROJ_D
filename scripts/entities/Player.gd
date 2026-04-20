@@ -2285,13 +2285,35 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 	# Sprite slash animation carries the attack feel — no position lunge.
 	# [skill-agent] route through CombatSystem so skill levels are factored in.
 	var skill_sys: Node = get_tree().root.get_node_or_null("Game/SkillSystem")
-	# Action energy cost = weapon delay * 10 (DCSS BASELINE). Monsters
-	# pick this up on their next take_turn to accumulate the right
-	# energy count for this swing.
-	var weapon_delay: float = 1.0
+	# DCSS attack_delay port (player-act.cc:252 attack_delay_with):
+	#   delay = weapon_speed
+	#   delay -= min(skill*10, mindelay_skill*10) / 20        # skill up to
+	#                                                           mindelay halves
+	#   if brand == speed: delay = delay*2/3
+	#   if brand == heavy: delay = delay*3/2
+	#   delay = max(delay, 3)
+	# Our last_action_ticks is stored in BASELINE_DELAY units (×10), so the
+	# 10-point scale gets converted to ticks at the end.
+	var weapon_delay_base: float = 1.0
 	if equipped_weapon_id != "" and WeaponRegistry.is_weapon(equipped_weapon_id):
-		weapon_delay = WeaponRegistry.weapon_delay_for(equipped_weapon_id)
-	last_action_ticks = int(round(weapon_delay * 10))
+		weapon_delay_base = WeaponRegistry.weapon_delay_for(equipped_weapon_id)
+	var delay_10: int = int(round(weapon_delay_base * 10))
+	var wpn_skill_id: String = WeaponRegistry.weapon_skill_for(equipped_weapon_id)
+	var wpn_sklev: int = 0
+	if skill_sys != null and wpn_skill_id != "":
+		wpn_sklev = skill_sys.get_level(self, wpn_skill_id)
+	# mindelay_skill is usually 10 in DCSS (half-delay point). Cap skill
+	# contribution so specialisation past 10 doesn't keep cutting delay.
+	var capped_sk: int = mini(wpn_sklev, 10)
+	delay_10 = maxi(3, delay_10 - capped_sk * 10 / 20)
+	# Brand multipliers: speed weapons fire at 2/3 delay, heavy at 3/2.
+	if equipped_weapon_id != "":
+		var brand_key: String = "_weapon_brand_" + equipped_weapon_id
+		if has_meta(brand_key):
+			match String(get_meta(brand_key)):
+				"speed": delay_10 = maxi(3, delay_10 * 2 / 3)
+				"heavy": delay_10 = delay_10 * 3 / 2
+	last_action_ticks = delay_10
 	CombatSystem.melee_attack(self, monster, skill_sys)
 	attacked.emit(monster)
 	# Combat is loud — DCSS broadcasts noise roughly proportional to the
