@@ -20,15 +20,39 @@ extends Object
 
 const _POPULATION_JSON: String = "res://assets/dcss_mons/population.json"
 
-## Our game's 5-branch structure → DCSS branch names to pull from.
-## Pulling from multiple DCSS branches lets one of our branches inherit a
-## union of DCSS pools (e.g. our "mine" reuses DCSS Orcish Mines + Dungeon).
+## Branch id → DCSS population source(s). Two kinds of keys:
+##
+## Legacy trunk buckets (still used on main-dungeon depth rotation):
+##   main / mine / forest / swamp / volcano
+##
+## Real DCSS branch ids (used when GameManager.current_branch is set by
+## `enter_branch`). Each of these maps to a primary DCSS pool, sometimes
+## with a secondary fallback for depth edges.
 const _BRANCH_MAP: Dictionary = {
+	# --- Trunk rotation (legacy) ---
 	"main":    ["Dungeon"],
 	"mine":    ["Orcish Mines", "Dungeon", "Dwarven Hall"],
 	"forest":  ["Lair", "Forest", "Snake Pit", "Spider Nest"],
 	"swamp":   ["Swamp", "Shoals", "Lair"],
 	"volcano": ["Volcano", "Gehenna", "Zot"],
+	# --- Real DCSS branches (via GameManager.enter_branch) ---
+	"dungeon": ["Dungeon"],
+	"temple":  ["Dungeon"],                       # Temple has no wandering monsters in DCSS
+	"lair":    ["Lair", "Forest"],
+	"orc":     ["Orcish Mines", "Dwarven Hall"],
+	"elf":     ["Elven Halls"],
+	"vaults":  ["Vaults"],
+	"crypt":   ["Crypt"],
+	"tomb":    ["Tomb", "Crypt"],
+	"snake":   ["Snake Pit"],
+	"spider":  ["Spider Nest"],
+	"shoals":  ["Shoals"],
+	"slime":   ["Slime Pits"],
+	"zot":     ["Zot"],
+	"depths":  ["Depths"],
+	"abyss":   ["Abyss"],
+	"pan":     ["Pandemonium"],
+	"hell":    ["Hell"],
 }
 
 static var _table: Dictionary = {}

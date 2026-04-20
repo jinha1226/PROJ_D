@@ -245,6 +245,16 @@ static func _pick_boss_tile(gen: DungeonGenerator, used: Dictionary, fallback: A
 
 
 static func _branch_for(d: int) -> String:
+	# When the player is inside a real DCSS branch (Lair/Orc/Vaults/…),
+	# spawn from that branch's pool directly. Otherwise fall back to the
+	# legacy depth-bucketed rotation used on the main trunk.
+	var mgr: Node = null
+	if Engine.get_main_loop() != null:
+		mgr = Engine.get_main_loop().root.get_node_or_null("GameManager")
+	if mgr != null:
+		var real: String = String(mgr.get("current_branch") or "dungeon")
+		if real != "" and real != "dungeon":
+			return real
 	if d <= 5:
 		return "main"
 	if d <= 10:
