@@ -187,10 +187,15 @@ func _on_longpress(grid: Vector2i) -> void:
 
 func _farthest_floor_from(start: Vector2i) -> Vector2i:
 	# BFS over 4-connected walkable tiles.
-	# Priority 1: nearest unexplored tile (reveals new map area).
-	# Priority 2: farthest reachable explored tile (keep moving when fully explored).
+	# Priority 1: nearest visible floor item the player hasn't grabbed yet.
+	# Priority 2: nearest unexplored tile (keep revealing map).
+	# Priority 3: farthest reachable explored tile (keep moving when
+	#            fully explored and everything's been picked up).
+	var item_tiles: Dictionary = _visible_pickup_tiles()
 	var visited: Dictionary = {start: 0}
 	var queue: Array[Vector2i] = [start]
+	var nearest_item: Vector2i = start
+	var nearest_item_d: int = 999999
 	var nearest_unexplored: Vector2i = start
 	var nearest_unexplored_d: int = 999999
 	var farthest: Vector2i = start
@@ -202,7 +207,11 @@ func _farthest_floor_from(start: Vector2i) -> Vector2i:
 		if d > farthest_d:
 			farthest_d = d
 			farthest = cur
-		# Track nearest unexplored tile (uses dmap fog-of-war if available).
+		# Visible-item priority comes first — a loot tile 3 squares away
+		# beats an unexplored corridor 6 squares away.
+		if cur != start and item_tiles.has(cur) and d < nearest_item_d:
+			nearest_item_d = d
+			nearest_item = cur
 		if dmap != null and not dmap.is_explored(cur) and d < nearest_unexplored_d:
 			nearest_unexplored_d = d
 			nearest_unexplored = cur
@@ -214,13 +223,35 @@ func _farthest_floor_from(start: Vector2i) -> Vector2i:
 				continue
 			visited[nb] = d + 1
 			queue.append(nb)
-	return nearest_unexplored if nearest_unexplored_d < 999999 else farthest
+	# Priority order: visible item → unexplored tile → farthest explored.
+	if nearest_item_d < 999999:
+		return nearest_item
+	if nearest_unexplored_d < 999999:
+		return nearest_unexplored
+	return farthest
+
+
+## Tiles of every floor item currently in the player's FOV. Used so auto-
+## explore can divert to loot before continuing to the next unexplored
+## room.
+func _visible_pickup_tiles() -> Dictionary:
+	var out: Dictionary = {}
+	for fi in get_tree().get_nodes_in_group("floor_items"):
+		if not is_instance_valid(fi) or not ("grid_pos" in fi):
+			continue
+		var p: Vector2i = fi.grid_pos
+		if dmap != null and not dmap.is_tile_visible(p):
+			continue
+		out[p] = true
+	return out
 
 
 func _on_player_turn_started() -> void:
 	if _is_auto_moving:
-		# 150 ms delay so each step is visually distinct.
-		get_tree().create_timer(0.15).timeout.connect(_step_auto_move, CONNECT_ONE_SHOT)
+		# Roughly-2x faster auto-step cadence. Pair with Player's shorter
+		# movement tween so each step still reads distinctly without
+		# dragging on mobile.
+		get_tree().create_timer(0.06).timeout.connect(_step_auto_move, CONNECT_ONE_SHOT)
 
 
 func _step_auto_move() -> void:

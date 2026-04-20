@@ -66,6 +66,13 @@ var _bag_category: String = "all"
 var _bag_swipe_start_x: float = -1.0
 var _bag_swipe_start_y: float = -1.0
 const _BAG_CATEGORIES: Array = ["all", "weapon", "armor", "cloak", "ring", "potion", "scroll", "book"]
+# Swipe state for the skill dialog's category tabs — same pattern as
+# _bag_swipe_* but keyed per-dialog so closing one doesn't bleed into
+# the other.
+var _skills_swipe_dlg: AcceptDialog = null
+var _skills_swipe_category: String = ""
+var _skills_swipe_start_x: float = -1.0
+var _skills_swipe_start_y: float = -1.0
 var _skills_dlg: AcceptDialog = null
 var _status_dlg: AcceptDialog = null
 var _map_dlg: AcceptDialog = null
@@ -447,7 +454,7 @@ func _open_quickslot_picker(slot_index: int) -> void:
 	vb.add_theme_constant_override("separation", 6)
 	dlg.add_child(vb)
 
-	var scroll := ScrollContainer.new()
+	var scroll := ScrollContainer.new(); scroll.scroll_deadzone = 20
 	scroll.custom_minimum_size = Vector2(0, 1200)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	vb.add_child(scroll)
@@ -1272,6 +1279,13 @@ func _on_identify_pick(id: String, dlg: AcceptDialog) -> void:
 
 
 func _on_player_leveled_up(new_level: int) -> void:
+	# DCSS-style pacing — stat point every 3 levels (so 3 / 6 / 9 / …).
+	# Other level-ups still trigger the toast stack via player.leveled_up
+	# but skip the stat-picker popup.
+	if new_level % 3 != 0:
+		if skill_toast != null and skill_toast.has_method("show_toast"):
+			skill_toast.show_toast("Lv.%d" % new_level)
+		return
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null or not popup_mgr.has_method("show_levelup_popup"):
 		return
@@ -1460,18 +1474,27 @@ func _open_skills_dialog(category: String) -> void:
 	for cat in _SKILL_CATEGORIES:
 		var tb := Button.new()
 		tb.text = _SKILL_CATEGORY_LABELS.get(cat, cat)
-		tb.custom_minimum_size = Vector2(0, 48)
+		tb.custom_minimum_size = Vector2(0, 64)
 		tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		tb.toggle_mode = true
 		tb.button_pressed = (cat == category)
+		tb.add_theme_font_size_override("font_size", 40)
 		tb.pressed.connect(_on_skills_tab.bind(cat, dlg))
 		tabs_hbox.add_child(tb)
 	vb.add_child(tabs_hbox)
 
-	var scroll := ScrollContainer.new()
+	# Horizontal swipe on the dialog body cycles category tabs (mirrors the
+	# bag screen). Threshold + axis check come from the shared helper.
+	_skills_swipe_dlg = dlg
+	_skills_swipe_category = category
+	vb.mouse_filter = Control.MOUSE_FILTER_PASS
+	vb.gui_input.connect(_on_skills_swipe_input)
+
+	var scroll := ScrollContainer.new(); scroll.scroll_deadzone = 20
 	scroll.custom_minimum_size = Vector2(0, 1200)
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.scroll_deadzone = 20
 	vb.add_child(scroll)
 
 	var rows := VBoxContainer.new()
@@ -1555,7 +1578,7 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 	var name_lab := Label.new()
 	name_lab.text = String(SkillRow.SKILL_NAMES.get(skill_id, skill_id))
 	name_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_lab.add_theme_font_size_override("font_size", 40)
+	name_lab.add_theme_font_size_override("font_size", 46)
 	row.add_child(name_lab)
 
 	var level: int = int(entry.get("level", 0))
@@ -1566,7 +1589,7 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 		lv_lab.text = "MAX"
 	else:
 		lv_lab.text = "Lv.%d" % level
-	lv_lab.add_theme_font_size_override("font_size", 40)
+	lv_lab.add_theme_font_size_override("font_size", 46)
 	lv_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	row.add_child(lv_lab)
 
@@ -1575,8 +1598,8 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 	# trains fast or slow for this race.
 	var apt_lab := Label.new()
 	apt_lab.text = _format_aptitude(skill_id)
-	apt_lab.add_theme_font_size_override("font_size", 40)
-	apt_lab.custom_minimum_size = Vector2(90, 0)
+	apt_lab.add_theme_font_size_override("font_size", 46)
+	apt_lab.custom_minimum_size = Vector2(100, 0)
 	apt_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	var apt_val: int = _player_aptitude(skill_id)
 	if apt_val > 0:
@@ -1592,14 +1615,17 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 	var desc_text: String = String(_SKILL_DESCS.get(skill_id, ""))
 	var is_training: bool = bool(entry.get("training", false))
 	var parts: Array = [desc_text]
-	if level > 0 and level < SkillSystem.MAX_LEVEL:
+	# Show XP as soon as the skill is being trained (or has any level) so
+	# the player sees progress from the very first kill instead of having
+	# to wait for the first level-up.
+	if (is_training or level > 0) and level < SkillSystem.MAX_LEVEL:
 		parts.append("XP %d/%d" % [int(xp), int(need)])
 	if not skill_system.auto_training and is_training:
 		var trained_count: int = _count_trained_skills()
 		if trained_count > 0:
 			parts.append("%d%% XP" % int(100.0 / trained_count))
 	info_line.text = "  |  ".join(PackedStringArray(parts))
-	info_line.add_theme_font_size_override("font_size", 34)
+	info_line.add_theme_font_size_override("font_size", 38)
 	info_line.modulate = Color(0.6, 0.75, 0.6)
 	outer.add_child(info_line)
 
@@ -1669,7 +1695,7 @@ func _open_magic_dialog() -> void:
 	vb.add_child(header)
 	vb.add_child(HSeparator.new())
 
-	var scroll := ScrollContainer.new()
+	var scroll := ScrollContainer.new(); scroll.scroll_deadzone = 20
 	scroll.custom_minimum_size = Vector2(0, 1400)
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -2254,7 +2280,7 @@ func _on_bag_pressed() -> void:
 
 	_build_equipped_section(vb)
 
-	var scroll := ScrollContainer.new()
+	var scroll := ScrollContainer.new(); scroll.scroll_deadzone = 20
 	scroll.custom_minimum_size = Vector2(0, 1300)
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -2291,12 +2317,21 @@ func _on_bag_pressed() -> void:
 			row.custom_minimum_size = Vector2(0, 80)
 			row.add_theme_constant_override("separation", 8)
 			var iid_row: String = String(it.get("id", ""))
-			var tex: Texture2D = TileRenderer.item(iid_row)
+			# Thumbnail: for potions/scrolls show the colour-only base tile
+			# until identified (mirrors how DCSS hides unidentified types).
+			# Other kinds always use the identified icon.
+			var tex: Texture2D = null
+			if (kind == "potion" or kind == "scroll") \
+					and GameManager != null and not GameManager.is_identified(iid_row):
+				tex = TileRenderer.consumable_base(iid_row, kind)
+			if tex == null:
+				tex = TileRenderer.item(iid_row)
 			if tex != null:
 				var icon := TextureRect.new()
 				icon.texture = tex
 				icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-				icon.custom_minimum_size = Vector2(48, 48)
+				icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+				icon.custom_minimum_size = Vector2(64, 64)
 				icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 				icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 				row.add_child(icon)
@@ -2391,6 +2426,49 @@ func _shift_bag_category(step: int) -> void:
 		idx = 0
 	var next_idx: int = (idx + step + _BAG_CATEGORIES.size()) % _BAG_CATEGORIES.size()
 	_open_bag_filtered(String(_BAG_CATEGORIES[next_idx]))
+
+
+## Skill dialog swipe handler — identical shape to _on_bag_swipe_input.
+func _on_skills_swipe_input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch:
+		var st: InputEventScreenTouch = event
+		if st.pressed:
+			_skills_swipe_start_x = st.position.x
+			_skills_swipe_start_y = st.position.y
+		else:
+			_try_skills_swipe(st.position)
+		return
+	if event is InputEventMouseButton:
+		var mb: InputEventMouseButton = event
+		if mb.button_index != MOUSE_BUTTON_LEFT:
+			return
+		if mb.pressed:
+			_skills_swipe_start_x = mb.position.x
+			_skills_swipe_start_y = mb.position.y
+		else:
+			_try_skills_swipe(mb.position)
+
+
+func _try_skills_swipe(end_pos: Vector2) -> void:
+	if _skills_swipe_start_x < 0:
+		return
+	var dx: float = end_pos.x - _skills_swipe_start_x
+	var dy: float = end_pos.y - _skills_swipe_start_y
+	_skills_swipe_start_x = -1.0
+	_skills_swipe_start_y = -1.0
+	if abs(dx) < 120.0 or abs(dx) < abs(dy) * 1.5:
+		return
+	var step: int = -1 if dx > 0 else 1
+	var idx: int = _SKILL_CATEGORIES.find(_skills_swipe_category)
+	if idx < 0:
+		idx = 0
+	var next_idx: int = (idx + step + _SKILL_CATEGORIES.size()) % _SKILL_CATEGORIES.size()
+	var dlg: AcceptDialog = _skills_swipe_dlg
+	if dlg == null or not is_instance_valid(dlg):
+		return
+	dlg.queue_free()
+	_skills_dlg = null
+	_open_skills_dialog(String(_SKILL_CATEGORIES[next_idx]))
 
 
 ## Render the "Equipped" block at the top of the bag. Shows the current
@@ -2647,7 +2725,7 @@ func _on_status_pressed() -> void:
 	dlg.title = "Status"
 	dlg.ok_button_text = "Close"
 
-	var scroll := ScrollContainer.new()
+	var scroll := ScrollContainer.new(); scroll.scroll_deadzone = 20
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.custom_minimum_size = Vector2(920, 1500)

@@ -366,7 +366,7 @@ static func _cast_fire_single(layer: Node2D, from_px: Vector2, target: Node2D,
 	fb.ball_color = color
 	fb.ball_radius = 9.0
 	var dist: float = from_px.distance_to(t_pos)
-	var dur: float = clamp(dist / 440.0, 0.10, 0.28)
+	var dur: float = clamp(dist / 880.0, 0.05, 0.14)
 	_shoot_projectile(layer, from_px, t_pos, fb, color, dur, Tween.EASE_OUT, func():
 		if is_instance_valid(target):
 			flash(target, color.lightened(0.4))
@@ -382,7 +382,7 @@ static func _cast_cold_single(layer: Node2D, from_px: Vector2, target: Node2D,
 	shard.shard_color = color
 	shard.shard_size = 11.0
 	var dist: float = from_px.distance_to(t_pos)
-	var dur: float = clamp(dist / 500.0, 0.09, 0.24)
+	var dur: float = clamp(dist / 1000.0, 0.045, 0.12)
 	_shoot_projectile(layer, from_px, t_pos, shard, color, dur, Tween.EASE_IN_OUT, func():
 		if is_instance_valid(target):
 			flash(target, color.lightened(0.35))
@@ -420,7 +420,7 @@ static func _cast_earth_single(layer: Node2D, from_px: Vector2, target: Node2D,
 	var rock: _Rock = _Rock.new()
 	rock.rock_color = color
 	var dist: float = from_px.distance_to(t_pos)
-	var dur: float = clamp(dist / 380.0, 0.14, 0.34)
+	var dur: float = clamp(dist / 760.0, 0.07, 0.17)
 	_shoot_projectile(layer, from_px, t_pos, rock, color, dur, Tween.EASE_IN, func():
 		if is_instance_valid(target):
 			flash(target, color.lightened(0.2))
@@ -434,7 +434,7 @@ static func _cast_necro_single(layer: Node2D, from_px: Vector2, target: Node2D,
 	var wisp: _Wisp = _Wisp.new()
 	wisp.wisp_color = color
 	var dist: float = from_px.distance_to(t_pos)
-	var dur: float = clamp(dist / 420.0, 0.12, 0.30)
+	var dur: float = clamp(dist / 840.0, 0.06, 0.15)
 	_shoot_projectile(layer, from_px, t_pos, wisp, color, dur, Tween.EASE_OUT, func():
 		if is_instance_valid(target):
 			flash(target, color.darkened(0.2))
@@ -457,7 +457,7 @@ static func _cast_poison_single(layer: Node2D, from_px: Vector2, target: Node2D,
 	var cloud: _PoisonCloud = _PoisonCloud.new()
 	cloud.cloud_color = color
 	var dist: float = from_px.distance_to(t_pos)
-	var dur: float = clamp(dist / 420.0, 0.11, 0.28)
+	var dur: float = clamp(dist / 840.0, 0.055, 0.14)
 	_shoot_projectile(layer, from_px, t_pos, cloud, color, dur, Tween.EASE_OUT, func():
 		if is_instance_valid(target):
 			flash(target, color.lightened(0.25))
@@ -496,7 +496,7 @@ static func _cast_conj_single(layer: Node2D, from_px: Vector2, target: Node2D,
 		dart.rotation = heading.angle()
 	layer.add_child(dart)
 	var dist: float = from_px.distance_to(t_pos)
-	var dur: float = clamp(dist / 460.0, 0.09, 0.24)
+	var dur: float = clamp(dist / 920.0, 0.045, 0.12)
 	var tw: Tween = dart.create_tween()
 	tw.tween_property(dart, "position", t_pos, dur)
 	tw.tween_callback(func():
@@ -575,7 +575,7 @@ static func cast_area(layer: Node2D, from_px: Vector2, center_px: Vector2,
 			proj = n
 
 	var dist: float = from_px.distance_to(center_px)
-	var dur: float = clamp(dist / 440.0, 0.10, 0.30)
+	var dur: float = clamp(dist / 880.0, 0.05, 0.15)
 	_shoot_projectile(layer, from_px, center_px, proj, c, dur, Tween.EASE_OUT, func():
 		# Layered explosion rings.
 		burst_ring(layer, center_px, tile_radius_px, c, 0.0, 4.0)
@@ -722,7 +722,7 @@ static func shoot(layer: Node2D, from_px: Vector2, to_px: Vector2,
 		ball.draw_circle(Vector2.ZERO, 3.8, Color(1, 1, 1, 0.85)))
 	ball.queue_redraw()
 	var dist: float = from_px.distance_to(to_px)
-	var dur: float = clamp(dist / 480.0, 0.10, 0.28)
+	var dur: float = clamp(dist / 960.0, 0.05, 0.14)
 	var tw: Tween = ball.create_tween()
 	tw.tween_property(ball, "position", to_px, dur)
 	tw.tween_callback(func():

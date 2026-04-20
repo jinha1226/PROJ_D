@@ -30,6 +30,7 @@ offset_top = 240.0
 offset_right = -24.0
 offset_bottom = -260.0
 horizontal_scroll_mode = 0
+scroll_deadzone = 20
 
 [node name="List" type="VBoxContainer" parent="Scroll"]
 size_flags_horizontal = 3

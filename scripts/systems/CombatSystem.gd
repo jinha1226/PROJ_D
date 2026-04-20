@@ -185,10 +185,17 @@ static func _show_hit_feedback(target: Node, dmg: int, color: Color) -> void:
 	tw2.tween_callback(label.queue_free)
 
 
-## Horizontal jitter on the target Node2D proportional to damage. Keeps the
-## original position via a Tween so concurrent movement tweens on the entity
-## aren't clobbered (we restore to the end-of-shake baseline).
+## Horizontal jitter on the target Node2D proportional to damage.
+##
+## Skipped for the player: Player.position is being driven by the move
+## tween most frames, and layering a second position tween on top fights
+## the walk interpolation — end-of-shake would snap the sprite back to
+## the pre-hit tile, which read as a "knockback". The player already
+## gets camera shake on damage, so the per-entity shake is cosmetic
+## redundancy anyway. Monsters still shake normally.
 static func _apply_hit_shake(target: Node2D, dmg: int) -> void:
+	if target is Player:
+		return
 	var amplitude: float = clamp(float(dmg) * 0.5, 3.0, 10.0)
 	var base: Vector2 = target.position
 	var tw: Tween = target.create_tween()
