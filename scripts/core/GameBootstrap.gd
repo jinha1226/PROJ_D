@@ -1161,12 +1161,15 @@ func _regenerate_dungeon(going_up: bool, secondary: bool = false) -> void:
 		touch_input.generator = generator
 	if _top_hud_ref != null and _top_hud_ref.has_method("set_depth"):
 		_top_hud_ref.set_depth(GameManager.current_depth)
-	_refresh_minimap_preview(dmap, entry_pos)
 	await get_tree().process_frame
 	if _floor_state.has(GameManager.current_depth):
 		_restore_floor(GameManager.current_depth)
 	else:
 		_spawn_monsters_for_current_depth()
+	# Build the minimap AFTER restoring the explored-tile bitmap and spawning
+	# monsters. Doing this before _restore_floor gave us a thumbnail drawn
+	# from an empty explored set on every revisit.
+	_refresh_minimap_preview(dmap, entry_pos)
 		_spawn_dummy_items(5)
 	_refresh_actor_visibility(dmap)
 

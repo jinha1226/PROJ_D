@@ -1,7 +1,25 @@
 class_name MonsterSpawner
 
 const MONSTER_SCENE_PATH: String = "res://scenes/entities/Monster.tscn"
-const MAX_COUNT: int = 14
+## DCSS dungeon.cc caps monster-wanted at 60. Keep the same cap.
+const MAX_COUNT: int = 60
+
+
+## DCSS dungeon.cc _mon_die_size (per-depth table). Spawn count is
+## `roll_dice(3, die)` capped at MAX_COUNT. D:1 = 3d12 averaging ~19.5,
+## which matches the canonical "20-25 monsters per floor on D:1" figure.
+static func _mon_die_size(depth: int) -> int:
+	match depth:
+		1: return 12
+		2: return 10
+		3, 4: return 9
+		5, 6: return 7
+		7: return 6
+		8, 9: return 5
+		10: return 4
+		11: return 5
+		12, 13, 14, 15: return 6
+		_: return 12
 
 ## Legacy fallback pool — used only if MonsterPopulation can't resolve any
 ## eligible monster (e.g. data file missing). Kept so a broken JSON never
@@ -59,10 +77,15 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 			b.setup(gen, boss_tile, boss_data)
 			result.append(b)
 
-	# Boss floors also get a handful of normal regulars as guards.
-	var base_count: int = clamp(3 + depth, 5, MAX_COUNT)
+	# DCSS _num_mons_wanted: 3d(_mon_die_size(depth)) capped at 60.
+	var die: int = _mon_die_size(depth)
+	var base_count: int = spawn_rng.randi_range(1, die) \
+			+ spawn_rng.randi_range(1, die) \
+			+ spawn_rng.randi_range(1, die)
+	base_count = min(base_count, MAX_COUNT)
+	# Boss floors get half the regulars so the boss doesn't get drowned out.
 	if is_boss_floor:
-		base_count = clamp(base_count / 2, 2, 5)
+		base_count = clamp(base_count / 2, 5, MAX_COUNT)
 	var count: int = base_count
 
 	var spawned: int = 0

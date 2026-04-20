@@ -36,7 +36,9 @@ func _ready() -> void:
 func setup(gen: DungeonGenerator, pos: Vector2i, mdata: MonsterData) -> void:
 	generator = gen
 	data = mdata
-	hp = mdata.hp
+	# DCSS rolls HP per spawn: avg = hp_10x / 10 ± 33% variance, sampled from
+	# random2avg(2*variance, 8). Ports mon-util.cc:2251 hit_points().
+	hp = _dcss_roll_hp(mdata.hp_10x) if mdata.hp_10x > 10 else mdata.hp
 	ac = mdata.ac
 	dex = mdata.dex
 	sight_range = mdata.sight_range if mdata.sight_range > 0 else 6
@@ -48,6 +50,29 @@ func setup(gen: DungeonGenerator, pos: Vector2i, mdata: MonsterData) -> void:
 	_load_sprite()
 	if not _has_preset:
 		queue_redraw()
+
+
+## DCSS hit_points(avg_hp_10x, scale=10) — mon-util.cc:2251. Each spawn rolls
+## HP as `avg ± 33% variance` via an 8-sample random2avg to give a tight
+## bell curve. Returns at least 1. `hp_10x` of 10 or less means "no roll"
+## in DCSS (summons, temp monsters) — caller falls back to mdata.hp.
+static func _dcss_roll_hp(hp_10x: int) -> int:
+	if hp_10x <= 0:
+		return 1
+	var variance: int = int(round(float(hp_10x) * 33.0 / 100.0))
+	var min_hp: int = hp_10x - variance
+	# random2avg(max, rolls=8): sum of one random2(max) + 7 random2(max+1),
+	# divided by 8. Gives mean ~= variance with a bell shape.
+	var size: int = variance * 2
+	if size <= 0:
+		return max(1, hp_10x / 10)
+	var sum: int = randi() % size  # random2(size) = 0..size-1
+	var n_extra: int = 7
+	for _i in n_extra:
+		sum += randi() % (size + 1)  # random2(size+1) = 0..size
+	var rolled: int = sum / 8
+	var hp_total: int = min_hp + rolled
+	return max(1, hp_total / 10)
 
 
 func _load_sprite() -> void:
