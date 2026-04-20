@@ -417,11 +417,16 @@ static func _monster_perception(m: Monster, sleeping: bool) -> int:
 			hd = int(m.data.hd)
 		if "intel" in m.data:
 			intel = String(m.data.intel)
+	# DCSS mon_intel_type (mon-enum.h:201): only three tiers.
+	#   I_BRAINLESS → 15  (oozes, jellies, plants)
+	#   I_ANIMAL    → 20  (rats, bats, hydras)
+	#   I_HUMAN     → 30  (orcs, elves, wizards)
 	var intel_factor: int
 	match intel:
-		"animal": intel_factor = 15
-		"human":  intel_factor = 30
-		_:        intel_factor = 20
+		"brainless": intel_factor = 15
+		"animal":    intel_factor = 20
+		"human":     intel_factor = 30
+		_:           intel_factor = 20
 	var perc_mult: int = intel_factor + (0 if sleeping else 15)
 	var perc: int = (5 + hd * 3 / 2) * perc_mult / 20
 	return maxi(12, perc)
