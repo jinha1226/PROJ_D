@@ -110,6 +110,8 @@ static func process_room_place(anchor: Dictionary, place: Dictionary,
 		"build": build,
 		"options": options,
 		"normals": {"x": nx, "y": ny},
+		# Needed by wall decorators so they can rewrite grid feature cells.
+		"usage_grid": usage_grid,
 	}
 
 	var veto_place = options.get("veto_place_callback", strategy.get("veto_place", null))
