@@ -7,49 +7,67 @@ extends RefCounted
 
 const _DCSS_JSON := "res://assets/dcss_items/weapons.json"
 
-# Hand-tuned / alias entries (our internal ids).
+# Hand-tuned / alias entries (our internal ids). Values match DCSS
+# 0.34 item-prop.cc `Weapon_prop[]`. DCSS `speed` is the 1/10-second
+# delay field; we divide by 10 to get the float delay.
+#
+# IDs prefixed with `weap_` would be cleaner but we keep our legacy
+# short names so existing JobData starting_equipment / code paths
+# don't shift. Aliases (longsword → long_sword, etc.) exist where
+# DCSS renamed a weapon.
 const DATA: Dictionary = {
-	# Axes
-	"axe":        {"dmg": 7,  "skill": "axe",         "delay": 1.3},
-	"axe_medium": {"dmg": 11, "skill": "axe",         "delay": 1.5},
-	"waraxe":     {"dmg": 11, "skill": "axe",         "delay": 1.5},
-	# Maces
+	# --- Maces & flails ---
 	"club":       {"dmg": 5,  "skill": "mace",        "delay": 1.3},
-	"mace":       {"dmg": 9,  "skill": "mace",        "delay": 1.4},
-	"flail":      {"dmg": 11, "skill": "mace",        "delay": 1.4},
-	# Short blades
+	"whip":       {"dmg": 6,  "skill": "mace",        "delay": 1.1},
+	"mace":       {"dmg": 8,  "skill": "mace",        "delay": 1.4},
+	"flail":      {"dmg": 10, "skill": "mace",        "delay": 1.4},
+	"morningstar":{"dmg": 13, "skill": "mace",        "delay": 1.5},
+	"great_mace": {"dmg": 17, "skill": "mace",        "delay": 1.7},
+	# --- Short blades ---
 	"dagger":     {"dmg": 4,  "skill": "short_blade", "delay": 1.0},
-	"short_sword":{"dmg": 6,  "skill": "short_blade", "delay": 1.1},
+	"quick_blade":{"dmg": 4,  "skill": "short_blade", "delay": 1.5},
+	"short_sword":{"dmg": 5,  "skill": "short_blade", "delay": 1.0},
 	"rapier":     {"dmg": 7,  "skill": "short_blade", "delay": 1.2},
-	"saber":      {"dmg": 7,  "skill": "short_blade", "delay": 1.2},
-	# Long blades
-	"arming_sword":{"dmg": 7,  "skill": "long_blade", "delay": 1.3},
-	"longsword":   {"dmg": 10, "skill": "long_blade", "delay": 1.4},
-	"katana":      {"dmg": 10, "skill": "long_blade", "delay": 1.4},
-	"scimitar":    {"dmg": 11, "skill": "long_blade", "delay": 1.5},
-	"greatsword":  {"dmg": 17, "skill": "long_blade", "delay": 1.7},
-	# Polearms
-	"spear":      {"dmg": 7,  "skill": "polearm",     "delay": 1.2},
-	"longspear":  {"dmg": 9,  "skill": "polearm",     "delay": 1.3},
+	# --- Long blades ---
+	"falchion":   {"dmg": 8,  "skill": "long_blade",  "delay": 1.3},
+	"long_sword": {"dmg": 10, "skill": "long_blade",  "delay": 1.4},
+	"longsword":  {"dmg": 10, "skill": "long_blade",  "delay": 1.4},  # alias
+	"scimitar":   {"dmg": 12, "skill": "long_blade",  "delay": 1.4},
+	"great_sword":{"dmg": 17, "skill": "long_blade",  "delay": 1.7},
+	"greatsword": {"dmg": 17, "skill": "long_blade",  "delay": 1.7},  # alias
+	# --- Axes ---
+	"hand_axe":   {"dmg": 7,  "skill": "axe",         "delay": 1.3},
+	"axe":        {"dmg": 7,  "skill": "axe",         "delay": 1.3},  # alias → hand_axe
+	"war_axe":    {"dmg": 11, "skill": "axe",         "delay": 1.5},
+	"waraxe":     {"dmg": 11, "skill": "axe",         "delay": 1.5},  # alias
+	"axe_medium": {"dmg": 11, "skill": "axe",         "delay": 1.5},  # alias → war_axe
+	"broad_axe":  {"dmg": 13, "skill": "axe",         "delay": 1.6},
+	"battleaxe":  {"dmg": 15, "skill": "axe",         "delay": 1.7},
+	# --- Polearms ---
+	"spear":      {"dmg": 6,  "skill": "polearm",     "delay": 1.1},
 	"trident":    {"dmg": 9,  "skill": "polearm",     "delay": 1.3},
 	"halberd":    {"dmg": 13, "skill": "polearm",     "delay": 1.5},
-	"scythe":     {"dmg": 14, "skill": "polearm",     "delay": 1.8},
-	# Ranged
-	"short_bow":  {"dmg": 9,  "skill": "bow",         "delay": 1.3},
-	"long_bow":   {"dmg": 15, "skill": "bow",         "delay": 1.6},
-	"bow":        {"dmg": 9,  "skill": "bow",         "delay": 1.3},
-	"crossbow":   {"dmg": 18, "skill": "crossbow",    "delay": 1.9},
-	"slingshot":  {"dmg": 5,  "skill": "sling",       "delay": 1.1},
-	"boomerang":  {"dmg": 5,  "skill": "throwing",    "delay": 1.0},
-	"throwing_axe":{"dmg": 8, "skill": "throwing",    "delay": 1.1},
-	# Staves
-	"gnarled_staff":  {"dmg": 10, "skill": "staff", "delay": 1.3, "spell_school": "",      "spell_bonus": 2},
-	"fire_staff":     {"dmg": 8,  "skill": "staff", "delay": 1.3, "spell_school": "fire",  "spell_bonus": 3},
-	"ice_staff":      {"dmg": 8,  "skill": "staff", "delay": 1.3, "spell_school": "cold",  "spell_bonus": 3},
-	"lightning_staff":{"dmg": 8,  "skill": "staff", "delay": 1.3, "spell_school": "air",   "spell_bonus": 3},
-	"crystal_staff":  {"dmg": 8,  "skill": "staff", "delay": 1.3, "spell_school": "earth", "spell_bonus": 3},
-	# Evocable
-	"wand_simple": {"dmg": 3, "skill": "evocations", "delay": 1.0},
+	"glaive":     {"dmg": 15, "skill": "polearm",     "delay": 1.7},
+	"bardiche":   {"dmg": 18, "skill": "polearm",     "delay": 1.9},
+	# --- Staves ---
+	"staff":        {"dmg": 5,  "skill": "staff", "delay": 1.2},
+	"quarterstaff": {"dmg": 10, "skill": "staff", "delay": 1.3},
+	"gnarled_staff":{"dmg": 10, "skill": "staff", "delay": 1.3, "spell_school": "",      "spell_bonus": 2},  # magical quarterstaff
+	"fire_staff":   {"dmg": 5,  "skill": "staff", "delay": 1.2, "spell_school": "fire",  "spell_bonus": 3},  # staff of fire
+	"ice_staff":    {"dmg": 5,  "skill": "staff", "delay": 1.2, "spell_school": "cold",  "spell_bonus": 3},
+	"lightning_staff":{"dmg": 5,"skill": "staff", "delay": 1.2, "spell_school": "air",   "spell_bonus": 3},
+	"crystal_staff":{"dmg": 5,  "skill": "staff", "delay": 1.2, "spell_school": "earth", "spell_bonus": 3},
+	# --- Ranged (DCSS 0.34 folds bow/sling/crossbow into SK_RANGED) ---
+	"sling":      {"dmg": 7,  "skill": "bow",         "delay": 1.4},
+	"slingshot":  {"dmg": 7,  "skill": "bow",         "delay": 1.4},  # alias
+	"shortbow":   {"dmg": 8,  "skill": "bow",         "delay": 1.4},
+	"short_bow":  {"dmg": 8,  "skill": "bow",         "delay": 1.4},  # alias
+	"bow":        {"dmg": 8,  "skill": "bow",         "delay": 1.4},  # alias
+	"orcbow":     {"dmg": 11, "skill": "bow",         "delay": 1.5},
+	"longbow":    {"dmg": 14, "skill": "bow",         "delay": 1.7},
+	"long_bow":   {"dmg": 14, "skill": "bow",         "delay": 1.7},  # alias
+	"arbalest":   {"dmg": 16, "skill": "bow",         "delay": 1.9},
+	"crossbow":   {"dmg": 16, "skill": "bow",         "delay": 1.9},  # alias
 }
 
 static var _dcss: Dictionary = {}

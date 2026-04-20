@@ -6,17 +6,17 @@ extends Control
 const JOB_SELECT_PATH := "res://scenes/menu/JobSelect.tscn"
 const MAIN_MENU_PATH := "res://scenes/menu/MainMenu.tscn"
 
-# Canonical DCSS race roster. Order affects list presentation — grouped by
-# archetype (combat → rogue/stealth → magic → undead/exotic).
+# Canonical DCSS 0.34 race roster (22 species). Legacy/removed species
+# — halfling, hill_orc, catfolk (→ felid), deep_dwarf, ghoul, vampire,
+# meteoran — were dropped to keep balance parity with real DCSS.
+# Order affects list presentation — grouped by archetype.
 const RACE_IDS: Array[String] = [
 	# Baseline humans and kin
-	"human", "halfling", "gnoll",
+	"human", "gnoll",
 	# Heavy fighters
-	"minotaur", "hill_orc", "troll", "oni", "formicid", "gargoyle", "coglin",
+	"minotaur", "troll", "oni", "formicid", "gargoyle", "coglin",
 	# Rogues / stealth
-	"kobold", "spriggan", "catfolk", "vine_stalker",
-	# Dwarven / earthy
-	"deep_dwarf",
+	"kobold", "spriggan", "vine_stalker",
 	# Draconian / scaled
 	"draconian", "naga",
 	# Magical / elven
@@ -24,9 +24,9 @@ const RACE_IDS: Array[String] = [
 	# Aquatic / outre
 	"merfolk", "octopode", "barachi",
 	# Undead
-	"ghoul", "mummy", "vampire",
+	"mummy",
 	# Divine / cosmic
-	"demigod", "demonspawn", "meteoran",
+	"demigod", "demonspawn",
 ]
 
 const _ROW_HEIGHT: float = 320.0

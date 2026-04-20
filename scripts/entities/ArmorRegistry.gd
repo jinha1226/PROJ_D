@@ -22,29 +22,18 @@ const _SLOT_MAP: Dictionary = {
 	"orb": "offhand",
 }
 
-# Hand-tuned entries (our custom/aliased ids). These win over DCSS.
+# Hand-tuned entries — DCSS itself supplies AC / EV values via
+# `assets/dcss_items/armours.json` (see _ensure_loaded). Only a handful
+# of magical-cloak variants and spelling-aliases live here; everything
+# else falls through to DCSS's item-prop.cc data.
 const DATA: Dictionary = {
-	"robe":          {"name": "Robe",          "slot": "chest", "ac": 2,  "color": Color(0.55, 0.40, 0.85)},
-	"leather_chest": {"name": "Leather Chest", "slot": "chest", "ac": 3,  "color": Color(0.55, 0.35, 0.20)},
-	"chain_chest":   {"name": "Chain Chest",   "slot": "chest", "ac": 6,  "color": Color(0.70, 0.72, 0.78)},
-	"plate_chest":   {"name": "Plate Chest",   "slot": "chest", "ac": 10, "color": Color(0.85, 0.85, 0.90)},
-	"leather_legs":  {"name": "Leather Legs",  "slot": "legs",  "ac": 1,  "color": Color(0.55, 0.35, 0.20)},
-	"chain_legs":    {"name": "Chain Legs",    "slot": "legs",  "ac": 2,  "color": Color(0.70, 0.72, 0.78)},
-	"plate_legs":    {"name": "Plate Legs",    "slot": "legs",  "ac": 3,  "color": Color(0.85, 0.85, 0.90)},
-	"leather_boots": {"name": "Leather Boots", "slot": "boots", "ac": 1,  "color": Color(0.55, 0.35, 0.20)},
-	"plate_boots":   {"name": "Plate Boots",   "slot": "boots", "ac": 2,  "color": Color(0.85, 0.85, 0.90)},
-	"leather_helm":  {"name": "Leather Helm",  "slot": "helm",  "ac": 1,  "color": Color(0.55, 0.35, 0.20)},
-	"plate_helm":    {"name": "Plate Helm",    "slot": "helm",  "ac": 2,  "color": Color(0.85, 0.85, 0.90)},
-	"leather_gloves":{"name": "Leather Gloves","slot": "gloves","ac": 1,  "color": Color(0.55, 0.35, 0.20)},
-	"plate_gloves":  {"name": "Plate Gloves",  "slot": "gloves","ac": 2,  "color": Color(0.85, 0.85, 0.90)},
-	"cloak":             {"name": "Cloak",              "slot": "cloak", "ac": 1, "ev_bonus": 1, "color": Color(0.35, 0.22, 0.55)},
-	"cloak_protection":  {"name": "Cloak of Protection","slot": "cloak", "ac": 2, "ev_bonus": 1, "color": Color(0.55, 0.45, 0.85)},
-	"cloak_stealth":     {"name": "Cloak of Stealth",   "slot": "cloak", "ac": 1, "ev_bonus": 1, "stealth": 2, "color": Color(0.12, 0.14, 0.22)},
-	"cloak_resistance":  {"name": "Cloak of Resistance","slot": "cloak", "ac": 1, "ev_bonus": 1, "dmg_reduce": 1, "color": Color(0.7, 0.25, 0.25)},
-	# Legacy aliases
-	"leather_armor": {"name": "Leather Chest", "slot": "chest", "ac": 3,  "color": Color(0.55, 0.35, 0.20)},
-	"chain_mail":    {"name": "Chain Mail",    "slot": "chest", "ac": 8,  "color": Color(0.70, 0.72, 0.78)},
-	"plate_armor":   {"name": "Plate Armour",  "slot": "chest", "ac": 10, "color": Color(0.85, 0.85, 0.90)},
+	# Cloak ego variants (our mobile layer — no direct DCSS equivalent).
+	"cloak_protection":  {"name": "Cloak of Protection","slot": "cloak", "ac": 2, "ev_penalty": 0, "ev_bonus": 1, "color": Color(0.55, 0.45, 0.85)},
+	"cloak_stealth":     {"name": "Cloak of Stealth",   "slot": "cloak", "ac": 1, "ev_penalty": 0, "ev_bonus": 1, "stealth": 2, "color": Color(0.12, 0.14, 0.22)},
+	"cloak_resistance":  {"name": "Cloak of Resistance","slot": "cloak", "ac": 1, "ev_penalty": 0, "ev_bonus": 1, "dmg_reduce": 1, "color": Color(0.7, 0.25, 0.25)},
+	# Legacy spelling aliases that some save/LPC paths still use.
+	"leather_armor": {"name": "Leather Armour", "slot": "chest", "ac": 3, "ev_penalty": -40, "color": Color(0.55, 0.35, 0.20)},
+	"plate_armor":   {"name": "Plate Armour",   "slot": "chest", "ac": 10, "ev_penalty": -180, "color": Color(0.85, 0.85, 0.90)},
 }
 
 static var _dcss: Dictionary = {}

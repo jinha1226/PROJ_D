@@ -752,7 +752,7 @@ func _get_trait_equipment(trait_id: String) -> Dictionary:
 		"sword": return {"weapon": "longsword"}
 		"polearm_trait": return {"weapon": "halberd"}
 		"shield_trait": return {"weapon": "short_sword"}
-		"heavy_armor": return {"weapon": "arming_sword", "armor": ["plate_chest", "plate_helm"]}
+		"heavy_armor": return {"weapon": "long_sword", "armor": ["plate_armour", "helmet"]}
 		"axe_trait": return {"weapon": "waraxe"}
 		"mace_trait": return {"weapon": "mace"}
 		"brawler": return {}
@@ -1959,10 +1959,10 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 		"acquirement":
 			if generator == null:
 				return false
-			var _acq_weapons: Array = ["longsword", "arming_sword", "waraxe", "mace", "short_bow",
-					"halberd", "rapier", "gnarled_staff", "crystal_staff"]
-			var _acq_armor: Array = ["chain_chest", "plate_chest", "leather_chest",
-					"plate_helm", "leather_helm", "plate_boots"]
+			var _acq_weapons: Array = ["long_sword", "war_axe", "mace", "shortbow",
+					"halberd", "rapier", "quarterstaff", "crystal_staff"]
+			var _acq_armor: Array = ["chain_mail", "plate_armour", "leather_armour",
+					"helmet", "buckler", "boots"]
 			var pool: Array = _acq_weapons + _acq_armor
 			var chosen: String = pool[randi() % pool.size()]
 			# Emit a pickup-like event: drop item at player position for auto-pickup.
