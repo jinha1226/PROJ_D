@@ -2,15 +2,54 @@ extends Button
 class_name QuickSlot
 
 signal pressed_slot(slot_index: int)
+signal long_pressed_slot(slot_index: int)
 
 @export var slot_index: int = 0
+
+const LONGPRESS_TIME: float = 0.45
 
 @onready var icon_rect: TextureRect = $Icon
 @onready var label: Label = $Label
 
+var _hold_timer: float = 0.0
+var _holding: bool = false
+var _long_fired: bool = false
+
+
 func _ready() -> void:
 	add_theme_font_size_override("font_size", 39)
-	pressed.connect(func(): pressed_slot.emit(slot_index))
+	button_down.connect(_on_button_down)
+	button_up.connect(_on_button_up)
+	pressed.connect(_on_pressed)
+
+
+func _process(delta: float) -> void:
+	if not _holding or _long_fired:
+		return
+	_hold_timer += delta
+	if _hold_timer >= LONGPRESS_TIME:
+		_long_fired = true
+		long_pressed_slot.emit(slot_index)
+
+
+func _on_button_down() -> void:
+	_holding = true
+	_long_fired = false
+	_hold_timer = 0.0
+
+
+func _on_button_up() -> void:
+	_holding = false
+	_hold_timer = 0.0
+
+
+func _on_pressed() -> void:
+	# `pressed` fires after button_up — suppress the tap emit if a long-press
+	# already consumed this hold.
+	if _long_fired:
+		_long_fired = false
+		return
+	pressed_slot.emit(slot_index)
 
 
 func set_item(icon: Texture2D, text: String) -> void:

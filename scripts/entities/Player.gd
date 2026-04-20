@@ -5,6 +5,7 @@ extends Node2D
 signal moved(new_grid_pos: Vector2i)
 signal died
 signal attacked(target)
+signal damaged(amount: int)
 signal stats_changed
 signal leveled_up(new_level: int)
 signal xp_changed(cur: int, to_next: int, level: int)
@@ -1059,6 +1060,7 @@ func take_damage(amount: int) -> void:
 	if resist_turns > 0:
 		amount = max(1, amount / 2)
 	stats.HP -= amount
+	damaged.emit(amount)
 	if stats.HP <= 0:
 		stats.HP = 0
 		is_alive = false

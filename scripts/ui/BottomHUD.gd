@@ -2,6 +2,7 @@ extends Control
 class_name BottomHUD
 
 signal quickslot_pressed(index: int)
+signal quickslot_long_pressed(index: int)
 signal rest_pressed
 signal bag_pressed
 signal skills_pressed
@@ -40,6 +41,8 @@ func _ready() -> void:
 		qs.slot_index = i
 		if qs.has_signal("pressed_slot"):
 			qs.pressed_slot.connect(func(idx): quickslot_pressed.emit(idx))
+		if qs.has_signal("long_pressed_slot"):
+			qs.long_pressed_slot.connect(func(idx): quickslot_long_pressed.emit(idx))
 	rest_button.pressed.connect(func(): rest_pressed.emit())
 	bag_button.pressed.connect(func(): bag_pressed.emit())
 	skills_button.pressed.connect(func(): skills_pressed.emit())

@@ -142,6 +142,7 @@ func _ready() -> void:
 	player.moved.connect(_on_player_moved)
 	# [meta-agent] hook player death → result screen.
 	player.died.connect(_on_player_died)
+	player.damaged.connect(_on_player_damaged)
 	player.leveled_up.connect(_on_player_leveled_up)
 	player.identify_one_requested.connect(_on_identify_one_requested)
 	if player.has_signal("summon_companion_requested"):
@@ -161,10 +162,13 @@ func _ready() -> void:
 			if top_hud.has_method("set_hp"):
 				top_hud.set_hp(player.stats.HP, player.stats.hp_max)
 			if top_hud.has_method("set_mp"):
-				top_hud.set_mp(player.stats.MP, player.stats.mp_max))
+				top_hud.set_mp(player.stats.MP, player.stats.mp_max)
+			_update_low_hp_overlay())
 		if top_hud.has_method("set_hp") and player.stats != null:
 			top_hud.set_hp(player.stats.HP, player.stats.hp_max)
 			top_hud.set_mp(player.stats.MP, player.stats.mp_max)
+
+	_setup_low_hp_overlay()
 
 	# TopHUD keeps HP/MP/XP bars + minimap preview; all other buttons moved
 	# to BottomHUD. Wire depth, XP updates, minimap preview + click.
@@ -233,6 +237,8 @@ func _ready() -> void:
 	# → refresh display.
 	if bottom_hud != null and bottom_hud.has_signal("quickslot_pressed"):
 		bottom_hud.quickslot_pressed.connect(_on_quickslot_pressed)
+	if bottom_hud != null and bottom_hud.has_signal("quickslot_long_pressed"):
+		bottom_hud.quickslot_long_pressed.connect(_on_quickslot_long_pressed)
 	if player.has_signal("quickslots_changed"):
 		player.quickslots_changed.connect(_refresh_quickslots.bind(bottom_hud))
 	if player.has_signal("inventory_changed"):
@@ -349,6 +355,35 @@ func _process(_delta: float) -> void:
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	if dmap != null and generator != null:
 		_refresh_actor_visibility(dmap)
+
+
+## Long-press on a quickslot → show its assigned item/spell info instead of
+## firing it. Empty slots still just open the picker so users can assign
+## something — no info to show.
+func _on_quickslot_long_pressed(index: int) -> void:
+	if player == null:
+		return
+	var id: String = player.quickslot_ids[index] if index < player.quickslot_ids.size() else ""
+	if id == "":
+		_open_quickslot_picker(index)
+		return
+	if id.begins_with("spell:"):
+		_show_spell_info(id.substr(6))
+		return
+	# Assume item id — show via the same info popup the bag uses.
+	var item_dict: Dictionary = _find_inventory_item_by_id(id)
+	if item_dict.is_empty():
+		item_dict = {"id": id, "name": id.capitalize().replace("_", " ")}
+	_on_bag_info(item_dict)
+
+
+func _find_inventory_item_by_id(iid: String) -> Dictionary:
+	if player == null:
+		return {}
+	for it in player.get_items():
+		if String(it.get("id", "")) == iid:
+			return it
+	return {}
 
 
 func _on_quickslot_pressed(index: int) -> void:
@@ -1173,6 +1208,84 @@ func _on_player_leveled_up(new_level: int) -> void:
 	if popup_mgr == null or not popup_mgr.has_method("show_levelup_popup"):
 		return
 	popup_mgr.show_levelup_popup(new_level, Callable(player, "apply_level_up_stat"))
+
+
+## Low-HP warning vignette — a full-screen red ColorRect that pulses when
+## HP drops below 25% max. Created once, then modulated on/off.
+var _low_hp_overlay: ColorRect = null
+var _low_hp_tween: Tween = null
+
+func _setup_low_hp_overlay() -> void:
+	if _low_hp_overlay != null and is_instance_valid(_low_hp_overlay):
+		return
+	var ui_root: Node = get_node_or_null("UILayer/UI")
+	if ui_root == null:
+		return
+	var rect := ColorRect.new()
+	rect.name = "LowHPVignette"
+	rect.color = Color(0.75, 0.05, 0.05, 0.0)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rect.anchor_right = 1.0
+	rect.anchor_bottom = 1.0
+	rect.z_index = -10  # Behind HUD so buttons/text stay readable.
+	# Inner gradient: only the border area is red-ish; centre stays clear.
+	# Simple cheat — use a shader-like material? We go simpler: just a full
+	# overlay with low alpha during pulse.
+	ui_root.add_child(rect)
+	_low_hp_overlay = rect
+	_update_low_hp_overlay()
+
+
+func _update_low_hp_overlay() -> void:
+	if player == null or player.stats == null or _low_hp_overlay == null:
+		return
+	var hp_pct: float = float(player.stats.HP) / float(max(player.stats.hp_max, 1))
+	var threshold: float = 0.25
+	if hp_pct > threshold or not player.is_alive:
+		if _low_hp_tween != null and _low_hp_tween.is_valid():
+			_low_hp_tween.kill()
+		_low_hp_tween = null
+		_low_hp_overlay.color.a = 0.0
+		return
+	# Already pulsing — don't restart.
+	if _low_hp_tween != null and _low_hp_tween.is_valid():
+		return
+	# Loop a slow red pulse; each cycle 0.15 → 0.35 → 0.15 alpha.
+	_low_hp_tween = create_tween().set_loops()
+	_low_hp_tween.tween_property(_low_hp_overlay, "color:a", 0.35, 0.55) \
+			.set_trans(Tween.TRANS_SINE)
+	_low_hp_tween.tween_property(_low_hp_overlay, "color:a", 0.15, 0.55) \
+			.set_trans(Tween.TRANS_SINE)
+
+
+## Camera shake scaled to the hit. Small jabs get nothing (<5 dmg); anything
+## bigger gets a brief random-offset shake that tapers back to the player's
+## actual position. Uses Camera2D.offset so the base `position` tween
+## (which follows the player) is untouched.
+func _on_player_damaged(amount: int) -> void:
+	if amount < 5:
+		return
+	var cam: Camera2D = $Camera2D
+	if cam == null:
+		return
+	var magnitude: float = clamp(float(amount) * 1.5, 8.0, 32.0)
+	_shake_camera(cam, magnitude, 0.25)
+
+
+func _shake_camera(cam: Camera2D, magnitude: float, duration: float) -> void:
+	if cam == null:
+		return
+	var steps: int = 6
+	var step_t: float = duration / float(steps)
+	var base_offset: Vector2 = cam.offset
+	var tw: Tween = cam.create_tween()
+	for i in steps:
+		var falloff: float = 1.0 - float(i) / float(steps)
+		var jitter: Vector2 = Vector2(
+			randf_range(-magnitude, magnitude),
+			randf_range(-magnitude, magnitude)) * falloff
+		tw.tween_property(cam, "offset", base_offset + jitter, step_t)
+	tw.tween_property(cam, "offset", base_offset, step_t)
 
 
 func _on_player_died() -> void:
