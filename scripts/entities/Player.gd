@@ -93,9 +93,9 @@ func _ready() -> void:
 
 
 func _ensure_sprite() -> void:
-	# DCSS mode renders the player via Player._draw() (texture-blit), so we
-	# don't need the LPC AnimatedSprite child at all.
-	if TileRenderer.is_dcss():
+	# DCSS / ASCII modes render via Player._draw() (texture-blit or glyph),
+	# so we don't need the LPC AnimatedSprite child at all.
+	if TileRenderer.is_dcss() or TileRenderer.is_ascii():
 		queue_redraw()
 		return
 	if _sprite != null:
@@ -106,8 +106,8 @@ func _ensure_sprite() -> void:
 
 
 func _load_sprite_preset() -> void:
-	if TileRenderer.is_dcss():
-		queue_redraw()  # texture pulled lazily in _draw()
+	if TileRenderer.is_dcss() or TileRenderer.is_ascii():
+		queue_redraw()
 		return
 	if _sprite == null:
 		return
@@ -130,6 +130,11 @@ func _load_sprite_preset() -> void:
 ## different); the job just decides starting gear, which shows up through
 ## the doll layers.
 func _draw() -> void:
+	if TileRenderer.is_ascii():
+		TileRenderer.draw_ascii_glyph(self, Vector2.ZERO, tile_size,
+				String(TileRenderer.PLAYER_GLYPH[0]),
+				TileRenderer.PLAYER_GLYPH[1])
+		return
 	if not TileRenderer.is_dcss():
 		return
 	var base: Texture2D = _pick_base_sprite()

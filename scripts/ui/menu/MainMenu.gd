@@ -6,6 +6,11 @@ const RACE_SELECT_PATH := "res://scenes/menu/RaceSelect.tscn"
 const CREDITS_LPC_PATH := "res://CREDITS_LPC.md"
 const CREDITS_FONTS_PATH := "res://CREDITS_FONTS.md"
 
+# GameManager.render_mode: 0=LPC, 1=DCSS tiles, 2=ASCII. The toggle button
+# cycles DCSS↔ASCII only — LPC mode is unfinished and not user-facing.
+const _DISPLAY_LABELS: Array = ["DCSS Tiles", "DCSS Tiles", "ASCII"]
+var _display_btn: Button = null
+
 
 func _ready() -> void:
 	$Buttons/NewRunButton.pressed.connect(_on_new_run)
@@ -13,6 +18,35 @@ func _ready() -> void:
 	$Buttons/CreditsButton.pressed.connect(_on_credits)
 	theme = GameTheme.create()
 	_ensure_meta()
+	_add_display_toggle()
+
+
+func _add_display_toggle() -> void:
+	var buttons: VBoxContainer = $Buttons as VBoxContainer
+	if buttons == null:
+		return
+	_display_btn = Button.new()
+	_display_btn.custom_minimum_size = Vector2(0, 120)
+	_display_btn.add_theme_font_size_override("font_size", 48)
+	_display_btn.pressed.connect(_on_cycle_display)
+	buttons.add_child(_display_btn)
+	_refresh_display_label()
+
+
+func _on_cycle_display() -> void:
+	# Toggle between DCSS Tiles (1) and ASCII (2).
+	if GameManager.render_mode == 2:
+		GameManager.render_mode = 1
+	else:
+		GameManager.render_mode = 2
+	_refresh_display_label()
+
+
+func _refresh_display_label() -> void:
+	if _display_btn == null:
+		return
+	var idx: int = clamp(int(GameManager.render_mode), 0, _DISPLAY_LABELS.size() - 1)
+	_display_btn.text = "Display: %s" % String(_DISPLAY_LABELS[idx])
 
 
 func _ensure_meta() -> MetaProgression:

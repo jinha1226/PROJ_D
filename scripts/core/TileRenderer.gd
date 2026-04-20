@@ -2,17 +2,37 @@ extends Node
 class_name TileRenderer
 ## Central lookup for which art asset renders a given in-game id.
 ## Modes:
-##   LPC  — composed LPC sprites
-##   DCSS — Dungeon Crawl Stone Soup individual tile PNGs (default)
+##   LPC   — composed LPC sprites
+##   DCSS  — Dungeon Crawl Stone Soup individual tile PNGs (default)
+##   ASCII — classic roguelike glyphs (DCSS console palette)
 ##
 ## All DCSS tiles live under res://assets/dcss_tiles/individual/ — the full
 ## crawl rltiles tree (~6055 PNGs across dngn/, mon/, item/, player/) is
 ## bundled, so adding new monsters/items/branches is just a matter of
 ## extending the mapping dictionaries below.
 
-enum Mode { LPC, DCSS }
+enum Mode { LPC, DCSS, ASCII }
 
 const TILE: int = 32
+const _ASCII_FONT_PATH: String = "res://assets/fonts/DejaVuSansMono.ttf"
+
+# DCSS console palette (roughly ANSI 16).
+const _C_BLACK       := Color(0.05, 0.05, 0.08)
+const _C_DARKGREY    := Color(0.40, 0.40, 0.42)
+const _C_LIGHTGREY   := Color(0.72, 0.72, 0.72)
+const _C_WHITE       := Color(0.98, 0.98, 1.00)
+const _C_RED         := Color(0.78, 0.10, 0.10)
+const _C_LIGHTRED    := Color(1.00, 0.38, 0.38)
+const _C_GREEN       := Color(0.10, 0.70, 0.20)
+const _C_LIGHTGREEN  := Color(0.35, 1.00, 0.35)
+const _C_BROWN       := Color(0.70, 0.55, 0.25)
+const _C_YELLOW      := Color(1.00, 0.95, 0.30)
+const _C_BLUE        := Color(0.15, 0.45, 1.00)
+const _C_LIGHTBLUE   := Color(0.40, 0.75, 1.00)
+const _C_MAGENTA     := Color(0.72, 0.10, 0.72)
+const _C_LIGHTMAGENTA:= Color(1.00, 0.45, 1.00)
+const _C_CYAN        := Color(0.15, 0.70, 0.75)
+const _C_LIGHTCYAN   := Color(0.35, 0.95, 1.00)
 const _BASE_DIR: String = "res://assets/dcss_tiles/individual/"
 
 # Dungeon features keyed by canonical id. Branch overrides via BRANCH_TILESETS.
@@ -448,3 +468,155 @@ static func compose_doll(base_id: String, weapon_id: String = "",
 ## All known branch ids; useful for menus / debug.
 static func known_branches() -> Array:
 	return BRANCH_TILESETS.keys()
+
+
+# ---- ASCII mode ----------------------------------------------------------
+
+static func is_ascii() -> bool:
+	return mode() == Mode.ASCII
+
+
+static var _ascii_font_cache: Font = null
+
+
+## Monospace font used for ASCII rendering. Cached after first load.
+static func ascii_font() -> Font:
+	if _ascii_font_cache != null:
+		return _ascii_font_cache
+	if ResourceLoader.exists(_ASCII_FONT_PATH):
+		_ascii_font_cache = load(_ASCII_FONT_PATH) as Font
+	if _ascii_font_cache == null:
+		_ascii_font_cache = ThemeDB.fallback_font
+	return _ascii_font_cache
+
+
+## Glyph + colour for a map tile type enum value. Falls back to "?" white.
+## DungeonGenerator.TileType is passed in; we keep the mapping keyed by the
+## int value so this file has no direct dependency on DungeonGenerator.
+const _FEATURE_GLYPHS: Dictionary = {
+	# enum order: WALL=0, FLOOR=1, DOOR_OPEN=2, DOOR_CLOSED=3, STAIRS_DOWN=4,
+	# STAIRS_UP=5, WATER=6, LAVA=7, TRAP=8, BRANCH_ENTRANCE=9, SHOP=10,
+	# ALTAR=11, TREE=12
+	0:  ["#", _C_LIGHTGREY],
+	1:  [".", _C_DARKGREY],
+	2:  ["'", _C_BROWN],
+	3:  ["+", _C_BROWN],
+	4:  [">", _C_YELLOW],
+	5:  ["<", _C_YELLOW],
+	6:  ["~", _C_LIGHTBLUE],
+	7:  ["~", _C_RED],
+	8:  ["^", _C_LIGHTMAGENTA],
+	9:  [">", _C_LIGHTCYAN],
+	10: ["$", _C_YELLOW],
+	11: ["_", _C_WHITE],
+	12: ["T", _C_GREEN],
+}
+
+
+static func ascii_feature(tile_enum: int) -> Array:
+	return _FEATURE_GLYPHS.get(tile_enum, ["?", _C_WHITE])
+
+
+const _MONSTER_GLYPHS: Dictionary = {
+	"rat":            ["r", _C_LIGHTGREY],
+	"bat":            ["b", _C_LIGHTGREY],
+	"goblin":         ["g", _C_GREEN],
+	"hobgoblin":      ["g", _C_BROWN],
+	"kobold":         ["k", _C_BROWN],
+	"gnoll":          ["g", _C_LIGHTRED],
+	"orc":            ["o", _C_RED],
+	"orc_warrior":    ["o", _C_LIGHTRED],
+	"orc_priest":     ["o", _C_LIGHTGREY],
+	"orc_wizard":     ["o", _C_LIGHTMAGENTA],
+	"orc_knight":     ["o", _C_CYAN],
+	"adder":          ["s", _C_GREEN],
+	"ball_python":    ["s", _C_YELLOW],
+	"wolf":           ["h", _C_BROWN],
+	"jackal":         ["h", _C_YELLOW],
+	"hell_hound":     ["h", _C_LIGHTRED],
+	"alligator":      ["l", _C_GREEN],
+	"boggart":        ["i", _C_LIGHTMAGENTA],
+	"dryad":          ["n", _C_GREEN],
+	"ghoul":          ["z", _C_LIGHTGREY],
+	"bog_body":       ["z", _C_DARKGREY],
+	"skeleton":       ["z", _C_WHITE],
+	"lich":           ["L", _C_WHITE],
+	"ogre":           ["O", _C_RED],
+	"fire_giant":     ["G", _C_LIGHTRED],
+	"swamp_dragon":   ["D", _C_GREEN],
+	"fire_dragon":    ["D", _C_LIGHTRED],
+	"fire_sprite":    ["i", _C_LIGHTRED],
+}
+
+
+static func ascii_monster(monster_id: String) -> Array:
+	return _MONSTER_GLYPHS.get(monster_id, ["M", _C_LIGHTGREY])
+
+
+## Item glyphs by kind first, fall back to specific id overrides.
+const _ITEM_KIND_GLYPHS: Dictionary = {
+	"potion": ["!", _C_LIGHTCYAN],
+	"scroll": ["?", _C_WHITE],
+	"weapon": ["(", _C_LIGHTCYAN],
+	"armor":  ["[", _C_BROWN],
+	"book":   ["+", _C_LIGHTMAGENTA],
+	"staff":  ["\\", _C_BROWN],
+	"ring":   ["=", _C_YELLOW],
+	"amulet": ["\"", _C_YELLOW],
+	"wand":   ["/", _C_LIGHTGREEN],
+	"gold":   ["$", _C_YELLOW],
+}
+
+# Per-id colour overrides for specific items (mostly ranged weapons / staves).
+const _ITEM_ID_GLYPHS: Dictionary = {
+	"short_bow":       [")", _C_BROWN],
+	"long_bow":        [")", _C_BROWN],
+	"bow":             [")", _C_BROWN],
+	"crossbow":        [")", _C_LIGHTGREY],
+	"slingshot":       [")", _C_LIGHTGREY],
+	"boomerang":       [")", _C_LIGHTGREEN],
+	"throwing_axe":    [")", _C_LIGHTRED],
+	"fire_staff":      ["\\", _C_LIGHTRED],
+	"ice_staff":       ["\\", _C_LIGHTBLUE],
+	"lightning_staff": ["\\", _C_YELLOW],
+	"crystal_staff":   ["\\", _C_LIGHTMAGENTA],
+	"gnarled_staff":   ["\\", _C_BROWN],
+}
+
+
+static func ascii_item(item_id: String, kind: String = "") -> Array:
+	if _ITEM_ID_GLYPHS.has(item_id):
+		return _ITEM_ID_GLYPHS[item_id]
+	if kind != "" and _ITEM_KIND_GLYPHS.has(kind):
+		return _ITEM_KIND_GLYPHS[kind]
+	# Infer kind from id if caller didn't supply one.
+	if WeaponRegistry != null and item_id != "" and WeaponRegistry.is_weapon(item_id):
+		return _ITEM_KIND_GLYPHS["weapon"]
+	if ArmorRegistry != null and item_id != "" and ArmorRegistry.is_armor(item_id):
+		return _ITEM_KIND_GLYPHS["armor"]
+	return ["*", _C_WHITE]
+
+
+## Player and companion glyphs.
+const PLAYER_GLYPH: Array = ["@", _C_WHITE]
+const COMPANION_GLYPH: Array = ["@", _C_LIGHTCYAN]
+
+
+## Draw a single ASCII glyph centred on `world_px` in `tile_px_size`. Pass
+## `visible=true` for full colour, `false` for dimmed (explored but out of
+## FOV). Safe to call in any _draw() path.
+static func draw_ascii_glyph(ci: CanvasItem, world_px: Vector2,
+		tile_px_size: int, glyph: String, color: Color,
+		visible: bool = true) -> void:
+	var f: Font = ascii_font()
+	if f == null:
+		return
+	var eff: Color = color if visible else color.darkened(0.55)
+	var font_size: int = int(tile_px_size * 0.85)
+	var ascent: float = f.get_ascent(font_size)
+	var gw: float = f.get_string_size(glyph, HORIZONTAL_ALIGNMENT_LEFT, -1,
+			font_size).x
+	var px: float = world_px.x - gw * 0.5
+	var py: float = world_px.y + ascent * 0.5 - tile_px_size * 0.08
+	ci.draw_string(f, Vector2(px, py), glyph,
+			HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, eff)

@@ -44,6 +44,11 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var bob: float = sin(_bob_phase) * _BOB_AMP
+	if TileRenderer.is_ascii():
+		var entry: Array = TileRenderer.ascii_item(item_id, kind)
+		TileRenderer.draw_ascii_glyph(self, Vector2(0.0, bob), 32,
+				String(entry[0]), entry[1])
+		return
 	if TileRenderer.is_dcss():
 		# Potions/scrolls: base colour tile always shown, effect overlay
 		# only after identification.

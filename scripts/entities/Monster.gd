@@ -53,8 +53,9 @@ func setup(gen: DungeonGenerator, pos: Vector2i, mdata: MonsterData) -> void:
 func _load_sprite() -> void:
 	if data == null:
 		return
-	# DCSS mode: skip LPC entirely and let _draw() render the DCSS tile.
-	if TileRenderer.is_dcss():
+	# DCSS / ASCII modes: skip LPC entirely and let _draw() render the tile
+	# or glyph.
+	if TileRenderer.is_dcss() or TileRenderer.is_ascii():
 		_has_preset = false
 		queue_redraw()
 		return
@@ -146,6 +147,13 @@ func move_to_grid(pos: Vector2i) -> void:
 
 func _draw() -> void:
 	if _has_preset:
+		return
+	# ASCII mode: draw the DCSS console glyph.
+	if TileRenderer.is_ascii() and data != null:
+		var entry: Array = TileRenderer.ascii_monster(String(data.id))
+		TileRenderer.draw_ascii_glyph(self, Vector2.ZERO, 32,
+				String(entry[0]), entry[1])
+		_draw_hp_bar(Vector2(32, 32))
 		return
 	# DCSS mode: render the monster's tile texture centred on the entity.
 	if TileRenderer.is_dcss() and data != null:

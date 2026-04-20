@@ -85,14 +85,18 @@ func move_to_grid(pos: Vector2i) -> void:
 
 
 func _draw() -> void:
+	if TileRenderer.is_ascii() and data != null:
+		var entry: Array = TileRenderer.ascii_monster(String(data.id))
+		# Companion glyph colour overrides monster colour so allies stand out.
+		TileRenderer.draw_ascii_glyph(self, Vector2.ZERO, 32,
+				String(entry[0]), TileRenderer.COMPANION_GLYPH[1])
+		return
 	if TileRenderer.is_dcss() and data != null:
 		var tex: Texture2D = TileRenderer.monster(String(data.id))
 		if tex != null:
 			var sz: Vector2 = tex.get_size()
 			draw_texture(tex, -sz * 0.5)
-			# Small green dot to mark "ally" at a glance.
 			draw_circle(Vector2(sz.x * 0.4, -sz.y * 0.4), 3.5, Color(0.3, 1.0, 0.3, 0.9))
 			return
-	# Fallback: a small green disc so we can still see it.
 	draw_circle(Vector2.ZERO, 9.0, Color(0.25, 0.9, 0.35))
 	draw_arc(Vector2.ZERO, 9.0, 0.0, TAU, 16, Color.BLACK, 1.0)

@@ -122,7 +122,9 @@ func clear_path() -> void:
 func _draw() -> void:
 	if generator == null or generator.map.is_empty():
 		return
-	if TileRenderer.is_dcss():
+	if TileRenderer.is_ascii():
+		_draw_ascii()
+	elif TileRenderer.is_dcss():
 		_draw_dcss()
 	else:
 		_draw_lpc()
@@ -199,6 +201,29 @@ func _draw_dcss() -> void:
 			else:
 				# Last-resort solid fill if the tile asset is missing.
 				draw_rect(rect, Color(0.4, 0.4, 0.4) * modulate, true)
+
+
+## Classic roguelike console view — every tile gets a character glyph.
+func _draw_ascii() -> void:
+	var unseen_color := Color(0.02, 0.02, 0.04)
+	var bg_color := Color(0.04, 0.04, 0.06)
+	for x in DungeonGenerator.MAP_WIDTH:
+		for y in DungeonGenerator.MAP_HEIGHT:
+			var tile := Vector2i(x, y)
+			var rect := Rect2(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+			if not is_explored(tile):
+				draw_rect(rect, unseen_color, true)
+				continue
+			# Solid background so glyphs pop.
+			draw_rect(rect, bg_color, true)
+			var t: int = generator.map[x][y]
+			var entry: Array = TileRenderer.ascii_feature(t)
+			var glyph: String = String(entry[0])
+			var color: Color = entry[1]
+			TileRenderer.draw_ascii_glyph(self,
+					Vector2(x * TILE_SIZE + TILE_SIZE * 0.5,
+							y * TILE_SIZE + TILE_SIZE * 0.5),
+					TILE_SIZE, glyph, color, is_tile_visible(tile))
 
 
 func _draw_lpc() -> void:
