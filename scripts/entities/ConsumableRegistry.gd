@@ -389,21 +389,66 @@ const DATA: Dictionary = {
 }
 
 
+const _BOOKS_JSON: String = "res://assets/dcss_spells/books.json"
+static var _dcss_books: Dictionary = {}
+static var _books_loaded: bool = false
+
+
+## Load DCSS book-data.h (via tools/convert_dcss_books.py) lazily so the
+## 80+ hand-curated spellbooks become pickups the same way DCSS treats
+## them. Each entry becomes a `learn_spells` consumable.
+static func _ensure_books_loaded() -> void:
+	if _books_loaded:
+		return
+	_books_loaded = true
+	var f := FileAccess.open(_BOOKS_JSON, FileAccess.READ)
+	if f == null:
+		return
+	var parsed = JSON.parse_string(f.get_as_text())
+	f.close()
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return
+	_dcss_books = parsed
+
+
 static func has(id: String) -> bool:
-	return DATA.has(id)
+	if DATA.has(id):
+		return true
+	_ensure_books_loaded()
+	return _dcss_books.has(id)
 
 
 static func get_info(id: String) -> Dictionary:
-	if not DATA.has(id):
-		return {}
-	var d: Dictionary = DATA[id].duplicate()
-	d["id"] = id
-	return d
+	if DATA.has(id):
+		var d: Dictionary = DATA[id].duplicate()
+		d["id"] = id
+		return d
+	_ensure_books_loaded()
+	if _dcss_books.has(id):
+		var book: Dictionary = _dcss_books[id]
+		var colour: Array = book.get("colour", [0.85, 0.80, 0.60])
+		return {
+			"id": id,
+			"name": String(book.get("name", id)),
+			"kind": "book",
+			"effect": "learn_spells",
+			"spells": Array(book.get("spells", [])),
+			"color": Color(colour[0], colour[1], colour[2]),
+			"desc": "Teaches: %s" % ", ".join(
+					Array(book.get("spells", [])).map(
+							func(s): return String(s).replace("_", " ").capitalize())),
+		}
+	return {}
 
 
 static func all_ids() -> Array:
-	return DATA.keys()
+	_ensure_books_loaded()
+	var out: Array = DATA.keys()
+	for k in _dcss_books.keys():
+		if not out.has(k):
+			out.append(k)
+	return out
 
 
 static func description_for(id: String) -> String:
-	return String(DATA.get(id, {}).get("desc", ""))
+	return String(get_info(id).get("desc", ""))

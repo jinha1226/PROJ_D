@@ -972,7 +972,18 @@ func _place_random_floor_item(pos: Vector2i, depth: int, parent: Node) -> bool:
 				wand_info.get("color", Color(0.85, 0.85, 0.95)),
 				{"charges": charges})
 	else:
-		var cid: String = _pick_by_depth("consumable", depth)
+		# 80% potion / scroll (depth-weighted), 20% spellbook. Books draw
+		# from the DCSS book-data.h roster (~88 entries) so casters find a
+		# real variety of curated sets instead of just the half-dozen we
+		# had hand-authored before.
+		var cid: String
+		if randf() < 0.20:
+			var all_books: Array = ConsumableRegistry.all_ids().filter(
+					func(k): return String(ConsumableRegistry.get_info(k).get("kind", "")) == "book")
+			cid = String(all_books[randi() % all_books.size()]) if not all_books.is_empty() \
+					else _pick_by_depth("consumable", depth)
+		else:
+			cid = _pick_by_depth("consumable", depth)
 		if cid.is_empty():
 			cid = "potion_curing"
 		var cinfo: Dictionary = ConsumableRegistry.get_info(cid)

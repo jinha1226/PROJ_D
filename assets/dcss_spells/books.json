@@ -1,0 +1,1145 @@
+{
+ "book_akashic_record": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Akashic Record",
+  "spells": [
+   "dispersal",
+   "malign_gateway",
+   "disjunction"
+  ]
+ },
+ "book_codex_of_conductivity": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Codex of Conductivity",
+  "spells": [
+   "forge_lightning_spire",
+   "arcjolt",
+   "maxwells_coupling"
+  ]
+ },
+ "book_compendium_of_siegecraft": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Compendium of Siegecraft",
+  "spells": [
+   "boulder",
+   "hoarfrost_cannonade",
+   "bombard",
+   "hellfire_mortar"
+  ]
+ },
+ "book_everburning_encyclopedia": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Everburning Encyclopedia",
+  "spells": [
+   "ignite_poison",
+   "sticky_flame",
+   "ignition"
+  ]
+ },
+ "book_fen_folio": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Fen Folio",
+  "spells": [
+   "summon_forest",
+   "noxious_bog",
+   "summon_hydra"
+  ]
+ },
+ "book_grand_grimoire": {
+  "colour": [
+   0.25,
+   0.2,
+   0.3
+  ],
+  "name": "Grand Grimoire",
+  "spells": [
+   "malign_gateway",
+   "summon_horrible_things"
+  ]
+ },
+ "book_great_wizards_vol_ii": {
+  "colour": [
+   0.7,
+   0.7,
+   1.0
+  ],
+  "name": "Great Wizards, Vol. II",
+  "spells": [
+   "intoxicate",
+   "borgnjors_vile_clutch",
+   "noxious_bog"
+  ]
+ },
+ "book_great_wizards_vol_vii": {
+  "colour": [
+   0.7,
+   0.7,
+   1.0
+  ],
+  "name": "Great Wizards, Vol. VII",
+  "spells": [
+   "tukimas_dance",
+   "golubrias_passage",
+   "violent_unravelling"
+  ]
+ },
+ "book_handbook_of_applied_construction": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Handbook of Applied Construction",
+  "spells": [
+   "spike_launcher",
+   "clockwork_bee",
+   "forge_blazeheart_golem"
+  ]
+ },
+ "book_inescapable_atlas": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Inescapable Atlas",
+  "spells": [
+   "blink",
+   "manifold_assault"
+  ]
+ },
+ "book_maxwell_s_memoranda": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Maxwell's Memoranda",
+  "spells": [
+   "piledriver",
+   "magnavolt",
+   "maxwells_coupling"
+  ]
+ },
+ "book_my_sojourn_through_swamps": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "My Sojourn Through Swamps",
+  "spells": [
+   "mercury_arrow",
+   "clockwork_bee",
+   "surprising_crocodile"
+  ]
+ },
+ "book_necronomicon": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Necronomicon",
+  "spells": [
+   "haunt",
+   "borgnjors_revivification",
+   "deaths_door"
+  ]
+ },
+ "book_of_air": {
+  "colour": [
+   0.7,
+   0.9,
+   1.0
+  ],
+  "name": "Book of Air",
+  "spells": [
+   "shock",
+   "swiftness",
+   "airstrike"
+  ]
+ },
+ "book_of_annihilations": {
+  "colour": [
+   1.0,
+   0.45,
+   0.25
+  ],
+  "name": "Book of Annihilations",
+  "spells": [
+   "chain_lightning",
+   "fire_storm",
+   "shatter"
+  ]
+ },
+ "book_of_armaments": {
+  "colour": [
+   0.8,
+   0.8,
+   0.85
+  ],
+  "name": "Book of Armaments",
+  "spells": [
+   "stone_arrow",
+   "rending_blade",
+   "lehudibs_crystal_spear"
+  ]
+ },
+ "book_of_battle": {
+  "colour": [
+   0.85,
+   0.7,
+   0.25
+  ],
+  "name": "Book of Battle",
+  "spells": [
+   "fugue_of_the_fallen",
+   "ozocubus_armour",
+   "detonation_catalyst",
+   "manifold_assault"
+  ]
+ },
+ "book_of_beasts": {
+  "colour": [
+   0.7,
+   0.55,
+   0.25
+  ],
+  "name": "Book of Beasts",
+  "spells": [
+   "summon_ice_beast",
+   "summon_seismosaurus_egg",
+   "summon_mana_viper",
+   "sphinx_sisters"
+  ]
+ },
+ "book_of_blasting": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Blasting",
+  "spells": [
+   "blastmote",
+   "fulminant_prism",
+   "iskenderuns_mystic_blast",
+   "monarch_bomb"
+  ]
+ },
+ "book_of_blood": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Blood",
+  "spells": [
+   "sublimation_of_blood",
+   "ignite_poison",
+   "summon_hydra"
+  ]
+ },
+ "book_of_burglary": {
+  "colour": [
+   0.6,
+   0.55,
+   0.3
+  ],
+  "name": "Book of Burglary",
+  "spells": [
+   "hibernation",
+   "swiftness",
+   "passwall"
+  ]
+ },
+ "book_of_callings": {
+  "colour": [
+   0.75,
+   0.55,
+   0.95
+  ],
+  "name": "Book of Callings",
+  "spells": [
+   "summon_small_mammal",
+   "call_imp",
+   "call_canine_familiar",
+   "surprising_crocodile"
+  ]
+ },
+ "book_of_cantrips": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Cantrips",
+  "spells": [
+   "poisonous_vapours",
+   "kinetic_grapnel",
+   "summon_small_mammal",
+   "apportation"
+  ]
+ },
+ "book_of_chaos": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Chaos",
+  "spells": [
+   "conjure_ball_lightning",
+   "disjunction",
+   "discord"
+  ]
+ },
+ "book_of_conjurations": {
+  "colour": [
+   0.75,
+   0.75,
+   1.0
+  ],
+  "name": "Book of Conjurations",
+  "spells": [
+   "magic_dart",
+   "searing_ray",
+   "fulminant_prism"
+  ]
+ },
+ "book_of_contraptions": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Contraptions",
+  "spells": [
+   "walking_alembic",
+   "monarch_bomb",
+   "diamond_sawblades"
+  ]
+ },
+ "book_of_control": {
+  "colour": [
+   0.75,
+   0.55,
+   0.95
+  ],
+  "name": "Book of Control",
+  "spells": [
+   "englaciation"
+  ]
+ },
+ "book_of_cryoformation": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Cryoformation",
+  "spells": [
+   "hoarfrost_cannonade",
+   "simulacrum",
+   "splinterfrost_shell"
+  ]
+ },
+ "book_of_dangerous_friends": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Dangerous Friends",
+  "spells": [
+   "forge_blazeheart_golem",
+   "iood",
+   "spellspark_servitor"
+  ]
+ },
+ "book_of_death": {
+  "colour": [
+   0.3,
+   0.1,
+   0.45
+  ],
+  "name": "Book of Death",
+  "spells": [
+   "animate_dead",
+   "haunt",
+   "infestation"
+  ]
+ },
+ "book_of_debilitation": {
+  "colour": [
+   0.7,
+   0.45,
+   0.8
+  ],
+  "name": "Book of Debilitation",
+  "spells": [
+   "slow",
+   "confusing_touch",
+   "putrefaction"
+  ]
+ },
+ "book_of_decay": {
+  "colour": [
+   0.4,
+   0.35,
+   0.2
+  ],
+  "name": "Book of Decay",
+  "spells": [
+   "putrefaction",
+   "dispel_undead",
+   "martyrs_knell"
+  ]
+ },
+ "book_of_displacement": {
+  "colour": [
+   0.7,
+   0.4,
+   1.0
+  ],
+  "name": "Book of Displacement",
+  "spells": [
+   "beckoning",
+   "teleport_other",
+   "piledriver"
+  ]
+ },
+ "book_of_dreams": {
+  "colour": [
+   0.6,
+   0.6,
+   0.95
+  ],
+  "name": "Book of Dreams",
+  "spells": [
+   "hibernation",
+   "fugue_of_the_fallen",
+   "anguish"
+  ]
+ },
+ "book_of_duality": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Duality",
+  "spells": [
+   "vampiric_draining",
+   "iskenderuns_mystic_blast",
+   "percussive_tempering",
+   "splinterfrost_shell"
+  ]
+ },
+ "book_of_earth": {
+  "colour": [
+   0.6,
+   0.45,
+   0.25
+  ],
+  "name": "Book of Earth",
+  "spells": [
+   "ledas_liquefaction",
+   "lrd",
+   "permafrost_eruption"
+  ]
+ },
+ "book_of_envenomations": {
+  "colour": [
+   0.5,
+   0.8,
+   0.3
+  ],
+  "name": "Book of Envenomations",
+  "spells": [
+   "olgrebs_toxic_radiance",
+   "intoxicate"
+  ]
+ },
+ "book_of_fire": {
+  "colour": [
+   1.0,
+   0.4,
+   0.15
+  ],
+  "name": "Book of Fire",
+  "spells": [
+   "foxfire",
+   "plasma_beam",
+   "starburst"
+  ]
+ },
+ "book_of_flames": {
+  "colour": [
+   1.0,
+   0.4,
+   0.15
+  ],
+  "name": "Book of Flames",
+  "spells": [
+   "inner_flame",
+   "sticky_flame",
+   "flame_wave"
+  ]
+ },
+ "book_of_frost": {
+  "colour": [
+   0.45,
+   0.8,
+   1.0
+  ],
+  "name": "Book of Frost",
+  "spells": [
+   "freeze",
+   "frozen_ramparts",
+   "hailstorm"
+  ]
+ },
+ "book_of_geomancy": {
+  "colour": [
+   0.6,
+   0.45,
+   0.25
+  ],
+  "name": "Book of Geomancy",
+  "spells": [
+   "sandblast",
+   "stone_arrow",
+   "passwall"
+  ]
+ },
+ "book_of_hexes": {
+  "colour": [
+   0.8,
+   0.4,
+   0.85
+  ],
+  "name": "Book of Hexes",
+  "spells": [
+   "anguish",
+   "cause_fear",
+   "enfeeble"
+  ]
+ },
+ "book_of_ice": {
+  "colour": [
+   0.45,
+   0.8,
+   1.0
+  ],
+  "name": "Book of Ice",
+  "spells": [
+   "freezing_cloud",
+   "ozocubus_refrigeration",
+   "polar_vortex"
+  ]
+ },
+ "book_of_iron": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Iron",
+  "spells": [
+   "awaken_armour",
+   "lrd",
+   "magnavolt"
+  ]
+ },
+ "book_of_lightning": {
+  "colour": [
+   1.0,
+   1.0,
+   0.4
+  ],
+  "name": "Book of Lightning",
+  "spells": [
+   "electric_charge",
+   "arcjolt",
+   "plasma_beam"
+  ]
+ },
+ "book_of_maladies": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Maladies",
+  "spells": [
+   "sublimation_of_blood",
+   "curse_of_agony",
+   "rimeblight"
+  ]
+ },
+ "book_of_maledictions": {
+  "colour": [
+   0.8,
+   0.4,
+   0.85
+  ],
+  "name": "Book of Maledictions",
+  "spells": [
+   "anguish",
+   "enfeeble"
+  ]
+ },
+ "book_of_metalworking": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Metalworking",
+  "spells": [
+   "percussive_tempering",
+   "walking_alembic",
+   "phalanx_beetle"
+  ]
+ },
+ "book_of_minor_magic": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Minor Magic",
+  "spells": [
+   "magic_dart",
+   "blink",
+   "call_imp"
+  ]
+ },
+ "book_of_misfortune": {
+  "colour": [
+   0.5,
+   0.5,
+   0.6
+  ],
+  "name": "Book of Misfortune",
+  "spells": [
+   "jinxbite",
+   "violent_unravelling",
+   "enfeeble",
+   "sphinx_sisters"
+  ]
+ },
+ "book_of_movement": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Movement",
+  "spells": [
+   "blastmote",
+   "electric_charge",
+   "gells_gavotte"
+  ]
+ },
+ "book_of_necromancy": {
+  "colour": [
+   0.35,
+   0.1,
+   0.5
+  ],
+  "name": "Book of Necromancy",
+  "spells": [
+   "soul_splinter",
+   "grave_claw",
+   "vampiric_draining"
+  ]
+ },
+ "book_of_pain": {
+  "colour": [
+   0.55,
+   0.1,
+   0.5
+  ],
+  "name": "Book of Pain",
+  "spells": [
+   "soul_splinter",
+   "curse_of_agony"
+  ]
+ },
+ "book_of_party_tricks": {
+  "colour": [
+   0.95,
+   0.85,
+   0.95
+  ],
+  "name": "Book of Party Tricks",
+  "spells": [
+   "apportation",
+   "jinxbite",
+   "intoxicate"
+  ]
+ },
+ "book_of_power": {
+  "colour": [
+   0.95,
+   0.85,
+   0.3
+  ],
+  "name": "Book of Power",
+  "spells": [
+   "battlesphere",
+   "bombard",
+   "fortress_blast",
+   "spellspark_servitor"
+  ]
+ },
+ "book_of_rime": {
+  "colour": [
+   0.6,
+   0.85,
+   1.0
+  ],
+  "name": "Book of Rime",
+  "spells": [
+   "frozen_ramparts",
+   "summon_ice_beast"
+  ]
+ },
+ "book_of_scorching": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Scorching",
+  "spells": [
+   "scorch",
+   "flame_wave",
+   "summon_cactus"
+  ]
+ },
+ "book_of_sloth": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Sloth",
+  "spells": [
+   "ledas_liquefaction",
+   "petrify",
+   "englaciation"
+  ]
+ },
+ "book_of_spatial_translocations": {
+  "colour": [
+   0.7,
+   0.4,
+   1.0
+  ],
+  "name": "Book of Spatial Translocations",
+  "spells": [
+   "blink",
+   "momentum_strike",
+   "beckoning"
+  ]
+ },
+ "book_of_spectacle": {
+  "colour": [
+   0.95,
+   0.7,
+   0.95
+  ],
+  "name": "Book of Spectacle",
+  "spells": [
+   "gloom",
+   "starburst",
+   "fulsome_fusillade"
+  ]
+ },
+ "book_of_spheres": {
+  "colour": [
+   0.75,
+   0.75,
+   0.95
+  ],
+  "name": "Book of Spheres",
+  "spells": [
+   "boulder",
+   "battlesphere",
+   "fireball",
+   "conjure_ball_lightning",
+   "iood"
+  ]
+ },
+ "book_of_spontaneous_combustion": {
+  "colour": [
+   1.0,
+   0.55,
+   0.2
+  ],
+  "name": "Book of Spontaneous Combustion",
+  "spells": [
+   "inner_flame",
+   "detonation_catalyst",
+   "irradiate",
+   "ignition"
+  ]
+ },
+ "book_of_stone": {
+  "colour": [
+   0.6,
+   0.55,
+   0.35
+  ],
+  "name": "Book of Stone",
+  "spells": [
+   "ledas_liquefaction"
+  ]
+ },
+ "book_of_storms": {
+  "colour": [
+   0.8,
+   0.95,
+   1.0
+  ],
+  "name": "Book of Storms",
+  "spells": [
+   "discharge",
+   "airstrike",
+   "forge_lightning_spire"
+  ]
+ },
+ "book_of_the_dragon": {
+  "colour": [
+   0.85,
+   0.25,
+   0.25
+  ],
+  "name": "Book of the Dragon",
+  "spells": [
+   "cause_fear",
+   "fireball",
+   "dragon_call"
+  ]
+ },
+ "book_of_the_fortress": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of the Fortress",
+  "spells": [
+   "awaken_armour",
+   "phalanx_beetle",
+   "fortress_blast"
+  ]
+ },
+ "book_of_the_grave": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of the Grave",
+  "spells": [
+   "grave_claw",
+   "animate_dead",
+   "borgnjors_vile_clutch"
+  ]
+ },
+ "book_of_the_hunter": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of the Hunter",
+  "spells": [
+   "sigil_of_binding",
+   "call_canine_familiar",
+   "dimensional_bullseye"
+  ]
+ },
+ "book_of_the_moon": {
+  "colour": [
+   0.85,
+   0.85,
+   0.95
+  ],
+  "name": "Book of the Moon",
+  "spells": [
+   "golubrias_passage",
+   "silence",
+   "lehudibs_crystal_spear"
+  ]
+ },
+ "book_of_the_senses": {
+  "colour": [
+   0.85,
+   0.8,
+   0.55
+  ],
+  "name": "Book of the Senses",
+  "spells": [
+   "gloom",
+   "mephitic_cloud",
+   "silence",
+   "curse_of_agony"
+  ]
+ },
+ "book_of_the_sky": {
+  "colour": [
+   0.7,
+   0.9,
+   1.0
+  ],
+  "name": "Book of the Sky",
+  "spells": [
+   "maxwells_coupling"
+  ]
+ },
+ "book_of_the_tundra": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of the Tundra",
+  "spells": [
+   "hailstorm",
+   "summon_ice_beast",
+   "permafrost_eruption"
+  ]
+ },
+ "book_of_the_warp": {
+  "colour": [
+   0.7,
+   0.4,
+   1.0
+  ],
+  "name": "Book of the Warp",
+  "spells": [
+   "dispersal",
+   "manifold_assault",
+   "disjunction"
+  ]
+ },
+ "book_of_the_wilderness": {
+  "colour": [
+   0.45,
+   0.7,
+   0.35
+  ],
+  "name": "Book of the Wilderness",
+  "spells": [
+   "summon_seismosaurus_egg",
+   "summon_forest",
+   "summon_mana_viper",
+   "summon_cactus"
+  ]
+ },
+ "book_of_touch": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Touch",
+  "spells": [
+   "kiss_of_death",
+   "confusing_touch",
+   "dispel_undead"
+  ]
+ },
+ "book_of_transfigurations": {
+  "colour": [
+   0.75,
+   0.55,
+   0.95
+  ],
+  "name": "Book of Transfigurations",
+  "spells": [
+   "irradiate"
+  ]
+ },
+ "book_of_transmutation": {
+  "colour": [
+   0.75,
+   0.55,
+   0.95
+  ],
+  "name": "Book of Transmutation",
+  "spells": [
+   "petrify",
+   "irradiate",
+   "fulsome_fusillade"
+  ]
+ },
+ "book_of_unlife": {
+  "colour": [
+   0.35,
+   0.1,
+   0.5
+  ],
+  "name": "Book of Unlife",
+  "spells": [
+   "soul_splinter",
+   "martyrs_knell",
+   "death_channel"
+  ]
+ },
+ "book_of_weapons": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Weapons",
+  "spells": [
+   "tukimas_dance",
+   "dimensional_bullseye",
+   "rending_blade",
+   "platinum_paragon"
+  ]
+ },
+ "book_of_wicked_creation": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Book of Wicked Creation",
+  "spells": [
+   "simulacrum",
+   "death_channel",
+   "rimeblight"
+  ]
+ },
+ "book_of_winter": {
+  "colour": [
+   0.7,
+   0.9,
+   1.0
+  ],
+  "name": "Book of Winter",
+  "spells": [
+   "frozen_ramparts",
+   "ozocubus_armour",
+   "englaciation"
+  ]
+ },
+ "book_of_wizardry": {
+  "colour": [
+   0.7,
+   0.7,
+   1.0
+  ],
+  "name": "Book of Wizardry",
+  "spells": [
+   "curse_of_agony",
+   "spellspark_servitor"
+  ]
+ },
+ "book_ozocubu_s_autobio": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Ozocubu's Autobio",
+  "spells": [
+   "ozocubus_armour",
+   "ozocubus_refrigeration"
+  ]
+ },
+ "book_there_and_back_book": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "There-And-Back Book",
+  "spells": [
+   "teleport_other",
+   "gells_gavotte",
+   "dispersal"
+  ]
+ },
+ "book_treatise_on_traps": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Treatise on Traps",
+  "spells": [
+   "spike_launcher",
+   "sigil_of_binding",
+   "diamond_sawblades"
+  ]
+ },
+ "book_trismegistus_codex": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Trismegistus Codex",
+  "spells": [
+   "mephitic_cloud",
+   "freezing_cloud",
+   "hellfire_mortar"
+  ]
+ },
+ "book_unrestrained_analects": {
+  "colour": [
+   0.85,
+   0.8,
+   0.6
+  ],
+  "name": "Unrestrained Analects",
+  "spells": [
+   "olgrebs_toxic_radiance",
+   "ozocubus_refrigeration",
+   "discord"
+  ]
+ },
+ "book_young_poisoner_s_handbook": {
+  "colour": [
+   0.5,
+   0.8,
+   0.3
+  ],
+  "name": "Young Poisoner's Handbook",
+  "spells": [
+   "poisonous_vapours",
+   "mercury_arrow",
+   "olgrebs_toxic_radiance"
+  ]
+ }
+}
