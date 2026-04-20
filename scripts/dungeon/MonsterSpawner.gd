@@ -5,6 +5,34 @@ const MONSTER_SCENE_PATH: String = "res://scenes/entities/Monster.tscn"
 const MAX_COUNT: int = 60
 
 
+## DCSS mon-place.cc:_choose_band — a small set of leader→band mappings.
+## Each entry names a follower id plus a count range. When the leader is
+## picked on a floor, we also spawn `[min, max]` extra followers on
+## nearby tiles so packs (orcs, jackals, gnolls) feel grouped instead of
+## sprinkled. Kept compact; expand incrementally as more pack leaders
+## land in the content set.
+const _BANDS: Dictionary = {
+	"orc":             {"follower": "orc",            "min": 2, "max": 5},
+	"orc_wizard":      {"follower": "orc",            "min": 2, "max": 5},
+	"orc_priest":      {"follower": "orc_warrior",    "min": 2, "max": 5},
+	"orc_warrior":     {"follower": "orc_warrior",    "min": 2, "max": 5},
+	"orc_knight":      {"follower": "orc_knight",     "min": 3, "max": 7},
+	"orc_warlord":     {"follower": "orc_knight",     "min": 6, "max": 12},
+	"orc_sorcerer":    {"follower": "orc_priest",     "min": 4, "max": 8},
+	"gnoll":           {"follower": "gnoll",          "min": 2, "max": 4},
+	"gnoll_shaman":    {"follower": "gnoll",          "min": 2, "max": 4},
+	"kobold":          {"follower": "kobold",         "min": 1, "max": 3},
+	"kobold_demonologist": {"follower": "kobold",     "min": 2, "max": 4},
+	"jackal":          {"follower": "jackal",         "min": 2, "max": 4},
+	"gnoll_sergeant":  {"follower": "gnoll",          "min": 3, "max": 5},
+	"deep_elf_fighter":{"follower": "deep_elf_knight","min": 2, "max": 4},
+	"centaur":         {"follower": "centaur",        "min": 1, "max": 3},
+	"yaktaur":         {"follower": "yaktaur",        "min": 1, "max": 3},
+	"two_headed_ogre": {"follower": "ogre",           "min": 1, "max": 3},
+	"hobgoblin":       {"follower": "hobgoblin",      "min": 2, "max": 4},
+}
+
+
 ## DCSS dungeon.cc _mon_die_size (per-depth table). Spawn count is
 ## `roll_dice(3, die)` capped at MAX_COUNT. D:1 = 3d12 averaging ~19.5,
 ## which matches the canonical "20-25 monsters per floor on D:1" figure.
@@ -102,6 +130,8 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 		container.add_child(m)
 		m.setup(gen, tile, data)
 		result.append(m)
+		spawned += _spawn_band_for(data, tile, gen, container, floor_tiles,
+				used, scene, result, spawn_rng)
 		spawned += 1
 	return result
 
@@ -134,6 +164,65 @@ static func _load_monster(id: String) -> MonsterData:
 	# MonsterRegistry checks .tres overrides first, then falls back to the
 	# DCSS JSON. Missing ids return null with a warning.
 	return MonsterRegistry.fetch(id)
+
+
+## Spawn a pack of followers around a just-placed leader, reading the
+## `_BANDS` table. Returns the number of extra monsters placed so the
+## outer spawn loop can count them against the floor cap.
+static func _spawn_band_for(leader: MonsterData, leader_tile: Vector2i,
+		gen: DungeonGenerator, container: Node, floor_tiles: Array,
+		used: Dictionary, scene: PackedScene, result: Array[Monster],
+		rng: RandomNumberGenerator) -> int:
+	if leader == null or leader.id == "":
+		return 0
+	var band: Dictionary = _BANDS.get(String(leader.id), {})
+	if band.is_empty():
+		return 0
+	var follower_id: String = String(band.get("follower", ""))
+	if follower_id == "":
+		return 0
+	var follower_data: MonsterData = _load_monster(follower_id)
+	if follower_data == null:
+		return 0
+	var lo: int = int(band.get("min", 1))
+	var hi: int = int(band.get("max", 2))
+	var want: int = rng.randi_range(lo, hi)
+	var placed: int = 0
+	# Search outward from leader_tile in Chebyshev rings for walkable
+	# unoccupied floor. Cap the scan so a packed floor doesn't spin.
+	for tile in _nearby_free_tiles(leader_tile, floor_tiles, used, 5):
+		if placed >= want:
+			break
+		used[tile] = true
+		var f: Monster = scene.instantiate()
+		container.add_child(f)
+		f.setup(gen, tile, follower_data)
+		result.append(f)
+		placed += 1
+	return placed
+
+
+## Candidate free tiles in Chebyshev rings 1..`radius` from `center`,
+## filtered by `floor_tiles` membership and `used` set. Returned in ring
+## order so followers cluster near the leader.
+static func _nearby_free_tiles(center: Vector2i, floor_tiles: Array,
+		used: Dictionary, radius: int) -> Array:
+	var out: Array = []
+	var seen: Dictionary = {}
+	for r in range(1, radius + 1):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				if max(abs(dx), abs(dy)) != r:
+					continue
+				var p: Vector2i = center + Vector2i(dx, dy)
+				if seen.has(p):
+					continue
+				seen[p] = true
+				if used.has(p):
+					continue
+				if floor_tiles.has(p):
+					out.append(p)
+	return out
 
 
 ## Boss prefers the room around the stairs-down tile (the player's eventual

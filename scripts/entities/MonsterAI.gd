@@ -69,6 +69,17 @@ static func act(m: Monster) -> void:
 			m.remove_meta("_vuln_turns")
 		else:
 			m.set_meta("_vuln_turns", vt - 1)
+	# DCSS cowardice: intelligent monsters below 25% HP turn and run. Set
+	# the flee meta so the existing fear path (above) handles movement; the
+	# monster will re-engage once HP recovers past the threshold or the
+	# counter expires.
+	if _should_flee_from_low_hp(m) and not m.has_meta("_flee_turns"):
+		m.set_meta("_flee_turns", 6)
+		CombatLog.add("The %s turns to flee!" % (m.data.display_name if m.data else "monster"))
+		var flee_from: Node = _nearest_hostile(m)
+		if flee_from != null:
+			_step_away_from(m, flee_from.grid_pos)
+		return
 	# Choose the nearest hostile (player OR companion). Companions count as
 	# enemies to monsters, so a monster next to a summoned skeleton will
 	# whack the skeleton instead of running past it toward the player.
@@ -110,6 +121,20 @@ static func act(m: Monster) -> void:
 
 static func _cheb(a: Vector2i, b: Vector2i) -> int:
 	return max(abs(a.x - b.x), abs(a.y - b.y))
+
+
+## DCSS cowardice check: intelligent monsters below 25% HP flee once.
+## Animals, plants, and mindless undead fight to the death. Bosses too.
+static func _should_flee_from_low_hp(m: Monster) -> bool:
+	if m == null or m.data == null:
+		return false
+	if m.data.is_boss:
+		return false
+	var intel: String = String(m.data.intelligence)
+	if intel == "animal" or intel == "plant" or intel == "brainless":
+		return false
+	var max_hp: int = int(m.data.hp) if m.data.hp > 0 else 10
+	return m.hp * 4 <= max_hp  # below 25%
 
 
 const _MONSTER_SPELLBOOKS_JSON: String = "res://assets/dcss_mons/spellbooks.json"
