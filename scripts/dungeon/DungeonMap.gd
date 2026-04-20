@@ -36,10 +36,32 @@ func render(gen: DungeonGenerator) -> void:
 func update_fov(center: Vector2i, radius: int = EXPLORE_RADIUS) -> void:
 	if generator == null:
 		return
-	_visible_tiles = FieldOfView.compute(center, radius, _opaque_at)
+	# Explicit Callable construction — Godot 4's implicit self-binding on a
+	# bare method name isn't reliable when passed into a static function
+	# parameter typed as Callable. Using `Callable(self, ...)` forces the
+	# bind, which keeps `_opaque_at` reachable from `FieldOfView.compute`.
+	var opaque_cb: Callable = Callable(self, "_opaque_at")
+	var computed: Dictionary = FieldOfView.compute(center, radius, opaque_cb)
+	# Defensive fallback: if the new engine somehow returns empty, fall back
+	# to the raw Chebyshev disc so at minimum the player isn't standing in
+	# a black void. Should never trigger, but guards against surprise
+	# regressions that would make monsters/items vanish from the map.
+	if computed.is_empty():
+		computed = _fallback_cheb_disc(center, radius)
+	_visible_tiles = computed
 	for tile in _visible_tiles.keys():
 		_mark_tile_explored(tile)
 	queue_redraw()
+
+
+func _fallback_cheb_disc(center: Vector2i, radius: int) -> Dictionary:
+	var out: Dictionary = {}
+	for dy in range(-radius, radius + 1):
+		for dx in range(-radius, radius + 1):
+			if maxi(absi(dx), absi(dy)) > radius:
+				continue
+			out[Vector2i(center.x + dx, center.y + dy)] = true
+	return out
 
 
 ## Opacity callback passed to FieldOfView. Mirrors DCSS losparam.cc
@@ -98,7 +120,7 @@ func _mark_tile_explored(tile: Vector2i) -> void:
 ## Forward to FieldOfView so every LOS query in the project agrees
 ## with update_fov (DCSS los.cc port). Kept for legacy callers.
 func _has_los(from: Vector2i, to: Vector2i) -> bool:
-	return FieldOfView.cell_see_cell(from, to, _opaque_at)
+	return FieldOfView.cell_see_cell(from, to, Callable(self, "_opaque_at"))
 
 ## Show the planned auto-move path as blue-green dots.
 func show_path(path: Array[Vector2i]) -> void:

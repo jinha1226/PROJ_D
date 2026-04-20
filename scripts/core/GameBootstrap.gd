@@ -848,6 +848,7 @@ func _spawn_monsters_for_current_depth() -> void:
 	for m in monsters:
 		if m != null and not m.died.is_connected(_on_monster_died):
 			m.died.connect(_on_monster_died)
+	print("[spawn] depth=%d spawned=%d" % [GameManager.current_depth, monsters.size()])
 
 
 const _LOOT_DROP_CHANCE: float = 0.30

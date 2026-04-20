@@ -653,22 +653,34 @@ func get_resist(element: String) -> int:
 	return total
 
 
-## DCSS resistance math: rF+1 halves, rF+2 reduces to 1/3, rF+3 to 1/5.
-## Negative resist amplifies (rF- = 1.5×, rF-- = 2×). Non-resist damage
-## and elements we don't model return unchanged.
+## DCSS resist_adjust_damage (fight.cc:853) — player branch.
+##   resistible = amount   (100 % resistible for fire/cold/elec/pois/neg)
+##   if res > 3:            return 0 (immune)
+##   elif res in 1..3:      resistible /= (3*res + 1) / 2 + bonus_res
+##                          bonus_res = 1 for "boolean" resists (pois, neg)
+##   elif res == -1:        resistible *= 1.5
+##   elif res <= -2:        resistible *= 2
+## BEAM_NEG (drain) on player uses a different divisor (res*2) — we
+## treat that element-by-element below.
 func _apply_elem_resist(amount: int, element: String) -> int:
 	var rl: int = get_resist(element)
-	if rl >= 3:
-		return max(1, amount / 5)
-	if rl == 2:
-		return max(1, amount / 3)
-	if rl == 1:
-		return max(1, amount / 2)
-	if rl == -1:
-		return amount * 3 / 2
-	if rl <= -2:
-		return amount * 2
-	return amount
+	if rl > 3:
+		return 0  # immune at rF++++ etc.
+	if rl == 0:
+		return amount
+	if rl < 0:
+		if rl == -1:
+			return amount * 3 / 2
+		return amount * 2  # rF-- and worse
+	# Positive resist path.
+	var bonus_res: int = 0
+	if element == "poison" or element == "neg":
+		bonus_res = 1  # boolean resists
+	if element == "neg":
+		# DCSS special: rN divides by res*2 instead of the polynomial.
+		return maxi(1, amount / (rl * 2))
+	var denom: int = (3 * rl + 1) / 2 + bonus_res
+	return maxi(1, amount / maxi(1, denom))
 
 
 ## Generic `_<name>_turns` meta countdown. Removes the meta at 0.
