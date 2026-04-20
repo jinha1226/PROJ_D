@@ -3694,7 +3694,7 @@ func _tooltip_weapon(id: String, name_s: String, it: Dictionary) -> String:
 func _tooltip_armor(id: String, name_s: String, it: Dictionary) -> String:
 	var new_ac: int = int(it.get("ac", 0))
 	var slot: String = String(it.get("slot", ArmorRegistry.slot_for(id)))
-	var ev_penalty: int = ArmorRegistry.ev_penalty_for(id) if ArmorRegistry.has_method("ev_penalty_for") else 0
+	var ev_penalty: int = ArmorRegistry.ev_penalty_for(id)
 	var cur: Dictionary = {}
 	if player != null and player.equipped_armor.has(slot):
 		cur = player.equipped_armor[slot]

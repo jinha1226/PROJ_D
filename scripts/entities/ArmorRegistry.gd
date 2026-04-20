@@ -81,7 +81,7 @@ static func _ensure_loaded() -> void:
 		_merged[k] = DATA[k]
 
 
-static func _get(id: String) -> Dictionary:
+static func _lookup(id: String) -> Dictionary:
 	_ensure_loaded()
 	return _merged.get(id, {})
 
@@ -92,7 +92,7 @@ static func is_armor(id: String) -> bool:
 
 
 static func get_info(id: String) -> Dictionary:
-	var d: Dictionary = _get(id)
+	var d: Dictionary = _lookup(id)
 	if d.is_empty():
 		return {}
 	var out: Dictionary = d.duplicate()
@@ -101,16 +101,16 @@ static func get_info(id: String) -> Dictionary:
 
 
 static func slot_for(id: String) -> String:
-	return String(_get(id).get("slot", ""))
+	return String(_lookup(id).get("slot", ""))
 
 
 static func ac_for(id: String) -> int:
-	return int(_get(id).get("ac", 0))
+	return int(_lookup(id).get("ac", 0))
 
 
 static func ev_penalty_for(id: String) -> int:
-	return int(_get(id).get("ev_penalty", 0))
+	return int(_lookup(id).get("ev_penalty", 0))
 
 
 static func display_name_for(id: String) -> String:
-	return String(_get(id).get("name", id.replace("_", " ").capitalize()))
+	return String(_lookup(id).get("name", id.replace("_", " ").capitalize()))

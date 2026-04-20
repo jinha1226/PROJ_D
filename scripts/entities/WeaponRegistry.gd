@@ -87,7 +87,7 @@ static func _ensure_loaded() -> void:
 		_merged[k] = DATA[k]
 
 
-static func _get(id: String) -> Dictionary:
+static func _lookup(id: String) -> Dictionary:
 	_ensure_loaded()
 	return _merged.get(id, {})
 
@@ -98,15 +98,15 @@ static func is_weapon(id: String) -> bool:
 
 
 static func weapon_damage_for(id: String) -> int:
-	return int(_get(id).get("dmg", 0))
+	return int(_lookup(id).get("dmg", 0))
 
 
 static func weapon_skill_for(id: String) -> String:
-	return String(_get(id).get("skill", ""))
+	return String(_lookup(id).get("skill", ""))
 
 
 static func weapon_delay_for(id: String) -> float:
-	var d = _get(id).get("delay", 1.0)
+	var d = _lookup(id).get("delay", 1.0)
 	return float(d)
 
 
@@ -139,8 +139,8 @@ static func display_name_for(id: String) -> String:
 
 
 static func staff_spell_school(weapon_id: String) -> String:
-	return String(_get(weapon_id).get("spell_school", ""))
+	return String(_lookup(weapon_id).get("spell_school", ""))
 
 
 static func staff_spell_bonus(weapon_id: String) -> int:
-	return int(_get(weapon_id).get("spell_bonus", 0))
+	return int(_lookup(weapon_id).get("spell_bonus", 0))
