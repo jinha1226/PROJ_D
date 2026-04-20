@@ -89,8 +89,17 @@ const _CAM_FOLLOW_DUR: float = 0.14
 var _resting: bool = false
 var _rest_turns: int = 0
 const _REST_MAX_TURNS: int = 50
-const _REST_HP_PER_TURN: int = 2
-const _REST_MP_PER_TURN: int = 1
+## DCSS rest doesn't heal faster than walking — it just advances time
+## safely. The `_REST_*` constants are kept only so save files from the
+## old format load cleanly; the `_rest_turn()` handler no longer adds
+## them on top of the normal per-turn regen.
+const _REST_HP_PER_TURN: int = 0
+const _REST_MP_PER_TURN: int = 0
+## DCSS-style regen accumulators (cleared on floor change). Incremented
+## per turn by `20 + hp_max/6` for HP and `7 + mp_max/7` for MP; each
+## full 100 ticks a single HP / MP recovery.
+var _hp_regen_accum: int = 0
+var _mp_regen_accum: int = 0
 
 
 func _ready() -> void:
@@ -364,19 +373,24 @@ func _refresh_danger_tiles(dmap: DungeonMap) -> void:
 func _apply_passive_racial_traits() -> void:
 	if player == null or player.stats == null or not player.is_alive:
 		return
-	# Baseline natural regeneration — applies every player turn,
-	# including auto-move steps. HP trickles every 3 turns, MP every 4,
-	# so extended travel actually restores vitals. Stacks on top of
-	# racial / gear regen below.
-	var turn: int = TurnManager.turn_number
-	if turn > 0 and turn % 3 == 0:
-		if player.stats.HP < player.stats.hp_max:
-			player.stats.HP = min(player.stats.hp_max, player.stats.HP + 1)
-			player.stats_changed.emit()
-	if turn > 0 and turn % 4 == 0:
-		if player.stats.MP < player.stats.mp_max:
-			player.stats.MP = min(player.stats.mp_max, player.stats.MP + 1)
-			player.stats_changed.emit()
+	# DCSS regeneration (player.cc:player_regen): per-turn accumulator
+	# of `20 + hp_max/6` points, heal 1 HP at 100. At XL 1 with ~15 HP
+	# that's 22/turn → ~5 turns per HP, matching the slow DCSS crawl
+	# (Lv 10 ~70 HP → ~30/turn → ~3 turns per HP).
+	var hp_rate: int = 20 + player.stats.hp_max / 6
+	_hp_regen_accum += hp_rate
+	while _hp_regen_accum >= 100 and player.stats.HP < player.stats.hp_max:
+		player.stats.HP += 1
+		_hp_regen_accum -= 100
+		player.stats_changed.emit()
+	# MP regen: roughly the same shape but with mp_max/7, matching
+	# DCSS's `player_mp_regen` at XL 1 ~3 MP → ~23/turn → ~4 turns/MP.
+	var mp_rate: int = 7 + player.stats.mp_max / 7
+	_mp_regen_accum += mp_rate
+	while _mp_regen_accum >= 100 and player.stats.MP < player.stats.mp_max:
+		player.stats.MP += 1
+		_mp_regen_accum -= 100
+		player.stats_changed.emit()
 	var special: String = ""
 	if player.trait_res != null:
 		special = player.trait_res.special

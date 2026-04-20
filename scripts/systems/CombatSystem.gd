@@ -147,28 +147,73 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 ## Monster → player melee. Monsters don't have skills in M1, so this path
 ## keeps the legacy formula.
 static func melee_attack_from_monster(m, defender) -> int:
-	var base_atk: int = int(m.data.str) / 2 + 3
+	# DCSS-faithful damage: every attack entry on the monster rolls a
+	# separate 1..damage swing. Multi-attack beasts (troll has 3, hydra
+	# has 1-per-head) swing each attack with diminishing per-attack odds
+	# (100% / 50% / 33% / …) so their total output tracks DCSS's
+	# `mons_attack_spec` averages without the full roll-vs-EV engine.
 	var def_ac: int = 0
 	if "stats" in defender and defender.stats != null:
 		def_ac = defender.stats.AC
 	elif "ac" in defender:
 		def_ac = int(defender.ac)
-	var dmg: int = roll_damage(base_atk, def_ac)
+
+	var atks: Array = m.data.attacks if m.data and "attacks" in m.data else []
+	var total: int = 0
+	var dealt_any: bool = false
+	if atks.is_empty():
+		# Fallback for data-less monsters: keep the old str/2+3 shape so
+		# summons/bosses without YAML stats still swing for something.
+		total = roll_damage(int(m.data.str) / 2 + 3 if m.data else 3, def_ac)
+		dealt_any = total > 0
+	else:
+		for i in atks.size():
+			var a: Dictionary = atks[i]
+			var base: int = int(a.get("damage", 0))
+			if base <= 0:
+				continue
+			var chance: float = 1.0 / float(1 + i)  # 100% / 50% / 33% / 25% …
+			if i > 0 and randf() >= chance:
+				continue
+			# Each swing rolls 1 + random2(base), then AC soaks a random
+			# fraction (matches DCSS `apply_ac` shape: flat soak with jitter).
+			var raw: int = 1 + (randi() % base)
+			var after_ac: int = max(1, raw - def_ac + randi_range(-1, 1))
+			total += after_ac
+			dealt_any = true
+			# Flavour riders: poison / drain / fire on melee. Keyed off
+			# the `flavour` field per attack entry.
+			var flav: String = String(a.get("flavour", ""))
+			match flav:
+				"poison":
+					if defender.has_method("set_meta"):
+						defender.set_meta("_poison_turns", 5)
+						defender.set_meta("_poison_dmg", max(1, base / 4))
+				"drain", "drain_xp":
+					# Simplified: clip 3 HP off max while the drain lasts.
+					if defender.has_method("set_meta"):
+						defender.set_meta("_drained_turns", 20)
+				"fire":
+					pass  # resist check handled on defender side if set
+
+	if not dealt_any:
+		total = 1  # missed-ish — DCSS still shows a hit-for-1
+
 	var def_trait: String = ""
 	if "trait_res" in defender and defender.trait_res != null:
 		def_trait = defender.trait_res.special
 	if def_trait == "iron_will" and randf() < 0.3:
-		dmg = max(1, dmg / 2)
+		total = max(1, total / 2)
 	if defender.has_method("take_damage"):
-		defender.take_damage(dmg)
+		defender.take_damage(total)
 	var atk_name: String = ""
 	if "data" in m and m.data != null and "display_name" in m.data:
 		atk_name = String(m.data.display_name)
 	if atk_name != "":
-		CombatLog.add("The %s hits you for %d!" % [atk_name, dmg])
-	_show_hit_feedback(defender, dmg, Color(1.0, 0.3, 0.3))
+		CombatLog.add("The %s hits you for %d!" % [atk_name, total])
+	_show_hit_feedback(defender, total, Color(1.0, 0.3, 0.3))
 	_show_slash_fx(defender)
-	return dmg
+	return total
 
 
 static func _show_hit_feedback(target: Node, dmg: int, color: Color) -> void:
