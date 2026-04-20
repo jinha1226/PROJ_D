@@ -408,8 +408,15 @@ static func _tile_occupied(pos: Vector2i, self_ref: Monster) -> bool:
 static func _can_enter(m: Monster, pos: Vector2i, allow_player_tile: bool = false) -> bool:
 	if m.generator == null:
 		return false
+	# DCSS: intelligent monsters open doors as they move through them.
+	# Animals and plants can't. We treat DOOR_CLOSED as passable for
+	# eligible monsters and let _move_to actually open it on step.
 	if not m.generator.is_walkable(pos):
-		return false
+		if _monster_can_open_doors(m) \
+				and m.generator.get_tile(pos) == DungeonGenerator.TileType.DOOR_CLOSED:
+			pass  # fall through — treated as walkable for pathing
+		else:
+			return false
 	if allow_player_tile:
 		# only block on other monsters
 		var tree: SceneTree = m.get_tree()
@@ -484,4 +491,21 @@ static func _maybe_wander(m: Monster) -> void:
 
 
 static func _move_to(m: Monster, pos: Vector2i) -> void:
+	# If the target tile is a closed door, open it (this is why
+	# `_can_enter` let us path through it) and skip the move itself
+	# — opening is the whole turn. DCSS monsters do the same.
+	if m.generator != null \
+			and m.generator.get_tile(pos) == DungeonGenerator.TileType.DOOR_CLOSED \
+			and _monster_can_open_doors(m):
+		m.generator.open_door(pos)
+		return
 	m.move_to_grid(pos)
+
+
+## Intelligence check for door-opening. DCSS animals/plants/brainless
+## can't work a latch; intelligent humanoids / caster monsters can.
+static func _monster_can_open_doors(m: Monster) -> bool:
+	if m == null or m.data == null:
+		return false
+	var intel: String = String(m.data.intelligence)
+	return intel != "animal" and intel != "plant" and intel != "brainless"
