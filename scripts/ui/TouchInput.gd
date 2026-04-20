@@ -31,6 +31,10 @@ var _auto_exploring: bool = false  # continuous explore until done / interrupted
 const MAX_AUTO_STEPS: int = 400
 var _auto_steps: int = 0
 var _auto_move_grace: float = 0.0
+# Monster instance IDs already spotted during the current auto-move session.
+# DCSS-faithful: only *newly* visible monsters halt travel — ones you've
+# already seen (and presumably chose to ignore) don't re-trigger the stop.
+var _seen_monster_ids: Dictionary = {}
 
 
 func _ready() -> void:
@@ -134,6 +138,7 @@ func _on_tap(grid: Vector2i) -> void:
 	_is_auto_moving = true
 	_auto_move_grace = 0.5
 	_auto_steps = 0
+	_snapshot_visible_monsters()
 	_update_path_overlay()
 	_step_auto_move()
 
@@ -168,6 +173,7 @@ func begin_auto_move_to(target: Vector2i) -> bool:
 	_is_auto_moving = true
 	_auto_move_grace = 0.5
 	_auto_steps = 0
+	_snapshot_visible_monsters()
 	_update_path_overlay()
 	_step_auto_move()
 	return true
@@ -220,7 +226,7 @@ func _on_player_turn_started() -> void:
 func _step_auto_move() -> void:
 	if not _is_auto_moving:
 		return
-	if _monster_in_sight():
+	if _new_monster_in_sight():
 		_cancel_auto_move()
 		return
 	if _auto_move_path.is_empty():
@@ -280,8 +286,22 @@ func _cancel_auto_move() -> void:
 	_auto_exploring = false
 	_auto_move_path.clear()
 	_auto_steps = 0
+	_seen_monster_ids.clear()
 	if dmap != null:
 		dmap.clear_path()
+
+
+## Snapshot monsters currently in FOV so they don't re-trigger a stop later
+## in the same auto-move session. Called once when travel begins.
+func _snapshot_visible_monsters() -> void:
+	_seen_monster_ids.clear()
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if not is_instance_valid(m) or not ("grid_pos" in m):
+			continue
+		if "is_alive" in m and not m.is_alive:
+			continue
+		if _monster_is_visible(m):
+			_seen_monster_ids[m.get_instance_id()] = true
 
 
 func _update_path_overlay() -> void:
@@ -290,17 +310,29 @@ func _update_path_overlay() -> void:
 	dmap.show_path(_auto_move_path)
 
 
-func _monster_in_sight() -> bool:
+## True iff a monster's tile is currently visible to the player.
+func _monster_is_visible(m: Node) -> bool:
+	if dmap != null:
+		return dmap.is_tile_visible(m.grid_pos)
+	var d: int = max(abs(m.grid_pos.x - player.grid_pos.x),
+			abs(m.grid_pos.y - player.grid_pos.y))
+	return d <= SIGHT_RANGE
+
+
+## True iff any monster entered FOV that wasn't already known at auto-move
+## start. Newly-spotted monsters are added to the seen-set so they don't
+## stop travel again in this session.
+func _new_monster_in_sight() -> bool:
+	var spotted_new: bool = false
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if not is_instance_valid(m) or not ("grid_pos" in m):
 			continue
 		if "is_alive" in m and not m.is_alive:
 			continue
-		if dmap != null:
-			if dmap.is_tile_visible(m.grid_pos):
-				return true
-		else:
-			var d: int = max(abs(m.grid_pos.x - player.grid_pos.x), abs(m.grid_pos.y - player.grid_pos.y))
-			if d <= SIGHT_RANGE:
-				return true
-	return false
+		if not _monster_is_visible(m):
+			continue
+		var mid: int = m.get_instance_id()
+		if not _seen_monster_ids.has(mid):
+			_seen_monster_ids[mid] = true
+			spotted_new = true
+	return spotted_new
