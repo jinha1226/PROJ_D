@@ -1298,10 +1298,16 @@ func _on_identify_one_requested() -> void:
 	# surfaces on top. Without this it stacks behind the bag and becomes
 	# untouchable.
 	_close_all_dialogs()
+	# Dedupe by item id — carrying three of the same unknown potion should
+	# show one row in the picker, and identifying it reveals all three.
 	var unidentified: Array = []
+	var seen_ids: Dictionary = {}
 	for it in player.get_items():
 		var iid: String = String(it.get("id", ""))
+		if iid == "" or seen_ids.has(iid):
+			continue
 		if ConsumableRegistry.has(iid) and not GameManager.is_identified(iid):
+			seen_ids[iid] = true
 			unidentified.append(it)
 	var dlg := AcceptDialog.new()
 	dlg.exclusive = false

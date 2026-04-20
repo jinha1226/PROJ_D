@@ -47,7 +47,9 @@ func _ready() -> void:
 func _build_rows() -> void:
 	var list: VBoxContainer = $Scroll/List
 	for rid in RACE_IDS:
-		var res: RaceData = load("res://resources/races/%s.tres" % rid) as RaceData
+		# Route through RaceRegistry so DCSS aptitudes/base stats overlay
+		# the hand-tuned .tres before selection UI displays them.
+		var res: RaceData = RaceRegistry.fetch(rid)
 		if res == null:
 			continue
 		var row := _make_row(res)

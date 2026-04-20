@@ -37,3 +37,16 @@ Thumbs.db
 # NOTE: *.import files ARE committed — they carry stable Godot UIDs.
 # NOTE: assets/ulpc/ IS committed so CI can build without the generator repo.
 assets/ulpc/
+
+# DCSS source clone (GPL, huge). Only referenced by tools/convert_dcss_*.py
+# at author-time; the rendered data lives under assets/dcss_*/ (JSON) and
+# assets/dcss_des/ (vault templates).
+/crawl/
+
+# Stale sprite packs from an earlier experiment — not shipped.
+32rogues-*/
+32rogues-*.zip
+kenney_*.zip
+lpc_base_assets.zip
+assets/32rogues/
+assets/kenney/

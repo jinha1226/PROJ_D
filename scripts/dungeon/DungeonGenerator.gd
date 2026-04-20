@@ -29,6 +29,10 @@ var spawn_pos: Vector2i = Vector2i.ZERO
 var spawn_pos2: Vector2i = Vector2i.ZERO
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
+# DCSS layout_basic emits three stair pairs; cache them so _place_stairs can
+# use the authentic positions instead of re-deriving via room centres.
+var _dcss_stairs_down: Array = []
+var _dcss_stairs_up: Array = []
 
 func generate(depth: int, run_seed: int = -1) -> void:
 	if run_seed == -1:
@@ -36,189 +40,63 @@ func generate(depth: int, run_seed: int = -1) -> void:
 	else:
 		_rng.seed = run_seed + depth * 1000
 	rooms.clear()
+	_dcss_stairs_down.clear()
+	_dcss_stairs_up.clear()
 	_init_map()
-	HyperLayout.set_seed(_rng.seed + depth)
 	var branch: String = _current_branch()
 	match branch:
-		"main":    _build_hyper_main()
+		"main":    _build_dcss_overlapping_boxes(depth)
 		"mine":    _build_caves(); _decorate_rock_debris(8)
 		"forest":  _build_caves(); _decorate_trees(22)
 		"swamp":   _build_caves(); _decorate_trees(10); _place_pools(TileType.WATER, 4, 4, 9)
 		"volcano": _build_caves(); _place_pools(TileType.LAVA, 3, 3, 7)
-		_:         _build_hyper_main()
-	_place_vault(branch)
+		_:         _build_dcss_overlapping_boxes(depth)
+	# Up to 3 vault placements per floor so DCSS's ~100-vault pool actually
+	# shows up visibly. Each call only stamps one vault (or none) — repeated
+	# calls naturally thin out if the map has no more room.
+	_place_vault(branch, depth)
+	_place_vault(branch, depth)
+	_place_vault(branch, depth)
+	if branch == "main":
+		_decorate_rock_debris(6)
 	_ensure_reachability()
 	_place_stairs()
 
 
-# ---- Builder: DCSS hyper engine ------------------------------------------
+# ---- Builder: DCSS overlapping-boxes port --------------------------------
 
-## Drive the ported DCSS 0.34 hyper layout engine to produce the main
-## branch (and any "basic rooms" branch). Produces a usage_grid which we
-## then translate back into our TileType enum map.
-func _build_hyper_main() -> void:
-	var paint_cb: Callable = Callable(self, "_hyper_paint_buffered_room")
-	var options: Dictionary = {
-		"name": "Main Dungeon",
+## Direct GDScript port of DCSS 0.34 `dgn_build_basic_level` — the actual D-level
+## layout from crawl-ref/source/dgn-layouts.cc. Produces three winding trails
+## with stair triplets, L-joined together, then ~15-25 random rooms stamped
+## where their walls touch a corridor. This is why DCSS levels feel like
+## "rooms branching off corridors" — the rooms are literally attached to the
+## trail geometry.
+func _build_dcss_overlapping_boxes(depth: int) -> void:
+	var result: Dictionary = DCSSLayout.build_basic({
 		"width": MAP_WIDTH,
 		"height": MAP_HEIGHT,
-		"min_room_size": 6,
-		"max_room_size": 12,
-		"max_rooms": 16,
-		"max_room_tries": 40,
-		"max_place_tries": 80,
-		"layout_wall_type": "rock_wall",
-		"layout_floor_type": "floor",
-		"grid_initialiser": Callable(self, "_hyper_init_cell"),
-		"skip_analyse": false,
-		# Direct paint generator — space buffer + wall ring + floor core
-		# in one step. Skipping room_transform sidesteps Callable-resolution
-		# headaches and makes the flow easier to reason about.
-		"room_type_weights": [
-			{
-				"generator": "code",
-				"paint_callback": paint_cb,
-				"weight": 3,
-				"min_size": 6,
-				"max_size": 10,
-			},
-			{
-				"generator": "code",
-				"paint_callback": paint_cb,
-				"weight": 1,
-				"min_size": 10,
-				"max_size": 14,
-			},
-		],
-		"build_fixture": [
-			# First pass: seed the level with a primary room.
-			{
-				"type": "build",
-				"max_rooms": 1,
-				"strategy": HyperStrategy.strategy_primary(),
-			},
-			# Main pass: attach rooms off existing walls.
-			{
-				"type": "build",
-				"max_rooms": 14,
-				"strategy": HyperStrategy.strategy_default(),
-			},
-		],
-	}
-	var state: Dictionary = HyperLayout.build(options)
-	_apply_usage_grid(state["usage_grid"])
-	# Safety: if the hyper engine produced no usable rooms (or tiny ones
-	# with no walkable exits), fall back to the classic BSP builder so
-	# runs are never stuck in a sealed room.
-	if rooms.size() < 2 or _count_floor_tiles() < 80:
-		_init_map()
-		rooms.clear()
-		_build_rooms_and_corridors()
-
-
-func _count_floor_tiles() -> int:
-	var n: int = 0
+		"depth": depth,
+		"rng": _rng,
+	})
+	var features: Array = result.get("features", [])
 	for x in MAP_WIDTH:
 		for y in MAP_HEIGHT:
-			if map[x][y] == TileType.FLOOR or map[x][y] == TileType.DOOR_OPEN:
-				n += 1
-	return n
+			map[x][y] = _dcss_feature_to_tile(String(features[x][y]))
+	rooms = result.get("rooms", [])
+	# Remember the DCSS stair picks for _place_stairs to re-use instead of
+	# clobbering them.
+	_dcss_stairs_down = result.get("stairs_down", [])
+	_dcss_stairs_up = result.get("stairs_up", [])
 
 
-## Seed each usage cell as solid rock so the engine has walls to carve.
-func _hyper_init_cell(_x: int, _y: int) -> Dictionary:
-	return {
-		"feature": "rock_wall",
-		"solid": true,
-		"wall": true,
-		"carvable": true,
-		"space": false,
-		"vault": false,
-		"anchors": [],
-	}
-
-
-## Paint callback: produces a room cell whose outer ring is buffer space,
-## next ring is carvable wall, and the inner area is floor. Equivalent to
-## running make_code_room + add_buffer_walls but inline so we don't rely
-## on the room_transform Callable being resolved at runtime.
-func _hyper_paint_buffered_room(room: Dictionary, _options: Dictionary,
-		_chosen: Dictionary) -> Array:
-	var size: Vector2i = room["size"]
-	return [
-		{
-			"type": "space",
-			"corner1": {"x": 0, "y": 0},
-			"corner2": {"x": size.x - 1, "y": size.y - 1},
-			"usage": {"buffer": true},
-		},
-		{
-			"type": "wall",
-			"corner1": {"x": 1, "y": 1},
-			"corner2": {"x": size.x - 2, "y": size.y - 2},
-			"usage": {"carvable": true, "protect": true},
-		},
-		{
-			"type": "floor",
-			"corner1": {"x": 2, "y": 2},
-			"corner2": {"x": size.x - 3, "y": size.y - 3},
-			"open": true,
-		},
-	]
-
-
-## Translate the finished usage_grid back into our TileType enum map +
-## rooms array (needed for stair placement / reachability).
-func _apply_usage_grid(usage_grid: Dictionary) -> void:
-	for x in MAP_WIDTH:
-		for y in MAP_HEIGHT:
-			var cell: Dictionary = HyperUsage.get_usage(usage_grid, x, y)
-			map[x][y] = _feature_to_tile(String(cell.get("feature", "rock_wall")))
-	# Derive rooms from per-room anchors — simplest: collect bounding rect
-	# per unique room ref. Used by _place_stairs and _ensure_reachability.
-	var by_room: Dictionary = {}
-	for x in MAP_WIDTH:
-		for y in MAP_HEIGHT:
-			var cell: Dictionary = HyperUsage.get_usage(usage_grid, x, y)
-			var r = cell.get("room", null)
-			if r == null:
-				continue
-			if bool(cell.get("solid", true)) and not String(cell.get("feature", "")) == "open_door":
-				continue
-			var key: int = r.get_instance_id() if r is Object else hash(r)
-			if not by_room.has(key):
-				by_room[key] = {"min_x": x, "min_y": y, "max_x": x, "max_y": y}
-			else:
-				var rec: Dictionary = by_room[key]
-				rec["min_x"] = min(rec["min_x"], x)
-				rec["min_y"] = min(rec["min_y"], y)
-				rec["max_x"] = max(rec["max_x"], x)
-				rec["max_y"] = max(rec["max_y"], y)
-	rooms.clear()
-	for rec_v in by_room.values():
-		var rec: Dictionary = rec_v
-		rooms.append(Rect2i(
-				rec["min_x"], rec["min_y"],
-				rec["max_x"] - rec["min_x"] + 1,
-				rec["max_y"] - rec["min_y"] + 1))
-
-
-## Feature-string → TileType enum lookup. Unknown → wall.
-func _feature_to_tile(feature: String) -> int:
-	match feature:
-		"floor":             return TileType.FLOOR
-		"rock_wall":         return TileType.WALL
-		"stone_wall":        return TileType.WALL
-		"open_door":         return TileType.DOOR_OPEN
-		"closed_door":       return TileType.DOOR_CLOSED
-		"stone_stairs_up":   return TileType.STAIRS_UP
-		"stone_stairs_down": return TileType.STAIRS_DOWN
-		"shallow_water":     return TileType.WATER
-		"deep_water":        return TileType.WATER
-		"lava":              return TileType.LAVA
-		"tree":              return TileType.TREE
-		"space":             return TileType.WALL
-		_:                   return TileType.WALL
+static func _dcss_feature_to_tile(f: String) -> int:
+	match f:
+		"floor":              return TileType.FLOOR
+		"rock_wall":          return TileType.WALL
+		"closed_door":        return TileType.DOOR_CLOSED
+		"stone_stairs_down":  return TileType.STAIRS_DOWN
+		"stone_stairs_up":    return TileType.STAIRS_UP
+	return TileType.WALL
 
 
 func _current_branch() -> String:
@@ -547,22 +425,26 @@ func _grow_pool(start: Vector2i, tile: int, target: int) -> void:
 
 # ---- Vault placement ------------------------------------------------------
 
-func _place_vault(branch: String) -> void:
-	var pool: Array = VaultRegistry.for_branch(branch)
+func _place_vault(branch: String, depth: int) -> void:
+	var pool: Array = VaultRegistry.for_branch_at_depth(branch, depth)
 	if pool.is_empty():
 		return
-	var template: Array = pool[_rng.randi_range(0, pool.size() - 1)]
-	if template.is_empty():
-		return
-	var h: int = template.size()
-	var w: int = String(template[0]).length()
-	# 20 attempts to find a fit; silently skip if none.
-	for _i in 20:
-		var ox: int = _rng.randi_range(2, MAP_WIDTH - w - 2)
-		var oy: int = _rng.randi_range(2, MAP_HEIGHT - h - 2)
-		if _vault_fits(template, ox, oy):
-			_stamp_vault(template, ox, oy)
-			return
+	# Up to 3 vault attempts per floor so DCSS's large pool gets some coverage;
+	# each attempt picks a different template then tries 15 positions.
+	for _attempt in 3:
+		var template: Array = pool[_rng.randi_range(0, pool.size() - 1)]
+		if template.is_empty():
+			continue
+		var h: int = template.size()
+		var w: int = String(template[0]).length()
+		if w >= MAP_WIDTH - 4 or h >= MAP_HEIGHT - 4:
+			continue
+		for _i in 15:
+			var ox: int = _rng.randi_range(2, MAP_WIDTH - w - 2)
+			var oy: int = _rng.randi_range(2, MAP_HEIGHT - h - 2)
+			if _vault_fits(template, ox, oy):
+				_stamp_vault(template, ox, oy)
+				return
 
 
 func _vault_fits(template: Array, ox: int, oy: int) -> bool:
@@ -686,6 +568,16 @@ func _bfs_farthest(from: Vector2i) -> Vector2i:
 
 
 func _place_stairs() -> void:
+	# DCSS layout_basic already placed three stair pairs via its trails. If
+	# the current build produced them, respect those positions so the corridor
+	# endpoints align with the stairs (otherwise stairs show up in odd spots
+	# because room centres don't sit on corridor ends).
+	if _dcss_stairs_up.size() >= 1 and _dcss_stairs_down.size() >= 1:
+		spawn_pos = _dcss_stairs_up[0]
+		stairs_down_pos = _dcss_stairs_down[0]
+		spawn_pos2 = _dcss_stairs_up[1] if _dcss_stairs_up.size() >= 2 else spawn_pos
+		stairs_down_pos2 = _dcss_stairs_down[1] if _dcss_stairs_down.size() >= 2 else stairs_down_pos
+		return
 	if rooms.is_empty():
 		spawn_pos = Vector2i(MAP_WIDTH / 2, MAP_HEIGHT / 2)
 		stairs_down_pos = spawn_pos

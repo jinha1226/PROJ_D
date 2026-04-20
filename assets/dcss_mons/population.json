@@ -1,0 +1,6710 @@
+{
+ "Abyss": [
+  {
+   "id": "abomination_small",
+   "max": 6,
+   "min": -1,
+   "shape": "FALL",
+   "weight": 1150
+  },
+  {
+   "id": "brain_worm",
+   "max": 6,
+   "min": -1,
+   "shape": "FALL",
+   "weight": 150
+  },
+  {
+   "id": "weeping_skull",
+   "max": 6,
+   "min": -1,
+   "shape": "FALL",
+   "weight": 200
+  },
+  {
+   "id": "crimson_imp",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 25
+  },
+  {
+   "id": "white_imp",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 145
+  },
+  {
+   "id": "ufetubus",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 145
+  },
+  {
+   "id": "iron_imp",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 145
+  },
+  {
+   "id": "drude",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 145
+  },
+  {
+   "id": "shadow_imp",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 25
+  },
+  {
+   "id": "red_devil",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 8
+  },
+  {
+   "id": "ice_devil",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 25
+  },
+  {
+   "id": "rust_devil",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 36
+  },
+  {
+   "id": "hellwing",
+   "max": 8,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 73
+  },
+  {
+   "id": "sixfirhy",
+   "max": 8,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 91
+  },
+  {
+   "id": "orange_demon",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 125
+  },
+  {
+   "id": "ynoxinul",
+   "max": 8,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 300
+  },
+  {
+   "id": "obsidian_bat",
+   "max": 6,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 65
+  },
+  {
+   "id": "zombie",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 130
+  },
+  {
+   "id": "wight",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 35
+  },
+  {
+   "id": "wraith",
+   "max": 8,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 70
+  },
+  {
+   "id": "shadowghast",
+   "max": 8,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 10
+  },
+  {
+   "id": "vampire",
+   "max": 8,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 25
+  },
+  {
+   "id": "basilisk",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 4
+  },
+  {
+   "id": "jelly",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 21
+  },
+  {
+   "id": "ice_beast",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 21
+  },
+  {
+   "id": "sky_beast",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 21
+  },
+  {
+   "id": "kobold_demonologist",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 14
+  },
+  {
+   "id": "fire_bat",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 46
+  },
+  {
+   "id": "shapeshifter",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "shapeshifter",
+   "max": 5,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 50
+  },
+  {
+   "id": "unseen_horror",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 35
+  },
+  {
+   "id": "unseen_horror",
+   "max": 5,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 35
+  },
+  {
+   "id": "simulacrum",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 40
+  },
+  {
+   "id": "simulacrum",
+   "max": 5,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 40
+  },
+  {
+   "id": "great_orb_of_eyes",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 33
+  },
+  {
+   "id": "great_orb_of_eyes",
+   "max": 5,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 33
+  },
+  {
+   "id": "orc_sorcerer",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "blink_frog",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 29
+  },
+  {
+   "id": "mana_viper",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "orb_spider",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "earth_elemental",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 18
+  },
+  {
+   "id": "fire_elemental",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 6
+  },
+  {
+   "id": "air_elemental",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 6
+  },
+  {
+   "id": "water_elemental",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 6
+  },
+  {
+   "id": "black_draconian",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 5
+  },
+  {
+   "id": "yellow_draconian",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 5
+  },
+  {
+   "id": "green_draconian",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 5
+  },
+  {
+   "id": "purple_draconian",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 5
+  },
+  {
+   "id": "red_draconian",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 5
+  },
+  {
+   "id": "white_draconian",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 5
+  },
+  {
+   "id": "eye_of_devastation",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "vampire_mage",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 12
+  },
+  {
+   "id": "death_drake",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "chaos_spawn",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 192
+  },
+  {
+   "id": "chaos_spawn",
+   "max": 6,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 192
+  },
+  {
+   "id": "sun_demon",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 22
+  },
+  {
+   "id": "sun_demon",
+   "max": 6,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 22
+  },
+  {
+   "id": "soul_eater",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 14
+  },
+  {
+   "id": "soul_eater",
+   "max": 6,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 14
+  },
+  {
+   "id": "efreet",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "efreet",
+   "max": 6,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 50
+  },
+  {
+   "id": "rakshasa",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 66
+  },
+  {
+   "id": "rakshasa",
+   "max": 6,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 66
+  },
+  {
+   "id": "demonic_crawler",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "demonic_crawler",
+   "max": 6,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 25
+  },
+  {
+   "id": "freezing_wraith",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 48
+  },
+  {
+   "id": "freezing_wraith",
+   "max": 6,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 48
+  },
+  {
+   "id": "guardian_serpent",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "guardian_serpent",
+   "max": 6,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 25
+  },
+  {
+   "id": "flayed_ghost",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 16
+  },
+  {
+   "id": "flayed_ghost",
+   "max": 6,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 16
+  },
+  {
+   "id": "hell_knight",
+   "max": 6,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "necromancer",
+   "max": 6,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "occultist",
+   "max": 6,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "screaming_refraction",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 48
+  },
+  {
+   "id": "screaming_refraction",
+   "max": 7,
+   "min": 6,
+   "shape": "FALL",
+   "weight": 48
+  },
+  {
+   "id": "laughing_skull",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 150
+  },
+  {
+   "id": "laughing_skull",
+   "max": 7,
+   "min": 6,
+   "shape": "FALL",
+   "weight": 150
+  },
+  {
+   "id": "abomination_large",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 875
+  },
+  {
+   "id": "abomination_large",
+   "max": 7,
+   "min": 6,
+   "shape": "FALL",
+   "weight": 850
+  },
+  {
+   "id": "very_ugly_thing",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 52
+  },
+  {
+   "id": "very_ugly_thing",
+   "max": 7,
+   "min": 6,
+   "shape": "FALL",
+   "weight": 52
+  },
+  {
+   "id": "raiju",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 300
+  },
+  {
+   "id": "raiju",
+   "max": 7,
+   "min": 6,
+   "shape": "FALL",
+   "weight": 300
+  },
+  {
+   "id": "worldbinder",
+   "max": 8,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 165
+  },
+  {
+   "id": "hell_hound",
+   "max": 8,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 30
+  },
+  {
+   "id": "will_o_the_wisp",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 35
+  },
+  {
+   "id": "glowing_shapeshifter",
+   "max": 10,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 10
+  },
+  {
+   "id": "tentacled_monstrosity",
+   "max": 10,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 16
+  },
+  {
+   "id": "shadow_demon",
+   "max": 10,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 16
+  },
+  {
+   "id": "hell_hog",
+   "max": 10,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 40
+  },
+  {
+   "id": "acid_blob",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 21
+  },
+  {
+   "id": "ghost_moth",
+   "max": 10,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 4
+  },
+  {
+   "id": "crystal_guardian",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 2
+  },
+  {
+   "id": "crystal_guardian",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 20
+  },
+  {
+   "id": "frostbound_tome",
+   "max": 10,
+   "min": 4,
+   "shape": "SEMI",
+   "weight": 5
+  },
+  {
+   "id": "earthen_tome",
+   "max": 10,
+   "min": 4,
+   "shape": "SEMI",
+   "weight": 5
+  },
+  {
+   "id": "crystal_tome",
+   "max": 10,
+   "min": 4,
+   "shape": "SEMI",
+   "weight": 5
+  },
+  {
+   "id": "divine_tome",
+   "max": 10,
+   "min": 4,
+   "shape": "SEMI",
+   "weight": 5
+  },
+  {
+   "id": "spatial_maelstrom",
+   "max": 10,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 180
+  },
+  {
+   "id": "hellephant",
+   "max": 10,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 16
+  },
+  {
+   "id": "hellephant",
+   "max": 10,
+   "min": 6,
+   "shape": "RISE",
+   "weight": 50
+  },
+  {
+   "id": "profane_servitor",
+   "max": 10,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 22
+  },
+  {
+   "id": "profane_servitor",
+   "max": 10,
+   "min": 6,
+   "shape": "RISE",
+   "weight": 50
+  },
+  {
+   "id": "shadow_dragon",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 2
+  },
+  {
+   "id": "shadow_dragon",
+   "max": 10,
+   "min": 6,
+   "shape": "RISE",
+   "weight": 20
+  },
+  {
+   "id": "quicksilver_dragon",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 2
+  },
+  {
+   "id": "quicksilver_dragon",
+   "max": 10,
+   "min": 6,
+   "shape": "RISE",
+   "weight": 20
+  },
+  {
+   "id": "pearl_dragon",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 2
+  },
+  {
+   "id": "pearl_dragon",
+   "max": 10,
+   "min": 6,
+   "shape": "RISE",
+   "weight": 20
+  },
+  {
+   "id": "crystal_echidna",
+   "max": 10,
+   "min": 6,
+   "shape": "RISE",
+   "weight": 10
+  },
+  {
+   "id": "quicksilver_elemental",
+   "max": 10,
+   "min": 6,
+   "shape": "RISE",
+   "weight": 10
+  },
+  {
+   "id": "nargun",
+   "max": 10,
+   "min": 6,
+   "shape": "RISE",
+   "weight": 10
+  },
+  {
+   "id": "putrid_mouth",
+   "max": 10,
+   "min": 6,
+   "shape": "RISE",
+   "weight": 10
+  },
+  {
+   "id": "wretched_star",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 340
+  },
+  {
+   "id": "tentacled_starspawn",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 340
+  },
+  {
+   "id": "ancient_zyme",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 340
+  },
+  {
+   "id": "starcursed_mass",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 335
+  },
+  {
+   "id": "thrashing_horror",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 335
+  },
+  {
+   "id": "lurking_horror",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 90
+  },
+  {
+   "id": "apocalypse_crab",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 90
+  },
+  {
+   "id": "neqoxec",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 225
+  },
+  {
+   "id": "smoke_demon",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 300
+  },
+  {
+   "id": "hellion",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "tormentor",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 21
+  },
+  {
+   "id": "reaper",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 15
+  },
+  {
+   "id": "green_death",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "blizzard_demon",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 22
+  },
+  {
+   "id": "balrug",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 22
+  },
+  {
+   "id": "cacodemon",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "zykzyl",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "executioner",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "hell_sentinel",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 10
+  },
+  {
+   "id": "cognitogaunt",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 105
+  },
+  {
+   "id": "shadow_wraith",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 23
+  },
+  {
+   "id": "silent_spectre",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 10
+  },
+  {
+   "id": "bone_dragon",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 80
+  },
+  {
+   "id": "revenant_soulmonger",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 9
+  },
+  {
+   "id": "lich",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 46
+  },
+  {
+   "id": "ancient_lich",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "dread_lich",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "deep_elf_sorcerer",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "deep_elf_demonologist",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 5
+  },
+  {
+   "id": "deep_elf_elementalist",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "eidolon",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 17
+  },
+  {
+   "id": "dancing_weapon",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1
+  },
+  {
+   "id": "toenail_golem",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1
+  },
+  {
+   "id": "shining_eye",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "golden_eye",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 33
+  },
+  {
+   "id": "glowing_orange_brain",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 52
+  },
+  {
+   "id": "draconian_stormcaller",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 3
+  },
+  {
+   "id": "draconian_monk",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 3
+  },
+  {
+   "id": "draconian_shifter",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 5
+  },
+  {
+   "id": "draconian_annihilator",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 3
+  },
+  {
+   "id": "draconian_knight",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 3
+  },
+  {
+   "id": "draconian_scorcher",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 3
+  },
+  {
+   "id": "bunyip",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 5
+  },
+  {
+   "id": "demonspawn_corrupter",
+   "max": 7,
+   "min": 3,
+   "shape": "FLAT",
+   "weight": 1
+  },
+  {
+   "id": "fravashi",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 2
+  },
+  {
+   "id": "angel",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 11
+  },
+  {
+   "id": "daeva",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 14
+  },
+  {
+   "id": "ophan",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  }
+ ],
+ "Arena": [],
+ "Bailey": [
+  {
+   "id": "gnoll",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "orc",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "orc_warrior",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 260
+  },
+  {
+   "id": "orc_knight",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  }
+ ],
+ "Bazaar": [],
+ "Cocytus": [
+  {
+   "id": "simulacrum",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 800
+  },
+  {
+   "id": "simulacrum",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 200
+  },
+  {
+   "id": "freezing_wraith",
+   "max": 7,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 100
+  },
+  {
+   "id": "freezing_wraith",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "frost_giant",
+   "max": 7,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 100
+  },
+  {
+   "id": "frost_giant",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "titan",
+   "max": 7,
+   "min": 1,
+   "shape": "PEAK",
+   "weight": 200
+  },
+  {
+   "id": "azure_jelly",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "wendigo",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 375
+  },
+  {
+   "id": "wendigo",
+   "max": 14,
+   "min": 7,
+   "shape": "FALL",
+   "weight": 500
+  },
+  {
+   "id": "nargun",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 375
+  },
+  {
+   "id": "nargun",
+   "max": 14,
+   "min": 7,
+   "shape": "FALL",
+   "weight": 500
+  },
+  {
+   "id": "ice_fiend",
+   "max": 7,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 400
+  },
+  {
+   "id": "ice_fiend",
+   "max": 14,
+   "min": 8,
+   "shape": "FLAT",
+   "weight": 400
+  },
+  {
+   "id": "shard_shrike",
+   "max": 14,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 400
+  }
+ ],
+ "Crucible": [
+  {
+   "id": "ice_devil",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "orange_demon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "rust_devil",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "red_devil",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "hellwing",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 75
+  },
+  {
+   "id": "soul_eater",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "ynoxinul",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 120
+  },
+  {
+   "id": "smoke_demon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 120
+  },
+  {
+   "id": "sun_demon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 120
+  },
+  {
+   "id": "sixfirhy",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 120
+  },
+  {
+   "id": "blizzard_demon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "green_death",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "cacodemon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 65
+  },
+  {
+   "id": "balrug",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "executioner",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  }
+ ],
+ "Crypt": [
+  {
+   "id": "laughing_skull",
+   "max": 3,
+   "min": -4,
+   "shape": "SEMI",
+   "weight": 125
+  },
+  {
+   "id": "necromancer",
+   "max": 3,
+   "min": -4,
+   "shape": "SEMI",
+   "weight": 75
+  },
+  {
+   "id": "death_knight",
+   "max": 3,
+   "min": -3,
+   "shape": "SEMI",
+   "weight": 75
+  },
+  {
+   "id": "wraith",
+   "max": 3,
+   "min": -2,
+   "shape": "SEMI",
+   "weight": 90
+  },
+  {
+   "id": "jiangshi",
+   "max": 5,
+   "min": -1,
+   "shape": "PEAK",
+   "weight": 75
+  },
+  {
+   "id": "phantasmal_warrior",
+   "max": 5,
+   "min": -1,
+   "shape": "PEAK",
+   "weight": 125
+  },
+  {
+   "id": "ancient_champion",
+   "max": 9,
+   "min": -1,
+   "shape": "PEAK",
+   "weight": 120
+  },
+  {
+   "id": "freezing_wraith",
+   "max": 2,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 55
+  },
+  {
+   "id": "vampire_mage",
+   "max": 5,
+   "min": 0,
+   "shape": "FLAT",
+   "weight": 125
+  },
+  {
+   "id": "cognitogaunt",
+   "max": 5,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 65
+  },
+  {
+   "id": "ghoul",
+   "max": 5,
+   "min": 0,
+   "shape": "PEAK",
+   "weight": 70
+  },
+  {
+   "id": "vampire_knight",
+   "max": 5,
+   "min": 0,
+   "shape": "FLAT",
+   "weight": 105
+  },
+  {
+   "id": "skeletal_warrior",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 75
+  },
+  {
+   "id": "soul_eater",
+   "max": 5,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 55
+  },
+  {
+   "id": "eidolon",
+   "max": 6,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 145
+  },
+  {
+   "id": "deep_elf_death_mage",
+   "max": 6,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 80
+  },
+  {
+   "id": "revenant_soulmonger",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 85
+  },
+  {
+   "id": "curse_skull",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 55
+  },
+  {
+   "id": "flayed_ghost",
+   "max": 5,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 140
+  },
+  {
+   "id": "shadow_wraith",
+   "max": 5,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 95
+  },
+  {
+   "id": "reaper",
+   "max": 7,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 40
+  },
+  {
+   "id": "bone_dragon",
+   "max": 7,
+   "min": 2,
+   "shape": "PEAK",
+   "weight": 25
+  },
+  {
+   "id": "lich",
+   "max": 7,
+   "min": 2,
+   "shape": "PEAK",
+   "weight": 55
+  },
+  {
+   "id": "vampire_bloodprince",
+   "max": 7,
+   "min": 2,
+   "shape": "PEAK",
+   "weight": 30
+  },
+  {
+   "id": "ancient_lich",
+   "max": 7,
+   "min": 3,
+   "shape": "PEAK",
+   "weight": 15
+  },
+  {
+   "id": "dread_lich",
+   "max": 7,
+   "min": 3,
+   "shape": "PEAK",
+   "weight": 15
+  }
+ ],
+ "Desolation": [
+  {
+   "id": "saltling",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1200
+  },
+  {
+   "id": "dancing_weapon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "molten_gargoyle",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "crystal_guardian",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "imperial_myrmidon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  }
+ ],
+ "Dis": [
+  {
+   "id": "ancient_champion",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 500
+  },
+  {
+   "id": "ancient_champion",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 125
+  },
+  {
+   "id": "war_gargoyle",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 400
+  },
+  {
+   "id": "war_gargoyle",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "iron_dragon",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 100
+  },
+  {
+   "id": "iron_dragon",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "iron_golem",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 300
+  },
+  {
+   "id": "iron_golem",
+   "max": 14,
+   "min": 7,
+   "shape": "FALL",
+   "weight": 300
+  },
+  {
+   "id": "caustic_shrike",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 200
+  },
+  {
+   "id": "caustic_shrike",
+   "max": 14,
+   "min": 7,
+   "shape": "FALL",
+   "weight": 200
+  },
+  {
+   "id": "quicksilver_elemental",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 300
+  },
+  {
+   "id": "quicksilver_elemental",
+   "max": 14,
+   "min": 7,
+   "shape": "FALL",
+   "weight": 300
+  },
+  {
+   "id": "crystal_echidna",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 200
+  },
+  {
+   "id": "crystal_echidna",
+   "max": 14,
+   "min": 7,
+   "shape": "FALL",
+   "weight": 200
+  },
+  {
+   "id": "hell_sentinel",
+   "max": 7,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 400
+  },
+  {
+   "id": "hell_sentinel",
+   "max": 14,
+   "min": 8,
+   "shape": "FLAT",
+   "weight": 400
+  },
+  {
+   "id": "iron_giant",
+   "max": 14,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 400
+  }
+ ],
+ "Dungeon": [
+  {
+   "id": "bat",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "rat",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "frilled_lizard",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 640
+  },
+  {
+   "id": "ball_python",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "goblin",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "kobold",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "hobgoblin",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "endoplasm",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "dart_slug",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 375
+  },
+  {
+   "id": "quokka",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "jackal",
+   "max": 3,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 175
+  },
+  {
+   "id": "jackal",
+   "max": 5,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 175
+  },
+  {
+   "id": "quokka",
+   "max": 5,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 500
+  },
+  {
+   "id": "dart_slug",
+   "max": 5,
+   "min": 4,
+   "shape": "FALL",
+   "weight": 375
+  },
+  {
+   "id": "gnoll",
+   "max": 8,
+   "min": 1,
+   "shape": "PEAK",
+   "weight": 200
+  },
+  {
+   "id": "ribbon_worm",
+   "max": 5,
+   "min": 2,
+   "shape": "FALL",
+   "weight": 500
+  },
+  {
+   "id": "adder",
+   "max": 6,
+   "min": 2,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "orc",
+   "max": 8,
+   "min": 3,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "bombardier_beetle",
+   "max": 7,
+   "min": 3,
+   "shape": "PEAK",
+   "weight": 400
+  },
+  {
+   "id": "clockroach",
+   "max": 6,
+   "min": 3,
+   "shape": "SEMI",
+   "weight": 250
+  },
+  {
+   "id": "scorpion",
+   "max": 7,
+   "min": 4,
+   "shape": "PEAK",
+   "weight": 800
+  },
+  {
+   "id": "hound",
+   "max": 7,
+   "min": 4,
+   "shape": "PEAK",
+   "weight": 980
+  },
+  {
+   "id": "ogre",
+   "max": 7,
+   "min": 4,
+   "shape": "PEAK",
+   "weight": 490
+  },
+  {
+   "id": "iguana",
+   "max": 7,
+   "min": 4,
+   "shape": "PEAK",
+   "weight": 1000
+  },
+  {
+   "id": "phantom",
+   "max": 7,
+   "min": 4,
+   "shape": "PEAK",
+   "weight": 340
+  },
+  {
+   "id": "jelly",
+   "max": 8,
+   "min": 4,
+   "shape": "PEAK",
+   "weight": 480
+  },
+  {
+   "id": "sleepcap",
+   "max": 8,
+   "min": 4,
+   "shape": "PEAK",
+   "weight": 340
+  },
+  {
+   "id": "black_bear",
+   "max": 8,
+   "min": 4,
+   "shape": "PEAK",
+   "weight": 350
+  },
+  {
+   "id": "gnoll_bouda",
+   "max": 10,
+   "min": 4,
+   "shape": "PEAK",
+   "weight": 200
+  },
+  {
+   "id": "orc_priest",
+   "max": 12,
+   "min": 4,
+   "shape": "PEAK",
+   "weight": 150
+  },
+  {
+   "id": "orc_wizard",
+   "max": 14,
+   "min": 4,
+   "shape": "PEAK",
+   "weight": 500
+  },
+  {
+   "id": "howler_monkey",
+   "max": 14,
+   "min": 4,
+   "shape": "PEAK",
+   "weight": 350
+  },
+  {
+   "id": "ufetubus",
+   "max": 7,
+   "min": 4,
+   "shape": "PEAK",
+   "weight": 350
+  },
+  {
+   "id": "shadow_imp",
+   "max": 7,
+   "min": 4,
+   "shape": "PEAK",
+   "weight": 250
+  },
+  {
+   "id": "bes_kemwar",
+   "max": 8,
+   "min": 5,
+   "shape": "PEAK",
+   "weight": 80
+  },
+  {
+   "id": "white_imp",
+   "max": 8,
+   "min": 5,
+   "shape": "PEAK",
+   "weight": 350
+  },
+  {
+   "id": "ice_beast",
+   "max": 8,
+   "min": 5,
+   "shape": "PEAK",
+   "weight": 500
+  },
+  {
+   "id": "water_moccasin",
+   "max": 9,
+   "min": 5,
+   "shape": "PEAK",
+   "weight": 400
+  },
+  {
+   "id": "drude",
+   "max": 10,
+   "min": 5,
+   "shape": "PEAK",
+   "weight": 350
+  },
+  {
+   "id": "centaur",
+   "max": 13,
+   "min": 5,
+   "shape": "PEAK",
+   "weight": 600
+  },
+  {
+   "id": "gnoll_sergeant",
+   "max": 13,
+   "min": 5,
+   "shape": "PEAK",
+   "weight": 200
+  },
+  {
+   "id": "marrowcuda",
+   "max": 9,
+   "min": 5,
+   "shape": "PEAK",
+   "weight": 100
+  },
+  {
+   "id": "kobold_geomancer",
+   "max": 11,
+   "min": 5,
+   "shape": "PEAK",
+   "weight": 200
+  },
+  {
+   "id": "sky_beast",
+   "max": 8,
+   "min": 6,
+   "shape": "PEAK",
+   "weight": 500
+  },
+  {
+   "id": "bullfrog",
+   "max": 9,
+   "min": 6,
+   "shape": "PEAK",
+   "weight": 1000
+  },
+  {
+   "id": "wight",
+   "max": 10,
+   "min": 6,
+   "shape": "PEAK",
+   "weight": 500
+  },
+  {
+   "id": "rock_fish",
+   "max": 10,
+   "min": 6,
+   "shape": "PEAK",
+   "weight": 300
+  },
+  {
+   "id": "steam_dragon",
+   "max": 10,
+   "min": 6,
+   "shape": "PEAK",
+   "weight": 350
+  },
+  {
+   "id": "kobold_brigand",
+   "max": 11,
+   "min": 6,
+   "shape": "PEAK",
+   "weight": 500
+  },
+  {
+   "id": "orc_warrior",
+   "max": 12,
+   "min": 6,
+   "shape": "PEAK",
+   "weight": 600
+  },
+  {
+   "id": "killer_bee",
+   "max": 11,
+   "min": 7,
+   "shape": "PEAK",
+   "weight": 500
+  },
+  {
+   "id": "hornet",
+   "max": 11,
+   "min": 7,
+   "shape": "PEAK",
+   "weight": 200
+  },
+  {
+   "id": "wyvern",
+   "max": 11,
+   "min": 7,
+   "shape": "PEAK",
+   "weight": 350
+  },
+  {
+   "id": "yak",
+   "max": 12,
+   "min": 8,
+   "shape": "PEAK",
+   "weight": 800
+  },
+  {
+   "id": "acid_dragon",
+   "max": 14,
+   "min": 8,
+   "shape": "PEAK",
+   "weight": 350
+  },
+  {
+   "id": "two_headed_ogre",
+   "max": 14,
+   "min": 8,
+   "shape": "PEAK",
+   "weight": 600
+  },
+  {
+   "id": "shadowghast",
+   "max": 13,
+   "min": 9,
+   "shape": "PEAK",
+   "weight": 350
+  },
+  {
+   "id": "kobold_demonologist",
+   "max": 14,
+   "min": 9,
+   "shape": "PEAK",
+   "weight": 200
+  },
+  {
+   "id": "wraith",
+   "max": 14,
+   "min": 9,
+   "shape": "PEAK",
+   "weight": 500
+  },
+  {
+   "id": "troll",
+   "max": 14,
+   "min": 9,
+   "shape": "PEAK",
+   "weight": 800
+  },
+  {
+   "id": "vampire",
+   "max": 14,
+   "min": 9,
+   "shape": "PEAK",
+   "weight": 200
+  },
+  {
+   "id": "unseen_horror",
+   "max": 13,
+   "min": 10,
+   "shape": "PEAK",
+   "weight": 350
+  },
+  {
+   "id": "komodo_dragon",
+   "max": 13,
+   "min": 10,
+   "shape": "PEAK",
+   "weight": 200
+  },
+  {
+   "id": "gargoyle",
+   "max": 14,
+   "min": 10,
+   "shape": "PEAK",
+   "weight": 350
+  },
+  {
+   "id": "vampire_mosquito",
+   "max": 15,
+   "min": 10,
+   "shape": "PEAK",
+   "weight": 500
+  },
+  {
+   "id": "ugly_thing",
+   "max": 18,
+   "min": 11,
+   "shape": "PEAK",
+   "weight": 800
+  },
+  {
+   "id": "manticore",
+   "max": 21,
+   "min": 11,
+   "shape": "SEMI",
+   "weight": 520
+  },
+  {
+   "id": "cyclops",
+   "max": 21,
+   "min": 11,
+   "shape": "SEMI",
+   "weight": 825
+  },
+  {
+   "id": "basilisk",
+   "max": 21,
+   "min": 11,
+   "shape": "PEAK",
+   "weight": 285
+  },
+  {
+   "id": "skeletal_warrior",
+   "max": 21,
+   "min": 11,
+   "shape": "PEAK",
+   "weight": 192
+  },
+  {
+   "id": "boulder_beetle",
+   "max": 23,
+   "min": 11,
+   "shape": "SEMI",
+   "weight": 540
+  },
+  {
+   "id": "deep_elf_fire_mage",
+   "max": 19,
+   "min": 12,
+   "shape": "SEMI",
+   "weight": 475
+  },
+  {
+   "id": "slime_creature",
+   "max": 22,
+   "min": 12,
+   "shape": "FALL",
+   "weight": 440
+  },
+  {
+   "id": "meliai",
+   "max": 20,
+   "min": 13,
+   "shape": "SEMI",
+   "weight": 150
+  },
+  {
+   "id": "rakshasa",
+   "max": 21,
+   "min": 13,
+   "shape": "PEAK",
+   "weight": 99
+  },
+  {
+   "id": "hydra",
+   "max": 23,
+   "min": 13,
+   "shape": "SEMI",
+   "weight": 530
+  },
+  {
+   "id": "centaur_warrior",
+   "max": 17,
+   "min": 13,
+   "shape": "FLAT",
+   "weight": 925
+  },
+  {
+   "id": "centaur_warrior",
+   "max": 23,
+   "min": 18,
+   "shape": "FALL",
+   "weight": 925
+  },
+  {
+   "id": "arcanist",
+   "max": 18,
+   "min": 13,
+   "shape": "FLAT",
+   "weight": 105
+  },
+  {
+   "id": "tengu_warrior",
+   "max": 19,
+   "min": 13,
+   "shape": "SEMI",
+   "weight": 365
+  },
+  {
+   "id": "tengu_conjurer",
+   "max": 19,
+   "min": 13,
+   "shape": "SEMI",
+   "weight": 205
+  },
+  {
+   "id": "efreet",
+   "max": 19,
+   "min": 13,
+   "shape": "SEMI",
+   "weight": 285
+  },
+  {
+   "id": "shapeshifter",
+   "max": 23,
+   "min": 13,
+   "shape": "SEMI",
+   "weight": 675
+  },
+  {
+   "id": "catoblepas",
+   "max": 27,
+   "min": 13,
+   "shape": "FALL",
+   "weight": 89
+  },
+  {
+   "id": "laughing_skull",
+   "max": 22,
+   "min": 13,
+   "shape": "SEMI",
+   "weight": 245
+  },
+  {
+   "id": "freezing_wraith",
+   "max": 22,
+   "min": 14,
+   "shape": "SEMI",
+   "weight": 265
+  },
+  {
+   "id": "simulacrum",
+   "max": 22,
+   "min": 14,
+   "shape": "SEMI",
+   "weight": 270
+  },
+  {
+   "id": "boggart",
+   "max": 22,
+   "min": 14,
+   "shape": "SEMI",
+   "weight": 115
+  },
+  {
+   "id": "fire_dragon",
+   "max": 27,
+   "min": 14,
+   "shape": "PEAK",
+   "weight": 195
+  },
+  {
+   "id": "occultist",
+   "max": 19,
+   "min": 15,
+   "shape": "FLAT",
+   "weight": 105
+  },
+  {
+   "id": "yaktaur",
+   "max": 20,
+   "min": 15,
+   "shape": "SEMI",
+   "weight": 335
+  },
+  {
+   "id": "orc_knight",
+   "max": 24,
+   "min": 15,
+   "shape": "FALL",
+   "weight": 345
+  },
+  {
+   "id": "ogre_mage",
+   "max": 25,
+   "min": 15,
+   "shape": "FALL",
+   "weight": 345
+  },
+  {
+   "id": "wolf_spider",
+   "max": 25,
+   "min": 15,
+   "shape": "PEAK",
+   "weight": 275
+  },
+  {
+   "id": "redback",
+   "max": 24,
+   "min": 16,
+   "shape": "PEAK",
+   "weight": 89
+  },
+  {
+   "id": "necromancer",
+   "max": 24,
+   "min": 16,
+   "shape": "SEMI",
+   "weight": 65
+  },
+  {
+   "id": "ice_dragon",
+   "max": 27,
+   "min": 16,
+   "shape": "PEAK",
+   "weight": 100
+  },
+  {
+   "id": "very_ugly_thing",
+   "max": 23,
+   "min": 17,
+   "shape": "PEAK",
+   "weight": 89
+  },
+  {
+   "id": "great_orb_of_eyes",
+   "max": 24,
+   "min": 17,
+   "shape": "SEMI",
+   "weight": 102
+  },
+  {
+   "id": "deep_elf_knight",
+   "max": 25,
+   "min": 17,
+   "shape": "SEMI",
+   "weight": 136
+  },
+  {
+   "id": "deep_elf_archer",
+   "max": 25,
+   "min": 17,
+   "shape": "SEMI",
+   "weight": 136
+  },
+  {
+   "id": "hornet",
+   "max": 25,
+   "min": 17,
+   "shape": "SEMI",
+   "weight": 136
+  },
+  {
+   "id": "fire_crab",
+   "max": 25,
+   "min": 17,
+   "shape": "PEAK",
+   "weight": 89
+  },
+  {
+   "id": "harpy",
+   "max": 25,
+   "min": 17,
+   "shape": "PEAK",
+   "weight": 89
+  },
+  {
+   "id": "deep_elf_air_mage",
+   "max": 25,
+   "min": 17,
+   "shape": "SEMI",
+   "weight": 136
+  },
+  {
+   "id": "glowing_orange_brain",
+   "max": 24,
+   "min": 18,
+   "shape": "SEMI",
+   "weight": 52
+  },
+  {
+   "id": "flayed_ghost",
+   "max": 28,
+   "min": 18,
+   "shape": "PEAK",
+   "weight": 180
+  },
+  {
+   "id": "orc_high_priest",
+   "max": 25,
+   "min": 19,
+   "shape": "PEAK",
+   "weight": 35
+  },
+  {
+   "id": "deep_troll",
+   "max": 26,
+   "min": 19,
+   "shape": "SEMI",
+   "weight": 136
+  },
+  {
+   "id": "orc_sorcerer",
+   "max": 27,
+   "min": 19,
+   "shape": "PEAK",
+   "weight": 25
+  },
+  {
+   "id": "yaktaur_captain",
+   "max": 30,
+   "min": 20,
+   "shape": "FALL",
+   "weight": 310
+  },
+  {
+   "id": "fire_giant",
+   "max": 30,
+   "min": 20,
+   "shape": "SEMI",
+   "weight": 136
+  },
+  {
+   "id": "frost_giant",
+   "max": 30,
+   "min": 20,
+   "shape": "SEMI",
+   "weight": 136
+  },
+  {
+   "id": "stone_giant",
+   "max": 27,
+   "min": 21,
+   "shape": "FALL",
+   "weight": 310
+  },
+  {
+   "id": "ettin",
+   "max": 31,
+   "min": 21,
+   "shape": "PEAK",
+   "weight": 192
+  },
+  {
+   "id": "sphinx_marauder",
+   "max": 27,
+   "min": 22,
+   "shape": "RISE",
+   "weight": 100
+  },
+  {
+   "id": "deep_troll_earth_mage",
+   "max": 30,
+   "min": 22,
+   "shape": "SEMI",
+   "weight": 136
+  },
+  {
+   "id": "storm_dragon",
+   "max": 27,
+   "min": 23,
+   "shape": "RISE",
+   "weight": 89
+  },
+  {
+   "id": "orc_warlord",
+   "max": 27,
+   "min": 23,
+   "shape": "SEMI",
+   "weight": 28
+  },
+  {
+   "id": "hell_knight",
+   "max": 29,
+   "min": 23,
+   "shape": "PEAK",
+   "weight": 25
+  },
+  {
+   "id": "phantasmal_warrior",
+   "max": 31,
+   "min": 23,
+   "shape": "PEAK",
+   "weight": 89
+  },
+  {
+   "id": "glowing_shapeshifter",
+   "max": 27,
+   "min": 23,
+   "shape": "FLAT",
+   "weight": 136
+  },
+  {
+   "id": "thermic_dynamo",
+   "max": 27,
+   "min": 23,
+   "shape": "RISE",
+   "weight": 22
+  },
+  {
+   "id": "deep_elf_annihilator",
+   "max": 27,
+   "min": 24,
+   "shape": "RISE",
+   "weight": 22
+  },
+  {
+   "id": "deep_elf_high_priest",
+   "max": 27,
+   "min": 24,
+   "shape": "RISE",
+   "weight": 22
+  },
+  {
+   "id": "vampire_knight",
+   "max": 27,
+   "min": 24,
+   "shape": "RISE",
+   "weight": 22
+  },
+  {
+   "id": "tengu_reaver",
+   "max": 27,
+   "min": 24,
+   "shape": "RISE",
+   "weight": 136
+  },
+  {
+   "id": "dancing_weapon",
+   "max": 27,
+   "min": 24,
+   "shape": "RISE",
+   "weight": 8
+  },
+  {
+   "id": "eye_of_draining",
+   "max": 28,
+   "min": 25,
+   "shape": "RISE",
+   "weight": 50
+  }
+ ],
+ "Dwarven Hall": [
+  {
+   "id": "deep_dwarf",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "death_knight",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 690
+  },
+  {
+   "id": "deep_troll",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 3
+  },
+  {
+   "id": "deep_troll_earth_mage",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 3
+  },
+  {
+   "id": "deep_troll_shaman",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 3
+  },
+  {
+   "id": "stone_giant",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "fire_giant",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "frost_giant",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "wraith",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 192
+  },
+  {
+   "id": "shadow_wraith",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 3
+  },
+  {
+   "id": "eidolon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "phantasmal_warrior",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  }
+ ],
+ "Elven Halls": [
+  {
+   "id": "orc_high_priest",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "orc_sorcerer",
+   "max": 6,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "deep_elf_air_mage",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1360
+  },
+  {
+   "id": "deep_elf_fire_mage",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1360
+  },
+  {
+   "id": "dancing_weapon",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1360
+  },
+  {
+   "id": "deep_elf_knight",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 925
+  },
+  {
+   "id": "deep_elf_archer",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 925
+  },
+  {
+   "id": "fire_elemental",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 320
+  },
+  {
+   "id": "water_elemental",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 320
+  },
+  {
+   "id": "air_elemental",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 320
+  },
+  {
+   "id": "earth_elemental",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 320
+  },
+  {
+   "id": "thermic_dynamo",
+   "max": 8,
+   "min": -1,
+   "shape": "SEMI",
+   "weight": 340
+  },
+  {
+   "id": "deep_elf_sorcerer",
+   "max": 8,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 65
+  },
+  {
+   "id": "deep_elf_annihilator",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 40
+  },
+  {
+   "id": "deep_elf_demonologist",
+   "max": 8,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 65
+  },
+  {
+   "id": "deep_elf_high_priest",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 40
+  },
+  {
+   "id": "deep_elf_elementalist",
+   "max": 8,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 65
+  },
+  {
+   "id": "deep_elf_death_mage",
+   "max": 7,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 45
+  },
+  {
+   "id": "deep_elf_blademaster",
+   "max": 7,
+   "min": 6,
+   "shape": "RISE",
+   "weight": 10
+  },
+  {
+   "id": "deep_elf_master_archer",
+   "max": 7,
+   "min": 6,
+   "shape": "RISE",
+   "weight": 10
+  },
+  {
+   "id": "shapeshifter",
+   "max": 6,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 150
+  },
+  {
+   "id": "glowing_shapeshifter",
+   "max": 6,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 65
+  }
+ ],
+ "Extended generic zombie bases. Pop range caps at 15": [
+  {
+   "id": "anaconda",
+   "max": 15,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "naga_warrior",
+   "max": 15,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "nagaraja",
+   "max": 15,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "alligator",
+   "max": 8,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 222
+  },
+  {
+   "id": "fire_dragon",
+   "max": 8,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 111
+  },
+  {
+   "id": "ice_dragon",
+   "max": 8,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 111
+  },
+  {
+   "id": "swamp_dragon",
+   "max": 8,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 222
+  },
+  {
+   "id": "shadow_dragon",
+   "max": 8,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 222
+  },
+  {
+   "id": "storm_dragon",
+   "max": 8,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 222
+  },
+  {
+   "id": "iron_dragon",
+   "max": 15,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 222
+  },
+  {
+   "id": "golden_dragon",
+   "max": 15,
+   "min": 5,
+   "shape": "RISE",
+   "weight": 222
+  },
+  {
+   "id": "pearl_dragon",
+   "max": 15,
+   "min": 5,
+   "shape": "RISE",
+   "weight": 222
+  },
+  {
+   "id": "dire_elephant",
+   "max": 15,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 666
+  },
+  {
+   "id": "hellephant",
+   "max": 15,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 666
+  },
+  {
+   "id": "iron_giant",
+   "max": 15,
+   "min": 7,
+   "shape": "RISE",
+   "weight": 500
+  },
+  {
+   "id": "titan",
+   "max": 15,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "ettin",
+   "max": 15,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "stone_giant",
+   "max": 15,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 500
+  },
+  {
+   "id": "hydra",
+   "max": 15,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 250
+  },
+  {
+   "id": "emperor_scorpion",
+   "max": 8,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 100
+  },
+  {
+   "id": "catoblepas",
+   "max": 8,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 100
+  },
+  {
+   "id": "alligator_snapping_turtle",
+   "max": 10,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 250
+  },
+  {
+   "id": "draconian_monk",
+   "max": 9,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 72
+  },
+  {
+   "id": "orc_warlord",
+   "max": 9,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 72
+  },
+  {
+   "id": "tengu_reaver",
+   "max": 9,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 72
+  },
+  {
+   "id": "minotaur",
+   "max": 9,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 72
+  },
+  {
+   "id": "demonspawn",
+   "max": 9,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 72
+  },
+  {
+   "id": "deep_elf_blademaster",
+   "max": 9,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 72
+  },
+  {
+   "id": "merfolk_impaler",
+   "max": 9,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 72
+  },
+  {
+   "id": "vault_warden",
+   "max": 9,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 72
+  },
+  {
+   "id": "deep_troll",
+   "max": 9,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 72
+  },
+  {
+   "id": "two_headed_ogre",
+   "max": 9,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 72
+  },
+  {
+   "id": "quicksilver_dragon",
+   "max": 15,
+   "min": 5,
+   "shape": "RISE",
+   "weight": 722
+  },
+  {
+   "id": "juggernaut",
+   "max": 15,
+   "min": 5,
+   "shape": "RISE",
+   "weight": 1000
+  },
+  {
+   "id": "fenstrider_witch",
+   "max": 9,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 500
+  },
+  {
+   "id": "black_mamba",
+   "max": 9,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 500
+  },
+  {
+   "id": "caustic_shrike",
+   "max": 15,
+   "min": 5,
+   "shape": "RISE",
+   "weight": 1500
+  },
+  {
+   "id": "shard_shrike",
+   "max": 15,
+   "min": 8,
+   "shape": "RISE",
+   "weight": 1500
+  },
+  {
+   "id": "centaur_warrior",
+   "max": 9,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "spriggan_defender",
+   "max": 15,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1500
+  },
+  {
+   "id": "harpy",
+   "max": 15,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1500
+  },
+  {
+   "id": "bunyip",
+   "max": 9,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "electric_eel",
+   "max": 27,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 150
+  },
+  {
+   "id": "no_monster",
+   "max": 27,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 500
+  }
+ ],
+ "Forest": [
+  {
+   "id": "wolf",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 120
+  },
+  {
+   "id": "black_bear",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 35
+  },
+  {
+   "id": "yak",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "dire_elephant",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 145
+  },
+  {
+   "id": "hornet",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 45
+  },
+  {
+   "id": "redback",
+   "max": 6,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 75
+  },
+  {
+   "id": "wolf_spider",
+   "max": 7,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 35
+  },
+  {
+   "id": "oklob_plant",
+   "max": 9,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 75
+  },
+  {
+   "id": "dryad",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 170
+  },
+  {
+   "id": "wind_drake",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 120
+  },
+  {
+   "id": "faun",
+   "max": 5,
+   "min": -1,
+   "shape": "SEMI",
+   "weight": 75
+  },
+  {
+   "id": "satyr",
+   "max": 9,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 105
+  },
+  {
+   "id": "spriggan_druid",
+   "max": 8,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 55
+  },
+  {
+   "id": "spriggan_rider",
+   "max": 6,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 155
+  },
+  {
+   "id": "spriggan_berserker",
+   "max": 9,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 235
+  },
+  {
+   "id": "spriggan_air_mage",
+   "max": 8,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 155
+  },
+  {
+   "id": "spriggan_defender",
+   "max": 5,
+   "min": 3,
+   "shape": "RISE",
+   "weight": 115
+  },
+  {
+   "id": "apis",
+   "max": 7,
+   "min": 1,
+   "shape": "PEAK",
+   "weight": 85
+  },
+  {
+   "id": "shambling_mangrove",
+   "max": 7,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 165
+  },
+  {
+   "id": "anaconda",
+   "max": 6,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 85
+  },
+  {
+   "id": "thorn_hunter",
+   "max": 9,
+   "min": 1,
+   "shape": "PEAK",
+   "weight": 100
+  },
+  {
+   "id": "butterfly",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 125
+  }
+ ],
+ "Gauntlet": [],
+ "Gehenna": [
+  {
+   "id": "hell_hog",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 400
+  },
+  {
+   "id": "hell_hog",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "fire_giant",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 400
+  },
+  {
+   "id": "fire_giant",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "salamander_tyrant",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 200
+  },
+  {
+   "id": "salamander_tyrant",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "balrug",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 450
+  },
+  {
+   "id": "balrug",
+   "max": 14,
+   "min": 7,
+   "shape": "FALL",
+   "weight": 450
+  },
+  {
+   "id": "creeping_inferno",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 30
+  },
+  {
+   "id": "searing_wretch",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 450
+  },
+  {
+   "id": "searing_wretch",
+   "max": 14,
+   "min": 7,
+   "shape": "FALL",
+   "weight": 450
+  },
+  {
+   "id": "hellephant",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 300
+  },
+  {
+   "id": "hellephant",
+   "max": 14,
+   "min": 8,
+   "shape": "FALL",
+   "weight": 300
+  },
+  {
+   "id": "stoker",
+   "max": 10,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 70
+  },
+  {
+   "id": "oni_incarcerator",
+   "max": 8,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 225
+  },
+  {
+   "id": "oni_incarcerator",
+   "max": 14,
+   "min": 9,
+   "shape": "FLAT",
+   "weight": 225
+  },
+  {
+   "id": "brimstone_fiend",
+   "max": 14,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 400
+  }
+ ],
+ "Hall of Blades": [
+  {
+   "id": "dancing_weapon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  }
+ ],
+ "Hell": [
+  {
+   "id": "hell_rat",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 89
+  },
+  {
+   "id": "demonic_crawler",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 89
+  },
+  {
+   "id": "hell_hound",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 89
+  },
+  {
+   "id": "hell_hog",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 145
+  },
+  {
+   "id": "hell_knight",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 136
+  },
+  {
+   "id": "necromancer",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 136
+  },
+  {
+   "id": "hellephant",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "tentacled_monstrosity",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "red_devil",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 89
+  },
+  {
+   "id": "ice_devil",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 89
+  },
+  {
+   "id": "sun_demon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "soul_eater",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "reaper",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 545
+  },
+  {
+   "id": "hellion",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "tormentor",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "rust_devil",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 89
+  },
+  {
+   "id": "green_death",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 89
+  },
+  {
+   "id": "blizzard_demon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 62
+  },
+  {
+   "id": "balrug",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 62
+  },
+  {
+   "id": "cacodemon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 52
+  },
+  {
+   "id": "zykzyl",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 52
+  }
+ ],
+ "Ice Cave": [
+  {
+   "id": "yak",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 120
+  },
+  {
+   "id": "wolf",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 90
+  },
+  {
+   "id": "polar_bear",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 400
+  },
+  {
+   "id": "ice_beast",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 90
+  },
+  {
+   "id": "white_imp",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "ice_devil",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "rime_drake",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "freezing_wraith",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 260
+  },
+  {
+   "id": "simulacrum",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1030
+  }
+ ],
+ "Labyrinth": [],
+ "Lair": [
+  {
+   "id": "black_bear",
+   "max": 4,
+   "min": -2,
+   "shape": "SEMI",
+   "weight": 100
+  },
+  {
+   "id": "basilisk",
+   "max": 6,
+   "min": -2,
+   "shape": "SEMI",
+   "weight": 310
+  },
+  {
+   "id": "scorpion",
+   "max": 3,
+   "min": -1,
+   "shape": "PEAK",
+   "weight": 24
+  },
+  {
+   "id": "wolf",
+   "max": 5,
+   "min": -1,
+   "shape": "SEMI",
+   "weight": 310
+  },
+  {
+   "id": "rime_drake",
+   "max": 8,
+   "min": -1,
+   "shape": "PEAK",
+   "weight": 290
+  },
+  {
+   "id": "black_mamba",
+   "max": 10,
+   "min": -1,
+   "shape": "SEMI",
+   "weight": 380
+  },
+  {
+   "id": "bullfrog",
+   "max": 4,
+   "min": 0,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "water_moccasin",
+   "max": 5,
+   "min": 0,
+   "shape": "FLAT",
+   "weight": 990
+  },
+  {
+   "id": "yak",
+   "max": 5,
+   "min": 0,
+   "shape": "FLAT",
+   "weight": 565
+  },
+  {
+   "id": "wyvern",
+   "max": 6,
+   "min": 0,
+   "shape": "PEAK",
+   "weight": 340
+  },
+  {
+   "id": "blink_frog",
+   "max": 7,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 380
+  },
+  {
+   "id": "cane_toad",
+   "max": 5,
+   "min": 0,
+   "shape": "FLAT",
+   "weight": 900
+  },
+  {
+   "id": "komodo_dragon",
+   "max": 5,
+   "min": 0,
+   "shape": "FLAT",
+   "weight": 615
+  },
+  {
+   "id": "hell_rat",
+   "max": 7,
+   "min": 0,
+   "shape": "PEAK",
+   "weight": 50
+  },
+  {
+   "id": "polar_bear",
+   "max": 7,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 150
+  },
+  {
+   "id": "hornet",
+   "max": 4,
+   "min": 1,
+   "shape": "PEAK",
+   "weight": 16
+  },
+  {
+   "id": "steam_dragon",
+   "max": 4,
+   "min": 1,
+   "shape": "PEAK",
+   "weight": 50
+  },
+  {
+   "id": "oklob_plant",
+   "max": 6,
+   "min": 1,
+   "shape": "PEAK",
+   "weight": 25
+  },
+  {
+   "id": "elephant",
+   "max": 8,
+   "min": 1,
+   "shape": "PEAK",
+   "weight": 290
+  },
+  {
+   "id": "death_yak",
+   "max": 9,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 210
+  },
+  {
+   "id": "raven",
+   "max": 6,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 120
+  },
+  {
+   "id": "catoblepas",
+   "max": 10,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 70
+  },
+  {
+   "id": "boulder_beetle",
+   "max": 15,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 70
+  },
+  {
+   "id": "torpor_snail",
+   "max": 15,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 85
+  },
+  {
+   "id": "polar_bear",
+   "max": 7,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 75
+  },
+  {
+   "id": "skyshark",
+   "max": 7,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 200
+  },
+  {
+   "id": "lindwurm",
+   "max": 9,
+   "min": 2,
+   "shape": "PEAK",
+   "weight": 50
+  },
+  {
+   "id": "hydra",
+   "max": 10,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 400
+  },
+  {
+   "id": "dream_sheep",
+   "max": 11,
+   "min": 3,
+   "shape": "SEMI",
+   "weight": 140
+  },
+  {
+   "id": "fire_crab",
+   "max": 15,
+   "min": 3,
+   "shape": "RISE",
+   "weight": 36
+  },
+  {
+   "id": "mountainshell",
+   "max": 11,
+   "min": 3,
+   "shape": "SEMI",
+   "weight": 100
+  },
+  {
+   "id": "cane_toad",
+   "max": 9,
+   "min": 6,
+   "shape": "FLAT",
+   "weight": 160
+  },
+  {
+   "id": "komodo_dragon",
+   "max": 9,
+   "min": 6,
+   "shape": "FLAT",
+   "weight": 160
+  },
+  {
+   "id": "dire_elephant",
+   "max": 11,
+   "min": 10,
+   "shape": "FLAT",
+   "weight": 32
+  },
+  {
+   "id": "alligator",
+   "max": 11,
+   "min": 10,
+   "shape": "FLAT",
+   "weight": 32
+  },
+  {
+   "id": "manticore",
+   "max": 11,
+   "min": 10,
+   "shape": "FLAT",
+   "weight": 32
+  },
+  {
+   "id": "anaconda",
+   "max": 11,
+   "min": 10,
+   "shape": "FLAT",
+   "weight": 32
+  },
+  {
+   "id": "wolf_spider",
+   "max": 11,
+   "min": 10,
+   "shape": "FLAT",
+   "weight": 32
+  }
+ ],
+ "Necropolis": [
+  {
+   "id": "wraith",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "shadowghast",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  }
+ ],
+ "Orcish Mines": [
+  {
+   "id": "orc_warrior",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 190
+  },
+  {
+   "id": "orc_priest",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 24
+  },
+  {
+   "id": "orc_wizard",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 24
+  },
+  {
+   "id": "orc_knight",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 24
+  },
+  {
+   "id": "orc_high_priest",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "orc_sorcerer",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 24
+  },
+  {
+   "id": "orc_warlord",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "warg",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 40
+  },
+  {
+   "id": "obsidian_bat",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 18
+  },
+  {
+   "id": "kobold_blastminer",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 32
+  },
+  {
+   "id": "ogre",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 80
+  },
+  {
+   "id": "two_headed_ogre",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "ogre_mage",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 2
+  },
+  {
+   "id": "troll",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 32
+  },
+  {
+   "id": "cyclops",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 4
+  },
+  {
+   "id": "ettin",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 4
+  },
+  {
+   "id": "stone_giant",
+   "max": 4,
+   "min": 3,
+   "shape": "FLAT",
+   "weight": 4
+  }
+ ],
+ "Ossuary": [
+  {
+   "id": "weeping_skull",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 40
+  },
+  {
+   "id": "mummy",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 90
+  },
+  {
+   "id": "draugr",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "zombie",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  }
+ ],
+ "Pandemonium - only used for 1 in 40 random Pan spawns": [
+  {
+   "id": "golden_eye",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 4
+  },
+  {
+   "id": "great_orb_of_eyes",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 4
+  },
+  {
+   "id": "glowing_orange_brain",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 4
+  },
+  {
+   "id": "toenail_golem",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "demonic_crawler",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 192
+  },
+  {
+   "id": "hell_hound",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "hell_hog",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "abomination_large",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "efreet",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 89
+  },
+  {
+   "id": "rakshasa",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 89
+  },
+  {
+   "id": "hellephant",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "orange_demon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "hellwing",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "sixfirhy",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "red_devil",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 670
+  },
+  {
+   "id": "ice_devil",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 335
+  },
+  {
+   "id": "rust_devil",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 335
+  },
+  {
+   "id": "ynoxinul",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "neqoxec",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 400
+  },
+  {
+   "id": "smoke_demon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 900
+  },
+  {
+   "id": "sun_demon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 535
+  },
+  {
+   "id": "soul_eater",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 535
+  },
+  {
+   "id": "chaos_spawn",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 192
+  },
+  {
+   "id": "balrug",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "blizzard_demon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "green_death",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "cacodemon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "zykzyl",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "hellion",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 335
+  },
+  {
+   "id": "tormentor",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 335
+  },
+  {
+   "id": "reaper",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 535
+  },
+  {
+   "id": "shadow_demon",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 535
+  },
+  {
+   "id": "sin_beast",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 675
+  },
+  {
+   "id": "executioner",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "brimstone_fiend",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 335
+  },
+  {
+   "id": "ice_fiend",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 335
+  },
+  {
+   "id": "hell_sentinel",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 335
+  },
+  {
+   "id": "tzitzimitl",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 335
+  },
+  {
+   "id": "profane_servitor",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 8
+  },
+  {
+   "id": "demonspawn_blood_saint",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 675
+  },
+  {
+   "id": "demonspawn_warmonger",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 675
+  },
+  {
+   "id": "demonspawn_corrupter",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 675
+  },
+  {
+   "id": "demonspawn_soul_scholar",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 675
+  },
+  {
+   "id": "angel",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "fravashi",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "cherub",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 40
+  },
+  {
+   "id": "daeva",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  }
+ ],
+ "Sewer": [
+  {
+   "id": "frilled_lizard",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "quokka",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 315
+  },
+  {
+   "id": "bat",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "dart_slug",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 315
+  },
+  {
+   "id": "ball_python",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "adder",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "ribbon_worm",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "endoplasm",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "clockroach",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "brain_worm",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 55
+  },
+  {
+   "id": "crocodile",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 55
+  }
+ ],
+ "Shoals": [
+  {
+   "id": "centaur_warrior",
+   "max": 3,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 89
+  },
+  {
+   "id": "faun",
+   "max": 3,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 355
+  },
+  {
+   "id": "skyshark",
+   "max": 3,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 400
+  },
+  {
+   "id": "water_nymph",
+   "max": 6,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 300
+  },
+  {
+   "id": "merfolk_avatar",
+   "max": 6,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 170
+  },
+  {
+   "id": "cyclops",
+   "max": 6,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 110
+  },
+  {
+   "id": "kraken",
+   "max": 6,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 73
+  },
+  {
+   "id": "merfolk_impaler",
+   "max": 7,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 265
+  },
+  {
+   "id": "merfolk_aquamancer",
+   "max": 7,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 125
+  },
+  {
+   "id": "merfolk",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 735
+  },
+  {
+   "id": "sea_snake",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "snapping_turtle",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 410
+  },
+  {
+   "id": "manticore",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 510
+  },
+  {
+   "id": "merfolk_siren",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 300
+  },
+  {
+   "id": "water_elemental",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 195
+  },
+  {
+   "id": "wind_drake",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 275
+  },
+  {
+   "id": "harpy",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 190
+  },
+  {
+   "id": "merfolk_javelineer",
+   "max": 7,
+   "min": 1,
+   "shape": "PEAK",
+   "weight": 135
+  },
+  {
+   "id": "alligator_snapping_turtle",
+   "max": 7,
+   "min": 1,
+   "shape": "PEAK",
+   "weight": 110
+  },
+  {
+   "id": "satyr",
+   "max": 4,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 190
+  },
+  {
+   "id": "sphinx_marauder",
+   "max": 7,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 80
+  },
+  {
+   "id": "formless_jellyfish",
+   "max": 7,
+   "min": 3,
+   "shape": "PEAK",
+   "weight": 30
+  }
+ ],
+ "Slime Pits": [
+  {
+   "id": "slime_creature",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 950
+  },
+  {
+   "id": "slime_creature",
+   "max": 5,
+   "min": -2,
+   "shape": "FALL",
+   "weight": 380
+  },
+  {
+   "id": "colossal_amoeba",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 65
+  },
+  {
+   "id": "colossal_amoeba",
+   "max": 5,
+   "min": -2,
+   "shape": "RISE",
+   "weight": 365
+  },
+  {
+   "id": "morphogenic_ooze",
+   "max": 4,
+   "min": -1,
+   "shape": "RISE",
+   "weight": 105
+  },
+  {
+   "id": "creeping_plasmodium",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 245
+  },
+  {
+   "id": "acid_blob",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "azure_jelly",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "rockslime",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "void_ooze",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "star_jelly",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 400
+  },
+  {
+   "id": "shining_eye",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "golden_eye",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 175
+  },
+  {
+   "id": "formless_jellyfish",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 200
+  },
+  {
+   "id": "eye_of_devastation",
+   "max": 8,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 300
+  },
+  {
+   "id": "great_orb_of_eyes",
+   "max": 8,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 240
+  },
+  {
+   "id": "slymdra",
+   "max": 8,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 350
+  },
+  {
+   "id": "glowing_orange_brain",
+   "max": 5,
+   "min": 2,
+   "shape": "RISE",
+   "weight": 100
+  },
+  {
+   "id": "glass_eye",
+   "max": 8,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 315
+  },
+  {
+   "id": "eye_of_draining",
+   "max": 8,
+   "min": 3,
+   "shape": "SEMI",
+   "weight": 50
+  }
+ ],
+ "Snake Pit": [
+  {
+   "id": "naga",
+   "max": 4,
+   "min": -4,
+   "shape": "SEMI",
+   "weight": 750
+  },
+  {
+   "id": "salamander",
+   "max": 4,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 215
+  },
+  {
+   "id": "anaconda",
+   "max": 6,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 315
+  },
+  {
+   "id": "black_mamba",
+   "max": 8,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 1125
+  },
+  {
+   "id": "naga_warrior",
+   "max": 8,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 340
+  },
+  {
+   "id": "naga_mage",
+   "max": 8,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 550
+  },
+  {
+   "id": "naga_ritualist",
+   "max": 8,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 225
+  },
+  {
+   "id": "naga_sharpshooter",
+   "max": 8,
+   "min": 0,
+   "shape": "SEMI",
+   "weight": 315
+  },
+  {
+   "id": "shock_serpent",
+   "max": 8,
+   "min": 0,
+   "shape": "PEAK",
+   "weight": 415
+  },
+  {
+   "id": "mana_viper",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 200
+  },
+  {
+   "id": "guardian_serpent",
+   "max": 7,
+   "min": 1,
+   "shape": "PEAK",
+   "weight": 225
+  },
+  {
+   "id": "salamander_mystic",
+   "max": 5,
+   "min": 2,
+   "shape": "PEAK",
+   "weight": 110
+  },
+  {
+   "id": "nagaraja",
+   "max": 8,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 145
+  },
+  {
+   "id": "salamander_tyrant",
+   "max": 8,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 100
+  }
+ ],
+ "Spider Nest": [
+  {
+   "id": "boulder_beetle",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 200
+  },
+  {
+   "id": "boulder_beetle",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 100
+  },
+  {
+   "id": "redback",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 800
+  },
+  {
+   "id": "redback",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 800
+  },
+  {
+   "id": "jumping_spider",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "jumping_spider",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 900
+  },
+  {
+   "id": "tarantella",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 600
+  },
+  {
+   "id": "tarantella",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 500
+  },
+  {
+   "id": "culicivora",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "culicivora",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 500
+  },
+  {
+   "id": "demonic_crawler",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 700
+  },
+  {
+   "id": "demonic_crawler",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 300
+  },
+  {
+   "id": "wolf_spider",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 625
+  },
+  {
+   "id": "wolf_spider",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 525
+  },
+  {
+   "id": "torpor_snail",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 400
+  },
+  {
+   "id": "torpor_snail",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 200
+  },
+  {
+   "id": "entropy_weaver",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 325
+  },
+  {
+   "id": "entropy_weaver",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 325
+  },
+  {
+   "id": "radroach",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 200
+  },
+  {
+   "id": "radroach",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 200
+  },
+  {
+   "id": "pharaoh_ant",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 525
+  },
+  {
+   "id": "pharaoh_ant",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 425
+  },
+  {
+   "id": "moth_of_wrath",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 200
+  },
+  {
+   "id": "moth_of_wrath",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 250
+  },
+  {
+   "id": "steelbarb_worm",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 525
+  },
+  {
+   "id": "steelbarb_worm",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 325
+  },
+  {
+   "id": "orb_spider",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 200
+  },
+  {
+   "id": "orb_spider",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 350
+  },
+  {
+   "id": "ghost_moth",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "ghost_moth",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 175
+  },
+  {
+   "id": "emperor_scorpion",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "emperor_scorpion",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 175
+  },
+  {
+   "id": "broodmother",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "broodmother",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 150
+  },
+  {
+   "id": "jorogumo",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 75
+  },
+  {
+   "id": "jorogumo",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 150
+  },
+  {
+   "id": "meliai",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "meliai",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 150
+  },
+  {
+   "id": "sun_moth",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "sun_moth",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 150
+  },
+  {
+   "id": "spark_wasp",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 75
+  },
+  {
+   "id": "spark_wasp",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 150
+  },
+  {
+   "id": "spark_wasp",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1500
+  },
+  {
+   "id": "jorogumo",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1500
+  },
+  {
+   "id": "radroach",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1500
+  },
+  {
+   "id": "broodmother",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1500
+  },
+  {
+   "id": "ghost_moth",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1750
+  },
+  {
+   "id": "emperor_scorpion",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1750
+  },
+  {
+   "id": "death_scarab",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 500
+  }
+ ],
+ "Swamp": [
+  {
+   "id": "vampire_mosquito",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 500
+  },
+  {
+   "id": "swamp_drake",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 500
+  },
+  {
+   "id": "spriggan_rider",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 500
+  },
+  {
+   "id": "spriggan_rider",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "tyrant_leech",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 600
+  },
+  {
+   "id": "tyrant_leech",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "goliath_frog",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 700
+  },
+  {
+   "id": "goliath_frog",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "bloated_husk",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 300
+  },
+  {
+   "id": "bloated_husk",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 300
+  },
+  {
+   "id": "bog_body",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 800
+  },
+  {
+   "id": "bog_body",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 200
+  },
+  {
+   "id": "spriggan_druid",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 400
+  },
+  {
+   "id": "spriggan_druid",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 500
+  },
+  {
+   "id": "ghost_crab",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 200
+  },
+  {
+   "id": "ghost_crab",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 300
+  },
+  {
+   "id": "will_o_the_wisp",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "will_o_the_wisp",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 400
+  },
+  {
+   "id": "eleionoma",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 600
+  },
+  {
+   "id": "eleionoma",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 400
+  },
+  {
+   "id": "hydra",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 800
+  },
+  {
+   "id": "hydra",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 500
+  },
+  {
+   "id": "swamp_dragon",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 400
+  },
+  {
+   "id": "swamp_dragon",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 600
+  },
+  {
+   "id": "bunyip",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 600
+  },
+  {
+   "id": "bunyip",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 400
+  },
+  {
+   "id": "alligator",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "alligator",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 400
+  },
+  {
+   "id": "thorn_hunter",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 33
+  },
+  {
+   "id": "thorn_hunter",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 133
+  },
+  {
+   "id": "shambling_mangrove",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 33
+  },
+  {
+   "id": "shambling_mangrove",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 133
+  },
+  {
+   "id": "fenstrider_witch",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 29
+  },
+  {
+   "id": "fenstrider_witch",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 129
+  },
+  {
+   "id": "tentacled_monstrosity",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 5
+  },
+  {
+   "id": "tentacled_monstrosity",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 5
+  },
+  {
+   "id": "fenstrider_witch",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "shambling_mangrove",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1500
+  },
+  {
+   "id": "thorn_hunter",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1500
+  },
+  {
+   "id": "tentacled_monstrosity",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1500
+  },
+  {
+   "id": "ghoul",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1500
+  },
+  {
+   "id": "spriggan_air_mage",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "spriggan_berserker",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1000
+  },
+  {
+   "id": "death_drake",
+   "max": 7,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 1000
+  }
+ ],
+ "Tartarus": [
+  {
+   "id": "spectral_thing",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 800
+  },
+  {
+   "id": "spectral_thing",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 200
+  },
+  {
+   "id": "shadow_wraith",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 100
+  },
+  {
+   "id": "shadow_wraith",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "eidolon",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 100
+  },
+  {
+   "id": "eidolon",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 25
+  },
+  {
+   "id": "profane_servitor",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 200
+  },
+  {
+   "id": "undertaker",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 150
+  },
+  {
+   "id": "undertaker",
+   "max": 14,
+   "min": 7,
+   "shape": "FALL",
+   "weight": 375
+  },
+  {
+   "id": "oblivion_hound",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 300
+  },
+  {
+   "id": "oblivion_hound",
+   "max": 14,
+   "min": 7,
+   "shape": "FALL",
+   "weight": 300
+  },
+  {
+   "id": "putrid_mouth",
+   "max": 7,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 300
+  },
+  {
+   "id": "putrid_mouth",
+   "max": 14,
+   "min": 7,
+   "shape": "FALL",
+   "weight": 300
+  },
+  {
+   "id": "silent_spectre",
+   "max": 12,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 50
+  },
+  {
+   "id": "tainted_leviathan",
+   "max": 7,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 400
+  },
+  {
+   "id": "tainted_leviathan",
+   "max": 14,
+   "min": 8,
+   "shape": "FLAT",
+   "weight": 400
+  },
+  {
+   "id": "tzitzimitl",
+   "max": 14,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 400
+  }
+ ],
+ "Temple": [],
+ "The Vaults": [
+  {
+   "id": "yaktaur",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 400
+  },
+  {
+   "id": "centaur_warrior",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 350
+  },
+  {
+   "id": "harpy",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 120
+  },
+  {
+   "id": "boggart",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 100
+  },
+  {
+   "id": "lindwurm",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 600
+  },
+  {
+   "id": "crawling_flesh_cage",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 25
+  },
+  {
+   "id": "ironbound_mechanist",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 75
+  },
+  {
+   "id": "ironbound_mechanist",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 230
+  },
+  {
+   "id": "dire_elephant",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 200
+  },
+  {
+   "id": "dire_elephant",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 200
+  },
+  {
+   "id": "slime_creature",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 400
+  },
+  {
+   "id": "slime_creature",
+   "max": 4,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 400
+  },
+  {
+   "id": "vault_sentinel",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1250
+  },
+  {
+   "id": "entropy_weaver",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 150
+  },
+  {
+   "id": "polterguardian",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "ironbound_convoker",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1200
+  },
+  {
+   "id": "ironbound_preserver",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1200
+  },
+  {
+   "id": "ironbound_frostheart",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 725
+  },
+  {
+   "id": "vault_warden",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 525
+  },
+  {
+   "id": "vault_warden",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 525
+  },
+  {
+   "id": "ironbound_thunderhulk",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "ironbound_thunderhulk",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 200
+  },
+  {
+   "id": "great_orb_of_eyes",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 325
+  },
+  {
+   "id": "great_orb_of_eyes",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 325
+  },
+  {
+   "id": "glowing_orange_brain",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 45
+  },
+  {
+   "id": "glowing_orange_brain",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 45
+  },
+  {
+   "id": "formless_jellyfish",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 150
+  },
+  {
+   "id": "formless_jellyfish",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 100
+  },
+  {
+   "id": "arcanist",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 325
+  },
+  {
+   "id": "arcanist",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 325
+  },
+  {
+   "id": "yaktaur_captain",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 500
+  },
+  {
+   "id": "yaktaur_captain",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 400
+  },
+  {
+   "id": "orc_warlord",
+   "max": 4,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "orc_warlord",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 50
+  },
+  {
+   "id": "death_knight",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 145
+  },
+  {
+   "id": "peacekeeper",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 350
+  },
+  {
+   "id": "sphinx_marauder",
+   "max": 4,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 225
+  },
+  {
+   "id": "guardian_sphinx",
+   "max": 4,
+   "min": 2,
+   "shape": "RISE",
+   "weight": 115
+  },
+  {
+   "id": "vault_warden",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 1000
+  },
+  {
+   "id": "ironbound_preserver",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 600
+  },
+  {
+   "id": "ironbound_convoker",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 520
+  },
+  {
+   "id": "vault_sentinel",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 520
+  },
+  {
+   "id": "vault_guard",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 130
+  },
+  {
+   "id": "death_knight",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 70
+  },
+  {
+   "id": "hell_knight",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 90
+  },
+  {
+   "id": "phantasmal_warrior",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 520
+  },
+  {
+   "id": "freezing_wraith",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 100
+  },
+  {
+   "id": "lich",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 110
+  },
+  {
+   "id": "flayed_ghost",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 45
+  },
+  {
+   "id": "deep_elf_high_priest",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 300
+  },
+  {
+   "id": "deep_elf_death_mage",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 150
+  },
+  {
+   "id": "deep_elf_annihilator",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 150
+  },
+  {
+   "id": "deep_elf_demonologist",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 150
+  },
+  {
+   "id": "deep_elf_sorcerer",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 150
+  },
+  {
+   "id": "stone_giant",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 700
+  },
+  {
+   "id": "ettin",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 640
+  },
+  {
+   "id": "fire_giant",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 350
+  },
+  {
+   "id": "frost_giant",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 350
+  },
+  {
+   "id": "ogre_mage",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 220
+  },
+  {
+   "id": "deep_troll_earth_mage",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 120
+  },
+  {
+   "id": "entropy_weaver",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 45
+  },
+  {
+   "id": "yaktaur_captain",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 800
+  },
+  {
+   "id": "glowing_shapeshifter",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 750
+  },
+  {
+   "id": "tengu_reaver",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 600
+  },
+  {
+   "id": "guardian_sphinx",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 260
+  },
+  {
+   "id": "war_gargoyle",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 260
+  },
+  {
+   "id": "polterguardian",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 300
+  },
+  {
+   "id": "ironbound_mechanist",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 135
+  },
+  {
+   "id": "crawling_flesh_cage",
+   "max": 12,
+   "min": 5,
+   "shape": "FALL",
+   "weight": 350
+  },
+  {
+   "id": "orc_knight",
+   "max": 5,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 650
+  },
+  {
+   "id": "formless_jellyfish",
+   "max": 5,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 180
+  },
+  {
+   "id": "dancing_weapon",
+   "max": 5,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 60
+  },
+  {
+   "id": "great_orb_of_eyes",
+   "max": 5,
+   "min": 5,
+   "shape": "FLAT",
+   "weight": 60
+  },
+  {
+   "id": "titan",
+   "max": 12,
+   "min": 5,
+   "shape": "RISE",
+   "weight": 190
+  },
+  {
+   "id": "shadow_dragon",
+   "max": 12,
+   "min": 5,
+   "shape": "RISE",
+   "weight": 155
+  },
+  {
+   "id": "undying_armoury",
+   "max": 12,
+   "min": 5,
+   "shape": "RISE",
+   "weight": 150
+  },
+  {
+   "id": "storm_dragon",
+   "max": 12,
+   "min": 5,
+   "shape": "RISE",
+   "weight": 100
+  },
+  {
+   "id": "golden_dragon",
+   "max": 12,
+   "min": 5,
+   "shape": "RISE",
+   "weight": 70
+  },
+  {
+   "id": "quicksilver_dragon",
+   "max": 12,
+   "min": 5,
+   "shape": "RISE",
+   "weight": 50
+  },
+  {
+   "id": "iron_dragon",
+   "max": 12,
+   "min": 5,
+   "shape": "RISE",
+   "weight": 45
+  },
+  {
+   "id": "ancient_lich",
+   "max": 12,
+   "min": 5,
+   "shape": "RISE",
+   "weight": 45
+  },
+  {
+   "id": "dread_lich",
+   "max": 12,
+   "min": 5,
+   "shape": "RISE",
+   "weight": 45
+  }
+ ],
+ "Tomb": [
+  {
+   "id": "draugr",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 300
+  },
+  {
+   "id": "zombie",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 235
+  },
+  {
+   "id": "simulacrum",
+   "max": 5,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 80
+  },
+  {
+   "id": "mummy",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 1050
+  },
+  {
+   "id": "guardian_mummy",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 600
+  },
+  {
+   "id": "mummy_priest",
+   "max": 9,
+   "min": -1,
+   "shape": "SEMI",
+   "weight": 335
+  },
+  {
+   "id": "royal_mummy",
+   "max": 5,
+   "min": 4,
+   "shape": "RISE",
+   "weight": 3
+  },
+  {
+   "id": "lich",
+   "max": 5,
+   "min": 3,
+   "shape": "FLAT",
+   "weight": 6
+  },
+  {
+   "id": "ancient_lich",
+   "max": 5,
+   "min": 3,
+   "shape": "SEMI",
+   "weight": 3
+  },
+  {
+   "id": "dread_lich",
+   "max": 5,
+   "min": 3,
+   "shape": "SEMI",
+   "weight": 3
+  },
+  {
+   "id": "ushabti",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 250
+  },
+  {
+   "id": "death_scarab",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 150
+  },
+  {
+   "id": "bennu",
+   "max": 5,
+   "min": 3,
+   "shape": "SEMI",
+   "weight": 12
+  }
+ ],
+ "Trove": [],
+ "Volcano": [
+  {
+   "id": "salamander",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 555
+  },
+  {
+   "id": "hell_hound",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "red_devil",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 385
+  },
+  {
+   "id": "efreet",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "lindwurm",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "toenail_golem",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 55
+  },
+  {
+   "id": "obsidian_bat",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 55
+  },
+  {
+   "id": "fire_crab",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 55
+  },
+  {
+   "id": "fire_elemental",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 555
+  },
+  {
+   "id": "gargoyle",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 385
+  },
+  {
+   "id": "molten_gargoyle",
+   "max": 1,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  }
+ ],
+ "Wizlab": [],
+ "Ziggurat": [],
+ "Zot": [
+  {
+   "id": "moth_of_wrath",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 970
+  },
+  {
+   "id": "ghost_moth",
+   "max": 5,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 192
+  },
+  {
+   "id": "ghost_moth",
+   "max": 7,
+   "min": 6,
+   "shape": "FLAT",
+   "weight": 192
+  },
+  {
+   "id": "black_draconian",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "yellow_draconian",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "green_draconian",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "purple_draconian",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "red_draconian",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "white_draconian",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 100
+  },
+  {
+   "id": "draconian_stormcaller",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 67
+  },
+  {
+   "id": "draconian_monk",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 67
+  },
+  {
+   "id": "draconian_shifter",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 67
+  },
+  {
+   "id": "draconian_annihilator",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 67
+  },
+  {
+   "id": "draconian_knight",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 67
+  },
+  {
+   "id": "draconian_scorcher",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 67
+  },
+  {
+   "id": "draconian_stormcaller",
+   "max": 7,
+   "min": 6,
+   "shape": "FLAT",
+   "weight": 150
+  },
+  {
+   "id": "draconian_monk",
+   "max": 7,
+   "min": 6,
+   "shape": "FLAT",
+   "weight": 150
+  },
+  {
+   "id": "draconian_shifter",
+   "max": 7,
+   "min": 6,
+   "shape": "FLAT",
+   "weight": 150
+  },
+  {
+   "id": "draconian_annihilator",
+   "max": 7,
+   "min": 6,
+   "shape": "FLAT",
+   "weight": 150
+  },
+  {
+   "id": "draconian_knight",
+   "max": 7,
+   "min": 6,
+   "shape": "FLAT",
+   "weight": 150
+  },
+  {
+   "id": "draconian_scorcher",
+   "max": 7,
+   "min": 6,
+   "shape": "FLAT",
+   "weight": 150
+  },
+  {
+   "id": "quicksilver_dragon",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 200
+  },
+  {
+   "id": "shadow_dragon",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 200
+  },
+  {
+   "id": "storm_dragon",
+   "max": 5,
+   "min": -4,
+   "shape": "RISE",
+   "weight": 515
+  },
+  {
+   "id": "storm_dragon",
+   "max": 7,
+   "min": 6,
+   "shape": "FLAT",
+   "weight": 315
+  },
+  {
+   "id": "golden_dragon",
+   "max": 11,
+   "min": 1,
+   "shape": "SEMI",
+   "weight": 365
+  },
+  {
+   "id": "protean_progenitor",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 112
+  },
+  {
+   "id": "killer_klown",
+   "max": 8,
+   "min": 2,
+   "shape": "SEMI",
+   "weight": 52
+  },
+  {
+   "id": "death_cob",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 335
+  },
+  {
+   "id": "curse_toe",
+   "max": 5,
+   "min": 1,
+   "shape": "RISE",
+   "weight": 150
+  },
+  {
+   "id": "curse_toe",
+   "max": 7,
+   "min": 6,
+   "shape": "FLAT",
+   "weight": 70
+  },
+  {
+   "id": "tentacled_monstrosity",
+   "max": 7,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 515
+  },
+  {
+   "id": "electric_golem",
+   "max": 5,
+   "min": 1,
+   "shape": "FALL",
+   "weight": 89
+  },
+  {
+   "id": "electric_golem",
+   "max": 7,
+   "min": 6,
+   "shape": "FLAT",
+   "weight": 20
+  },
+  {
+   "id": "orb_of_appropriateness",
+   "max": 5,
+   "min": 1,
+   "shape": "FLAT",
+   "weight": 42
+  },
+  {
+   "id": "orb_of_appropriateness",
+   "max": 7,
+   "min": 6,
+   "shape": "FLAT",
+   "weight": 80
+  }
+ ]
+}

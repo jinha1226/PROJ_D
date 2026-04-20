@@ -162,7 +162,7 @@ func _compose_preview(race_id: String, job_id: String) -> Texture2D:
 
 
 func _race_display_name(race_id: String) -> String:
-	var r: RaceData = load("res://resources/races/%s.tres" % race_id) as RaceData
+	var r: RaceData = RaceRegistry.fetch(race_id)
 	return String(r.display_name) if r != null else race_id.capitalize().replace("_", " ")
 
 

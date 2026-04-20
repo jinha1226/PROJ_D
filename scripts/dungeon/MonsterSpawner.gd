@@ -3,13 +3,15 @@ class_name MonsterSpawner
 const MONSTER_SCENE_PATH: String = "res://scenes/entities/Monster.tscn"
 const MAX_COUNT: int = 14
 
-## Branch → regular monster ids, ordered roughly easiest→hardest within the branch.
-const _BRANCH_REGULARS: Dictionary = {
+## Legacy fallback pool — used only if MonsterPopulation can't resolve any
+## eligible monster (e.g. data file missing). Kept so a broken JSON never
+## leaves us with empty floors.
+const _FALLBACK_REGULARS: Dictionary = {
 	"main":    ["rat", "bat", "goblin", "kobold", "jackal", "hobgoblin"],
-	"mine":    ["hobgoblin", "kobold", "gnoll", "orc", "orc_warrior", "skeleton"],
-	"forest":  ["jackal", "adder", "wolf", "ball_python", "boggart", "fire_sprite"],
-	"swamp":   ["adder", "boggart", "ghoul", "bog_body", "alligator", "skeleton"],
-	"volcano": ["hell_hound", "fire_sprite", "ghoul", "orc_warrior", "fire_giant", "lich"],
+	"mine":    ["hobgoblin", "kobold", "gnoll", "orc", "orc_warrior"],
+	"forest":  ["jackal", "adder", "ball_python", "boggart"],
+	"swamp":   ["adder", "boggart", "bog_body", "alligator"],
+	"volcano": ["hell_hound", "fire_sprite", "ghoul", "orc_warrior"],
 }
 
 ## Boss-floor (depth % 5 == 0) → boss id. One named monster per segment.
@@ -31,10 +33,7 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 		push_error("MonsterSpawner: failed to load Monster.tscn")
 		return result
 
-	var pool: Array[MonsterData] = _load_pool(depth)
-	if pool.is_empty():
-		return result
-
+	var branch: String = _branch_for(depth)
 	var floor_tiles: Array[Vector2i] = _collect_floor_tiles(gen)
 	if floor_tiles.is_empty():
 		return result
@@ -42,6 +41,8 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 
 	var used: Dictionary = {}
 	used[gen.spawn_pos] = true
+	var spawn_rng := RandomNumberGenerator.new()
+	spawn_rng.randomize()
 
 	# Boss floor: place 1 boss in the stairs-down room first, then half the
 	# usual regulars so the floor doesn't feel emptier than a normal one.
@@ -71,7 +72,9 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 		if used.has(tile):
 			continue
 		used[tile] = true
-		var data: MonsterData = pool[randi() % pool.size()]
+		var data: MonsterData = _pick_monster(branch, depth, spawn_rng)
+		if data == null:
+			continue
 		var m: Monster = scene.instantiate()
 		container.add_child(m)
 		m.setup(gen, tile, data)
@@ -80,25 +83,34 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 	return result
 
 
-## Pool depends on the branch the depth falls in (every 5 floors), not the
-## raw depth — keeps theming consistent within a segment.
-static func _load_pool(depth: int) -> Array[MonsterData]:
-	var pool: Array[MonsterData] = []
-	var branch: String = _branch_for(depth)
-	var ids: Array = _BRANCH_REGULARS.get(branch, ["rat", "goblin"])
-	for id in ids:
-		var d: MonsterData = _load_monster(String(id))
+## DCSS population → MonsterRegistry. If the weighted pick lands on an id
+## we don't have data for (common — DCSS has 667 monsters), retry a few
+## times before falling back to the hand-curated per-branch list.
+static func _pick_monster(branch: String, depth: int, rng: RandomNumberGenerator) -> MonsterData:
+	# DCSS pop tables are branch-local (Lair runs 1..6, Dungeon 1..27). Our
+	# 5-per-branch layout maps depth 11 to forest:1, depth 12 to forest:2, etc.
+	var local_depth: int = MonsterPopulation.branch_local_depth(depth)
+	for _i in 10:
+		var id: String = MonsterPopulation.pick(branch, local_depth, rng)
+		if id == "":
+			break
+		var d: MonsterData = MonsterRegistry.fetch(id)
 		if d != null:
-			pool.append(d)
-	return pool
+			return d
+	# Fallback: hand-curated pool for this branch.
+	var fb: Array = _FALLBACK_REGULARS.get(branch, ["rat", "goblin"])
+	for _i in 5:
+		var id2: String = String(fb[rng.randi() % fb.size()])
+		var d2: MonsterData = MonsterRegistry.fetch(id2)
+		if d2 != null:
+			return d2
+	return null
 
 
 static func _load_monster(id: String) -> MonsterData:
-	var path: String = "res://resources/monsters/%s.tres" % id
-	if not ResourceLoader.exists(path):
-		push_warning("MonsterSpawner: missing %s" % path)
-		return null
-	return load(path) as MonsterData
+	# MonsterRegistry checks .tres overrides first, then falls back to the
+	# DCSS JSON. Missing ids return null with a warning.
+	return MonsterRegistry.fetch(id)
 
 
 ## Boss prefers the room around the stairs-down tile (the player's eventual
