@@ -213,13 +213,14 @@
       "translocation"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -283,13 +284,15 @@
       "hexes"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer",
+      "wl_check"
     ],
-    "level": 0,
-    "power_cap": 4,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
     "targeting": "single"
   },
   {
@@ -358,11 +361,11 @@
       "tracer",
       "wl_check"
     ],
-    "level": 0,
-    "power_cap": 3,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 3,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
     "targeting": "single"
   },
   {
@@ -856,13 +859,14 @@
     "flags": [
       "targeted",
       "not_self",
-      "tracer"
+      "tracer",
+      "wl_check"
     ],
-    "level": 0,
-    "power_cap": 4,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
     "targeting": "single"
   },
   {
@@ -892,11 +896,11 @@
       "tracer",
       "wl_check"
     ],
-    "level": 0,
-    "power_cap": 1,
-    "min_range": 25,
-    "max_range": 25,
-    "mp": 0,
+    "level": 1,
+    "power_cap": 25,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 1,
     "targeting": "single"
   },
   {
@@ -908,13 +912,14 @@
     "flags": [
       "targeted",
       "tracer",
-      "wl_check"
+      "wl_check",
+      "not_self"
     ],
-    "level": 0,
-    "power_cap": 1,
-    "min_range": 25,
-    "max_range": 25,
-    "mp": 0,
+    "level": 1,
+    "power_cap": 25,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 1,
     "targeting": "single"
   },
   {
@@ -1152,13 +1157,15 @@
       "translocation"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer",
+      "wl_check"
     ],
-    "level": 0,
-    "power_cap": 4,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
     "targeting": "single"
   },
   {
@@ -1202,13 +1209,14 @@
     "flags": [
       "targeted",
       "tracer",
-      "wl_check"
+      "wl_check",
+      "not_self"
     ],
-    "level": 0,
-    "power_cap": 3,
-    "min_range": 100,
-    "max_range": 100,
-    "mp": 0,
+    "level": 3,
+    "power_cap": 100,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
     "targeting": "single"
   },
   {
@@ -1218,11 +1226,11 @@
       "summoning"
     ],
     "flags": [],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
     "targeting": "self"
   },
   {
@@ -1232,11 +1240,11 @@
       "summoning"
     ],
     "flags": [],
-    "level": 0,
-    "power_cap": 7,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 7,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
     "targeting": "self"
   },
   {
@@ -1353,13 +1361,14 @@
     ],
     "flags": [
       "targeted",
-      "tracer"
+      "tracer",
+      "wl_check"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 1,
+    "max_range": 1,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -1371,13 +1380,14 @@
     "flags": [
       "targeted",
       "not_self",
-      "tracer"
+      "tracer",
+      "wl_check"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 100,
-    "max_range": 100,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 100,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -1389,13 +1399,14 @@
     "flags": [
       "targeted",
       "not_self",
-      "tracer"
+      "tracer",
+      "wl_check"
     ],
-    "level": 0,
-    "power_cap": 6,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 6,
     "targeting": "single"
   },
   {
@@ -1600,13 +1611,14 @@
     "flags": [
       "targeted",
       "not_self",
-      "tracer"
+      "tracer",
+      "wl_check"
     ],
-    "level": 0,
-    "power_cap": 2,
-    "min_range": 50,
-    "max_range": 50,
-    "mp": 0,
+    "level": 2,
+    "power_cap": 50,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 2,
     "targeting": "single"
   },
   {
@@ -1692,13 +1704,14 @@
     ],
     "flags": [
       "targeted",
-      "tracer"
+      "tracer",
+      "wl_check"
     ],
-    "level": 0,
-    "power_cap": 1,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 1,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 1,
     "targeting": "single"
   },
   {
@@ -1741,13 +1754,14 @@
     "flags": [
       "targeted",
       "not_self",
-      "tracer"
+      "tracer",
+      "destructive"
     ],
-    "level": 0,
-    "power_cap": 1,
-    "min_range": 50,
-    "max_range": 50,
-    "mp": 0,
+    "level": 1,
+    "power_cap": 50,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 1,
     "targeting": "single"
   },
   {
@@ -1762,11 +1776,11 @@
       "not_self",
       "tracer"
     ],
-    "level": 0,
-    "power_cap": 6,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 1,
+    "max_range": 1,
+    "mp": 6,
     "targeting": "single"
   },
   {
@@ -1872,13 +1886,14 @@
     ],
     "flags": [
       "targeted",
-      "tracer"
+      "tracer",
+      "wl_check"
     ],
-    "level": 0,
-    "power_cap": 4,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
     "targeting": "single"
   },
   {
@@ -1939,12 +1954,13 @@
       "conjurations"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
     "level": 0,
-    "power_cap": 0,
-    "min_range": 9,
-    "max_range": 9,
+    "power_cap": 9,
+    "min_range": 200,
+    "max_range": 200,
     "mp": 0,
     "targeting": "single"
   },
@@ -1977,11 +1993,11 @@
       "targeted",
       "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -2053,13 +2069,14 @@
       "alchemy"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 2,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 2,
+    "power_cap": 0,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 2,
     "targeting": "single"
   },
   {
@@ -2150,13 +2167,14 @@
       "conjurations"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 6,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 6,
+    "power_cap": 0,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 6,
     "targeting": "single"
   },
   {
@@ -2181,13 +2199,14 @@
       "translocation"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 2,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 2,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 2,
     "targeting": "single"
   },
   {
@@ -2228,13 +2247,14 @@
       "alchemy"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -2281,13 +2301,14 @@
       "fire"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -2298,13 +2319,14 @@
       "fire"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -2315,13 +2337,14 @@
       "none"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -2332,13 +2355,14 @@
       "cold"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -2382,13 +2406,14 @@
     ],
     "flags": [
       "targeted",
-      "tracer"
+      "tracer",
+      "wl_check"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -2427,13 +2452,15 @@
     ],
     "flags": [
       "targeted",
-      "helpful"
+      "helpful",
+      "hasty",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 6,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 6,
     "targeting": "single"
   },
   {
@@ -2486,13 +2513,14 @@
     ],
     "flags": [
       "targeted",
-      "tracer"
+      "tracer",
+      "wl_check"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -2740,11 +2768,11 @@
       "helpful",
       "tracer"
     ],
-    "level": 0,
-    "power_cap": 6,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 6,
     "targeting": "single"
   },
   {
@@ -2774,11 +2802,11 @@
       "targeted",
       "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -3018,11 +3046,11 @@
       "targeted",
       "tracer"
     ],
-    "level": 0,
-    "power_cap": 6,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 6,
     "targeting": "single"
   },
   {
@@ -3086,11 +3114,11 @@
       "tracer",
       "wl_check"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -3149,13 +3177,14 @@
       "necromancy"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -3185,11 +3214,11 @@
       "tracer",
       "wl_check"
     ],
-    "level": 0,
-    "power_cap": 4,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
     "targeting": "single"
   },
   {
@@ -3301,11 +3330,11 @@
       "tracer",
       "wl_check"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -3418,11 +3447,11 @@
       "tracer",
       "wl_check"
     ],
-    "level": 0,
-    "power_cap": 4,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
     "targeting": "single"
   },
   {
@@ -3590,11 +3619,11 @@
       "targeted",
       "tracer"
     ],
-    "level": 0,
-    "power_cap": 7,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 7,
     "targeting": "single"
   },
   {
@@ -3835,11 +3864,11 @@
       "targeted",
       "tracer"
     ],
-    "level": 0,
-    "power_cap": 6,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 6,
     "targeting": "single"
   },
   {
@@ -3865,13 +3894,14 @@
       "conjurations"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -3881,13 +3911,14 @@
       "conjurations"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -3897,13 +3928,14 @@
       "conjurations"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -3913,13 +3945,14 @@
       "conjurations"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -3961,13 +3994,14 @@
       "earth"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -3978,13 +4012,14 @@
       "air"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -3998,11 +4033,11 @@
       "targeted",
       "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -4012,13 +4047,14 @@
       "conjurations"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -4960,13 +4996,14 @@
     ],
     "flags": [
       "targeted",
-      "tracer"
+      "tracer",
+      "wl_check"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -5116,13 +5153,14 @@
     ],
     "flags": [
       "targeted",
-      "helpful"
+      "helpful",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -5471,11 +5509,11 @@
       "tracer",
       "wl_check"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -5744,11 +5782,11 @@
       "tracer",
       "destructive"
     ],
-    "level": 0,
-    "power_cap": 7,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 7,
     "targeting": "single"
   },
   {
@@ -5777,13 +5815,14 @@
     ],
     "flags": [
       "targeted",
-      "destructive"
+      "destructive",
+      "not_self"
     ],
-    "level": 0,
-    "power_cap": 7,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 7,
     "targeting": "single"
   },
   {
@@ -5913,11 +5952,11 @@
       "targeted",
       "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -5930,11 +5969,11 @@
       "targeted",
       "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -5947,11 +5986,11 @@
       "targeted",
       "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -6041,11 +6080,11 @@
       "targeted",
       "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -6074,11 +6113,11 @@
       "targeted",
       "tracer"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -6320,11 +6359,11 @@
       "helpful",
       "destructive"
     ],
-    "level": 0,
-    "power_cap": 5,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
     "targeting": "single"
   },
   {
@@ -6414,13 +6453,14 @@
     ],
     "flags": [
       "targeted",
-      "tracer"
+      "tracer",
+      "wl_check"
     ],
-    "level": 0,
-    "power_cap": 4,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
     "targeting": "single"
   },
   {
@@ -6430,13 +6470,14 @@
       "necromancy"
     ],
     "flags": [
-      "targeted"
+      "targeted",
+      "tracer"
     ],
-    "level": 0,
-    "power_cap": 6,
-    "min_range": 0,
-    "max_range": 0,
-    "mp": 0,
+    "level": 6,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 6,
     "targeting": "single"
   },
   {
@@ -6572,11 +6613,11 @@
       "targeted",
       "tracer"
     ],
-    "level": 0,
-    "power_cap": 4,
-    "min_range": 200,
-    "max_range": 200,
-    "mp": 0,
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
     "targeting": "single"
   },
   {

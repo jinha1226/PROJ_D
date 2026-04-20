@@ -55,7 +55,17 @@ spells = []
 
 for m in BLOCK_RE.finditer(text):
     body = m.group(1).strip()
-    lines = [ln.strip().rstrip(',') for ln in body.splitlines() if ln.strip()]
+    raw_lines = [ln.strip().rstrip(',') for ln in body.splitlines() if ln.strip()]
+    # DCSS occasionally wraps flag/school lists across multiple source
+    # lines; normalise by joining any line that begins with `|` onto the
+    # previous one so our line-index slots (0=name, 1=schools, 2=flags,
+    # 3=level, 4=power_cap, 5=ranges) stay accurate.
+    lines: list = []
+    for ln in raw_lines:
+        if ln.startswith("|") and lines:
+            lines[-1] = lines[-1] + " " + ln
+        else:
+            lines.append(ln)
     if len(lines) < 5:
         continue
 
