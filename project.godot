@@ -33,9 +33,9 @@ window/size/viewport_width=1080
 window/size/viewport_height=2340
 window/size/window_width_override=540
 window/size/window_height_override=1170
-window/handheld/orientation=1
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/handheld/orientation=1
 
 [gui]
 
