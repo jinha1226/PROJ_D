@@ -82,6 +82,13 @@ static func compute(origin: Vector2i, radius: int, opaque_fn: Callable) -> Dicti
 	var out: Dictionary = {}
 	out[origin] = true
 	var r: int = clampi(radius, 0, LOS_RADIUS)
+	# Sanity-check the callable. If it's invalid / unbound, the FOV would
+	# silently collapse to just the origin — which looks to the player
+	# exactly like "all monsters vanished". Log once and fall through so
+	# the caller's Chebyshev fallback takes over cleanly.
+	if not opaque_fn.is_valid():
+		push_warning("FieldOfView.compute: invalid opaque_fn Callable; returning origin-only")
+		return out
 	# DCSS uses a disc bounded by Chebyshev distance. Enumerate every
 	# candidate in the bounding square, test visibility via multi-ray.
 	for dy in range(-r, r + 1):

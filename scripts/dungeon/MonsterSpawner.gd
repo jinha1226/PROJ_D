@@ -117,6 +117,7 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 	var count: int = base_count
 
 	var spawned: int = 0
+	var null_picks: int = 0
 	for tile in floor_tiles:
 		if spawned >= count:
 			break
@@ -125,6 +126,7 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 		used[tile] = true
 		var data: MonsterData = _pick_monster(branch, depth, spawn_rng)
 		if data == null:
+			null_picks += 1
 			continue
 		var m: Monster = scene.instantiate()
 		container.add_child(m)
@@ -133,6 +135,8 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 		spawned += _spawn_band_for(data, tile, gen, container, floor_tiles,
 				used, scene, result, spawn_rng)
 		spawned += 1
+	print("[MonsterSpawner] depth=%d branch=%s want=%d spawned=%d null_picks=%d floor_tiles=%d" \
+			% [depth, branch, count, spawned, null_picks, floor_tiles.size()])
 	return result
 
 

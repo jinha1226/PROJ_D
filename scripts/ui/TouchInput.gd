@@ -339,10 +339,10 @@ func _visible_pickup_tiles() -> Dictionary:
 
 func _on_player_turn_started() -> void:
 	if _is_auto_moving:
-		# Roughly-2x faster auto-step cadence. Pair with Player's shorter
-		# movement tween so each step still reads distinctly without
-		# dragging on mobile.
-		get_tree().create_timer(0.06).timeout.connect(_step_auto_move, CONNECT_ONE_SHOT)
+		# Auto-step cadence. Slowed from 0.06 → 0.12 per user feedback —
+		# previous speed blurred into the movement tween on desktop and
+		# made it hard to see where the player was stopping.
+		get_tree().create_timer(0.12).timeout.connect(_step_auto_move, CONNECT_ONE_SHOT)
 
 
 func _step_auto_move() -> void:

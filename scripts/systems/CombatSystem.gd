@@ -337,6 +337,23 @@ static func melee_attack_from_monster(m, defender) -> int:
 				"acid":
 					flav_bonus = 4 + (randi() % 9)  # DCSS acid proxy
 					flav_element = "acid"
+				"holy":
+					# AF_HOLY damages demonic/undead attackers, nothing else.
+					# Our defender is always the player, so this path never
+					# fires against us — logged here for completeness / future
+					# monster-vs-monster melee.
+					pass
+				"drown":
+					# AF_DROWN: HD*3/4 + random2(HD*3/4), no element resist
+					# in DCSS (purely raw). We treat as physical bonus.
+					flav_bonus = hd * 3 / 4 + (randi() % maxi(1, hd * 3 / 4))
+					flav_element = ""
+				"vampiric":
+					# AF_VAMPIRIC: heal attacker for half the damage dealt
+					# to defender. No elemental scaling; pure life-drain.
+					if m.is_alive and "hp" in m and "data" in m and m.data != null:
+						var heal: int = maxi(1, after_ac / 2)
+						m.hp = mini(m.hp + heal, int(m.data.hp))
 			if flav_bonus > 0 and defender.has_method("take_damage"):
 				# Apply the elemental rider now with its own resist routing so
 				# rF+/rC+ scale the bonus before it's added to the physical
