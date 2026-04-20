@@ -608,6 +608,16 @@ static func _spell_level(spell_id: String) -> int:
 ## damage rolled, or -1 if there's no zap data (caller should fall back to
 ## the spell's legacy min_dmg/max_dmg entry). Port of beam.cc's
 ## dicedef_calculator / calcdice_calculator → roll.
+## DCSS beam flavour → our resistance element tag. Used by combat to
+## route a zap's damage through the target's rF/rC/rPois/… scaling.
+## Returns "physical" for pure-missile zaps (magic dart, stone arrow);
+## "" when the spell has no zap data at all.
+static func element_for(spell_id: String) -> String:
+	_ensure_loaded()
+	var zap: Dictionary = _zaps.get(spell_id, {})
+	return String(zap.get("element", "")) if not zap.is_empty() else ""
+
+
 static func roll_damage(spell_id: String, power: int) -> int:
 	_ensure_loaded()
 	var zap: Dictionary = _zaps.get(spell_id, {})

@@ -59,6 +59,26 @@ _CALC_RE = re.compile(
     r"new\s+(dicedef|calcdice)_calculator<\s*"
     r"(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*>"
 )
+_BEAM_RE = re.compile(r"BEAM_([A-Z_]+)")
+
+# Beam flavour → element tag our combat resistance code keys off.
+_BEAM_TO_ELEM = {
+    "FIRE": "fire",
+    "LAVA": "fire",
+    "STICKY_FLAME": "fire",
+    "COLD": "cold",
+    "ICE": "cold",
+    "ELECTRICITY": "elec",
+    "POISON": "poison",
+    "POISON_ARROW": "poison",
+    "MEPHITIC": "poison",
+    "ACID": "acid",
+    "HOLY": "holy",
+    "NEG": "drain",
+    "DEVASTATION": "devastation",
+    "LIGHT": "holy",
+    "DAMNATION": "fire",
+}
 
 
 def parse_zap_data() -> dict:
@@ -112,12 +132,23 @@ def parse_zap_data() -> dict:
             continue
         if zap in out:
             continue
+        # Pull the BEAM_* flavour out of the same block to tag damage
+        # element. Falls back to "physical" when the zap is plain
+        # missile damage (BEAM_MMISSILE or similar).
+        beam_match = None
+        for bm in _BEAM_RE.finditer(block):
+            beam_match = bm
+        elem = "physical"
+        if beam_match is not None:
+            tok = beam_match.group(1)
+            elem = _BEAM_TO_ELEM.get(tok, "physical")
         out[zap] = {
             "kind": calc_match.group(1),
             "n": int(calc_match.group(2)),
             "a": int(calc_match.group(3)),
             "mn": int(calc_match.group(4)),
             "md": int(calc_match.group(5)),
+            "element": elem,
         }
     return out
 

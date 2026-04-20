@@ -67,14 +67,46 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	if "stats" in attacker and attacker.stats != null:
 		base_stat_atk = attacker.stats.get_attack()
 
+	# DCSS player to-hit (attack.cc:calc_pre_roll_to_hit):
+	#   mhit = 15 + dex/2
+	#   mhit += random2(fighting_skill*100+1) / 100
+	#   mhit += random2(weapon_skill*100+1) / 100
+	#   mhit += weapon.plus                       (enchant)
+	#   mhit += slaying_bonus
+	# Then roll random2(mhit+1) vs target EV; miss if < EV.
+	var dex_for_hit: int = 10
+	if "stats" in attacker and attacker.stats != null:
+		dex_for_hit = attacker.stats.DEX
+	var to_hit: int = 15 + dex_for_hit / 2
+	to_hit += (randi() % (fighting_level * 100 + 1)) / 100
+	to_hit += (randi() % (weapon_skill_level * 100 + 1)) / 100
+	if "equipped_weapon_plus" in attacker:
+		to_hit += int(attacker.equipped_weapon_plus)
+	# Slaying from rings (aggregated through gear_damage_bonus — treated
+	# equally as to-hit in DCSS `you.slaying()`).
+	if attacker.has_method("gear_damage_bonus"):
+		to_hit += int(attacker.gear_damage_bonus())
+	var def_ev: int = 0
+	if "stats" in defender and defender.stats != null:
+		def_ev = defender.stats.EV
+	elif "data" in defender and defender.data != null and "ev" in defender.data:
+		def_ev = int(defender.data.ev)
+	var to_hit_roll: int = randi() % (to_hit + 1)
+	if to_hit_roll < def_ev:
+		var miss_name: String = ""
+		if "data" in defender and defender.data != null:
+			miss_name = String(defender.data.display_name)
+		if miss_name != "":
+			CombatLog.add("You miss the %s." % miss_name)
+		_show_hit_feedback(defender, 0, Color(0.8, 0.8, 0.8))
+		return 0
+
 	# DCSS multiplicative damage pipeline (attack.cc player path):
 	#   potential  = weapon_damage * 100  (fixed base × 100)
 	#   potential *= stat_modify_damage    (STR/DEX → 75..175% + scale)
 	#   damage     = random2(potential+1) / 100  (roll)
 	#   damage    *= apply_weapon_skill   (1.0..2.08x)
 	#   damage    *= apply_fighting_skill (1.0..1.9x)
-	# This replaces the old additive `base + str/3 + skill/2` which
-	# gave ~2× too much damage at mid-skill levels.
 	var attr: int = 10
 	if "stats" in attacker and attacker.stats != null:
 		# Short blades / polearms / ranged use DEX; everything else uses STR.

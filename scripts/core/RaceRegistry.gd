@@ -61,6 +61,8 @@ static func _apply_dcss(target: RaceData, entry: Dictionary) -> void:
 		target.hp_mod = int(entry.get("hp", 0))
 	if entry.has("mp_mod"):
 		target.mp_mod = int(entry.get("mp_mod", 0))
+	if entry.has("xp"):
+		target.xp_mod = int(entry.get("xp", 0))
 	# Legacy per-level fields kept so character-progress code that still
 	# reads hp_per_level/mp_per_level doesn't break while the DCSS formula
 	# rolls out. The new formula ignores these values.

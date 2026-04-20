@@ -209,11 +209,13 @@ static func _apply_mon_spell(m: Monster, target: Node, spell_id: String) -> bool
 	# Monster spell power scales with HD, roughly DCSS mons_power = HD * 12.
 	var hd: int = int(m.data.hd if m.data else 1)
 	var power: int = max(12, hd * 12)
-	# Direct-damage zaps go through SpellRegistry.roll_damage.
+	# Direct-damage zaps go through SpellRegistry.roll_damage with the
+	# element routed to the defender's resistance check.
 	var dmg: int = SpellRegistry.roll_damage(spell_id, power)
 	if dmg >= 0:
 		if target.has_method("take_damage"):
-			target.take_damage(dmg)
+			var elem: String = SpellRegistry.element_for(spell_id)
+			target.take_damage(dmg, elem)
 			var mname: String = m.data.display_name if m.data else "monster"
 			CombatLog.add("The %s casts %s for %d damage!" % [
 					mname, spell_id.replace("_", " "), dmg])

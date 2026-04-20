@@ -71,6 +71,56 @@ func setup(gen: DungeonGenerator, pos: Vector2i, mdata: MonsterData) -> void:
 ## HP as `avg ± 33% variance` via an 8-sample random2avg to give a tight
 ## bell curve. Returns at least 1. `hp_10x` of 10 or less means "no roll"
 ## in DCSS (summons, temp monsters) — caller falls back to mdata.hp.
+## Read the monster's resist level for `element` from DCSS-sourced flags
+## (`resists: [fire, cold]`) + holiness-derived intrinsics (undead →
+## cold+poison+drain, demonic → fire, nonliving → poison+drain).
+## `data.resists` entries can be either plain strings ("fire") or
+## scaled ("fire2" meaning rF+2) — we count level per entry.
+func _mon_resist_level(element: String) -> int:
+	if data == null:
+		return 0
+	var total: int = 0
+	for r in data.resists:
+		var s: String = String(r).to_lower()
+		if s.begins_with(element):
+			# "fire" → 1, "fire2" → 2, "fire3" → 3, "fire-1" → -1.
+			var tail: String = s.substr(element.length())
+			if tail == "":
+				total += 1
+			elif tail.is_valid_int():
+				total += int(tail)
+			else:
+				total += 1
+	# Holiness-derived defaults (DCSS mons_class_res_*).
+	var holy: String = String(data.get("holiness", "") if "holiness" in data else "")
+	match element:
+		"cold", "drain":
+			if holy == "undead" or holy == "nonliving":
+				total += 1
+		"poison":
+			if holy == "undead" or holy == "nonliving" or holy == "plant":
+				total += 1
+		"fire":
+			if holy == "demonic":
+				total += 1
+	return total
+
+
+func _apply_mon_resist(amount: int, element: String) -> int:
+	var rl: int = _mon_resist_level(element)
+	if rl >= 3:
+		return max(1, amount / 5)
+	if rl == 2:
+		return max(1, amount / 3)
+	if rl == 1:
+		return max(1, amount / 2)
+	if rl == -1:
+		return amount * 3 / 2
+	if rl <= -2:
+		return amount * 2
+	return amount
+
+
 static func _dcss_roll_hp(hp_10x: int) -> int:
 	if hp_10x <= 0:
 		return 1
@@ -112,9 +162,13 @@ func _load_sprite() -> void:
 	_sprite.play_anim("idle", true)
 
 
-func take_damage(amount: int) -> void:
+func take_damage(amount: int, element: String = "") -> void:
 	if not is_alive:
 		return
+	# Monster resistance scaling: data.resists is a dict of {element: level}.
+	# DCSS rF+1 halves / +2 thirds / +3 fifths; negative amplifies.
+	if element != "" and data != null:
+		amount = _apply_mon_resist(amount, element)
 	# DCSS: damage always wakes a sleeping monster (mon-behv.cc:1172). Route
 	# through MonsterAI.wake so the ring of adjacent sleepers wakes too.
 	if is_sleeping:
@@ -144,11 +198,20 @@ func die() -> void:
 func take_turn() -> void:
 	if not is_alive:
 		return
-	# DCSS energy model: accumulate monster speed each player turn,
-	# then spend 10 energy per action taken. Fast monsters (speed > 10)
-	# act multiple times; slow ones (speed < 10) skip some turns.
-	var speed: int = int(data.speed) if data else 10
-	_action_energy += speed
+	# DCSS energy model: each player action costs `player_move_speed`
+	# ticks (naga 14, human 10, spriggan 10 but with mutations/haste
+	# modifiers), and every monster accumulates that many energy points
+	# scaled by its speed / 10. Net effect: walking naga lets a bat
+	# swing 4 times before it moves a tile, a haste-12 player slightly
+	# outpaces a standard orc.
+	var monster_speed: int = int(data.speed) if data else 10
+	var player_ticks: int = 10
+	var tree: SceneTree = get_tree()
+	if tree != null:
+		var p: Node = tree.get_first_node_in_group("player")
+		if p != null and "race_res" in p and p.race_res != null:
+			player_ticks = 10 + int(p.race_res.move_speed_mod)
+	_action_energy += monster_speed * player_ticks / 10
 	while is_alive and _action_energy >= 10:
 		var prev_pos: Vector2i = grid_pos
 		if boss_ai != null:

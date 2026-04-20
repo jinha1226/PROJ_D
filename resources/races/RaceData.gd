@@ -19,6 +19,10 @@ extends Resource
 # mp_mod: flat bonus added after scaling (e.g. deep elf +2).
 @export var hp_mod: int = 0
 @export var mp_mod: int = 0
+# DCSS XP aptitude (species.yaml `xp` field). 0 = human baseline;
+# troll/spriggan -1 (slower); demigod -2; minotaur +1. Feeds
+# Player.xp_for_next_level through the DCSS apt_to_factor curve.
+@export var xp_mod: int = 0
 
 @export var essence_affinity: Dictionary = {}
 @export var lpc_asset: String = ""  # legacy, unused after preset composition refactor

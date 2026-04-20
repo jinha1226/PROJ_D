@@ -1138,6 +1138,16 @@ func _spell_roll_dmg(spell_id: String, info: Dictionary, power: int) -> int:
 	return randi_range(int(info.get("min_dmg", 1)), int(info.get("max_dmg", 3))) + power / 2
 
 
+## Deal spell damage to `target` with the correct element routed through
+## so target.take_damage can apply the resist scaling. Logs + damage
+## numbers come from the caller.
+func _spell_deal_dmg(target: Node, dmg: int, spell_id: String) -> void:
+	if target == null or not target.has_method("take_damage"):
+		return
+	var element: String = SpellRegistry.element_for(spell_id)
+	target.take_damage(dmg, element)
+
+
 ## Global XP multiplier sourced from the player's racial trait. Applied to
 ## both skill XP and character XP on every kill so the curve stays
 ## consistent with the DCSS feel of slow-leveling demigods and XP-chugging
@@ -2969,7 +2979,7 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 			if dist > 0:
 				dmg = max(1, dmg - dist * 3)
 			hit_positions.append(m.position)
-			m.take_damage(dmg)
+			m.take_damage(dmg, SpellRegistry.element_for(spell_id))
 			total_dmg += dmg
 			hits += 1
 		SpellFX.cast_area(fx_layer, player.position, target.position, hit_positions, spell_color, float(radius) * float(TILE_SIZE) + float(TILE_SIZE) / 2.0, school)
@@ -2982,7 +2992,7 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 			SpellFX.cast_status(fx_layer, target.position, spell_color, school, "SLOW")
 			CombatLog.add("%s is slowed!" % String(target.data.display_name if target.data else "enemy"))
 		else:
-			target.take_damage(dmg)
+			target.take_damage(dmg, SpellRegistry.element_for(spell_id))
 			SpellFX.cast_single(fx_layer, player.position, target, dmg, spell_color, school)
 			CombatLog.add("%s → %d dmg" % [String(info.get("name", spell_id)), dmg])
 	if skill_system != null:
@@ -3121,6 +3131,11 @@ func _execute_cast(spell_id: String) -> Dictionary:
 	# while the duration runs.
 	if player.has_meta("_silenced_turns"):
 		return {"success": false, "message": "You are surrounded by silence — no casting."}
+	# DCSS confusion: can't cast while confused; attempts fail and the
+	# MP is consumed regardless (represents the mental fumble).
+	if player.has_meta("_confused") and bool(player.get_meta("_confused", false)):
+		player.stats.MP = max(0, player.stats.MP - int(SpellRegistry.get_spell(spell_id).get("mp", 1)))
+		return {"success": false, "message": "You are too confused to cast!"}
 	var info: Dictionary = SpellRegistry.get_spell(spell_id)
 	if info.is_empty():
 		return {"success": false, "message": "Unknown spell: %s" % spell_id}
@@ -3209,7 +3224,7 @@ func _cast_single_target(spell_id: String, info: Dictionary, power: int) -> Dict
 		return {"success": true, "message": "%s is burning! (%d + %d/turn)" % [tname, dmg_f, max(1, dmg_f / 2)]}
 
 	var dmg: int = _spell_roll_dmg(spell_id, info, power)
-	target.take_damage(dmg)
+	target.take_damage(dmg, SpellRegistry.element_for(spell_id))
 	SpellFX.cast_single(fx_layer, player.position, target, dmg, spell_color, school)
 	return {"success": true, "message": "%s → %s: %d dmg" % [String(info.get("name", spell_id)), tname, dmg], "damage": dmg}
 
@@ -3241,7 +3256,7 @@ func _cast_area_spell(spell_id: String, info: Dictionary, power: int) -> Diction
 		if dist > 0:
 			dmg = max(1, dmg - dist * 3)
 		hit_positions.append(m.position)
-		m.take_damage(dmg)
+		m.take_damage(dmg, SpellRegistry.element_for(spell_id))
 		total_dmg += dmg
 		hits += 1
 

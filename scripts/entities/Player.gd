@@ -344,6 +344,16 @@ func _tick_duration_metas() -> void:
 	_tick_simple_meta("_silenced_turns")
 	_tick_simple_meta("_heroism_turns")
 	_tick_simple_meta("_finesse_turns")
+	# Confusion duration: when _confusion_turns hits zero, also clear
+	# the boolean `_confused` so movement / spellcasting unblock.
+	if has_meta("_confusion_turns"):
+		var ct: int = int(get_meta("_confusion_turns", 0)) - 1
+		if ct <= 0:
+			remove_meta("_confusion_turns")
+			remove_meta("_confused")
+			CombatLog.add("You feel less confused.")
+		else:
+			set_meta("_confusion_turns", ct)
 	_tick_simple_meta("_exhausted_turns")
 	_tick_simple_meta("_mesmerised_turns")
 	_tick_simple_meta("_sanctuary_turns")
@@ -588,6 +598,59 @@ func clear_form() -> void:
 	current_form = ""
 	stats_changed.emit()
 	CombatLog.add("You return to your usual form.")
+
+
+## Sum the player's current resistance level for `element`, including
+## mutations (`_mut_rF`…), active-form resists (`_form_rfire`…), and
+## racial intrinsics (gargoyle neg-drain, vine stalker poison, …).
+## Returns an int; positive = resist, negative = vulnerability.
+func get_resist(element: String) -> int:
+	var total: int = 0
+	match element:
+		"fire":
+			total += int(get_meta("_mut_rF", 0))
+			total += int(get_meta("_form_rfire", 0))
+		"cold":
+			total += int(get_meta("_mut_rC", 0))
+			total += int(get_meta("_form_rcold", 0))
+		"elec":
+			total += int(get_meta("_mut_rElec", 0))
+			total += int(get_meta("_form_relec", 0))
+		"poison":
+			total += int(get_meta("_mut_rPois", 0))
+			total += int(get_meta("_form_rpoison", 0))
+			# Vine stalker / mummy / kobold built-in poison resistance.
+			var trait_id: String = _racial_trait_id()
+			if trait_id in ["vine_stalker_poison", "mummy_undead", "kobold_sneak"]:
+				total += 1
+		"acid":
+			total += int(get_meta("_form_racid", 0))
+		"holy":
+			pass  # DCSS has rHoly only via mutations; we don't model yet
+		"drain":
+			# Gargoyle / mummy / demonspawn get drain resist.
+			var tt: String = _racial_trait_id()
+			if tt == "gargoyle_stone" or tt == "mummy_undead":
+				total += 1
+	return total
+
+
+## DCSS resistance math: rF+1 halves, rF+2 reduces to 1/3, rF+3 to 1/5.
+## Negative resist amplifies (rF- = 1.5×, rF-- = 2×). Non-resist damage
+## and elements we don't model return unchanged.
+func _apply_elem_resist(amount: int, element: String) -> int:
+	var rl: int = get_resist(element)
+	if rl >= 3:
+		return max(1, amount / 5)
+	if rl == 2:
+		return max(1, amount / 3)
+	if rl == 1:
+		return max(1, amount / 2)
+	if rl == -1:
+		return amount * 3 / 2
+	if rl <= -2:
+		return amount * 2
+	return amount
 
 
 ## Generic `_<name>_turns` meta countdown. Removes the meta at 0.
@@ -1109,6 +1172,14 @@ func try_move(delta: Vector2i) -> bool:
 	if has_meta("_petrified_turns"):
 		CombatLog.add("You cannot move — you are stone.")
 		return false
+	# DCSS confusion: each move has ~50% chance to stagger into a
+	# random cardinal direction instead. Doesn't stop the action.
+	if has_meta("_confused") and bool(get_meta("_confused", false)):
+		if randf() < 0.5:
+			var dirs: Array = [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1),
+					Vector2i(1,1), Vector2i(-1,-1), Vector2i(1,-1), Vector2i(-1,1)]
+			delta = dirs[randi() % dirs.size()]
+			CombatLog.add("You stagger confusedly!")
 	# Mesmerised: can't walk away from the caster (simplification —
 	# DCSS checks direction; we just block movement outright for
 	# `_mesmerised_turns`).
@@ -2103,11 +2174,17 @@ func grant_xp(amount: int) -> void:
 
 
 func xp_for_next_level() -> int:
-	# Cumulative cost to reach the next XL minus what we already passed
-	# to reach the current one. Table comes straight from DCSS.
+	# DCSS exp_needed(level, exp_apt):
+	#   cost = table[level] - table[level-1]    (apt 1 baseline)
+	#   cost *= apt_to_factor(exp_apt - 1)       (species scaling)
+	# apt_to_factor(apt) = 1 / 2^(apt/4). Higher apt → lower XP cost.
+	# Troll xp_mod -1 → factor 2^0.5 ≈ 1.414× slower. Demigod -2 → ~1.68×.
 	var here: int = _DCSS_EXP_NEEDED[clampi(level - 1, 0, _DCSS_EXP_NEEDED.size() - 1)]
 	var next: int = _DCSS_EXP_NEEDED[clampi(level, 0, _DCSS_EXP_NEEDED.size() - 1)]
-	return max(1, next - here)
+	var base: int = max(1, next - here)
+	var apt: int = race_res.xp_mod if race_res != null else 0
+	var factor: float = pow(2.0, -float(apt - 1) / 4.0)  # apt_to_factor(apt-1)
+	return max(1, int(base * factor))
 
 
 func _apply_level_up_growth() -> void:
@@ -2198,15 +2275,22 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 	return monster
 
 
-func take_damage(amount: int) -> void:
+func take_damage(amount: int, element: String = "") -> void:
 	if not is_alive:
 		return
+	# DCSS resistance pipeline: an element-tagged hit (fire/cold/elec/
+	# poison/acid/holy/drain) first gets scaled by the player's total
+	# resist level for that element before any generic mitigation.
+	if element != "":
+		amount = _apply_elem_resist(amount, element)
 	# Shadow form halves all incoming damage.
 	if has_meta("_shadow_form_turns"):
 		amount = max(1, amount / 2)
 	# Divine shield and fiery armour shave a flat chunk.
 	if has_meta("_divine_shield_turns"):
 		amount = max(1, amount - 3)
+	# Potion/scroll of Resistance still applies a generic halving on top of
+	# the specific-element scaling so it pairs with rF+/rC+ gear.
 	if resist_turns > 0:
 		amount = max(1, amount / 2)
 	# Sanctuary: Zin protects the faithful from almost all harm.

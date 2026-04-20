@@ -1,6 +1,7 @@
 {
  "acid_ball": {
   "a": 4,
+  "element": "acid",
   "kind": "dicedef",
   "md": 105,
   "mn": 10,
@@ -9,6 +10,7 @@
  },
  "all_purpose_tempering": {
   "a": 4,
+  "element": "physical",
   "kind": "dicedef",
   "md": 12,
   "mn": 1,
@@ -17,6 +19,7 @@
  },
  "awaken_flesh": {
   "a": 5,
+  "element": "physical",
   "kind": "dicedef",
   "md": 16,
   "mn": 1,
@@ -25,6 +28,7 @@
  },
  "beckoning_gale": {
   "a": 4,
+  "element": "physical",
   "kind": "dicedef",
   "md": 20,
   "mn": 1,
@@ -33,6 +37,7 @@
  },
  "blastmote": {
   "a": 20,
+  "element": "fire",
   "kind": "calcdice",
   "md": 3,
   "mn": 1,
@@ -41,6 +46,7 @@
  },
  "blinkbolt": {
   "a": 11,
+  "element": "elec",
   "kind": "dicedef",
   "md": 5,
   "mn": 3,
@@ -49,6 +55,7 @@
  },
  "bolt_of_cold": {
   "a": 18,
+  "element": "cold",
   "kind": "calcdice",
   "md": 3,
   "mn": 2,
@@ -57,6 +64,7 @@
  },
  "bolt_of_devastation": {
   "a": 24,
+  "element": "devastation",
   "kind": "dicedef",
   "md": 1,
   "mn": 0,
@@ -65,6 +73,7 @@
  },
  "bolt_of_draining": {
   "a": 15,
+  "element": "drain",
   "kind": "calcdice",
   "md": 5,
   "mn": 3,
@@ -73,6 +82,7 @@
  },
  "bolt_of_fire": {
   "a": 18,
+  "element": "fire",
   "kind": "calcdice",
   "md": 3,
   "mn": 2,
@@ -81,6 +91,7 @@
  },
  "bolt_of_flesh": {
   "a": 3,
+  "element": "physical",
   "kind": "dicedef",
   "md": 10,
   "mn": 1,
@@ -89,6 +100,7 @@
  },
  "bolt_of_light": {
   "a": 13,
+  "element": "holy",
   "kind": "calcdice",
   "md": 5,
   "mn": 3,
@@ -97,6 +109,7 @@
  },
  "bolt_of_magma": {
   "a": 16,
+  "element": "fire",
   "kind": "calcdice",
   "md": 3,
   "mn": 2,
@@ -105,6 +118,7 @@
  },
  "bombard": {
   "a": 13,
+  "element": "physical",
   "kind": "calcdice",
   "md": 3,
   "mn": 2,
@@ -113,6 +127,7 @@
  },
  "call_down_damnation": {
   "a": 15,
+  "element": "fire",
   "kind": "dicedef",
   "md": 10,
   "mn": 0,
@@ -121,6 +136,7 @@
  },
  "call_down_lightning": {
   "a": 11,
+  "element": "elec",
   "kind": "calcdice",
   "md": 5,
   "mn": 3,
@@ -129,6 +145,7 @@
  },
  "caustic_breath": {
   "a": 3,
+  "element": "acid",
   "kind": "dicedef",
   "md": 1,
   "mn": 1,
@@ -137,6 +154,7 @@
  },
  "chain_lightning": {
   "a": 0,
+  "element": "physical",
   "kind": "calcdice",
   "md": 1,
   "mn": 2,
@@ -145,6 +163,7 @@
  },
  "chaos_breath": {
   "a": 1,
+  "element": "physical",
   "kind": "dicedef",
   "md": 1,
   "mn": 0,
@@ -153,6 +172,7 @@
  },
  "cold_breath": {
   "a": 0,
+  "element": "cold",
   "kind": "dicedef",
   "md": 6,
   "mn": 1,
@@ -161,6 +181,7 @@
  },
  "combustion_breath": {
   "a": 0,
+  "element": "physical",
   "kind": "dicedef",
   "md": 1,
   "mn": 0,
@@ -169,6 +190,7 @@
  },
  "corrosive_bolt": {
   "a": 13,
+  "element": "acid",
   "kind": "calcdice",
   "md": 5,
   "mn": 3,
@@ -177,6 +199,7 @@
  },
  "creeping_frost": {
   "a": 7,
+  "element": "cold",
   "kind": "dicedef",
   "md": 12,
   "mn": 1,
@@ -185,6 +208,7 @@
  },
  "creeping_shadow": {
   "a": 4,
+  "element": "physical",
   "kind": "dicedef",
   "md": 14,
   "mn": 1,
@@ -193,6 +217,7 @@
  },
  "crystallising_shot": {
   "a": 6,
+  "element": "physical",
   "kind": "dicedef",
   "md": 10,
   "mn": 1,
@@ -201,6 +226,7 @@
  },
  "deploy_bomblet": {
   "a": 3,
+  "element": "physical",
   "kind": "dicedef",
   "md": 30,
   "mn": 1,
@@ -209,6 +235,7 @@
  },
  "dispel_undead": {
   "a": 20,
+  "element": "physical",
   "kind": "calcdice",
   "md": 4,
   "mn": 3,
@@ -217,6 +244,7 @@
  },
  "dispel_undead_range": {
   "a": 20,
+  "element": "physical",
   "kind": "calcdice",
   "md": 4,
   "mn": 3,
@@ -225,6 +253,7 @@
  },
  "doom_bolt": {
   "a": 3,
+  "element": "physical",
   "kind": "dicedef",
   "md": 9,
   "mn": 1,
@@ -233,6 +262,7 @@
  },
  "drain_life": {
   "a": 6,
+  "element": "drain",
   "kind": "dicedef",
   "md": 10,
   "mn": 7,
@@ -241,6 +271,7 @@
  },
  "electrical_bolt": {
   "a": 3,
+  "element": "elec",
   "kind": "dicedef",
   "md": 12,
   "mn": 1,
@@ -249,6 +280,7 @@
  },
  "fire_breath": {
   "a": 0,
+  "element": "fire",
   "kind": "dicedef",
   "md": 6,
   "mn": 1,
@@ -257,6 +289,7 @@
  },
  "fire_storm": {
   "a": 5,
+  "element": "fire",
   "kind": "calcdice",
   "md": 1,
   "mn": 1,
@@ -265,6 +298,7 @@
  },
  "fireball": {
   "a": 10,
+  "element": "fire",
   "kind": "calcdice",
   "md": 2,
   "mn": 1,
@@ -273,6 +307,7 @@
  },
  "flame_wave": {
   "a": 9,
+  "element": "fire",
   "kind": "calcdice",
   "md": 3,
   "mn": 1,
@@ -281,6 +316,7 @@
  },
  "flaming_cloud": {
   "a": 1,
+  "element": "physical",
   "kind": "dicedef",
   "md": 1,
   "mn": 0,
@@ -289,6 +325,7 @@
  },
  "flash_freeze": {
   "a": 10,
+  "element": "cold",
   "kind": "dicedef",
   "md": 17,
   "mn": 1,
@@ -297,6 +334,7 @@
  },
  "flashing_balestra": {
   "a": 7,
+  "element": "physical",
   "kind": "dicedef",
   "md": 12,
   "mn": 1,
@@ -305,6 +343,7 @@
  },
  "force_lance": {
   "a": 6,
+  "element": "physical",
   "kind": "dicedef",
   "md": 6,
   "mn": 1,
@@ -313,6 +352,7 @@
  },
  "foxfire": {
   "a": 4,
+  "element": "fire",
   "kind": "dicedef",
   "md": 5,
   "mn": 1,
@@ -321,6 +361,7 @@
  },
  "freeze": {
   "a": 3,
+  "element": "cold",
   "kind": "dicedef",
   "md": 10,
   "mn": 3,
@@ -329,6 +370,7 @@
  },
  "freezing_gust": {
   "a": 9,
+  "element": "cold",
   "kind": "dicedef",
   "md": 11,
   "mn": 1,
@@ -337,6 +379,7 @@
  },
  "fulsome_fusillade": {
   "a": 5,
+  "element": "physical",
   "kind": "dicedef",
   "md": 8,
   "mn": 1,
@@ -345,6 +388,7 @@
  },
  "galvanic_breath": {
   "a": 3,
+  "element": "elec",
   "kind": "dicedef",
   "md": 10,
   "mn": 9,
@@ -353,6 +397,7 @@
  },
  "ghostly_fireball": {
   "a": 6,
+  "element": "drain",
   "kind": "dicedef",
   "md": 13,
   "mn": 1,
@@ -361,6 +406,7 @@
  },
  "ghostly_sacrifice": {
   "a": 6,
+  "element": "drain",
   "kind": "dicedef",
   "md": 13,
   "mn": 1,
@@ -369,6 +415,7 @@
  },
  "glacial_breath": {
   "a": 6,
+  "element": "cold",
   "kind": "dicedef",
   "md": 3,
   "mn": 4,
@@ -377,6 +424,7 @@
  },
  "golden_breath": {
   "a": 2,
+  "element": "physical",
   "kind": "dicedef",
   "md": 3,
   "mn": 4,
@@ -385,6 +433,7 @@
  },
  "grave_claw": {
   "a": 7,
+  "element": "physical",
   "kind": "dicedef",
   "md": 7,
   "mn": 1,
@@ -393,6 +442,7 @@
  },
  "gravitas": {
   "a": 6,
+  "element": "physical",
   "kind": "dicedef",
   "md": 14,
   "mn": 1,
@@ -401,6 +451,7 @@
  },
  "hailstorm": {
   "a": 15,
+  "element": "cold",
   "kind": "calcdice",
   "md": 3,
   "mn": 1,
@@ -409,6 +460,7 @@
  },
  "harpoon_shot": {
   "a": 7,
+  "element": "physical",
   "kind": "dicedef",
   "md": 20,
   "mn": 1,
@@ -417,6 +469,7 @@
  },
  "hoarfrost_bullet": {
   "a": 3,
+  "element": "cold",
   "kind": "dicedef",
   "md": 16,
   "mn": 1,
@@ -425,6 +478,7 @@
  },
  "holy_breath": {
   "a": 0,
+  "element": "holy",
   "kind": "dicedef",
   "md": 12,
   "mn": 1,
@@ -433,6 +487,7 @@
  },
  "hurl_damnation": {
   "a": 8,
+  "element": "fire",
   "kind": "calcdice",
   "md": 5,
   "mn": 3,
@@ -441,6 +496,7 @@
  },
  "hurl_sludge": {
   "a": 3,
+  "element": "poison",
   "kind": "dicedef",
   "md": 16,
   "mn": 1,
@@ -449,6 +505,7 @@
  },
  "hurl_torchlight": {
   "a": 7,
+  "element": "physical",
   "kind": "dicedef",
   "md": 5,
   "mn": 1,
@@ -457,6 +514,7 @@
  },
  "iceblast": {
   "a": 14,
+  "element": "cold",
   "kind": "calcdice",
   "md": 5,
   "mn": 3,
@@ -465,6 +523,7 @@
  },
  "ignition": {
   "a": 10,
+  "element": "fire",
   "kind": "calcdice",
   "md": 3,
   "mn": 1,
@@ -473,6 +532,7 @@
  },
  "iron_shot": {
   "a": 15,
+  "element": "physical",
   "kind": "calcdice",
   "md": 4,
   "mn": 3,
@@ -481,6 +541,7 @@
  },
  "iskenderuns_mystic_blast": {
   "a": 6,
+  "element": "physical",
   "kind": "calcdice",
   "md": 3,
   "mn": 1,
@@ -489,6 +550,7 @@
  },
  "kinetic_grapnel": {
   "a": 4,
+  "element": "physical",
   "kind": "dicedef",
   "md": 25,
   "mn": 4,
@@ -497,6 +559,7 @@
  },
  "kiss_of_death": {
   "a": 11,
+  "element": "drain",
   "kind": "calcdice",
   "md": 5,
   "mn": 3,
@@ -505,6 +568,7 @@
  },
  "landbreaker": {
   "a": 2,
+  "element": "physical",
   "kind": "dicedef",
   "md": 23,
   "mn": 1,
@@ -513,6 +577,7 @@
  },
  "lehudibs_crystal_spear": {
   "a": 23,
+  "element": "physical",
   "kind": "calcdice",
   "md": 1,
   "mn": 1,
@@ -521,6 +586,7 @@
  },
  "lightning_bolt": {
   "a": 11,
+  "element": "elec",
   "kind": "calcdice",
   "md": 5,
   "mn": 3,
@@ -529,6 +595,7 @@
  },
  "magic_dart": {
   "a": 3,
+  "element": "physical",
   "kind": "dicedef",
   "md": 5,
   "mn": 1,
@@ -537,6 +604,7 @@
  },
  "magma_barrage": {
   "a": 4,
+  "element": "fire",
   "kind": "dicedef",
   "md": 21,
   "mn": 2,
@@ -545,6 +613,7 @@
  },
  "magnavolt": {
   "a": 9,
+  "element": "elec",
   "kind": "dicedef",
   "md": 10,
   "mn": 1,
@@ -553,6 +622,7 @@
  },
  "malign_offering": {
   "a": 4,
+  "element": "physical",
   "kind": "dicedef",
   "md": 10,
   "mn": 1,
@@ -561,6 +631,7 @@
  },
  "marshlight": {
   "a": 4,
+  "element": "fire",
   "kind": "dicedef",
   "md": 5,
   "mn": 1,
@@ -569,6 +640,7 @@
  },
  "mercury_arrow": {
   "a": 11,
+  "element": "physical",
   "kind": "calcdice",
   "md": 4,
   "mn": 1,
@@ -577,6 +649,7 @@
  },
  "metal_splinters": {
   "a": 20,
+  "element": "physical",
   "kind": "dicedef",
   "md": 20,
   "mn": 1,
@@ -585,6 +658,7 @@
  },
  "miasma_breath": {
   "a": 5,
+  "element": "physical",
   "kind": "dicedef",
   "md": 24,
   "mn": 1,
@@ -593,6 +667,7 @@
  },
  "mindburst": {
   "a": 15,
+  "element": "physical",
   "kind": "calcdice",
   "md": 4,
   "mn": 3,
@@ -601,6 +676,7 @@
  },
  "momentum_strike": {
   "a": 24,
+  "element": "physical",
   "kind": "calcdice",
   "md": 6,
   "mn": 1,
@@ -609,6 +685,7 @@
  },
  "monarch_bomb": {
   "a": 5,
+  "element": "fire",
   "kind": "dicedef",
   "md": 8,
   "mn": 1,
@@ -617,6 +694,7 @@
  },
  "mud_breath": {
   "a": 3,
+  "element": "physical",
   "kind": "dicedef",
   "md": 1,
   "mn": 1,
@@ -625,6 +703,7 @@
  },
  "noxious_breath": {
   "a": 1,
+  "element": "poison",
   "kind": "dicedef",
   "md": 1,
   "mn": 1,
@@ -633,6 +712,7 @@
  },
  "noxious_cloud": {
   "a": 1,
+  "element": "physical",
   "kind": "dicedef",
   "md": 1,
   "mn": 0,
@@ -641,6 +721,7 @@
  },
  "nullifying_breath": {
   "a": 4,
+  "element": "physical",
   "kind": "dicedef",
   "md": 3,
   "mn": 1,
@@ -649,6 +730,7 @@
  },
  "orb_of_electricity": {
   "a": 13,
+  "element": "elec",
   "kind": "calcdice",
   "md": 5,
   "mn": 4,
@@ -657,6 +739,7 @@
  },
  "ozocubus_refrigeration": {
   "a": 30,
+  "element": "cold",
   "kind": "calcdice",
   "md": 9,
   "mn": 4,
@@ -665,6 +748,7 @@
  },
  "pain": {
   "a": 7,
+  "element": "physical",
   "kind": "dicedef",
   "md": 20,
   "mn": 1,
@@ -673,6 +757,7 @@
  },
  "percussive_tempering": {
   "a": 4,
+  "element": "physical",
   "kind": "dicedef",
   "md": 12,
   "mn": 1,
@@ -681,6 +766,7 @@
  },
  "permafrost_eruption": {
   "a": 6,
+  "element": "cold",
   "kind": "calcdice",
   "md": 8,
   "mn": 3,
@@ -689,6 +775,7 @@
  },
  "petrifying_cloud": {
   "a": 6,
+  "element": "physical",
   "kind": "dicedef",
   "md": 1,
   "mn": 0,
@@ -697,6 +784,7 @@
  },
  "phantom_blitz": {
   "a": 9,
+  "element": "physical",
   "kind": "dicedef",
   "md": 11,
   "mn": 1,
@@ -705,6 +793,7 @@
  },
  "plasma_beam": {
   "a": 10,
+  "element": "fire",
   "kind": "dicedef",
   "md": 20,
   "mn": 11,
@@ -713,6 +802,7 @@
  },
  "platinum_paragon": {
   "a": 10,
+  "element": "physical",
   "kind": "dicedef",
   "md": 10,
   "mn": 1,
@@ -721,6 +811,7 @@
  },
  "poison_arrow": {
   "a": 15,
+  "element": "poison",
   "kind": "calcdice",
   "md": 1,
   "mn": 1,
@@ -729,6 +820,7 @@
  },
  "poisonous_cloud": {
   "a": 3,
+  "element": "poison",
   "kind": "dicedef",
   "md": 25,
   "mn": 1,
@@ -737,6 +829,7 @@
  },
  "primal_wave": {
   "a": 10,
+  "element": "physical",
   "kind": "calcdice",
   "md": 5,
   "mn": 1,
@@ -745,6 +838,7 @@
  },
  "pyre_arrow": {
   "a": 0,
+  "element": "fire",
   "kind": "dicedef",
   "md": 1,
   "mn": 0,
@@ -753,6 +847,7 @@
  },
  "pyroclastic_surge": {
   "a": 18,
+  "element": "fire",
   "kind": "calcdice",
   "md": 3,
   "mn": 2,
@@ -761,6 +856,7 @@
  },
  "quicksilver_bolt": {
   "a": 15,
+  "element": "physical",
   "kind": "calcdice",
   "md": 3,
   "mn": 2,
@@ -769,6 +865,7 @@
  },
  "ravenous_swarm": {
   "a": 1,
+  "element": "physical",
   "kind": "dicedef",
   "md": 1,
   "mn": 1,
@@ -777,6 +874,7 @@
  },
  "rebounding_blaze": {
   "a": 18,
+  "element": "fire",
   "kind": "calcdice",
   "md": 3,
   "mn": 2,
@@ -785,6 +883,7 @@
  },
  "rebounding_chill": {
   "a": 18,
+  "element": "cold",
   "kind": "calcdice",
   "md": 3,
   "mn": 2,
@@ -793,6 +892,7 @@
  },
  "sandblast": {
   "a": 4,
+  "element": "physical",
   "kind": "dicedef",
   "md": 3,
   "mn": 1,
@@ -801,6 +901,7 @@
  },
  "searing_breath": {
   "a": 0,
+  "element": "fire",
   "kind": "dicedef",
   "md": 9,
   "mn": 1,
@@ -809,6 +910,7 @@
  },
  "searing_ray": {
   "a": 9,
+  "element": "physical",
   "kind": "calcdice",
   "md": 7,
   "mn": 1,
@@ -817,6 +919,7 @@
  },
  "seismic_stomp": {
   "a": 3,
+  "element": "physical",
   "kind": "dicedef",
   "md": 23,
   "mn": 1,
@@ -825,6 +928,7 @@
  },
  "seracfall": {
   "a": 14,
+  "element": "cold",
   "kind": "calcdice",
   "md": 5,
   "mn": 3,
@@ -833,6 +937,7 @@
  },
  "shadow_ball": {
   "a": 4,
+  "element": "physical",
   "kind": "dicedef",
   "md": 14,
   "mn": 1,
@@ -841,6 +946,7 @@
  },
  "shadow_beam": {
   "a": 6,
+  "element": "physical",
   "kind": "dicedef",
   "md": 13,
   "mn": 1,
@@ -849,6 +955,7 @@
  },
  "shadow_shard": {
   "a": 7,
+  "element": "physical",
   "kind": "dicedef",
   "md": 9,
   "mn": 1,
@@ -857,6 +964,7 @@
  },
  "shadow_shot": {
   "a": 3,
+  "element": "physical",
   "kind": "dicedef",
   "md": 17,
   "mn": 1,
@@ -865,6 +973,7 @@
  },
  "shadow_tempest": {
   "a": 4,
+  "element": "physical",
   "kind": "dicedef",
   "md": 16,
   "mn": 1,
@@ -873,6 +982,7 @@
  },
  "shock": {
   "a": 3,
+  "element": "elec",
   "kind": "dicedef",
   "md": 4,
   "mn": 1,
@@ -881,6 +991,7 @@
  },
  "shred": {
   "a": 4,
+  "element": "physical",
   "kind": "dicedef",
   "md": 22,
   "mn": 1,
@@ -889,6 +1000,7 @@
  },
  "slug_dart": {
   "a": 3,
+  "element": "physical",
   "kind": "dicedef",
   "md": 25,
   "mn": 1,
@@ -897,6 +1009,7 @@
  },
  "sojourning_bolt": {
   "a": 7,
+  "element": "physical",
   "kind": "dicedef",
   "md": 12,
   "mn": 1,
@@ -905,6 +1018,7 @@
  },
  "sonic_wave": {
   "a": 5,
+  "element": "physical",
   "kind": "calcdice",
   "md": 5,
   "mn": 1,
@@ -913,6 +1027,7 @@
  },
  "spike_launcher": {
   "a": 3,
+  "element": "physical",
   "kind": "dicedef",
   "md": 12,
   "mn": 1,
@@ -921,6 +1036,7 @@
  },
  "spit_acid": {
   "a": 14,
+  "element": "acid",
   "kind": "dicedef",
   "md": 1,
   "mn": 0,
@@ -929,6 +1045,7 @@
  },
  "spit_lava": {
   "a": 10,
+  "element": "fire",
   "kind": "dicedef",
   "md": 1,
   "mn": 0,
@@ -937,6 +1054,7 @@
  },
  "spit_poison": {
   "a": 4,
+  "element": "poison",
   "kind": "dicedef",
   "md": 2,
   "mn": 1,
@@ -945,6 +1063,7 @@
  },
  "splinterfrost_shell": {
   "a": 24,
+  "element": "cold",
   "kind": "calcdice",
   "md": 5,
   "mn": 4,
@@ -953,6 +1072,7 @@
  },
  "splinterspray": {
   "a": 15,
+  "element": "physical",
   "kind": "dicedef",
   "md": 20,
   "mn": 1,
@@ -961,6 +1081,7 @@
  },
  "starburst": {
   "a": 18,
+  "element": "fire",
   "kind": "calcdice",
   "md": 3,
   "mn": 2,
@@ -969,6 +1090,7 @@
  },
  "steam_ball": {
   "a": 4,
+  "element": "physical",
   "kind": "dicedef",
   "md": 3,
   "mn": 2,
@@ -977,6 +1099,7 @@
  },
  "steam_breath": {
   "a": 4,
+  "element": "physical",
   "kind": "dicedef",
   "md": 3,
   "mn": 2,
@@ -985,6 +1108,7 @@
  },
  "sticky_flame": {
   "a": 4,
+  "element": "fire",
   "kind": "dicedef",
   "md": 9,
   "mn": 1,
@@ -993,6 +1117,7 @@
  },
  "sting": {
   "a": 3,
+  "element": "poison",
   "kind": "dicedef",
   "md": 4,
   "mn": 1,
@@ -1001,6 +1126,7 @@
  },
  "stone_arrow": {
   "a": 7,
+  "element": "physical",
   "kind": "dicedef",
   "md": 8,
   "mn": 1,
@@ -1009,6 +1135,7 @@
  },
  "stunning_burst": {
   "a": 8,
+  "element": "physical",
   "kind": "dicedef",
   "md": 20,
   "mn": 1,
@@ -1017,6 +1144,7 @@
  },
  "thorn_volley": {
   "a": 5,
+  "element": "physical",
   "kind": "dicedef",
   "md": 13,
   "mn": 1,
@@ -1025,6 +1153,7 @@
  },
  "throw_barbs": {
   "a": 13,
+  "element": "physical",
   "kind": "dicedef",
   "md": 1,
   "mn": 0,
@@ -1033,6 +1162,7 @@
  },
  "throw_bolas": {
   "a": 5,
+  "element": "physical",
   "kind": "dicedef",
   "md": 20,
   "mn": 1,
@@ -1041,6 +1171,7 @@
  },
  "throw_flame": {
   "a": 4,
+  "element": "fire",
   "kind": "dicedef",
   "md": 10,
   "mn": 1,
@@ -1049,6 +1180,7 @@
  },
  "throw_frost": {
   "a": 4,
+  "element": "cold",
   "kind": "dicedef",
   "md": 10,
   "mn": 1,
@@ -1057,6 +1189,7 @@
  },
  "throw_icicle": {
   "a": 10,
+  "element": "cold",
   "kind": "calcdice",
   "md": 2,
   "mn": 1,
@@ -1065,6 +1198,7 @@
  },
  "throw_pie": {
   "a": 20,
+  "element": "physical",
   "kind": "dicedef",
   "md": 1,
   "mn": 0,
@@ -1073,6 +1207,7 @@
  },
  "tremorstone": {
   "a": 6,
+  "element": "physical",
   "kind": "dicedef",
   "md": 1,
   "mn": 0,
@@ -1081,6 +1216,7 @@
  },
  "unleash_destruction": {
   "a": 5,
+  "element": "physical",
   "kind": "dicedef",
   "md": 2,
   "mn": 1,
@@ -1089,6 +1225,7 @@
  },
  "vampiric_draining": {
   "a": 6,
+  "element": "physical",
   "kind": "dicedef",
   "md": 14,
   "mn": 1,
@@ -1097,6 +1234,7 @@
  },
  "venom_bolt": {
   "a": 16,
+  "element": "poison",
   "kind": "calcdice",
   "md": 5,
   "mn": 3,
@@ -1105,6 +1243,7 @@
  },
  "violent_unravelling": {
   "a": 3,
+  "element": "physical",
   "kind": "dicedef",
   "md": 6,
   "mn": 1,
@@ -1113,6 +1252,7 @@
  },
  "warp_body": {
   "a": 3,
+  "element": "physical",
   "kind": "dicedef",
   "md": 18,
   "mn": 1,
@@ -1121,6 +1261,7 @@
  },
  "warp_space": {
   "a": 12,
+  "element": "physical",
   "kind": "calcdice",
   "md": 5,
   "mn": 3,
