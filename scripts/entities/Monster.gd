@@ -106,19 +106,27 @@ func _mon_resist_level(element: String) -> int:
 	return total
 
 
+## DCSS resist_adjust_damage (fight.cc:853) — monster branch.
+##   resistible /= 1 + bonus_res + res*res     (stronger than player!)
+## res=1 → /2, res=2 → /5, res=3 → /10 (or immune for poison/neg/holy).
+## Negative resist → ×1.5 damage.
 func _apply_mon_resist(amount: int, element: String) -> int:
 	var rl: int = _mon_resist_level(element)
-	if rl >= 3:
-		return max(1, amount / 5)
-	if rl == 2:
-		return max(1, amount / 3)
-	if rl == 1:
-		return max(1, amount / 2)
-	if rl == -1:
-		return amount * 3 / 2
-	if rl <= -2:
-		return amount * 2
-	return amount
+	if rl == 0:
+		return amount
+	if rl < 0:
+		return amount * 15 / 10  # -1 level: +50%
+	# Positive resist. DCSS treats monsters as immune at res>=3 for
+	# "boolean" elements (poison, drain, holy). Fire/cold/elec still
+	# just divide heavily.
+	var boolean_immune: bool = element == "poison" \
+			or element == "neg" \
+			or element == "holy"
+	if boolean_immune and rl >= 3:
+		return 0
+	var bonus_res: int = 1 if (element == "poison" or element == "neg") else 0
+	var denom: int = 1 + bonus_res + rl * rl
+	return maxi(1, amount / maxi(1, denom))
 
 
 static func _dcss_roll_hp(hp_10x: int) -> int:

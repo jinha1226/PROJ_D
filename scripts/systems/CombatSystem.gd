@@ -39,10 +39,12 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	var weapon_dmg: int = UNARMED_DAMAGE
 	if weapon_id != "" and WeaponRegistry.is_weapon(weapon_id):
 		weapon_dmg = WeaponRegistry.weapon_damage_for(weapon_id)
-	# Flat bonuses from the equipped weapon's own enchant level + any
-	# legacy whole-player weapon_bonus_dmg field (kept for essences).
-	if "equipped_weapon_plus" in attacker:
-		weapon_dmg += int(attacker.equipped_weapon_plus)
+	# DCSS attack.cc:840 player_apply_slaying_bonuses applies weapon
+	# plus + ring-of-slaying as `+random2(1+plus)` AFTER skill
+	# multipliers — NOT as a flat pre-roll add (the old code doubled
+	# enchant value at high skill because it multiplied by 2+). We now
+	# carry weapon_bonus_dmg (essences, mobile-only) as the only flat
+	# pre-mult term. The DCSS slaying random2 lands after skills below.
 	if "weapon_bonus_dmg" in attacker:
 		weapon_dmg += int(attacker.weapon_bonus_dmg)
 	if weapon_id == "" and "trait_res" in attacker and attacker.trait_res != null \
@@ -124,6 +126,18 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	# Fighting-skill multiplier (scale 3000).
 	var f_skill_scaled: int = fighting_level * 100
 	base_damage = base_damage * (3000 + (randi() % (f_skill_scaled + 1))) / 3000
+	# DCSS player_apply_slaying_bonuses (attack.cc:840). Apply weapon
+	# enchant + ring-of-slaying as `+random2(1+plus)` AFTER skill
+	# multipliers. Negative plus subtracts `random2(1-plus)`.
+	var slaying: int = 0
+	if "equipped_weapon_plus" in attacker:
+		slaying += int(attacker.equipped_weapon_plus)
+	if attacker.has_method("gear_damage_bonus"):
+		slaying += int(attacker.gear_damage_bonus())
+	if slaying >= 0:
+		base_damage += randi() % (1 + slaying)
+	else:
+		base_damage -= randi() % (1 - slaying)
 	var atk: int = max(1, base_damage)
 
 	var def_ac: int = 0
@@ -201,9 +215,9 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	if race_trait == "kobold_sneak" and skill_sys != null:
 		var stealth_lv: int = skill_sys.get_level(attacker, "stealth")
 		dmg += stealth_lv / 3
-	# Flat damage bonus from rings of slaying / ring of fire / etc.
-	if attacker.has_method("gear_damage_bonus"):
-		dmg += int(attacker.gear_damage_bonus())
+	# Ring-of-slaying / ring-of-fire flat bonus is already folded into
+	# the DCSS slaying roll above (random2(1+plus)). No second add here,
+	# or we'd double-count.
 	# DCSS weapon brand: Scroll of Brand Weapon stamps a permanent brand
 	# onto the wielded weapon; each brand adds a flat elemental proc on top
 	# of the base physical damage.
