@@ -32,7 +32,14 @@ var level: int = 1
 var xp: int = 0
 # XP required to reach (level+1) from current level. Linear ramp.
 # With tier-1 monsters giving 4–25 XP, level 2 lands around the 5th kill.
-const _XP_PER_LEVEL: int = 50
+## DCSS XP table — cumulative XP required to REACH this XL, lifted
+## verbatim from player.cc:exp_needed. XL 1 costs 0; XL 2 costs 10;
+## XL 27 (cap) costs 1,059,325. Per-level cost is `table[N] - table[N-1]`.
+const _DCSS_EXP_NEEDED: Array = [
+	0, 10, 30, 70, 140, 270, 520, 1010, 1980, 3910,
+	7760, 15450, 26895, 45585, 72745, 108375, 152475, 205045,
+	266085, 335595, 413575, 500025, 594945, 698335, 810195, 930525, 1059325,
+]
 const _HP_PER_LEVEL: int = 5  # fallback if race_res missing
 const _MP_PER_LEVEL: int = 3
 
@@ -2076,7 +2083,11 @@ func grant_xp(amount: int) -> void:
 
 
 func xp_for_next_level() -> int:
-	return _XP_PER_LEVEL * level
+	# Cumulative cost to reach the next XL minus what we already passed
+	# to reach the current one. Table comes straight from DCSS.
+	var here: int = _DCSS_EXP_NEEDED[clampi(level - 1, 0, _DCSS_EXP_NEEDED.size() - 1)]
+	var next: int = _DCSS_EXP_NEEDED[clampi(level, 0, _DCSS_EXP_NEEDED.size() - 1)]
+	return max(1, next - here)
 
 
 func _apply_level_up_growth() -> void:
