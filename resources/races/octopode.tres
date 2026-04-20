@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "octopode"
+display_name = "Octopode"
+description = "Eight-limbed cephalopod. Can't wear body armour or shields, but every tentacle fits a ring — stacking magical gear is your whole thing."
+base_str = 7
+base_dex = 9
+base_int = 10
+hp_per_level = 4
+mp_per_level = 2
+move_speed_mod = 0
+body_def = "body_male"
+skin_tint = "red"
+hair_def = ""
+hair_color = "red"
+base_ac = 0
+racial_trait = "octopode_many_rings"
+skill_aptitudes = {
+	"fighting": 0, "short_blade": 1, "long_blade": -1, "axe": -1,
+	"mace": -1, "polearm": -1, "staff": 2,
+	"bow": -1, "crossbow": -1, "sling": -1, "throwing": 0,
+	"armour": -3, "dodging": 1, "shields": -3, "stealth": 1,
+	"spellcasting": 2, "conjurations": 1, "hexes": 1,
+	"fire": 0, "cold": 0, "earth": 0, "air": 0,
+	"necromancy": 0, "translocations": 1, "summonings": 1,
+	"evocations": 1,
+}

@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "naga"
+display_name = "Naga"
+description = "Snake-bodied warrior-mages. Slower than bipedal races, but huge torso, poison spit, and poison magic synergy make up for it."
+base_str = 11
+base_dex = 7
+base_int = 7
+hp_per_level = 5
+mp_per_level = 3
+move_speed_mod = -2
+body_def = "body_male"
+skin_tint = "green"
+hair_def = "hair_long"
+hair_color = "black"
+base_ac = 1
+racial_trait = "naga_poison_spit"
+skill_aptitudes = {
+	"fighting": 1, "short_blade": 0, "long_blade": 0, "axe": 0,
+	"mace": 0, "polearm": 0, "staff": 0,
+	"bow": 0, "crossbow": 0, "sling": 0, "throwing": 0,
+	"armour": 0, "dodging": -2, "shields": 0, "stealth": 2,
+	"spellcasting": 0, "conjurations": 0, "hexes": 0,
+	"fire": 0, "cold": 0, "earth": 0, "air": 0,
+	"necromancy": 0, "translocations": 0, "summonings": 0,
+	"evocations": 0,
+}

@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "coglin"
+display_name = "Coglin"
+description = "Steam-powered dwarves in battle exo-suits. Dual-wield any two weapons at once. Miscasts spew steam instead of fizzling."
+base_str = 10
+base_dex = 8
+base_int = 6
+hp_per_level = 4
+mp_per_level = 2
+move_speed_mod = 0
+body_def = "body_male"
+skin_tint = "metal"
+hair_def = "hair_parted"
+hair_color = "grey"
+beard_def = "beard_full"
+beard_color = "grey"
+base_ac = 2
+racial_trait = "coglin_dualwield"
+skill_aptitudes = {
+	"fighting": 1, "short_blade": 0, "long_blade": 0, "axe": 1,
+	"mace": 1, "polearm": 0, "staff": 0,
+	"bow": -1, "crossbow": 1, "sling": -1, "throwing": 0,
+	"armour": 1, "dodging": -1, "shields": 0, "stealth": -1,
+	"spellcasting": -2, "conjurations": -1, "hexes": -1,
+	"fire": -1, "cold": -1, "earth": 0, "air": -1,
+	"necromancy": -1, "translocations": -1, "summonings": -1,
+	"evocations": 2,
+}

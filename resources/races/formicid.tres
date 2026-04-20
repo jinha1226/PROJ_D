@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "formicid"
+display_name = "Formicid"
+description = "Four-armed ant-folk. Extra arms let you wield a weapon and a shield at once, but permanent stasis blocks every form of teleport."
+base_str = 12
+base_dex = 7
+base_int = 7
+hp_per_level = 5
+mp_per_level = 2
+move_speed_mod = 0
+body_def = "body_male"
+skin_tint = "tan"
+hair_def = ""
+hair_color = "brown"
+base_ac = 0
+racial_trait = "formicid_stasis"
+skill_aptitudes = {
+	"fighting": 1, "short_blade": 0, "long_blade": 0, "axe": 2,
+	"mace": 2, "polearm": 2, "staff": 0,
+	"bow": -1, "crossbow": 0, "sling": -1, "throwing": 1,
+	"armour": 2, "dodging": -2, "shields": 0, "stealth": 2,
+	"spellcasting": -2, "conjurations": -2, "hexes": -1,
+	"fire": -2, "cold": -2, "earth": 3, "air": -4,
+	"necromancy": -2, "translocations": -4, "summonings": -1,
+	"evocations": -1,
+}

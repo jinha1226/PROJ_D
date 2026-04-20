@@ -1,165 +1,153 @@
 extends Control
-## Race-selection screen. Loads all resources/races/*.tres, renders a
-## 2-column scrollable card grid with live LPC-composited previews.
-## Cards show compact info; tapping expands to reveal full details.
+## Race-selection screen. Full-width row list — each row shows a dressed
+## doll preview on the left, name / stats / description / trait on the
+## right. Races sourced from resources/races/*.tres (DCSS roster).
 
-const CHAR_SPRITE_SCENE := preload("res://scenes/entities/CharacterSprite.tscn")
 const JOB_SELECT_PATH := "res://scenes/menu/JobSelect.tscn"
 const MAIN_MENU_PATH := "res://scenes/menu/MainMenu.tscn"
+
+# Canonical DCSS race roster. Order affects list presentation — grouped by
+# archetype (combat → rogue/stealth → magic → undead/exotic).
 const RACE_IDS: Array[String] = [
-	"human", "hill_orc", "minotaur", "deep_elf",
-	"troll", "spriggan", "catfolk", "draconian",
+	# Baseline humans and kin
+	"human", "halfling", "gnoll",
+	# Heavy fighters
+	"minotaur", "hill_orc", "troll", "oni", "formicid", "gargoyle", "coglin",
+	# Rogues / stealth
+	"kobold", "spriggan", "catfolk", "vine_stalker",
+	# Dwarven / earthy
+	"deep_dwarf",
+	# Draconian / scaled
+	"draconian", "naga",
+	# Magical / elven
+	"deep_elf", "tengu", "djinni",
+	# Aquatic / outre
+	"merfolk", "octopode", "barachi",
+	# Undead
+	"ghoul", "mummy", "vampire",
+	# Divine / cosmic
+	"demigod", "demonspawn", "meteoran",
 ]
 
-const _CARD_W: float = 540.0
-const _CARD_H_COMPACT: float = 680.0
-const _CARD_H_EXPANDED: float = 980.0
+const _ROW_HEIGHT: float = 320.0
+const _DOLL_WIDTH: float = 260.0
 
 var _selected_id: String = ""
-var _cards: Dictionary = {}        # race_id -> Button
-var _detail_nodes: Dictionary = {} # race_id -> {sep, detail}
+var _rows: Dictionary = {}  # race_id -> Button
 
 
 func _ready() -> void:
+	theme = GameTheme.create()
 	$Footer/BackButton.pressed.connect(_on_back)
 	$Footer/NextButton.pressed.connect(_on_next)
 	$Footer/NextButton.disabled = true
-	_build_cards()
+	_build_rows()
 
 
-func _build_cards() -> void:
-	var grid: GridContainer = $Scroll/Grid
+func _build_rows() -> void:
+	var list: VBoxContainer = $Scroll/List
 	for rid in RACE_IDS:
 		var res: RaceData = load("res://resources/races/%s.tres" % rid) as RaceData
 		if res == null:
 			continue
-		var card := _make_card(res)
-		grid.add_child(card)
-		_cards[rid] = card
+		var row := _make_row(res)
+		list.add_child(row)
+		_rows[rid] = row
 
 
-func _make_card(r: RaceData) -> Button:
+## Full-width row: dressed doll preview on the left, text stack on the
+## right. All info is visible at once — selection just toggles a tint.
+func _make_row(r: RaceData) -> Button:
 	var btn := Button.new()
 	btn.toggle_mode = true
-	btn.custom_minimum_size = Vector2(_CARD_W, _CARD_H_COMPACT)
-	btn.pressed.connect(_on_card_pressed.bind(r.id))
+	btn.custom_minimum_size = Vector2(0, _ROW_HEIGHT)
+	btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	btn.pressed.connect(_on_row_pressed.bind(r.id))
 
-	var vbox := VBoxContainer.new()
-	vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	vbox.add_theme_constant_override("separation", 10)
-	vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vbox.offset_left = 16
-	vbox.offset_top = 16
-	vbox.offset_right = -16
-	vbox.offset_bottom = -16
-	btn.add_child(vbox)
+	var h := HBoxContainer.new()
+	h.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	h.offset_left = 16
+	h.offset_top = 14
+	h.offset_right = -16
+	h.offset_bottom = -14
+	h.add_theme_constant_override("separation", 20)
+	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	btn.add_child(h)
 
-	# Preview: DCSS tile in DCSS mode, SubViewport+LPC otherwise.
-	if TileRenderer.is_dcss():
-		var trect := TextureRect.new()
-		trect.custom_minimum_size = Vector2(504, 460)
-		trect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		trect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-		trect.texture = TileRenderer.player_race(r.id)
-		trect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		trect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		vbox.add_child(trect)
-	else:
-		var vpc := SubViewportContainer.new()
-		vpc.custom_minimum_size = Vector2(504, 460)
-		vpc.stretch = true
-		vpc.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		vbox.add_child(vpc)
-		var vp := SubViewport.new()
-		vp.size = Vector2i(504, 460)
-		vp.transparent_bg = true
-		vp.disable_3d = true
-		vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-		vpc.add_child(vp)
-		var cs: CharacterSprite = CHAR_SPRITE_SCENE.instantiate() as CharacterSprite
-		vp.add_child(cs)
-		cs.load_character(_race_to_preset(r))
-		cs.set_direction("down")
-		cs.play_anim("idle", true)
-		cs.position = Vector2(252, 400)
-		cs.scale = Vector2(5.5, 5.5)
+	# --- Left: dressed doll preview ---
+	var doll_tex: Texture2D = _compose_dressed_preview(r)
+	var preview := TextureRect.new()
+	preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	preview.custom_minimum_size = Vector2(_DOLL_WIDTH, 0)
+	preview.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	preview.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if doll_tex != null:
+		preview.texture = doll_tex
+	h.add_child(preview)
 
-	# Race name — always visible.
+	# --- Right: text stack ---
+	var vb := VBoxContainer.new()
+	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vb.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vb.add_theme_constant_override("separation", 8)
+	vb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	h.add_child(vb)
+
 	var name_lbl := Label.new()
 	name_lbl.text = r.display_name
-	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_lbl.add_theme_font_size_override("font_size", 56)
+	name_lbl.add_theme_font_size_override("font_size", 60)
 	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vbox.add_child(name_lbl)
+	vb.add_child(name_lbl)
 
-	# Core stats — always visible.
+	var stat_line: String = "STR %d   DEX %d   INT %d   HP/lv %d   MP/lv %d" % [
+			r.base_str, r.base_dex, r.base_int, r.hp_per_level, r.mp_per_level]
 	var stats_lbl := Label.new()
-	stats_lbl.text = "STR %d   DEX %d   INT %d" % [r.base_str, r.base_dex, r.base_int]
-	stats_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	stats_lbl.add_theme_font_size_override("font_size", 38)
+	stats_lbl.text = stat_line
+	stats_lbl.add_theme_font_size_override("font_size", 32)
+	stats_lbl.add_theme_color_override("font_color", Color(0.5, 0.85, 1.0))
 	stats_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vbox.add_child(stats_lbl)
-
-	# --- Detail section (hidden until card is selected) ---
-	var sep := HSeparator.new()
-	sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	sep.visible = false
-	vbox.add_child(sep)
-
-	var detail := VBoxContainer.new()
-	detail.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	detail.visible = false
-	detail.add_theme_constant_override("separation", 6)
-	vbox.add_child(detail)
-
-	var hp_lbl := Label.new()
-	hp_lbl.text = "HP/lv %d   MP/lv %d" % [r.hp_per_level, r.mp_per_level]
-	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hp_lbl.add_theme_font_size_override("font_size", 34)
-	hp_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	detail.add_child(hp_lbl)
-
-	var trait_name: String = r.racial_trait if r.racial_trait != "" else "(no trait)"
-	var trait_lbl := Label.new()
-	trait_lbl.text = "Trait: %s" % trait_name
-	trait_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	trait_lbl.add_theme_font_size_override("font_size", 34)
-	trait_lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
-	trait_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	detail.add_child(trait_lbl)
+	vb.add_child(stats_lbl)
 
 	var desc_lbl := Label.new()
 	desc_lbl.text = r.description
 	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_lbl.add_theme_font_size_override("font_size", 32)
+	desc_lbl.add_theme_font_size_override("font_size", 30)
+	desc_lbl.modulate = Color(0.88, 0.88, 0.96)
+	desc_lbl.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	desc_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	detail.add_child(desc_lbl)
+	vb.add_child(desc_lbl)
 
-	_detail_nodes[r.id] = {"sep": sep, "detail": detail}
+	if r.racial_trait != "":
+		var trait_lbl := Label.new()
+		trait_lbl.text = "Trait: %s" % _format_trait(r.racial_trait)
+		trait_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		trait_lbl.add_theme_font_size_override("font_size", 28)
+		trait_lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
+		trait_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		vb.add_child(trait_lbl)
+
 	return btn
 
 
-## Race-only preset (no job equipment) for the preview sprite.
-func _race_to_preset(r: RaceData) -> Dictionary:
-	var equipment: Array = []
-	if r.hair_def != "":
-		equipment.append({"def": r.hair_def, "variant": r.hair_color})
-	if r.beard_def != "":
-		equipment.append({"def": r.beard_def, "variant": r.beard_color})
-	if r.horns_def != "":
-		equipment.append({"def": r.horns_def, "variant": r.horns_color})
-	if r.ears_def != "":
-		equipment.append({"def": r.ears_def, "variant": r.ears_color})
-	return {
-		"id": r.id,
-		"body_def": r.body_def,
-		"body_variant": "",
-		"skin_tint": r.skin_tint,
-		"equipment": equipment,
-	}
+## Wrap a raw trait_id like "naga_poison_spit" into a readable label.
+func _format_trait(trait_id: String) -> String:
+	return trait_id.replace("_", " ").capitalize()
 
 
-func _on_card_pressed(race_id: String) -> void:
+## Compose a preview texture from the race body + a plain robe overlay so
+## races aren't shown naked. When the race's base sprite doesn't have
+## humanoid dimensions (felid cat, octopode), compose_doll still works
+## because PLAYER_DOLL entries are 32×32 and blend onto the base rect.
+func _compose_dressed_preview(r: RaceData) -> Texture2D:
+	var armor_by_slot: Dictionary = {"chest": "robe"}
+	var tex: Texture2D = TileRenderer.compose_doll(r.id, "", armor_by_slot)
+	if tex == null:
+		return TileRenderer.player_race(r.id)
+	return tex
+
+
+func _on_row_pressed(race_id: String) -> void:
 	var toggling_off: bool = (_selected_id == race_id)
 	if toggling_off:
 		_selected_id = ""
@@ -168,17 +156,13 @@ func _on_card_pressed(race_id: String) -> void:
 		_selected_id = race_id
 		$Footer/NextButton.disabled = false
 
-	for rid in _cards.keys():
-		var b: Button = _cards[rid]
+	for rid in _rows.keys():
+		var b: Button = _rows[rid]
 		if b == null:
 			continue
 		var is_sel: bool = (rid == _selected_id)
 		b.button_pressed = is_sel
-		b.custom_minimum_size = Vector2(_CARD_W, _CARD_H_EXPANDED if is_sel else _CARD_H_COMPACT)
-		if _detail_nodes.has(rid):
-			var d: Dictionary = _detail_nodes[rid]
-			d["sep"].visible = is_sel
-			d["detail"].visible = is_sel
+		b.modulate = Color(1.15, 1.1, 0.85) if is_sel else Color.WHITE
 
 
 func _on_back() -> void:

@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "vine_stalker"
+display_name = "Vine Stalker"
+description = "Plant-humanoid with an antimagic shell. Can't drink potions, but every spell cast and every kill feeds the MP-regenerating vines."
+base_str = 8
+base_dex = 10
+base_int = 9
+hp_per_level = 3
+mp_per_level = 2
+move_speed_mod = 0
+body_def = "body_male"
+skin_tint = "green"
+hair_def = "hair_vines"
+hair_color = "green"
+base_ac = 0
+racial_trait = "vine_stalker_mpregen"
+skill_aptitudes = {
+	"fighting": 1, "short_blade": 1, "long_blade": 0, "axe": 0,
+	"mace": 0, "polearm": 0, "staff": 0,
+	"bow": -1, "crossbow": -1, "sling": -1, "throwing": 0,
+	"armour": -2, "dodging": 1, "shields": -2, "stealth": 2,
+	"spellcasting": 1, "conjurations": 1, "hexes": 0,
+	"fire": 0, "cold": 0, "earth": 0, "air": 0,
+	"necromancy": 0, "translocations": 0, "summonings": 0,
+	"evocations": 0,
+}

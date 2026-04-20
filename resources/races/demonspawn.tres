@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "demonspawn"
+display_name = "Demonspawn"
+description = "Humanoids with infernal blood. Gain mutations as you level. Balanced fighter-mage with necromantic and summoning edge."
+base_str = 9
+base_dex = 7
+base_int = 9
+hp_per_level = 5
+mp_per_level = 3
+move_speed_mod = 0
+body_def = "body_male"
+skin_tint = "dark"
+hair_def = "hair_spiky"
+hair_color = "black"
+horns_def = "horns_short"
+horns_color = "black"
+base_ac = 0
+racial_trait = "demonspawn_mutations"
+skill_aptitudes = {
+	"fighting": 1, "short_blade": 0, "long_blade": 0, "axe": 0,
+	"mace": 1, "polearm": 0, "staff": 0,
+	"bow": -1, "crossbow": -1, "sling": -1, "throwing": 0,
+	"armour": 0, "dodging": 0, "shields": 0, "stealth": 1,
+	"spellcasting": 0, "conjurations": 0, "hexes": 0,
+	"fire": 1, "cold": 0, "earth": 0, "air": 0,
+	"necromancy": 2, "translocations": 0, "summonings": 2,
+	"evocations": 0,
+}

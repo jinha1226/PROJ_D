@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "oni"
+display_name = "Oni"
+description = "Big, brutal spellwielders from the far dungeons. Conjurations come easy, stealth comes never. You don't sneak up on anything."
+base_str = 12
+base_dex = 6
+base_int = 10
+hp_per_level = 6
+mp_per_level = 3
+move_speed_mod = 0
+body_def = "body_male"
+skin_tint = "red"
+hair_def = "hair_messy"
+hair_color = "black"
+horns_def = "horns_short"
+horns_color = "white"
+base_ac = 0
+racial_trait = "oni_magical_might"
+skill_aptitudes = {
+	"fighting": 1, "short_blade": -1, "long_blade": 0, "axe": 1,
+	"mace": 1, "polearm": 1, "staff": 0,
+	"bow": -1, "crossbow": -1, "sling": -1, "throwing": 0,
+	"armour": 1, "dodging": -1, "shields": 0, "stealth": -3,
+	"spellcasting": 1, "conjurations": 3, "hexes": 0,
+	"fire": 2, "cold": 0, "earth": 1, "air": 0,
+	"necromancy": 1, "translocations": 0, "summonings": 0,
+	"evocations": 0,
+}

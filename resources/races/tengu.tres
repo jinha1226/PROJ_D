@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "tengu"
+display_name = "Tengu"
+description = "Winged avian warriors. Unlock flight as you level — no traps, no water, no barrier. Fragile, so you stay in the air for good reasons."
+base_str = 7
+base_dex = 10
+base_int = 10
+hp_per_level = 3
+mp_per_level = 3
+move_speed_mod = 0
+body_def = "body_male"
+skin_tint = "peach"
+hair_def = "hair_feather"
+hair_color = "black"
+base_ac = 0
+racial_trait = "tengu_flight"
+skill_aptitudes = {
+	"fighting": -1, "short_blade": 1, "long_blade": 1, "axe": 1,
+	"mace": 0, "polearm": -1, "staff": 0,
+	"bow": 1, "crossbow": 0, "sling": 0, "throwing": 0,
+	"armour": -2, "dodging": 2, "shields": -2, "stealth": 1,
+	"spellcasting": 2, "conjurations": 2, "hexes": 0,
+	"fire": 1, "cold": 0, "earth": -1, "air": 3,
+	"necromancy": 0, "translocations": 0, "summonings": 0,
+	"evocations": 0,
+}

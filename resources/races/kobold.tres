@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "kobold"
+display_name = "Kobold"
+description = "Small, sneaky, and scrappy. Weak in a straight fight, but quick feet, ranged tricks, and wand evocations let you punch above your weight."
+base_str = 5
+base_dex = 9
+base_int = 10
+hp_per_level = 3
+mp_per_level = 3
+move_speed_mod = 0
+body_def = "body_male"
+skin_tint = "tan"
+hair_def = ""
+hair_color = "brown"
+base_ac = 0
+racial_trait = "kobold_sneak"
+skill_aptitudes = {
+	"fighting": 0, "short_blade": 1, "long_blade": -1, "axe": 0,
+	"mace": -1, "polearm": -2, "staff": 0,
+	"bow": 1, "crossbow": 1, "sling": 1, "throwing": 1,
+	"armour": -1, "dodging": 1, "shields": -2, "stealth": 2,
+	"spellcasting": 1, "conjurations": 0, "hexes": 0,
+	"fire": 0, "cold": 0, "earth": 0, "air": 0,
+	"necromancy": 0, "translocations": 1, "summonings": 1,
+	"evocations": 2,
+}

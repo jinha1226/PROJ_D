@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "djinni"
+display_name = "Djinni"
+description = "Wishful flame-spirits. Innate flight and a single combined HP/MP pool — every spell cast bleeds health."
+base_str = 8
+base_dex = 8
+base_int = 10
+hp_per_level = 6
+mp_per_level = 0
+move_speed_mod = 0
+body_def = "body_male"
+skin_tint = "peach"
+hair_def = "hair_long"
+hair_color = "blue"
+base_ac = 0
+racial_trait = "djinni_flight"
+skill_aptitudes = {
+	"fighting": -2, "short_blade": 0, "long_blade": -1, "axe": -1,
+	"mace": -1, "polearm": -1, "staff": -1,
+	"bow": -1, "crossbow": -1, "sling": -1, "throwing": -1,
+	"armour": -3, "dodging": 1, "shields": -3, "stealth": -1,
+	"spellcasting": 3, "conjurations": 2, "hexes": 2,
+	"fire": 3, "cold": -1, "earth": 1, "air": 2,
+	"necromancy": 0, "translocations": 1, "summonings": 1,
+	"evocations": 2,
+}

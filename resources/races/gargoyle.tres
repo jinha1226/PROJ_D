@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/races/RaceData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "gargoyle"
+display_name = "Gargoyle"
+description = "Living stone. Natural AC, flight at high level, immune to petrify and poison. Low HP but gain damage reduction over time."
+base_str = 10
+base_dex = 8
+base_int = 7
+hp_per_level = 3
+mp_per_level = 3
+move_speed_mod = 0
+body_def = "body_male"
+skin_tint = "stone_grey"
+hair_def = ""
+hair_color = "grey"
+base_ac = 4
+racial_trait = "gargoyle_stone"
+skill_aptitudes = {
+	"fighting": 0, "short_blade": -1, "long_blade": -1, "axe": -1,
+	"mace": 0, "polearm": 0, "staff": 0,
+	"bow": -1, "crossbow": -1, "sling": -1, "throwing": -1,
+	"armour": 1, "dodging": 0, "shields": 0, "stealth": -2,
+	"spellcasting": -1, "conjurations": -1, "hexes": 0,
+	"fire": -1, "cold": 0, "earth": 3, "air": 0,
+	"necromancy": 0, "translocations": 0, "summonings": 0,
+	"evocations": 0,
+}

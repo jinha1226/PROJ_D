@@ -258,6 +258,28 @@ const PLAYER_RACES: Dictionary = {
 	"catfolk":            "player/felids/cat1.png",
 	"draconian":          "player/base/draconian.png",
 	"deep_elf":           "player/base/deep_elf_m.png",
+	# Expanded DCSS race roster
+	"deep_dwarf":         "player/base/deep_dwarf_m.png",
+	"demigod":            "player/base/demigod_m.png",
+	"demonspawn":         "player/base/demonspawn_red_m.png",
+	"djinni":             "player/base/djinni_blue_m.png",
+	"formicid":           "player/base/formicid.png",
+	"gargoyle":           "player/base/gargoyle_m.png",
+	"ghoul":              "player/base/ghoul_m.png",
+	"gnoll":              "player/base/gnoll_m.png",
+	"halfling":           "player/base/halfling_m.png",
+	"kobold":             "player/base/kobold_m.png",
+	"merfolk":            "player/base/merfolk_m.png",
+	"meteoran":           "player/base/meteoran_m.png",
+	"mummy":              "player/base/mummy_m.png",
+	"naga":               "player/base/naga_green_m.png",
+	"octopode":           "player/base/octopode1.png",
+	"oni":                "player/base/oni_red_m.png",
+	"tengu":              "player/base/tengu_winged_m.png",
+	"vampire":            "player/base/vampire_m.png",
+	"vine_stalker":       "player/base/vine_stalker_green_m.png",
+	"barachi":            "player/base/frog_m.png",
+	"coglin":             "player/base/coglin.png",
 }
 
 ## Doll overlay layers stacked on top of the race body sprite. Keyed by
