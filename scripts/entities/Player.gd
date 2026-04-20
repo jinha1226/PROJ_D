@@ -70,7 +70,14 @@ var resist_turns: int = 0
 var _vuln_applied: bool = false
 
 const _CHAR_SPRITE_SCENE := preload("res://scenes/entities/CharacterSprite.tscn")
-const _MOVE_TWEEN_DUR: float = 0.07
+const _MOVE_TWEEN_DUR: float = 0.12
+# Faster tween used when auto-explore / auto-move is driving movement,
+# so tapping to travel across the map reads twice as fast without
+# making single-step manual walk feel jittery.
+const _MOVE_TWEEN_DUR_AUTO: float = 0.06
+# Flipped by TouchInput around the auto-move step call so try_move picks
+# the right duration without having to plumb a parameter everywhere.
+var is_auto_step: bool = false
 const _ATTACK_LUNGE_DUR: float = 0.08
 var _sprite: CharacterSprite = null
 var _walk_idle_timer: SceneTreeTimer = null
@@ -732,7 +739,8 @@ func try_move(delta: Vector2i) -> bool:
 		return false
 	grid_pos = target
 	var target_px: Vector2 = Vector2(grid_pos.x * tile_size + tile_size / 2.0, grid_pos.y * tile_size + tile_size / 2.0)
-	_tween_visual_to(target_px, _MOVE_TWEEN_DUR)
+	var dur: float = _MOVE_TWEEN_DUR_AUTO if is_auto_step else _MOVE_TWEEN_DUR
+	_tween_visual_to(target_px, dur)
 	_pickup_items_here()
 	if _sprite:
 		_sprite.face_toward(delta)

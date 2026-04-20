@@ -264,6 +264,11 @@ func _step_auto_move() -> void:
 		# Path done — if exploring, try to continue to next unexplored tile.
 		if _auto_exploring:
 			_continue_auto_explore()
+			# _continue_auto_explore just set a new path but doesn't end a
+			# turn, so the next player_turn_started timer won't fire by
+			# itself. Step into the new path immediately.
+			if _auto_move_path.size() > 0:
+				_step_auto_move()
 		else:
 			_cancel_auto_move()
 		return
@@ -275,12 +280,20 @@ func _step_auto_move() -> void:
 	_auto_move_path.remove_at(0)
 	_update_path_overlay()
 	var delta: Vector2i = next_tile - player.grid_pos
+	# Flip the player's auto-step flag so try_move picks the fast tween
+	# duration; restore right after so a manual tap reverts to normal.
+	if player != null:
+		player.is_auto_step = true
 	var moved_ok: bool = player.try_move(delta)
+	if player != null:
+		player.is_auto_step = false
 	if not moved_ok:
 		# Blocked (door/wall changed); retry next target if exploring.
 		if _auto_exploring:
 			_auto_move_path.clear()
 			_continue_auto_explore()
+			if _auto_move_path.size() > 0:
+				_step_auto_move()
 		else:
 			_cancel_auto_move()
 
