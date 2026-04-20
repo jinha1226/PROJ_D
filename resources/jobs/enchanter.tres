@@ -12,5 +12,5 @@ dex_bonus = 1
 int_bonus = 2
 starting_equipment = Array[String](["dagger", "robe"])
 starting_skills = {"hexes": 3, "spellcasting": 2, "short_blade": 2, "stealth": 1}
-starting_spells = Array[String](["slow"])
+starting_spells = Array[String](["slow", "confuse", "dazzling_flash"])
 unique_ability = ""

@@ -12,5 +12,5 @@ dex_bonus = 0
 int_bonus = 3
 starting_equipment = Array[String](["fire_staff", "robe"])
 starting_skills = {"fire": 3, "conjurations": 2, "spellcasting": 2}
-starting_spells = Array[String](["flame_tongue"])
+starting_spells = Array[String](["flame_tongue", "scorch", "sticky_flame"])
 unique_ability = ""

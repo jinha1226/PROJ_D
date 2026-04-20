@@ -59,6 +59,7 @@ var _base_seed: int = 0
 var _floor_state: Dictionary = {}
 # Toggle tracking — pressing the same HUD button again closes its popup.
 var _bag_dlg: AcceptDialog = null
+var _suppress_bag_reopen: bool = false
 # Active bag filter ("all" | "weapon" | "armor" | "potion" | "scroll" | "book").
 # Remembered across reopens so swiping/tabbing doesn't lose the user's spot.
 var _bag_category: String = "all"
@@ -1260,7 +1261,10 @@ func _restore_floor(depth: int) -> void:
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	if dmap != null and snapshot.has("explored"):
 		dmap.explored = snapshot["explored"].duplicate()
-		dmap.queue_redraw()
+		if player != null:
+			dmap.update_fov(player.grid_pos)
+		else:
+			dmap.queue_redraw()
 
 
 ## Spawn a Companion at the first walkable tile adjacent to the player.
@@ -1321,6 +1325,7 @@ func _on_identify_one_requested() -> void:
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null or player == null:
 		return
+	_suppress_bag_reopen = true
 	# Close the bag / any other open dialog first so the identify picker
 	# surfaces on top. Without this it stacks behind the bag and becomes
 	# untouchable.
@@ -2990,11 +2995,14 @@ func _on_bag_info(it: Dictionary) -> void:
 
 
 func _on_bag_use(idx: int, dlg: AcceptDialog) -> void:
+	_suppress_bag_reopen = false
 	if player != null:
 		player.use_item(idx)
 	_bag_dlg = null  # Clear BEFORE reopening so toggle check doesn't see stale ref.
 	dlg.queue_free()
-	_on_bag_pressed()
+	if not _suppress_bag_reopen:
+		_on_bag_pressed()
+	_suppress_bag_reopen = false
 
 
 func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
