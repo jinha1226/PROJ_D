@@ -482,8 +482,10 @@ static func _load(path_rel: String) -> Texture2D:
 static func feature(id: String, branch: String = "") -> Texture2D:
 	if branch == "" and Engine.get_main_loop() != null:
 		var gm: Object = Engine.get_main_loop().root.get_node_or_null("GameManager")
-		if gm != null:
-			branch = String(gm.get("current_branch") or "")
+		if gm != null and "current_branch" in gm:
+			var cb = gm.current_branch
+			if typeof(cb) == TYPE_STRING:
+				branch = String(cb)
 	if branch != "" and BRANCH_TILESETS.has(branch):
 		var override: String = String(BRANCH_TILESETS[branch].get(id, ""))
 		if override != "":

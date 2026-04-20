@@ -128,7 +128,14 @@ func _current_branch() -> String:
 		return "main"
 	if mgr.has_method("tileset_branch"):
 		return mgr.call("tileset_branch")
-	return String(mgr.get("current_branch") or "main")
+	# Safer than `String(x or y)` — that crashed with "Nonexistent String
+	# constructor" under some Godot 4.6 paths when `mgr.get(...)` returned
+	# a typed-String default, because the `or` coerced the branch types.
+	if "current_branch" in mgr:
+		var cb = mgr.current_branch
+		if typeof(cb) == TYPE_STRING and String(cb) != "":
+			return String(cb)
+	return "main"
 
 
 func _init_map() -> void:
@@ -522,8 +529,10 @@ func _place_branch_entrances(depth: int, run_seed: int) -> void:
 	if Engine.get_main_loop() != null:
 		mgr = Engine.get_main_loop().root.get_node_or_null("GameManager")
 	var parent: String = "dungeon"
-	if mgr != null:
-		parent = String(mgr.get("current_branch") or "dungeon")
+	if mgr != null and "current_branch" in mgr:
+		var cb = mgr.current_branch
+		if typeof(cb) == TYPE_STRING and String(cb) != "":
+			parent = String(cb)
 	if parent != "dungeon":
 		return
 	var to_place: Array = BranchRegistry.children_entering_at(parent, depth)
@@ -553,8 +562,10 @@ func _place_altars() -> void:
 	if Engine.get_main_loop() != null:
 		mgr = Engine.get_main_loop().root.get_node_or_null("GameManager")
 	var branch: String = "dungeon"
-	if mgr != null:
-		branch = String(mgr.get("current_branch") or "dungeon")
+	if mgr != null and "current_branch" in mgr:
+		var cb = mgr.current_branch
+		if typeof(cb) == TYPE_STRING and String(cb) != "":
+			branch = String(cb)
 	var god_ids: Array = GodRegistry.all_ids()
 	if god_ids.is_empty():
 		return

@@ -255,10 +255,10 @@ static func _branch_for(d: int) -> String:
 	var mgr: Node = null
 	if Engine.get_main_loop() != null:
 		mgr = Engine.get_main_loop().root.get_node_or_null("GameManager")
-	if mgr != null:
-		var real: String = String(mgr.get("current_branch") or "dungeon")
-		if real != "" and real != "dungeon":
-			return real
+	if mgr != null and "current_branch" in mgr:
+		var cb = mgr.current_branch
+		if typeof(cb) == TYPE_STRING and String(cb) != "" and String(cb) != "dungeon":
+			return String(cb)
 	if d <= 5:
 		return "main"
 	if d <= 10:
