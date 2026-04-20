@@ -59,3 +59,7 @@ extends Resource
 @export var attacks: Array = []
 ## Resistance records from DCSS (`fire`, `cold`, `poison` …).
 @export var resists: Array[String] = []
+## DCSS `spells:` field — spellbook id (e.g. `orc_wizard`, `deep_elf_fire_mage`).
+## MonsterAI resolves this against `assets/dcss_mons/spellbooks.json` to pick
+## and cast a spell on hostile sight.
+@export var spells_book: String = ""

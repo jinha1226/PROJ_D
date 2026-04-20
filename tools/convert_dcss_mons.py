@@ -30,6 +30,7 @@ FIELDS_KEEP = {
     "name", "glyph", "hd", "hp_10x", "ac", "ev", "speed", "will", "exp",
     "attacks", "size", "intelligence", "shape", "habitat", "flags",
     "shout", "genus", "resists", "uses", "holiness", "energy", "has_corpse",
+    "spells",
 }
 
 

@@ -65,6 +65,8 @@ static func _merge_dcss_extended(target: MonsterData, entry: Dictionary) -> void
 		target.speed = int(entry.get("speed", 10))
 	if target.flags.is_empty():
 		target.flags = _to_string_array(entry.get("flags", []))
+	if target.spells_book == "":
+		target.spells_book = String(entry.get("spells", ""))
 	if target.attacks.is_empty():
 		target.attacks = entry.get("attacks", []) if typeof(entry.get("attacks")) == TYPE_ARRAY else []
 	if target.resists.is_empty():
@@ -163,6 +165,7 @@ static func _build_from_dcss(id: String, entry: Dictionary) -> MonsterData:
 	d.flags = _to_string_array(entry.get("flags", []))
 	d.attacks = entry.get("attacks", []) if typeof(entry.get("attacks")) == TYPE_ARRAY else []
 	d.resists = _to_string_array(entry.get("resists", []))
+	d.spells_book = String(entry.get("spells", ""))
 	# Tier is a rough difficulty band we use for UI sorting. Map to DCSS HD.
 	if d.hd >= 20:
 		d.tier = 5

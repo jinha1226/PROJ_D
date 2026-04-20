@@ -86,6 +86,7 @@
   "shape": "blob",
   "size": "small",
   "speed": 12,
+  "spells": "acid_spit",
   "will": 160
  },
  "acid_dragon": {
@@ -123,6 +124,7 @@
   "shape": "quadruped_winged",
   "shout": "roar",
   "size": "large",
+  "spells": "acid_dragon",
   "will": 20
  },
  "adder": {
@@ -226,6 +228,7 @@
   "shape": "misc",
   "size": "large",
   "speed": 25,
+  "spells": "air_elemental",
   "will": "invuln"
  },
  "aizul": {
@@ -261,6 +264,7 @@
   "shout": "shout",
   "size": "large",
   "speed": 15,
+  "spells": "aizul",
   "uses": "starting_equipment",
   "will": 120
  },
@@ -298,6 +302,7 @@
   },
   "shape": "plant",
   "size": "giant",
+  "spells": "alderking",
   "will": 100
  },
  "alligator": {
@@ -412,6 +417,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "amaemon",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -644,6 +650,7 @@
   },
   "shape": "humanoid",
   "size": "medium",
+  "spells": "ancient_champion",
   "uses": "weapons_armour",
   "will": 120
  },
@@ -681,6 +688,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "ancient_lich",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -754,6 +762,7 @@
   "shout": "shout",
   "size": "medium",
   "speed": 15,
+  "spells": "angel",
   "uses": "weapons_armour",
   "will": 120
  },
@@ -826,6 +835,7 @@
   "shape": "humanoid",
   "shout": "demon_taunt",
   "size": "giant",
+  "spells": "antaeus",
   "uses": "weapons_armour",
   "will": "invuln"
  },
@@ -859,6 +869,7 @@
   },
   "shape": "humanoid",
   "size": "medium",
+  "spells": "antique_champion",
   "uses": "weapons_armour",
   "will": 120
  },
@@ -934,6 +945,7 @@
   },
   "shape": "quadruped",
   "size": "small",
+  "spells": "apocalypse_crab",
   "will": 60
  },
  "arachne": {
@@ -968,6 +980,7 @@
   "shout": "shout",
   "size": "large",
   "speed": 15,
+  "spells": "arachne",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -997,6 +1010,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "arcanist",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -1078,6 +1092,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "large",
+  "spells": "asmodeus",
   "uses": "weapons_armour",
   "will": "invuln"
  },
@@ -1144,6 +1159,7 @@
   "shape": "humanoid",
   "shout": "bellow",
   "size": "medium",
+  "spells": "asterion",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -1182,6 +1198,7 @@
   },
   "shape": "humanoid",
   "size": "large",
+  "spells": "azrael",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -1274,6 +1291,7 @@
   "shape": "humanoid_tailed",
   "shout": "roar",
   "size": "medium",
+  "spells": "bai_suzhen",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -1322,6 +1340,7 @@
   "shape": "snake",
   "shout": "loud_roar",
   "size": "giant",
+  "spells": "bai_suzhen_dragon",
   "uses": "open_doors",
   "will": 100
  },
@@ -1425,6 +1444,7 @@
   },
   "shape": "fungus",
   "size": "tiny",
+  "spells": "ballistomycete",
   "will": "invuln"
  },
  "ballistomycete_spore": {
@@ -1498,6 +1518,7 @@
   "shout": "shout",
   "size": "large",
   "speed": 12,
+  "spells": "balrug",
   "uses": "weapons_armour",
   "will": 160
  },
@@ -1562,6 +1583,7 @@
   "shape": "quadruped",
   "shout": "hiss",
   "size": "little",
+  "spells": "basilisk",
   "will": 20
  },
  "bat": {
@@ -1726,6 +1748,7 @@
   "shape": "snake",
   "size": "tiny",
   "speed": 12,
+  "spells": "bes_kemwar",
   "will": 10
  },
  "black_bear": {
@@ -1762,6 +1785,7 @@
   "shape": "quadruped_tailless",
   "shout": "growl",
   "size": "medium",
+  "spells": "bear",
   "will": 20
  },
  "black_draconian": {
@@ -1932,6 +1956,7 @@
   "shout": "croak",
   "size": "medium",
   "speed": 14,
+  "spells": "blinker",
   "will": 40
  },
  "blizzard_demon": {
@@ -1973,6 +1998,7 @@
   "shape": "misc",
   "shout": "shout",
   "size": "large",
+  "spells": "blizzard_demon",
   "uses": "open_doors",
   "will": 140
  },
@@ -2082,6 +2108,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "blorkula",
   "uses": "weapons_armour",
   "will": 20
  },
@@ -2122,6 +2149,7 @@
   },
   "shape": "humanoid",
   "size": "medium",
+  "spells": "bog_body",
   "uses": "open_doors",
   "will": 40
  },
@@ -2151,6 +2179,7 @@
   "shout": "shout",
   "size": "little",
   "speed": 12,
+  "spells": "boggart",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -2182,6 +2211,7 @@
   "shape": "insect",
   "size": "little",
   "speed": 6,
+  "spells": "bombardier_beetle",
   "will": 20
  },
  "bomblet": {
@@ -2254,6 +2284,7 @@
   },
   "shape": "quadruped_winged",
   "size": "giant",
+  "spells": "bone_dragon",
   "will": 100
  },
  "boris": {
@@ -2295,6 +2326,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "boris",
   "uses": "weapons_armour",
   "will": "invuln"
  },
@@ -2359,6 +2391,7 @@
   },
   "shape": "insect",
   "size": "large",
+  "spells": "boulder_beetle",
   "will": 40
  },
  "bound_soul": {
@@ -2421,6 +2454,7 @@
   "name": "boundless tesseract",
   "shape": "misc",
   "size": "large",
+  "spells": "boundless_tesseract",
   "will": "invuln"
  },
  "brain_worm": {
@@ -2449,6 +2483,7 @@
   "name": "brain worm",
   "shape": "snake",
   "size": "small",
+  "spells": "brain_worm",
   "will": 20
  },
  "briar_patch": {
@@ -2525,6 +2560,7 @@
   "shape": "humanoid_winged",
   "shout": "roar",
   "size": "large",
+  "spells": "brimstone_fiend",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -2557,6 +2593,7 @@
   "shout": "skitter",
   "size": "large",
   "speed": 12,
+  "spells": "broodmother",
   "will": 60
  },
  "bullfrog": {
@@ -2633,6 +2670,7 @@
   "shout": "scream",
   "size": "large",
   "speed": 15,
+  "spells": "bunyip",
   "will": 60
  },
  "burial_acolyte": {
@@ -2661,6 +2699,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "burial_acolyte",
   "uses": "weapons_armour",
   "will": 20
  },
@@ -2787,6 +2826,7 @@
   "shape": "humanoid",
   "shout": "laugh",
   "size": "large",
+  "spells": "cacodemon",
   "uses": "open_doors",
   "will": 160
  },
@@ -2894,6 +2934,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "cassandra",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -2926,6 +2967,7 @@
   "shape": "quadruped",
   "shout": "bellow",
   "size": "large",
+  "spells": "catoblepas",
   "will": 100
  },
  "caustic_shrike": {
@@ -3102,6 +3144,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "giant",
+  "spells": "cerebov",
   "uses": "weapons_armour",
   "will": "invuln"
  },
@@ -3211,6 +3254,7 @@
   "shape": "humanoid_winged",
   "shout": "cherub",
   "size": "medium",
+  "spells": "battlecry",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -3252,6 +3296,7 @@
   "shout": "screech",
   "size": "tiny",
   "speed": 20,
+  "spells": "chonchon",
   "will": 60
  },
  "chuck": {
@@ -3315,6 +3360,7 @@
   "shape": "insect",
   "size": "little",
   "speed": 12,
+  "spells": "clockroach",
   "will": 20
  },
  "clockwork_bee": {
@@ -3409,6 +3455,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "cloud_mage",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -3450,6 +3497,7 @@
   },
   "shape": "humanoid",
   "size": "small",
+  "spells": "cognitogaunt",
   "uses": "open_doors",
   "will": 80
  },
@@ -3657,6 +3705,7 @@
   "shape": "blob",
   "size": "medium",
   "speed": 10,
+  "spells": "creeping_plasmodium",
   "will": 160
  },
  "crimson_imp": {
@@ -3693,6 +3742,7 @@
   "shape": "humanoid_winged",
   "shout": "shout",
   "size": "little",
+  "spells": "blinker",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -3756,6 +3806,7 @@
   "shape": "quadruped",
   "size": "little",
   "speed": 13,
+  "spells": "crystal_echidna",
   "will": "invuln"
  },
  "crystal_guardian": {
@@ -3791,6 +3842,7 @@
   },
   "shape": "humanoid",
   "size": "large",
+  "spells": "crystal_guardian",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -3822,6 +3874,7 @@
   "shape": "misc",
   "shout": "rustle",
   "size": "small",
+  "spells": "walking_tome",
   "will": "invuln"
  },
  "culicivora": {
@@ -3856,6 +3909,7 @@
   "shout": "faint_skitter",
   "size": "small",
   "speed": 15,
+  "spells": "culicivora",
   "will": 20
  },
  "curse_skull": {
@@ -3888,6 +3942,7 @@
   "shout": "moan",
   "size": "tiny",
   "speed": 15,
+  "spells": "curse_skull",
   "will": "invuln"
  },
  "curse_toe": {
@@ -3922,6 +3977,7 @@
   "shape": "misc",
   "shout": "moan",
   "size": "tiny",
+  "spells": "curse_toe",
   "will": "invuln"
  },
  "cyclops": {
@@ -3992,6 +4048,7 @@
   "shape": "humanoid_winged",
   "shout": "shout",
   "size": "medium",
+  "spells": "daeva",
   "uses": "weapons_armour",
   "will": 140
  },
@@ -4062,6 +4119,7 @@
   "shape": "snail",
   "size": "little",
   "speed": 7,
+  "spells": "dart_slug",
   "will": 0
  },
  "death_cob": {
@@ -4131,6 +4189,7 @@
   "shout": "hiss",
   "size": "large",
   "speed": 13,
+  "spells": "death_drake",
   "will": 40
  },
  "death_knight": {
@@ -4160,6 +4219,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "death_knight",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -4255,6 +4315,7 @@
   },
   "shape": "fungus",
   "size": "tiny",
+  "spells": "deathcap",
   "will": 80
  },
  "deep_elf_air_mage": {
@@ -4283,6 +4344,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "deep_elf_air_mage",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -4313,6 +4375,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "annihilator",
   "uses": "weapons_armour",
   "will": 120
  },
@@ -4343,6 +4406,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "deep_elf_archer",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -4409,6 +4473,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "deep_elf_death_mage",
   "uses": "weapons_armour",
   "will": 120
  },
@@ -4439,6 +4504,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "deep_elf_demonologist",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -4469,6 +4535,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "deep_elf_elementalist",
   "uses": "weapons_armour",
   "will": 120
  },
@@ -4498,6 +4565,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "deep_elf_fire_mage",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -4527,6 +4595,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "deep_elf_high_priest",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -4557,6 +4626,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "deep_elf_knight",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -4621,6 +4691,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "deep_elf_sorcerer",
   "uses": "weapons_armour",
   "will": 120
  },
@@ -4702,6 +4773,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "large",
+  "spells": "deep_troll_earth_mage",
   "uses": "open_doors",
   "will": 40
  },
@@ -4742,6 +4814,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "large",
+  "spells": "deep_troll_shaman",
   "uses": "open_doors",
   "will": 40
  },
@@ -4928,6 +5001,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "demonspawn_blood_saint",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -4968,6 +5042,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "demonspawn_corrupter",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -5005,6 +5080,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "demonspawn_soul_scholar",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -5047,6 +5123,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "demonspawn_warmonger",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -5108,6 +5185,7 @@
   },
   "shape": "misc",
   "size": "large",
+  "spells": "sawblade",
   "will": "invuln"
  },
  "dire_elephant": {
@@ -5185,6 +5263,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "large",
+  "spells": "dispater",
   "uses": "weapons_armour",
   "will": "invuln"
  },
@@ -5231,6 +5310,7 @@
   },
   "shape": "blob",
   "size": "medium",
+  "spells": "dissolution",
   "will": 120
  },
  "divine_tome": {
@@ -5258,6 +5338,7 @@
   "shape": "misc",
   "shout": "rustle",
   "size": "small",
+  "spells": "walking_tome",
   "will": "invuln"
  },
  "djinni": {
@@ -5325,6 +5406,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "donald",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -5356,6 +5438,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "dowan",
   "uses": "weapons_armour",
   "will": 20
  },
@@ -5416,6 +5499,7 @@
   "shape": "humanoid_tailed",
   "shout": "roar",
   "size": "medium",
+  "spells": "annihilator",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -5446,6 +5530,7 @@
   "shape": "humanoid_tailed",
   "shout": "roar",
   "size": "medium",
+  "spells": "draconian_knight",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -5514,6 +5599,7 @@
   "shape": "humanoid_tailed",
   "shout": "roar",
   "size": "medium",
+  "spells": "draconian_scorcher",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -5543,6 +5629,7 @@
   "shape": "humanoid_tailed",
   "shout": "roar",
   "size": "medium",
+  "spells": "draconian_shifter",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -5572,6 +5659,7 @@
   "shape": "humanoid_tailed",
   "shout": "roar",
   "size": "medium",
+  "spells": "draconian_stormcaller",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -5684,6 +5772,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "dread_lich",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -5713,6 +5802,7 @@
   "shape": "quadruped_tailless",
   "shout": "bleat",
   "size": "medium",
+  "spells": "dream_sheep",
   "will": 30
  },
  "drowned_soul": {
@@ -5826,6 +5916,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "dryad",
   "will": 80
  },
  "duvessa": {
@@ -5950,6 +6041,7 @@
   "shape": "misc",
   "shout": "rustle",
   "size": "small",
+  "spells": "walking_tome",
   "will": "invuln"
  },
  "edmund": {
@@ -6016,6 +6108,7 @@
   },
   "shape": "humanoid",
   "size": "large",
+  "spells": "efreet",
   "uses": "weapons_armour",
   "will": 20
  },
@@ -6057,6 +6150,7 @@
   "shape": "humanoid",
   "shout": "moan",
   "size": "medium",
+  "spells": "eidolon",
   "uses": "open_doors",
   "will": 140
  },
@@ -6166,6 +6260,7 @@
   },
   "shape": "snake",
   "size": "small",
+  "spells": "zapper",
   "will": 10
  },
  "electric_golem": {
@@ -6217,6 +6312,7 @@
   "shape": "humanoid",
   "size": "large",
   "speed": 16,
+  "spells": "electric_golem",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -6246,6 +6342,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "eleionoma",
   "uses": "starting_equipment",
   "will": 100
  },
@@ -6298,6 +6395,7 @@
   },
   "shape": "misc",
   "size": "large",
+  "spells": "elemental_wellspring",
   "will": "invuln"
  },
  "elephant": {
@@ -6467,6 +6565,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "little",
+  "spells": "enchantress",
   "uses": "weapons_armour",
   "will": 160
  },
@@ -6500,6 +6599,7 @@
   },
   "shape": "blob",
   "size": "little",
+  "spells": "endoplasm",
   "will": 0
  },
  "entropy_weaver": {
@@ -6545,6 +6645,7 @@
   "shout": "shout",
   "size": "medium",
   "speed": 12,
+  "spells": "entropy_weaver",
   "uses": "open_doors",
   "will": 60
  },
@@ -6587,6 +6688,7 @@
   "shout": "shout",
   "size": "large",
   "speed": 14,
+  "spells": "ereshkigal",
   "uses": "weapons_armour",
   "will": "invuln"
  },
@@ -6625,6 +6727,7 @@
   "shape": "misc",
   "shout": "shout",
   "size": "medium",
+  "spells": "erica",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -6660,6 +6763,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "large",
+  "spells": "erolcha",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -6759,6 +6863,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "eustachio",
   "uses": "weapons_armour",
   "will": 20
  },
@@ -6805,6 +6910,7 @@
   "shout": "scream",
   "size": "large",
   "speed": 20,
+  "spells": "executioner",
   "uses": "open_doors",
   "will": 140
  },
@@ -6833,6 +6939,7 @@
   "shape": "orb",
   "size": "medium",
   "speed": 8,
+  "spells": "eye_of_devastation",
   "will": 100
  },
  "eye_of_draining": {
@@ -6863,6 +6970,7 @@
   },
   "shape": "orb",
   "size": "medium",
+  "spells": "eye_of_draining",
   "will": 80
  },
  "fannar": {
@@ -6893,6 +7001,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "fannar",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -6922,6 +7031,7 @@
   "shape": "humanoid_tailed",
   "shout": "shout",
   "size": "medium",
+  "spells": "faun",
   "uses": "starting_equipment",
   "will": 40
  },
@@ -6993,6 +7103,7 @@
   "shout": "shout",
   "size": "giant",
   "speed": 13,
+  "spells": "fenstrider_witch",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -7068,6 +7179,7 @@
   },
   "shape": "quadruped",
   "size": "small",
+  "spells": "fire_crab",
   "will": 40
  },
  "fire_dragon": {
@@ -7111,6 +7223,7 @@
   "shape": "quadruped_winged",
   "shout": "loud_roar",
   "size": "giant",
+  "spells": "fire_dragon_breath",
   "will": 60
  },
  "fire_elemental": {
@@ -7182,6 +7295,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "giant",
+  "spells": "fire_giant",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -7253,6 +7367,7 @@
   "name": "flayed ghost",
   "shape": "humanoid",
   "size": "medium",
+  "spells": "flayed_ghost",
   "uses": "open_doors",
   "will": 60
  },
@@ -7350,6 +7465,7 @@
   },
   "shape": "blob",
   "size": "large",
+  "spells": "blink_close",
   "will": 60
  },
  "foxfire": {
@@ -7414,6 +7530,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "frances",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -7449,6 +7566,7 @@
   "shape": "humanoid_winged",
   "shout": "shout",
   "size": "medium",
+  "spells": "fravashi",
   "uses": "starting_equipment",
   "will": 120
  },
@@ -7482,6 +7600,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "frederick",
   "uses": "weapons_armour",
   "will": 140
  },
@@ -7612,6 +7731,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "giant",
+  "spells": "frost_giant",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -7645,6 +7765,7 @@
   "shape": "misc",
   "shout": "rustle",
   "size": "small",
+  "spells": "walking_tome",
   "will": "invuln"
  },
  "fulminant_prism": {
@@ -7740,6 +7861,7 @@
   },
   "shape": "humanoid_winged_tailed",
   "size": "medium",
+  "spells": "gargoyle",
   "uses": "starting_equipment",
   "will": 40
  },
@@ -7774,6 +7896,7 @@
   "shout": "gurgle",
   "size": "giant",
   "speed": 5,
+  "spells": "gastronok",
   "uses": "starting_equipment",
   "will": 80
  },
@@ -7812,6 +7935,7 @@
   "shape": "humanoid_winged",
   "shout": "roar",
   "size": "giant",
+  "spells": "geryon",
   "uses": "starting_equipment",
   "will": 120
  },
@@ -7877,6 +8001,7 @@
   "name": "ghost crab",
   "shape": "quadruped",
   "size": "small",
+  "spells": "ghost_crab",
   "will": 40
  },
  "ghost_moth": {
@@ -7920,6 +8045,7 @@
   "shape": "insect_winged",
   "size": "large",
   "speed": 12,
+  "spells": "ghost_moth",
   "will": 100
  },
  "ghoul": {
@@ -8032,6 +8158,7 @@
   },
   "shape": "orb",
   "size": "medium",
+  "spells": "glass_eye",
   "will": 60
  },
  "globe_of_annihilation": {
@@ -8110,6 +8237,7 @@
   "shout": "moan",
   "size": "large",
   "speed": 20,
+  "spells": "gloorx_vloq",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -8140,6 +8268,7 @@
   },
   "shape": "orb",
   "size": "medium",
+  "spells": "glowing_orange_brain",
   "uses": "open_doors",
   "will": 100
  },
@@ -8223,6 +8352,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "bouda",
   "uses": "weapons_armour",
   "will": 20
  },
@@ -8391,6 +8521,7 @@
   "shape": "quadruped_winged",
   "shout": "loud_roar",
   "size": "giant",
+  "spells": "golden_dragon",
   "will": 180
  },
  "golden_eye": {
@@ -8419,6 +8550,7 @@
   "shape": "orb",
   "size": "tiny",
   "speed": 13,
+  "spells": "golden_eye",
   "will": 60
  },
  "golem": {
@@ -8506,6 +8638,7 @@
   },
   "shape": "orb",
   "size": "large",
+  "spells": "great_orb_of_eyes",
   "will": 120
  },
  "green_death": {
@@ -8538,6 +8671,7 @@
   "shape": "humanoid",
   "shout": "roar",
   "size": "large",
+  "spells": "green_death",
   "uses": "open_doors",
   "will": 160
  },
@@ -8650,6 +8784,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "little",
+  "spells": "grinder",
   "uses": "starting_equipment",
   "will": 20
  },
@@ -8781,6 +8916,7 @@
   "shout": "shout",
   "size": "large",
   "speed": 15,
+  "spells": "guardian_serpent",
   "will": 60
  },
  "guardian_sphinx": {
@@ -8821,6 +8957,7 @@
   "shout": "shout",
   "size": "giant",
   "speed": 12,
+  "spells": "guardian_sphinx",
   "uses": "starting_equipment",
   "will": 80
  },
@@ -8856,6 +8993,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "halazid_warlock",
   "uses": "open_doors",
   "will": 100
  },
@@ -8919,6 +9057,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "harold",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -9030,6 +9169,7 @@
   "shout": "shout",
   "size": "medium",
   "speed": 15,
+  "spells": "headmaster",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -9063,6 +9203,7 @@
   "shout": "squeal",
   "size": "medium",
   "speed": 14,
+  "spells": "hell_hog",
   "will": 40
  },
  "hell_hound": {
@@ -9100,6 +9241,7 @@
   "shout": "bark",
   "size": "medium",
   "speed": 15,
+  "spells": "hell_hound",
   "will": 20
  },
  "hell_knight": {
@@ -9132,6 +9274,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "hell_knight",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -9229,6 +9372,7 @@
   "shape": "humanoid",
   "shout": "roar",
   "size": "large",
+  "spells": "hell_sentinel",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -9259,6 +9403,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "hellbinder",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -9300,6 +9445,7 @@
   "shape": "quadruped",
   "shout": "trumpet",
   "size": "giant",
+  "spells": "hellephant",
   "will": 140
  },
  "hellfire_mortar": {
@@ -9336,6 +9482,7 @@
   "shape": "misc",
   "size": "giant",
   "speed": 10,
+  "spells": "hellfire_mortar",
   "will": "invuln"
  },
  "hellion": {
@@ -9367,6 +9514,7 @@
   "shout": "scream",
   "size": "medium",
   "speed": 12,
+  "spells": "hellion",
   "uses": "open_doors",
   "will": 60
  },
@@ -9442,6 +9590,7 @@
   "shape": "quadruped_winged",
   "shout": "screech",
   "size": "large",
+  "spells": "hippogriff",
   "will": 20
  },
  "hoarfrost_cannon": {
@@ -9476,6 +9625,7 @@
   "shape": "misc",
   "size": "large",
   "speed": 5,
+  "spells": "hoarfrost_cannon",
   "will": "invuln"
  },
  "hobgoblin": {
@@ -9657,6 +9807,7 @@
   "shout": "howl",
   "size": "small",
   "speed": 12,
+  "spells": "howler_monkey",
   "uses": "open_doors",
   "will": 10
  },
@@ -9829,6 +9980,7 @@
   "shape": "quadruped_winged",
   "shout": "loud_roar",
   "size": "giant",
+  "spells": "ice_dragon_breath",
   "will": 40
  },
  "ice_fiend": {
@@ -9870,6 +10022,7 @@
   "shape": "humanoid_winged",
   "shout": "roar",
   "size": "large",
+  "spells": "ice_fiend",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -9903,6 +10056,7 @@
   },
   "shape": "humanoid",
   "size": "large",
+  "spells": "ice_statue",
   "will": "invuln"
  },
  "ignacio": {
@@ -9955,6 +10109,7 @@
   "shout": "shout",
   "size": "large",
   "speed": 20,
+  "spells": "ignacio",
   "uses": "starting_equipment",
   "will": 160
  },
@@ -10051,6 +10206,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "ilsuiw",
   "uses": "weapons_armour",
   "will": 140
  },
@@ -10082,6 +10238,7 @@
   "shout": "shout",
   "size": "medium",
   "speed": 12,
+  "spells": "imperial_myrmidon",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -10161,6 +10318,7 @@
   "shout": "loud_roar",
   "size": "giant",
   "speed": 8,
+  "spells": "iron_dragon",
   "will": 160
  },
  "iron_elemental": {
@@ -10193,6 +10351,7 @@
   "shape": "misc",
   "size": "large",
   "speed": 6,
+  "spells": "iron_elemental",
   "will": "invuln"
  },
  "iron_giant": {
@@ -10229,6 +10388,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "giant",
+  "spells": "iron_giant",
   "uses": "starting_equipment",
   "will": 120
  },
@@ -10381,6 +10541,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "ironbound_beastmaster",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -10410,6 +10571,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "ironbound_convoker",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -10444,6 +10606,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "ironbound_frostheart",
   "uses": "starting_equipment",
   "will": 40
  },
@@ -10479,6 +10642,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "ironbound_mechanist",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -10508,6 +10672,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "ironbound_preserver",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -10540,6 +10705,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "large",
+  "spells": "ironbound_thunderhulk",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -10641,6 +10807,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "jeremiah",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -10672,6 +10839,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "jessica",
   "uses": "weapons_armour",
   "will": 10
  },
@@ -10745,6 +10913,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "jorgrun",
   "uses": "weapons_armour",
   "will": 120
  },
@@ -10778,6 +10947,7 @@
   "shout": "shout",
   "size": "medium",
   "speed": 12,
+  "spells": "jorogumo",
   "uses": "open_doors",
   "will": 60
  },
@@ -10821,6 +10991,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "jory",
   "uses": "weapons_armour",
   "will": 160
  },
@@ -10896,6 +11067,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "josephina",
   "uses": "weapons_armour",
   "will": "invuln"
  },
@@ -10930,6 +11102,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "josephine",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -11009,6 +11182,7 @@
   "shout": "faint_skitter",
   "size": "small",
   "speed": 15,
+  "spells": "jumping_spider",
   "will": 20
  },
  "khufu": {
@@ -11044,6 +11218,7 @@
   },
   "shape": "humanoid",
   "size": "medium",
+  "spells": "khufu",
   "uses": "weapons_armour",
   "will": 160
  },
@@ -11111,6 +11286,7 @@
   "shout": "shout",
   "size": "medium",
   "speed": 13,
+  "spells": "killer_klown",
   "uses": "starting_equipment",
   "will": 160
  },
@@ -11143,6 +11319,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "kirke",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -11204,6 +11381,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "small",
+  "spells": "kobold_blastminer",
   "uses": "weapons_armour",
   "will": 20
  },
@@ -11262,6 +11440,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "small",
+  "spells": "kobold_demonologist",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -11300,6 +11479,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "small",
+  "spells": "kobold_fleshcrafter",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -11329,6 +11509,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "small",
+  "spells": "kobold_geomancer",
   "uses": "weapons_armour",
   "will": 20
  },
@@ -11391,6 +11572,7 @@
   "shape": "misc",
   "size": "giant",
   "speed": 14,
+  "spells": "kraken",
   "will": 60
  },
  "kraken_tentacle": {
@@ -11484,6 +11666,7 @@
   "shout": "scream",
   "size": "tiny",
   "speed": 15,
+  "spells": "laughing_skull",
   "will": 20
  },
  "lava_snake": {
@@ -11518,6 +11701,7 @@
   "shape": "snake",
   "shout": "hiss",
   "size": "small",
+  "spells": "lava_snake",
   "will": 10
  },
  "lemure": {
@@ -11620,6 +11804,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "lich",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -11651,6 +11836,7 @@
   },
   "shape": "misc",
   "size": "small",
+  "spells": "zapper",
   "will": "invuln"
  },
  "lindwurm": {
@@ -11687,6 +11873,7 @@
   "shape": "quadruped",
   "shout": "roar",
   "size": "large",
+  "spells": "lindwurm",
   "will": 40
  },
  "living_spell": {
@@ -11744,6 +11931,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "large",
+  "spells": "lodul",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -11788,6 +11976,7 @@
   "shape": "humanoid",
   "shout": "scream",
   "size": "large",
+  "spells": "lom_lobon",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -11852,6 +12041,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "louise",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -11913,6 +12103,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "maggie",
   "uses": "weapons_armour",
   "will": 20
  },
@@ -11943,6 +12134,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "merfolk_avatar",
   "uses": "open_doors",
   "will": 120
  },
@@ -12012,6 +12204,7 @@
   "name": "manticore",
   "shape": "quadruped",
   "size": "large",
+  "spells": "manticore",
   "will": 40
  },
  "mara": {
@@ -12052,6 +12245,7 @@
   },
   "shape": "humanoid",
   "size": "medium",
+  "spells": "mara",
   "uses": "weapons_armour",
   "will": 140
  },
@@ -12084,6 +12278,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "margery",
   "uses": "weapons_armour",
   "will": 140
  },
@@ -12186,6 +12381,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "maurice",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -12226,6 +12422,7 @@
   "shout": "buzz",
   "size": "small",
   "speed": 20,
+  "spells": "meliai",
   "uses": "weapons_armour",
   "will": 20
  },
@@ -12264,6 +12461,7 @@
   "shout": "shout",
   "size": "medium",
   "speed": 8,
+  "spells": "menkaure",
   "uses": "open_doors",
   "will": 20
  },
@@ -12306,6 +12504,7 @@
   "shape": "humanoid_winged",
   "size": "medium",
   "speed": 15,
+  "spells": "mennas",
   "uses": "weapons_armour",
   "will": 160
  },
@@ -12373,6 +12572,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "merfolk_aquamancer",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -12402,6 +12602,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "merfolk_avatar",
   "uses": "open_doors",
   "will": 120
  },
@@ -12504,6 +12705,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "merfolk_siren",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -12613,6 +12815,7 @@
   "shout": "shout",
   "size": "giant",
   "speed": 14,
+  "spells": "mlioglotl",
   "will": 120
  },
  "mnoleg": {
@@ -12664,6 +12867,7 @@
   "shout": "buzz",
   "size": "large",
   "speed": 13,
+  "spells": "mnoleg",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -12700,6 +12904,7 @@
   },
   "shape": "humanoid_winged_tailed",
   "size": "medium",
+  "spells": "molten_gargoyle",
   "uses": "starting_equipment",
   "will": 60
  },
@@ -12734,6 +12939,7 @@
   "shape": "orb",
   "size": "medium",
   "speed": 13,
+  "spells": "monarch_bomb",
   "will": "invuln"
  },
  "moon_troll": {
@@ -12781,6 +12987,7 @@
   "shout": "shout",
   "size": "large",
   "speed": 12,
+  "spells": "moon_troll",
   "uses": "weapons_armour",
   "will": 140
  },
@@ -12880,6 +13087,7 @@
   "shape": "insect_winged",
   "size": "small",
   "speed": 12,
+  "spells": "moth_of_wrath",
   "will": 40
  },
  "mountainshell": {
@@ -12909,6 +13117,7 @@
   "shout": "growl",
   "size": "large",
   "speed": 7,
+  "spells": "mountainshell",
   "will": 80
  },
  "mummy": {
@@ -12973,6 +13182,7 @@
   "shape": "humanoid",
   "size": "medium",
   "speed": 8,
+  "spells": "mummy_priest",
   "uses": "weapons_armour",
   "will": 120
  },
@@ -13015,6 +13225,7 @@
   "shape": "misc",
   "shout": "moan",
   "size": "tiny",
+  "spells": "murray",
   "will": "invuln"
  },
  "mutant_beast": {
@@ -13082,6 +13293,7 @@
   "shape": "naga",
   "shout": "shout",
   "size": "large",
+  "spells": "naga",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -13123,6 +13335,7 @@
   "shape": "naga",
   "shout": "shout",
   "size": "large",
+  "spells": "naga_mage",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -13164,6 +13377,7 @@
   "shape": "naga",
   "shout": "shout",
   "size": "large",
+  "spells": "naga_ritualist",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -13207,6 +13421,7 @@
   "shape": "naga",
   "shout": "shout",
   "size": "large",
+  "spells": "naga_sharpshooter",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -13249,6 +13464,7 @@
   "shape": "naga",
   "shout": "shout",
   "size": "large",
+  "spells": "naga_warrior",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -13291,6 +13507,7 @@
   "shape": "naga",
   "shout": "shout",
   "size": "large",
+  "spells": "nagaraja",
   "uses": "weapons_armour",
   "will": 140
  },
@@ -13323,6 +13540,7 @@
   "name": "nameless horror",
   "shape": "misc",
   "size": "giant",
+  "spells": "nameless",
   "will": "invuln"
  },
  "nargun": {
@@ -13364,6 +13582,7 @@
   },
   "shape": "blob",
   "size": "medium",
+  "spells": "nargun",
   "will": 100
  },
  "nascent_plasmodium": {
@@ -13396,6 +13615,7 @@
   },
   "shape": "blob",
   "size": "small",
+  "spells": "nascent_plasmodium",
   "will": 160
  },
  "natasha": {
@@ -13430,6 +13650,7 @@
   "shape": "quadruped",
   "shout": "hiss",
   "size": "little",
+  "spells": "natasha",
   "uses": "starting_equipment",
   "will": 20
  },
@@ -13459,6 +13680,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "necromancer",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -13535,6 +13757,7 @@
   },
   "shape": "humanoid",
   "size": "medium",
+  "spells": "nekomata",
   "uses": "starting_equipment",
   "will": 120
  },
@@ -13579,6 +13802,7 @@
   "shape": "quadruped",
   "shout": "trumpet",
   "size": "giant",
+  "spells": "hellephant",
   "will": 140
  },
  "neqoxec": {
@@ -13611,6 +13835,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "neqoxec",
   "uses": "open_doors",
   "will": 40
  },
@@ -13643,6 +13868,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "nergalle",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -13680,6 +13906,7 @@
   "shout": "shout",
   "size": "large",
   "speed": 15,
+  "spells": "nessos",
   "uses": "weapons_armour",
   "will": 20
  },
@@ -13712,6 +13939,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "nikola",
   "uses": "weapons_armour",
   "will": 120
  },
@@ -13748,6 +13976,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "nameless_revenant",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -13783,6 +14012,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "norris",
   "uses": "weapons_armour",
   "will": 140
  },
@@ -13821,6 +14051,7 @@
   "shout": "bark",
   "size": "medium",
   "speed": 13,
+  "spells": "oblivion_hound",
   "will": 20
  },
  "obsidian_bat": {
@@ -13891,6 +14122,7 @@
   },
   "shape": "humanoid",
   "size": "large",
+  "spells": "obsidian_statue",
   "will": "invuln"
  },
  "occultist": {
@@ -13919,6 +14151,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "occultist",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -14021,6 +14254,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "large",
+  "spells": "ogre_mage",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -14050,6 +14284,7 @@
   },
   "shape": "plant",
   "size": "small",
+  "spells": "acid_spit",
   "will": 40
  },
  "oklob_sapling": {
@@ -14078,6 +14313,7 @@
   },
   "shape": "plant",
   "size": "small",
+  "spells": "oklob_sapling",
   "will": 20
  },
  "oni": {
@@ -14146,6 +14382,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "large",
+  "spells": "oni_incarcerator",
   "uses": "starting_equipment",
   "will": 100
  },
@@ -14173,6 +14410,7 @@
   "name": "ophan",
   "shape": "orb",
   "size": "medium",
+  "spells": "ophan",
   "will": 140
  },
  "orange_demon": {
@@ -14238,6 +14476,7 @@
   },
   "shape": "humanoid",
   "size": "large",
+  "spells": "orange_crystal_statue",
   "will": "invuln"
  },
  "orb_guardian": {
@@ -14335,6 +14574,7 @@
   "shape": "orb",
   "size": "little",
   "speed": 15,
+  "spells": "orb_of_entropy",
   "will": "invuln"
  },
  "orb_of_fire": {
@@ -14366,6 +14606,7 @@
   "shape": "orb",
   "size": "little",
   "speed": 15,
+  "spells": "orb_of_fire",
   "will": "invuln"
  },
  "orb_of_winter": {
@@ -14397,6 +14638,7 @@
   "shape": "orb",
   "size": "little",
   "speed": 15,
+  "spells": "orb_of_winter",
   "will": "invuln"
  },
  "orb_spider": {
@@ -14434,6 +14676,7 @@
   "shout": "faint_skitter",
   "size": "small",
   "speed": 12,
+  "spells": "orb_spider",
   "will": 40
  },
  "orc": {
@@ -14498,6 +14741,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "ghost",
   "uses": "starting_equipment"
  },
  "orc_high_priest": {
@@ -14526,6 +14770,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "orc_high_priest",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -14556,6 +14801,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "orc_knight",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -14585,6 +14831,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "orc_priest",
   "uses": "weapons_armour",
   "will": 20
  },
@@ -14615,6 +14862,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "orc_sorcerer",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -14645,6 +14893,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "battlecry",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -14704,6 +14953,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "orc_wizard",
   "uses": "weapons_armour",
   "will": 20
  },
@@ -14775,6 +15025,7 @@
   "shape": "humanoid",
   "shout": "demon_taunt",
   "size": "large",
+  "spells": "ghost",
   "uses": "open_doors"
  },
  "parghit": {
@@ -14895,6 +15146,7 @@
   "shout": "roar",
   "size": "medium",
   "speed": 15,
+  "spells": "peacekeeper",
   "will": "invuln"
  },
  "pearl_dragon": {
@@ -14935,6 +15187,7 @@
   "shout": "loud_roar",
   "size": "giant",
   "speed": 12,
+  "spells": "pearl_dragon",
   "will": 160
  },
  "petrified_flower": {
@@ -15038,6 +15291,7 @@
   },
   "shape": "humanoid",
   "size": "medium",
+  "spells": "blink_close",
   "uses": "open_doors",
   "will": 80
  },
@@ -15372,6 +15626,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "ghost",
   "uses": "open_doors"
  },
  "player_illusion": {
@@ -15406,6 +15661,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "ghost",
   "uses": "open_doors"
  },
  "player_shadow": {
@@ -15478,6 +15734,7 @@
   "shape": "quadruped_tailless",
   "shout": "growl",
   "size": "large",
+  "spells": "bear",
   "will": 20
  },
  "poltergeist": {
@@ -15545,6 +15802,7 @@
   },
   "shape": "misc",
   "size": "medium",
+  "spells": "polterguardian",
   "uses": "open_doors",
   "will": 80
  },
@@ -15581,6 +15839,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "giant",
+  "spells": "polyphemus",
   "uses": "starting_equipment",
   "will": 60
  },
@@ -15618,6 +15877,7 @@
   "shout": "croak",
   "size": "medium",
   "speed": 14,
+  "spells": "blinker",
   "will": 40
  },
  "profane_servitor": {
@@ -15721,6 +15981,7 @@
   "shout": "gurgle",
   "size": "giant",
   "speed": 14,
+  "spells": "protean_progenitor",
   "uses": "open_doors",
   "will": 120
  },
@@ -15789,6 +16050,7 @@
   "shape": "misc",
   "shout": "moan",
   "size": "medium",
+  "spells": "putrid_mouth",
   "uses": "open_doors",
   "will": 100
  },
@@ -15823,6 +16085,7 @@
   "shape": "insect_winged",
   "shout": "buzz",
   "size": "little",
+  "spells": "queen_bee",
   "will": 20
  },
  "quicksilver_dragon": {
@@ -15858,6 +16121,7 @@
   "shout": "loud_roar",
   "size": "giant",
   "speed": 15,
+  "spells": "quicksilver_dragon",
   "will": 140
  },
  "quicksilver_elemental": {
@@ -15896,6 +16160,7 @@
   "shape": "misc",
   "size": "large",
   "speed": 20,
+  "spells": "quicksilver_dragon",
   "will": "invuln"
  },
  "quokka": {
@@ -15954,6 +16219,7 @@
   "name": "radroach",
   "shape": "insect",
   "size": "little",
+  "spells": "radroach",
   "will": 60
  },
  "ragged_hierophant": {
@@ -15982,6 +16248,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "ragged_hierophant",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -16016,6 +16283,7 @@
   "shape": "quadruped",
   "shout": "bark",
   "size": "medium",
+  "spells": "raiju",
   "will": 20
  },
  "rakshasa": {
@@ -16047,6 +16315,7 @@
   },
   "shape": "humanoid",
   "size": "medium",
+  "spells": "rakshasa",
   "uses": "weapons_armour",
   "will": 140
  },
@@ -16104,6 +16373,7 @@
   "shout": "caw",
   "size": "tiny",
   "speed": 20,
+  "spells": "raven",
   "will": 20
  },
  "reaper": {
@@ -16341,6 +16611,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "revenant",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -16370,6 +16641,7 @@
   "shape": "snake",
   "size": "small",
   "speed": 8,
+  "spells": "ribbon_worm",
   "will": 10
  },
  "rime_drake": {
@@ -16403,6 +16675,7 @@
   "shout": "hiss",
   "size": "large",
   "speed": 12,
+  "spells": "rime_drake",
   "will": 20
  },
  "river_rat": {
@@ -16463,6 +16736,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "robin",
   "uses": "weapons_armour",
   "will": 10
  },
@@ -16566,6 +16840,7 @@
   },
   "shape": "humanoid",
   "size": "large",
+  "spells": "roxanne",
   "uses": "starting_equipment",
   "will": "invuln"
  },
@@ -16644,6 +16919,7 @@
   },
   "shape": "humanoid",
   "size": "medium",
+  "spells": "royal_mummy",
   "uses": "weapons_armour",
   "will": 160
  },
@@ -16675,6 +16951,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "rupert",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -16774,6 +17051,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "saint_roka",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -16849,6 +17127,7 @@
   },
   "shape": "naga",
   "size": "medium",
+  "spells": "salamander_mystic",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -16886,6 +17165,7 @@
   },
   "shape": "naga",
   "size": "medium",
+  "spells": "salamander_tyrant",
   "uses": "open_doors",
   "will": 60
  },
@@ -16946,6 +17226,7 @@
   "shape": "humanoid_tailed",
   "shout": "shout",
   "size": "medium",
+  "spells": "satyr",
   "uses": "starting_equipment",
   "will": 40
  },
@@ -17012,6 +17293,7 @@
   "shape": "misc",
   "shout": "moan",
   "size": "medium",
+  "spells": "screaming_refraction",
   "uses": "open_doors",
   "will": 60
  },
@@ -17041,6 +17323,7 @@
   },
   "shape": "plant",
   "size": "medium",
+  "spells": "scrub_nettle",
   "will": 40
  },
  "sea_snake": {
@@ -17146,6 +17429,7 @@
   "shape": "quadruped",
   "shout": "roar",
   "size": "large",
+  "spells": "seismosaurus",
   "will": 80
  },
  "seismosaurus_egg": {
@@ -17357,6 +17641,7 @@
   "shout": "shout",
   "size": "medium",
   "speed": 15,
+  "spells": "seraph",
   "uses": "weapons_armour",
   "will": 160
  },
@@ -17414,6 +17699,7 @@
   "shout": "loud_roar",
   "size": "giant",
   "speed": 14,
+  "spells": "serpent_of_hell_geh",
   "will": 180
  },
  "serpent_of_hell_cocytus": {
@@ -17470,6 +17756,7 @@
   "shout": "loud_roar",
   "size": "giant",
   "speed": 14,
+  "spells": "serpent_of_hell_coc",
   "will": 180
  },
  "serpent_of_hell_dis": {
@@ -17526,6 +17813,7 @@
   "shout": "loud_roar",
   "size": "giant",
   "speed": 14,
+  "spells": "serpent_of_hell_dis",
   "will": 180
  },
  "serpent_of_hell_tartarus": {
@@ -17582,6 +17870,7 @@
   "shout": "loud_roar",
   "size": "giant",
   "speed": 14,
+  "spells": "serpent_of_hell_tar",
   "will": 180
  },
  "servant_of_whispers": {
@@ -17610,6 +17899,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "servant_of_whispers",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -17644,6 +17934,7 @@
   "shape": "humanoid",
   "shout": "croak",
   "size": "small",
+  "spells": "shadow_demon",
   "uses": "open_doors",
   "will": 100
  },
@@ -17688,6 +17979,7 @@
   },
   "shape": "quadruped_winged",
   "size": "giant",
+  "spells": "shadow_dragon",
   "will": 120
  },
  "shadow_imp": {
@@ -17721,6 +18013,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "little",
+  "spells": "shadow_imp",
   "uses": "open_doors",
   "will": 10
  },
@@ -17824,6 +18117,7 @@
   "shape": "misc",
   "size": "medium",
   "speed": 5,
+  "spells": "shadow_turret",
   "will": "invuln"
  },
  "shadow_wraith": {
@@ -17894,6 +18188,7 @@
   },
   "shape": "humanoid",
   "size": "small",
+  "spells": "shadowghast",
   "uses": "open_doors",
   "will": 40
  },
@@ -17925,6 +18220,7 @@
   "shape": "plant",
   "size": "giant",
   "speed": 8,
+  "spells": "shambling_mangrove",
   "will": 100
  },
  "shapeshifter": {
@@ -17983,6 +18279,7 @@
   "shout": "screech",
   "size": "tiny",
   "speed": 30,
+  "spells": "shard_shrike",
   "will": 80
  },
  "shining_eye": {
@@ -18010,6 +18307,7 @@
   },
   "shape": "orb",
   "size": "medium",
+  "spells": "shining_eye",
   "will": 100
  },
  "shock_serpent": {
@@ -18043,6 +18341,7 @@
   "shout": "hiss",
   "size": "medium",
   "speed": 15,
+  "spells": "shock_serpent",
   "will": 40
  },
  "shooting_star": {
@@ -18111,6 +18410,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "merfolk_siren",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -18145,6 +18445,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "orc_wizard",
   "uses": "weapons_armour",
   "will": 10
  },
@@ -18533,6 +18834,7 @@
   "shape": "humanoid",
   "shout": "roar",
   "size": "medium",
+  "spells": "smoke_demon",
   "uses": "open_doors",
   "will": 60
  },
@@ -18700,6 +19002,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "large",
+  "spells": "snorg",
   "uses": "open_doors",
   "will": 60
  },
@@ -18742,6 +19045,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "sojobo",
   "uses": "weapons_armour",
   "will": 140
  },
@@ -18816,6 +19120,7 @@
   "shout": "shout",
   "size": "small",
   "speed": 14,
+  "spells": "sonja",
   "uses": "weapons_armour",
   "will": 10
  },
@@ -18851,6 +19156,7 @@
   },
   "shape": "humanoid",
   "size": "medium",
+  "spells": "soul_eater",
   "uses": "open_doors",
   "will": 140
  },
@@ -18917,6 +19223,7 @@
   "shout": "buzz",
   "size": "tiny",
   "speed": 15,
+  "spells": "spark_wasp",
   "will": 40
  },
  "spatial_maelstrom": {
@@ -19191,6 +19498,7 @@
   "shout": "shout",
   "size": "large",
   "speed": 12,
+  "spells": "sphinx_marauder",
   "uses": "starting_equipment",
   "will": 60
  },
@@ -19312,6 +19620,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "little",
+  "spells": "spriggan_air_mage",
   "uses": "weapons_armour",
   "will": 140
  },
@@ -19346,6 +19655,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "little",
+  "spells": "spriggan_berserker",
   "uses": "weapons_armour",
   "will": 120
  },
@@ -19411,6 +19721,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "little",
+  "spells": "spriggan_druid",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -19485,6 +19796,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "sprozz",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -19604,6 +19916,7 @@
   "shape": "plant",
   "shout": "gurgle",
   "size": "medium",
+  "spells": "starflower",
   "will": 100
  },
  "starspawn_tentacle": {
@@ -19739,6 +20052,7 @@
   "shape": "quadruped_winged",
   "shout": "hiss",
   "size": "large",
+  "spells": "steam_dragon",
   "will": 20
  },
  "steelbarb_worm": {
@@ -19807,6 +20121,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "stoker",
   "will": 120
  },
  "stone_giant": {
@@ -19879,6 +20194,7 @@
   "shout": "loud_roar",
   "size": "giant",
   "speed": 12,
+  "spells": "storm_dragon",
   "will": 100
  },
  "strange_machine": {
@@ -19909,6 +20225,7 @@
   },
   "shape": "misc",
   "size": "small",
+  "spells": "strange_machine",
   "will": "invuln"
  },
  "sun_demon": {
@@ -19981,6 +20298,7 @@
   "shape": "insect_winged",
   "size": "small",
   "speed": 12,
+  "spells": "sun_moth",
   "will": 60
  },
  "swamp_dragon": {
@@ -20022,6 +20340,7 @@
   "shape": "quadruped_winged",
   "shout": "loud_roar",
   "size": "giant",
+  "spells": "swamp_dragon",
   "will": 40
  },
  "swamp_drake": {
@@ -20054,6 +20373,7 @@
   "shape": "quadruped_winged",
   "shout": "roar",
   "size": "large",
+  "spells": "swamp_drake",
   "will": 20
  },
  "swamp_worm": {
@@ -20086,6 +20406,7 @@
   "shape": "snake",
   "size": "medium",
   "speed": 12,
+  "spells": "swamp_worm",
   "will": 10
  },
  "tainted_leviathan": {
@@ -20130,6 +20451,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "giant",
+  "spells": "tainted_leviathan",
   "uses": "starting_equipment",
   "will": 120
  },
@@ -20243,6 +20565,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "tengu_conjurer",
   "uses": "weapons_armour",
   "will": 20
  },
@@ -20283,6 +20606,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "tengu_reaver",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -20403,6 +20727,7 @@
   "name": "tentacled starspawn",
   "shape": "misc",
   "size": "giant",
+  "spells": "tentacled_starspawn",
   "uses": "open_doors",
   "will": 120
  },
@@ -20479,6 +20804,7 @@
   },
   "shape": "misc",
   "size": "medium",
+  "spells": "thermic_dynamo",
   "will": "invuln"
  },
  "thorn_hunter": {
@@ -20521,6 +20847,7 @@
   "shape": "plant",
   "size": "large",
   "speed": 12,
+  "spells": "thorn_hunter",
   "will": 100
  },
  "thrashing_horror": {
@@ -20563,6 +20890,7 @@
   "shout": "roar",
   "size": "large",
   "speed": 25,
+  "spells": "thrashing_horror",
   "will": 60
  },
  "tiamat": {
@@ -20636,6 +20964,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "giant",
+  "spells": "titan",
   "uses": "open_doors",
   "will": 180
  },
@@ -20738,6 +21067,7 @@
   "shout": "roar",
   "size": "medium",
   "speed": 13,
+  "spells": "tormentor",
   "uses": "open_doors",
   "will": 60
  },
@@ -20984,6 +21314,7 @@
   "shape": "humanoid",
   "shout": "roar",
   "size": "large",
+  "spells": "tzitzimitl",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -21092,6 +21423,7 @@
   },
   "shape": "misc",
   "size": "giant",
+  "spells": "undertaker",
   "uses": "open_doors",
   "will": "invuln"
  },
@@ -21136,6 +21468,7 @@
   },
   "shape": "misc",
   "size": "medium",
+  "spells": "undying_armoury",
   "uses": "open_doors",
   "will": 120
  },
@@ -21233,6 +21566,7 @@
   "shape": "misc",
   "size": "little",
   "speed": 8,
+  "spells": "ushabti",
   "will": "invuln"
  },
  "vampire": {
@@ -21271,6 +21605,7 @@
   },
   "shape": "humanoid",
   "size": "medium",
+  "spells": "vampire",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -21349,6 +21684,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "vampire_bloodprince",
   "uses": "weapons_armour",
   "will": 120
  },
@@ -21390,6 +21726,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "vampire_knight",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -21430,6 +21767,7 @@
   },
   "shape": "humanoid",
   "size": "medium",
+  "spells": "vampire_mage",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -21509,6 +21847,7 @@
   "shape": "naga",
   "shout": "shout",
   "size": "large",
+  "spells": "vashnia",
   "uses": "weapons_armour",
   "will": 120
  },
@@ -21571,6 +21910,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "vault_sentinel",
   "uses": "weapons_armour",
   "will": 40
  },
@@ -21602,6 +21942,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "vault_warden",
   "uses": "weapons_armour",
   "will": 60
  },
@@ -21757,6 +22098,7 @@
   },
   "shape": "humanoid",
   "size": "medium",
+  "spells": "vv",
   "uses": "open_doors",
   "will": 140
  },
@@ -21885,6 +22227,7 @@
   "shape": "humanoid_winged_tailed",
   "size": "medium",
   "speed": 14,
+  "spells": "war_gargoyle",
   "uses": "starting_equipment",
   "will": 100
  },
@@ -22025,6 +22368,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "water_nymph",
   "uses": "open_doors",
   "will": 100
  },
@@ -22059,6 +22403,7 @@
   "shape": "misc",
   "shout": "moan",
   "size": "tiny",
+  "spells": "weeping_skull",
   "will": 20
  },
  "wendigo": {
@@ -22099,6 +22444,7 @@
   "shape": "humanoid",
   "shout": "howl",
   "size": "medium",
+  "spells": "wendigo",
   "will": 140
  },
  "white_draconian": {
@@ -22168,6 +22514,7 @@
   "shape": "humanoid_winged",
   "shout": "shout",
   "size": "little",
+  "spells": "white_imp",
   "uses": "open_doors",
   "will": 10
  },
@@ -22230,6 +22577,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "wiglaf",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -22261,6 +22609,7 @@
   "shape": "misc",
   "shout": "moan",
   "size": "tiny",
+  "spells": "will_o_the_wisp",
   "will": "invuln"
  },
  "wind_drake": {
@@ -22291,6 +22640,7 @@
   "shout": "hiss",
   "size": "large",
   "speed": 12,
+  "spells": "wind_drake",
   "will": 40
  },
  "withered_plant": {
@@ -22424,6 +22774,7 @@
   "shape": "misc",
   "size": "small",
   "speed": 14,
+  "spells": "worldbinder",
   "uses": "open_doors",
   "will": 60
  },
@@ -22493,6 +22844,7 @@
   },
   "shape": "orb",
   "size": "little",
+  "spells": "wretched_star",
   "will": "invuln"
  },
  "wyrmhole": {
@@ -22532,6 +22884,7 @@
   "shout": "hiss",
   "size": "small",
   "speed": 12,
+  "spells": "wyrmhole",
   "will": "invuln"
  },
  "wyvern": {
@@ -22596,6 +22949,7 @@
   "shout": "shout",
   "size": "medium",
   "speed": 10,
+  "spells": "xakkrixis",
   "uses": "weapons_armour",
   "will": 80
  },
@@ -22645,6 +22999,7 @@
   "shape": "quadruped_winged",
   "shout": "loud_roar",
   "size": "giant",
+  "spells": "xtahua",
   "will": 180
  },
  "yak": {
@@ -22806,6 +23161,7 @@
   "shape": "humanoid_winged",
   "shout": "bellow",
   "size": "medium",
+  "spells": "ynoxinul",
   "uses": "open_doors",
   "will": 40
  },
@@ -22837,6 +23193,7 @@
   "shape": "humanoid",
   "shout": "shout",
   "size": "medium",
+  "spells": "zenata",
   "uses": "weapons_armour",
   "will": 100
  },
@@ -22902,6 +23259,7 @@
   "shape": "humanoid",
   "shout": "gurgle",
   "size": "large",
+  "spells": "zykzyl",
   "uses": "open_doors",
   "will": 160
  }

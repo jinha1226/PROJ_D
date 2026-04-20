@@ -96,6 +96,12 @@ static func act(m: Monster) -> void:
 		return
 
 	if dist <= m.sight_range:
+		# DCSS caster monsters may throw a spell instead of closing. Roll
+		# against the combined frequency of their spellbook; each row fires
+		# at `freq` / 200 chance per turn (freq 15 ≈ 7.5%/turn), matching
+		# the look of DCSS mon-cast.cc handle_mon_spell pacing.
+		if _try_cast_at(m, target):
+			return
 		_step_toward(m, ppos)
 		return
 
@@ -104,6 +110,128 @@ static func act(m: Monster) -> void:
 
 static func _cheb(a: Vector2i, b: Vector2i) -> int:
 	return max(abs(a.x - b.x), abs(a.y - b.y))
+
+
+const _MONSTER_SPELLBOOKS_JSON: String = "res://assets/dcss_mons/spellbooks.json"
+static var _mon_spellbooks: Dictionary = {}
+static var _mon_spellbooks_loaded: bool = false
+
+
+## DCSS mon-spell.h spellbooks, loaded lazily. Structure:
+##   { book_id: [{spell, freq, flags}, ...] }
+## Book id matches `MonsterData.spells_book` which comes from
+## `dat/mons/*.yaml` `spells:` field.
+static func _ensure_spellbooks_loaded() -> void:
+	if _mon_spellbooks_loaded:
+		return
+	_mon_spellbooks_loaded = true
+	var f := FileAccess.open(_MONSTER_SPELLBOOKS_JSON, FileAccess.READ)
+	if f == null:
+		return
+	var parsed = JSON.parse_string(f.get_as_text())
+	f.close()
+	if typeof(parsed) == TYPE_DICTIONARY:
+		_mon_spellbooks = parsed
+
+
+## DCSS handle_mon_spell: each spell has a frequency 1..100 and each turn
+## the monster rolls 1d200 — if under freq, it casts. We keep the same
+## shape so caster monsters cast about 5-10% of their turns instead of
+## whacking with melee.
+static func _try_cast_at(m: Monster, target: Node) -> bool:
+	if m == null or m.data == null:
+		return false
+	var book: String = String(m.data.spells_book)
+	if book == "":
+		return false
+	_ensure_spellbooks_loaded()
+	var rows: Array = _mon_spellbooks.get(book, [])
+	if rows.is_empty():
+		return false
+	# Silence zone around the target: DCSS suppresses wizard/priest casts.
+	if target != null and "has_meta" in target and target.has_method("has_meta") \
+			and target.has_meta("_silenced_turns"):
+		return false
+	# Pick a spell weighted by freq. Total weight also gates whether we cast
+	# at all: a book summing to 60 weight casts 60/200 = 30% of turns.
+	var total_w: int = 0
+	for row in rows:
+		total_w += int(row.get("freq", 0))
+	if total_w <= 0:
+		return false
+	if randi() % 200 >= total_w:
+		return false
+	var roll: int = randi() % total_w
+	var acc: int = 0
+	var picked: Dictionary = {}
+	for row in rows:
+		acc += int(row.get("freq", 0))
+		if roll < acc:
+			picked = row
+			break
+	if picked.is_empty():
+		return false
+	return _apply_mon_spell(m, target, String(picked.get("spell", "")))
+
+
+## Apply a cast spell from monster `m` onto `target`. We key off the
+## damage zap data in SpellRegistry — if the spell has a zap, roll it at
+## the monster's HD-scaled power; otherwise branch on a small table of
+## non-damage effects. Returns true on a successful cast.
+static func _apply_mon_spell(m: Monster, target: Node, spell_id: String) -> bool:
+	if spell_id == "" or target == null:
+		return false
+	# Monster spell power scales with HD, roughly DCSS mons_power = HD * 12.
+	var hd: int = int(m.data.hd if m.data else 1)
+	var power: int = max(12, hd * 12)
+	# Direct-damage zaps go through SpellRegistry.roll_damage.
+	var dmg: int = SpellRegistry.roll_damage(spell_id, power)
+	if dmg >= 0:
+		if target.has_method("take_damage"):
+			target.take_damage(dmg)
+			var mname: String = m.data.display_name if m.data else "monster"
+			CombatLog.add("The %s casts %s for %d damage!" % [
+					mname, spell_id.replace("_", " "), dmg])
+		return true
+	# Non-damage spells: hex / heal-other / summon / invisibility. Minimum
+	# viable coverage so priests and wizards feel like DCSS rather than
+	# standing silent. Anything not matched here silently fails — caller
+	# still returns true so the monster spends a turn on the attempt.
+	match spell_id:
+		"confuse":
+			if target.has_method("set_meta"):
+				target.set_meta("_confused", true)
+				var ct: int = 4 + int(hd / 4)
+				target.set_meta("_confusion_turns", ct)
+			CombatLog.add("The %s confuses you!" % (m.data.display_name if m.data else "caster"))
+			return true
+		"paralyse":
+			if target.has_method("set_meta"):
+				target.set_meta("_paralysis_turns", 2 + int(hd / 6))
+			CombatLog.add("The %s paralyses you!" % (m.data.display_name if m.data else "caster"))
+			return true
+		"invisibility":
+			if m.has_method("set_meta"):
+				m.set_meta("_invisible_turns", 20)
+			return true
+		"haste_other":
+			# Monster hastes itself. We stash a meta the MonsterAI doesn't
+			# yet honour, so the effect is purely narrative for now.
+			return true
+		"heal_other", "minor_healing", "major_healing":
+			m.hp = min(m.hp + randi_range(5, 15), m.data.hp if m.data else m.hp)
+			return true
+		"cantrip", "smiting":
+			# Smiting ignores armour: fixed 7-17 damage.
+			if target.has_method("take_damage"):
+				target.take_damage(randi_range(7, 17))
+			return true
+		"pain":
+			if target.has_method("take_damage"):
+				target.take_damage(randi_range(3, 8))
+			return true
+		_:
+			return false
 
 
 ## Wake a sleeping monster and propagate the alarm to adjacent sleepers.

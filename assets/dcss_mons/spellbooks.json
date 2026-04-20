@@ -1,0 +1,6246 @@
+{
+ "acid_dragon": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 55,
+   "spell": "spit_acid"
+  }
+ ],
+ "acid_spit": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 67,
+   "spell": "spit_acid"
+  }
+ ],
+ "air_elemental": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 50,
+   "spell": "stunning_burst"
+  }
+ ],
+ "aizul": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 32,
+   "spell": "venom_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "poison_arrow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "sleep"
+  }
+ ],
+ "alderking": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 30,
+   "spell": "grasping_roots"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 25,
+   "spell": "siphon_essence"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 15,
+   "spell": "dispel_undead"
+  }
+ ],
+ "amaemon": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 30,
+   "spell": "concentrate_venom"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "summon_scorpions"
+  }
+ ],
+ "ancient_champion": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 21,
+   "spell": "iron_shot"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 21,
+   "spell": "haste"
+  }
+ ],
+ "ancient_lich": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "corrosive_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "lehudibs_crystal_spear"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "haste"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "petrify"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "invisibility"
+  }
+ ],
+ "angel": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 62,
+   "spell": "minor_healing"
+  }
+ ],
+ "annihilator": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "lightning_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "poison_arrow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "iron_shot"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "lehudibs_crystal_spear"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 22,
+   "spell": "blink"
+  }
+ ],
+ "antaeus": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 24,
+   "spell": "lightning_bolt"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 36,
+   "spell": "sleetstrike"
+  }
+ ],
+ "antique_champion": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "ghostly_fireball"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "haunt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 18,
+   "spell": "might"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 18,
+   "spell": "haste"
+  }
+ ],
+ "apocalypse_crab": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 62,
+   "spell": "chaos_breath"
+  }
+ ],
+ "arachne": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 18,
+   "spell": "venom_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 18,
+   "spell": "poison_arrow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 34,
+   "spell": "greater_ensnare"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "blink_range"
+  }
+ ],
+ "arcanist": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "bolt_of_cold"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "searing_ray"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "vitrify"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "haste"
+  }
+ ],
+ "asmodeus": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 22,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 22,
+   "spell": "hurl_damnation"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 22,
+   "spell": "hellfire_court"
+  }
+ ],
+ "asterion": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 11,
+   "spell": "major_destruction"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 22,
+   "spell": "greater_servant_makhleb"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 32,
+   "spell": "haste"
+  }
+ ],
+ "azrael": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 13,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 13,
+   "spell": "fireball"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 13,
+   "spell": "hurl_damnation"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 13,
+   "spell": "call_down_damnation"
+  }
+ ],
+ "bai_suzhen": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 40,
+   "spell": "summon_hydra"
+  }
+ ],
+ "bai_suzhen_dragon": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 68,
+   "spell": "primal_wave"
+  }
+ ],
+ "ballistomycete": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 67,
+   "spell": "sporulate"
+  }
+ ],
+ "balrug": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 16,
+   "spell": "pyre_arrow"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 16,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 16,
+   "spell": "fireball"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 16,
+   "spell": "smiting"
+  }
+ ],
+ "basilisk": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 56,
+   "spell": "petrify"
+  }
+ ],
+ "battlecry": [
+  {
+   "flags": [
+    "vocal"
+   ],
+   "freq": 100,
+   "spell": "battlecry"
+  }
+ ],
+ "bear": [
+  {
+   "flags": [
+    "natural",
+    "emergency"
+   ],
+   "freq": 100,
+   "spell": "berserker_rage"
+  }
+ ],
+ "bes_kemwar": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 44,
+   "spell": "diminish_spells"
+  }
+ ],
+ "blink_close": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 67,
+   "spell": "blink_close"
+  }
+ ],
+ "blinker": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 29,
+   "spell": "blink"
+  }
+ ],
+ "blizzard_demon": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 21,
+   "spell": "lightning_bolt"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 21,
+   "spell": "freezing_gust"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 21,
+   "spell": "sleetstrike"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 16,
+   "spell": "deflect_missiles"
+  }
+ ],
+ "blorkula": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 9,
+   "spell": "sandblast"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 9,
+   "spell": "sting"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 9,
+   "spell": "shock"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 9,
+   "spell": "throw_frost"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 9,
+   "spell": "throw_flame"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "haste"
+  }
+ ],
+ "bog_body": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 28,
+   "spell": "bolt_of_cold"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 28,
+   "spell": "slow"
+  }
+ ],
+ "boggart": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 33,
+   "spell": "shadow_creatures"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "invisibility"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "blink"
+  }
+ ],
+ "bombardier_beetle": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 40,
+   "spell": "pyre_arrow"
+  }
+ ],
+ "bone_dragon": [
+  {
+   "flags": [
+    "natural",
+    "noisy"
+   ],
+   "freq": 59,
+   "spell": "march_of_sorrows"
+  }
+ ],
+ "boris": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "bolt_of_cold"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "iron_shot"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "iood"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "march_of_sorrows"
+  }
+ ],
+ "bouda": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 20,
+   "spell": "heal_other"
+  },
+  {
+   "flags": [
+    "priest",
+    "emergency"
+   ],
+   "freq": 20,
+   "spell": "minor_healing"
+  },
+  {
+   "flags": [
+    "priest",
+    "instant"
+   ],
+   "freq": 20,
+   "spell": "weakening_gaze"
+  },
+  {
+   "flags": [
+    "vocal"
+   ],
+   "freq": 50,
+   "spell": "hunting_call"
+  }
+ ],
+ "boulder_beetle": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 50,
+   "spell": "roll"
+  },
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 20,
+   "spell": "blink_away"
+  }
+ ],
+ "boundless_tesseract": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 0,
+   "spell": "planar_overlay"
+  }
+ ],
+ "brain_worm": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 32,
+   "spell": "brain_bite"
+  }
+ ],
+ "brimstone_fiend": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 34,
+   "spell": "hurl_damnation"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 17,
+   "spell": "symbol_of_torment"
+  }
+ ],
+ "broodmother": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 30,
+   "spell": "summon_spiders"
+  }
+ ],
+ "bunyip": [
+  {
+   "flags": [
+    "vocal",
+    "breath"
+   ],
+   "freq": 20,
+   "spell": "warning_cry"
+  }
+ ],
+ "burial_acolyte": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 16,
+   "spell": "malign_offering"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 12,
+   "spell": "dispel_undead"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 22,
+   "spell": "funeral_dirge"
+  }
+ ],
+ "cacodemon": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 22,
+   "spell": "doom_bolt"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 20,
+   "spell": "vitrify"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 13,
+   "spell": "slow"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 13,
+   "spell": "dig"
+  }
+ ],
+ "cassandra": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 200,
+   "spell": "doomsaying"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 34,
+   "spell": "doom_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 24,
+   "spell": "fleetfoot"
+  }
+ ],
+ "catoblepas": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 41,
+   "spell": "petrifying_cloud"
+  }
+ ],
+ "cerebov": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 11,
+   "spell": "iron_shot"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 11,
+   "spell": "fire_storm"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 11,
+   "spell": "hellfire_court"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 36,
+   "spell": "haste"
+  }
+ ],
+ "chonchon": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 26,
+   "spell": "beckoning_gale"
+  }
+ ],
+ "clockroach": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 30,
+   "spell": "sandblast"
+  }
+ ],
+ "cloud_mage": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 25,
+   "spell": "airstrike"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 40,
+   "spell": "polar_vortex"
+  }
+ ],
+ "cognitogaunt": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 76,
+   "spell": "brain_bite"
+  }
+ ],
+ "creeping_plasmodium": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 70,
+   "spell": "launch_sporangium"
+  }
+ ],
+ "crystal_echidna": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 30,
+   "spell": "crystallising_shot"
+  },
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 30,
+   "spell": "throw_barbs"
+  }
+ ],
+ "crystal_guardian": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 50,
+   "spell": "crystallising_shot"
+  }
+ ],
+ "culicivora": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 40,
+   "spell": "heal_other"
+  }
+ ],
+ "curse_skull": [
+  {
+   "flags": [
+    "magical",
+    "noisy"
+   ],
+   "freq": 48,
+   "spell": "summon_undead"
+  },
+  {
+   "flags": [
+    "magical",
+    "noisy"
+   ],
+   "freq": 16,
+   "spell": "symbol_of_torment"
+  }
+ ],
+ "curse_toe": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 26,
+   "spell": "symbol_of_torment"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 39,
+   "spell": "summon_mushrooms"
+  }
+ ],
+ "daeva": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 64,
+   "spell": "smiting"
+  }
+ ],
+ "dart_slug": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 60,
+   "spell": "slug_dart"
+  }
+ ],
+ "death_drake": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 59,
+   "spell": "miasma_breath"
+  }
+ ],
+ "death_knight": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 15,
+   "spell": "agony"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 30,
+   "spell": "hurl_torchlight"
+  }
+ ],
+ "deathcap": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 30,
+   "spell": "drain_life"
+  }
+ ],
+ "deep_elf_air_mage": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 40,
+   "spell": "lightning_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "blink"
+  }
+ ],
+ "deep_elf_archer": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "slow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "confuse"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "deflect_missiles"
+  },
+  {
+   "flags": [
+    "wizard",
+    "short_range"
+   ],
+   "freq": 36,
+   "spell": "blink_range"
+  }
+ ],
+ "deep_elf_death_mage": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 22,
+   "spell": "bolt_of_draining"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 22,
+   "spell": "vampiric_draining"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 22,
+   "spell": "call_lost_souls"
+  }
+ ],
+ "deep_elf_demonologist": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 24,
+   "spell": "summon_demon"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 24,
+   "spell": "summon_greater_demon"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "banishment"
+  }
+ ],
+ "deep_elf_elementalist": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 33,
+   "spell": "hoarfrost_cannonade"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "fireball"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 33,
+   "spell": "lrd"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "deflect_missiles"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "haste"
+  }
+ ],
+ "deep_elf_fire_mage": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "pyre_arrow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "fire_elementals"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "blink"
+  }
+ ],
+ "deep_elf_high_priest": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 25,
+   "spell": "prayer_of_brilliance"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 12,
+   "spell": "call_down_damnation"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 18,
+   "spell": "malign_offering"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 18,
+   "spell": "smiting"
+  }
+ ],
+ "deep_elf_knight": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 24,
+   "spell": "throw_icicle"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "force_lance"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "haste"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "invisibility"
+  }
+ ],
+ "deep_elf_sorcerer": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 18,
+   "spell": "corrosive_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "banishment"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 22,
+   "spell": "haste"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "hurl_damnation"
+  }
+ ],
+ "deep_troll_earth_mage": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 31,
+   "spell": "lrd"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 31,
+   "spell": "dig"
+  }
+ ],
+ "deep_troll_shaman": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 21,
+   "spell": "haste_other"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 21,
+   "spell": "might_other"
+  }
+ ],
+ "demonspawn_blood_saint": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 40,
+   "spell": "legendary_destruction"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 20,
+   "spell": "call_of_chaos"
+  }
+ ],
+ "demonspawn_corrupter": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 40,
+   "spell": "planerend"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 20,
+   "spell": "entropic_weave"
+  }
+ ],
+ "demonspawn_soul_scholar": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 18,
+   "spell": "bolt_of_draining"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 18,
+   "spell": "dispel_undead_range"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 28,
+   "spell": "sign_of_ruin"
+  }
+ ],
+ "demonspawn_warmonger": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 18,
+   "spell": "sap_magic"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 32,
+   "spell": "haste_other"
+  }
+ ],
+ "dispater": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 13,
+   "spell": "iron_shot"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 13,
+   "spell": "lehudibs_crystal_spear"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 13,
+   "spell": "hurl_damnation"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 26,
+   "spell": "summon_hell_sentinel"
+  }
+ ],
+ "dissolution": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 62,
+   "spell": "summon_eyeballs"
+  }
+ ],
+ "donald": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 34,
+   "spell": "might"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 34,
+   "spell": "haste"
+  }
+ ],
+ "dowan": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 9,
+   "spell": "throw_flame"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 9,
+   "spell": "throw_frost"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 9,
+   "spell": "blink"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 9,
+   "spell": "corona"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 9,
+   "spell": "haste_other"
+  }
+ ],
+ "draconian_knight": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "throw_icicle"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "bolt_of_cold"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "haste"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "invisibility"
+  }
+ ],
+ "draconian_scorcher": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "bolt_of_magma"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "fireball"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "hurl_damnation"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "call_down_damnation"
+  }
+ ],
+ "draconian_shifter": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "dimension_anchor"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "blink_other"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "blink_range"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "blink_allies_encircle"
+  },
+  {
+   "flags": [
+    "wizard",
+    "emergency"
+   ],
+   "freq": 15,
+   "spell": "blink_range"
+  }
+ ],
+ "draconian_stormcaller": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 20,
+   "spell": "smiting"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 20,
+   "spell": "summon_drakes"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 30,
+   "spell": "upheaval"
+  }
+ ],
+ "dread_lich": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 18,
+   "spell": "summon_greater_demon"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 18,
+   "spell": "paralyse"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "haste"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "invisibility"
+  }
+ ],
+ "dream_sheep": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 40,
+   "spell": "dream_dust"
+  }
+ ],
+ "dryad": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 23,
+   "spell": "awaken_vines"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 23,
+   "spell": "awaken_forest"
+  },
+  {
+   "flags": [
+    "wizard",
+    "emergency"
+   ],
+   "freq": 11,
+   "spell": "minor_healing"
+  }
+ ],
+ "efreet": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 29,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 29,
+   "spell": "fireball"
+  }
+ ],
+ "eidolon": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 21,
+   "spell": "bolt_of_draining"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 21,
+   "spell": "cause_fear"
+  }
+ ],
+ "electric_golem": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 44,
+   "spell": "lightning_bolt"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 22,
+   "spell": "blink"
+  }
+ ],
+ "eleionoma": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 50,
+   "spell": "splinterspray"
+  },
+  {
+   "flags": [
+    "magical",
+    "emergency"
+   ],
+   "freq": 150,
+   "spell": "woodweal"
+  }
+ ],
+ "elemental_wellspring": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 65,
+   "spell": "primal_wave"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 65,
+   "spell": "water_elementals"
+  }
+ ],
+ "enchantress": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "slow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "dimension_anchor"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "mass_confusion"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "strip_willpower"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "haste"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "deflect_missiles"
+  }
+ ],
+ "endoplasm": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 70,
+   "spell": "freeze"
+  }
+ ],
+ "entropy_weaver": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 25,
+   "spell": "entropic_weave"
+  }
+ ],
+ "ereshkigal": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 11,
+   "spell": "bolt_of_cold"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 11,
+   "spell": "symbol_of_torment"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 11,
+   "spell": "summon_tzitzimitl"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 11,
+   "spell": "paralyse"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 11,
+   "spell": "silence"
+  },
+  {
+   "flags": [
+    "magical",
+    "emergency"
+   ],
+   "freq": 11,
+   "spell": "major_healing"
+  }
+ ],
+ "erica": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "venom_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "slow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "invisibility"
+  }
+ ],
+ "erolcha": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "fireball"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "invisibility"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "banishment"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "blink"
+  }
+ ],
+ "eustachio": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "summon_small_mammal"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "summon_minor_demon"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 27,
+   "spell": "blink"
+  }
+ ],
+ "executioner": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 41,
+   "spell": "haste"
+  }
+ ],
+ "eye_of_devastation": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 90,
+   "spell": "bolt_of_devastation"
+  }
+ ],
+ "eye_of_draining": [
+  {
+   "flags": [
+    "magical",
+    "instant"
+   ],
+   "freq": 100,
+   "spell": "draining_gaze"
+  }
+ ],
+ "fannar": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "bolt_of_cold"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "ozocubus_refrigeration"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "summon_ice_beast"
+  },
+  {
+   "flags": [
+    "wizard",
+    "emergency"
+   ],
+   "freq": 10,
+   "spell": "blink"
+  }
+ ],
+ "faun": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "corona"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 30,
+   "spell": "strip_willpower"
+  }
+ ],
+ "fenstrider_witch": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "paralyse"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 30,
+   "spell": "agonising_touch"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "hurl_sludge"
+  }
+ ],
+ "fire_crab": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 62,
+   "spell": "flaming_cloud"
+  }
+ ],
+ "fire_dragon_breath": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 62,
+   "spell": "fire_breath"
+  }
+ ],
+ "fire_giant": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 29,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 29,
+   "spell": "fireball"
+  }
+ ],
+ "flayed_ghost": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 40,
+   "spell": "flay"
+  }
+ ],
+ "frances": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "throw_icicle"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "iron_shot"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "summon_demon"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "haste"
+  }
+ ],
+ "fravashi": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 64,
+   "spell": "summon_mortal_champion"
+  }
+ ],
+ "frederick": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 24,
+   "spell": "plasma_beam"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 24,
+   "spell": "bombard"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 32,
+   "spell": "spellspark_servitor"
+  }
+ ],
+ "frost_giant": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 66,
+   "spell": "bolt_of_cold"
+  }
+ ],
+ "gargoyle": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 56,
+   "spell": "stone_arrow"
+  }
+ ],
+ "gastronok": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "cantrip"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 23,
+   "spell": "airstrike"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "summon_small_mammal"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "slow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "fleetfoot"
+  }
+ ],
+ "geryon": [
+  {
+   "flags": [
+    "vocal"
+   ],
+   "freq": 55,
+   "spell": "summon_sin_beast"
+  }
+ ],
+ "ghost_crab": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 62,
+   "spell": "spectral_cloud"
+  }
+ ],
+ "ghost_moth": [
+  {
+   "flags": [
+    "magical",
+    "instant"
+   ],
+   "freq": 100,
+   "spell": "antimagic_gaze"
+  }
+ ],
+ "glass_eye": [
+  {
+   "flags": [
+    "magical",
+    "instant"
+   ],
+   "freq": 75,
+   "spell": "vitrifying_gaze"
+  }
+ ],
+ "gloorx_vloq": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 20,
+   "spell": "poison_arrow"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 20,
+   "spell": "miasma_breath"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 20,
+   "spell": "symbol_of_torment"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 20,
+   "spell": "dispel_undead_range"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 40,
+   "spell": "summon_executioners"
+  }
+ ],
+ "glowing_orange_brain": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 14,
+   "spell": "cause_fear"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 14,
+   "spell": "shadow_creatures"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 14,
+   "spell": "mass_confusion"
+  }
+ ],
+ "golden_dragon": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 23,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 23,
+   "spell": "bolt_of_cold"
+  },
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 23,
+   "spell": "poisonous_cloud"
+  }
+ ],
+ "golden_eye": [
+  {
+   "flags": [
+    "magical",
+    "instant"
+   ],
+   "freq": 100,
+   "spell": "confusion_gaze"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 29,
+   "spell": "blink"
+  }
+ ],
+ "great_orb_of_eyes": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 12,
+   "spell": "vitrify"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 12,
+   "spell": "mindburst"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 12,
+   "spell": "polymorph"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 12,
+   "spell": "confuse"
+  }
+ ],
+ "green_death": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 21,
+   "spell": "poison_arrow"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 21,
+   "spell": "poisonous_cloud"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 21,
+   "spell": "venom_bolt"
+  }
+ ],
+ "grinder": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 17,
+   "spell": "pain"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 17,
+   "spell": "paralyse"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 21,
+   "spell": "blink"
+  }
+ ],
+ "guardian_serpent": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 19,
+   "spell": "venom_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 19,
+   "spell": "slow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 19,
+   "spell": "blink_allies_encircle"
+  }
+ ],
+ "guardian_sphinx": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "confuse"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "slow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "paralyse"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "smiting"
+  }
+ ],
+ "halazid_warlock": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "ghostly_sacrifice"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "bolt_of_draining"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "bolt_of_cold"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "shadow_creatures"
+  }
+ ],
+ "harold": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "harpoon_shot"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "sentinel_mark"
+  }
+ ],
+ "headmaster": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "summon_mana_viper"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "dimension_anchor"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "blink_close"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "bolt_of_devastation"
+  }
+ ],
+ "hell_hog": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 60,
+   "spell": "fireball"
+  }
+ ],
+ "hell_hound": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 20,
+   "spell": "fire_breath"
+  }
+ ],
+ "hell_knight": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 17,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "priest",
+    "emergency"
+   ],
+   "freq": 10,
+   "spell": "blink"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 26,
+   "spell": "haste"
+  }
+ ],
+ "hell_sentinel": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 28,
+   "spell": "hurl_damnation"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 14,
+   "spell": "iron_shot"
+  }
+ ],
+ "hellbinder": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "hurl_damnation"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 24,
+   "spell": "summon_greater_demon"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "summon_demon"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "haste"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "blink_away"
+  }
+ ],
+ "hellephant": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 35,
+   "spell": "fire_breath"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 35,
+   "spell": "blink"
+  }
+ ],
+ "hellfire_mortar": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 200,
+   "spell": "magma_barrage"
+  }
+ ],
+ "hellion": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 57,
+   "spell": "call_down_damnation"
+  }
+ ],
+ "hippogriff": [
+  {
+   "flags": [
+    "vocal",
+    "breath"
+   ],
+   "freq": 35,
+   "spell": "warning_cry"
+  },
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 60,
+   "spell": "beckoning_gale"
+  }
+ ],
+ "hoarfrost_cannon": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 200,
+   "spell": "hoarfrost_bullet"
+  }
+ ],
+ "howler_monkey": [
+  {
+   "flags": [
+    "vocal",
+    "breath"
+   ],
+   "freq": 40,
+   "spell": "warning_cry"
+  }
+ ],
+ "ice_dragon_breath": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 62,
+   "spell": "cold_breath"
+  }
+ ],
+ "ice_fiend": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 46,
+   "spell": "bolt_of_cold"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 23,
+   "spell": "symbol_of_torment"
+  }
+ ],
+ "ice_statue": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 20,
+   "spell": "bolt_of_cold"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 20,
+   "spell": "throw_icicle"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 20,
+   "spell": "freezing_gust"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 40,
+   "spell": "summon_ice_beast"
+  }
+ ],
+ "ignacio": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 21,
+   "spell": "agony"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 41,
+   "spell": "haste"
+  }
+ ],
+ "ilsuiw": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "throw_icicle"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 22,
+   "spell": "water_elementals"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "call_tide"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "invisibility"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "blink"
+  }
+ ],
+ "imperial_myrmidon": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "slow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "confuse"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "agony"
+  }
+ ],
+ "iron_dragon": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 68,
+   "spell": "metal_splinters"
+  }
+ ],
+ "iron_elemental": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 21,
+   "spell": "iron_shot"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 21,
+   "spell": "metal_splinters"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 21,
+   "spell": "slow"
+  }
+ ],
+ "iron_giant": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 24,
+   "spell": "iron_shot"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 36,
+   "spell": "harpoon_shot"
+  },
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 36,
+   "spell": "throw_ally"
+  }
+ ],
+ "ironbound_beastmaster": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 40,
+   "spell": "throw_bolas"
+  }
+ ],
+ "ironbound_convoker": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 30,
+   "spell": "word_of_recall"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 30,
+   "spell": "might_other"
+  }
+ ],
+ "ironbound_frostheart": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 50,
+   "spell": "creeping_frost"
+  }
+ ],
+ "ironbound_mechanist": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 35,
+   "spell": "phalanx_beetle"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 45,
+   "spell": "all_purpose_tempering"
+  }
+ ],
+ "ironbound_preserver": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 21,
+   "spell": "injury_bond"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 41,
+   "spell": "minor_healing"
+  }
+ ],
+ "ironbound_thunderhulk": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 50,
+   "spell": "call_down_lightning"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 20,
+   "spell": "blink_range"
+  }
+ ],
+ "jeremiah": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 16,
+   "spell": "blink_range"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 16,
+   "spell": "smiting"
+  }
+ ],
+ "jessica": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 17,
+   "spell": "pain"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 8,
+   "spell": "slow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 8,
+   "spell": "haste"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 17,
+   "spell": "blink"
+  }
+ ],
+ "jorgrun": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "lrd"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "grasping_roots"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "iron_shot"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "petrify"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "dig"
+  }
+ ],
+ "jorogumo": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "bolt_of_draining"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 40,
+   "spell": "ensnare"
+  }
+ ],
+ "jory": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 50,
+   "spell": "vampiric_draining"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 17,
+   "spell": "lehudibs_crystal_spear"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 17,
+   "spell": "mesmerise"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 17,
+   "spell": "blink_close"
+  }
+ ],
+ "josephina": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 36,
+   "spell": "seracfall"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 24,
+   "spell": "ghostly_fireball"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 24,
+   "spell": "bind_souls"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "flash_freeze"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "dominate_undead"
+  }
+ ],
+ "josephine": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "vampiric_draining"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 24,
+   "spell": "ghostly_fireball"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "dispel_undead_range"
+  }
+ ],
+ "jumping_spider": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 29,
+   "spell": "blink_close"
+  },
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 29,
+   "spell": "blink_range"
+  }
+ ],
+ "khufu": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 23,
+   "spell": "smiting"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "symbol_of_torment"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "summon_emperor_scorpions"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "summon_scarabs"
+  },
+  {
+   "flags": [
+    "wizard",
+    "emergency"
+   ],
+   "freq": 11,
+   "spell": "blink"
+  }
+ ],
+ "killer_klown": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 29,
+   "spell": "blink"
+  },
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 24,
+   "spell": "throw_pie"
+  }
+ ],
+ "kirke": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 22,
+   "spell": "porkalator"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "slow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "monstrous_menagerie"
+  },
+  {
+   "flags": [
+    "wizard",
+    "emergency"
+   ],
+   "freq": 11,
+   "spell": "invisibility"
+  }
+ ],
+ "kobold_blastminer": [
+  {
+   "flags": [
+    "natural",
+    "noisy"
+   ],
+   "freq": 32,
+   "spell": "bombard"
+  }
+ ],
+ "kobold_demonologist": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 19,
+   "spell": "cantrip"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 19,
+   "spell": "summon_minor_demon"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 19,
+   "spell": "summon_demon"
+  }
+ ],
+ "kobold_fleshcrafter": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 32,
+   "spell": "bolt_of_flesh"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 60,
+   "spell": "awaken_flesh"
+  }
+ ],
+ "kobold_geomancer": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 32,
+   "spell": "lrd"
+  }
+ ],
+ "kraken": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 44,
+   "spell": "create_tentacles"
+  },
+  {
+   "flags": [
+    "natural",
+    "emergency"
+   ],
+   "freq": 22,
+   "spell": "ink_cloud"
+  }
+ ],
+ "laughing_skull": [
+  {
+   "flags": [
+    "magical",
+    "noisy"
+   ],
+   "freq": 30,
+   "spell": "bolt_of_draining"
+  }
+ ],
+ "lava_snake": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 100,
+   "spell": "spit_lava"
+  }
+ ],
+ "lich": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "bolt_of_cold"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "iood"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "haste"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "slow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "invisibility"
+  }
+ ],
+ "lindwurm": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 62,
+   "spell": "fire_breath"
+  }
+ ],
+ "lodul": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 40,
+   "spell": "call_down_lightning"
+  }
+ ],
+ "lom_lobon": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 30,
+   "spell": "conjure_ball_lightning"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 30,
+   "spell": "glaciate"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 60,
+   "spell": "polar_vortex"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 30,
+   "spell": "major_healing"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 30,
+   "spell": "blink_range"
+  }
+ ],
+ "louise": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "stone_arrow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "lightning_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "banishment"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "blink"
+  }
+ ],
+ "maggie": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 36,
+   "spell": "mesmerise"
+  }
+ ],
+ "manticore": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 100,
+   "spell": "throw_barbs"
+  }
+ ],
+ "mara": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 14,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 14,
+   "spell": "fake_mara_summon"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 14,
+   "spell": "summon_illusion"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 29,
+   "spell": "blink"
+  }
+ ],
+ "margery": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 36,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 36,
+   "spell": "fireball"
+  }
+ ],
+ "maurice": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "invisibility"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "blink"
+  }
+ ],
+ "meliai": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 18,
+   "spell": "smiting"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 18,
+   "spell": "heal_other"
+  }
+ ],
+ "menkaure": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 18,
+   "spell": "pain"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 18,
+   "spell": "haste"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 18,
+   "spell": "symbol_of_torment"
+  }
+ ],
+ "mennas": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 17,
+   "spell": "mass_confusion"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 17,
+   "spell": "silence"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 34,
+   "spell": "minor_healing"
+  }
+ ],
+ "merfolk_aquamancer": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "primal_wave"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "steam_ball"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "throw_icicle"
+  },
+  {
+   "flags": [
+    "wizard",
+    "emergency"
+   ],
+   "freq": 16,
+   "spell": "blink"
+  }
+ ],
+ "merfolk_avatar": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 80,
+   "spell": "avatar_song"
+  }
+ ],
+ "merfolk_siren": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 80,
+   "spell": "siren_song"
+  }
+ ],
+ "mlioglotl": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 18,
+   "spell": "might"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 18,
+   "spell": "cause_fear"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 36,
+   "spell": "corrupt_locale"
+  }
+ ],
+ "mnoleg": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 40,
+   "spell": "malign_gateway"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 20,
+   "spell": "summon_eyeballs"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 40,
+   "spell": "summon_horrible_things"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 30,
+   "spell": "call_of_chaos"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 15,
+   "spell": "dig"
+  }
+ ],
+ "molten_gargoyle": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 57,
+   "spell": "bolt_of_magma"
+  }
+ ],
+ "monarch_bomb": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 100,
+   "spell": "deploy_bomblet"
+  }
+ ],
+ "moon_troll": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 35,
+   "spell": "corrosive_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 35,
+   "spell": "lrd"
+  }
+ ],
+ "moth_of_wrath": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 66,
+   "spell": "berserk_other"
+  }
+ ],
+ "mountainshell": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 50,
+   "spell": "landbreaker"
+  }
+ ],
+ "mummy_priest": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 12,
+   "spell": "summon_demon"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 24,
+   "spell": "summon_undead"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 12,
+   "spell": "smiting"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 12,
+   "spell": "symbol_of_torment"
+  }
+ ],
+ "murray": [
+  {
+   "flags": [
+    "magical",
+    "noisy"
+   ],
+   "freq": 11,
+   "spell": "symbol_of_torment"
+  },
+  {
+   "flags": [
+    "magical",
+    "noisy"
+   ],
+   "freq": 33,
+   "spell": "summon_undead"
+  },
+  {
+   "flags": [
+    "magical",
+    "noisy"
+   ],
+   "freq": 22,
+   "spell": "sign_of_ruin"
+  }
+ ],
+ "naga": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 55,
+   "spell": "spit_poison"
+  }
+ ],
+ "naga_mage": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 55,
+   "spell": "spit_poison"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "venom_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "concentrate_venom"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "haste"
+  }
+ ],
+ "naga_ritualist": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 55,
+   "spell": "spit_poison"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 30,
+   "spell": "olgrebs_toxic_radiance"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 35,
+   "spell": "virulence"
+  }
+ ],
+ "naga_sharpshooter": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 55,
+   "spell": "spit_poison"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 59,
+   "spell": "portal_projectile"
+  }
+ ],
+ "naga_warrior": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 55,
+   "spell": "spit_poison"
+  },
+  {
+   "flags": [
+    "vocal"
+   ],
+   "freq": 25,
+   "spell": "battlecry"
+  }
+ ],
+ "nagaraja": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 55,
+   "spell": "spit_poison"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "venom_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "poison_arrow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "dimension_anchor"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "haste"
+  }
+ ],
+ "nameless": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 60,
+   "spell": "abjuration"
+  }
+ ],
+ "nameless_revenant": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 0,
+   "spell": "pyrrhic_recollection"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "blink_close"
+  }
+ ],
+ "nargun": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 66,
+   "spell": "petrify"
+  }
+ ],
+ "nascent_plasmodium": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 70,
+   "spell": "acid_ball"
+  }
+ ],
+ "natasha": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "magic_dart"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "call_imp"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "slow"
+  }
+ ],
+ "necromancer": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "bolt_of_draining"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "agony"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 30,
+   "spell": "bind_souls"
+  }
+ ],
+ "nekomata": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 48,
+   "spell": "phantom_blitz"
+  }
+ ],
+ "neqoxec": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 30,
+   "spell": "warp_body"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 28,
+   "spell": "brain_bite"
+  }
+ ],
+ "nergalle": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "bolt_of_draining"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 24,
+   "spell": "vanquished_vanguard"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "haste_other"
+  }
+ ],
+ "nessos": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 30,
+   "spell": "blink_range"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 30,
+   "spell": "haste"
+  }
+ ],
+ "nikola": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "lightning_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 23,
+   "spell": "chain_lightning"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 23,
+   "spell": "blink"
+  }
+ ],
+ "norris": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 36,
+   "spell": "antimagic_gaze"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 30,
+   "spell": "primal_wave"
+  }
+ ],
+ "oblivion_hound": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 30,
+   "spell": "oblivion_howl"
+  }
+ ],
+ "obsidian_statue": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 33,
+   "spell": "summon_minor_demon"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 33,
+   "spell": "summon_demon"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 33,
+   "spell": "mesmerise"
+  }
+ ],
+ "occultist": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "fireball"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "poison_arrow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "invisibility"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "banishment"
+  }
+ ],
+ "ogre_mage": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "bolt_of_magma"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "haste_other"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "paralyse"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "invisibility"
+  }
+ ],
+ "oklob_sapling": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 50,
+   "spell": "spit_acid"
+  }
+ ],
+ "oni_incarcerator": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 40,
+   "spell": "manifold_assault"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "throw_bolas"
+  }
+ ],
+ "ophan": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 32,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 32,
+   "spell": "holy_flames"
+  }
+ ],
+ "orange_crystal_statue": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 50,
+   "spell": "shadow_creatures"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 25,
+   "spell": "antimagic_gaze"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 25,
+   "spell": "mass_confusion"
+  }
+ ],
+ "orb_of_entropy": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 32,
+   "spell": "bolt_of_draining"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 32,
+   "spell": "acid_ball"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 16,
+   "spell": "ill_omen"
+  }
+ ],
+ "orb_of_fire": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 32,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 32,
+   "spell": "fireball"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 16,
+   "spell": "malmutate"
+  }
+ ],
+ "orb_of_winter": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 32,
+   "spell": "ozocubus_refrigeration"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 32,
+   "spell": "flash_freeze"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 16,
+   "spell": "ostracise"
+  }
+ ],
+ "orb_spider": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 80,
+   "spell": "iood"
+  }
+ ],
+ "orc_high_priest": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 10,
+   "spell": "pain"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 10,
+   "spell": "smiting"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 20,
+   "spell": "summon_demon"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 10,
+   "spell": "heal_other"
+  }
+ ],
+ "orc_knight": [
+  {
+   "flags": [
+    "vocal"
+   ],
+   "freq": 50,
+   "spell": "battlecry"
+  }
+ ],
+ "orc_priest": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 13,
+   "spell": "cantrip"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 13,
+   "spell": "pain"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 13,
+   "spell": "smiting"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 13,
+   "spell": "heal_other"
+  }
+ ],
+ "orc_sorcerer": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "bolt_of_draining"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "summon_demon"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "paralyse"
+  }
+ ],
+ "orc_wizard": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 9,
+   "spell": "magic_dart"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 9,
+   "spell": "throw_flame"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 18,
+   "spell": "confuse"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 9,
+   "spell": "invisibility"
+  }
+ ],
+ "peacekeeper": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 33,
+   "spell": "throw_barbs"
+  },
+  {
+   "flags": [
+    "vocal"
+   ],
+   "freq": 25,
+   "spell": "battlecry"
+  }
+ ],
+ "pearl_dragon": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 68,
+   "spell": "holy_breath"
+  }
+ ],
+ "polterguardian": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 40,
+   "spell": "force_lance"
+  }
+ ],
+ "protean_progenitor": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 22,
+   "spell": "irradiate"
+  }
+ ],
+ "putrid_mouth": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 50,
+   "spell": "miasma_breath"
+  },
+  {
+   "flags": [
+    "vocal",
+    "breath"
+   ],
+   "freq": 20,
+   "spell": "warning_cry"
+  }
+ ],
+ "queen_bee": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 50,
+   "spell": "berserk_other"
+  },
+  {
+   "flags": [
+    "natural",
+    "emergency"
+   ],
+   "freq": 75,
+   "spell": "berserk_other"
+  }
+ ],
+ "quicksilver_dragon": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 66,
+   "spell": "quicksilver_bolt"
+  }
+ ],
+ "radroach": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 50,
+   "spell": "irradiate"
+  }
+ ],
+ "ragged_hierophant": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "injury_bond"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 40,
+   "spell": "resonance_strike"
+  }
+ ],
+ "raiju": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 40,
+   "spell": "blinkbolt"
+  }
+ ],
+ "rakshasa": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 20,
+   "spell": "force_lance"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 20,
+   "spell": "phantom_mirror"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 10,
+   "spell": "blink"
+  }
+ ],
+ "raven": [
+  {
+   "flags": [
+    "natural",
+    "noisy"
+   ],
+   "freq": 24,
+   "spell": "ill_omen"
+  }
+ ],
+ "revenant": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 17,
+   "spell": "spectral_cloud"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 17,
+   "spell": "ghostly_fireball"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 17,
+   "spell": "dispel_undead_range"
+  },
+  {
+   "flags": [
+    "wizard",
+    "emergency"
+   ],
+   "freq": 17,
+   "spell": "blink_away"
+  }
+ ],
+ "ribbon_worm": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 60,
+   "spell": "ensnare"
+  }
+ ],
+ "rime_drake": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 62,
+   "spell": "flash_freeze"
+  }
+ ],
+ "robin": [
+  {
+   "flags": [
+    "vocal"
+   ],
+   "freq": 50,
+   "spell": "battlecry"
+  }
+ ],
+ "roxanne": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "bolt_of_magma"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "iron_shot"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "lehudibs_crystal_spear"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "blink_other_close"
+  }
+ ],
+ "royal_mummy": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "smiting"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "symbol_of_torment"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 13,
+   "spell": "summon_emperor_scorpions"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 26,
+   "spell": "summon_scarabs"
+  }
+ ],
+ "rupert": [
+  {
+   "flags": [
+    "vocal"
+   ],
+   "freq": 16,
+   "spell": "paralyse"
+  },
+  {
+   "flags": [
+    "vocal"
+   ],
+   "freq": 16,
+   "spell": "confuse"
+  },
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 33,
+   "spell": "berserker_rage"
+  }
+ ],
+ "saint_roka": [
+  {
+   "flags": [
+    "vocal"
+   ],
+   "freq": 100,
+   "spell": "battlecry"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 64,
+   "spell": "smiting"
+  }
+ ],
+ "salamander_mystic": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "force_lance"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "bolt_of_magma"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 24,
+   "spell": "haste_other"
+  }
+ ],
+ "salamander_tyrant": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "eruption"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 50,
+   "spell": "pyroclastic_surge"
+  },
+  {
+   "flags": [
+    "wizard",
+    "instant"
+   ],
+   "freq": 50,
+   "spell": "weakening_gaze"
+  }
+ ],
+ "satyr": [
+  {
+   "flags": [
+    "vocal"
+   ],
+   "freq": 25,
+   "spell": "battlecry"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 32,
+   "spell": "cause_fear"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "sleep"
+  }
+ ],
+ "sawblade": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 200,
+   "spell": "shred"
+  }
+ ],
+ "screaming_refraction": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 40,
+   "spell": "injury_mirror"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 40,
+   "spell": "lrd"
+  }
+ ],
+ "scrub_nettle": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 60,
+   "spell": "sting"
+  }
+ ],
+ "seismosaurus": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 56,
+   "spell": "seismic_stomp"
+  }
+ ],
+ "seraph": [
+  {
+   "flags": [
+    "vocal",
+    "breath"
+   ],
+   "freq": 50,
+   "spell": "warning_cry"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 50,
+   "spell": "summon_holies"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 50,
+   "spell": "injury_bond"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 25,
+   "spell": "cleansing_flame"
+  }
+ ],
+ "serpent_of_hell_coc": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 35,
+   "spell": "serpent_of_hell_coc_breath"
+  },
+  {
+   "flags": [
+    "magical",
+    "noisy"
+   ],
+   "freq": 35,
+   "spell": "summon_dragon"
+  }
+ ],
+ "serpent_of_hell_dis": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 35,
+   "spell": "serpent_of_hell_dis_breath"
+  },
+  {
+   "flags": [
+    "magical",
+    "noisy"
+   ],
+   "freq": 35,
+   "spell": "summon_dragon"
+  }
+ ],
+ "serpent_of_hell_geh": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 35,
+   "spell": "serpent_of_hell_geh_breath"
+  },
+  {
+   "flags": [
+    "magical",
+    "noisy"
+   ],
+   "freq": 35,
+   "spell": "summon_dragon"
+  }
+ ],
+ "serpent_of_hell_tar": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 35,
+   "spell": "serpent_of_hell_tar_breath"
+  },
+  {
+   "flags": [
+    "magical",
+    "noisy"
+   ],
+   "freq": 35,
+   "spell": "summon_dragon"
+  }
+ ],
+ "servant_of_whispers": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 20,
+   "spell": "still_winds"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 40,
+   "spell": "lightning_bolt"
+  }
+ ],
+ "shadow_demon": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 30,
+   "spell": "shadow_creatures"
+  }
+ ],
+ "shadow_dragon": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 67,
+   "spell": "bolt_of_draining"
+  }
+ ],
+ "shadow_imp": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 17,
+   "spell": "pain"
+  }
+ ],
+ "shadow_turret": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 200,
+   "spell": "shadow_shot"
+  }
+ ],
+ "shadowghast": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 33,
+   "spell": "invisibility"
+  }
+ ],
+ "shambling_mangrove": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 40,
+   "spell": "grasping_roots"
+  }
+ ],
+ "shard_shrike": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 24,
+   "spell": "throw_icicle"
+  }
+ ],
+ "shining_eye": [
+  {
+   "flags": [
+    "magical",
+    "instant"
+   ],
+   "freq": 150,
+   "spell": "mutagenic_gaze"
+  }
+ ],
+ "shock_serpent": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 33,
+   "spell": "electrical_bolt"
+  }
+ ],
+ "smoke_demon": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 19,
+   "spell": "pyre_arrow"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 19,
+   "spell": "steam_ball"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 19,
+   "spell": "smiting"
+  }
+ ],
+ "snorg": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 33,
+   "spell": "berserker_rage"
+  }
+ ],
+ "sojobo": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 28,
+   "spell": "wind_blast"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "lightning_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "airstrike"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "air_elementals"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "deflect_missiles"
+  }
+ ],
+ "sonja": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 28,
+   "spell": "blink"
+  }
+ ],
+ "soul_eater": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 30,
+   "spell": "drain_life"
+  }
+ ],
+ "spark_wasp": [
+  {
+   "flags": [
+    "magical",
+    "long_range"
+   ],
+   "freq": 40,
+   "spell": "blinkbolt"
+  }
+ ],
+ "sphinx_marauder": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "confuse"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 22,
+   "spell": "vex"
+  }
+ ],
+ "spriggan_air_mage": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "lightning_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 32,
+   "spell": "airstrike"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 16,
+   "spell": "deflect_missiles"
+  }
+ ],
+ "spriggan_berserker": [
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 21,
+   "spell": "brothers_in_arms"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 21,
+   "spell": "berserker_rage"
+  },
+  {
+   "flags": [
+    "priest"
+   ],
+   "freq": 21,
+   "spell": "trogs_hand"
+  }
+ ],
+ "spriggan_druid": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "stone_arrow"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 15,
+   "spell": "druids_call"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 25,
+   "spell": "awaken_forest"
+  },
+  {
+   "flags": [
+    "wizard",
+    "emergency"
+   ],
+   "freq": 15,
+   "spell": "minor_healing"
+  }
+ ],
+ "sprozz": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 70,
+   "spell": "clockwork_bee"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 30,
+   "spell": "all_purpose_tempering"
+  }
+ ],
+ "starflower": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 80,
+   "spell": "harpoon_shot"
+  }
+ ],
+ "steam_dragon": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 54,
+   "spell": "steam_ball"
+  }
+ ],
+ "stoker": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "wind_blast"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "stoke_flames"
+  }
+ ],
+ "storm_dragon": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 64,
+   "spell": "lightning_bolt"
+  }
+ ],
+ "strange_machine": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 50,
+   "spell": "summon_illusion"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 20,
+   "spell": "shadow_creatures"
+  }
+ ],
+ "sun_moth": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 35,
+   "spell": "pyre_arrow"
+  }
+ ],
+ "swamp_dragon": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 59,
+   "spell": "poisonous_cloud"
+  }
+ ],
+ "swamp_drake": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 54,
+   "spell": "noxious_cloud"
+  }
+ ],
+ "swamp_worm": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 80,
+   "spell": "harpoon_shot"
+  }
+ ],
+ "tainted_leviathan": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 33,
+   "spell": "mesmerise"
+  }
+ ],
+ "tengu_conjurer": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 30,
+   "spell": "battlesphere"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "lightning_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "force_lance"
+  },
+  {
+   "flags": [
+    "wizard",
+    "emergency"
+   ],
+   "freq": 20,
+   "spell": "force_lance"
+  }
+ ],
+ "tengu_reaver": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "venom_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "bolt_of_fire"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "bolt_of_cold"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "corrosive_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "lightning_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "bolt_of_draining"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "deflect_missiles"
+  }
+ ],
+ "tentacled_starspawn": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 66,
+   "spell": "create_tentacles"
+  }
+ ],
+ "test_spawner": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 100,
+   "spell": "shadow_creatures"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 67,
+   "spell": "planerend"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 33,
+   "spell": "phantom_mirror"
+  }
+ ],
+ "thermic_dynamo": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 32,
+   "spell": "rebounding_blaze"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 32,
+   "spell": "rebounding_chill"
+  }
+ ],
+ "thorn_hunter": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 50,
+   "spell": "thorn_volley"
+  },
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 80,
+   "spell": "cage_of_brambles"
+  }
+ ],
+ "thrashing_horror": [
+  {
+   "flags": [
+    "natural",
+    "emergency"
+   ],
+   "freq": 59,
+   "spell": "might"
+  }
+ ],
+ "titan": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 18,
+   "spell": "lightning_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 36,
+   "spell": "minor_healing"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 18,
+   "spell": "airstrike"
+  }
+ ],
+ "tormentor": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 29,
+   "spell": "symbol_of_torment"
+  }
+ ],
+ "tzitzimitl": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 25,
+   "spell": "bolt_of_draining"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 25,
+   "spell": "symbol_of_torment"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 25,
+   "spell": "dispel_undead_range"
+  }
+ ],
+ "undertaker": [
+  {
+   "flags": [
+    "magical",
+    "long_range"
+   ],
+   "freq": 36,
+   "spell": "borgnjors_vile_clutch"
+  }
+ ],
+ "undying_armoury": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 40,
+   "spell": "bestow_arms"
+  },
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 35,
+   "spell": "flashing_balestra"
+  }
+ ],
+ "ushabti": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 36,
+   "spell": "death_rattle"
+  },
+  {
+   "flags": [
+    "vocal",
+    "breath"
+   ],
+   "freq": 56,
+   "spell": "warning_cry"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 44,
+   "spell": "dispel_undead_range"
+  }
+ ],
+ "vampire": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 50,
+   "spell": "vampiric_draining"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "confuse"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 14,
+   "spell": "invisibility"
+  }
+ ],
+ "vampire_bloodprince": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 30,
+   "spell": "grave_claw"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 30,
+   "spell": "drain_life"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 40,
+   "spell": "ravenous_swarm"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 22,
+   "spell": "dominate_undead"
+  }
+ ],
+ "vampire_knight": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "blink_close"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "paralyse"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "haste"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 12,
+   "spell": "invisibility"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 50,
+   "spell": "vampiric_draining"
+  }
+ ],
+ "vampire_mage": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "bolt_of_draining"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 10,
+   "spell": "summon_undead"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 20,
+   "spell": "invisibility"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 50,
+   "spell": "vampiric_draining"
+  }
+ ],
+ "vashnia": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 55,
+   "spell": "spit_poison"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 22,
+   "spell": "portal_projectile"
+  },
+  {
+   "flags": [
+    "wizard",
+    "emergency"
+   ],
+   "freq": 11,
+   "spell": "blink_other"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 22,
+   "spell": "blink_allies_away"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 11,
+   "spell": "blink_range"
+  }
+ ],
+ "vault_sentinel": [
+  {
+   "flags": [
+    "vocal",
+    "breath"
+   ],
+   "freq": 50,
+   "spell": "warning_cry"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 58,
+   "spell": "sentinel_mark"
+  }
+ ],
+ "vault_warden": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 50,
+   "spell": "seal_doors"
+  }
+ ],
+ "vv": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 25,
+   "spell": "eruption"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 50,
+   "spell": "pyroclastic_surge"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 25,
+   "spell": "creeping_frost"
+  }
+ ],
+ "walking_tome": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 60,
+   "spell": "conjure_living_spells"
+  }
+ ],
+ "war_gargoyle": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 52,
+   "spell": "metal_splinters"
+  }
+ ],
+ "water_nymph": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 60,
+   "spell": "waterstrike"
+  }
+ ],
+ "weeping_skull": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 48,
+   "spell": "mourning_wail"
+  }
+ ],
+ "wendigo": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 50,
+   "spell": "seracfall"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 30,
+   "spell": "stunning_burst"
+  }
+ ],
+ "white_imp": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 52,
+   "spell": "throw_frost"
+  }
+ ],
+ "wiglaf": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 34,
+   "spell": "might"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 34,
+   "spell": "hellfire_mortar"
+  }
+ ],
+ "will_o_the_wisp": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 50,
+   "spell": "marshlight"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 12,
+   "spell": "blink"
+  }
+ ],
+ "wind_drake": [
+  {
+   "flags": [
+    "natural",
+    "breath"
+   ],
+   "freq": 50,
+   "spell": "wind_blast"
+  },
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 29,
+   "spell": "airstrike"
+  },
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 29,
+   "spell": "deflect_missiles"
+  }
+ ],
+ "worldbinder": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 58,
+   "spell": "forceful_invitation"
+  }
+ ],
+ "wretched_star": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 60,
+   "spell": "force_lance"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 40,
+   "spell": "corrupting_pulse"
+  }
+ ],
+ "wyrmhole": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 50,
+   "spell": "sojourning_bolt"
+  }
+ ],
+ "xakkrixis": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 24,
+   "spell": "venom_bolt"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 35,
+   "spell": "ignite_poison"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 21,
+   "spell": "fulminant_prism"
+  }
+ ],
+ "xtahua": [
+  {
+   "flags": [
+    "natural",
+    "breath",
+    "noisy"
+   ],
+   "freq": 62,
+   "spell": "searing_breath"
+  },
+  {
+   "flags": [
+    "vocal"
+   ],
+   "freq": 18,
+   "spell": "paralyse"
+  }
+ ],
+ "ynoxinul": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 22,
+   "spell": "iron_shot"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 50,
+   "spell": "ufetubi_swarm"
+  }
+ ],
+ "zapper": [
+  {
+   "flags": [
+    "natural"
+   ],
+   "freq": 100,
+   "spell": "electrical_bolt"
+  }
+ ],
+ "zenata": [
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 40,
+   "spell": "resonance_strike"
+  },
+  {
+   "flags": [
+    "wizard"
+   ],
+   "freq": 30,
+   "spell": "shezas_dance"
+  }
+ ],
+ "zykzyl": [
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 15,
+   "spell": "malmutate"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 20,
+   "spell": "enfeeble"
+  },
+  {
+   "flags": [
+    "magical"
+   ],
+   "freq": 13,
+   "spell": "bolt_of_flesh"
+  }
+ ]
+}
