@@ -170,6 +170,13 @@ func _draw_dcss() -> void:
 			var tex: Texture2D = floor_tex
 			match t:
 				DungeonGenerator.TileType.WALL:
+					# Rock filling between rooms stays black — only walls
+					# that border a walkable tile (i.e. an actual room /
+					# corridor edge) get a wall sprite drawn. DCSS-style
+					# clean look instead of a carpet of rock_wall texture.
+					if not _wall_borders_floor(tile):
+						draw_rect(rect, unseen_color, true)
+						continue
 					tex = wall_tex
 				DungeonGenerator.TileType.TREE:
 					# Trees sit on a floor backdrop so edges read.
@@ -204,6 +211,33 @@ func _draw_dcss() -> void:
 
 
 ## Classic roguelike console view — every tile gets a character glyph.
+## True iff any 8-neighbour of `tile` is a walkable feature — corridor
+## or room interior. Used so rock walls deep in the dungeon bulk can
+## render as empty black space instead of a wall sprite.
+func _wall_borders_floor(tile: Vector2i) -> bool:
+	if generator == null:
+		return false
+	for dy in [-1, 0, 1]:
+		for dx in [-1, 0, 1]:
+			if dx == 0 and dy == 0:
+				continue
+			var n: Vector2i = Vector2i(tile.x + dx, tile.y + dy)
+			if n.x < 0 or n.y < 0 \
+					or n.x >= DungeonGenerator.MAP_WIDTH \
+					or n.y >= DungeonGenerator.MAP_HEIGHT:
+				continue
+			var nt: int = generator.map[n.x][n.y]
+			if nt == DungeonGenerator.TileType.FLOOR \
+					or nt == DungeonGenerator.TileType.DOOR_OPEN \
+					or nt == DungeonGenerator.TileType.DOOR_CLOSED \
+					or nt == DungeonGenerator.TileType.STAIRS_UP \
+					or nt == DungeonGenerator.TileType.STAIRS_DOWN \
+					or nt == DungeonGenerator.TileType.WATER \
+					or nt == DungeonGenerator.TileType.LAVA:
+				return true
+	return false
+
+
 func _draw_ascii() -> void:
 	var unseen_color := Color(0.02, 0.02, 0.04)
 	var bg_color := Color(0.04, 0.04, 0.06)
