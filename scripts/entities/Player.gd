@@ -298,6 +298,72 @@ func _on_player_turn_started() -> void:
 	# Decrement temporary buffs.
 	if resist_turns > 0:
 		resist_turns -= 1
+	_tick_duration_metas()
+
+
+## Count down every turn-based duration the player tracks via metas, and
+## undo their effects cleanly when they expire. Keeping this in one place
+## means new potions just have to drop a meta in _apply_consumable_effect
+## and the tick here takes care of the rest.
+func _tick_duration_metas() -> void:
+	_tick_simple_meta("_haste_turns")
+	_tick_simple_meta("_enlightened_turns")
+	_tick_simple_meta("_invisible_turns")
+	# Ambrosia: confusion while the duration runs, HP/MP regen each tick.
+	if has_meta("_ambrosia_turns"):
+		var at: int = int(get_meta("_ambrosia_turns", 0))
+		if at > 0 and stats != null:
+			stats.HP = min(stats.hp_max, stats.HP + 3)
+			stats.MP = min(stats.mp_max, stats.MP + 1)
+			stats_changed.emit()
+		at -= 1
+		if at <= 0:
+			remove_meta("_ambrosia_turns")
+			remove_meta("_confused")
+		else:
+			set_meta("_ambrosia_turns", at)
+	# Berserk: reverse the HP inflation on expiry.
+	if has_meta("_berserk_turns"):
+		var bt: int = int(get_meta("_berserk_turns", 0)) - 1
+		if bt <= 0:
+			remove_meta("_berserk_turns")
+			if stats != null and has_meta("_berserk_bonus_hp"):
+				var bonus: int = int(get_meta("_berserk_bonus_hp", 0))
+				stats.hp_max = max(1, stats.hp_max - bonus)
+				stats.HP = min(stats.HP, stats.hp_max)
+				remove_meta("_berserk_bonus_hp")
+				stats_changed.emit()
+			CombatLog.add("Your rage subsides.")
+		else:
+			set_meta("_berserk_turns", bt)
+	# Tree form: reverse AC and HP bonuses on expiry.
+	if has_meta("_tree_turns"):
+		var tt: int = int(get_meta("_tree_turns", 0)) - 1
+		if tt <= 0:
+			remove_meta("_tree_turns")
+			if stats != null:
+				var ac_b: int = int(get_meta("_tree_ac_bonus", 0))
+				var hp_b: int = int(get_meta("_tree_hp_bonus", 0))
+				stats.AC = max(0, stats.AC - ac_b)
+				stats.hp_max = max(1, stats.hp_max - hp_b)
+				stats.HP = min(stats.HP, stats.hp_max)
+				remove_meta("_tree_ac_bonus")
+				remove_meta("_tree_hp_bonus")
+				stats_changed.emit()
+			CombatLog.add("You return to your usual form.")
+		else:
+			set_meta("_tree_turns", tt)
+
+
+## Generic `_<name>_turns` meta countdown. Removes the meta at 0.
+func _tick_simple_meta(key: String) -> void:
+	if not has_meta(key):
+		return
+	var t: int = int(get_meta(key, 0)) - 1
+	if t <= 0:
+		remove_meta(key)
+	else:
+		set_meta(key, t)
 
 
 var trait_res: TraitData = null
@@ -784,6 +850,14 @@ func try_move(delta: Vector2i) -> bool:
 		return false
 	if generator == null:
 		return false
+	# Tree form (potion of lignification) — root in place; you can still
+	# swing at adjacent monsters, but you can't walk.
+	if has_meta("_tree_turns"):
+		var tile_here: int = generator.get_tile(grid_pos + delta)
+		var monster_adj: bool = _monster_at(grid_pos + delta) != null
+		if not monster_adj:
+			CombatLog.add("You are rooted to the spot.")
+			return false
 	var target: Vector2i = grid_pos + delta
 	# Check monster occupancy → attack instead.
 	var monster: Node = _monster_at(target)
@@ -1176,22 +1250,102 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 			set_meta("_haste_turns", int(get_meta("_haste_turns", 0)) + turns)
 			CombatLog.add("Time seems to slow! (%d turns of haste)" % turns)
 			return true
-		"degenerate":
-			if stats == null:
-				return false
-			var amt: int = int(info.get("amount", 8))
-			stats.hp_max = max(1, stats.hp_max - amt)
-			stats.HP = min(stats.HP, stats.hp_max)
-			stats_changed.emit()
-			CombatLog.add("You feel your life force drain away! (-%d max HP)" % amt)
+		"attraction":
+			# DCSS potion_effects.cc:potion_effect_attraction — pulls every
+			# nearby monster a step closer. Duration in our model is how many
+			# times the pull fires in the next few turns.
+			var count_att: int = 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not ("is_alive" in m) or not m.is_alive:
+					continue
+				if not ("grid_pos" in m):
+					continue
+				var d: int = max(abs(m.grid_pos.x - grid_pos.x), abs(m.grid_pos.y - grid_pos.y))
+				if d <= 10 and d > 1:
+					var toward: Vector2i = Vector2i(
+							sign(grid_pos.x - m.grid_pos.x),
+							sign(grid_pos.y - m.grid_pos.y))
+					var step: Vector2i = m.grid_pos + toward
+					if generator != null and generator.is_walkable(step):
+						m.move_to_grid(step)
+						count_att += 1
+					# Also wake sleepers — attraction is anything but subtle.
+					if "is_sleeping" in m and m.is_sleeping:
+						MonsterAI.wake(m)
+			CombatLog.add("Monsters lurch toward you. (%d pulled)" % count_att)
 			return true
-		"restore_all":
-			if stats == null:
-				return false
-			stats.HP = stats.hp_max
-			stats.MP = stats.mp_max
+		"enlightenment":
+			# See invisible + clarity (anti-confusion). Represented as a
+			# combined "enlightened" meta the combat/hex checks can key off.
+			var dur_e: int = int(info.get("dur_base", 35)) + (randi() % max(int(info.get("dur_rand", 35)), 1))
+			set_meta("_enlightened_turns", int(get_meta("_enlightened_turns", 0)) + dur_e)
+			CombatLog.add("Your senses sharpen. (%d turns of clarity)" % dur_e)
+			return true
+		"cancellation":
+			# DCSS potion-effects.cc: dispels the drinker's own timed buffs.
+			# We clear every temp-buff meta our game currently tracks.
+			remove_meta("_haste_turns")
+			remove_meta("_enlightened_turns")
+			remove_meta("_invisible_turns")
+			remove_meta("_berserk_turns")
+			remove_meta("_tree_turns")
+			resist_turns = 0
+			set_meta("_temp_buffs", [])
 			stats_changed.emit()
-			CombatLog.add("You are fully restored!")
+			CombatLog.add("A rush of nothingness erases your enchantments.")
+			return true
+		"ambrosia":
+			# Confused + HP/MP regen for a few turns. DCSS uses DUR_AMBROSIA.
+			var dur_a: int = int(info.get("dur_base", 4)) + (randi() % max(int(info.get("dur_rand", 4)), 1))
+			set_meta("_ambrosia_turns", int(get_meta("_ambrosia_turns", 0)) + dur_a)
+			set_meta("_confused", true)
+			CombatLog.add("Sweet honey fills your senses! (%d turns of ambrosia)" % dur_a)
+			return true
+		"invisibility":
+			var dur_i: int = int(info.get("dur_base", 18)) + (randi() % max(int(info.get("dur_rand", 10)), 1))
+			set_meta("_invisible_turns", int(get_meta("_invisible_turns", 0)) + dur_i)
+			CombatLog.add("You vanish from sight. (%d turns invisible)" % dur_i)
+			return true
+		"experience":
+			# DCSS: one character-level's worth of XP. We grant xp_for_next
+			# so the next kill or two levels the player up, matching feel.
+			if has_method("grant_xp"):
+				var amt_xp: int = max(50, xp_for_next_level())
+				grant_xp(amt_xp)
+				CombatLog.add("Your past learnings crystallise. (+%d XP)" % amt_xp)
+			return true
+		"berserk":
+			var dur_b: int = int(info.get("dur_base", 11)) + (randi() % max(int(info.get("dur_rand", 8)), 1))
+			set_meta("_berserk_turns", int(get_meta("_berserk_turns", 0)) + dur_b)
+			# DCSS berserk also hastes and grants bonus HP for the duration.
+			set_meta("_haste_turns", int(get_meta("_haste_turns", 0)) + dur_b)
+			if stats != null:
+				var bonus: int = max(1, stats.hp_max / 3)
+				stats.hp_max += bonus
+				stats.HP += bonus
+				set_meta("_berserk_bonus_hp", bonus)
+				stats_changed.emit()
+			CombatLog.add("You go berserk! (%d turns)" % dur_b)
+			return true
+		"mutation":
+			# Mutation system is still pending — for now, log and bank the
+			# intent so Mutations.gd (future commit) can consume it.
+			set_meta("_pending_mutations", int(get_meta("_pending_mutations", 0)) + 1)
+			CombatLog.add("Your flesh writhes and resettles. (mutation queued)")
+			return true
+		"lignify":
+			var dur_l: int = int(info.get("dur_base", 35)) + (randi() % max(int(info.get("dur_rand", 15)), 1))
+			set_meta("_tree_turns", int(get_meta("_tree_turns", 0)) + dur_l)
+			# Hefty AC bump + big HP pool while rooted.
+			if stats != null:
+				stats.AC += 15
+				var bonus_l: int = stats.hp_max  # double HP
+				stats.hp_max += bonus_l
+				stats.HP = stats.hp_max
+				set_meta("_tree_ac_bonus", 15)
+				set_meta("_tree_hp_bonus", bonus_l)
+				stats_changed.emit()
+			CombatLog.add("You take root! (tree form for %d turns)" % dur_l)
 			return true
 		"fear_monsters":
 			var count: int = 0

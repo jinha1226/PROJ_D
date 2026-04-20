@@ -127,7 +127,12 @@ static func _should_wake(m: Monster) -> bool:
 		return false
 	var player: Node = tree.get_first_node_in_group("player")
 	if player != null and "grid_pos" in player and "is_alive" in player and player.is_alive:
-		if _cheb(m.grid_pos, player.grid_pos) <= m.sight_range \
+		# Invisibility (potion, spell) hides the player from sight-based wake
+		# checks. DCSS also allows monsters to see invisible via special sight,
+		# but until we model resists fall back to blanket hiding.
+		var invis: bool = player.has_method("has_meta") and player.has_meta("_invisible_turns")
+		if not invis \
+				and _cheb(m.grid_pos, player.grid_pos) <= m.sight_range \
 				and _monster_has_fov_to(m, player.grid_pos):
 			return true
 	# Companions are also hostile targets and break stealth.
