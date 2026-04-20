@@ -23,8 +23,9 @@ const FEATURES: Dictionary = {
 	"stairs_down": "dngn/gateways/stone_stairs_down.png",
 	"door_open":   "dngn/doors/open_door.png",
 	"door_closed": "dngn/doors/closed_door.png",
-	"water":       "dngn/floor/swamp0.png",
-	"lava":        "dngn/floor/volcanic_floor0.png",
+	"water":       "dngn/water/deep_water.png",
+	"lava":        "dngn/floor/lava00.png",
+	"tree":        "dngn/trees/tree1.png",
 }
 
 ## Per-branch overrides. DungeonMap picks the right floor/wall/etc. by

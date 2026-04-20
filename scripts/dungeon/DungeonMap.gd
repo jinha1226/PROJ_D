@@ -149,6 +149,11 @@ func _draw_dcss() -> void:
 	var wall_tex: Texture2D = TileRenderer.feature("wall")
 	var stairs_dn_tex: Texture2D = TileRenderer.feature("stairs_down")
 	var stairs_up_tex: Texture2D = TileRenderer.feature("stairs_up")
+	var water_tex: Texture2D = TileRenderer.feature("water")
+	var lava_tex: Texture2D = TileRenderer.feature("lava")
+	var tree_tex: Texture2D = TileRenderer.feature("tree")
+	var door_open_tex: Texture2D = TileRenderer.feature("door_open")
+	var door_closed_tex: Texture2D = TileRenderer.feature("door_closed")
 	var unseen_color := Color(0.02, 0.02, 0.04)
 	var dim := Color(0.45, 0.45, 0.45)  # mod for explored-but-not-visible
 	for x in DungeonGenerator.MAP_WIDTH:
@@ -161,17 +166,34 @@ func _draw_dcss() -> void:
 			var t: int = generator.map[x][y]
 			var modulate: Color = Color.WHITE if is_tile_visible(tile) else dim
 			var tex: Texture2D = floor_tex
-			if t == DungeonGenerator.TileType.WALL:
-				tex = wall_tex
-			elif t == DungeonGenerator.TileType.STAIRS_DOWN:
-				# Floor under stairs so the stairs glyph reads cleanly.
-				if floor_tex != null:
-					draw_texture_rect(floor_tex, rect, false, modulate)
-				tex = stairs_dn_tex
-			elif t == DungeonGenerator.TileType.STAIRS_UP:
-				if floor_tex != null:
-					draw_texture_rect(floor_tex, rect, false, modulate)
-				tex = stairs_up_tex
+			match t:
+				DungeonGenerator.TileType.WALL:
+					tex = wall_tex
+				DungeonGenerator.TileType.TREE:
+					# Trees sit on a floor backdrop so edges read.
+					if floor_tex != null:
+						draw_texture_rect(floor_tex, rect, false, modulate)
+					tex = tree_tex
+				DungeonGenerator.TileType.STAIRS_DOWN:
+					if floor_tex != null:
+						draw_texture_rect(floor_tex, rect, false, modulate)
+					tex = stairs_dn_tex
+				DungeonGenerator.TileType.STAIRS_UP:
+					if floor_tex != null:
+						draw_texture_rect(floor_tex, rect, false, modulate)
+					tex = stairs_up_tex
+				DungeonGenerator.TileType.WATER:
+					tex = water_tex
+				DungeonGenerator.TileType.LAVA:
+					tex = lava_tex
+				DungeonGenerator.TileType.DOOR_OPEN:
+					if floor_tex != null:
+						draw_texture_rect(floor_tex, rect, false, modulate)
+					tex = door_open_tex
+				DungeonGenerator.TileType.DOOR_CLOSED:
+					if floor_tex != null:
+						draw_texture_rect(floor_tex, rect, false, modulate)
+					tex = door_closed_tex
 			if tex != null:
 				draw_texture_rect(tex, rect, false, modulate)
 			else:
