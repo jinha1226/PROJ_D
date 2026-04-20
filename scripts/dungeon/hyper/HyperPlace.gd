@@ -123,7 +123,7 @@ static func process_room_place(anchor: Dictionary, place: Dictionary,
 	var is_clear: bool = true
 	var place_check = room.get("generator_used", {}).get("veto_cell",
 			build.get("veto_cell",
-			strategy.get("veto_cell", Callable(HyperStrategy, "cell_veto_normal"))))
+			strategy.get("veto_cell", HyperStrategy.cell_veto_normal)))
 
 	for m in range(int(room["size"].y)):
 		for n in range(int(room["size"].x)):
@@ -210,7 +210,7 @@ static func apply_room(state: Dictionary, room: Dictionary, build: Dictionary,
 
 	# Run wall decorator for doors.
 	var decorate = build.get("wall_decorator",
-			options.get("decorate_walls_callback", Callable(HyperDecor, "decorate_walls")))
+			options.get("decorate_walls_callback", HyperDecor.decorate_walls))
 	if decorate is Callable and (decorate as Callable).is_valid():
 		(decorate as Callable).call(state, door_connections, true)
 		for n in range(4):

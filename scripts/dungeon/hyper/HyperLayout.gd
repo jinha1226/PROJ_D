@@ -36,7 +36,7 @@ static func default_options() -> Dictionary:
 		"room_type_weights": [
 			{
 				"generator": "code",
-				"paint_callback": Callable(HyperLayout, "_default_floor_paint"),
+				"paint_callback": HyperLayout._default_floor_paint,
 				"weight": 1,
 				"min_size": 4,
 				"max_size": 10,

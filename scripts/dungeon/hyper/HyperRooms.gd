@@ -113,7 +113,7 @@ static func make_code_room(chosen: Dictionary, options: Dictionary) -> Dictionar
 		elif raw is Dictionary:
 			size = Vector2i(int(raw.get("x", 0)), int(raw.get("y", 0)))
 	else:
-		var size_fn: Callable = chosen.get("size_callback", Callable(HyperShapes, "size_default"))
+		var size_fn: Callable = chosen.get("size_callback", HyperShapes.size_default)
 		size = size_fn.call(chosen, options)
 	if size.x <= 0 or size.y <= 0:
 		return {}

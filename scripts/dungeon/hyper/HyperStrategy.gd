@@ -148,27 +148,27 @@ static func cell_veto_normal(coord: Dictionary, state: Dictionary) -> bool:
 ## For an initial primary room that paints the level bulk.
 static func strategy_primary() -> Dictionary:
 	return {
-		"pick_place": Callable(HyperStrategy, "pick_place_random"),
-		"pick_anchor": Callable(HyperStrategy, "anchor_origin"),
-		"veto_cell": Callable(HyperStrategy, "_veto_none"),
+		"pick_place": HyperStrategy.pick_place_random,
+		"pick_anchor": HyperStrategy.anchor_origin,
+		"veto_cell": HyperStrategy._veto_none,
 	}
 
 
 ## Default: carve rooms into rock from existing wall cells.
 static func strategy_default() -> Dictionary:
 	return {
-		"pick_place": Callable(HyperStrategy, "pick_place_closed"),
-		"pick_anchor": Callable(HyperStrategy, "anchor_wall"),
-		"veto_cell": Callable(HyperStrategy, "cell_veto_normal"),
+		"pick_place": HyperStrategy.pick_place_closed,
+		"pick_anchor": HyperStrategy.anchor_wall,
+		"veto_cell": HyperStrategy.cell_veto_normal,
 	}
 
 
 ## Places in open areas by attaching to eligible open cells.
 static func strategy_open() -> Dictionary:
 	return {
-		"pick_place": Callable(HyperStrategy, "pick_place_open"),
-		"pick_anchor": Callable(HyperStrategy, "anchor_wall"),
-		"veto_cell": Callable(HyperStrategy, "cell_veto_normal"),
+		"pick_place": HyperStrategy.pick_place_open,
+		"pick_anchor": HyperStrategy.anchor_wall,
+		"veto_cell": HyperStrategy.cell_veto_normal,
 	}
 
 

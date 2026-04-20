@@ -57,7 +57,7 @@ func generate(depth: int, run_seed: int = -1) -> void:
 ## branch (and any "basic rooms" branch). Produces a usage_grid which we
 ## then translate back into our TileType enum map.
 func _build_hyper_main() -> void:
-	var paint_cb: Callable = Callable(HyperLayout, "_default_floor_paint")
+	var paint_cb: Callable = HyperLayout._default_floor_paint
 	var options: Dictionary = {
 		"name": "Main Dungeon",
 		"width": MAP_WIDTH,
@@ -78,7 +78,7 @@ func _build_hyper_main() -> void:
 			{
 				"generator": "code",
 				"paint_callback": paint_cb,
-				"room_transform": Callable(HyperRooms, "add_buffer_walls"),
+				"room_transform": HyperRooms.add_buffer_walls,
 				"weight": 3,
 				"min_size": 4,
 				"max_size": 8,
@@ -86,7 +86,7 @@ func _build_hyper_main() -> void:
 			{
 				"generator": "code",
 				"paint_callback": paint_cb,
-				"room_transform": Callable(HyperRooms, "add_buffer_walls"),
+				"room_transform": HyperRooms.add_buffer_walls,
 				"weight": 1,
 				"min_size": 7,
 				"max_size": 11,
@@ -109,6 +109,22 @@ func _build_hyper_main() -> void:
 	}
 	var state: Dictionary = HyperLayout.build(options)
 	_apply_usage_grid(state["usage_grid"])
+	# Safety: if the hyper engine produced no usable rooms (or tiny ones
+	# with no walkable exits), fall back to the classic BSP builder so
+	# runs are never stuck in a sealed room.
+	if rooms.size() < 2 or _count_floor_tiles() < 80:
+		_init_map()
+		rooms.clear()
+		_build_rooms_and_corridors()
+
+
+func _count_floor_tiles() -> int:
+	var n: int = 0
+	for x in MAP_WIDTH:
+		for y in MAP_HEIGHT:
+			if map[x][y] == TileType.FLOOR or map[x][y] == TileType.DOOR_OPEN:
+				n += 1
+	return n
 
 
 ## Seed each usage cell as solid rock so the engine has walls to carve.
