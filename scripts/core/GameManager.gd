@@ -64,6 +64,10 @@ func start_new_run(job_id: String = "fighter", race_id: String = "human", run_se
 	_pseudonyms.clear()
 	_consumable_bases.clear()
 	_pseudonyms_assigned = false
+	# Persist the combo so QuickStart can resurface it on the next boot.
+	var meta: Node = get_tree().root.get_node_or_null("MetaProgression") if get_tree() != null else null
+	if meta != null and meta.has_method("record_last_combo"):
+		meta.record_last_combo(race_id, job_id)
 	run_started.emit()
 
 

@@ -1,0 +1,57 @@
+[gd_scene load_steps=2 format=3 uid="uid://bquickstart001"]
+
+[ext_resource type="Script" path="res://scripts/ui/menu/QuickStart.gd" id="1_qs"]
+
+[node name="QuickStart" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_qs")
+
+[node name="BG" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.04, 0.03, 0.08, 1)
+
+[node name="Title" type="Label" parent="."]
+anchor_right = 1.0
+offset_top = 60.0
+offset_bottom = 220.0
+text = "Start a New Run"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 84
+theme_override_colors/font_color = Color(0.95, 0.92, 0.82, 1)
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 240.0
+offset_right = -24.0
+offset_bottom = -260.0
+horizontal_scroll_mode = 0
+
+[node name="List" type="VBoxContainer" parent="Scroll"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 22
+
+[node name="Footer" type="HBoxContainer" parent="."]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -220.0
+offset_right = -24.0
+offset_bottom = -60.0
+theme_override_constants/separation = 32
+
+[node name="BackButton" type="Button" parent="Footer"]
+custom_minimum_size = Vector2(380, 150)
+text = "Back"
+theme_override_font_sizes/font_size = 56
+
+[node name="CustomButton" type="Button" parent="Footer"]
+custom_minimum_size = Vector2(380, 150)
+size_flags_horizontal = 3
+text = "Custom Build"
+theme_override_font_sizes/font_size = 56

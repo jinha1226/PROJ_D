@@ -3,6 +3,7 @@ extends Control
 ## for a new run, or shows the in-game Credits popup.
 
 const RACE_SELECT_PATH := "res://scenes/menu/RaceSelect.tscn"
+const QUICK_START_PATH := "res://scenes/menu/QuickStart.tscn"
 const CREDITS_LPC_PATH := "res://CREDITS_LPC.md"
 const CREDITS_FONTS_PATH := "res://CREDITS_FONTS.md"
 
@@ -61,11 +62,14 @@ func _ensure_meta() -> MetaProgression:
 
 
 func _on_new_run() -> void:
-	# Reset any prior selection so we start the flow fresh.
+	# Clear the trait override (race/job get set by QuickStart or the
+	# Race→Job flow). QuickStart routes to the recommended-combos screen
+	# where the user can one-tap a popular build, re-roll the last combo,
+	# or drop into the custom picker.
 	GameManager.selected_race_id = ""
 	GameManager.selected_job_id = ""
 	GameManager.selected_trait_id = ""
-	get_tree().change_scene_to_file(RACE_SELECT_PATH)
+	get_tree().change_scene_to_file(QUICK_START_PATH)
 
 
 func _on_upgrades() -> void:

@@ -37,6 +37,11 @@ var rune_shards: int = 0
 var unlocked: Dictionary = {}
 var stats_record: Dictionary = {}
 var bestiary: Dictionary = {}
+# Most recently started run — surfaced on the QuickStart screen so the
+# player can re-roll the same build with one tap. Empty strings mean
+# "no prior run recorded yet".
+var last_race: String = ""
+var last_job: String = ""
 
 
 func load_from_disk() -> void:
@@ -58,6 +63,8 @@ func load_from_disk() -> void:
 		stats_record["total_runs"] = 0
 	var b = data.get("bestiary", {})
 	bestiary = b if typeof(b) == TYPE_DICTIONARY else {}
+	last_race = String(data.get("last_race", ""))
+	last_job = String(data.get("last_job", ""))
 
 
 func save_to_disk() -> void:
@@ -67,8 +74,22 @@ func save_to_disk() -> void:
 		"unlocked": unlocked,
 		"stats_record": stats_record,
 		"bestiary": bestiary,
+		"last_race": last_race,
+		"last_job": last_job,
 	}
 	SaveManager.save_json(SaveManager.META_FILE, payload)
+
+
+## Record the race/job the player just started a run with. Persisted so the
+## QuickStart screen can surface it as a one-tap rerun option.
+func record_last_combo(race_id: String, job_id: String) -> void:
+	if race_id == "" or job_id == "":
+		return
+	if race_id == last_race and job_id == last_job:
+		return
+	last_race = race_id
+	last_job = job_id
+	save_to_disk()
 
 
 func add_rune_shards(amount: int) -> void:
