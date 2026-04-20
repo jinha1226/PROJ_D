@@ -1233,54 +1233,381 @@ func _invoke(inv_id: String, dlg: AcceptDialog) -> void:
 	player.piety -= int(inv.get("cost", 0))
 	if dlg != null:
 		dlg.queue_free()
-	match String(inv.get("effect", "")):
+	_dispatch_invocation(String(inv.get("effect", "")))
+
+
+## Invocation effect switchboard. One big match that branches to helpers
+## so each god's power reads compactly. Effects that are just a rename
+## of an existing potion/scroll reuse `_apply_consumable_effect`; novel
+## ones get inline logic.
+func _dispatch_invocation(effect: String) -> void:
+	match effect:
+		# ---- Trog ----
 		"berserk":
 			player._apply_consumable_effect({"effect": "berserk", "dur_base": 15, "dur_rand": 10})
 		"trog_hand":
-			var tile: Vector2i = _find_free_adjacent_tile(player.grid_pos)
-			if tile != player.grid_pos:
-				var c: Companion = _COMPANION_SCENE.instantiate()
-				$EntityLayer.add_child(c)
-				var mdata: MonsterData = MonsterRegistry.fetch("orc_warrior")
-				if mdata != null:
-					c.setup(generator, tile, mdata)
-					c.lifetime = 60
-				CombatLog.add("Trog's Hand strikes your side!")
+			_summon_ally("orc_warrior", 60, "Trog's Hand strikes your side!")
 		"brothers":
 			for i in 3:
-				var tile_b: Vector2i = _find_free_adjacent_tile(player.grid_pos)
-				if tile_b == player.grid_pos:
-					continue
-				var mdata_b: MonsterData = MonsterRegistry.fetch("deep_troll")
-				if mdata_b == null:
-					mdata_b = MonsterRegistry.fetch("orc_warrior")
-				if mdata_b == null:
-					continue
-				var c_b: Companion = _COMPANION_SCENE.instantiate()
-				$EntityLayer.add_child(c_b)
-				c_b.setup(generator, tile_b, mdata_b)
-				c_b.lifetime = 40
+				_summon_ally("deep_troll", 40, "")
 			CombatLog.add("Trog sends his brothers in arms!")
+		# ---- Okawaru ----
 		"heroism":
 			player.set_meta("_heroism_turns", 25)
 			CombatLog.add("Your combat prowess surges!")
 		"finesse":
 			player.set_meta("_finesse_turns", 10)
 			CombatLog.add("Your strikes blur into a flurry!")
+		"duel":
+			var duel_t: Monster = _find_nearest_visible_monster(10)
+			if duel_t != null:
+				duel_t.take_damage(randi_range(25, 45))
+				CombatLog.add("Okawaru pulls the %s into a duel!" % _mon_name(duel_t))
+		# ---- Makhleb ----
+		"minor_destruction":
+			_damage_nearest_visible(12, 22, "A burst of chaos strikes %s!")
+		"major_destruction":
+			_damage_nearest_visible(28, 55, "Makhleb's destruction engulfs %s!")
+		"summon_demon":
+			_summon_ally("red_devil", 50, "A demon rises to serve!")
+		# ---- Uskayaw ----
+		"stomp":
+			_aoe_damage_visible(8, 10, 20, "Uskayaw's stomp rattles the floor!")
+		"line_pass":
+			_aoe_damage_visible(12, 15, 30, "You dance through the enemy line!")
+		# ---- Zin / TSO / Elyvilon ----
 		"vitalisation":
-			if player.stats != null:
-				player.stats.HP = min(player.stats.hp_max, player.stats.HP + 40)
-				player.stats.MP = min(player.stats.mp_max, player.stats.MP + 20)
-				player.stats_changed.emit()
-			CombatLog.add("Zin's light fills you.")
+			_heal_player(40, 20, "Zin's light fills you.")
 		"imprison":
-			var target: Monster = _find_nearest_visible_monster(8)
-			if target != null:
-				target.set_meta("_paralysis_turns", 10)
-				CombatLog.add("Stone walls seal the %s in place." % \
-						String(target.data.display_name if target.data else "foe"))
+			var imp_t: Monster = _find_nearest_visible_monster(8)
+			if imp_t != null:
+				imp_t.set_meta("_paralysis_turns", 10)
+				CombatLog.add("Stone walls seal the %s in place." % _mon_name(imp_t))
+		"sanctuary":
+			player.set_meta("_sanctuary_turns", 12)
+			CombatLog.add("A peaceful silence falls around you.")
+		"divine_shield":
+			if player.stats != null:
+				player.stats.AC += 6
+				player.set_meta("_divine_shield_turns", 15)
+				player.set_meta("_divine_shield_ac", 6)
+				player.stats_changed.emit()
+			CombatLog.add("A golden shield surrounds you.")
+		"cleansing_flame":
+			_aoe_damage_visible(12, 20, 40, "Cleansing flame burns every foe!")
+		"summon_angel":
+			_summon_ally("angel", 80, "An angel descends to your aid!")
+		"lesser_healing":
+			_heal_player(15, 0, "Elyvilon mends your wounds.")
+		"greater_healing":
+			_heal_player(40, 0, "Elyvilon heals you deeply.")
+		"pacify":
+			var pac_t: Monster = _find_nearest_visible_monster(8)
+			if pac_t != null:
+				pac_t.set_meta("_flee_turns", 20)
+				CombatLog.add("The %s calms and flees in peace." % _mon_name(pac_t))
+		# ---- Vehumet ----
+		"gift_spell":
+			if player.learned_spells.size() < 20:
+				var pool: Array = ["throw_flame", "throw_frost", "bolt_of_fire", "bolt_of_cold"]
+				var sp: String = String(pool[randi() % pool.size()])
+				if not player.learned_spells.has(sp):
+					player.learned_spells.append(sp)
+					CombatLog.add("Vehumet gifts you %s." % sp.replace("_", " "))
+		# ---- Sif Muna ----
+		"channel_mana":
+			if player.stats != null:
+				player.stats.MP = min(player.stats.mp_max, player.stats.MP + 15)
+				player.stats_changed.emit()
+			CombatLog.add("Sif Muna channels arcane energy into you.")
+		"divine_exegesis":
+			if player.stats != null:
+				player.stats.MP = min(player.stats.mp_max, player.stats.MP + 30)
+				player.stats_changed.emit()
+			CombatLog.add("Your next spell will hit like a meteor.")
+		"amnesia":
+			player._apply_consumable_effect({"effect": "amnesia"})
+		# ---- Kikubaaqudgha ----
+		"receive_corpses":
+			for i in 3:
+				_summon_ally("zombie", 30, "")
+			CombatLog.add("Corpses stir to your service.")
+		"god_torment":
+			player._apply_consumable_effect({"effect": "torment"})
+		"unearthly_bond":
+			player.set_meta("_unearthly_bond", true)
+			CombatLog.add("Your summons are bound to you.")
+		# ---- Nemelex ----
+		"draw_card":
+			_nemelex_draw_card()
+		"stack_five":
+			for i in 3:
+				_nemelex_draw_card()
+			CombatLog.add("You stack the deck and draw three.")
+		# ---- Yredelemnul ----
+		"yred_animate":
+			for i in 2:
+				_summon_ally("zombie", 50, "")
+			CombatLog.add("The dead answer your call.")
+		"drain_life":
+			var drained: int = _aoe_damage_visible(10, 5, 15, "Life flows out of the living!")
+			_heal_player(drained / 2, 0, "")
+		"enslave_soul":
+			var es_t: Monster = _find_nearest_visible_monster(8)
+			if es_t != null:
+				es_t.set_meta("_enslaved_on_death", true)
+				CombatLog.add("The %s's soul is yours to claim." % _mon_name(es_t))
+		# ---- Beogh ----
+		"recall_followers":
+			CombatLog.add("Orc allies rally to your side.")
+		"smite":
+			var sm_t: Monster = _find_nearest_visible_monster(10)
+			if sm_t != null:
+				sm_t.take_damage(randi_range(20, 40))
+				CombatLog.add("Divine wrath smites the %s!" % _mon_name(sm_t))
+		# ---- Jiyva ----
+		"jelly_prayer":
+			player.piety = min(200, player.piety + 10)
+			CombatLog.add("The slimes commune with their god.")
+		"cure_bad_mutation":
+			_cure_one_bad_mutation()
+		"slimify":
+			player.set_meta("_slimify_turns", 10)
+			CombatLog.add("Your weapon oozes acidic slime.")
+		# ---- Fedhas ----
+		"sunlight":
+			var dmap_s: DungeonMap = $DungeonLayer/DungeonMap
+			if dmap_s != null and dmap_s.has_method("reveal_all"):
+				dmap_s.reveal_all()
+			CombatLog.add("Sunlight floods the level.")
+		"plant_ring":
+			CombatLog.add("Plants rise around you (decorative for now).")
+		"rain":
+			CombatLog.add("Rain soaks the floor.")
+		# ---- Cheibriados ----
+		"bend_time":
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if is_instance_valid(m) and m.is_alive:
+					m.slowed_turns = 6
+			CombatLog.add("Time slows for every foe.")
+		"temporal_distortion":
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if is_instance_valid(m) and m.is_alive:
+					m.slowed_turns = randi_range(3, 10)
+			CombatLog.add("Time fractures unpredictably.")
+		"slouch":
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if is_instance_valid(m) and m.is_alive:
+					m.take_damage(randi_range(8, 20))
+			CombatLog.add("Slouch hits the swift!")
+		# ---- Lugonu ----
+		"bend_space":
+			var bs_t: Monster = _find_nearest_visible_monster(8)
+			if bs_t != null:
+				bs_t.take_damage(randi_range(5, 12))
+				CombatLog.add("Space warps around the %s." % _mon_name(bs_t))
+		"banishment":
+			var bn_t: Monster = _find_nearest_visible_monster(8)
+			if bn_t != null:
+				bn_t.take_damage(9999)
+				CombatLog.add("The %s vanishes into the Abyss!" % _mon_name(bn_t))
+		"corrupt_level":
+			CombatLog.add("The level writhes and corrupts (cosmetic for now).")
+		# ---- Ashenzari ----
+		"scry":
+			var dmap_y: DungeonMap = $DungeonLayer/DungeonMap
+			if dmap_y != null and dmap_y.has_method("reveal_all"):
+				dmap_y.reveal_all()
+			CombatLog.add("Ashenzari grants you sight.")
+		"transfer_knowledge":
+			CombatLog.add("Your skills shift. (stub — no UI yet)")
+		# ---- Dithmenos ----
+		"shadow_step":
+			var ss_t: Monster = _find_nearest_visible_monster(10)
+			if ss_t != null:
+				var near: Vector2i = _find_free_adjacent_tile(ss_t.grid_pos)
+				if near != ss_t.grid_pos:
+					player.grid_pos = near
+					player.position = Vector2(near.x * TILE_SIZE + TILE_SIZE / 2.0,
+							near.y * TILE_SIZE + TILE_SIZE / 2.0)
+					player.moved.emit(near)
+					CombatLog.add("You step through shadow!")
+		"shadow_form":
+			player.set_meta("_shadow_form_turns", 20)
+			CombatLog.add("You become a living shadow.")
+		"summon_shadow":
+			_summon_ally("shadow", 50, "A shadow detaches from you.")
+		# ---- Gozag ----
+		"potion_petition":
+			for i in 3:
+				var pot_ids: Array = ["potion_curing", "potion_haste", "potion_might",
+						"potion_brilliance", "potion_agility", "potion_magic"]
+				var pid: String = String(pot_ids[randi() % pot_ids.size()])
+				player.items.append(ConsumableRegistry.get_info(pid))
+			player.inventory_changed.emit()
+			CombatLog.add("Gozag sells you three potions.")
+		"call_merchant":
+			CombatLog.add("Gozag summons a merchant. (stub)")
+		"bribe_branch":
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if is_instance_valid(m) and m.is_alive:
+					m.set_meta("_flee_turns", 30)
+			CombatLog.add("Gold changes hands; monsters retreat.")
+		# ---- Qazlal ----
+		"upheaval":
+			_damage_nearest_visible(25, 50, "Upheaval tears up the floor!")
+		"elemental_force":
+			for i in 3:
+				_summon_ally("fire_elemental", 30, "")
+			CombatLog.add("Elementals swirl at your command.")
+		"disaster_area":
+			_aoe_damage_visible(12, 30, 60, "Disaster area erupts!")
+		# ---- Ru ----
+		"draw_out_power":
+			if player.stats != null:
+				player.stats.HP = player.stats.hp_max
+				player.stats.MP = player.stats.mp_max
+				player.stats_changed.emit()
+			CombatLog.add("Ru surges power through you!")
+		"power_leap":
+			_aoe_damage_visible(12, 20, 40, "You leap with awesome power!")
+		"apocalypse":
+			_aoe_damage_visible(15, 40, 80, "Apocalypse!")
+		# ---- Wu Jian ----
+		"wall_jump":
+			_aoe_damage_visible(8, 12, 24, "You pivot off the wall!")
+		"heavenly_storm":
+			player.set_meta("_heavenly_storm_turns", 20)
+			CombatLog.add("Heavenly storm girds your attacks.")
+		# ---- Hepliaklqana ----
+		"recall_ancestor":
+			_summon_ally("orc_knight", 999, "Your ancestor answers the call.")
+		"idealise":
+			CombatLog.add("Your ancestor gleams with potential.")
+		"transference":
+			CombatLog.add("You swap places with your ancestor. (stub)")
+		# ---- Ignis ----
+		"fiery_armour":
+			player.set_meta("_fiery_armour_turns", 30)
+			CombatLog.add("Flames wreath your armour.")
+		"foxfire_swarm":
+			for i in 4:
+				_summon_ally("fire_elemental", 20, "")
+			CombatLog.add("A swarm of foxfires flits out.")
+		"rising_flame":
+			_damage_nearest_visible(30, 55, "A spire of flame engulfs %s!")
 		_:
 			CombatLog.add("The god is silent.")
+
+
+## ---- Invocation helpers ---------------------------------------------------
+
+func _mon_name(m: Node) -> String:
+	if m == null or not ("data" in m) or m.data == null:
+		return "foe"
+	return String(m.data.display_name)
+
+
+func _heal_player(hp: int, mp: int, msg: String) -> void:
+	if player == null or player.stats == null:
+		return
+	if hp > 0:
+		player.stats.HP = min(player.stats.hp_max, player.stats.HP + hp)
+	if mp > 0:
+		player.stats.MP = min(player.stats.mp_max, player.stats.MP + mp)
+	player.stats_changed.emit()
+	if msg != "":
+		CombatLog.add(msg)
+
+
+func _damage_nearest_visible(lo: int, hi: int, msg: String) -> void:
+	var t: Monster = _find_nearest_visible_monster(12)
+	if t == null:
+		return
+	var dmg: int = randi_range(lo, hi)
+	t.take_damage(dmg)
+	if "%s" in msg:
+		CombatLog.add(msg % _mon_name(t))
+	else:
+		CombatLog.add(msg)
+
+
+## AoE across every currently visible hostile. Returns total damage dealt
+## so lifesteal effects like drain_life can feed it back to the player.
+func _aoe_damage_visible(radius: int, lo: int, hi: int, msg: String) -> int:
+	var total: int = 0
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+			continue
+		if dmap != null and not dmap.is_tile_visible(m.grid_pos):
+			continue
+		var d: int = max(abs(m.grid_pos.x - player.grid_pos.x),
+				abs(m.grid_pos.y - player.grid_pos.y))
+		if d > radius:
+			continue
+		var dmg: int = randi_range(lo, hi)
+		m.take_damage(dmg)
+		total += dmg
+	if msg != "":
+		CombatLog.add(msg)
+	return total
+
+
+## Try to summon a friendly Companion of `monster_id` adjacent to the
+## player. Silently no-ops if the id is unknown or no free tile exists.
+func _summon_ally(monster_id: String, lifetime: int, msg: String) -> void:
+	if generator == null or player == null:
+		return
+	var mdata: MonsterData = MonsterRegistry.fetch(monster_id)
+	if mdata == null:
+		return
+	var tile: Vector2i = _find_free_adjacent_tile(player.grid_pos)
+	if tile == player.grid_pos:
+		return
+	var c: Companion = _COMPANION_SCENE.instantiate()
+	$EntityLayer.add_child(c)
+	c.setup(generator, tile, mdata)
+	c.lifetime = lifetime
+	if msg != "":
+		CombatLog.add(msg)
+
+
+## Remove one random "bad" mutation from the player, reversing its
+## delta. Used by Jiyva's `cure_bad_mutation`.
+func _cure_one_bad_mutation() -> void:
+	if player == null or player.mutations.is_empty():
+		CombatLog.add("You have no mutations to cure.")
+		return
+	var bad_ids: Array = []
+	for mid in player.mutations.keys():
+		var flags: Array = MutationRegistry.get_info(String(mid)).get("flags", [])
+		if flags.has("bad"):
+			bad_ids.append(String(mid))
+	if bad_ids.is_empty():
+		CombatLog.add("Nothing bad to purge.")
+		return
+	var picked: String = String(bad_ids[randi() % bad_ids.size()])
+	player.remove_mutation(picked)
+	CombatLog.add("You feel %s drain away." % picked.replace("_", " "))
+
+
+## Nemelex-style single card draw. We reuse existing consumable effects
+## weighted by a small table; fancier decks can come later.
+func _nemelex_draw_card() -> void:
+	if player == null:
+		return
+	var cards: Array = [
+		{"effect": "haste", "dur_base": 10, "dur_rand": 5, "msg": "Card of Haste!"},
+		{"effect": "heal", "hp_base": 20, "hp_rand": 10, "msg": "Card of Healing!"},
+		{"effect": "blink", "msg": "Card of Blink!"},
+		{"effect": "immolation", "msg": "Card of Fire!"},
+		{"effect": "fog", "msg": "Card of Warp!"},
+		{"effect": "buff_temp", "stat": "STR", "amount": 6, "dur_base": 15, "dur_rand": 10, "msg": "Card of Might!"},
+	]
+	var card: Dictionary = cards[randi() % cards.size()]
+	CombatLog.add(String(card.get("msg", "A card shimmers.")))
+	player._apply_consumable_effect(card)
 
 
 ## DCSS-style branch entry: tapping onto a BRANCH_ENTRANCE tile saves
@@ -2415,12 +2742,13 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 func _apply_spell_piety_penalty(spell_level: int) -> void:
 	if player == null or player.current_god == "":
 		return
-	var god: Dictionary = GodRegistry.get_info(player.current_god)
-	if not bool(god.get("hates_spells", false)):
+	if not GodRegistry.has_conduct(player.current_god, "spells"):
 		return
 	var loss: int = max(1, spell_level * 2)
 	player.piety = max(0, player.piety - loss)
-	CombatLog.add("Trog scowls at your spellcraft. (-%d piety)" % loss)
+	var god: Dictionary = GodRegistry.get_info(player.current_god)
+	CombatLog.add("%s scowls at your spellcraft. (-%d piety)" % \
+			[String(god.get("title", player.current_god)), loss])
 
 
 func _assign_spell_quickslot(spell_id: String, dlg: AcceptDialog) -> void:
