@@ -2707,17 +2707,28 @@ func _on_bag_info(it: Dictionary) -> void:
 	var dlg := AcceptDialog.new()
 	dlg.exclusive = false
 	dlg.title = String(it.get("name", "Item"))
-	dlg.ok_button_text = "Close"
+	# Hide AcceptDialog's built-in OK footer — we ship our own Close
+	# button that's easier to hit on a tall mobile screen.
+	dlg.ok_button_text = ""
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 12)
+	vb.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	dlg.add_child(vb)
+	# Scroll the tooltip so a long description doesn't balloon the
+	# dialog out to the full viewport height (which was pushing the
+	# text to the top of the screen).
+	var scroll := ScrollContainer.new()
+	scroll.scroll_deadzone = 20
+	scroll.custom_minimum_size = Vector2(860, 700)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vb.add_child(scroll)
 	var lab := Label.new()
 	lab.text = _build_item_tooltip(it)
 	lab.add_theme_font_size_override("font_size", 48)
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	vb.add_child(lab)
-	# Explicit close button — AcceptDialog's OK footer can be hidden
-	# behind viewport padding on tall devices.
+	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(lab)
 	var close_btn := Button.new()
 	close_btn.text = "Close"
 	close_btn.add_theme_font_size_override("font_size", 44)
@@ -2727,7 +2738,10 @@ func _on_bag_info(it: Dictionary) -> void:
 	popup_mgr.add_child(dlg)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(900, 1100))
+	# Fixed compact size, centred. popup_centered sets the window size
+	# exactly to this Vector2i so the dialog sits in the middle of the
+	# viewport regardless of content length.
+	dlg.popup_centered(Vector2i(920, 900))
 
 
 func _on_bag_use(idx: int, dlg: AcceptDialog) -> void:
