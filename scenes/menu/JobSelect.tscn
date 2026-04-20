@@ -31,11 +31,9 @@ offset_right = -24.0
 offset_bottom = -260.0
 horizontal_scroll_mode = 0
 
-[node name="Grid" type="GridContainer" parent="Scroll"]
+[node name="List" type="VBoxContainer" parent="Scroll"]
 size_flags_horizontal = 3
-columns = 2
-theme_override_constants/h_separation = 6
-theme_override_constants/v_separation = 16
+theme_override_constants/separation = 18
 
 [node name="Footer" type="HBoxContainer" parent="."]
 anchor_top = 1.0
