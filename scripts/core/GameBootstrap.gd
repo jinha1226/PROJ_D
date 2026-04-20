@@ -511,6 +511,8 @@ func _on_inspect_requested(pos: Vector2i) -> void:
 		var tile_names: Dictionary = {
 			0: "Wall", 1: "Floor", 2: "Open Door", 3: "Closed Door",
 			4: "Stairs Down", 5: "Stairs Up", 6: "Water", 7: "Lava",
+			8: "Trap", 9: "Branch Entrance", 10: "Shop", 11: "Altar",
+			12: "Tree",
 		}
 		lines.append("Tile: %s (%d,%d)" % [tile_names.get(t, "Unknown"), pos.x, pos.y])
 	# Monster info
