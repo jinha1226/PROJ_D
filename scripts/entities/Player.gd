@@ -607,7 +607,7 @@ func try_move(delta: Vector2i) -> bool:
 	if monster != null:
 		try_attack_at(target)
 		return false
-	if not generator.is_walkable(target):
+	if not _player_can_walk_on(target):
 		return false
 	grid_pos = target
 	var target_px: Vector2 = Vector2(grid_pos.x * tile_size + tile_size / 2.0, grid_pos.y * tile_size + tile_size / 2.0)
@@ -944,6 +944,9 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 func _teleport_random() -> bool:
 	if generator == null:
 		return false
+	if _is_formicid_stasis():
+		CombatLog.add("Your stasis prevents any teleportation.")
+		return false
 	var candidates: Array = []
 	for x in DungeonGenerator.MAP_WIDTH:
 		for y in DungeonGenerator.MAP_HEIGHT:
@@ -959,6 +962,9 @@ func _teleport_random() -> bool:
 func _teleport_blink(radius: int) -> bool:
 	if generator == null:
 		return false
+	if _is_formicid_stasis():
+		CombatLog.add("Your stasis prevents any teleportation.")
+		return false
 	var candidates: Array = []
 	for dy in range(-radius, radius + 1):
 		for dx in range(-radius, radius + 1):
@@ -973,6 +979,37 @@ func _teleport_blink(radius: int) -> bool:
 		return false
 	_teleport_to(candidates[randi() % candidates.size()])
 	return true
+
+
+## Formicids are permanent-stasis — every teleport/blink path checks this
+## so scrolls, blink spells, and trait triggers all bounce off.
+func _is_formicid_stasis() -> bool:
+	return _racial_trait_id() == "formicid_stasis"
+
+
+## Race-aware walkability. Extends DungeonGenerator.is_walkable with:
+##   merfolk_swim → water tiles count as walkable (tengu_flight likewise
+##     ignores water/lava when implemented on a per-tile basis).
+## Other races fall back to the default.
+func _player_can_walk_on(target: Vector2i) -> bool:
+	if generator == null:
+		return false
+	if generator.is_walkable(target):
+		return true
+	var tile: int = generator.get_tile(target)
+	var trait_id: String = _racial_trait_id()
+	if trait_id == "merfolk_swim" and tile == DungeonGenerator.TileType.WATER:
+		return true
+	if trait_id == "tengu_flight":
+		# Winged races cross water but never walk through lava.
+		if tile == DungeonGenerator.TileType.WATER:
+			return true
+	if trait_id == "djinni_flight":
+		# Flame-spirits glide over both hazards.
+		if tile == DungeonGenerator.TileType.WATER \
+				or tile == DungeonGenerator.TileType.LAVA:
+			return true
+	return false
 
 
 func _teleport_to(target: Vector2i) -> void:

@@ -2116,6 +2116,10 @@ func _cast_area_spell(spell_id: String, info: Dictionary, power: int) -> Diction
 
 func _cast_self_spell(spell_id: String, _info: Dictionary, _power: int) -> Dictionary:
 	if spell_id == "blink":
+		# Formicid stasis blocks every teleport path.
+		if player != null and player.race_res != null \
+				and player.race_res.racial_trait == "formicid_stasis":
+			return {"success": true, "message": "Your stasis prevents the blink."}
 		var old_px: Vector2 = player.position
 		var fx_layer: Node2D = $EntityLayer
 		for _i in 60:

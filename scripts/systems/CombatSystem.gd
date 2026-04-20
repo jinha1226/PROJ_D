@@ -84,6 +84,17 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 			attacker.set_meta("_backstab_used", true)
 		else:
 			dmg = int(dmg * 1.15)
+	# Racial passive: naga venom bite adds a flat +1 to every melee hit.
+	var race_trait: String = ""
+	if "race_res" in attacker and attacker.race_res != null:
+		race_trait = String(attacker.race_res.racial_trait)
+	if race_trait == "naga_poison_spit":
+		dmg += 1
+	# Kobold sneak attack: stealth_skill_level / 3 added to damage, so the
+	# kobold's stealth investment translates into a real combat bonus.
+	if race_trait == "kobold_sneak" and skill_sys != null:
+		var stealth_lv: int = skill_sys.get_level(attacker, "stealth")
+		dmg += stealth_lv / 3
 	if defender.has_method("take_damage"):
 		defender.take_damage(dmg)
 	var def_name: String = ""
