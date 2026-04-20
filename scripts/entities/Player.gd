@@ -354,9 +354,24 @@ func equip_weapon(weapon_id: String) -> String:
 	var prev: String = equipped_weapon_id
 	equipped_weapon_id = weapon_id
 	equipped_weapon_cursed = false
+	_auto_train_weapon_skill(weapon_id)
 	stats_changed.emit()
 	_load_sprite_preset()
 	return prev
+
+
+## Auto-enable the skill that `weapon_id` trains so the next kill's XP flows
+## into the right weapon pool. Does NOT disable the previously-trained
+## skill — the player can still turn it off manually in the skill dialog.
+func _auto_train_weapon_skill(weapon_id: String) -> void:
+	if weapon_id == "":
+		return
+	var skill_id: String = WeaponRegistry.weapon_skill_for(weapon_id)
+	if skill_id == "":
+		return
+	if not (skill_state is Dictionary) or not skill_state.has(skill_id):
+		return
+	skill_state[skill_id]["training"] = true
 
 
 ## Equip an armor dict that includes a "slot" key. Replaces the prior armor
