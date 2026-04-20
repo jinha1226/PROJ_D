@@ -333,6 +333,57 @@ func _tick_duration_metas() -> void:
 	_tick_simple_meta("_silenced_turns")
 	_tick_simple_meta("_heroism_turns")
 	_tick_simple_meta("_finesse_turns")
+	_tick_simple_meta("_exhausted_turns")
+	_tick_simple_meta("_mesmerised_turns")
+	_tick_simple_meta("_sanctuary_turns")
+	_tick_simple_meta("_divine_shield_turns")
+	_tick_simple_meta("_shadow_form_turns")
+	_tick_simple_meta("_fiery_armour_turns")
+	_tick_simple_meta("_heavenly_storm_turns")
+	_tick_simple_meta("_slimify_turns")
+	# Poison DoT: DCSS tracks a total poison pool that ticks down a tiny
+	# amount per turn until cured. We simplify to {turns, dmg-per-turn}.
+	if has_meta("_poison_turns"):
+		var pt: int = int(get_meta("_poison_turns", 0))
+		if pt > 0 and stats != null:
+			var dmg: int = int(get_meta("_poison_dmg", 2))
+			take_damage(dmg)
+			if pt <= 1:
+				remove_meta("_poison_turns")
+				remove_meta("_poison_dmg")
+			else:
+				set_meta("_poison_turns", pt - 1)
+	# Petrifying → petrified. Petrifying counts down; when it expires,
+	# the petrified meta engages and freezes the player for N turns.
+	if has_meta("_petrifying_turns"):
+		var pt2: int = int(get_meta("_petrifying_turns", 0)) - 1
+		if pt2 <= 0:
+			remove_meta("_petrifying_turns")
+			set_meta("_petrified_turns", 5)
+			CombatLog.add("You petrify!")
+		else:
+			set_meta("_petrifying_turns", pt2)
+	_tick_simple_meta("_petrified_turns")
+	# Corrosion: each stack shaves 4 AC until the counter expires.
+	if has_meta("_corroded_turns"):
+		var ct: int = int(get_meta("_corroded_turns", 0)) - 1
+		if ct <= 0:
+			var stacks: int = int(get_meta("_corrosion_stacks", 0))
+			if stats != null:
+				stats.AC += stacks * 4
+				stats_changed.emit()
+			remove_meta("_corroded_turns")
+			remove_meta("_corrosion_stacks")
+		else:
+			set_meta("_corroded_turns", ct)
+	# Death's Door: HP locked at 1, counter ticks down, lethal at 0.
+	if has_meta("_deaths_door_turns"):
+		var dt: int = int(get_meta("_deaths_door_turns", 0)) - 1
+		if dt <= 0:
+			remove_meta("_deaths_door_turns")
+			CombatLog.add("Death's Door closes. Normal damage resumes.")
+		else:
+			set_meta("_deaths_door_turns", dt)
 	# Ambrosia: confusion while the duration runs, HP/MP regen each tick.
 	if has_meta("_ambrosia_turns"):
 		var at: int = int(get_meta("_ambrosia_turns", 0))
@@ -346,7 +397,8 @@ func _tick_duration_metas() -> void:
 			remove_meta("_confused")
 		else:
 			set_meta("_ambrosia_turns", at)
-	# Berserk: reverse the HP inflation on expiry.
+	# Berserk: reverse the HP inflation on expiry, leave the player
+	# exhausted for 8 turns (DCSS DUR_EXHAUSTED).
 	if has_meta("_berserk_turns"):
 		var bt: int = int(get_meta("_berserk_turns", 0)) - 1
 		if bt <= 0:
@@ -357,7 +409,8 @@ func _tick_duration_metas() -> void:
 				stats.HP = min(stats.HP, stats.hp_max)
 				remove_meta("_berserk_bonus_hp")
 				stats_changed.emit()
-			CombatLog.add("Your rage subsides.")
+			set_meta("_exhausted_turns", 8)
+			CombatLog.add("Your rage subsides. You feel exhausted.")
 		else:
 			set_meta("_berserk_turns", bt)
 	# Tree form: reverse AC and HP bonuses on expiry.
@@ -1020,6 +1073,17 @@ func try_move(delta: Vector2i) -> bool:
 	if not is_alive:
 		return false
 	if generator == null:
+		return false
+	# Petrified: no movement or attacks whatsoever.
+	if has_meta("_petrified_turns"):
+		CombatLog.add("You cannot move — you are stone.")
+		return false
+	# Mesmerised: can't walk away from the caster (simplification —
+	# DCSS checks direction; we just block movement outright for
+	# `_mesmerised_turns`).
+	if has_meta("_mesmerised_turns") \
+			and _monster_at(grid_pos + delta) == null:
+		CombatLog.add("You are transfixed.")
 		return false
 	# Tree form (potion of lignification) — root in place; you can still
 	# swing at adjacent monsters, but you can't walk.
@@ -2093,8 +2157,22 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 func take_damage(amount: int) -> void:
 	if not is_alive:
 		return
+	# Shadow form halves all incoming damage.
+	if has_meta("_shadow_form_turns"):
+		amount = max(1, amount / 2)
+	# Divine shield and fiery armour shave a flat chunk.
+	if has_meta("_divine_shield_turns"):
+		amount = max(1, amount - 3)
 	if resist_turns > 0:
 		amount = max(1, amount / 2)
+	# Sanctuary: Zin protects the faithful from almost all harm.
+	if has_meta("_sanctuary_turns"):
+		amount = max(1, amount / 4)
+	# Death's Door: HP cannot drop below 1 while the duration runs.
+	if has_meta("_deaths_door_turns") and stats != null:
+		amount = min(amount, stats.HP - 1)
+		if amount <= 0:
+			return
 	# --- Racial trait mitigation ---
 	var trait_id: String = _racial_trait_id()
 	if trait_id == "halfling_lucky" and randf() < 0.15:
