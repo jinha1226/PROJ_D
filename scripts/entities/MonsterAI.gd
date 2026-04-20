@@ -261,24 +261,46 @@ static func _apply_mon_spell(m: Monster, target: Node, spell_id: String) -> bool
 			return false
 
 
-## Wake every sleeping monster within `radius` of `origin`. Used by loud
-## actions (melee from a caster, successful spellcast, noisy scrolls).
-## DCSS stealth skill on the player trims the effective radius so
-## careful casters don't broadcast their position across the floor.
+## Broadcast a noise pulse. Delegates to Noise (shout.cc port), which
+## walks the tile grid with per-feature attenuation so walls and closed
+## doors actually muffle the wave instead of a raw Chebyshev test.
 static func broadcast_noise(tree: SceneTree, origin: Vector2i, loudness: int,
 		stealth: int = 0) -> void:
 	if tree == null:
 		return
-	var eff: int = max(0, loudness - stealth / 3)
-	if eff <= 0:
+	var gen: DungeonGenerator = _find_generator(tree)
+	if gen == null:
+		# Without a map we fall back to the old disc test — better to
+		# wake neighbours than nothing. Rare path; only hits when the
+		# dungeon isn't loaded yet.
+		var eff: int = maxi(0, loudness - stealth / 3)
+		if eff <= 0:
+			return
+		for m in tree.get_nodes_in_group("monsters"):
+			if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+				continue
+			if not m.is_sleeping:
+				continue
+			if _cheb(m.grid_pos, origin) <= eff:
+				wake(m)
 		return
-	for m in tree.get_nodes_in_group("monsters"):
-		if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
-			continue
-		if not m.is_sleeping:
-			continue
-		if _cheb(m.grid_pos, origin) <= eff:
-			wake(m)
+	var map_fn: Callable = func(cell: Vector2i) -> int:
+		if cell.x < 0 or cell.x >= DungeonGenerator.MAP_WIDTH:
+			return -1
+		if cell.y < 0 or cell.y >= DungeonGenerator.MAP_HEIGHT:
+			return -1
+		return gen.map[cell.x][cell.y]
+	Noise.broadcast(tree, origin, loudness, stealth, map_fn)
+
+
+static func _find_generator(tree: SceneTree) -> DungeonGenerator:
+	var game: Node = tree.root.get_node_or_null("Game")
+	if game == null:
+		return null
+	var dmap = game.get_node_or_null("DungeonLayer/DungeonMap")
+	if dmap == null or not ("generator" in dmap):
+		return null
+	return dmap.generator
 
 
 ## Wake a sleeping monster and propagate the alarm to adjacent sleepers.

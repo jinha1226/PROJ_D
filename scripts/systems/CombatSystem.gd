@@ -135,9 +135,19 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	if defender.has_method("has_meta") and defender.has_meta("_vuln_turns"):
 		def_ac = def_ac / 2
 
-	# DCSS apply_ac: AC soaks `random2(2*AC+1)` off the hit — average
-	# of AC damage blocked, with a lot of variance.
-	var soak: int = (randi() % (2 * def_ac + 1)) if def_ac > 0 else 0
+	# DCSS actor::apply_ac, ac_type::normal (actor.cc:355):
+	#   saved = random2(1 + ac)
+	# We previously rolled random2(2*ac+1), which averages AC damage
+	# blocked instead of AC/2 — effectively a doubled-AC shield that
+	# made mid-game armour feel invulnerable. This now matches DCSS.
+	var soak: int = (randi() % (def_ac + 1)) if def_ac > 0 else 0
+	# GDR (guaranteed damage reduction): body armour guarantees at least
+	# a percentage of the hit absorbed, capped at ac/2. DCSS derives gdr
+	# from base armour EVP; we approximate with body encumbrance tiers.
+	var gdr_pct: int = _gdr_percent(defender)
+	if gdr_pct > 0 and def_ac > 0:
+		var gdr_soak: int = mini(gdr_pct * max(potential / 100, 1) / 100, def_ac / 2)
+		soak = maxi(soak, gdr_soak)
 	var dmg: int = max(1, atk - soak)
 	var trait_special: String = ""
 	if "trait_res" in attacker and attacker.trait_res != null:
@@ -251,7 +261,7 @@ static func melee_attack_from_monster(m, defender) -> int:
 		var to_hit: int = randi() % (mhit_base + 1)
 		if to_hit >= def_ev:
 			var raw_f: int = max(1, (int(m.data.str) / 2 + 3) if m.data else 3)
-			total = max(0, raw_f - (randi() % (2 * def_ac + 1)))
+			total = max(0, raw_f - (randi() % (def_ac + 1)))
 			dealt_any = total > 0
 		else:
 			missed_any = true
@@ -270,9 +280,9 @@ static func melee_attack_from_monster(m, defender) -> int:
 				missed_any = true
 				continue
 			# Each connecting swing: 1 + random2(base), then AC soaks
-			# `random2(2*AC+1)` (DCSS apply_ac shape for monsters).
+			# `random2(1+AC)` (DCSS actor::apply_ac, ac_type::normal).
 			var raw: int = 1 + (randi() % base)
-			var soak: int = randi() % (2 * def_ac + 1) if def_ac > 0 else 0
+			var soak: int = randi() % (def_ac + 1) if def_ac > 0 else 0
 			var after_ac: int = max(0, raw - soak)
 			if after_ac > 0:
 				total += after_ac
@@ -311,6 +321,22 @@ static func melee_attack_from_monster(m, defender) -> int:
 	_show_hit_feedback(defender, total, Color(1.0, 0.3, 0.3))
 	_show_slash_fx(defender)
 	return total
+
+
+## DCSS player::gdr_perc (player.cc:6620): `16 * sqrt(sqrt(ac))`.
+## Returns a percentage (0..100). Applies to any actor with an AC stat;
+## monsters get 0 until we wire the monster-armour table.
+static func _gdr_percent(actor) -> int:
+	var ac: int = 0
+	if actor == null:
+		return 0
+	if "stats" in actor and actor.stats != null:
+		ac = int(actor.stats.AC)
+	elif "ac" in actor:
+		ac = int(actor.ac)
+	if ac <= 0:
+		return 0
+	return int(16.0 * sqrt(sqrt(float(ac))))
 
 
 static func _show_hit_feedback(target: Node, dmg: int, color: Color) -> void:

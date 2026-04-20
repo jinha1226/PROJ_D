@@ -392,9 +392,11 @@ func _apply_passive_racial_traits() -> void:
 		player.stats.HP += 1
 		_hp_regen_accum -= 100
 		player.stats_changed.emit()
-	# MP regen: roughly the same shape but with mp_max/7, matching
-	# DCSS's `player_mp_regen` at XL 1 ~3 MP → ~23/turn → ~4 turns/MP.
-	var mp_rate: int = 7 + player.stats.mp_max / 7
+	# DCSS player_mp_regen (player.cc:1298): `7 + mp_max / 2`.
+	# We previously divided by 7 which scaled MP regen 2–3× too slowly
+	# at mid/late game (at 60 MP max: DCSS 37/turn, ours 15/turn). The
+	# divisor is now corrected so MP flow matches the source.
+	var mp_rate: int = 7 + player.stats.mp_max / 2
 	_mp_regen_accum += mp_rate
 	while _mp_regen_accum >= 100 and player.stats.MP < player.stats.mp_max:
 		player.stats.MP += 1
