@@ -1,5 +1,10 @@
-class_name Noise
+class_name DCSSNoise
 extends Object
+## NOTE: named `DCSSNoise` because Godot 4 already has a built-in
+## `Noise` class (base for FastNoiseLite). Using `class_name Noise`
+## silently compiled but `Noise.broadcast(...)` resolved against the
+## engine class and errored at runtime with "Static function
+## broadcast() not found in base GDScriptNativeClass".
 ## Faithful DCSS 0.34 noise-propagation port.
 ##
 ## Source:

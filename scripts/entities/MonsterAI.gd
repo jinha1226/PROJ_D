@@ -290,7 +290,7 @@ static func broadcast_noise(tree: SceneTree, origin: Vector2i, loudness: int,
 		if cell.y < 0 or cell.y >= DungeonGenerator.MAP_HEIGHT:
 			return -1
 		return gen.map[cell.x][cell.y]
-	Noise.broadcast(tree, origin, loudness, stealth, map_fn)
+	DCSSNoise.broadcast(tree, origin, loudness, stealth, map_fn)
 
 
 static func _find_generator(tree: SceneTree) -> DungeonGenerator:
