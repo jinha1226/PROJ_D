@@ -307,6 +307,13 @@ static func melee_attack_from_monster(m, defender) -> int:
 				total += after_ac
 				dealt_any = true
 			var flav: String = String(a.get("flavour", ""))
+			# DCSS melee-attack.cc mons_apply_attack_flavour + mon-util.cc
+			# flavour_damage. Elemental flavours deal extra damage on top of
+			# the physical hit, routed through the defender's resistance.
+			# We collect the delta and add it below so a single take_damage
+			# call carries the elemental tag for player resist scaling.
+			var flav_bonus: int = 0
+			var flav_element: String = ""
 			match flav:
 				"poison":
 					if defender.has_method("set_meta"):
@@ -316,7 +323,29 @@ static func melee_attack_from_monster(m, defender) -> int:
 					if defender.has_method("set_meta"):
 						defender.set_meta("_drained_turns", 20)
 				"fire":
-					pass
+					flav_bonus = hd + (randi() % maxi(1, hd))
+					flav_element = "fire"
+				"cold":
+					flav_bonus = hd + (randi() % maxi(1, hd * 2))
+					flav_element = "cold"
+				"elec", "electric":
+					flav_bonus = hd + (randi() % maxi(1, hd / 2 + 1))
+					flav_element = "elec"
+				"pure_fire":
+					flav_bonus = hd * 3 / 2 + (randi() % maxi(1, hd))
+					flav_element = "fire"
+				"acid":
+					flav_bonus = 4 + (randi() % 9)  # DCSS acid proxy
+					flav_element = "acid"
+			if flav_bonus > 0 and defender.has_method("take_damage"):
+				# Apply the elemental rider now with its own resist routing so
+				# rF+/rC+ scale the bonus before it's added to the physical
+				# total. The caller's single take_damage below applies AC-
+				# resisted physical on its own.
+				var bonus_after: int = flav_bonus
+				if defender.has_method("_apply_elem_resist"):
+					bonus_after = int(defender._apply_elem_resist(flav_bonus, flav_element))
+				total += bonus_after
 
 	if not dealt_any:
 		if missed_any:
