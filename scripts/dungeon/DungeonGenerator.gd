@@ -37,17 +37,145 @@ func generate(depth: int, run_seed: int = -1) -> void:
 		_rng.seed = run_seed + depth * 1000
 	rooms.clear()
 	_init_map()
+	HyperLayout.set_seed(_rng.seed + depth)
 	var branch: String = _current_branch()
 	match branch:
-		"main":    _build_rooms_and_corridors()
+		"main":    _build_hyper_main()
 		"mine":    _build_caves(); _decorate_rock_debris(8)
 		"forest":  _build_caves(); _decorate_trees(22)
 		"swamp":   _build_caves(); _decorate_trees(10); _place_pools(TileType.WATER, 4, 4, 9)
 		"volcano": _build_caves(); _place_pools(TileType.LAVA, 3, 3, 7)
-		_:         _build_rooms_and_corridors()
+		_:         _build_hyper_main()
 	_place_vault(branch)
 	_ensure_reachability()
 	_place_stairs()
+
+
+# ---- Builder: DCSS hyper engine ------------------------------------------
+
+## Drive the ported DCSS 0.34 hyper layout engine to produce the main
+## branch (and any "basic rooms" branch). Produces a usage_grid which we
+## then translate back into our TileType enum map.
+func _build_hyper_main() -> void:
+	var paint_cb: Callable = Callable(HyperLayout, "_default_floor_paint")
+	var options: Dictionary = {
+		"name": "Main Dungeon",
+		"width": MAP_WIDTH,
+		"height": MAP_HEIGHT,
+		"min_room_size": 4,
+		"max_room_size": 10,
+		"max_rooms": 16,
+		"max_room_tries": 40,
+		"max_place_tries": 80,
+		"layout_wall_type": "rock_wall",
+		"layout_floor_type": "floor",
+		"grid_initialiser": Callable(self, "_hyper_init_cell"),
+		"skip_analyse": false,
+		# One varied "code" generator — floor rectangle + added walls +
+		# buffer so adjacent rooms don't touch. A second generator with
+		# bigger min_size handles larger rooms (25%).
+		"room_type_weights": [
+			{
+				"generator": "code",
+				"paint_callback": paint_cb,
+				"room_transform": Callable(HyperRooms, "add_buffer_walls"),
+				"weight": 3,
+				"min_size": 4,
+				"max_size": 8,
+			},
+			{
+				"generator": "code",
+				"paint_callback": paint_cb,
+				"room_transform": Callable(HyperRooms, "add_buffer_walls"),
+				"weight": 1,
+				"min_size": 7,
+				"max_size": 11,
+			},
+		],
+		"build_fixture": [
+			# First pass: seed the level with a primary room.
+			{
+				"type": "build",
+				"max_rooms": 1,
+				"strategy": HyperStrategy.strategy_primary(),
+			},
+			# Main pass: attach rooms off existing walls.
+			{
+				"type": "build",
+				"max_rooms": 14,
+				"strategy": HyperStrategy.strategy_default(),
+			},
+		],
+	}
+	var state: Dictionary = HyperLayout.build(options)
+	_apply_usage_grid(state["usage_grid"])
+
+
+## Seed each usage cell as solid rock so the engine has walls to carve.
+func _hyper_init_cell(x: int, y: int) -> Dictionary:
+	return {
+		"feature": "rock_wall",
+		"solid": true,
+		"wall": true,
+		"carvable": true,
+		"space": false,
+		"vault": false,
+		"anchors": [],
+	}
+
+
+## Translate the finished usage_grid back into our TileType enum map +
+## rooms array (needed for stair placement / reachability).
+func _apply_usage_grid(usage_grid: Dictionary) -> void:
+	for x in MAP_WIDTH:
+		for y in MAP_HEIGHT:
+			var cell: Dictionary = HyperUsage.get_usage(usage_grid, x, y)
+			map[x][y] = _feature_to_tile(String(cell.get("feature", "rock_wall")))
+	# Derive rooms from per-room anchors — simplest: collect bounding rect
+	# per unique room ref. Used by _place_stairs and _ensure_reachability.
+	var by_room: Dictionary = {}
+	for x in MAP_WIDTH:
+		for y in MAP_HEIGHT:
+			var cell: Dictionary = HyperUsage.get_usage(usage_grid, x, y)
+			var r = cell.get("room", null)
+			if r == null:
+				continue
+			if bool(cell.get("solid", true)) and not String(cell.get("feature", "")) == "open_door":
+				continue
+			var key: int = r.get_instance_id() if r is Object else hash(r)
+			if not by_room.has(key):
+				by_room[key] = {"min_x": x, "min_y": y, "max_x": x, "max_y": y}
+			else:
+				var rec: Dictionary = by_room[key]
+				rec["min_x"] = min(rec["min_x"], x)
+				rec["min_y"] = min(rec["min_y"], y)
+				rec["max_x"] = max(rec["max_x"], x)
+				rec["max_y"] = max(rec["max_y"], y)
+	rooms.clear()
+	for rec_v in by_room.values():
+		var rec: Dictionary = rec_v
+		rooms.append(Rect2i(
+				rec["min_x"], rec["min_y"],
+				rec["max_x"] - rec["min_x"] + 1,
+				rec["max_y"] - rec["min_y"] + 1))
+
+
+## Feature-string → TileType enum lookup. Unknown → wall.
+func _feature_to_tile(feature: String) -> int:
+	match feature:
+		"floor":             return TileType.FLOOR
+		"rock_wall":         return TileType.WALL
+		"stone_wall":        return TileType.WALL
+		"open_door":         return TileType.DOOR_OPEN
+		"closed_door":       return TileType.DOOR_CLOSED
+		"stone_stairs_up":   return TileType.STAIRS_UP
+		"stone_stairs_down": return TileType.STAIRS_DOWN
+		"shallow_water":     return TileType.WATER
+		"deep_water":        return TileType.WATER
+		"lava":              return TileType.LAVA
+		"tree":              return TileType.TREE
+		"space":             return TileType.WALL
+		_:                   return TileType.WALL
 
 
 func _current_branch() -> String:
