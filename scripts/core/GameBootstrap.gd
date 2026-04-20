@@ -1870,7 +1870,12 @@ func _regenerate_dungeon(going_up: bool, secondary: bool = false) -> void:
 			it.queue_free()
 	if is_instance_valid(generator):
 		generator.queue_free()
-	GameManager.current_branch = GameManager.branch_for_depth(GameManager.current_depth)
+	# Legacy: this used to overwrite `current_branch` with the tileset
+	# bucket on every depth change. That clobbered real branch state
+	# (lair/orc/vaults/…) set by `enter_branch`, so floor_key lookups
+	# drifted on re-entry and saved explored maps vanished. Tileset
+	# selection now goes through GameManager.tileset_branch() which
+	# derives the theme without mutating current_branch.
 	TileRenderer._cache.clear()
 	generator = DungeonGenerator.new()
 	add_child(generator)
@@ -3631,53 +3636,212 @@ func _append_equipped_row(vb: VBoxContainer, slot: String, display: String,
 
 
 ## Build a multi-line tooltip string comparing this item to what the
-## player currently has equipped in the same slot.
+## player currently has equipped in the same slot. Covers every kind
+## the game ships so ring/wand/book/talisman/evocable descriptions
+## surface the real mechanical data (DPS, charges, form stats, …).
 func _build_item_tooltip(it: Dictionary) -> String:
 	var kind: String = String(it.get("kind", ""))
 	var id: String = String(it.get("id", ""))
-	# Unidentified consumables show their pseudonym; weapons/armor always
-	# show their real name.
 	var raw_name: String = String(it.get("name", WeaponRegistry.display_name_for(id)))
 	var name_s: String = GameManager.display_name_for_item(id, raw_name, kind)
 	match kind:
-		"weapon":
-			var new_dmg: int = WeaponRegistry.weapon_damage_for(id)
-			var new_delay: float = WeaponRegistry.weapon_delay_for(id)
-			var new_skill: String = WeaponRegistry.weapon_skill_for(id)
-			var cur_id: String = player.equipped_weapon_id if player else ""
-			var cur_dmg: int = WeaponRegistry.weapon_damage_for(cur_id)
-			var cur_delay: float = WeaponRegistry.weapon_delay_for(cur_id)
-			var cur_name: String = WeaponRegistry.display_name_for(cur_id) if cur_id != "" else "unarmed"
-			var diff_dmg: int = new_dmg - cur_dmg
-			var sign_d: String = "+" if diff_dmg >= 0 else ""
-			return "%s\nDamage: %d (%s%d vs %s)\nDelay: %.2f (cur %.2f)\nSkill: %s" % [
-				name_s, new_dmg, sign_d, diff_dmg, cur_name, new_delay, cur_delay, new_skill,
-			]
-		"armor":
-			var new_ac: int = int(it.get("ac", 0))
-			# Slot-aware comparison: look up what's worn in this item's slot.
-			var slot: String = String(it.get("slot", ArmorRegistry.slot_for(id)))
-			var cur: Dictionary = {}
-			if player != null and player.equipped_armor.has(slot):
-				cur = player.equipped_armor[slot]
-			var cur_ac: int = int(cur.get("ac", 0))
-			var cur_name: String = String(cur.get("name", "(empty)"))
-			var diff_ac: int = new_ac - cur_ac
-			var sign_a: String = "+" if diff_ac >= 0 else ""
-			return "%s [%s slot]\nAC: %d (%s%d vs %s)" % [
-				name_s, slot, new_ac, sign_a, diff_ac, cur_name,
-			]
-		"potion", "scroll":
-			# Description hidden until identified — "?" keeps the mystery
-			# so the player has to experiment or read an identify scroll.
-			var desc: String = ""
-			if GameManager.is_identified(id):
-				desc = ConsumableRegistry.description_for(id)
-			if desc == "":
-				desc = ("Drink to find out." if kind == "potion" else "Read aloud to find out.")
-			return "%s\n%s" % [name_s, desc]
-		_:
-			return "%s\nMiscellaneous junk." % name_s
+		"weapon":   return _tooltip_weapon(id, name_s, it)
+		"armor":    return _tooltip_armor(id, name_s, it)
+		"ring":     return _tooltip_ring(id, name_s, it)
+		"potion":   return _tooltip_consumable(id, name_s, "potion")
+		"scroll":   return _tooltip_consumable(id, name_s, "scroll")
+		"book":     return _tooltip_book(id, name_s, it)
+		"wand":     return _tooltip_wand(id, name_s, it)
+		"talisman": return _tooltip_talisman(id, name_s, it)
+		"evocable": return _tooltip_evocable(id, name_s, it)
+		"gold":     return "%d gold coins." % int(it.get("gold", 0))
+		_:          return "%s\nMiscellaneous junk." % name_s
+
+
+func _tooltip_weapon(id: String, name_s: String, it: Dictionary) -> String:
+	var new_dmg: int = WeaponRegistry.weapon_damage_for(id)
+	var new_delay: float = WeaponRegistry.weapon_delay_for(id)
+	var new_skill: String = WeaponRegistry.weapon_skill_for(id)
+	var plus: int = int(it.get("plus", 0))
+	var total_dmg: int = new_dmg + plus
+	var cur_id: String = player.equipped_weapon_id if player else ""
+	var cur_dmg: int = WeaponRegistry.weapon_damage_for(cur_id) \
+			+ (int(player.equipped_weapon_plus) if player and cur_id != "" else 0)
+	var cur_delay: float = WeaponRegistry.weapon_delay_for(cur_id)
+	var cur_name: String = WeaponRegistry.display_name_for(cur_id) if cur_id != "" else "unarmed"
+	var new_dps: float = float(total_dmg) / max(new_delay, 0.1)
+	var cur_dps: float = float(cur_dmg) / max(cur_delay, 0.1)
+	var diff_dmg: int = total_dmg - cur_dmg
+	var diff_dps: float = new_dps - cur_dps
+	var lines: Array = [name_s]
+	if plus != 0:
+		lines.append("Enchant: +%d" % plus)
+	lines.append("Damage: %d  (%s%d vs %s)" % [
+			total_dmg, ("+" if diff_dmg >= 0 else ""), diff_dmg, cur_name])
+	lines.append("Delay: %.2f  (cur %.2f — lower is faster)" % [new_delay, cur_delay])
+	lines.append("DPS: %.1f  (%s%.1f)" % [
+			new_dps, ("+" if diff_dps >= 0 else ""), diff_dps])
+	lines.append("Trains: %s" % new_skill.replace("_", " "))
+	var staff_school: String = WeaponRegistry.staff_spell_school(id)
+	if staff_school != "":
+		lines.append("Magical staff: +%d spell power to %s school" % [
+				WeaponRegistry.staff_spell_bonus(id), staff_school])
+	if bool(it.get("cursed", false)):
+		lines.append("[color=#c55]*** Cursed *** — you cannot unequip it.[/color]")
+	return "\n".join(PackedStringArray(lines))
+
+
+func _tooltip_armor(id: String, name_s: String, it: Dictionary) -> String:
+	var new_ac: int = int(it.get("ac", 0))
+	var slot: String = String(it.get("slot", ArmorRegistry.slot_for(id)))
+	var ev_penalty: int = ArmorRegistry.ev_penalty_for(id) if ArmorRegistry.has_method("ev_penalty_for") else 0
+	var cur: Dictionary = {}
+	if player != null and player.equipped_armor.has(slot):
+		cur = player.equipped_armor[slot]
+	var cur_ac: int = int(cur.get("ac", 0))
+	var cur_name: String = String(cur.get("name", "(empty)"))
+	var diff_ac: int = new_ac - cur_ac
+	var lines: Array = [name_s, "Slot: %s" % slot]
+	lines.append("AC: +%d  (%s%d vs %s)" % [
+			new_ac, ("+" if diff_ac >= 0 else ""), diff_ac, cur_name])
+	if ev_penalty < 0:
+		# ArmorRegistry stores raw PARM_EVASION (negative). `-40` = -4 EV,
+		# `-180` = -18 EV. Also slows spellcasting via encumbrance.
+		lines.append("EV penalty: %d  (heavier armour → worse dodge + spells)" \
+				% (ev_penalty / 10))
+	if bool(it.get("cursed", false)):
+		lines.append("[color=#c55]*** Cursed *** — you cannot remove it.[/color]")
+	return "\n".join(PackedStringArray(lines))
+
+
+func _tooltip_ring(id: String, name_s: String, it: Dictionary) -> String:
+	var info: Dictionary = RingRegistry.get_info(id)
+	if info.is_empty():
+		return "%s\nA small band of unknown metal." % name_s
+	var lines: Array = [name_s, "Slot: ring"]
+	# Pretty-print every effect field present.
+	var pairs: Array = [
+		["str",         "STR +%d"],
+		["dex",         "DEX +%d"],
+		["int_",        "INT +%d"],
+		["ac",          "AC +%d"],
+		["ev",          "EV +%d"],
+		["mp_max",      "Max MP +%d"],
+		["dmg_bonus",   "Melee damage +%d"],
+		["spell_power", "Spell power +%d"],
+		["regen",       "HP regen +%d / turn"],
+		["stealth",     "Stealth +%d"],
+		["fire_apt",    "Fire aptitude +%d (spells + resist)"],
+		["cold_apt",    "Cold aptitude +%d (spells + resist)"],
+	]
+	for p in pairs:
+		var key: String = p[0]
+		var fmt: String = p[1]
+		if info.has(key) and int(info[key]) != 0:
+			lines.append(fmt % int(info[key]))
+	# Stacking hint: shows how many rings we already wear.
+	if player != null:
+		var worn: int = player.equipped_rings.size() if "equipped_rings" in player else 0
+		var cap: int = 8 if player.race_res and player.race_res.racial_trait == "octopode_rings" else 2
+		lines.append("Worn: %d / %d rings" % [worn, cap])
+	return "\n".join(PackedStringArray(lines))
+
+
+func _tooltip_consumable(id: String, name_s: String, kind: String) -> String:
+	var desc: String = ""
+	if GameManager.is_identified(id):
+		desc = ConsumableRegistry.description_for(id)
+	if desc == "":
+		desc = ("Drink to find out." if kind == "potion" else "Read aloud to find out.")
+	return "%s\n%s" % [name_s, desc]
+
+
+func _tooltip_book(id: String, name_s: String, _it: Dictionary) -> String:
+	var info: Dictionary = ConsumableRegistry.get_info(id)
+	var spells: Array = info.get("spells", [])
+	var lines: Array = [name_s]
+	if spells.is_empty():
+		lines.append("Teaches nothing you can learn.")
+	else:
+		lines.append("Spells taught:")
+		for sid in spells:
+			var sid_s: String = String(sid)
+			var spell_info: Dictionary = SpellRegistry.get_spell(sid_s)
+			var sp_name: String = String(spell_info.get("name", sid_s.replace("_", " ").capitalize()))
+			var lv: int = int(spell_info.get("difficulty", 1))
+			var known: bool = player != null and player.learned_spells.has(sid_s)
+			var marker: String = " (known)" if known else ""
+			lines.append("  • %s  [Lv.%d]%s" % [sp_name, lv, marker])
+	return "\n".join(PackedStringArray(lines))
+
+
+func _tooltip_wand(id: String, name_s: String, it: Dictionary) -> String:
+	var info: Dictionary = WandRegistry.get_info(id)
+	if info.is_empty():
+		return "%s\nA thin rod of unknown craft." % name_s
+	var charges: int = int(it.get("charges", 0))
+	var spell_id: String = String(info.get("spell", ""))
+	var sp_name: String = spell_id.replace("_", " ").capitalize()
+	if spell_id != "":
+		var sp_info: Dictionary = SpellRegistry.get_spell(spell_id)
+		if not sp_info.is_empty():
+			sp_name = String(sp_info.get("name", sp_name))
+	var evo: int = 0
+	if player != null and player.skill_state.has("evocations"):
+		evo = int(player.skill_state["evocations"].get("level", 0))
+	var eff_power: int = 15 + evo * 7
+	var lines: Array = [name_s, "Charges: %d" % charges]
+	lines.append("Effect: %s" % sp_name)
+	lines.append("Evocation power: %d  (Evocations Lv.%d)" % [eff_power, evo])
+	lines.append(String(info.get("desc", "")))
+	return "\n".join(PackedStringArray(lines))
+
+
+func _tooltip_talisman(id: String, name_s: String, _it: Dictionary) -> String:
+	var info: Dictionary = ConsumableRegistry.get_info(id)
+	var form_id: String = String(info.get("form", id.replace("talisman_", "")))
+	var form: Dictionary = FormRegistry.get_info(form_id)
+	var lines: Array = [name_s]
+	lines.append(String(info.get("desc", "")))
+	if form.is_empty():
+		return "\n".join(PackedStringArray(lines))
+	var hp_mod: int = int(form.get("hp_mod", 100))
+	if hp_mod != 100:
+		lines.append("HP: %d%% of normal" % hp_mod)
+	if int(form.get("str_delta", 0)) != 0:
+		lines.append("STR %+d" % int(form.get("str_delta", 0)))
+	if int(form.get("dex_delta", 0)) != 0:
+		lines.append("DEX %+d" % int(form.get("dex_delta", 0)))
+	if int(form.get("ac_base", 0)) != 0:
+		lines.append("AC +%d  (+%d per 10 skill)" % [
+				int(form.get("ac_base", 0)), int(form.get("ac_scaling", 0))])
+	if int(form.get("unarmed_base", 0)) > 0:
+		lines.append("Unarmed attack: %d base  (+%d per 10 skill)" % [
+				int(form.get("unarmed_base", 0)), int(form.get("unarmed_scaling", 0))])
+	var resists: Dictionary = form.get("resists", {})
+	if not resists.is_empty():
+		var parts: Array = []
+		for r in resists.keys():
+			parts.append("r%s+%d" % [String(r), int(resists[r])])
+		lines.append("Resists: %s" % ", ".join(parts))
+	var flags: Array = []
+	if bool(form.get("can_fly", false)):
+		flags.append("fly")
+	if bool(form.get("can_swim", false)):
+		flags.append("swim")
+	if not flags.is_empty():
+		lines.append("Movement: %s" % ", ".join(flags))
+	if player != null and player.current_form == form_id:
+		lines.append("[color=#8dd]Currently active — evoke again to revert.[/color]")
+	return "\n".join(PackedStringArray(lines))
+
+
+func _tooltip_evocable(id: String, name_s: String, it: Dictionary) -> String:
+	var info: Dictionary = ConsumableRegistry.get_info(id)
+	var charges: int = int(it.get("charges", 0))
+	var lines: Array = [name_s, "Charges: %d" % charges]
+	lines.append(String(info.get("desc", "Activate to release its power.")))
+	return "\n".join(PackedStringArray(lines))
 
 
 ## Compose a bag thumbnail. For potions/scrolls the base-colour tile is
