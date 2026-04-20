@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "hedge_wizard"
+display_name = "Hedge Wizard"
+description = ""
+str_bonus = 2
+dex_bonus = 4
+int_bonus = 6
+starting_equipment = Array[String](["dagger", "robe", "hat", "potion_magic"])
+starting_skills = {"conjurations": 2, "dodging": 2, "necromancy": 1, "spellcasting": 3, "stealth": 2, "summonings": 1, "translocations": 1}
+starting_spells = Array[String](["magic_dart", "blink", "call_imp", "grave_claw", "mephitic_cloud"])
+unique_ability = ""

@@ -24,7 +24,7 @@ const COMBOS: Array = [
 	{"race": "mummy",      "job": "necromancer",       "tag": "MuNe — undead necromancer with strong death magic.",            "tier": "mid"},
 	{"race": "vampire",    "job": "enchanter",         "tag": "VpEn — hex everything, drink its blood.",                       "tier": "mid"},
 	{"race": "formicid",   "job": "hunter",            "tag": "FoHu — four-armed archer + heavy shield.",                      "tier": "mid"},
-	{"race": "naga",       "job": "transmuter",        "tag": "NaTm — slow serpent-mage with poison + transmutations.",        "tier": "hard"},
+	{"race": "naga",       "job": "shapeshifter",      "tag": "NaSh — slow serpent shapeshifter, forms over weapons.",         "tier": "hard"},
 	{"race": "merfolk",    "job": "ice_elementalist",  "tag": "MfIE — cold mage who rules the dungeon's waterways.",           "tier": "hard"},
 	{"race": "demonspawn", "job": "fighter",           "tag": "DsFi — bulky fighter who gains mutations as you level.",        "tier": "hard"},
 ]

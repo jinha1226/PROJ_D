@@ -102,8 +102,12 @@ func _make_row(r: RaceData) -> Button:
 	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vb.add_child(name_lbl)
 
-	var stat_line: String = "STR %d   DEX %d   INT %d   HP/lv %d   MP/lv %d" % [
-			r.base_str, r.base_dex, r.base_int, r.hp_per_level, r.mp_per_level]
+	# Show DCSS-style HP/MP modifiers (percent adjustment on base, per species-
+	# data.h) rather than flat per-level gains, which no longer drive growth.
+	var hp_pct: int = 100 + (r.hp_mod * 10)
+	var mp_line: String = "MP %+d" % r.mp_mod
+	var stat_line: String = "STR %d   DEX %d   INT %d   HP %d%%   %s" % [
+			r.base_str, r.base_dex, r.base_int, hp_pct, mp_line]
 	var stats_lbl := Label.new()
 	stats_lbl.text = stat_line
 	stats_lbl.add_theme_font_size_override("font_size", 32)

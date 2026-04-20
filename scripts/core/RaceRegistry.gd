@@ -47,8 +47,16 @@ static func _apply_dcss(target: RaceData, entry: Dictionary) -> void:
 	target.base_str = int(entry.get("base_str", target.base_str))
 	target.base_int = int(entry.get("base_int", target.base_int))
 	target.base_dex = int(entry.get("base_dex", target.base_dex))
-	# hp_per_level / mp_per_level: DCSS uses aptitude deltas (`hp`, `mp_mod`).
-	# Start from the race's current value and adjust by the DCSS delta.
+	# DCSS species HP/MP modifiers from dat/species/*.yaml. `hp` is the
+	# species-data.h `hp_mod` field; `mp_mod` matches directly. These drive
+	# Player._dcss_max_hp / _dcss_max_mp to match DCSS XL scaling.
+	if entry.has("hp"):
+		target.hp_mod = int(entry.get("hp", 0))
+	if entry.has("mp_mod"):
+		target.mp_mod = int(entry.get("mp_mod", 0))
+	# Legacy per-level fields kept so character-progress code that still
+	# reads hp_per_level/mp_per_level doesn't break while the DCSS formula
+	# rolls out. The new formula ignores these values.
 	if entry.has("hp"):
 		target.hp_per_level = max(2, target.hp_per_level + int(entry.get("hp", 0)))
 	if entry.has("mp_mod"):

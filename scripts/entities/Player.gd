@@ -36,6 +36,36 @@ const _XP_PER_LEVEL: int = 50
 const _HP_PER_LEVEL: int = 5  # fallback if race_res missing
 const _MP_PER_LEVEL: int = 3
 
+
+## DCSS get_real_hp (player.cc:4160) — base HP from XL + fighting skill, then
+## scaled by species hp_mod. Excludes transient bonuses (berserk, artifacts,
+## mutations) which we don't model yet.
+static func _dcss_max_hp(xl: int, fighting_skill: int, hp_mod: int) -> int:
+	var hitp: int = xl * 11 / 2 + 8
+	hitp += xl * fighting_skill * 5 / 70
+	hitp += (fighting_skill * 3 + 1) / 2
+	hitp = hitp * (10 + hp_mod) / 10
+	return max(1, hitp)
+
+
+## DCSS get_real_mp (player.cc:4217) — spellcasting/invocations scaled by XL
+## with a soft cap. Species mp_mod is a flat bonus added after scaling.
+## Mutations and items are not applied here; pass 0 for invocations until
+## we model god abilities.
+static func _dcss_max_mp(xl: int, spellcasting: int, invocations: int, mp_mod: int) -> int:
+	var scale: int = 100
+	var scaled_xl: int = xl * scale
+	var enp: int = min(23 * scale, scaled_xl)
+	var spell_extra: int = spellcasting * scale
+	var invoc_extra: int = invocations * scale / 2
+	var highest: int = max(spell_extra, invoc_extra)
+	enp += highest + min(8 * scale, min(highest, scaled_xl)) / 2
+	# DCSS multiplies by 100 (ROBUST/FRAIL baseline) then divides by 100*scale.
+	# Net effect with no mutations: enp = enp / scale.
+	enp = enp / scale
+	enp += mp_mod
+	return max(0, enp)
+
 # [skill-agent] equipped weapon + per-skill state (level/xp/training).
 var equipped_weapon_id: String = ""
 # True while the equipped weapon is cursed — cannot unequip or drop.
@@ -130,8 +160,8 @@ func _load_sprite_preset() -> void:
 	var preset: Dictionary = _compose_preset()
 	if preset.is_empty():
 		# Fallback to disk-based preset if composition failed.
-		var fallback_id := "%s_%s" % [job_id if job_id != "" else "barbarian", race_id if race_id != "" else "human"]
-		preset = LPCPresetLoader.load_with_fallback(fallback_id, "barbarian_human")
+		var fallback_id := "%s_%s" % [job_id if job_id != "" else "fighter", race_id if race_id != "" else "human"]
+		preset = LPCPresetLoader.load_with_fallback(fallback_id, "fighter_human")
 	if preset.is_empty():
 		push_error("Player: no preset available, sprite will be blank")
 		return
@@ -295,8 +325,18 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 	s.INT = base_int
 	var hp_pct: float = 1.0 + (p_trait.hp_bonus_pct if p_trait else 0.0)
 	var mp_pct: float = 1.0 + (p_trait.mp_bonus_pct if p_trait else 0.0)
-	var hp_total: int = int((5 * level + 30) * hp_pct)
-	var mp_total: int = int((3 * level + 10) * mp_pct)
+	# DCSS formula (player.cc get_real_hp/get_real_mp). Starting skills are
+	# read straight from the JobData because SkillSystem isn't installed on
+	# this Player until GameBootstrap does so right after setup() returns.
+	var fighting_sk: int = 0
+	var spellcast_sk: int = 0
+	if job != null:
+		fighting_sk = int(job.starting_skills.get("fighting", 0))
+		spellcast_sk = int(job.starting_skills.get("spellcasting", 0))
+	var hp_mod: int = race.hp_mod if race != null else 0
+	var mp_mod: int = race.mp_mod if race != null else 0
+	var hp_total: int = int(_dcss_max_hp(level, fighting_sk, hp_mod) * hp_pct)
+	var mp_total: int = int(_dcss_max_mp(level, spellcast_sk, 0, mp_mod) * mp_pct)
 	s.hp_max = hp_total
 	s.HP = hp_total
 	s.mp_max = mp_total
@@ -372,8 +412,10 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 				})
 	_recompute_defense()
 
-	if job != null and (job.id == "mage" or job.id == "warlock"):
-		GameManager.identify("mana_potion")
+	# Caster backgrounds — pre-identify the starting potion of magic and
+	# basic scrolls so first-turn play isn't gated by unknown-item testing.
+	if job != null and job.starting_equipment.has("potion_magic"):
+		GameManager.identify("potion_magic")
 		GameManager.identify("scroll_identify")
 
 	stats_changed.emit()
@@ -1250,15 +1292,36 @@ func xp_for_next_level() -> int:
 func _apply_level_up_growth() -> void:
 	if stats == null:
 		return
-	# Scale HP/MP gains by the race's per-level aptitude so Trolls grow
-	# beefy fast and Deep Elves stay fragile.
-	var hp_gain: int = race_res.hp_per_level if race_res != null else _HP_PER_LEVEL
-	var mp_gain: int = race_res.mp_per_level if race_res != null else _MP_PER_LEVEL
-	stats.hp_max += hp_gain
-	stats.HP = stats.hp_max  # full heal on level up
-	stats.mp_max += mp_gain
-	stats.MP = stats.mp_max
+	# DCSS recomputes hp_max/mp_max from scratch on level-up using current
+	# XL + skills + species mods. Follows player.cc calc_hp/calc_mp (scaled
+	# carry-over: current HP stays at the same ratio of new max).
+	var fighting_sk: int = _skill_level("fighting")
+	var spellcast_sk: int = _skill_level("spellcasting")
+	var hp_mod: int = race_res.hp_mod if race_res != null else 0
+	var mp_mod: int = race_res.mp_mod if race_res != null else 0
+	var trait_hp_pct: float = 1.0 + (trait_res.hp_bonus_pct if trait_res != null else 0.0)
+	var trait_mp_pct: float = 1.0 + (trait_res.mp_bonus_pct if trait_res != null else 0.0)
+	var new_hp_max: int = int(_dcss_max_hp(level, fighting_sk, hp_mod) * trait_hp_pct)
+	var new_mp_max: int = int(_dcss_max_mp(level, spellcast_sk, 0, mp_mod) * trait_mp_pct)
+	# Preserve HP/MP ratio across max changes (DCSS calc_hp scales the same way).
+	var old_hp_max: int = max(1, stats.hp_max)
+	var old_mp_max: int = max(1, stats.mp_max)
+	stats.hp_max = new_hp_max
+	stats.HP = clampi(stats.HP * new_hp_max / old_hp_max, 1, new_hp_max)
+	stats.mp_max = new_mp_max
+	stats.MP = clampi(stats.MP * new_mp_max / old_mp_max, 0, new_mp_max)
 	stats_changed.emit()
+
+
+## Helper: read current skill level. Reads `skill_state` if SkillSystem has
+## already seeded it; otherwise falls back to `job_res.starting_skills` (used
+## during initial setup, before SkillSystem is installed).
+func _skill_level(skill_id: String) -> int:
+	if skill_state.has(skill_id) and typeof(skill_state[skill_id]) == TYPE_DICTIONARY:
+		return int(skill_state[skill_id].get("level", 0))
+	if job_res != null and job_res.starting_skills.has(skill_id):
+		return int(job_res.starting_skills[skill_id])
+	return 0
 
 
 ## Called by the level-up popup with a chosen stat id ("STR"/"DEX"/"INT").

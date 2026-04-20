@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "forgewright"
+display_name = "Forgewright"
+description = ""
+str_bonus = 2
+dex_bonus = 3
+int_bonus = 7
+starting_equipment = Array[String](["mace", "robe", "potion_magic"])
+starting_skills = {"dodging": 2, "spellcasting": 2, "stealth": 2}
+starting_spells = Array[String](["kinetic_grapnel", "spike_launcher", "clockwork_bee", "forge_blazeheart_golem", "forge_lightning_spire"])
+unique_ability = ""

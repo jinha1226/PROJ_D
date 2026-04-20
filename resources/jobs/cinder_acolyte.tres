@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "cinder_acolyte"
+display_name = "Cinder Acolyte"
+description = ""
+str_bonus = 6
+dex_bonus = 0
+int_bonus = 6
+starting_equipment = Array[String](["mace", "robe"])
+starting_skills = {"fighting": 3, "fire": 3, "mace": 3, "spellcasting": 1}
+starting_spells = Array[String](["scorch"])
+unique_ability = ""

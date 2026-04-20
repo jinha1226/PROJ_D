@@ -3,13 +3,41 @@ extends Control
 const GAME_PATH := "res://scenes/main/Game.tscn"
 const JOB_SELECT_PATH := "res://scenes/menu/JobSelect.tscn"
 
+## Mobile/Pixel-Dungeon-style trait picks layered on top of DCSS backgrounds.
+## Each DCSS job offers 4 thematic trait cards that nudge early build
+## direction without replacing DCSS's skill system.
 const JOB_TRAITS: Dictionary = {
-	"fighter":   ["sword", "polearm_trait", "shield_trait", "heavy_armor"],
-	"barbarian": ["axe_trait", "mace_trait", "brawler", "throwing_trait"],
-	"ranger":    ["bow_trait", "crossbow_trait", "throwing_ranger", "scout"],
-	"rogue":     ["dagger_trait", "acrobat", "shadow", "evoker"],
-	"mage":      ["fire", "ice", "earth", "air"],
-	"warlock":   ["necro", "hexer", "arcane", "warper"],
+	# Warrior
+	"fighter":         ["sword", "polearm_trait", "shield_trait", "heavy_armor"],
+	"gladiator":       ["sword", "throwing_trait", "shield_trait", "scout"],
+	"monk":            ["brawler", "acrobat", "shield_trait", "scout"],
+	"hunter":          ["bow_trait", "crossbow_trait", "throwing_ranger", "scout"],
+	"brigand":         ["dagger_trait", "acrobat", "shadow", "throwing_trait"],
+	# Adventurer
+	"artificer":       ["evoker", "scout", "shield_trait", "heavy_armor"],
+	"shapeshifter":    ["brawler", "acrobat", "scout", "shadow"],
+	"wanderer":        ["sword", "brawler", "fire", "scout"],
+	"delver":          ["dagger_trait", "acrobat", "shadow", "scout"],
+	# Zealot
+	"berserker":       ["axe_trait", "mace_trait", "brawler", "heavy_armor"],
+	"chaos_knight":    ["axe_trait", "sword", "heavy_armor", "shield_trait"],
+	"cinder_acolyte":  ["fire", "mace_trait", "brawler", "heavy_armor"],
+	# Warrior-mage
+	"warper":          ["warper", "dagger_trait", "throwing_trait", "scout"],
+	"hexslinger":      ["hexer", "bow_trait", "dagger_trait", "fire"],
+	"enchanter":       ["hexer", "dagger_trait", "shadow", "arcane"],
+	"reaver":          ["arcane", "sword", "ice", "heavy_armor"],
+	# Mage
+	"hedge_wizard":    ["fire", "ice", "earth", "air"],
+	"conjurer":        ["arcane", "fire", "ice", "air"],
+	"summoner":        ["arcane", "necro", "hexer", "scout"],
+	"necromancer":     ["necro", "hexer", "arcane", "shadow"],
+	"fire_elementalist":  ["fire", "arcane", "hexer", "scout"],
+	"ice_elementalist":   ["ice", "arcane", "hexer", "scout"],
+	"air_elementalist":   ["air", "arcane", "warper", "scout"],
+	"earth_elementalist": ["earth", "arcane", "mace_trait", "heavy_armor"],
+	"alchemist":       ["necro", "fire", "hexer", "scout"],
+	"forgewright":     ["earth", "mace_trait", "arcane", "heavy_armor"],
 }
 
 var _selected_id: String = ""

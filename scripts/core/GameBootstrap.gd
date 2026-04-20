@@ -128,10 +128,9 @@ func _ready() -> void:
 	var race_id: String = GameManager.selected_race_id if GameManager.selected_race_id != "" else "human"
 	GameManager.start_new_run(job_id, race_id)
 	var job: JobData = load("res://resources/jobs/%s.tres" % job_id)
-	var race_res: RaceData = null
-	var race_path: String = "res://resources/races/%s.tres" % race_id
-	if ResourceLoader.exists(race_path):
-		race_res = load(race_path) as RaceData
+	# Route through RaceRegistry so DCSS aptitudes + hp_mod/mp_mod get
+	# merged onto the hand-tuned .tres before Player reads the data.
+	var race_res: RaceData = RaceRegistry.fetch(race_id)
 	player.setup(generator, generator.spawn_pos, job, race_res, null)
 
 	# [skill-agent] SkillSystem must exist before first attack; attach as child

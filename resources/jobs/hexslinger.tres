@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "hexslinger"
+display_name = "Hexslinger"
+description = ""
+str_bonus = 0
+dex_bonus = 7
+int_bonus = 5
+starting_equipment = Array[String](["robe", "slingshot"])
+starting_skills = {"dodging": 2, "fighting": 1, "fire": 1, "hexes": 3, "sling": 2, "spellcasting": 1}
+starting_spells = Array[String](["jinxbite", "sigil_of_binding", "inner_flame", "cause_fear", "dimensional_bullseye"])
+unique_ability = ""

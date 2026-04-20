@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "reaver"
+display_name = "Reaver"
+description = ""
+str_bonus = 4
+dex_bonus = 3
+int_bonus = 5
+starting_equipment = Array[String](["mace", "leather_armour"])
+starting_skills = {"conjurations": 3, "dodging": 2, "fighting": 2, "mace": 3, "spellcasting": 2}
+starting_spells = Array[String](["kiss_of_death", "momentum_strike", "hailstorm", "rending_blade"])
+unique_ability = ""

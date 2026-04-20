@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "wanderer"
+display_name = "Wanderer"
+description = "A jack-of-all-trades. DCSS randomises their kit; we give a sensible baseline."
+str_bonus = 2
+dex_bonus = 2
+int_bonus = 2
+starting_equipment = Array[String](["dagger", "leather_armour", "potion_curing"])
+starting_skills = {"dodging": 1, "fighting": 2, "short_blade": 1, "spellcasting": 1, "stealth": 1}
+starting_spells = Array[String](["magic_dart"])
+unique_ability = ""

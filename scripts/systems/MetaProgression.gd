@@ -22,10 +22,14 @@ const UPGRADES: Dictionary = {
 	"ess_drop":    {"name": "Essence Resonance",   "cost": 50, "cat": "essence", "requires": ""},
 }
 
+## Shards required to unlock non-starter DCSS backgrounds. Starter roster
+## (DEFAULT_JOBS) is free; the rest cost shards to gate progression.
 const JOB_UNLOCK_COST: Dictionary = {
 	"conjurer": 20, "summoner": 25, "necromancer": 30, "enchanter": 25,
-	"transmuter": 30, "warper": 35, "wizard": 40,
-	"arcane_marksman": 30, "skald": 25, "assassin": 35,
+	"shapeshifter": 30, "warper": 35, "hedge_wizard": 20,
+	"hexslinger": 30, "artificer": 25, "cinder_acolyte": 30,
+	"chaos_knight": 40, "reaver": 35, "alchemist": 30, "forgewright": 35,
+	"delver": 25, "wanderer": 20,
 }
 
 const DEFAULT_JOBS: Array = [

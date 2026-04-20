@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "shapeshifter"
+display_name = "Shapeshifter"
+description = ""
+str_bonus = 6
+dex_bonus = 4
+int_bonus = 2
+starting_equipment = Array[String](["dagger", "animal_skin", "potion_resistance"])
+starting_skills = {"dodging": 2, "fighting": 5}
+starting_spells = Array[String]([])
+unique_ability = ""

@@ -2,23 +2,21 @@ extends Control
 
 const GAME_PATH := "res://scenes/main/Game.tscn"
 const RACE_SELECT_PATH := "res://scenes/menu/RaceSelect.tscn"
+## DCSS 0.34 background roster (26 jobs). Order matches DCSS category grouping
+## used on the new-game screen so the list reads the same as crawl proper.
 const JOB_IDS: Array[String] = [
-	# Warriors
-	"fighter", "gladiator", "berserker", "barbarian", "monk",
-	# Adventurers
-	"ranger", "hunter", "arcane_marksman",
-	# Rogues
-	"rogue", "assassin", "brigand",
-	# Hybrid / Skald
-	"skald",
-	# Divine
-	"cleric",
-	# Mages
-	"mage", "warlock", "wizard", "conjurer", "necromancer",
-	"fire_elementalist", "ice_elementalist", "earth_elementalist",
-	"air_elementalist", "enchanter", "summoner",
-	# Transmuters / Warpers
-	"transmuter", "warper",
+	# Warrior
+	"fighter", "gladiator", "monk", "hunter", "brigand",
+	# Adventurer
+	"artificer", "shapeshifter", "wanderer", "delver",
+	# Zealot
+	"berserker", "chaos_knight", "cinder_acolyte",
+	# Warrior-mage
+	"warper", "hexslinger", "enchanter", "reaver",
+	# Mage
+	"hedge_wizard", "conjurer", "summoner", "necromancer",
+	"fire_elementalist", "ice_elementalist", "air_elementalist",
+	"earth_elementalist", "alchemist", "forgewright",
 ]
 
 const _ROW_HEIGHT: float = 320.0

@@ -276,39 +276,38 @@ const ITEMS: Dictionary = {
 }
 
 const PLAYER_RACES: Dictionary = {
-	# --- Warrior jobs ---
+	# --- DCSS Warrior backgrounds ---
 	"fighter":            "player/base/human_m.png",
 	"gladiator":          "mon/humanoids/humans/imperial_myrmidon.png",
-	"berserker":          "player/base/orc_m.png",
-	"barbarian":          "player/base/orc_m.png",
 	"monk":               "player/base/human2_m.png",
-	# --- Ranged jobs ---
-	"ranger":             "player/base/elf_m.png",
 	"hunter":             "player/base/elf_m.png",
-	"arcane_marksman":    "player/base/deep_elf_m.png",
-	# --- Rogue jobs ---
-	"rogue":              "player/base/halfling_m.png",
-	"assassin":           "player/base/halfling_m.png",
 	"brigand":            "player/base/halfling_m.png",
-	# --- Hybrid ---
-	"skald":              "player/base/human_m.png",
-	# --- Divine ---
-	"cleric":             "mon/humanoids/humans/human.png",
-	# --- Mage jobs ---
-	"mage":               "player/base/deep_elf_m.png",
-	"warlock":            "mon/humanoids/humans/death_knight.png",
-	"wizard":             "mon/humanoids/humans/arcanist.png",
+	# --- DCSS Adventurer backgrounds ---
+	"artificer":          "mon/humanoids/humans/arcanist.png",
+	"shapeshifter":       "player/base/deep_elf_m.png",
+	"wanderer":           "player/base/human_m.png",
+	"delver":             "player/base/halfling_m.png",
+	# --- DCSS Zealot backgrounds ---
+	"berserker":          "player/base/orc_m.png",
+	"chaos_knight":       "mon/humanoids/humans/hell_knight.png",
+	"cinder_acolyte":     "mon/humanoids/humans/death_knight.png",
+	# --- DCSS Warrior-mage backgrounds ---
+	"warper":             "player/base/deep_elf_m.png",
+	"hexslinger":         "player/base/deep_elf_m.png",
+	"enchanter":          "player/base/deep_elf_m.png",
+	"reaver":             "player/base/human_m.png",
+	# --- DCSS Mage backgrounds ---
+	"hedge_wizard":       "mon/humanoids/humans/arcanist.png",
 	"conjurer":           "player/base/deep_elf_m.png",
+	"summoner":           "mon/humanoids/elves/deep_elf_demonologist.png",
 	"necromancer":        "mon/humanoids/humans/necromancer.png",
 	"fire_elementalist":  "mon/humanoids/elves/deep_elf_elementalist1.png",
 	"ice_elementalist":   "mon/humanoids/elves/deep_elf_elementalist2.png",
 	"earth_elementalist": "mon/humanoids/elves/deep_elf_elementalist3.png",
 	"air_elementalist":   "mon/humanoids/elves/deep_elf_elementalist4.png",
-	"enchanter":          "player/base/deep_elf_m.png",
-	"summoner":           "mon/humanoids/elves/deep_elf_demonologist.png",
-	"transmuter":         "player/base/deep_elf_m.png",
-	"warper":             "player/base/deep_elf_m.png",
-	# --- Legacy ---
+	"alchemist":          "player/base/deep_elf_m.png",
+	"forgewright":        "mon/humanoids/humans/arcanist.png",
+	# --- Legacy sprite aliases (old removed jobs, in case save files refer) ---
 	"knight":             "mon/humanoids/humans/hell_knight.png",
 	# --- Race sprites ---
 	"human":              "player/base/human_m.png",

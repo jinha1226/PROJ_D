@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "delver"
+display_name = "Delver"
+description = ""
+str_bonus = 4
+dex_bonus = 6
+int_bonus = 2
+starting_equipment = Array[String](["dagger", "leather_armour", "scroll_fog", "scroll_magic_map", "scroll_fear", "potion_haste", "wand_simple"])
+starting_skills = {"dodging": 2, "fighting": 3, "short_blade": 2, "stealth": 5}
+starting_spells = Array[String]([])
+unique_ability = ""

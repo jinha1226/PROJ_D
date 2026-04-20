@@ -13,6 +13,13 @@ extends Resource
 @export var mp_per_level: int = 2
 @export var move_speed_mod: int = 0
 
+# DCSS species HP/MP multipliers from dat/species/*.yaml.
+# Used by Player._dcss_max_hp/_dcss_max_mp to match DCSS XL scaling.
+# hp_mod: additive term on 10x multiplier (e.g. troll +3 → 13/10 = 1.3x).
+# mp_mod: flat bonus added after scaling (e.g. deep elf +2).
+@export var hp_mod: int = 0
+@export var mp_mod: int = 0
+
 @export var essence_affinity: Dictionary = {}
 @export var lpc_asset: String = ""  # legacy, unused after preset composition refactor
 
