@@ -1135,7 +1135,20 @@ func _regenerate_dungeon(going_up: bool, secondary: bool = false) -> void:
 func _save_current_floor() -> void:
 	if generator == null:
 		return
-	var snapshot: Dictionary = {"monsters": [], "items": []}
+	var snapshot: Dictionary = {"monsters": [], "items": [], "map": []}
+	# Snapshot the raw tile grid so revisits show the same geometry even
+	# when generation involves non-deterministic branches (hyper fallbacks,
+	# vault placements, etc.).
+	for x in DungeonGenerator.MAP_WIDTH:
+		var col: Array = []
+		for y in DungeonGenerator.MAP_HEIGHT:
+			col.append(generator.map[x][y])
+		snapshot["map"].append(col)
+	snapshot["stairs_down_pos"] = generator.stairs_down_pos
+	snapshot["stairs_down_pos2"] = generator.stairs_down_pos2
+	snapshot["spawn_pos"] = generator.spawn_pos
+	snapshot["spawn_pos2"] = generator.spawn_pos2
+	snapshot["rooms"] = generator.rooms.duplicate()
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if not is_instance_valid(m) or not (m is Monster):
 			continue
@@ -1170,6 +1183,28 @@ func _restore_floor(depth: int) -> void:
 	var snapshot: Dictionary = _floor_state.get(depth, {})
 	if snapshot.is_empty():
 		return
+	# Prefer restoring the exact tile grid we saved rather than relying on
+	# the regenerator to replay the same RNG path — fallback builders,
+	# vault placement jitter and other stray randomness can drift. When a
+	# saved map exists, apply it verbatim.
+	if snapshot.has("map"):
+		var saved_map: Array = snapshot["map"]
+		for x in DungeonGenerator.MAP_WIDTH:
+			for y in DungeonGenerator.MAP_HEIGHT:
+				generator.map[x][y] = int(saved_map[x][y])
+		if snapshot.has("stairs_down_pos"):
+			generator.stairs_down_pos = snapshot["stairs_down_pos"]
+		if snapshot.has("stairs_down_pos2"):
+			generator.stairs_down_pos2 = snapshot["stairs_down_pos2"]
+		if snapshot.has("spawn_pos"):
+			generator.spawn_pos = snapshot["spawn_pos"]
+		if snapshot.has("spawn_pos2"):
+			generator.spawn_pos2 = snapshot["spawn_pos2"]
+		if snapshot.has("rooms"):
+			generator.rooms = snapshot["rooms"].duplicate()
+		var dmap_early: DungeonMap = $DungeonLayer/DungeonMap
+		if dmap_early != null:
+			dmap_early.queue_redraw()
 	var monster_scene: PackedScene = load("res://scenes/entities/Monster.tscn")
 	var entity_layer: Node = $EntityLayer
 	if monster_scene != null:
@@ -1678,7 +1713,7 @@ func _open_skills_dialog(category: String) -> void:
 		if _skills_dlg == dlg: _skills_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(960, 1700))
+	dlg.popup_centered(Vector2i(960, 1500))
 
 
 func _on_skills_tab(cat: String, dlg: AcceptDialog) -> void:
@@ -1885,7 +1920,7 @@ func _open_magic_dialog() -> void:
 		if _magic_dlg == dlg: _magic_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(900, 1700))
+	dlg.popup_centered(Vector2i(960, 1500))
 
 
 func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
@@ -1952,7 +1987,7 @@ func _show_spell_info(spell_id: String) -> void:
 	var dlg := AcceptDialog.new()
 	dlg.exclusive = false
 	dlg.title = String(info.get("name", spell_id))
-	dlg.ok_button_text = "Close"
+	dlg.ok_button_text = ""
 	var sch: String = String(info.get("school", "?"))
 	var sch_lv: int = skill_system.get_level(player, sch) if skill_system and player else 0
 	var sc_lv: int = skill_system.get_level(player, "spellcasting") if skill_system and player else 0
@@ -1967,11 +2002,31 @@ func _show_spell_info(spell_id: String) -> void:
 	]
 	if info.has("min_dmg") and int(info.get("min_dmg", 0)) > 0:
 		text += "\nDamage: %d-%d + power" % [int(info.get("min_dmg", 0)), int(info.get("max_dmg", 0))]
-	dlg.dialog_text = text
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 12)
+	dlg.add_child(vb)
+	var scroll := ScrollContainer.new()
+	scroll.scroll_deadzone = 20
+	scroll.custom_minimum_size = Vector2(860, 700)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vb.add_child(scroll)
+	var lab := Label.new()
+	lab.text = text
+	lab.add_theme_font_size_override("font_size", 48)
+	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(lab)
+	var close_btn := Button.new()
+	close_btn.text = "Close"
+	close_btn.add_theme_font_size_override("font_size", 44)
+	close_btn.custom_minimum_size = Vector2(0, 96)
+	close_btn.pressed.connect(dlg.queue_free)
+	vb.add_child(close_btn)
 	popup_mgr.add_child(dlg)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(700, 600))
+	dlg.popup_centered(Vector2i(920, 900))
 
 
 func _on_cast_with_targeting(spell_id: String, dlg: AcceptDialog) -> void:

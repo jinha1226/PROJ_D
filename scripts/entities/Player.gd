@@ -1221,17 +1221,20 @@ func _apply_level_up_growth() -> void:
 func apply_level_up_stat(stat: String) -> void:
 	if stats == null:
 		return
+	# One stat point per choice — the popup only fires on every third
+	# level (see GameBootstrap._on_player_leveled_up), so the overall
+	# stat-per-level pace averages 1/3, matching DCSS roughly.
 	match stat:
 		"STR":
-			stats.STR += 2
-			stats.hp_max += 3
-			stats.HP += 3
+			stats.STR += 1
+			stats.hp_max += 2
+			stats.HP += 2
 		"DEX":
-			stats.DEX += 2
+			stats.DEX += 1
 		"INT":
-			stats.INT += 2
-			stats.mp_max += 3
-			stats.MP += 3
+			stats.INT += 1
+			stats.mp_max += 2
+			stats.MP += 2
 	stats_changed.emit()
 
 

@@ -56,12 +56,16 @@ func show_levelup_popup(level: int, callback: Callable) -> void:
 	dlg.title = "LEVEL UP! Lv.%d" % level
 	dlg.dialog_hide_on_ok = false
 	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 16)
 	var lab := Label.new()
 	lab.text = "Choose a stat bonus:"
+	lab.add_theme_font_size_override("font_size", 40)
 	vb.add_child(lab)
 	for stat in ["STR", "DEX", "INT"]:
 		var b := Button.new()
-		b.text = "%s +2" % stat
+		b.text = "%s +1" % stat
+		b.custom_minimum_size = Vector2(0, 96)
+		b.add_theme_font_size_override("font_size", 44)
 		b.pressed.connect(func():
 			if callback.is_valid(): callback.call(stat)
 			dlg.queue_free())
@@ -69,4 +73,4 @@ func show_levelup_popup(level: int, callback: Callable) -> void:
 	dlg.add_child(vb)
 	dlg.get_ok_button().visible = false
 	add_child(dlg)
-	dlg.popup_centered(Vector2i(480, 400))
+	dlg.popup_centered(Vector2i(640, 620))
