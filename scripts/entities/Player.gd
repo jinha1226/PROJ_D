@@ -45,6 +45,9 @@ var weapon_bonus_dmg: int = 0
 # Slot-keyed Dict: "chest"/"legs"/"boots"/"helm"/"gloves" → {id,name,ac,color,slot}
 # Missing key = nothing in that slot.
 var equipped_armor: Dictionary = {}
+# Array of ring info dicts (from RingRegistry.get_info). Max size is race-
+# dependent — octopodes wear eight, everyone else two.
+var equipped_rings: Array = []
 var skill_state: Dictionary = {}
 # Memorised spell ids. Seeded from job.starting_spells at setup and
 # extended by reading spellbooks. Drives the MAGIC menu and what the
@@ -146,13 +149,16 @@ func _draw() -> void:
 	var rect: Rect2 = Rect2(-sz * 0.5, sz)
 	draw_texture_rect(base, rect, false)
 
-	# Overlay doll layers in DCSS paperdoll order.
+	# Overlay doll layers in DCSS paperdoll order: legs → chest → boots →
+	# cloak → gloves → helm → weapon.
 	var legs_id: String = String(equipped_armor.get("legs", {}).get("id", ""))
 	_draw_doll_layer("legs", legs_id, rect)
 	var chest_id: String = String(equipped_armor.get("chest", {}).get("id", ""))
 	_draw_doll_layer("chest", chest_id, rect)
 	var boots_id: String = String(equipped_armor.get("boots", {}).get("id", ""))
 	_draw_doll_layer("boots", boots_id, rect)
+	var cloak_id: String = String(equipped_armor.get("cloak", {}).get("id", ""))
+	_draw_doll_layer("cloak", cloak_id, rect)
 	var gloves_id: String = String(equipped_armor.get("gloves", {}).get("id", ""))
 	_draw_doll_layer("gloves", gloves_id, rect)
 	var helm_id: String = String(equipped_armor.get("helm", {}).get("id", ""))
@@ -462,7 +468,7 @@ func equip_armor(armor: Dictionary) -> Dictionary:
 	var slot: String = String(armor.get("slot", "chest"))
 	var prev: Dictionary = equipped_armor.get(slot, {})
 	equipped_armor[slot] = armor
-	_recompute_defense()
+	_recompute_gear_stats()
 	_load_sprite_preset()
 	return prev
 
@@ -471,21 +477,136 @@ func equip_armor(armor: Dictionary) -> Dictionary:
 func unequip_armor_slot(slot: String) -> Dictionary:
 	var prev: Dictionary = equipped_armor.get(slot, {})
 	equipped_armor.erase(slot)
-	_recompute_defense()
+	_recompute_gear_stats()
 	_load_sprite_preset()
 	return prev
 
 
-func _recompute_defense() -> void:
+## Maximum number of rings this player may equip. DCSS octopodes wear
+## eight; everyone else is capped at two.
+func max_ring_slots() -> int:
+	if race_res != null and race_res.racial_trait == "octopode_many_rings":
+		return 8
+	return 2
+
+
+## Equip a ring into the next free slot, or replace the ring at
+## `slot_index` if specified. Returns the displaced ring dict (empty when
+## no ring was removed) so the caller can re-insert it in inventory.
+func equip_ring(ring: Dictionary, slot_index: int = -1) -> Dictionary:
+	var cap: int = max_ring_slots()
+	if cap <= 0:
+		return ring
+	if slot_index < 0:
+		# Find first empty slot; fall back to slot 0 if already full.
+		while equipped_rings.size() < cap:
+			equipped_rings.append({})
+		slot_index = 0
+		for i in range(equipped_rings.size()):
+			if typeof(equipped_rings[i]) != TYPE_DICTIONARY or equipped_rings[i].is_empty():
+				slot_index = i
+				break
+	# Pad array so slot_index is always valid.
+	while equipped_rings.size() <= slot_index:
+		equipped_rings.append({})
+	var prev: Dictionary = equipped_rings[slot_index] if typeof(equipped_rings[slot_index]) == TYPE_DICTIONARY else {}
+	equipped_rings[slot_index] = ring
+	_recompute_gear_stats()
+	return prev
+
+
+## Empty a ring slot; returns the removed ring dict (empty if none).
+func unequip_ring(slot_index: int) -> Dictionary:
+	if slot_index < 0 or slot_index >= equipped_rings.size():
+		return {}
+	var prev: Dictionary = equipped_rings[slot_index]
+	equipped_rings[slot_index] = {}
+	_recompute_gear_stats()
+	return prev
+
+
+## Full stat recompute. Base stats are captured on character setup
+## (`base_stats`) and never mutated; equipment effects are layered fresh
+## on every equip/unequip so swapping rings is always reversible.
+func _recompute_gear_stats() -> void:
 	if stats == null:
 		return
+	if base_stats == null:
+		base_stats = stats.clone()
+	# Reset mutable fields to their base values.
+	stats.STR = base_stats.STR
+	stats.DEX = base_stats.DEX
+	stats.INT = base_stats.INT
+	stats.mp_max = base_stats.mp_max
+	var base_ev: int = base_stats.EV
+	# AC starts at racial intrinsic (gargoyle stone, etc) + trait AC bonus.
 	var ac: int = 0
 	if race_res != null:
 		ac += race_res.base_ac
+	if trait_res != null:
+		ac += trait_res.ac_bonus
+	var ev: int = base_ev
+	# Apply armor bonuses.
 	for slot_dict in equipped_armor.values():
 		ac += int(slot_dict.get("ac", 0))
+		ev += int(slot_dict.get("ev_bonus", 0))
+	# Apply ring bonuses.
+	for ring in equipped_rings:
+		if typeof(ring) != TYPE_DICTIONARY or ring.is_empty():
+			continue
+		stats.STR += int(ring.get("str", 0))
+		stats.DEX += int(ring.get("dex", 0))
+		stats.INT += int(ring.get("int_", 0))
+		ac += int(ring.get("ac", 0))
+		ev += int(ring.get("ev", 0))
+		stats.mp_max += int(ring.get("mp_max", 0))
 	stats.AC = ac
+	stats.EV = ev
+	# Clamp MP if cap dropped below current reading.
+	if stats.MP > stats.mp_max:
+		stats.MP = stats.mp_max
 	stats_changed.emit()
+
+
+## Back-compat shim: older callers invoke _recompute_defense().
+func _recompute_defense() -> void:
+	_recompute_gear_stats()
+
+
+## Aggregate flat-damage bonus from equipped rings (ring of slaying +
+## others). Added to every melee hit in CombatSystem.melee_attack.
+func gear_damage_bonus() -> int:
+	var bonus: int = 0
+	for ring in equipped_rings:
+		if typeof(ring) == TYPE_DICTIONARY:
+			bonus += int(ring.get("dmg_bonus", 0))
+	return bonus
+
+
+## Aggregate flat spell-power bonus from equipped rings.
+func gear_spell_power_bonus() -> int:
+	var bonus: int = 0
+	for ring in equipped_rings:
+		if typeof(ring) == TYPE_DICTIONARY:
+			bonus += int(ring.get("spell_power", 0))
+	return bonus
+
+
+## Aggregate per-turn HP regen from equipped rings + cloaks.
+func gear_regen_per_turn() -> int:
+	var r: int = 0
+	for ring in equipped_rings:
+		if typeof(ring) == TYPE_DICTIONARY:
+			r += int(ring.get("regen", 0))
+	return r
+
+
+## Flat incoming-damage reduction from cloak of resistance etc.
+func gear_damage_reduction() -> int:
+	var red: int = 0
+	for slot_dict in equipped_armor.values():
+		red += int(slot_dict.get("dmg_reduce", 0))
+	return red
 
 
 func get_current_weapon_skill() -> String:
@@ -1144,6 +1265,10 @@ func take_damage(amount: int) -> void:
 			amount = max(1, amount / 2)
 		else:
 			amount = max(1, amount - 1)
+	# Cloak / gear flat reduction applies after racial mitigation.
+	var reduction: int = gear_damage_reduction()
+	if reduction > 0:
+		amount = max(1, amount - reduction)
 	stats.HP -= amount
 	damaged.emit(amount)
 	if stats.HP <= 0:

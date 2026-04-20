@@ -25,6 +25,11 @@ const DATA: Dictionary = {
 	# --- Gloves ---
 	"leather_gloves": {"name": "Leather Gloves", "slot": "gloves", "ac": 1, "color": Color(0.55, 0.35, 0.20)},
 	"plate_gloves":   {"name": "Plate Gloves",   "slot": "gloves", "ac": 2, "color": Color(0.85, 0.85, 0.90)},
+	# --- Cloak — covers the chest, stacks AC/EV on top of body armour ---
+	"cloak":            {"name": "Cloak",             "slot": "cloak", "ac": 1, "ev_bonus": 1, "color": Color(0.35, 0.22, 0.55)},
+	"cloak_protection": {"name": "Cloak of Protection","slot": "cloak", "ac": 2, "ev_bonus": 1, "color": Color(0.55, 0.45, 0.85)},
+	"cloak_stealth":    {"name": "Cloak of Stealth",  "slot": "cloak", "ac": 1, "ev_bonus": 1, "stealth": 2, "color": Color(0.12, 0.14, 0.22)},
+	"cloak_resistance": {"name": "Cloak of Resistance","slot": "cloak", "ac": 1, "ev_bonus": 1, "dmg_reduce": 1, "color": Color(0.7, 0.25, 0.25)},
 	# --- Legacy aliases (kept so old job/spawn data still loads) ---
 	"leather_armor": {"name": "Leather Chest", "slot": "chest", "ac": 3,  "color": Color(0.55, 0.35, 0.20)},
 	"chain_mail":    {"name": "Chain Chest",   "slot": "chest", "ac": 6,  "color": Color(0.70, 0.72, 0.78)},

@@ -95,6 +95,9 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	if race_trait == "kobold_sneak" and skill_sys != null:
 		var stealth_lv: int = skill_sys.get_level(attacker, "stealth")
 		dmg += stealth_lv / 3
+	# Flat damage bonus from rings of slaying / ring of fire / etc.
+	if attacker.has_method("gear_damage_bonus"):
+		dmg += int(attacker.gear_damage_bonus())
 	if defender.has_method("take_damage"):
 		defender.take_damage(dmg)
 	var def_name: String = ""

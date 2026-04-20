@@ -65,7 +65,7 @@ var _bag_category: String = "all"
 # Swipe-tracking state for the current bag dialog.
 var _bag_swipe_start_x: float = -1.0
 var _bag_swipe_start_y: float = -1.0
-const _BAG_CATEGORIES: Array = ["all", "weapon", "armor", "potion", "scroll", "book"]
+const _BAG_CATEGORIES: Array = ["all", "weapon", "armor", "cloak", "ring", "potion", "scroll", "book"]
 var _skills_dlg: AcceptDialog = null
 var _status_dlg: AcceptDialog = null
 var _map_dlg: AcceptDialog = null
@@ -357,6 +357,12 @@ func _apply_passive_racial_traits() -> void:
 			if player.stats.MP < player.stats.mp_max:
 				player.stats.MP = min(player.stats.mp_max, player.stats.MP + 1)
 				player.stats_changed.emit()
+	# Equipment-sourced regen (ring of regeneration, etc) — stacks on top
+	# of any racial regen above.
+	var gear_regen: int = player.gear_regen_per_turn() if player.has_method("gear_regen_per_turn") else 0
+	if gear_regen > 0 and player.stats.HP < player.stats.hp_max:
+		player.stats.HP = min(player.stats.hp_max, player.stats.HP + gear_regen)
+		player.stats_changed.emit()
 
 
 ## Every frame make sure monsters/items don't leak into unexplored tiles.
@@ -787,8 +793,18 @@ const _WEAPON_T2: Array = ["arming_sword", "mace", "waraxe", "rapier", "spear", 
 const _WEAPON_T3: Array = ["longsword", "katana", "flail", "halberd", "long_bow", "gnarled_staff",
 		"fire_staff", "ice_staff", "lightning_staff"]
 const _ARMOR_T1: Array = ["leather_chest", "leather_legs", "leather_boots", "leather_helm"]
-const _ARMOR_T2: Array = ["chain_chest", "chain_legs", "plate_boots", "plate_helm", "leather_gloves"]
-const _ARMOR_T3: Array = ["plate_chest", "plate_legs", "plate_gloves", "plate_boots"]
+const _ARMOR_T2: Array = ["chain_chest", "chain_legs", "plate_boots", "plate_helm", "leather_gloves", "cloak"]
+const _ARMOR_T3: Array = ["plate_chest", "plate_legs", "plate_gloves", "plate_boots", "cloak_protection", "cloak_stealth", "cloak_resistance"]
+
+# Ring drop pool — a small chance branches into this pool instead of
+# armor/weapon/consumable on any monster drop.
+const _RING_POOL: Array = [
+	"ring_str", "ring_dex", "ring_int",
+	"ring_protection", "ring_evasion", "ring_slaying",
+	"ring_magical_power", "ring_wizardry",
+	"ring_regeneration", "ring_stealth",
+	"ring_fire", "ring_ice",
+]
 
 # Consumable pools by tier.
 const _CONS_T1: Array = ["minor_potion", "mana_potion", "scroll_identify", "scroll_blink",
@@ -828,7 +844,7 @@ func _maybe_drop_loot(monster: Monster) -> void:
 		armor_pool  = _ARMOR_T1  if tier_roll < 0.65 else _ARMOR_T2
 		cons_pool   = _CONS_T1   if tier_roll < 0.70 else _CONS_T2
 	var drop_roll: float = randf()
-	if drop_roll < 0.45:
+	if drop_roll < 0.42:
 		# Weapon drop.
 		var wid: String = weapon_pool[randi() % weapon_pool.size()]
 		var wname: String = WeaponRegistry.display_name_for(wid)
@@ -836,7 +852,7 @@ func _maybe_drop_loot(monster: Monster) -> void:
 			wname = "Cursed " + wname
 		fi.setup(monster.grid_pos, wid, wname, "weapon", Color(0.75, 0.75, 0.85),
 				{"cursed": is_cursed})
-	elif drop_roll < 0.75:
+	elif drop_roll < 0.70:
 		# Armor drop.
 		var aid: String = armor_pool[randi() % armor_pool.size()]
 		var info: Dictionary = ArmorRegistry.get_info(aid)
@@ -846,6 +862,14 @@ func _maybe_drop_loot(monster: Monster) -> void:
 		fi.setup(monster.grid_pos, aid, aname,
 				"armor", info.get("color", Color(0.6, 0.6, 0.7)),
 				{"ac": int(info.get("ac", 0)), "slot": String(info.get("slot", "chest")), "cursed": is_cursed})
+	elif drop_roll < 0.78:
+		# Ring drop — rarer than armor/weapon, never cursed in M1.
+		var rid: String = _RING_POOL[randi() % _RING_POOL.size()]
+		var ring_info: Dictionary = RingRegistry.get_info(rid)
+		fi.setup(monster.grid_pos, rid,
+				String(ring_info.get("name", rid)),
+				"ring",
+				ring_info.get("color", Color(0.85, 0.85, 0.90)))
 	else:
 		# Consumable drop.
 		var cid: String = cons_pool[randi() % cons_pool.size()]
@@ -1839,6 +1863,8 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
 	var power: int = eff_school2 + sc_lv / 2 + int_bonus
 	power = _apply_racial_spellpower(power)
+	if player != null and player.has_method("gear_spell_power_bonus"):
+		power += int(player.gear_spell_power_bonus())
 	var spell_color: Color = info.get("color", Color.WHITE)
 	var fx_layer: Node2D = $EntityLayer
 	var targeting_type: String = String(info.get("targeting", "single"))
@@ -2005,6 +2031,8 @@ func _execute_cast(spell_id: String) -> Dictionary:
 	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
 	var power: int = eff_school + sc_lv / 2 + int_bonus
 	power = _apply_racial_spellpower(power)
+	if player != null and player.has_method("gear_spell_power_bonus"):
+		power += int(player.gear_spell_power_bonus())
 
 	var targeting: String = String(info.get("targeting", "single"))
 	match targeting:
@@ -2282,7 +2310,7 @@ func _on_bag_pressed() -> void:
 			info_btn.add_theme_font_size_override("font_size", 40)
 			info_btn.pressed.connect(_on_bag_info.bind(it))
 			row.add_child(info_btn)
-			if kind == "weapon" or kind == "armor":
+			if kind == "weapon" or kind == "armor" or kind == "ring":
 				var eq_btn := Button.new()
 				eq_btn.text = "Equip"
 				eq_btn.add_theme_font_size_override("font_size", 40)
@@ -2393,8 +2421,8 @@ func _build_equipped_section(vb: VBoxContainer) -> void:
 			wname += "  (cursed)"
 		_append_equipped_row(vb, "weapon", wname, TileRenderer.item(wid))
 
-	# Armor rows — stable slot order.
-	var armor_slots: Array = ["chest", "legs", "helm", "gloves", "boots"]
+	# Armor rows — stable slot order, cloak sits after chest.
+	var armor_slots: Array = ["chest", "cloak", "legs", "helm", "gloves", "boots"]
 	for slot in armor_slots:
 		if not player.equipped_armor.has(slot):
 			continue
@@ -2404,6 +2432,16 @@ func _build_equipped_section(vb: VBoxContainer) -> void:
 		if bool(a.get("cursed", false)):
 			aname += "  (cursed)"
 		_append_equipped_row(vb, slot, aname, TileRenderer.item(aid))
+
+	# Ring rows — one per slot so octopodes' eight show cleanly.
+	if player.equipped_rings is Array:
+		for i in player.equipped_rings.size():
+			var ring: Dictionary = player.equipped_rings[i] if typeof(player.equipped_rings[i]) == TYPE_DICTIONARY else {}
+			if ring.is_empty():
+				continue
+			var rid: String = String(ring.get("id", ""))
+			var rname: String = String(ring.get("name", rid))
+			_append_equipped_row(vb, "ring %d" % (i + 1), rname, TileRenderer.item(rid))
 
 	var sep := HSeparator.new()
 	vb.add_child(sep)
@@ -2565,6 +2603,23 @@ func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
 						"slot": String(prev_armor.get("slot", "chest")),
 						"color": prev_armor.get("color", Color(0.6, 0.6, 0.7)),
 					})
+			elif kind == "ring":
+				var rid: String = String(it.get("id", ""))
+				var ring_info: Dictionary = RingRegistry.get_info(rid)
+				if ring_info.is_empty():
+					ring_info = {
+						"id": rid,
+						"name": String(it.get("name", rid)),
+						"slot": "ring",
+						"kind": "ring",
+						"color": it.get("color", Color(0.85, 0.85, 0.90)),
+					}
+				# Slot-0 replacement by default; we'll add a proper picker later.
+				var prev_ring: Dictionary = player.equip_ring(ring_info)
+				CombatLog.add("You slip on the %s." % String(ring_info.get("name", rid)))
+				if not prev_ring.is_empty():
+					prev_ring["kind"] = "ring"
+					items.append(prev_ring)
 			player.inventory_changed.emit()
 	_bag_dlg = null
 	dlg.queue_free()
