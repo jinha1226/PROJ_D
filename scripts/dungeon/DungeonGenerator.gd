@@ -651,3 +651,10 @@ func get_tile(p: Vector2i) -> int:
 func is_walkable(p: Vector2i) -> bool:
 	var t: int = get_tile(p)
 	return t == TileType.FLOOR or t == TileType.STAIRS_DOWN or t == TileType.STAIRS_UP or t == TileType.DOOR_OPEN
+
+
+func open_door(p: Vector2i) -> void:
+	if not _in_bounds(p):
+		return
+	if map[p.x][p.y] == TileType.DOOR_CLOSED:
+		map[p.x][p.y] = TileType.DOOR_OPEN

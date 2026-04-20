@@ -1,0 +1,434 @@
+[
+  {
+    "id": "club",
+    "dcss_enum": "WPN_CLUB",
+    "name": "Club",
+    "damage": 5,
+    "accuracy": 3,
+    "speed": 13,
+    "skill": "mace"
+  },
+  {
+    "id": "whip",
+    "dcss_enum": "WPN_WHIP",
+    "name": "Whip",
+    "damage": 6,
+    "accuracy": 2,
+    "speed": 11,
+    "skill": "mace"
+  },
+  {
+    "id": "mace",
+    "dcss_enum": "WPN_MACE",
+    "name": "Mace",
+    "damage": 8,
+    "accuracy": 3,
+    "speed": 14,
+    "skill": "mace"
+  },
+  {
+    "id": "flail",
+    "dcss_enum": "WPN_FLAIL",
+    "name": "Flail",
+    "damage": 10,
+    "accuracy": 0,
+    "speed": 14,
+    "skill": "mace"
+  },
+  {
+    "id": "morningstar",
+    "dcss_enum": "WPN_MORNINGSTAR",
+    "name": "Morningstar",
+    "damage": 13,
+    "accuracy": -2,
+    "speed": 15,
+    "skill": "mace"
+  },
+  {
+    "id": "demon_whip",
+    "dcss_enum": "WPN_DEMON_WHIP",
+    "name": "Demon Whip",
+    "damage": 11,
+    "accuracy": 1,
+    "speed": 11,
+    "skill": "mace"
+  },
+  {
+    "id": "sacred_scourge",
+    "dcss_enum": "WPN_SACRED_SCOURGE",
+    "name": "Sacred Scourge",
+    "damage": 12,
+    "accuracy": 0,
+    "speed": 11,
+    "skill": "mace"
+  },
+  {
+    "id": "dire_flail",
+    "dcss_enum": "WPN_DIRE_FLAIL",
+    "name": "Dire Flail",
+    "damage": 13,
+    "accuracy": -3,
+    "speed": 13,
+    "skill": "mace"
+  },
+  {
+    "id": "eveningstar",
+    "dcss_enum": "WPN_EVENINGSTAR",
+    "name": "Eveningstar",
+    "damage": 15,
+    "accuracy": -1,
+    "speed": 15,
+    "skill": "mace"
+  },
+  {
+    "id": "great_mace",
+    "dcss_enum": "WPN_GREAT_MACE",
+    "name": "Great Mace",
+    "damage": 17,
+    "accuracy": -4,
+    "speed": 17,
+    "skill": "mace"
+  },
+  {
+    "id": "giant_club",
+    "dcss_enum": "WPN_GIANT_CLUB",
+    "name": "Giant Club",
+    "damage": 20,
+    "accuracy": -6,
+    "speed": 16,
+    "skill": "mace"
+  },
+  {
+    "id": "giant_spiked_club",
+    "dcss_enum": "WPN_GIANT_SPIKED_CLUB",
+    "name": "Giant Spiked Club",
+    "damage": 22,
+    "accuracy": -7,
+    "speed": 18,
+    "skill": "mace"
+  },
+  {
+    "id": "dagger",
+    "dcss_enum": "WPN_DAGGER",
+    "name": "Dagger",
+    "damage": 4,
+    "accuracy": 6,
+    "speed": 10,
+    "skill": "short_blade"
+  },
+  {
+    "id": "quick_blade",
+    "dcss_enum": "WPN_QUICK_BLADE",
+    "name": "Quick Blade",
+    "damage": 4,
+    "accuracy": 6,
+    "speed": 15,
+    "skill": "short_blade"
+  },
+  {
+    "id": "short_sword",
+    "dcss_enum": "WPN_SHORT_SWORD",
+    "name": "Short Sword",
+    "damage": 5,
+    "accuracy": 4,
+    "speed": 10,
+    "skill": "short_blade"
+  },
+  {
+    "id": "rapier",
+    "dcss_enum": "WPN_RAPIER",
+    "name": "Rapier",
+    "damage": 7,
+    "accuracy": 4,
+    "speed": 12,
+    "skill": "short_blade"
+  },
+  {
+    "id": "athame",
+    "dcss_enum": "WPN_ATHAME",
+    "name": "Athame",
+    "damage": 6,
+    "accuracy": 5,
+    "speed": 13,
+    "skill": "short_blade"
+  },
+  {
+    "id": "falchion",
+    "dcss_enum": "WPN_FALCHION",
+    "name": "Falchion",
+    "damage": 8,
+    "accuracy": 2,
+    "speed": 13,
+    "skill": "long_blade"
+  },
+  {
+    "id": "long_sword",
+    "dcss_enum": "WPN_LONG_SWORD",
+    "name": "Long Sword",
+    "damage": 10,
+    "accuracy": 1,
+    "speed": 14,
+    "skill": "long_blade"
+  },
+  {
+    "id": "scimitar",
+    "dcss_enum": "WPN_SCIMITAR",
+    "name": "Scimitar",
+    "damage": 12,
+    "accuracy": 0,
+    "speed": 14,
+    "skill": "long_blade"
+  },
+  {
+    "id": "demon_blade",
+    "dcss_enum": "WPN_DEMON_BLADE",
+    "name": "Demon Blade",
+    "damage": 13,
+    "accuracy": -1,
+    "speed": 13,
+    "skill": "long_blade"
+  },
+  {
+    "id": "eudemon_blade",
+    "dcss_enum": "WPN_EUDEMON_BLADE",
+    "name": "Eudemon Blade",
+    "damage": 14,
+    "accuracy": -2,
+    "speed": 12,
+    "skill": "long_blade"
+  },
+  {
+    "id": "double_sword",
+    "dcss_enum": "WPN_DOUBLE_SWORD",
+    "name": "Double Sword",
+    "damage": 15,
+    "accuracy": -1,
+    "speed": 15,
+    "skill": "long_blade"
+  },
+  {
+    "id": "great_sword",
+    "dcss_enum": "WPN_GREAT_SWORD",
+    "name": "Great Sword",
+    "damage": 17,
+    "accuracy": -3,
+    "speed": 17,
+    "skill": "long_blade"
+  },
+  {
+    "id": "triple_sword",
+    "dcss_enum": "WPN_TRIPLE_SWORD",
+    "name": "Triple Sword",
+    "damage": 19,
+    "accuracy": -4,
+    "speed": 18,
+    "skill": "long_blade"
+  },
+  {
+    "id": "hand_axe",
+    "dcss_enum": "WPN_HAND_AXE",
+    "name": "Hand Axe",
+    "damage": 7,
+    "accuracy": 3,
+    "speed": 13,
+    "skill": "axe"
+  },
+  {
+    "id": "war_axe",
+    "dcss_enum": "WPN_WAR_AXE",
+    "name": "War Axe",
+    "damage": 11,
+    "accuracy": 0,
+    "speed": 15,
+    "skill": "axe"
+  },
+  {
+    "id": "broad_axe",
+    "dcss_enum": "WPN_BROAD_AXE",
+    "name": "Broad Axe",
+    "damage": 13,
+    "accuracy": -2,
+    "speed": 16,
+    "skill": "axe"
+  },
+  {
+    "id": "battleaxe",
+    "dcss_enum": "WPN_BATTLEAXE",
+    "name": "Battleaxe",
+    "damage": 15,
+    "accuracy": -4,
+    "speed": 17,
+    "skill": "axe"
+  },
+  {
+    "id": "executioners_axe",
+    "dcss_enum": "WPN_EXECUTIONERS_AXE",
+    "name": "Executioner'S Axe",
+    "damage": 18,
+    "accuracy": -6,
+    "speed": 19,
+    "skill": "axe"
+  },
+  {
+    "id": "spear",
+    "dcss_enum": "WPN_SPEAR",
+    "name": "Spear",
+    "damage": 6,
+    "accuracy": 4,
+    "speed": 11,
+    "skill": "polearm"
+  },
+  {
+    "id": "trident",
+    "dcss_enum": "WPN_TRIDENT",
+    "name": "Trident",
+    "damage": 9,
+    "accuracy": 1,
+    "speed": 13,
+    "skill": "polearm"
+  },
+  {
+    "id": "halberd",
+    "dcss_enum": "WPN_HALBERD",
+    "name": "Halberd",
+    "damage": 13,
+    "accuracy": -3,
+    "speed": 15,
+    "skill": "polearm"
+  },
+  {
+    "id": "partisan",
+    "dcss_enum": "WPN_PARTISAN",
+    "name": "Partisan",
+    "damage": 14,
+    "accuracy": 1,
+    "speed": 17,
+    "skill": "polearm"
+  },
+  {
+    "id": "demon_trident",
+    "dcss_enum": "WPN_DEMON_TRIDENT",
+    "name": "Demon Trident",
+    "damage": 12,
+    "accuracy": 1,
+    "speed": 13,
+    "skill": "polearm"
+  },
+  {
+    "id": "trishula",
+    "dcss_enum": "WPN_TRISHULA",
+    "name": "Trishula",
+    "damage": 13,
+    "accuracy": 0,
+    "speed": 13,
+    "skill": "polearm"
+  },
+  {
+    "id": "glaive",
+    "dcss_enum": "WPN_GLAIVE",
+    "name": "Glaive",
+    "damage": 15,
+    "accuracy": -3,
+    "speed": 17,
+    "skill": "polearm"
+  },
+  {
+    "id": "bardiche",
+    "dcss_enum": "WPN_BARDICHE",
+    "name": "Bardiche",
+    "damage": 18,
+    "accuracy": -6,
+    "speed": 19,
+    "skill": "polearm"
+  },
+  {
+    "id": "staff",
+    "dcss_enum": "WPN_STAFF",
+    "name": "Staff",
+    "damage": 5,
+    "accuracy": 5,
+    "speed": 12,
+    "skill": "staff"
+  },
+  {
+    "id": "quarterstaff",
+    "dcss_enum": "WPN_QUARTERSTAFF",
+    "name": "Quarterstaff",
+    "damage": 10,
+    "accuracy": 3,
+    "speed": 13,
+    "skill": "staff"
+  },
+  {
+    "id": "lajatang",
+    "dcss_enum": "WPN_LAJATANG",
+    "name": "Lajatang",
+    "damage": 16,
+    "accuracy": -3,
+    "speed": 14,
+    "skill": "staff"
+  },
+  {
+    "id": "sling",
+    "dcss_enum": "WPN_SLING",
+    "name": "Sling",
+    "damage": 7,
+    "accuracy": 0,
+    "speed": 14,
+    "skill": "bow"
+  },
+  {
+    "id": "hand_cannon",
+    "dcss_enum": "WPN_HAND_CANNON",
+    "name": "Hand Cannon",
+    "damage": 16,
+    "accuracy": 3,
+    "speed": 19,
+    "skill": "bow"
+  },
+  {
+    "id": "shortbow",
+    "dcss_enum": "WPN_SHORTBOW",
+    "name": "Shortbow",
+    "damage": 8,
+    "accuracy": 2,
+    "speed": 14,
+    "skill": "bow"
+  },
+  {
+    "id": "orcbow",
+    "dcss_enum": "WPN_ORCBOW",
+    "name": "Orcbow",
+    "damage": 11,
+    "accuracy": -3,
+    "speed": 15,
+    "skill": "bow"
+  },
+  {
+    "id": "arbalest",
+    "dcss_enum": "WPN_ARBALEST",
+    "name": "Arbalest",
+    "damage": 16,
+    "accuracy": -2,
+    "speed": 19,
+    "skill": "bow"
+  },
+  {
+    "id": "longbow",
+    "dcss_enum": "WPN_LONGBOW",
+    "name": "Longbow",
+    "damage": 14,
+    "accuracy": 0,
+    "speed": 17,
+    "skill": "bow"
+  },
+  {
+    "id": "triple_crossbow",
+    "dcss_enum": "WPN_TRIPLE_CROSSBOW",
+    "name": "Triple Crossbow",
+    "damage": 23,
+    "accuracy": -2,
+    "speed": 23,
+    "skill": "bow"
+  }
+]

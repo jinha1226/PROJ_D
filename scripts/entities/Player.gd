@@ -748,6 +748,13 @@ func try_move(delta: Vector2i) -> bool:
 	if monster != null:
 		try_attack_at(target)
 		return false
+	# Closed door: open it (costs a turn) but don't move onto it this step.
+	if generator.get_tile(target) == DungeonGenerator.TileType.DOOR_CLOSED:
+		generator.open_door(target)
+		CombatLog.add("You open the door.")
+		moved.emit(grid_pos)
+		TurnManager.end_player_turn()
+		return true
 	if not _player_can_walk_on(target):
 		return false
 	grid_pos = target

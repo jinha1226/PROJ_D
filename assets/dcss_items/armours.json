@@ -1,0 +1,178 @@
+[
+  {
+    "id": "animal_skin",
+    "dcss_enum": "ARM_ANIMAL_SKIN",
+    "name": "Animal Skin",
+    "ac": 2,
+    "ev_penalty": 0,
+    "price": 3
+  },
+  {
+    "id": "robe",
+    "dcss_enum": "ARM_ROBE",
+    "name": "Robe",
+    "ac": 2,
+    "ev_penalty": 0,
+    "price": 9
+  },
+  {
+    "id": "leather_armour",
+    "dcss_enum": "ARM_LEATHER_ARMOUR",
+    "name": "Leather Armour",
+    "ac": 3,
+    "ev_penalty": -40,
+    "price": 20
+  },
+  {
+    "id": "ring_mail",
+    "dcss_enum": "ARM_RING_MAIL",
+    "name": "Ring Mail",
+    "ac": 5,
+    "ev_penalty": -70,
+    "price": 40
+  },
+  {
+    "id": "scale_mail",
+    "dcss_enum": "ARM_SCALE_MAIL",
+    "name": "Scale Mail",
+    "ac": 6,
+    "ev_penalty": -100,
+    "price": 40
+  },
+  {
+    "id": "chain_mail",
+    "dcss_enum": "ARM_CHAIN_MAIL",
+    "name": "Chain Mail",
+    "ac": 8,
+    "ev_penalty": -140,
+    "price": 60
+  },
+  {
+    "id": "plate_armour",
+    "dcss_enum": "ARM_PLATE_ARMOUR",
+    "name": "Plate Armour",
+    "ac": 10,
+    "ev_penalty": -180,
+    "price": 180
+  },
+  {
+    "id": "crystal_plate_armour",
+    "dcss_enum": "ARM_CRYSTAL_PLATE_ARMOUR",
+    "name": "Crystal Plate Armour",
+    "ac": 14,
+    "ev_penalty": -230,
+    "price": 600
+  },
+  {
+    "id": "troll_leather_armour",
+    "dcss_enum": "ARM_TROLL_LEATHER_ARMOUR",
+    "name": "Troll Leather Armour",
+    "ac": 3,
+    "ev_penalty": -40,
+    "price": 150
+  },
+  {
+    "id": "cloak",
+    "dcss_enum": "ARM_CLOAK",
+    "name": "Cloak",
+    "ac": 1,
+    "ev_penalty": 0,
+    "price": 45
+  },
+  {
+    "id": "scarf",
+    "dcss_enum": "ARM_SCARF",
+    "name": "Scarf",
+    "ac": 0,
+    "ev_penalty": 0,
+    "price": 50
+  },
+  {
+    "id": "gloves",
+    "dcss_enum": "ARM_GLOVES",
+    "name": "Gloves",
+    "ac": 1,
+    "ev_penalty": 0,
+    "price": 45
+  },
+  {
+    "id": "helmet",
+    "dcss_enum": "ARM_HELMET",
+    "name": "Helmet",
+    "ac": 1,
+    "ev_penalty": 0,
+    "price": 45
+  },
+  {
+    "id": "cap",
+    "dcss_enum": "ARM_CAP",
+    "name": "Cap",
+    "ac": 0,
+    "ev_penalty": 0,
+    "price": 45
+  },
+  {
+    "id": "hat",
+    "dcss_enum": "ARM_HAT",
+    "name": "Hat",
+    "ac": 0,
+    "ev_penalty": 0,
+    "price": 40
+  },
+  {
+    "id": "boots",
+    "dcss_enum": "ARM_BOOTS",
+    "name": "Boots",
+    "ac": 1,
+    "ev_penalty": 0,
+    "price": 45
+  },
+  {
+    "id": "centaur_barding",
+    "dcss_enum": "ARM_CENTAUR_BARDING",
+    "name": "Centaur Barding",
+    "ac": 4,
+    "ev_penalty": -60,
+    "price": 230
+  },
+  {
+    "id": "barding",
+    "dcss_enum": "ARM_BARDING",
+    "name": "Barding",
+    "ac": 4,
+    "ev_penalty": -60,
+    "price": 230
+  },
+  {
+    "id": "orb",
+    "dcss_enum": "ARM_ORB",
+    "name": "Orb",
+    "ac": 0,
+    "ev_penalty": 0,
+    "price": 40
+  },
+  {
+    "id": "buckler",
+    "dcss_enum": "ARM_BUCKLER",
+    "name": "Buckler",
+    "ac": 3,
+    "ev_penalty": -50,
+    "price": 45
+  },
+  {
+    "id": "kite_shield",
+    "dcss_enum": "ARM_KITE_SHIELD",
+    "name": "Kite Shield",
+    "ac": 8,
+    "ev_penalty": -100,
+    "price": 70
+  },
+  {
+    "id": "tower_shield",
+    "dcss_enum": "ARM_TOWER_SHIELD",
+    "name": "Tower Shield",
+    "ac": 13,
+    "ev_penalty": -150,
+    "price": 80
+  }
+]

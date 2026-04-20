@@ -219,7 +219,9 @@ func _farthest_floor_from(start: Vector2i) -> Vector2i:
 			var nb: Vector2i = cur + nd
 			if visited.has(nb):
 				continue
-			if not generator.is_walkable(nb):
+			var nb_t: int = generator.get_tile(nb)
+			var passable: bool = generator.is_walkable(nb) or nb_t == DungeonGenerator.TileType.DOOR_CLOSED
+			if not passable:
 				continue
 			visited[nb] = d + 1
 			queue.append(nb)

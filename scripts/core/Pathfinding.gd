@@ -13,7 +13,9 @@ static func find_path(gen: DungeonGenerator, start: Vector2i, goal: Vector2i) ->
 		return result
 	if start == goal:
 		return result
-	if not gen.is_walkable(goal):
+	var goal_tile: int = gen.get_tile(goal)
+	var goal_ok: bool = gen.is_walkable(goal) or goal_tile == DungeonGenerator.TileType.DOOR_CLOSED
+	if not goal_ok:
 		return result
 
 	var open: Array = [start]
@@ -41,9 +43,9 @@ static func find_path(gen: DungeonGenerator, start: Vector2i, goal: Vector2i) ->
 			var nb: Vector2i = current + d
 			if closed.has(nb):
 				continue
-			if nb != goal and not gen.is_walkable(nb):
-				continue
-			if nb == goal and not gen.is_walkable(nb):
+			var nb_tile: int = gen.get_tile(nb)
+			var passable: bool = gen.is_walkable(nb) or nb_tile == DungeonGenerator.TileType.DOOR_CLOSED
+			if not passable:
 				continue
 			var tentative: int = g_score.get(current, 0x3fffffff) + 1
 			if tentative < g_score.get(nb, 0x3fffffff):
