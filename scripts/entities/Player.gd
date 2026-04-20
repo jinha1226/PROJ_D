@@ -97,6 +97,14 @@ var mutations: Dictionary = {}
 ## hostile conducts (spell-casting under Trog, etc.).
 var current_god: String = ""
 var piety: int = 0
+
+## DCSS transmutation state. Empty "" when in human form; set via
+## `apply_form(id)` from talismans, the transmutations spell school,
+## or god-granted shifts. All effect deltas (stats, HP cap, AC,
+## unarmed, resists) unwind when `clear_form` is called.
+var current_form: String = ""
+## Cached baseline so clear_form can restore every touched field.
+var _form_baseline: Dictionary = {}
 # Memorised spell ids. Seeded from job.starting_spells at setup and
 # extended by reading spellbooks. Drives the MAGIC menu and what the
 # player is allowed to cast.
@@ -453,6 +461,69 @@ func _apply_mutation_delta(id: String, direction: int) -> void:
 		_:
 			pass  # Non-modelled mutation — recorded but has no effect.
 	stats_changed.emit()
+
+
+## DCSS transmutation: adopt `form_id` (dragon / statue / blade / …).
+## Captures the player's current STR/DEX/AC/HP cap/unarmed damage as a
+## baseline, then applies the form's deltas. Reverse via `clear_form`.
+## No-op if the form is unknown or already active.
+func apply_form(form_id: String) -> bool:
+	if not FormRegistry.has(form_id):
+		return false
+	if current_form == form_id:
+		return false
+	if current_form != "":
+		clear_form()
+	var info: Dictionary = FormRegistry.get_info(form_id)
+	if stats == null:
+		return false
+	_form_baseline = {
+		"STR": stats.STR, "DEX": stats.DEX,
+		"AC": stats.AC,
+		"hp_max": stats.hp_max, "HP": stats.HP,
+	}
+	stats.STR += int(info.get("str_delta", 0))
+	stats.DEX += int(info.get("dex_delta", 0))
+	stats.AC += int(info.get("ac_base", 0))
+	var hp_mod: int = int(info.get("hp_mod", 100))
+	if hp_mod != 100:
+		var new_cap: int = max(1, int(stats.hp_max * hp_mod / 100))
+		stats.hp_max = new_cap
+		stats.HP = min(stats.HP * hp_mod / 100, new_cap)
+	# Resist metas, for the combat system to query.
+	for r in info.get("resists", {}).keys():
+		set_meta("_form_r%s" % String(r), int(info["resists"][r]))
+	# Feature flags.
+	if bool(info.get("can_fly", false)):
+		set_meta("_flying", true)
+	if bool(info.get("can_swim", false)):
+		set_meta("_swimming", true)
+	current_form = form_id
+	stats_changed.emit()
+	CombatLog.add("You transform into %s." % String(info.get("description",
+			info.get("name", form_id))))
+	return true
+
+
+func clear_form() -> void:
+	if current_form == "" or _form_baseline.is_empty():
+		current_form = ""
+		return
+	var info: Dictionary = FormRegistry.get_info(current_form)
+	if stats != null:
+		stats.STR = int(_form_baseline.get("STR", stats.STR))
+		stats.DEX = int(_form_baseline.get("DEX", stats.DEX))
+		stats.AC = int(_form_baseline.get("AC", stats.AC))
+		stats.hp_max = int(_form_baseline.get("hp_max", stats.hp_max))
+		stats.HP = min(stats.HP, stats.hp_max)
+	for r in info.get("resists", {}).keys():
+		remove_meta("_form_r%s" % String(r))
+	remove_meta("_flying")
+	remove_meta("_swimming")
+	_form_baseline.clear()
+	current_form = ""
+	stats_changed.emit()
+	CombatLog.add("You return to your usual form.")
 
 
 ## Generic `_<name>_turns` meta countdown. Removes the meta at 0.
@@ -1076,6 +1147,17 @@ func use_item(index: int) -> void:
 		var fired: bool = _evoke_wand(index)
 		if fired:
 			TurnManager.end_player_turn()
+		return
+	# Talismans: toggle a form. Item id is "talisman_<form>" (e.g.
+	# "talisman_dragon"); a second use clears the form and frees the
+	# player back to human shape. Talismans aren't consumed.
+	if String(it.get("kind", "")) == "talisman":
+		var form_id: String = String(it.get("form", item_id.replace("talisman_", "")))
+		if current_form == form_id:
+			clear_form()
+		else:
+			apply_form(form_id)
+		TurnManager.end_player_turn()
 		return
 	var info: Dictionary = ConsumableRegistry.get_info(item_id)
 	var consumed: bool = false

@@ -83,14 +83,15 @@ ITEM_MAP = {
     "wand of iceblast": "wand_simple",
     "wand of digging": "wand_simple",
     "wand of random effects": "wand_simple",
-    # Things we don't model — drop silently
-    "scroll of butterflies": None,
-    "scroll of poison": None,
+    # Talismans (new): map to our per-form talisman ids.
+    "quill talisman": "talisman_quill",
+    "protean talisman": "talisman_protean",
+    # Still-unmodelled bits — drop silently.
+    "scroll of butterflies": "scroll_butterflies",
+    "scroll of poison": "scroll_poison",
     "throwing net": None,
     "dart": None,
     "flux bauble": None,
-    "quill talisman": None,
-    "protean talisman": None,
 }
 
 # DCSS skill name → our SkillSystem skill id. None → drop.

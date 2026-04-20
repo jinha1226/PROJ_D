@@ -313,6 +313,57 @@ const DATA: Dictionary = {
 		"count": 5,
 		"desc": "A flutter of butterflies spawns around you — distractions, mostly.",
 	},
+	# --- DCSS talismans (activate a transmutation form on use) ---
+	"talisman_dragon": {
+		"name": "Dragon Talisman", "kind": "talisman", "form": "dragon",
+		"color": Color(0.30, 0.75, 0.30),
+		"desc": "A scale-etched claw. Evoke to take dragon form (teeth, claws, +50% HP).",
+	},
+	"talisman_statue": {
+		"name": "Statue Talisman", "kind": "talisman", "form": "statue",
+		"color": Color(0.65, 0.65, 0.70),
+		"desc": "A chiselled stone disc. Evoke to turn to stone (+AC, +HP, slow).",
+	},
+	"talisman_serpent": {
+		"name": "Serpent Talisman", "kind": "talisman", "form": "serpent",
+		"color": Color(0.30, 0.55, 0.25),
+		"desc": "A coiled snake-scale. Evoke to take serpent form (poison res, swim).",
+	},
+	"talisman_blade": {
+		"name": "Blade Talisman", "kind": "talisman", "form": "blade",
+		"color": Color(0.85, 0.85, 0.90),
+		"desc": "An obsidian shard. Evoke to grow blades in place of hands.",
+	},
+	"talisman_bat": {
+		"name": "Bat Talisman", "kind": "talisman", "form": "bat",
+		"color": Color(0.40, 0.25, 0.35),
+		"desc": "A leathery wing-fragment. Evoke to become a bat (fast, fragile).",
+	},
+	"talisman_rime_yak": {
+		"name": "Rime Yak Talisman", "kind": "talisman", "form": "rime_yak",
+		"color": Color(0.70, 0.85, 1.00),
+		"desc": "A frost-rimed horn. Evoke to charge as a rime-yak.",
+	},
+	"talisman_spider": {
+		"name": "Spider Talisman", "kind": "talisman", "form": "spider",
+		"color": Color(0.55, 0.25, 0.55),
+		"desc": "An eight-legged sigil. Evoke to skitter as a giant spider.",
+	},
+	"talisman_tree": {
+		"name": "Tree Talisman", "kind": "talisman", "form": "tree",
+		"color": Color(0.45, 0.65, 0.25),
+		"desc": "A seed pod. Evoke to take root — massive HP and AC, no movement.",
+	},
+	"talisman_quill": {
+		"name": "Quill Talisman", "kind": "talisman", "form": "quill",
+		"color": Color(0.75, 0.55, 0.30),
+		"desc": "Hair-thin spines. Evoke to become barbed (damage returned on hit).",
+	},
+	"talisman_protean": {
+		"name": "Protean Talisman", "kind": "talisman", "form": "jelly",
+		"color": Color(0.55, 0.90, 0.55),
+		"desc": "A gelatinous bead. Evoke to liquefy into a jelly.",
+	},
 	# --- Spellbooks (learn_spells effect) ---
 	"book_conjurations": {
 		"name": "Book of Conjurations",

@@ -1,0 +1,733 @@
+{
+ "aqua": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": true,
+  "description": "",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "aqua",
+  "is_badform": false,
+  "melds": [
+   "body"
+  ],
+  "move_speed": 10,
+  "name": "aqua",
+  "resists": {},
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "aqua",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "bat": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": true,
+  "can_swim": false,
+  "description": "a bat.",
+  "dex_delta": 5,
+  "hp_mod": 100,
+  "id": "bat",
+  "is_badform": true,
+  "melds": [
+   "physical",
+   "ring"
+  ],
+  "move_speed": 5,
+  "name": "bat",
+  "resists": {},
+  "size": "tiny",
+  "str_delta": 0,
+  "talisman": "",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "bat_swarm": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": true,
+  "can_swim": false,
+  "description": "a swarm of vampire bats.",
+  "dex_delta": 5,
+  "hp_mod": 100,
+  "id": "bat_swarm",
+  "is_badform": false,
+  "melds": [
+   "physical"
+  ],
+  "move_speed": 5,
+  "name": "Bat Swarm",
+  "resists": {
+   "cold": 1,
+   "neg": 2
+  },
+  "size": "tiny",
+  "str_delta": 0,
+  "talisman": "",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "blade": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "blade",
+  "is_badform": false,
+  "melds": [],
+  "move_speed": 10,
+  "name": "Blade",
+  "resists": {},
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "blade",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "death": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "an undying horror.",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "death",
+  "is_badform": false,
+  "melds": [],
+  "move_speed": 10,
+  "name": "death",
+  "resists": {
+   "cold": 1,
+   "neg": 3
+  },
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "death",
+  "unarmed_base": 6,
+  "unarmed_scaling": 0
+ },
+ "dragon": {
+  "ac_base": 12,
+  "ac_scaling": 6,
+  "can_fly": true,
+  "can_swim": false,
+  "description": "a fearsome dragon!",
+  "dex_delta": 0,
+  "hp_mod": 150,
+  "id": "dragon",
+  "is_badform": false,
+  "melds": [
+   "physical"
+  ],
+  "move_speed": 10,
+  "name": "dragon",
+  "resists": {
+   "cold": 1,
+   "fire": 1,
+   "poison": 1
+  },
+  "size": "giant",
+  "str_delta": 10,
+  "talisman": "dragon",
+  "unarmed_base": 8,
+  "unarmed_scaling": 10
+ },
+ "eel_hands": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "eel_hands",
+  "is_badform": false,
+  "melds": [
+   "held",
+   "gloves"
+  ],
+  "move_speed": 10,
+  "name": "Eel",
+  "resists": {
+   "elec": 1
+  },
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "eel",
+  "unarmed_base": 3,
+  "unarmed_scaling": 4
+ },
+ "flux": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "something dangerously unstable.",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "flux",
+  "is_badform": false,
+  "melds": [
+   "held",
+   "body",
+   "gloves"
+  ],
+  "move_speed": 10,
+  "name": "flux",
+  "resists": {},
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "fortress_crab": {
+  "ac_base": 3,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": true,
+  "description": "a heavily-armoured crab.",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "fortress_crab",
+  "is_badform": false,
+  "melds": [
+   "offhand",
+   "aux"
+  ],
+  "move_speed": 10,
+  "name": "Crab",
+  "resists": {
+   "corr": 1,
+   "poison": -1
+  },
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "fortress",
+  "unarmed_base": 5,
+  "unarmed_scaling": 5
+ },
+ "fungus": {
+  "ac_base": 12,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "a sentient fungus.",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "fungus",
+  "is_badform": true,
+  "melds": [
+   "physical"
+  ],
+  "move_speed": 10,
+  "name": "fungus",
+  "resists": {},
+  "size": "tiny",
+  "str_delta": 0,
+  "talisman": "",
+  "unarmed_base": 9,
+  "unarmed_scaling": 0
+ },
+ "hive": {
+  "ac_base": 5,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "a living hive.",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "hive",
+  "is_badform": false,
+  "melds": [
+   "body",
+   "helmet"
+  ],
+  "move_speed": 10,
+  "name": "Hive",
+  "resists": {},
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "hive",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "jelly": {
+  "ac_base": 1,
+  "ac_scaling": 7,
+  "can_fly": false,
+  "can_swim": true,
+  "description": "a lump of jelly.",
+  "dex_delta": 0,
+  "hp_mod": 125,
+  "id": "jelly",
+  "is_badform": true,
+  "melds": [
+   "physical"
+  ],
+  "move_speed": 10,
+  "name": "jelly",
+  "resists": {
+   "corr": 3,
+   "poison": 1
+  },
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "",
+  "unarmed_base": 9,
+  "unarmed_scaling": 14
+ },
+ "maw": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "a creature with a mouth for a stomach.",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "maw",
+  "is_badform": false,
+  "melds": [],
+  "move_speed": 10,
+  "name": "maw",
+  "resists": {},
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "maw",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "medusa": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "medusa",
+  "is_badform": false,
+  "melds": [
+   "helmet",
+   "cloak"
+  ],
+  "move_speed": 10,
+  "name": "medusa",
+  "resists": {
+   "poison": 1
+  },
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "medusa",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "pig": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "a filthy swine.",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "pig",
+  "is_badform": true,
+  "melds": [
+   "physical",
+   "ring"
+  ],
+  "move_speed": 7,
+  "name": "pig",
+  "resists": {},
+  "size": "small",
+  "str_delta": 0,
+  "talisman": "",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "quill": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "covered in sharp quills.",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "quill",
+  "is_badform": false,
+  "melds": [
+   "aux"
+  ],
+  "move_speed": 10,
+  "name": "quill",
+  "resists": {},
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "quill",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "rime_yak": {
+  "ac_base": 6,
+  "ac_scaling": 6,
+  "can_fly": false,
+  "can_swim": true,
+  "description": "an ice-encrusted yak.",
+  "dex_delta": 0,
+  "hp_mod": 115,
+  "id": "rime_yak",
+  "is_badform": false,
+  "melds": [
+   "physical"
+  ],
+  "move_speed": 10,
+  "name": "Yak",
+  "resists": {
+   "cold": 2,
+   "fire": -1
+  },
+  "size": "large",
+  "str_delta": 0,
+  "talisman": "rimehorn",
+  "unarmed_base": 4,
+  "unarmed_scaling": 0
+ },
+ "serpent": {
+  "ac_base": 10,
+  "ac_scaling": 6,
+  "can_fly": false,
+  "can_swim": true,
+  "description": "an enormous two-headed serpent.",
+  "dex_delta": 0,
+  "hp_mod": 120,
+  "id": "serpent",
+  "is_badform": false,
+  "melds": [
+   "weapon",
+   "offhand",
+   "body",
+   "boots",
+   "barding",
+   "gloves",
+   "cloak"
+  ],
+  "move_speed": 10,
+  "name": "amphisbaena-form",
+  "resists": {
+   "poison": 1
+  },
+  "size": "large",
+  "str_delta": 5,
+  "talisman": "serpent",
+  "unarmed_base": 7,
+  "unarmed_scaling": 0
+ },
+ "slaughter": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": true,
+  "can_swim": false,
+  "description": "a vessel of demonic slaughter.",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "slaughter",
+  "is_badform": false,
+  "melds": [],
+  "move_speed": 10,
+  "name": "slaughter",
+  "resists": {
+   "miasma": 1,
+   "neg": 3,
+   "poison": 1
+  },
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "sphinx": {
+  "ac_base": 7,
+  "ac_scaling": 0,
+  "can_fly": true,
+  "can_swim": false,
+  "description": "a cunning sphinx.",
+  "dex_delta": 0,
+  "hp_mod": 115,
+  "id": "sphinx",
+  "is_badform": false,
+  "melds": [
+   "weapon",
+   "offhand",
+   "body",
+   "boots",
+   "helmet",
+   "gloves"
+  ],
+  "move_speed": 10,
+  "name": "sphinx",
+  "resists": {},
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "sphinx",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "spider": {
+  "ac_base": 3,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "an agile web-spinner.",
+  "dex_delta": 5,
+  "hp_mod": 100,
+  "id": "spider",
+  "is_badform": false,
+  "melds": [
+   "physical"
+  ],
+  "move_speed": 10,
+  "name": "spider",
+  "resists": {
+   "poison": -1
+  },
+  "size": "tiny",
+  "str_delta": 0,
+  "talisman": "spider",
+  "unarmed_base": 3,
+  "unarmed_scaling": 0
+ },
+ "spore": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "spore",
+  "is_badform": false,
+  "melds": [
+   "offhand",
+   "boots"
+  ],
+  "move_speed": 10,
+  "name": "Spore",
+  "resists": {},
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "spore",
+  "unarmed_base": 4,
+  "unarmed_scaling": 0
+ },
+ "statue": {
+  "ac_base": 27,
+  "ac_scaling": 11,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "a stone statue.",
+  "dex_delta": 0,
+  "hp_mod": 130,
+  "id": "statue",
+  "is_badform": false,
+  "melds": [
+   "gloves",
+   "boots",
+   "barding",
+   "body"
+  ],
+  "move_speed": 10,
+  "name": "statue",
+  "resists": {
+   "elec": 1,
+   "neg": 1,
+   "petrify": 1
+  },
+  "size": "medium",
+  "str_delta": 7,
+  "talisman": "statue",
+  "unarmed_base": 5,
+  "unarmed_scaling": 0
+ },
+ "storm": {
+  "ac_base": 12,
+  "ac_scaling": 3,
+  "can_fly": true,
+  "can_swim": false,
+  "description": "a lightning-filled tempest!",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "storm",
+  "is_badform": false,
+  "melds": [
+   "physical"
+  ],
+  "move_speed": 10,
+  "name": "storm",
+  "resists": {
+   "elec": 1
+  },
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "storm",
+  "unarmed_base": 24,
+  "unarmed_scaling": 6
+ },
+ "sun_scarab": {
+  "ac_base": 5,
+  "ac_scaling": 4,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "a gleaming scarab beetle.",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "sun_scarab",
+  "is_badform": false,
+  "melds": [
+   "physical"
+  ],
+  "move_speed": 10,
+  "name": "Scarab",
+  "resists": {
+   "fire": 2,
+   "poison": -1
+  },
+  "size": "small",
+  "str_delta": 0,
+  "talisman": "scarab",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "tree": {
+  "ac_base": 20,
+  "ac_scaling": 14,
+  "can_fly": false,
+  "can_swim": true,
+  "description": "a tree.",
+  "dex_delta": 0,
+  "hp_mod": 150,
+  "id": "tree",
+  "is_badform": true,
+  "melds": [
+   "aux",
+   "body"
+  ],
+  "move_speed": 10,
+  "name": "tree",
+  "resists": {
+   "poison": 1
+  },
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "",
+  "unarmed_base": 9,
+  "unarmed_scaling": 0
+ },
+ "vampire": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "a living vampire.",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "vampire",
+  "is_badform": false,
+  "melds": [],
+  "move_speed": 10,
+  "name": "vampire",
+  "resists": {
+   "cold": 1,
+   "neg": 2
+  },
+  "size": "medium",
+  "str_delta": 0,
+  "talisman": "vampire",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "walking_scroll": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "a walking scroll.",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "walking_scroll",
+  "is_badform": false,
+  "melds": [
+   "physical"
+  ],
+  "move_speed": 10,
+  "name": "Scroll",
+  "resists": {
+   "fire": -1
+  },
+  "size": "tiny",
+  "str_delta": 0,
+  "talisman": "inkwell",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "werewolf": {
+  "ac_base": 0,
+  "ac_scaling": 0,
+  "can_fly": false,
+  "can_swim": false,
+  "description": "a ferocious werewolf.",
+  "dex_delta": 3,
+  "hp_mod": 100,
+  "id": "werewolf",
+  "is_badform": false,
+  "melds": [
+   "gloves",
+   "boots",
+   "barding"
+  ],
+  "move_speed": 10,
+  "name": "werewolf",
+  "resists": {
+   "cold": 1
+  },
+  "size": "medium",
+  "str_delta": 3,
+  "talisman": "werewolf",
+  "unarmed_base": 0,
+  "unarmed_scaling": 0
+ },
+ "wisp": {
+  "ac_base": 5,
+  "ac_scaling": 14,
+  "can_fly": true,
+  "can_swim": false,
+  "description": "an insubstantial wisp.",
+  "dex_delta": 0,
+  "hp_mod": 100,
+  "id": "wisp",
+  "is_badform": true,
+  "melds": [
+   "all"
+  ],
+  "move_speed": 10,
+  "name": "wisp",
+  "resists": {
+   "cold": 2,
+   "corr": 1,
+   "elec": 1,
+   "fire": 2,
+   "neg": 3
+  },
+  "size": "tiny",
+  "str_delta": 0,
+  "talisman": "",
+  "unarmed_base": 2,
+  "unarmed_scaling": 0
+ }
+}
