@@ -203,6 +203,28 @@ func _draw_dcss() -> void:
 					tex = stairs_dn_tex
 					# Tint the modulate downstream — we hack a draw_rect
 					# overlay after the tile draw for now.
+				DungeonGenerator.TileType.ALTAR:
+					# Altar = floor backdrop + a diamond drawn in the god's
+					# signature colour. Keeps the tile readable in every
+					# render mode without extra textures.
+					if floor_tex != null:
+						draw_texture_rect(floor_tex, rect, false, modulate)
+					var god_id: String = String(generator.altars.get(tile, "")) \
+							if "altars" in generator else ""
+					var god_col: Color = Color(0.85, 0.85, 0.9)
+					if god_id != "":
+						var info: Dictionary = GodRegistry.get_info(god_id)
+						god_col = info.get("color", god_col)
+					var mid: Vector2 = rect.position + rect.size * 0.5
+					var half: float = rect.size.x * 0.35
+					var poly := PackedVector2Array([
+						mid + Vector2(0, -half), mid + Vector2(half, 0),
+						mid + Vector2(0, half),  mid + Vector2(-half, 0),
+					])
+					draw_colored_polygon(poly, god_col * modulate)
+					draw_polyline(poly + PackedVector2Array([poly[0]]),
+							Color(0, 0, 0, 0.8) * modulate, 1.2)
+					continue
 				DungeonGenerator.TileType.WATER:
 					tex = water_tex
 				DungeonGenerator.TileType.LAVA:

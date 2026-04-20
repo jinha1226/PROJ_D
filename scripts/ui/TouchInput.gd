@@ -6,6 +6,7 @@ extends Node
 signal stairs_tapped(pos: Vector2i)
 signal stairs_up_tapped(pos: Vector2i)
 signal branch_entrance_tapped(pos: Vector2i)
+signal altar_tapped(pos: Vector2i)
 signal target_selected(pos: Vector2i)
 signal inspect_requested(pos: Vector2i)
 
@@ -129,6 +130,8 @@ func _on_tap(grid: Vector2i) -> void:
 			stairs_up_tapped.emit(grid)
 		elif tile_here == DungeonGenerator.TileType.BRANCH_ENTRANCE:
 			branch_entrance_tapped.emit(grid)
+		elif tile_here == DungeonGenerator.TileType.ALTAR:
+			altar_tapped.emit(grid)
 		return
 	if cheb == 1:
 		# Adjacent: move (or attack if monster there — handled in try_move).

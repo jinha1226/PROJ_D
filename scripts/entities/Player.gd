@@ -90,6 +90,13 @@ var skill_state: Dictionary = {}
 ## applied at the moment `apply_mutation` bumps the level, and reversed
 ## on `remove_mutation`.
 var mutations: Dictionary = {}
+
+## DCSS worship state. `current_god` is "" when unaligned, else the
+## GodRegistry id the player pledged to at an altar. `piety` is a
+## simple 0..god.piety_cap counter that climbs on kills and drops on
+## hostile conducts (spell-casting under Trog, etc.).
+var current_god: String = ""
+var piety: int = 0
 # Memorised spell ids. Seeded from job.starting_spells at setup and
 # extended by reading spellbooks. Drives the MAGIC menu and what the
 # player is allowed to cast.
@@ -316,6 +323,8 @@ func _tick_duration_metas() -> void:
 	_tick_simple_meta("_enlightened_turns")
 	_tick_simple_meta("_invisible_turns")
 	_tick_simple_meta("_silenced_turns")
+	_tick_simple_meta("_heroism_turns")
+	_tick_simple_meta("_finesse_turns")
 	# Ambrosia: confusion while the duration runs, HP/MP regen each tick.
 	if has_meta("_ambrosia_turns"):
 		var at: int = int(get_meta("_ambrosia_turns", 0))

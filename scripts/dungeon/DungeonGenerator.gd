@@ -32,6 +32,9 @@ var spawn_pos2: Vector2i = Vector2i.ZERO
 ## non-dungeon floors and on dungeon floors that aren't an entry depth
 ## for any child branch.
 var branch_entrances: Dictionary = {}
+## Altar tile → god id. Temple floors get three (one per god); most
+## dungeon floors get zero, ~12% get a single random altar.
+var altars: Dictionary = {}
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 # DCSS layout_basic emits three stair pairs; cache them so _place_stairs can
@@ -67,6 +70,7 @@ func generate(depth: int, run_seed: int = -1) -> void:
 	_ensure_reachability()
 	_place_stairs()
 	_place_branch_entrances(depth, run_seed)
+	_place_altars()
 
 
 # ---- Builder: DCSS overlapping-boxes port --------------------------------
@@ -531,6 +535,39 @@ func _place_branch_entrances(depth: int, run_seed: int) -> void:
 		branch_entrances[pos] = bid
 
 
+## Scatter altars. In DCSS Temple (when that branch loads) is wall-to-
+## wall altars; on the regular dungeon trunk each floor has ~12% chance
+## of a single random altar so god-pledging feels discoverable without
+## being free.
+func _place_altars() -> void:
+	altars.clear()
+	var mgr: Node = null
+	if Engine.get_main_loop() != null:
+		mgr = Engine.get_main_loop().root.get_node_or_null("GameManager")
+	var branch: String = "dungeon"
+	if mgr != null:
+		branch = String(mgr.get("current_branch") or "dungeon")
+	var god_ids: Array = GodRegistry.all_ids()
+	if god_ids.is_empty():
+		return
+	if branch == "temple":
+		# Temple: one altar per god.
+		for gid in god_ids:
+			var pos: Vector2i = _pick_branch_entrance_tile()
+			if pos != Vector2i(-1, -1):
+				map[pos.x][pos.y] = TileType.ALTAR
+				altars[pos] = String(gid)
+		return
+	# Regular floor: ~1-in-8 chance of a single random altar.
+	if _rng.randi() % 8 != 0:
+		return
+	var chosen_god: String = String(god_ids[_rng.randi() % god_ids.size()])
+	var spot: Vector2i = _pick_branch_entrance_tile()
+	if spot != Vector2i(-1, -1):
+		map[spot.x][spot.y] = TileType.ALTAR
+		altars[spot] = chosen_god
+
+
 func _pick_branch_entrance_tile() -> Vector2i:
 	# Try up to 40 random floor tiles, preferring ones that aren't
 	# adjacent to existing stairs so entrances don't clump.
@@ -709,7 +746,8 @@ func get_tile(p: Vector2i) -> int:
 func is_walkable(p: Vector2i) -> bool:
 	var t: int = get_tile(p)
 	return t == TileType.FLOOR or t == TileType.STAIRS_DOWN or t == TileType.STAIRS_UP \
-			or t == TileType.DOOR_OPEN or t == TileType.BRANCH_ENTRANCE
+			or t == TileType.DOOR_OPEN or t == TileType.BRANCH_ENTRANCE \
+			or t == TileType.ALTAR
 
 
 func open_door(p: Vector2i) -> void:

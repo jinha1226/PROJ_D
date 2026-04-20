@@ -270,6 +270,7 @@ func _ready() -> void:
 	touch_input.stairs_tapped.connect(_on_stairs_tapped)
 	touch_input.stairs_up_tapped.connect(_on_stairs_up_tapped)
 	touch_input.branch_entrance_tapped.connect(_on_branch_entrance_tapped)
+	touch_input.altar_tapped.connect(_on_altar_tapped)
 	touch_input.target_selected.connect(_on_target_selected)
 	touch_input.inspect_requested.connect(_on_inspect_requested)
 
@@ -1000,6 +1001,15 @@ func _on_monster_died(monster: Monster) -> void:
 		CombatLog.add("You kill the %s!" % String(monster.data.display_name))
 	if meta != null and monster != null and monster.data != null:
 		meta.record_kill(String(monster.data.id))
+	# DCSS piety gain: every god who likes kills (Trog/Okawaru/Zin)
+	# rewards the player per-victim. Amount is scaled down from DCSS
+	# because our runs are shorter; cap at the god's piety_cap.
+	if player != null and player.current_god != "":
+		var god: Dictionary = GodRegistry.get_info(player.current_god)
+		var gain: int = int(god.get("kill_piety", 0))
+		if gain > 0:
+			var cap: int = int(god.get("piety_cap", 200))
+			player.piety = min(cap, player.piety + gain)
 	if player != null and player.trait_res != null and player.trait_res.special == "holy_light":
 		if player.stats != null and player.is_alive:
 			var heal: int = max(1, int(player.stats.hp_max * 0.2))
@@ -1158,6 +1168,119 @@ func _on_stairs_up_tapped(_pos: Vector2i) -> void:
 	_save_current_floor()
 	GameManager.current_depth -= 1
 	_regenerate_dungeon(true, used_secondary)
+
+
+## Altar tap: if the player is unaligned, this pledges them to the
+## altar's god (DCSS `pray` / worship). If already aligned to this god,
+## open the invocations menu. If aligned to another god, politely
+## refuse — the player must abandon first (not modelled here).
+func _on_altar_tapped(pos: Vector2i) -> void:
+	if run_over or generator == null or player == null:
+		return
+	var god_id: String = String(generator.altars.get(pos, ""))
+	if god_id == "":
+		return
+	var info: Dictionary = GodRegistry.get_info(god_id)
+	if info.is_empty():
+		return
+	if player.current_god == "":
+		player.current_god = god_id
+		player.piety = 10  # DCSS seeds new converts with a little piety
+		CombatLog.add("You pledge yourself to %s." % String(info.get("title", god_id)))
+		return
+	if player.current_god == god_id:
+		_show_invocations_menu()
+		return
+	CombatLog.add("You are already pledged to %s." % \
+			GodRegistry.get_info(player.current_god).get("title", player.current_god))
+
+
+## Open a popup listing the current god's invocations. Greyed rows are
+## locked by piety threshold; active rows fire `_invoke(inv_id)`.
+func _show_invocations_menu() -> void:
+	if player == null or player.current_god == "":
+		return
+	var god: Dictionary = GodRegistry.get_info(player.current_god)
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null:
+		return
+	var dlg := AcceptDialog.new()
+	dlg.title = "%s — Piety %d/%d" % [String(god.get("title", "")), player.piety,
+			int(god.get("piety_cap", 200))]
+	dlg.exclusive = false
+	var vb := VBoxContainer.new()
+	dlg.add_child(vb)
+	for inv_id in god.get("invocations", []):
+		var inv: Dictionary = GodRegistry.invocation(String(inv_id))
+		var btn := Button.new()
+		var locked: bool = player.piety < int(inv.get("min_piety", 999))
+		btn.text = "%s  — %d piety  [%s]" % [String(inv.get("name", inv_id)),
+				int(inv.get("cost", 0)), ("LOCKED" if locked else "READY")]
+		btn.disabled = locked or player.piety < int(inv.get("cost", 0))
+		btn.pressed.connect(_invoke.bind(String(inv_id), dlg))
+		vb.add_child(btn)
+	popup_mgr.add_child(dlg)
+	dlg.popup_centered(Vector2i(720, 560))
+
+
+func _invoke(inv_id: String, dlg: AcceptDialog) -> void:
+	var inv: Dictionary = GodRegistry.invocation(inv_id)
+	if inv.is_empty() or player == null:
+		return
+	if player.piety < int(inv.get("cost", 0)):
+		CombatLog.add("Not enough piety.")
+		return
+	player.piety -= int(inv.get("cost", 0))
+	if dlg != null:
+		dlg.queue_free()
+	match String(inv.get("effect", "")):
+		"berserk":
+			player._apply_consumable_effect({"effect": "berserk", "dur_base": 15, "dur_rand": 10})
+		"trog_hand":
+			var tile: Vector2i = _find_free_adjacent_tile(player.grid_pos)
+			if tile != player.grid_pos:
+				var c: Companion = _COMPANION_SCENE.instantiate()
+				$EntityLayer.add_child(c)
+				var mdata: MonsterData = MonsterRegistry.fetch("orc_warrior")
+				if mdata != null:
+					c.setup(generator, tile, mdata)
+					c.lifetime = 60
+				CombatLog.add("Trog's Hand strikes your side!")
+		"brothers":
+			for i in 3:
+				var tile_b: Vector2i = _find_free_adjacent_tile(player.grid_pos)
+				if tile_b == player.grid_pos:
+					continue
+				var mdata_b: MonsterData = MonsterRegistry.fetch("deep_troll")
+				if mdata_b == null:
+					mdata_b = MonsterRegistry.fetch("orc_warrior")
+				if mdata_b == null:
+					continue
+				var c_b: Companion = _COMPANION_SCENE.instantiate()
+				$EntityLayer.add_child(c_b)
+				c_b.setup(generator, tile_b, mdata_b)
+				c_b.lifetime = 40
+			CombatLog.add("Trog sends his brothers in arms!")
+		"heroism":
+			player.set_meta("_heroism_turns", 25)
+			CombatLog.add("Your combat prowess surges!")
+		"finesse":
+			player.set_meta("_finesse_turns", 10)
+			CombatLog.add("Your strikes blur into a flurry!")
+		"vitalisation":
+			if player.stats != null:
+				player.stats.HP = min(player.stats.hp_max, player.stats.HP + 40)
+				player.stats.MP = min(player.stats.mp_max, player.stats.MP + 20)
+				player.stats_changed.emit()
+			CombatLog.add("Zin's light fills you.")
+		"imprison":
+			var target: Monster = _find_nearest_visible_monster(8)
+			if target != null:
+				target.set_meta("_paralysis_turns", 10)
+				CombatLog.add("Stone walls seal the %s in place." % \
+						String(target.data.display_name if target.data else "foe"))
+		_:
+			CombatLog.add("The god is silent.")
 
 
 ## DCSS-style branch entry: tapping onto a BRANCH_ENTRANCE tile saves
@@ -2281,7 +2404,23 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 	var spell_lv: int = int(info.get("difficulty", 1))
 	var stealth_lv: int = skill_system.get_level(player, "stealth") if skill_system else 0
 	MonsterAI.broadcast_noise(get_tree(), player.grid_pos, spell_lv * 2 + 4, stealth_lv)
+	# DCSS Trog conduct: every spell cast angers the berserker god.
+	_apply_spell_piety_penalty(spell_lv)
 	TurnManager.end_player_turn()
+
+
+## Piety hit for casting a spell while pledged to a spell-hating god
+## (Trog). Scales with spell difficulty so Lv1 cantrips barely register
+## and Lv9 nukes can excommunicate in a few casts.
+func _apply_spell_piety_penalty(spell_level: int) -> void:
+	if player == null or player.current_god == "":
+		return
+	var god: Dictionary = GodRegistry.get_info(player.current_god)
+	if not bool(god.get("hates_spells", false)):
+		return
+	var loss: int = max(1, spell_level * 2)
+	player.piety = max(0, player.piety - loss)
+	CombatLog.add("Trog scowls at your spellcraft. (-%d piety)" % loss)
 
 
 func _assign_spell_quickslot(spell_id: String, dlg: AcceptDialog) -> void:
