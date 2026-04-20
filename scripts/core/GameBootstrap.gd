@@ -940,33 +940,75 @@ func _maybe_drop_loot(monster: Monster) -> void:
 				String(cinfo.get("kind", "junk")), cinfo.get("color", Color(0.9, 0.5, 0.3)))
 
 
+## DCSS floor-gen item placement (dungeon.cc:_builder_items). Items per
+## floor = `3 + 3d9` (dungeon.cc:_num_items_wanted), so 6..30 per floor.
+## Item type is sampled from a weapon/armour/consumable/ring mix tuned to
+## match the feel of DCSS's OBJ_RANDOM distribution.
 func _spawn_dummy_items(_count: int) -> void:
-	# Spawn depth-scaled consumables on the floor for each new level.
 	var depth: int = GameManager.current_depth
-	var item_count: int = clamp(4 + depth / 2, 5, 12)
+	var d_roll: int = randi_range(1, 9) + randi_range(1, 9) + randi_range(1, 9)
+	var item_count: int = 3 + d_roll
 	var entity_layer: Node = $EntityLayer
 	var placed: int = 0
 	var attempts: int = 0
-	while placed < item_count and attempts < 400:
+	while placed < item_count and attempts < 800:
 		attempts += 1
 		var x: int = randi() % DungeonGenerator.MAP_WIDTH
 		var y: int = randi() % DungeonGenerator.MAP_HEIGHT
 		var gp: Vector2i = Vector2i(x, y)
 		if not generator.is_walkable(gp):
 			continue
-		if gp == player.grid_pos:
+		if player != null and gp == player.grid_pos:
 			continue
-		var iid: String = _pick_by_depth("consumable", depth)
-		if iid.is_empty():
-			iid = "potion_curing"
-		var info: Dictionary = ConsumableRegistry.get_info(iid)
-		if info.is_empty():
-			continue
-		var fi: FloorItem = FloorItem.new()
-		entity_layer.add_child(fi)
-		fi.setup(gp, iid, String(info.get("name", iid)), String(info.get("kind", "junk")),
-				info.get("color", Color(0.9, 0.9, 0.4)))
-		placed += 1
+		if _place_random_floor_item(gp, depth, entity_layer):
+			placed += 1
+
+
+## Spawn a single FloorItem at `pos` of a type sampled from the
+## depth-weighted tables. Returns false if the item couldn't be built
+## (unknown id, missing registry data). Same type-mix as monster-kill
+## loot so floor items and drops feel like one distribution.
+func _place_random_floor_item(pos: Vector2i, depth: int, parent: Node) -> bool:
+	var is_cursed: bool = randf() < _CURSE_CHANCE
+	var drop_roll: float = randf()
+	var fi: FloorItem = FloorItem.new()
+	parent.add_child(fi)
+	if drop_roll < 0.42:
+		var wid: String = _pick_by_depth("weapon", depth)
+		if wid.is_empty():
+			wid = "dagger"
+		var wname: String = WeaponRegistry.display_name_for(wid)
+		if is_cursed:
+			wname = "Cursed " + wname
+		fi.setup(pos, wid, wname, "weapon", Color(0.75, 0.75, 0.85),
+				{"cursed": is_cursed})
+	elif drop_roll < 0.70:
+		var aid: String = _pick_by_depth("armour", depth)
+		if aid.is_empty():
+			aid = "leather_armour"
+		var info: Dictionary = ArmorRegistry.get_info(aid)
+		var aname: String = String(info.get("name", aid))
+		if is_cursed:
+			aname = "Cursed " + aname
+		fi.setup(pos, aid, aname, "armor",
+				info.get("color", Color(0.6, 0.6, 0.7)),
+				{"ac": int(info.get("ac", 0)),
+				 "slot": String(info.get("slot", "chest")),
+				 "cursed": is_cursed})
+	elif drop_roll < 0.78:
+		var rid: String = _RING_POOL[randi() % _RING_POOL.size()]
+		var ring_info: Dictionary = RingRegistry.get_info(rid)
+		fi.setup(pos, rid, String(ring_info.get("name", rid)), "ring",
+				ring_info.get("color", Color(0.85, 0.85, 0.90)))
+	else:
+		var cid: String = _pick_by_depth("consumable", depth)
+		if cid.is_empty():
+			cid = "potion_curing"
+		var cinfo: Dictionary = ConsumableRegistry.get_info(cid)
+		fi.setup(pos, cid, String(cinfo.get("name", cid)),
+				String(cinfo.get("kind", "junk")),
+				cinfo.get("color", Color(0.9, 0.5, 0.3)))
+	return true
 
 
 func _on_monster_died(monster: Monster) -> void:

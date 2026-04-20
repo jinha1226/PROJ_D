@@ -35,6 +35,10 @@ var _auto_move_grace: float = 0.0
 # DCSS-faithful: only *newly* visible monsters halt travel — ones you've
 # already seen (and presumably chose to ignore) don't re-trigger the stop.
 var _seen_monster_ids: Dictionary = {}
+# Stair tiles seen at auto-move start. A stair that becomes visible mid-run
+# that wasn't in this set halts travel so the player can decide whether to
+# descend. Matches DCSS travel.cc's interesting-feature interrupt.
+var _seen_stair_tiles: Dictionary = {}
 
 
 func _ready() -> void:
@@ -139,6 +143,7 @@ func _on_tap(grid: Vector2i) -> void:
 	_auto_move_grace = 0.5
 	_auto_steps = 0
 	_snapshot_visible_monsters()
+	_snapshot_visible_stairs()
 	_update_path_overlay()
 	_step_auto_move()
 
@@ -174,6 +179,7 @@ func begin_auto_move_to(target: Vector2i) -> bool:
 	_auto_move_grace = 0.5
 	_auto_steps = 0
 	_snapshot_visible_monsters()
+	_snapshot_visible_stairs()
 	_update_path_overlay()
 	_step_auto_move()
 	return true
@@ -266,6 +272,9 @@ func _step_auto_move() -> void:
 	if _any_monster_in_sight():
 		_cancel_auto_move()
 		return
+	if _newly_visible_stair() != Vector2i.ZERO:
+		_cancel_auto_move()
+		return
 	if _auto_move_path.is_empty():
 		# Path done — if exploring, try to continue to next unexplored tile.
 		if _auto_exploring:
@@ -339,6 +348,7 @@ func _cancel_auto_move() -> void:
 	_auto_move_path.clear()
 	_auto_steps = 0
 	_seen_monster_ids.clear()
+	_seen_stair_tiles.clear()
 	if dmap != null:
 		dmap.clear_path()
 
@@ -354,6 +364,51 @@ func _snapshot_visible_monsters() -> void:
 			continue
 		if _monster_is_visible(m):
 			_seen_monster_ids[m.get_instance_id()] = true
+
+
+## Same idea as _snapshot_visible_monsters, but for stairs. Stairs the player
+## already sees before starting travel don't trigger an interrupt; ones that
+## come into view mid-run do, so the first sight of new stairs always halts.
+func _snapshot_visible_stairs() -> void:
+	_seen_stair_tiles.clear()
+	for tile in _stair_tiles():
+		if _tile_is_visible(tile):
+			_seen_stair_tiles[tile] = true
+
+
+## Return the first newly-visible stair tile this auto-move session, or
+## Vector2i.ZERO if none. Players only get interrupted once per staircase
+## because the tile is added to `_seen_stair_tiles` on the halt.
+func _newly_visible_stair() -> Vector2i:
+	for tile in _stair_tiles():
+		if _seen_stair_tiles.has(tile):
+			continue
+		if _tile_is_visible(tile):
+			_seen_stair_tiles[tile] = true
+			return tile
+	return Vector2i.ZERO
+
+
+func _stair_tiles() -> Array:
+	if generator == null:
+		return []
+	var out: Array = []
+	if generator.stairs_down_pos != Vector2i.ZERO:
+		out.append(generator.stairs_down_pos)
+	if generator.stairs_down_pos2 != Vector2i.ZERO \
+			and generator.stairs_down_pos2 != generator.stairs_down_pos:
+		out.append(generator.stairs_down_pos2)
+	if "spawn_pos" in generator and generator.spawn_pos != Vector2i.ZERO:
+		out.append(generator.spawn_pos)  # this is the STAIRS_UP tile
+	return out
+
+
+func _tile_is_visible(tile: Vector2i) -> bool:
+	if dmap != null:
+		return dmap.is_tile_visible(tile)
+	var d: int = max(abs(tile.x - player.grid_pos.x),
+			abs(tile.y - player.grid_pos.y))
+	return d <= SIGHT_RANGE
 
 
 func _update_path_overlay() -> void:

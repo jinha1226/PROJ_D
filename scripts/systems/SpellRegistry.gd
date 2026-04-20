@@ -470,8 +470,10 @@ static func calc_spell_power(spell_id: String, player: Node) -> int:
 
 ## DCSS raw_spell_fail (spl-cast.cc:455). Polynomial interpolation of a
 ## chance-to-fail curve, clamped to [0, 100]. Multi-school spells use the
-## average school skill via _skill_power above (DCSS does the same).
-## TODO: armour/shield encumbrance penalty, mutations, form vertigo.
+## average school skill via _skill_power above (DCSS does the same). The
+## body-armour + shield encumbrance penalty uses
+## `player.cc:player_armour_shield_spell_penalty` and makes heavy armour
+## a real obstacle to casting.
 static func failure_rate(spell_id: String, player: Node) -> int:
 	_ensure_loaded()
 	if player == null:
@@ -485,6 +487,7 @@ static func failure_rate(spell_id: String, player: Node) -> int:
 	var chance: int = 60
 	chance -= skpow * 6 / 100
 	chance -= intel * 2
+	chance += _armour_shield_spell_penalty(player)
 	# Difficulty-by-level table from DCSS spl-cast.cc:481.
 	var diff_by_lv: Array = [0, 3, 15, 35, 70, 100, 150, 200, 260, 340]
 	var spell_level: int = _spell_level(spell_id)
@@ -495,6 +498,59 @@ static func failure_rate(spell_id: String, player: Node) -> int:
 	var c2: int = (((chance + 426) * chance) + 82670) * chance + 7245398
 	c2 = c2 / 262144
 	return clampi(c2, 0, 100)
+
+
+## DCSS player.cc:2198 player_armour_shield_spell_penalty. Returns the
+## combined ENCUMBRANCE cost of the player's body armour + shield in
+## fail-chance units, to be added directly to raw_spell_fail's `chance`.
+## Returns 0 when no body armour / shield is equipped.
+static func _armour_shield_spell_penalty(player: Node) -> int:
+	if player == null:
+		return 0
+	var str_val: int = 10
+	if "stats" in player and player.stats != null:
+		str_val = int(player.stats.STR)
+	var armour_skill: int = _player_skill(player, "armour")
+	var shields_skill: int = _player_skill(player, "shields")
+	var body: Dictionary = {}
+	var shield: Dictionary = {}
+	if "equipped_armor" in player and player.equipped_armor is Dictionary:
+		body = player.equipped_armor.get("chest", {})
+		shield = player.equipped_armor.get("shield", {})
+	var body_pen: int = _adjusted_body_armour_penalty(body, str_val, armour_skill, 100)
+	var shield_pen: int = _adjusted_shield_penalty(shield, str_val, shields_skill, 100)
+	var total: int = 19 * max(body_pen, 0) + 19 * shield_pen
+	return max(total, 0) / 100
+
+
+## DCSS player::adjusted_body_armour_penalty (player.cc:6164). Quadratic in
+## the armour's raw EV-penalty, softened by STR and armour skill.
+##   2 * evp^2 * (450 - armour_skill*10) * scale / (5 * (str+3)) / 450
+static func _adjusted_body_armour_penalty(body: Dictionary, str_val: int, armour_skill: int, scale: int) -> int:
+	if body.is_empty():
+		return 0
+	# Our ArmorRegistry stores ev_penalty as the raw PARM_EVASION (negative).
+	# DCSS `unadjusted_body_armour_penalty` divides by 10.
+	var evp_raw: int = int(body.get("ev_penalty", 0))
+	var base: int = max(0, -evp_raw / 10)
+	if base <= 0:
+		return 0
+	return 2 * base * base * (450 - armour_skill * 10) * scale \
+			/ (5 * (str_val + 3)) / 450
+
+
+## DCSS player::adjusted_shield_penalty (player.cc:6179). Same shape, but
+## the falloff uses SK_SHIELDS and a different STR/skill coefficient.
+##   2 * evp^2 * (270 - shields_skill*10) * scale / (25 + 5*str) / 270
+static func _adjusted_shield_penalty(shield: Dictionary, str_val: int, shields_skill: int, scale: int) -> int:
+	if shield.is_empty():
+		return 0
+	var evp_raw: int = int(shield.get("ev_penalty", 0))
+	var base: int = max(0, -evp_raw / 10)
+	if base <= 0:
+		return 0
+	return 2 * base * base * (270 - shields_skill * 10) * scale \
+			/ (25 + 5 * str_val) / 270
 
 
 static func _spell_level(spell_id: String) -> int:
