@@ -2002,6 +2002,8 @@ func _on_bag_pressed() -> void:
 		cat_tabs.add_child(tab_btn)
 	vb.add_child(cat_tabs)
 
+	_build_equipped_section(vb)
+
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(0, 1300)
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -2080,6 +2082,77 @@ func _open_bag_filtered(category: String) -> void:
 		_on_bag_pressed()
 		return
 	_on_bag_pressed()
+
+
+## Render the "Equipped" block at the top of the bag. Shows the current
+## weapon + every armor slot the player has filled, with icon + name.
+## Silently renders nothing if the player has nothing equipped.
+func _build_equipped_section(vb: VBoxContainer) -> void:
+	if player == null:
+		return
+	var has_any: bool = false
+	if player.equipped_weapon_id != "":
+		has_any = true
+	if not has_any and player.equipped_armor is Dictionary and not player.equipped_armor.is_empty():
+		has_any = true
+	if not has_any:
+		return
+
+	var header := Label.new()
+	header.text = "Equipped"
+	header.add_theme_font_size_override("font_size", 32)
+	header.modulate = Color(0.85, 0.85, 0.7)
+	vb.add_child(header)
+
+	# Weapon row
+	if player.equipped_weapon_id != "":
+		var wid: String = player.equipped_weapon_id
+		var wname: String = WeaponRegistry.display_name_for(wid)
+		if player.equipped_weapon_cursed:
+			wname += "  (cursed)"
+		_append_equipped_row(vb, "weapon", wname, TileRenderer.item(wid))
+
+	# Armor rows — stable slot order.
+	var armor_slots: Array = ["chest", "legs", "helm", "gloves", "boots"]
+	for slot in armor_slots:
+		if not player.equipped_armor.has(slot):
+			continue
+		var a: Dictionary = player.equipped_armor[slot]
+		var aid: String = String(a.get("id", ""))
+		var aname: String = String(a.get("name", aid))
+		if bool(a.get("cursed", false)):
+			aname += "  (cursed)"
+		_append_equipped_row(vb, slot, aname, TileRenderer.item(aid))
+
+	var sep := HSeparator.new()
+	vb.add_child(sep)
+
+
+func _append_equipped_row(vb: VBoxContainer, slot: String, display: String,
+		tex: Texture2D) -> void:
+	var row := HBoxContainer.new()
+	row.custom_minimum_size = Vector2(0, 56)
+	row.add_theme_constant_override("separation", 8)
+	if tex != null:
+		var icon := TextureRect.new()
+		icon.texture = tex
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.custom_minimum_size = Vector2(40, 40)
+		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(icon)
+	var slot_label := Label.new()
+	slot_label.text = slot.capitalize() + ":"
+	slot_label.add_theme_font_size_override("font_size", 28)
+	slot_label.custom_minimum_size = Vector2(160, 0)
+	slot_label.modulate = Color(0.7, 0.7, 0.7)
+	row.add_child(slot_label)
+	var name_label := Label.new()
+	name_label.text = display
+	name_label.add_theme_font_size_override("font_size", 32)
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(name_label)
+	vb.add_child(row)
 
 
 ## Build a multi-line tooltip string comparing this item to what the
