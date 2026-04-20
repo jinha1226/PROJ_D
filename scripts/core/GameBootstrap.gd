@@ -1630,6 +1630,9 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 	var fail: float = SpellRegistry.failure_chance(spell_id, eff_school2, sc_lv)
 	if randf() < fail:
 		CombatLog.add("Spell fizzles! (%d%% fail)" % int(fail * 100))
+		var fx_layer_f: Node2D = $EntityLayer
+		var spell_color_f: Color = info.get("color", Color.WHITE)
+		SpellFX.cast_fizzle(fx_layer_f, player.position, school, spell_color_f)
 		TurnManager.end_player_turn()
 		return
 	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
@@ -1793,6 +1796,9 @@ func _execute_cast(spell_id: String) -> Dictionary:
 	var eff_school: int = school_lv + staff_bonus
 	var fail: float = SpellRegistry.failure_chance(spell_id, eff_school, sc_lv)
 	if randf() < fail:
+		var fx_layer_f: Node2D = $EntityLayer
+		var spell_color_f: Color = info.get("color", Color.WHITE)
+		SpellFX.cast_fizzle(fx_layer_f, player.position, school, spell_color_f)
 		return {"success": false, "message": "Spell fizzles! (%d%% fail)" % int(fail * 100)}
 	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
 	var power: int = eff_school + sc_lv / 2 + int_bonus

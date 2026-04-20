@@ -640,6 +640,36 @@ static func cast_status(layer: Node2D, target_px: Vector2, color: Color,
 		float_text(layer, target_px + Vector2(0, -20), label, c)
 
 
+## Spell fizzle at the caster. Grey smoke puff + "FIZZLE" label in school
+## colour (faded). Signals a miscast without ambiguous silence.
+static func cast_fizzle(layer: Node2D, caster_px: Vector2,
+		school: String = "", color: Color = Color(0.7, 0.7, 0.75)) -> void:
+	var c: Color = _resolve_color(school, color)
+	var faded: Color = Color(c.r, c.g, c.b, 0.55)
+	# Downward, sputtering puff — not the triumphant explosion of a real cast.
+	for i in 4:
+		var angle: float = randf_range(-TAU * 0.15, TAU * 0.15) - TAU * 0.25
+		var p: Node2D = Node2D.new()
+		p.position = caster_px
+		p.z_index = 47
+		layer.add_child(p)
+		var r: float = 7.0 + float(i) * 1.2
+		p.draw.connect(func():
+			p.draw_circle(Vector2.ZERO, r,
+					Color(faded.r, faded.g, faded.b, 0.35)))
+		p.queue_redraw()
+		var end_px: Vector2 = caster_px + Vector2(
+				cos(angle) * 14.0, sin(angle) * 20.0 - 8.0)
+		var tw: Tween = p.create_tween()
+		tw.parallel().tween_property(p, "position", end_px, 0.55) \
+				.set_ease(Tween.EASE_OUT)
+		tw.parallel().tween_property(p, "modulate:a", 0.0, 0.55)
+		tw.parallel().tween_property(p, "scale", Vector2(1.6, 1.6), 0.55)
+		tw.tween_callback(p.queue_free)
+	burst_ring(layer, caster_px, 18.0, Color(1, 1, 1, 0.6), 0.0, 2.0)
+	float_text(layer, caster_px + Vector2(0, -24), "FIZZLE", faded)
+
+
 ## Teleport / blink visual — bright swirl at origin and destination.
 static func cast_teleport(layer: Node2D, old_px: Vector2, new_px: Vector2,
 		color: Color = Color(0.75, 0.5, 1.0)) -> void:
