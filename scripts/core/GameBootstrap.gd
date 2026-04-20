@@ -300,14 +300,23 @@ func _setup_combat_log(ui_root: Node) -> void:
 	panel.offset_top = 0
 	panel.offset_bottom = 0
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Inner margin so text doesn't hug the screen edges — the left side
+	# was getting clipped against the viewport.
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 24)
+	margin.add_theme_constant_override("margin_right", 24)
+	margin.add_theme_constant_override("margin_top", 8)
+	margin.add_theme_constant_override("margin_bottom", 8)
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(margin)
 	var label := Label.new()
 	label.name = "LogLabel"
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_font_size_override("font_size", 26)
+	label.add_theme_font_size_override("font_size", 34)
 	label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.add_child(label)
+	margin.add_child(label)
 	ui_root.add_child(panel)
 	_combat_log_label = label
 	CombatLog.message_added.connect(func(_m: String) -> void:
@@ -1235,6 +1244,10 @@ func _on_identify_one_requested() -> void:
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null or player == null:
 		return
+	# Close the bag / any other open dialog first so the identify picker
+	# surfaces on top. Without this it stacks behind the bag and becomes
+	# untouchable.
+	_close_all_dialogs()
 	var unidentified: Array = []
 	for it in player.get_items():
 		var iid: String = String(it.get("id", ""))
@@ -1746,7 +1759,10 @@ func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
 	var s_sc: int = skill_system.get_level(player, "spellcasting") if skill_system and player else 0
 	var fail_p: int = int(SpellRegistry.failure_chance(spell_id, s_lv, s_sc) * 100)
 	var fail_txt: String = " (%d%%)" % fail_p if fail_p > 0 else ""
-	name_btn.text = "%s  [%d MP]%s" % [spell_name, int(info.get("mp", 0)), fail_txt]
+	var range_txt: String = ""
+	if int(info.get("range", 0)) > 0:
+		range_txt = "  range %d" % int(info.get("range", 0))
+	name_btn.text = "%s  [%d MP]%s%s" % [spell_name, int(info.get("mp", 0)), fail_txt, range_txt]
 	name_btn.add_theme_font_size_override("font_size", 40)
 	name_btn.add_theme_color_override("font_color", info.get("color", Color.WHITE))
 	name_btn.pressed.connect(_show_spell_info.bind(spell_id))
@@ -1832,6 +1848,20 @@ func _on_target_selected(pos: Vector2i) -> void:
 			break
 	if target_monster == null:
 		CombatLog.add("Targeting cancelled.")
+		_targeting_spell = ""
+		return
+	# Refuse if target isn't visible — wall-blocked (no LOS) or outside
+	# FOV. Refund nothing; the spell didn't actually fire.
+	if dmap != null and not dmap.is_tile_visible(target_monster.grid_pos):
+		CombatLog.add("Your line of sight is blocked.")
+		_targeting_spell = ""
+		return
+	# Range check: spell's max range from the registry.
+	var info_for_range: Dictionary = SpellRegistry.get_spell(_targeting_spell)
+	var max_range: int = int(info_for_range.get("range", 99))
+	var d: int = max(abs(pos.x - player.grid_pos.x), abs(pos.y - player.grid_pos.y))
+	if d > max_range:
+		CombatLog.add("Target is out of range (%d > %d)." % [d, max_range])
 		_targeting_spell = ""
 		return
 	var spell_id: String = _targeting_spell
@@ -2308,36 +2338,42 @@ func _on_bag_pressed() -> void:
 		empty.add_theme_font_size_override("font_size", 40)
 		rows.add_child(empty)
 	else:
-		for entry_i in range(visible.size()):
-			var entry: Dictionary = visible[entry_i]
-			var i: int = int(entry["orig"])
-			var it: Dictionary = entry["item"]
+		# Group identical items together so the list shows "Potion x3"
+		# instead of three rows. Key off (id, cursed) so a cursed and a
+		# clean copy stay separate. Preserves first-seen order.
+		var groups: Array = []                # ordered list of group dicts
+		var group_idx: Dictionary = {}        # key → index into `groups`
+		for entry_v in visible:
+			var entry: Dictionary = entry_v
+			var it_g: Dictionary = entry["item"]
+			var key: String = "%s|%d" % [
+				String(it_g.get("id", "")),
+				1 if bool(it_g.get("cursed", false)) else 0,
+			]
+			if not group_idx.has(key):
+				group_idx[key] = groups.size()
+				groups.append({"first_orig": int(entry["orig"]),
+						"item": it_g, "count": 1})
+			else:
+				groups[group_idx[key]]["count"] = int(groups[group_idx[key]]["count"]) + 1
+		for g_v in groups:
+			var g: Dictionary = g_v
+			var i: int = int(g["first_orig"])
+			var it: Dictionary = g["item"]
+			var count: int = int(g["count"])
 			var kind: String = String(it.get("kind", ""))
 			var row := HBoxContainer.new()
 			row.custom_minimum_size = Vector2(0, 80)
 			row.add_theme_constant_override("separation", 8)
 			var iid_row: String = String(it.get("id", ""))
-			# Thumbnail: for potions/scrolls show the colour-only base tile
-			# until identified (mirrors how DCSS hides unidentified types).
-			# Other kinds always use the identified icon.
-			var tex: Texture2D = null
-			if (kind == "potion" or kind == "scroll") \
-					and GameManager != null and not GameManager.is_identified(iid_row):
-				tex = TileRenderer.consumable_base(iid_row, kind)
-			if tex == null:
-				tex = TileRenderer.item(iid_row)
-			if tex != null:
-				var icon := TextureRect.new()
-				icon.texture = tex
-				icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-				icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-				icon.custom_minimum_size = Vector2(64, 64)
-				icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-				icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-				row.add_child(icon)
+			var icon_node: Control = _build_bag_item_thumbnail(iid_row, kind)
+			if icon_node != null:
+				row.add_child(icon_node)
 			var info_btn := Button.new()
 			var disp_name: String = GameManager.display_name_for_item(
 					iid_row, String(it.get("name", "?")), kind)
+			if count > 1:
+				disp_name = "%s  ×%d" % [disp_name, count]
 			info_btn.text = disp_name
 			info_btn.flat = true
 			info_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -2617,6 +2653,52 @@ func _build_item_tooltip(it: Dictionary) -> String:
 			return "%s\nMiscellaneous junk." % name_s
 
 
+## Compose a bag thumbnail. For potions/scrolls the base-colour tile is
+## the bottom layer; the effect icon stacks on top once identified. For
+## everything else the identified item texture is shown directly.
+## Returns null when no texture is available.
+func _build_bag_item_thumbnail(iid: String, kind: String) -> Control:
+	var icon_size: Vector2 = Vector2(64, 64)
+	var is_consumable: bool = (kind == "potion" or kind == "scroll")
+	if is_consumable:
+		var stack := Control.new()
+		stack.custom_minimum_size = icon_size
+		stack.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var base_tex: Texture2D = TileRenderer.consumable_base(iid, kind)
+		if base_tex != null:
+			var base_rect := TextureRect.new()
+			base_rect.texture = base_tex
+			base_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			base_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+			base_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+			base_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			base_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			stack.add_child(base_rect)
+		if GameManager != null and GameManager.is_identified(iid):
+			var overlay: Texture2D = TileRenderer.item(iid)
+			if overlay != null:
+				var over_rect := TextureRect.new()
+				over_rect.texture = overlay
+				over_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+				over_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+				over_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+				over_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+				over_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				stack.add_child(over_rect)
+		return stack
+	var tex: Texture2D = TileRenderer.item(iid)
+	if tex == null:
+		return null
+	var icon := TextureRect.new()
+	icon.texture = tex
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.custom_minimum_size = icon_size
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return icon
+
+
 func _on_bag_info(it: Dictionary) -> void:
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null:
@@ -2626,15 +2708,26 @@ func _on_bag_info(it: Dictionary) -> void:
 	dlg.exclusive = false
 	dlg.title = String(it.get("name", "Item"))
 	dlg.ok_button_text = "Close"
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 12)
+	dlg.add_child(vb)
 	var lab := Label.new()
 	lab.text = _build_item_tooltip(it)
-	lab.add_theme_font_size_override("font_size", 40)
+	lab.add_theme_font_size_override("font_size", 48)
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	dlg.add_child(lab)
+	vb.add_child(lab)
+	# Explicit close button — AcceptDialog's OK footer can be hidden
+	# behind viewport padding on tall devices.
+	var close_btn := Button.new()
+	close_btn.text = "Close"
+	close_btn.add_theme_font_size_override("font_size", 44)
+	close_btn.custom_minimum_size = Vector2(0, 96)
+	close_btn.pressed.connect(dlg.queue_free)
+	vb.add_child(close_btn)
 	popup_mgr.add_child(dlg)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(800, 700))
+	dlg.popup_centered(Vector2i(900, 1100))
 
 
 func _on_bag_use(idx: int, dlg: AcceptDialog) -> void:
@@ -2757,6 +2850,7 @@ func _on_status_pressed() -> void:
 	_status_build_combat(vb)
 	_status_build_equipment(vb)
 	_status_build_rings(vb)
+	_status_build_resistances(vb)
 	_status_build_trait(vb)
 
 	# Essence slots retained — each row handles its own cast/swap buttons.
@@ -3120,6 +3214,100 @@ func _ring_effect_summary(ring: Dictionary) -> String:
 
 
 ## Racial trait description block (only drawn when the player's race has one).
+## Elemental resistance table — derived from the active racial trait and
+## equipped gear. DCSS convention: each pip is one "level" of resistance.
+## We don't yet consume these during damage resolution; the panel just
+## surfaces them so the player sees what their build has.
+func _status_resistances() -> Dictionary:
+	var r: Dictionary = {
+		"fire": 0, "cold": 0, "poison": 0, "negative": 0,
+		"electric": 0, "magic": 0,
+	}
+	var trait_id: String = ""
+	if player != null and player.race_res != null:
+		trait_id = String(player.race_res.racial_trait)
+	match trait_id:
+		"djinni_flight":      r["fire"] += 1; r["cold"] -= 1
+		"vampire_bloodfeast": r["cold"] += 1; r["negative"] += 1
+		"mummy_undead":       r["cold"] += 1; r["negative"] += 1; r["poison"] += 1; r["fire"] -= 1
+		"ghoul_claws":        r["cold"] += 1; r["negative"] += 2; r["poison"] += 1
+		"gargoyle_stone":     r["poison"] += 1; r["negative"] += 1; r["electric"] += 1
+		"naga_poison_spit":   r["poison"] += 2
+		"formicid_stasis":    r["magic"] += 1
+		"deep_dwarf_dr":      r["negative"] += 1
+		"trollregen":         r["poison"] += 1
+		"demonspawn_mutations": r["fire"] += 1
+		"tengu_flight":       r["electric"] += 1
+		"draconian_resist":   r["magic"] += 1
+		"vine_stalker_mpregen": r["negative"] += 1; r["poison"] += 1
+	# Ring-sourced contributions (current ring effects: fire_apt → fire+,
+	# cold_apt → cold+, not true resistances but readable signal).
+	if player != null and player.equipped_rings is Array:
+		for ring in player.equipped_rings:
+			if typeof(ring) != TYPE_DICTIONARY:
+				continue
+			if int(ring.get("fire_apt", 0)) > 0:
+				r["fire"] += 1
+			if int(ring.get("cold_apt", 0)) > 0:
+				r["cold"] += 1
+	return r
+
+
+func _status_build_resistances(vb: VBoxContainer) -> void:
+	var r: Dictionary = _status_resistances()
+	vb.add_child(_status_section_header("Resistances"))
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 12)
+	h.add_child(_status_resist_card("rF",  r["fire"],     Color(1.0, 0.50, 0.30)))
+	h.add_child(_status_resist_card("rC",  r["cold"],     Color(0.50, 0.85, 1.0)))
+	h.add_child(_status_resist_card("rP",  r["poison"],   Color(0.45, 0.95, 0.45)))
+	h.add_child(_status_resist_card("rN",  r["negative"], Color(0.65, 0.40, 0.90)))
+	h.add_child(_status_resist_card("rE",  r["electric"], Color(1.0, 0.95, 0.35)))
+	h.add_child(_status_resist_card("MR",  r["magic"],    Color(0.90, 0.50, 0.90)))
+	vb.add_child(h)
+
+
+## Compact "rF +1" / "rC --" card.
+func _status_resist_card(label: String, value: int, tint: Color) -> Control:
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(tint.r * 0.12, tint.g * 0.12, tint.b * 0.12, 0.8)
+	sb.border_color = tint if value != 0 else Color(0.30, 0.30, 0.35)
+	sb.border_width_left = 2
+	sb.border_width_top = 2
+	sb.border_width_right = 2
+	sb.border_width_bottom = 2
+	sb.corner_radius_top_left = 6
+	sb.corner_radius_top_right = 6
+	sb.corner_radius_bottom_left = 6
+	sb.corner_radius_bottom_right = 6
+	sb.content_margin_left = 10
+	sb.content_margin_right = 10
+	sb.content_margin_top = 8
+	sb.content_margin_bottom = 8
+	panel.add_theme_stylebox_override("panel", sb)
+	var col := VBoxContainer.new()
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	panel.add_child(col)
+	var name_lbl := Label.new()
+	name_lbl.text = label
+	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.add_theme_font_size_override("font_size", 30)
+	name_lbl.modulate = tint
+	col.add_child(name_lbl)
+	var val_lbl := Label.new()
+	if value == 0:
+		val_lbl.text = "--"
+		val_lbl.modulate = Color(0.55, 0.55, 0.60)
+	else:
+		val_lbl.text = "+" + "+".repeat(max(1, value)) if value > 0 else "-" + "-".repeat(max(1, -value))
+	val_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	val_lbl.add_theme_font_size_override("font_size", 36)
+	col.add_child(val_lbl)
+	return panel
+
+
 func _status_build_trait(vb: VBoxContainer) -> void:
 	var trait_id: String = ""
 	if player.race_res != null:

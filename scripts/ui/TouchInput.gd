@@ -317,11 +317,13 @@ func _continue_auto_explore() -> void:
 	# Find next unexplored target.
 	var target: Vector2i = _farthest_floor_from(player.grid_pos)
 	if target == player.grid_pos:
-		# Fully explored — stop.
+		# Every reachable tile is already explored — nothing left to see.
+		CombatLog.add("Dungeon fully explored.")
 		_cancel_auto_move()
 		return
 	var path: Array[Vector2i] = Pathfinding.find_path(generator, player.grid_pos, target)
 	if path.is_empty():
+		CombatLog.add("Dungeon fully explored.")
 		_cancel_auto_move()
 		return
 	_auto_move_path = path
