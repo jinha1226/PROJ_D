@@ -56,8 +56,12 @@ func _ensure_meta() -> MetaProgression:
 		return meta as MetaProgression
 	var m := MetaProgression.new()
 	m.name = "MetaProgression"
-	get_tree().root.add_child(m)
-	m.load_from_disk()
+	# Godot 4 forbids add_child to root during its own _ready / setup phase
+	# (Node::blocked > 0). Use call_deferred so the add lands on the next
+	# idle frame after the current setup tree is done. load_from_disk is
+	# also deferred so the node exists in-tree when it runs.
+	get_tree().root.add_child.call_deferred(m)
+	m.call_deferred("load_from_disk")
 	return m
 
 
