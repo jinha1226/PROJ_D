@@ -17,6 +17,11 @@ var is_alive: bool = true
 var tile_size: int = 32
 # Hex effect: remaining turns where this monster skips its action.
 var slowed_turns: int = 0
+# DCSS BEH_SLEEP state. Sleeping monsters skip their turn until woken by
+# LOS of a hostile, damage, or adjacent combat noise. Set true at spawn for
+# almost every non-boss monster (dungeon.cc:4252); MonsterAI.act() is
+# responsible for the wake check and state transition.
+var is_sleeping: bool = false
 
 var _sprite: CharacterSprite = null
 var _has_preset: bool = false
@@ -41,6 +46,10 @@ func setup(gen: DungeonGenerator, pos: Vector2i, mdata: MonsterData) -> void:
 	hp = _dcss_roll_hp(mdata.hp_10x) if mdata.hp_10x > 10 else mdata.hp
 	ac = mdata.ac
 	dex = mdata.dex
+	# DCSS dungeon.cc:4252 — regular floor monsters start BEH_SLEEP; bosses
+	# and a small chance-to-be-awake get AWAKE. Waking rules are handled by
+	# MonsterAI on each turn.
+	is_sleeping = not mdata.is_boss and randi() % 8 != 0
 	sight_range = mdata.sight_range if mdata.sight_range > 0 else 6
 	grid_pos = pos
 	position = Vector2(pos.x * tile_size + tile_size / 2.0, pos.y * tile_size + tile_size / 2.0)
@@ -100,6 +109,10 @@ func _load_sprite() -> void:
 func take_damage(amount: int) -> void:
 	if not is_alive:
 		return
+	# DCSS: damage always wakes a sleeping monster (mon-behv.cc:1172). Route
+	# through MonsterAI.wake so the ring of adjacent sleepers wakes too.
+	if is_sleeping:
+		MonsterAI.wake(self)
 	hp -= amount
 	if _sprite and hp > 0:
 		_sprite.play_anim("hurt", false)
@@ -172,6 +185,8 @@ func move_to_grid(pos: Vector2i) -> void:
 
 func _draw() -> void:
 	if _has_preset:
+		if is_sleeping:
+			_draw_sleep_indicator(Vector2(32, 32))
 		return
 	# ASCII mode: draw the DCSS console glyph.
 	if TileRenderer.is_ascii() and data != null:
@@ -179,6 +194,8 @@ func _draw() -> void:
 		TileRenderer.draw_ascii_glyph(self, Vector2.ZERO, 32,
 				String(entry[0]), entry[1])
 		_draw_hp_bar(Vector2(32, 32))
+		if is_sleeping:
+			_draw_sleep_indicator(Vector2(32, 32))
 		return
 	# DCSS mode: render the monster's tile texture centred on the entity.
 	if TileRenderer.is_dcss() and data != null:
@@ -187,6 +204,8 @@ func _draw() -> void:
 			var sz: Vector2 = tex.get_size()
 			draw_texture(tex, -sz * 0.5)
 			_draw_hp_bar(sz)
+			if is_sleeping:
+				_draw_sleep_indicator(sz)
 			return
 	# LPC fallback / generic colored disc.
 	var color: Color
@@ -199,6 +218,23 @@ func _draw() -> void:
 		color = Color(0.85, 0.15, 0.15)
 	draw_circle(Vector2.ZERO, 10.0, color)
 	draw_arc(Vector2.ZERO, 10.0, 0.0, TAU, 16, Color.BLACK, 1.0)
+
+
+## Small "Z" over a sleeping monster's head so the player can tell at a
+## glance which enemies haven't spotted them yet. Doesn't render a font —
+## just a stylised Z traced with draw_line, which works in every render
+## mode without extra assets.
+func _draw_sleep_indicator(sprite_sz: Vector2) -> void:
+	var top_y: float = -sprite_sz.y * 0.5 - 6.0
+	var x0: float = sprite_sz.x * 0.2
+	var x1: float = sprite_sz.x * 0.45
+	var y_hi: float = top_y
+	var y_lo: float = top_y + 6.0
+	var color := Color(0.6, 0.85, 1.0, 0.9)
+	var w: float = 1.5
+	draw_line(Vector2(x0, y_hi), Vector2(x1, y_hi), color, w)
+	draw_line(Vector2(x1, y_hi), Vector2(x0, y_lo), color, w)
+	draw_line(Vector2(x0, y_lo), Vector2(x1, y_lo), color, w)
 
 
 func _draw_hp_bar(sprite_sz: Vector2) -> void:

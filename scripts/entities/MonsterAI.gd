@@ -5,6 +5,14 @@ class_name MonsterAI
 static func act(m: Monster) -> void:
 	if not m.is_alive:
 		return
+	# DCSS BEH_SLEEP handling. A sleeping monster first checks whether the
+	# player (or a companion) is in its sight line; if so it wakes and
+	# skips its first turn (DCSS charges a full-turn wake-up latency).
+	# Otherwise it just idles — sleeping monsters do not wander.
+	if m.is_sleeping:
+		if _should_wake(m):
+			wake(m)
+		return
 	# Slow hex: skip this turn and count down.
 	if m.slowed_turns > 0:
 		m.slowed_turns -= 1
@@ -59,6 +67,69 @@ static func act(m: Monster) -> void:
 
 static func _cheb(a: Vector2i, b: Vector2i) -> int:
 	return max(abs(a.x - b.x), abs(a.y - b.y))
+
+
+## Wake a sleeping monster and propagate the alarm to adjacent sleepers.
+## Called from MonsterAI.act() on LOS, and from Monster.take_damage() on
+## hit — a monster woken by damage skips no turn (it reacts immediately).
+static func wake(m: Monster) -> void:
+	if m == null or not m.is_sleeping:
+		return
+	m.is_sleeping = false
+	m.queue_redraw()
+	# Alarm adjacent sleepers (DCSS: noise propagates, we approximate with a
+	# 1-tile chain so a square of sleeping kobolds wakes together when one
+	# spots the player). Only one ring — avoids map-wide instant wake chains.
+	var tree: SceneTree = m.get_tree()
+	if tree == null:
+		return
+	for n in tree.get_nodes_in_group("monsters"):
+		if n == m or not (n is Monster) or not n.is_alive:
+			continue
+		if not n.is_sleeping:
+			continue
+		if _cheb(n.grid_pos, m.grid_pos) <= 1:
+			n.is_sleeping = false
+			n.queue_redraw()
+
+
+static func _should_wake(m: Monster) -> bool:
+	# If the player's FOV includes this monster's tile, sight is bidirectional
+	# in our game — the monster sees the player too.
+	if m.generator == null:
+		return false
+	var tree: SceneTree = m.get_tree()
+	if tree == null:
+		return false
+	var player: Node = tree.get_first_node_in_group("player")
+	if player != null and "grid_pos" in player and "is_alive" in player and player.is_alive:
+		if _cheb(m.grid_pos, player.grid_pos) <= m.sight_range \
+				and _monster_has_fov_to(m, player.grid_pos):
+			return true
+	# Companions are also hostile targets and break stealth.
+	for c in tree.get_nodes_in_group("companions"):
+		if c is Companion and c.is_alive and "grid_pos" in c:
+			if _cheb(m.grid_pos, c.grid_pos) <= m.sight_range \
+					and _monster_has_fov_to(m, c.grid_pos):
+				return true
+	return false
+
+
+## Cheap LOS approximation: the player-side FOV already knows which tiles
+## are visible from the player's position. Under symmetric LOS, if the
+## player can see this monster's tile, the monster can see the player —
+## so we just ask dmap whether m.grid_pos is currently visible.
+static func _monster_has_fov_to(m: Monster, _target: Vector2i) -> bool:
+	var tree: SceneTree = m.get_tree()
+	if tree == null:
+		return false
+	var dmap: Node = tree.get_first_node_in_group("dmap")
+	if dmap == null:
+		# Fallback if the scene hasn't registered a DungeonMap yet.
+		return true
+	if dmap.has_method("is_tile_visible"):
+		return dmap.is_tile_visible(m.grid_pos)
+	return true
 
 
 ## Pick the nearest hostile — player or any companion. Monsters treat both

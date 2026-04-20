@@ -20,6 +20,10 @@ func render(gen: DungeonGenerator) -> void:
 	explored.fill(0)
 	_visible_tiles.clear()
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	# Group membership lets sibling systems (MonsterAI wake check) fetch the
+	# FOV data without threading a reference through every call site.
+	if not is_in_group("dmap"):
+		add_to_group("dmap")
 	queue_redraw()
 
 
