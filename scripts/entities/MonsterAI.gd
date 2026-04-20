@@ -328,8 +328,11 @@ static func wake(m: Monster) -> void:
 
 
 static func _should_wake(m: Monster) -> bool:
-	# If the player's FOV includes this monster's tile, sight is bidirectional
-	# in our game — the monster sees the player too.
+	# DCSS shout.cc::check_awaken port. For a sleeping monster the
+	# wake check is: (a) monster can see player, (b) not berserk / not
+	# MUT_NO_STEALTH, (c) roll x_chance_in_y(monster_perception, stealth).
+	# Higher stealth literally hides you; lower perception on dumb
+	# beasts makes them sleep through near-adjacent casts.
 	if m.generator == null:
 		return false
 	var tree: SceneTree = m.get_tree()
@@ -337,19 +340,26 @@ static func _should_wake(m: Monster) -> bool:
 		return false
 	var player: Node = tree.get_first_node_in_group("player")
 	if player != null and "grid_pos" in player and "is_alive" in player and player.is_alive:
-		# Invisibility (potion, spell) hides the player from sight-based wake
-		# checks. DCSS also allows monsters to see invisible via special sight,
-		# but until we model resists fall back to blanket hiding.
 		var invis: bool = player.has_method("has_meta") and player.has_meta("_invisible_turns")
-		# DCSS stealth: higher skill lets you approach closer before the
-		# monster notices. We shorten the detection range by skill/4, so
-		# stealth 8 gives a 2-tile "sneak" buffer and stealth 20 gives 5.
-		var stealth_lv: int = _player_stealth(player)
-		var detect_range: int = max(1, m.sight_range - stealth_lv / 4)
-		if not invis \
-				and _cheb(m.grid_pos, player.grid_pos) <= detect_range \
-				and _monster_has_fov_to(m, player.grid_pos):
+		if invis:
+			return false
+		# Monster must actually see the player. Bidirectional LOS under
+		# our FOV engine: if the player can see the monster's cell, the
+		# monster can see the player's.
+		if _cheb(m.grid_pos, player.grid_pos) > m.sight_range:
+			return false
+		if not _monster_has_fov_to(m, player.grid_pos):
+			return false
+		# DCSS perception: `(5 + HD*3/2) * (intel_factor + awake_bonus) / 20`,
+		# floored at 12. We treat the sleeping case (awake_bonus = 0).
+		var perc: int = _monster_perception(m, true)
+		var stealth: int = _player_stealth_scaled(player)
+		# `x_chance_in_y(perc, stealth)` = perc/stealth probability.
+		if stealth <= 0:
 			return true
+		if randi() % stealth < perc:
+			return true
+		return false
 	# Companions are also hostile targets and break stealth.
 	for c in tree.get_nodes_in_group("companions"):
 		if c is Companion and c.is_alive and "grid_pos" in c:
@@ -359,9 +369,8 @@ static func _should_wake(m: Monster) -> bool:
 	return false
 
 
-## Read the player's stealth skill for the wake-range reduction, without
-## coupling MonsterAI directly to SkillSystem. Returns 0 if the dict is
-## missing (pre-init, or unusual test player).
+## Read the player's stealth skill. Kept as-is for legacy callers
+## (e.g. caster-noise broadcast scaling).
 static func _player_stealth(player: Node) -> int:
 	if player == null or not ("skill_state" in player):
 		return 0
@@ -369,6 +378,53 @@ static func _player_stealth(player: Node) -> int:
 		return 0
 	var st: Dictionary = player.skill_state.get("stealth", {})
 	return int(st.get("level", 0))
+
+
+## DCSS player_stealth (player.cc:3329), scaled integer form suitable
+## for x_chance_in_y. Returns `dex*3 + stealth_skill*15 - armour_pen`.
+## Form/background mutations and gear egos are TODO.
+static func _player_stealth_scaled(player: Node) -> int:
+	if player == null:
+		return 0
+	var dex: int = 10
+	if "stats" in player and player.stats != null:
+		dex = int(player.stats.DEX)
+	var sk: int = _player_stealth(player)
+	var stealth: int = dex * 3 + sk * 15
+	# Body armour stealth penalty: DCSS uses `player_armour_stealth_penalty`,
+	# which reads body_armour PARM_EVASION. Approximate with our stored
+	# ev_penalty on the chest slot (encumbrance tier).
+	if "equipped_armor" in player and typeof(player.equipped_armor) == TYPE_DICTIONARY:
+		var body: Dictionary = player.equipped_armor.get("chest", {})
+		var evp_raw: int = absi(int(body.get("ev_penalty", 0))) / 10
+		stealth -= evp_raw * evp_raw * 2 / 3
+	# Confusion shreds stealth (DCSS divides it by 3).
+	if player.has_method("has_meta") and player.has_meta("_confused"):
+		stealth /= 3
+	return maxi(0, stealth)
+
+
+## DCSS monster_perception (shout.cc:252).
+##   intel_factor = [15 (animal), 20 (normal), 30 (human)]
+##   perc_mult = intel_factor + (awake ? 15 : 0)
+##   perc = (5 + HD * 3/2) * perc_mult / 20
+##   perc = max(12, perc)
+static func _monster_perception(m: Monster, sleeping: bool) -> int:
+	var hd: int = 1
+	var intel: String = "normal"
+	if m.data != null:
+		if "hd" in m.data:
+			hd = int(m.data.hd)
+		if "intel" in m.data:
+			intel = String(m.data.intel)
+	var intel_factor: int
+	match intel:
+		"animal": intel_factor = 15
+		"human":  intel_factor = 30
+		_:        intel_factor = 20
+	var perc_mult: int = intel_factor + (0 if sleeping else 15)
+	var perc: int = (5 + hd * 3 / 2) * perc_mult / 20
+	return maxi(12, perc)
 
 
 ## Cheap LOS approximation: the player-side FOV already knows which tiles
