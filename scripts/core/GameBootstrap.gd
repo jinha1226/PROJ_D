@@ -2241,6 +2241,12 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 		var tags: Array = SpellRegistry.get_schools(spell_id).duplicate()
 		tags.append("spellcasting")
 		skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, tags)
+	# Spellcasting noise: loudness scales with spell level (DCSS
+	# spell-level * 2 baseline). Stealth reduces the effective radius so
+	# quiet hexes don't broadcast the caster's position.
+	var spell_lv: int = int(info.get("difficulty", 1))
+	var stealth_lv: int = skill_system.get_level(player, "stealth") if skill_system else 0
+	MonsterAI.broadcast_noise(get_tree(), player.grid_pos, spell_lv * 2 + 4, stealth_lv)
 	TurnManager.end_player_turn()
 
 

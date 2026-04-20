@@ -1818,6 +1818,10 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 	var skill_sys: Node = get_tree().root.get_node_or_null("Game/SkillSystem")
 	CombatSystem.melee_attack(self, monster, skill_sys)
 	attacked.emit(monster)
+	# Combat is loud — DCSS broadcasts noise roughly proportional to the
+	# attacker's weapon/size. We key off stealth skill so high-stealth
+	# rogues can pick off isolated targets without waking the whole room.
+	MonsterAI.broadcast_noise(get_tree(), grid_pos, 6, _skill_level("stealth"))
 	TurnManager.end_player_turn()
 	return monster
 

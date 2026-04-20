@@ -259,6 +259,26 @@ static func _apply_mon_spell(m: Monster, target: Node, spell_id: String) -> bool
 			return false
 
 
+## Wake every sleeping monster within `radius` of `origin`. Used by loud
+## actions (melee from a caster, successful spellcast, noisy scrolls).
+## DCSS stealth skill on the player trims the effective radius so
+## careful casters don't broadcast their position across the floor.
+static func broadcast_noise(tree: SceneTree, origin: Vector2i, loudness: int,
+		stealth: int = 0) -> void:
+	if tree == null:
+		return
+	var eff: int = max(0, loudness - stealth / 3)
+	if eff <= 0:
+		return
+	for m in tree.get_nodes_in_group("monsters"):
+		if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+			continue
+		if not m.is_sleeping:
+			continue
+		if _cheb(m.grid_pos, origin) <= eff:
+			wake(m)
+
+
 ## Wake a sleeping monster and propagate the alarm to adjacent sleepers.
 ## Called from MonsterAI.act() on LOS, and from Monster.take_damage() on
 ## hit — a monster woken by damage skips no turn (it reacts immediately).
@@ -297,8 +317,13 @@ static func _should_wake(m: Monster) -> bool:
 		# checks. DCSS also allows monsters to see invisible via special sight,
 		# but until we model resists fall back to blanket hiding.
 		var invis: bool = player.has_method("has_meta") and player.has_meta("_invisible_turns")
+		# DCSS stealth: higher skill lets you approach closer before the
+		# monster notices. We shorten the detection range by skill/4, so
+		# stealth 8 gives a 2-tile "sneak" buffer and stealth 20 gives 5.
+		var stealth_lv: int = _player_stealth(player)
+		var detect_range: int = max(1, m.sight_range - stealth_lv / 4)
 		if not invis \
-				and _cheb(m.grid_pos, player.grid_pos) <= m.sight_range \
+				and _cheb(m.grid_pos, player.grid_pos) <= detect_range \
 				and _monster_has_fov_to(m, player.grid_pos):
 			return true
 	# Companions are also hostile targets and break stealth.
@@ -308,6 +333,18 @@ static func _should_wake(m: Monster) -> bool:
 					and _monster_has_fov_to(m, c.grid_pos):
 				return true
 	return false
+
+
+## Read the player's stealth skill for the wake-range reduction, without
+## coupling MonsterAI directly to SkillSystem. Returns 0 if the dict is
+## missing (pre-init, or unusual test player).
+static func _player_stealth(player: Node) -> int:
+	if player == null or not ("skill_state" in player):
+		return 0
+	if typeof(player.skill_state) != TYPE_DICTIONARY:
+		return 0
+	var st: Dictionary = player.skill_state.get("stealth", {})
+	return int(st.get("level", 0))
 
 
 ## Cheap LOS approximation: the player-side FOV already knows which tiles
