@@ -974,9 +974,7 @@ func _place_random_floor_item(pos: Vector2i, depth: int, parent: Node) -> bool:
 				wand_info.get("color", Color(0.85, 0.85, 0.95)),
 				{"charges": charges})
 	else:
-		# 77% potion / scroll (depth-weighted), 20% spellbook, 3% talisman.
-		# Books draw from DCSS book-data.h; talismans from the 10 forms we
-		# modelled, so casters and shapeshifters both find variety.
+		# 74% potion / scroll, 20% book, 3% talisman, 3% misc evocable.
 		var cid: String
 		var roll: float = randf()
 		if roll < 0.20:
@@ -989,8 +987,24 @@ func _place_random_floor_item(pos: Vector2i, depth: int, parent: Node) -> bool:
 					func(k): return String(ConsumableRegistry.get_info(k).get("kind", "")) == "talisman")
 			cid = String(all_tali[randi() % all_tali.size()]) if not all_tali.is_empty() \
 					else _pick_by_depth("consumable", depth)
+		elif roll < 0.26:
+			var all_evoc: Array = ConsumableRegistry.all_ids().filter(
+					func(k): return String(ConsumableRegistry.get_info(k).get("kind", "")) == "evocable")
+			cid = String(all_evoc[randi() % all_evoc.size()]) if not all_evoc.is_empty() \
+					else _pick_by_depth("consumable", depth)
 		else:
 			cid = _pick_by_depth("consumable", depth)
+		# Evocables need `charges` rolled at spawn time.
+		var _pre_info: Dictionary = ConsumableRegistry.get_info(cid)
+		if String(_pre_info.get("kind", "")) == "evocable":
+			var cb: int = int(_pre_info.get("charges_base", 3))
+			var cr: int = int(_pre_info.get("charges_rand", 3))
+			var rolled_charges: int = max(1, cb + (randi() % max(cr, 1)))
+			var cinfo_e: Dictionary = _pre_info
+			fi.setup(pos, cid, String(cinfo_e.get("name", cid)), "evocable",
+					cinfo_e.get("color", Color(0.8, 0.8, 1.0)),
+					{"charges": rolled_charges})
+			return true
 		if cid.is_empty():
 			cid = "potion_curing"
 		var cinfo: Dictionary = ConsumableRegistry.get_info(cid)

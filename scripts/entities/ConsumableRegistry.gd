@@ -364,6 +364,64 @@ const DATA: Dictionary = {
 		"color": Color(0.55, 0.90, 0.55),
 		"desc": "A gelatinous bead. Evoke to liquefy into a jelly.",
 	},
+	# --- DCSS miscellaneous evocables ---
+	# Each has limited uses tracked via the "charges" field (set on spawn).
+	# Activation logic lives in Player._evoke_misc — damage bursts, summons,
+	# utility effects all go through SpellRegistry / the Companion spawner.
+	"horn_of_geryon": {
+		"name": "Horn of Geryon", "kind": "evocable",
+		"effect": "evoke_horn_geryon", "charges_base": 3, "charges_rand": 3,
+		"color": Color(0.45, 0.25, 0.55),
+		"desc": "A cursed horn. Summons 2-3 hell-beasts on blow.",
+	},
+	"box_of_beasts": {
+		"name": "Box of Beasts", "kind": "evocable",
+		"effect": "evoke_box_beasts", "charges_base": 5, "charges_rand": 5,
+		"color": Color(0.70, 0.60, 0.25),
+		"desc": "A rattling box. Opens to release a random ally beast.",
+	},
+	"phial_of_floods": {
+		"name": "Phial of Floods", "kind": "evocable",
+		"effect": "evoke_phial_floods", "charges_base": 4, "charges_rand": 4,
+		"color": Color(0.35, 0.55, 0.90),
+		"desc": "Summons a torrent of water that drowns enemies in LOS.",
+	},
+	"sack_of_spiders": {
+		"name": "Sack of Spiders", "kind": "evocable",
+		"effect": "evoke_sack_spiders", "charges_base": 5, "charges_rand": 5,
+		"color": Color(0.45, 0.20, 0.45),
+		"desc": "Tumbles out three spider allies.",
+	},
+	"phantom_mirror": {
+		"name": "Phantom Mirror", "kind": "evocable",
+		"effect": "evoke_phantom_mirror", "charges_base": 4, "charges_rand": 4,
+		"color": Color(0.75, 0.75, 0.85),
+		"desc": "Reflects a visible foe's phantom — fights alongside you briefly.",
+	},
+	"condenser_vane": {
+		"name": "Condenser Vane", "kind": "evocable",
+		"effect": "evoke_condenser_vane", "charges_base": 3, "charges_rand": 3,
+		"color": Color(0.70, 0.90, 1.00),
+		"desc": "Wraps your foes in a freezing cloud.",
+	},
+	"tin_of_tremorstones": {
+		"name": "Tin of Tremorstones", "kind": "evocable",
+		"effect": "evoke_tremorstones", "charges_base": 4, "charges_rand": 4,
+		"color": Color(0.60, 0.45, 0.30),
+		"desc": "Scatter-bomb of small earthquakes on a targeted area.",
+	},
+	"lightning_rod": {
+		"name": "Lightning Rod", "kind": "evocable",
+		"effect": "evoke_lightning_rod", "charges_base": 3, "charges_rand": 3,
+		"color": Color(1.00, 1.00, 0.50),
+		"desc": "Fire a beam of lightning — power builds on rapid reuse.",
+	},
+	"gell_gravitambourine": {
+		"name": "Gell's Gravitambourine", "kind": "evocable",
+		"effect": "evoke_gravitambourine", "charges_base": 3, "charges_rand": 3,
+		"color": Color(0.75, 0.25, 0.85),
+		"desc": "A gravity-bending percussion instrument — pulls foes in.",
+	},
 	# --- Spellbooks (learn_spells effect) ---
 	"book_conjurations": {
 		"name": "Book of Conjurations",

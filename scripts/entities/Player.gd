@@ -1159,6 +1159,13 @@ func use_item(index: int) -> void:
 			apply_form(form_id)
 		TurnManager.end_player_turn()
 		return
+	# Misc evocable (horn / box / phial / phantom mirror …). Charges
+	# attach to the item dict via `extra.charges` at floor-gen time;
+	# _evoke_misc decrements and runs the effect.
+	if String(it.get("kind", "")) == "evocable":
+		if _evoke_misc(index):
+			TurnManager.end_player_turn()
+		return
 	var info: Dictionary = ConsumableRegistry.get_info(item_id)
 	var consumed: bool = false
 	if info.is_empty():
@@ -1238,6 +1245,71 @@ func _evoke_wand(index: int) -> bool:
 	if GameManager != null:
 		GameManager.identify(wand_id)
 	return true
+
+
+## Evoke a misc item — same charges-decrement + destroy-on-0 pattern as
+## wands, but the effect is looked up on the ConsumableRegistry entry.
+## Most effects delegate to GameBootstrap helpers so the summon/AoE
+## plumbing stays in one place.
+func _evoke_misc(index: int) -> bool:
+	var it: Dictionary = items[index]
+	var info: Dictionary = ConsumableRegistry.get_info(String(it.get("id", "")))
+	if info.is_empty():
+		return false
+	var charges: int = int(it.get("charges", 0))
+	if charges <= 0:
+		CombatLog.add("The %s is depleted." % String(info.get("name", "item")))
+		return false
+	var effect: String = String(info.get("effect", ""))
+	var gb: Node = get_tree().root.get_node_or_null("Game")
+	if gb == null:
+		return false
+	match effect:
+		"evoke_horn_geryon":
+			for i in 3:
+				gb._summon_ally("hell_hound", 25, "")
+			CombatLog.add("The horn wails! Hell-hounds answer.")
+		"evoke_box_beasts":
+			var pool: Array = ["hound", "war_dog", "quokka", "polar_bear"]
+			gb._summon_ally(String(pool[randi() % pool.size()]), 30, "A beast springs from the box!")
+		"evoke_phial_floods":
+			gb._aoe_damage_visible(10, 10, 22, "A torrent of water crashes down!")
+		"evoke_sack_spiders":
+			for i in 3:
+				gb._summon_ally("spider", 25, "")
+			CombatLog.add("Spiders scatter from the sack!")
+		"evoke_phantom_mirror":
+			var mirror_t: Node = _nearest_visible_hostile()
+			if mirror_t != null and mirror_t.data != null:
+				gb._summon_ally(String(mirror_t.data.id), 20,
+						"A phantom %s steps forth!" % String(mirror_t.data.display_name))
+		"evoke_condenser_vane":
+			gb._aoe_damage_visible(8, 8, 18, "Freezing fog boils out of the vane!")
+		"evoke_tremorstones":
+			gb._aoe_damage_visible(6, 12, 25, "The ground quakes violently!")
+		"evoke_lightning_rod":
+			gb._damage_nearest_visible(18, 36, "Lightning arcs from the rod into %s!")
+		"evoke_gravitambourine":
+			# Pull every visible foe one tile toward the player + small dmg.
+			gb._aoe_damage_visible(8, 3, 8, "The tambourine drags the world toward you!")
+			if player_has_method("_pull_nearest"): pass  # future enhancement
+		_:
+			CombatLog.add("Nothing happens.")
+			return false
+	charges -= 1
+	it["charges"] = charges
+	items[index] = it
+	if charges <= 0:
+		CombatLog.add("The %s shatters, spent." % String(info.get("name", "item")))
+		items.remove_at(index)
+	inventory_changed.emit()
+	if GameManager != null:
+		GameManager.identify(String(info.get("id", "")))
+	return true
+
+
+func player_has_method(method: String) -> bool:
+	return has_method(method)
 
 
 func _spend_wand_charge(index: int, wand_id: String) -> void:
