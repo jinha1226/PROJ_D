@@ -152,6 +152,8 @@ func _ready() -> void:
 	player.damaged.connect(_on_player_damaged)
 	player.leveled_up.connect(_on_player_leveled_up)
 	player.identify_one_requested.connect(_on_identify_one_requested)
+	if player.has_signal("enchant_one_requested"):
+		player.enchant_one_requested.connect(_on_enchant_one_requested)
 	if player.has_signal("summon_companion_requested"):
 		player.summon_companion_requested.connect(_on_summon_companion_requested)
 
@@ -353,6 +355,19 @@ func _refresh_danger_tiles(dmap: DungeonMap) -> void:
 func _apply_passive_racial_traits() -> void:
 	if player == null or player.stats == null or not player.is_alive:
 		return
+	# Baseline natural regeneration — applies every player turn,
+	# including auto-move steps. HP trickles every 3 turns, MP every 4,
+	# so extended travel actually restores vitals. Stacks on top of
+	# racial / gear regen below.
+	var turn: int = TurnManager.turn_number
+	if turn > 0 and turn % 3 == 0:
+		if player.stats.HP < player.stats.hp_max:
+			player.stats.HP = min(player.stats.hp_max, player.stats.HP + 1)
+			player.stats_changed.emit()
+	if turn > 0 and turn % 4 == 0:
+		if player.stats.MP < player.stats.mp_max:
+			player.stats.MP = min(player.stats.mp_max, player.stats.MP + 1)
+			player.stats_changed.emit()
 	var special: String = ""
 	if player.trait_res != null:
 		special = player.trait_res.special
@@ -1289,6 +1304,139 @@ func _on_identify_one_requested() -> void:
 func _on_identify_pick(id: String, dlg: AcceptDialog) -> void:
 	GameManager.identify(id)
 	dlg.queue_free()
+
+
+## Scroll of Enchant Weapon / Armour — pops a picker listing every
+## weapon (or every armor piece) the player has, equipped or in the
+## bag. Tapping one bumps its enchant `plus` by 1.
+func _on_enchant_one_requested(kind: String) -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null or player == null:
+		return
+	_close_all_dialogs()
+	var dlg := AcceptDialog.new()
+	dlg.exclusive = false
+	dlg.ok_button_text = "Cancel"
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 8)
+	dlg.add_child(vb)
+	var prompt := Label.new()
+	prompt.add_theme_font_size_override("font_size", 40)
+	vb.add_child(prompt)
+
+	if kind == "weapon":
+		dlg.title = "Enchant Which Weapon?"
+		prompt.text = "Choose a weapon to enchant (+1 damage):"
+		# Equipped weapon first
+		if player.equipped_weapon_id != "":
+			var wid: String = player.equipped_weapon_id
+			var label: String = "%s (equipped)" % _weapon_name_with_plus(wid, player.equipped_weapon_plus)
+			var btn := _make_enchant_btn(label, dlg,
+					func(): _apply_enchant_equipped_weapon(1))
+			vb.add_child(btn)
+		# Inventory weapons
+		for i in range(player.get_items().size()):
+			var it: Dictionary = player.get_items()[i]
+			if String(it.get("kind", "")) != "weapon":
+				continue
+			var wid2: String = String(it.get("id", ""))
+			var lbl: String = _weapon_name_with_plus(wid2, int(it.get("plus", 0)))
+			var idx: int = i
+			var btn2 := _make_enchant_btn(lbl, dlg,
+					func(): _apply_enchant_inventory_item(idx, 1))
+			vb.add_child(btn2)
+	else:
+		dlg.title = "Enchant Which Armour?"
+		prompt.text = "Choose an armour piece to enchant (+1 AC):"
+		# Equipped armor slots
+		for slot in ["chest", "cloak", "legs", "helm", "gloves", "boots"]:
+			if not player.equipped_armor.has(slot):
+				continue
+			var a: Dictionary = player.equipped_armor[slot]
+			var label: String = "%s (%s, equipped)" % [
+				_armor_name_with_plus(a),
+				slot,
+			]
+			var slot_cap: String = slot
+			var btn := _make_enchant_btn(label, dlg,
+					func(): _apply_enchant_equipped_armor(slot_cap, 1))
+			vb.add_child(btn)
+		# Inventory armor
+		for i in range(player.get_items().size()):
+			var it: Dictionary = player.get_items()[i]
+			if String(it.get("kind", "")) != "armor":
+				continue
+			var lbl: String = _armor_name_with_plus(it)
+			var idx: int = i
+			var btn2 := _make_enchant_btn(lbl, dlg,
+					func(): _apply_enchant_inventory_item(idx, 1))
+			vb.add_child(btn2)
+
+	popup_mgr.add_child(dlg)
+	dlg.confirmed.connect(dlg.queue_free)
+	dlg.canceled.connect(dlg.queue_free)
+	dlg.popup_centered(Vector2i(900, 1200))
+
+
+func _make_enchant_btn(text: String, dlg: AcceptDialog,
+		on_pick: Callable) -> Button:
+	var btn := Button.new()
+	btn.text = text
+	btn.custom_minimum_size = Vector2(0, 80)
+	btn.add_theme_font_size_override("font_size", 38)
+	btn.pressed.connect(func():
+		on_pick.call()
+		dlg.queue_free())
+	return btn
+
+
+func _apply_enchant_equipped_weapon(amount: int) -> void:
+	if player == null:
+		return
+	player.equipped_weapon_plus += amount
+	CombatLog.add("Your %s glows brightly! (now +%d)" % [
+			WeaponRegistry.display_name_for(player.equipped_weapon_id),
+			player.equipped_weapon_plus])
+	player.stats_changed.emit()
+
+
+func _apply_enchant_equipped_armor(slot: String, amount: int) -> void:
+	if player == null or not player.equipped_armor.has(slot):
+		return
+	var a: Dictionary = player.equipped_armor[slot]
+	a["plus"] = int(a.get("plus", 0)) + amount
+	CombatLog.add("Your %s shimmers! (now +%d)" % [
+			String(a.get("name", "armour")), int(a["plus"])])
+	player._recompute_gear_stats()
+
+
+func _apply_enchant_inventory_item(idx: int, amount: int) -> void:
+	if player == null:
+		return
+	var items: Array = player.get_items()
+	if idx < 0 or idx >= items.size():
+		return
+	var it: Dictionary = items[idx]
+	it["plus"] = int(it.get("plus", 0)) + amount
+	CombatLog.add("Your %s shimmers! (now +%d)" % [
+			String(it.get("name", "item")), int(it["plus"])])
+	player.inventory_changed.emit()
+
+
+## Format helper: "Longsword +2" when plus > 0, plain name otherwise.
+func _weapon_name_with_plus(wid: String, plus: int) -> String:
+	var n: String = WeaponRegistry.display_name_for(wid)
+	if plus > 0:
+		return "%s +%d" % [n, plus]
+	return n
+
+
+func _armor_name_with_plus(a: Dictionary) -> String:
+	var n: String = String(a.get("name", a.get("id", "Armour")))
+	var p: int = int(a.get("plus", 0))
+	if p > 0:
+		return "%s +%d" % [n, p]
+	return n
 
 
 func _on_player_leveled_up(new_level: int) -> void:
@@ -2372,6 +2520,9 @@ func _on_bag_pressed() -> void:
 			var info_btn := Button.new()
 			var disp_name: String = GameManager.display_name_for_item(
 					iid_row, String(it.get("name", "?")), kind)
+			var plus_amt: int = int(it.get("plus", 0))
+			if plus_amt > 0:
+				disp_name = "%s +%d" % [disp_name, plus_amt]
 			if count > 1:
 				disp_name = "%s  ×%d" % [disp_name, count]
 			info_btn.text = disp_name
@@ -2531,9 +2682,12 @@ func _build_equipped_section(vb: VBoxContainer) -> void:
 	if player.equipped_weapon_id != "":
 		var wid: String = player.equipped_weapon_id
 		var wname: String = WeaponRegistry.display_name_for(wid)
+		if player.equipped_weapon_plus > 0:
+			wname = "%s +%d" % [wname, player.equipped_weapon_plus]
 		if player.equipped_weapon_cursed:
 			wname += "  (cursed)"
-		var winfo: Dictionary = {"id": wid, "name": wname, "kind": "weapon"}
+		var winfo: Dictionary = {"id": wid, "name": wname, "kind": "weapon",
+				"plus": player.equipped_weapon_plus}
 		_append_equipped_row(vb, "weapon", wname, TileRenderer.item(wid), winfo)
 
 	# Armor rows — stable slot order, cloak sits after chest.
@@ -2544,6 +2698,9 @@ func _build_equipped_section(vb: VBoxContainer) -> void:
 		var a: Dictionary = player.equipped_armor[slot]
 		var aid: String = String(a.get("id", ""))
 		var aname: String = String(a.get("name", aid))
+		var ap: int = int(a.get("plus", 0))
+		if ap > 0:
+			aname = "%s +%d" % [aname, ap]
 		if bool(a.get("cursed", false)):
 			aname += "  (cursed)"
 		var ainfo: Dictionary = a.duplicate()
@@ -2761,8 +2918,11 @@ func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
 			items.remove_at(idx)
 			if kind == "weapon":
 				var wid: String = String(it.get("id", ""))
-				var prev_id: String = player.equip_weapon(wid)
-				if prev_id == wid:
+				var new_plus: int = int(it.get("plus", 0))
+				var prev_id: String = player.equipped_weapon_id
+				var prev_plus: int = player.equipped_weapon_plus
+				var returned_id: String = player.equip_weapon(wid, new_plus)
+				if returned_id == wid:
 					# equip_weapon returned same id → was blocked (cursed).
 					items.insert(idx, it)
 				else:
@@ -2774,6 +2934,7 @@ func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
 							"id": prev_id,
 							"name": WeaponRegistry.display_name_for(prev_id),
 							"kind": "weapon",
+							"plus": prev_plus,
 							"color": Color(0.75, 0.75, 0.85),
 						})
 			elif kind == "armor":
@@ -2791,6 +2952,9 @@ func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
 					}
 				if bool(it.get("cursed", false)):
 					armor_info["cursed"] = true
+				# Carry the enchant level over onto the armor slot dict
+				# so the equipped AC calc sees it.
+				armor_info["plus"] = int(it.get("plus", 0))
 				var prev_armor: Dictionary = player.equip_armor(armor_info)
 				if bool(it.get("cursed", false)):
 					CombatLog.add("The %s is cursed!" % String(armor_info.get("name", aid)))
@@ -2800,6 +2964,7 @@ func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
 						"name": String(prev_armor.get("name", "")),
 						"kind": "armor",
 						"ac": int(prev_armor.get("ac", 0)),
+						"plus": int(prev_armor.get("plus", 0)),
 						"slot": String(prev_armor.get("slot", "chest")),
 						"color": prev_armor.get("color", Color(0.6, 0.6, 0.7)),
 					})

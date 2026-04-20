@@ -12,6 +12,7 @@ signal xp_changed(cur: int, to_next: int, level: int)
 ## Emitted when Scroll of Identification is used. GameBootstrap shows a
 ## picker popup that lets the player choose which inventory item to reveal.
 signal identify_one_requested
+signal enchant_one_requested(kind: String)
 ## Emitted when an essence's "summon" ability fires. Carries the essence id
 ## so GameBootstrap knows which Companion template to spawn.
 signal summon_companion_requested(essence_id: String)
@@ -48,6 +49,10 @@ var equipped_armor: Dictionary = {}
 # Array of ring info dicts (from RingRegistry.get_info). Max size is race-
 # dependent — octopodes wear eight, everyone else two.
 var equipped_rings: Array = []
+# Enchant level on the currently-equipped weapon (DCSS "pluses"). Travels
+# with the specific item dict in inventory; we mirror it here so combat
+# doesn't have to crack open equipped_weapon each tick.
+var equipped_weapon_plus: int = 0
 var skill_state: Dictionary = {}
 # Memorised spell ids. Seeded from job.starting_spells at setup and
 # extended by reading spellbooks. Drives the MAGIC menu and what the
@@ -414,17 +419,24 @@ func _get_trait_equipment(trait_id: String) -> Dictionary:
 	return {}
 
 
-func equip_weapon(weapon_id: String) -> String:
+func equip_weapon(weapon_id: String, plus: int = 0) -> String:
 	if equipped_weapon_cursed and equipped_weapon_id != "":
 		CombatLog.add("The %s is cursed and won't come off!" % WeaponRegistry.display_name_for(equipped_weapon_id))
 		return equipped_weapon_id
 	var prev: String = equipped_weapon_id
 	equipped_weapon_id = weapon_id
+	equipped_weapon_plus = plus
 	equipped_weapon_cursed = false
 	_auto_train_weapon_skill(weapon_id)
 	stats_changed.emit()
 	_load_sprite_preset()
 	return prev
+
+
+## Enchant-level of the currently-equipped weapon. Grows when a Scroll
+## of Enchant Weapon is used on it.
+func equip_weapon_plus() -> int:
+	return equipped_weapon_plus
 
 
 ## Current racial trait id — the trait_res takes precedence if the player
@@ -553,9 +565,10 @@ func _recompute_gear_stats() -> void:
 	if trait_res != null:
 		ac += trait_res.ac_bonus
 	var ev: int = base_ev
-	# Apply armor bonuses.
+	# Apply armor bonuses (base AC + enchant "plus").
 	for slot_dict in equipped_armor.values():
 		ac += int(slot_dict.get("ac", 0))
+		ac += int(slot_dict.get("plus", 0))
 		ev += int(slot_dict.get("ev_bonus", 0))
 	# Apply ring bonuses.
 	for ring in equipped_rings:
@@ -906,12 +919,10 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 			take_damage(int(info.get("amount", 5)))
 			return true
 		"enchant_weapon":
-			if equipped_weapon_id == "":
-				CombatLog.add("No weapon equipped to enchant.")
-				return false
-			weapon_bonus_dmg += int(info.get("amount", 1))
-			CombatLog.add("Your weapon glows brightly! (+%d damage)" % weapon_bonus_dmg)
-			stats_changed.emit()
+			# Hand control to the UI so the player picks WHICH weapon to
+			# enchant. GameBootstrap listens, shows a picker, then calls
+			# apply_enchant(kind, item_ref) to commit.
+			enchant_one_requested.emit("weapon")
 			return true
 		"remove_curse":
 			var removed: bool = false
@@ -927,13 +938,8 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 				CombatLog.add("You feel briefly cleansed (nothing was cursed).")
 			return true
 		"enchant_armor":
-			if equipped_armor.has("chest"):
-				equipped_armor["chest"]["ac"] = int(equipped_armor["chest"].get("ac", 0)) + int(info.get("amount", 1))
-				CombatLog.add("Your armour shimmers and feels stronger!")
-				_recompute_defense()
-				return true
-			CombatLog.add("You have no chest armour to enchant.")
-			return false
+			enchant_one_requested.emit("armor")
+			return true
 		"learn_spells":
 			var newly: Array[String] = []
 			for sp in info.get("spells", []):

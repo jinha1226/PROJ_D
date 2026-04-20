@@ -22,7 +22,10 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	var weapon_dmg: int = UNARMED_DAMAGE
 	if weapon_id != "" and WeaponRegistry.is_weapon(weapon_id):
 		weapon_dmg = WeaponRegistry.weapon_damage_for(weapon_id)
-	# Scroll of Enchant Weapon stacks: attacker.weapon_bonus_dmg adds directly.
+	# Flat bonuses from the equipped weapon's own enchant level + any
+	# legacy whole-player weapon_bonus_dmg field (kept for essences).
+	if "equipped_weapon_plus" in attacker:
+		weapon_dmg += int(attacker.equipped_weapon_plus)
 	if "weapon_bonus_dmg" in attacker:
 		weapon_dmg += int(attacker.weapon_bonus_dmg)
 	if weapon_id == "" and "trait_res" in attacker and attacker.trait_res != null \
