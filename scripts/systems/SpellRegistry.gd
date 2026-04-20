@@ -497,7 +497,50 @@ static func failure_rate(spell_id: String, player: Node) -> int:
 	# DCSS polynomial: ((x+426)*x + 82670)*x + 7245398 / 262144
 	var c2: int = (((chance + 426) * chance) + 82670) * chance + 7245398
 	c2 = c2 / 262144
-	return clampi(c2, 0, 100)
+	c2 = clampi(c2, 0, 100)
+	# DCSS spl-cast.cc:failure_rate_to_int — the UI shows a smoothed
+	# percentage derived by running the raw fail through a tetrahedral
+	# distribution (3 × random2avg(100, 3)). This makes low raw values
+	# feel safer in-hand than "25%" would imply, and is what the user
+	# sees on their character sheet / targeting prompt.
+	return _smooth_fail_to_display(c2)
+
+
+## Port of DCSS failure_rate_to_int + _get_true_fail_rate. Converts a raw
+## polynomial fail value into the displayed percentage the player reads
+## on the spell-list screen.
+static func _smooth_fail_to_display(raw_fail: int) -> int:
+	if raw_fail <= 0:
+		return 0
+	if raw_fail >= 100:
+		return (raw_fail + 100) / 2
+	var target: int = raw_fail * 3
+	var outcomes: int = 101 * 101 * 100  # 1,020,100
+	var numerator: int
+	if target <= 100:
+		numerator = _tetrahedral_number(target)
+	elif target <= 200:
+		numerator = _tetrahedral_number(target) \
+				- 2 * _tetrahedral_number(target - 101) \
+				- _tetrahedral_number(target - 100)
+	else:
+		# target > 200 — DCSS uses symmetry around 300 for the upper half
+		# of the distribution; mirror the low-side calc.
+		var mirror: int = 300 - target
+		var mirror_t: int
+		if mirror >= 0:
+			mirror_t = _tetrahedral_number(mirror)
+		else:
+			mirror_t = 0
+		numerator = outcomes - mirror_t
+	var pct: float = 100.0 * float(numerator) / float(outcomes)
+	return max(1, int(round(pct)))
+
+
+static func _tetrahedral_number(n: int) -> int:
+	if n <= 0:
+		return 0
+	return n * (n + 1) * (n + 2) / 6
 
 
 ## DCSS player.cc:2198 player_armour_shield_spell_penalty. Returns the
