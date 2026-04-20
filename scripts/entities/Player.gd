@@ -887,8 +887,12 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 		"heal":
 			if stats == null:
 				return false
-			stats.HP = min(stats.hp_max, stats.HP + int(info.get("amount", 20)))
+			var hp_base: int = int(info.get("hp_base", int(info.get("amount", 20))))
+			var hp_rand: int = int(info.get("hp_rand", 0))
+			var healed: int = hp_base + (randi() % max(hp_rand, 1) if hp_rand > 0 else 0)
+			stats.HP = min(stats.hp_max, stats.HP + healed)
 			stats_changed.emit()
+			CombatLog.add("You feel better! (+%d HP)" % healed)
 			return true
 		"restore_mp":
 			if stats == null:
@@ -963,19 +967,52 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 		"curing":
 			if stats == null:
 				return false
-			var amt: int = int(info.get("amount", 15))
-			stats.HP = min(stats.hp_max, stats.HP + amt)
+			var hp_base: int = int(info.get("hp_base", int(info.get("amount", 8))))
+			var hp_rand: int = int(info.get("hp_rand", 0))
+			var healed: int = hp_base + (randi() % max(hp_rand, 1) if hp_rand > 0 else 0)
+			stats.HP = min(stats.hp_max, stats.HP + healed)
 			stats_changed.emit()
-			CombatLog.add("You feel much better! (+%d HP)" % amt)
+			CombatLog.add("You feel much better! (+%d HP)" % healed)
+			# Cure status effects
+			for status in info.get("cures", []):
+				if status == "poison":
+					set_meta("_poisoned", false)
+					CombatLog.add("You feel less poisoned.")
+				elif status == "confusion":
+					set_meta("_confused", false)
+			return true
+		"buff_temp":
+			if stats == null:
+				return false
+			var amt: int = int(info.get("amount", 5))
+			var dur_base: int = int(info.get("dur_base", 35))
+			var dur_rand: int = int(info.get("dur_rand", 40))
+			var turns: int = dur_base + (randi() % max(dur_rand, 1))
+			var stat_key: String = String(info.get("stat", ""))
+			match stat_key:
+				"STR": stats.STR += amt
+				"DEX": stats.DEX += amt
+				"INT": stats.INT += amt
+			if not has_meta("_temp_buffs"):
+				set_meta("_temp_buffs", [])
+			var buffs: Array = get_meta("_temp_buffs")
+			buffs.append({"stat": stat_key, "amount": amt, "turns_left": turns})
+			set_meta("_temp_buffs", buffs)
+			stats_changed.emit()
+			CombatLog.add("You feel a surge of power! (+%d %s for %d turns)" % [amt, stat_key, turns])
 			return true
 		"resistance":
-			resist_turns = int(info.get("turns", 5))
-			CombatLog.add("You feel resistant to damage! (%d turns)" % resist_turns)
+			var dur_base: int = int(info.get("dur_base", 35))
+			var dur_rand: int = int(info.get("dur_rand", 40))
+			resist_turns = dur_base + (randi() % max(dur_rand, 1))
+			CombatLog.add("You feel protected! (rF+rC+rElec for %d turns)" % resist_turns)
 			return true
 		"haste":
-			# Skip monster action this turn by ending and immediately starting a new player turn.
-			TurnManager.end_player_turn()
-			CombatLog.add("Time seems to slow around you!")
+			var dur_base: int = int(info.get("dur_base", 26))
+			var dur_rand: int = int(info.get("dur_rand", 15))
+			var turns: int = dur_base + (randi() % max(dur_rand, 1))
+			set_meta("_haste_turns", int(get_meta("_haste_turns", 0)) + turns)
+			CombatLog.add("Time seems to slow! (%d turns of haste)" % turns)
 			return true
 		"degenerate":
 			if stats == null:

@@ -143,7 +143,7 @@ static func _build_from_dcss(id: String, entry: Dictionary) -> MonsterData:
 	d.speed = int(entry.get("speed", 10))
 	d.will = int(entry.get("will", 0))
 	d.exp_mod = int(entry.get("exp", 1))
-	d.xp_value = max(1, d.exp_mod * 10)
+	d.xp_value = max(1, d.exp_mod)  # DCSS exp field is the direct XP value
 	# Str / Dex aren't in DCSS YAML; approximate from HD and size so existing
 	# combat code reading attacker.str keeps working. Mediums & bigger get a
 	# small dex penalty, little & small get a bonus.

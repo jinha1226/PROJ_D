@@ -1,0 +1,615 @@
+{
+  "_comment": "DCSS branch structure from branch-data.h (0.32). abs_depth = item generation depth.",
+  "branches": [
+    {
+      "id": "dungeon",
+      "parent": null,
+      "min_depth": 1,
+      "max_depth": 15,
+      "floors": 15,
+      "abs_depth": 1,
+      "short_name": "Dungeon",
+      "long_name": "the Dungeon",
+      "abbrev": "D",
+      "runes": [],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    {
+      "id": "temple",
+      "parent": "dungeon",
+      "min_depth": 4,
+      "max_depth": 7,
+      "floors": 1,
+      "abs_depth": 5,
+      "short_name": "Temple",
+      "long_name": "the Ecumenical Temple",
+      "abbrev": "Temple",
+      "runes": [],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    {
+      "id": "orc",
+      "parent": "dungeon",
+      "min_depth": 9,
+      "max_depth": 12,
+      "floors": 2,
+      "abs_depth": 10,
+      "short_name": "Orcish Mines",
+      "long_name": "the Orcish Mines",
+      "abbrev": "Orc",
+      "runes": [],
+      "entry_msg": null,
+      "tileset": "orc"
+    },
+    {
+      "id": "elf",
+      "parent": "orc",
+      "min_depth": 2,
+      "max_depth": 2,
+      "floors": 3,
+      "abs_depth": 15,
+      "short_name": "Elven Halls",
+      "long_name": "the Elven Halls",
+      "abbrev": "Elf",
+      "runes": [],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    {
+      "id": "lair",
+      "parent": "dungeon",
+      "min_depth": 8,
+      "max_depth": 11,
+      "floors": 5,
+      "abs_depth": 10,
+      "short_name": "Lair",
+      "long_name": "the Lair of Beasts",
+      "abbrev": "Lair",
+      "runes": [],
+      "entry_msg": null,
+      "tileset": "lair"
+    },
+    {
+      "id": "swamp",
+      "parent": "lair",
+      "min_depth": 2,
+      "max_depth": 3,
+      "floors": 4,
+      "abs_depth": 15,
+      "short_name": "Swamp",
+      "long_name": "the Swamp",
+      "abbrev": "Swamp",
+      "runes": [
+        "swamp"
+      ],
+      "entry_msg": null,
+      "tileset": "swamp"
+    },
+    {
+      "id": "shoals",
+      "parent": "lair",
+      "min_depth": 2,
+      "max_depth": 3,
+      "floors": 4,
+      "abs_depth": 15,
+      "short_name": "Shoals",
+      "long_name": "the Shoals",
+      "abbrev": "Shoals",
+      "runes": [
+        "shoals"
+      ],
+      "entry_msg": null,
+      "tileset": "shoals"
+    },
+    {
+      "id": "snake",
+      "parent": "lair",
+      "min_depth": 2,
+      "max_depth": 3,
+      "floors": 4,
+      "abs_depth": 15,
+      "short_name": "Snake Pit",
+      "long_name": "the Snake Pit",
+      "abbrev": "Snake",
+      "runes": [
+        "snake"
+      ],
+      "entry_msg": null,
+      "tileset": "snake"
+    },
+    {
+      "id": "spider",
+      "parent": "lair",
+      "min_depth": 2,
+      "max_depth": 3,
+      "floors": 4,
+      "abs_depth": 15,
+      "short_name": "Spider Nest",
+      "long_name": "the Spider Nest",
+      "abbrev": "Spider",
+      "runes": [
+        "spider"
+      ],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    {
+      "id": "slime",
+      "parent": "lair",
+      "min_depth": 4,
+      "max_depth": 5,
+      "floors": 5,
+      "abs_depth": 17,
+      "short_name": "Slime Pits",
+      "long_name": "the Pits of Slime",
+      "abbrev": "Slime",
+      "runes": [
+        "slime"
+      ],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    {
+      "id": "vaults",
+      "parent": "dungeon",
+      "min_depth": 13,
+      "max_depth": 14,
+      "floors": 5,
+      "abs_depth": 19,
+      "short_name": "Vaults",
+      "long_name": "the Vaults",
+      "abbrev": "Vaults",
+      "runes": [
+        "vaults"
+      ],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    {
+      "id": "crypt",
+      "parent": "vaults",
+      "min_depth": 2,
+      "max_depth": 3,
+      "floors": 3,
+      "abs_depth": 19,
+      "short_name": "Crypt",
+      "long_name": "the Crypt",
+      "abbrev": "Crypt",
+      "runes": [],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    {
+      "id": "tomb",
+      "parent": "crypt",
+      "min_depth": 3,
+      "max_depth": 3,
+      "floors": 3,
+      "abs_depth": 21,
+      "short_name": "Tomb",
+      "long_name": "the Tomb of the Ancients",
+      "abbrev": "Tomb",
+      "runes": [
+        "tomb"
+      ],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    {
+      "id": "depths",
+      "parent": "dungeon",
+      "min_depth": 15,
+      "max_depth": 15,
+      "floors": 4,
+      "abs_depth": 22,
+      "short_name": "Depths",
+      "long_name": "the Depths",
+      "abbrev": "Depths",
+      "runes": [],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    {
+      "id": "vestibule",
+      "parent": null,
+      "min_depth": 27,
+      "max_depth": 27,
+      "floors": 1,
+      "abs_depth": 27,
+      "short_name": "Hell",
+      "long_name": "the Vestibule of Hell",
+      "abbrev": "Hell",
+      "runes": [],
+      "entry_msg": "Welcome to Hell! Please enjoy your stay.",
+      "tileset": "hell"
+    },
+    {
+      "id": "dis",
+      "parent": "vestibule",
+      "min_depth": 1,
+      "max_depth": 1,
+      "floors": 7,
+      "abs_depth": 28,
+      "short_name": "Dis",
+      "long_name": "the Iron City of Dis",
+      "abbrev": "Dis",
+      "runes": [
+        "iron"
+      ],
+      "entry_msg": "An ancient malice corrodes your equipment.",
+      "tileset": "dis"
+    },
+    {
+      "id": "gehenna",
+      "parent": "vestibule",
+      "min_depth": 1,
+      "max_depth": 1,
+      "floors": 7,
+      "abs_depth": 28,
+      "short_name": "Gehenna",
+      "long_name": "Gehenna",
+      "abbrev": "Geh",
+      "runes": [
+        "obsidian"
+      ],
+      "entry_msg": "Your scrolls appear blurry in the acrid smoke.",
+      "tileset": "gehenna"
+    },
+    {
+      "id": "cocytus",
+      "parent": "vestibule",
+      "min_depth": 1,
+      "max_depth": 1,
+      "floors": 7,
+      "abs_depth": 28,
+      "short_name": "Cocytus",
+      "long_name": "Cocytus",
+      "abbrev": "Coc",
+      "runes": [
+        "icy"
+      ],
+      "entry_msg": "You feel the icy cold of Cocytus seeping into your bones.",
+      "tileset": "cocytus"
+    },
+    {
+      "id": "tartarus",
+      "parent": "vestibule",
+      "min_depth": 1,
+      "max_depth": 1,
+      "floors": 7,
+      "abs_depth": 28,
+      "short_name": "Tartarus",
+      "long_name": "Tartarus",
+      "abbrev": "Tar",
+      "runes": [
+        "bone"
+      ],
+      "entry_msg": "A sense of desolation washes over you.",
+      "tileset": "tartarus"
+    },
+    {
+      "id": "zot",
+      "parent": "depths",
+      "min_depth": 5,
+      "max_depth": 5,
+      "floors": 5,
+      "abs_depth": 27,
+      "short_name": "Zot",
+      "long_name": "the Realm of Zot",
+      "abbrev": "Zot",
+      "runes": [
+        "golden"
+      ],
+      "entry_msg": "You feel the oppressive weight of Zot.",
+      "tileset": "zot"
+    }
+  ],
+  "by_id": {
+    "dungeon": {
+      "id": "dungeon",
+      "parent": null,
+      "min_depth": 1,
+      "max_depth": 15,
+      "floors": 15,
+      "abs_depth": 1,
+      "short_name": "Dungeon",
+      "long_name": "the Dungeon",
+      "abbrev": "D",
+      "runes": [],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    "temple": {
+      "id": "temple",
+      "parent": "dungeon",
+      "min_depth": 4,
+      "max_depth": 7,
+      "floors": 1,
+      "abs_depth": 5,
+      "short_name": "Temple",
+      "long_name": "the Ecumenical Temple",
+      "abbrev": "Temple",
+      "runes": [],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    "orc": {
+      "id": "orc",
+      "parent": "dungeon",
+      "min_depth": 9,
+      "max_depth": 12,
+      "floors": 2,
+      "abs_depth": 10,
+      "short_name": "Orcish Mines",
+      "long_name": "the Orcish Mines",
+      "abbrev": "Orc",
+      "runes": [],
+      "entry_msg": null,
+      "tileset": "orc"
+    },
+    "elf": {
+      "id": "elf",
+      "parent": "orc",
+      "min_depth": 2,
+      "max_depth": 2,
+      "floors": 3,
+      "abs_depth": 15,
+      "short_name": "Elven Halls",
+      "long_name": "the Elven Halls",
+      "abbrev": "Elf",
+      "runes": [],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    "lair": {
+      "id": "lair",
+      "parent": "dungeon",
+      "min_depth": 8,
+      "max_depth": 11,
+      "floors": 5,
+      "abs_depth": 10,
+      "short_name": "Lair",
+      "long_name": "the Lair of Beasts",
+      "abbrev": "Lair",
+      "runes": [],
+      "entry_msg": null,
+      "tileset": "lair"
+    },
+    "swamp": {
+      "id": "swamp",
+      "parent": "lair",
+      "min_depth": 2,
+      "max_depth": 3,
+      "floors": 4,
+      "abs_depth": 15,
+      "short_name": "Swamp",
+      "long_name": "the Swamp",
+      "abbrev": "Swamp",
+      "runes": [
+        "swamp"
+      ],
+      "entry_msg": null,
+      "tileset": "swamp"
+    },
+    "shoals": {
+      "id": "shoals",
+      "parent": "lair",
+      "min_depth": 2,
+      "max_depth": 3,
+      "floors": 4,
+      "abs_depth": 15,
+      "short_name": "Shoals",
+      "long_name": "the Shoals",
+      "abbrev": "Shoals",
+      "runes": [
+        "shoals"
+      ],
+      "entry_msg": null,
+      "tileset": "shoals"
+    },
+    "snake": {
+      "id": "snake",
+      "parent": "lair",
+      "min_depth": 2,
+      "max_depth": 3,
+      "floors": 4,
+      "abs_depth": 15,
+      "short_name": "Snake Pit",
+      "long_name": "the Snake Pit",
+      "abbrev": "Snake",
+      "runes": [
+        "snake"
+      ],
+      "entry_msg": null,
+      "tileset": "snake"
+    },
+    "spider": {
+      "id": "spider",
+      "parent": "lair",
+      "min_depth": 2,
+      "max_depth": 3,
+      "floors": 4,
+      "abs_depth": 15,
+      "short_name": "Spider Nest",
+      "long_name": "the Spider Nest",
+      "abbrev": "Spider",
+      "runes": [
+        "spider"
+      ],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    "slime": {
+      "id": "slime",
+      "parent": "lair",
+      "min_depth": 4,
+      "max_depth": 5,
+      "floors": 5,
+      "abs_depth": 17,
+      "short_name": "Slime Pits",
+      "long_name": "the Pits of Slime",
+      "abbrev": "Slime",
+      "runes": [
+        "slime"
+      ],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    "vaults": {
+      "id": "vaults",
+      "parent": "dungeon",
+      "min_depth": 13,
+      "max_depth": 14,
+      "floors": 5,
+      "abs_depth": 19,
+      "short_name": "Vaults",
+      "long_name": "the Vaults",
+      "abbrev": "Vaults",
+      "runes": [
+        "vaults"
+      ],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    "crypt": {
+      "id": "crypt",
+      "parent": "vaults",
+      "min_depth": 2,
+      "max_depth": 3,
+      "floors": 3,
+      "abs_depth": 19,
+      "short_name": "Crypt",
+      "long_name": "the Crypt",
+      "abbrev": "Crypt",
+      "runes": [],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    "tomb": {
+      "id": "tomb",
+      "parent": "crypt",
+      "min_depth": 3,
+      "max_depth": 3,
+      "floors": 3,
+      "abs_depth": 21,
+      "short_name": "Tomb",
+      "long_name": "the Tomb of the Ancients",
+      "abbrev": "Tomb",
+      "runes": [
+        "tomb"
+      ],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    "depths": {
+      "id": "depths",
+      "parent": "dungeon",
+      "min_depth": 15,
+      "max_depth": 15,
+      "floors": 4,
+      "abs_depth": 22,
+      "short_name": "Depths",
+      "long_name": "the Depths",
+      "abbrev": "Depths",
+      "runes": [],
+      "entry_msg": null,
+      "tileset": "dungeon"
+    },
+    "vestibule": {
+      "id": "vestibule",
+      "parent": null,
+      "min_depth": 27,
+      "max_depth": 27,
+      "floors": 1,
+      "abs_depth": 27,
+      "short_name": "Hell",
+      "long_name": "the Vestibule of Hell",
+      "abbrev": "Hell",
+      "runes": [],
+      "entry_msg": "Welcome to Hell! Please enjoy your stay.",
+      "tileset": "hell"
+    },
+    "dis": {
+      "id": "dis",
+      "parent": "vestibule",
+      "min_depth": 1,
+      "max_depth": 1,
+      "floors": 7,
+      "abs_depth": 28,
+      "short_name": "Dis",
+      "long_name": "the Iron City of Dis",
+      "abbrev": "Dis",
+      "runes": [
+        "iron"
+      ],
+      "entry_msg": "An ancient malice corrodes your equipment.",
+      "tileset": "dis"
+    },
+    "gehenna": {
+      "id": "gehenna",
+      "parent": "vestibule",
+      "min_depth": 1,
+      "max_depth": 1,
+      "floors": 7,
+      "abs_depth": 28,
+      "short_name": "Gehenna",
+      "long_name": "Gehenna",
+      "abbrev": "Geh",
+      "runes": [
+        "obsidian"
+      ],
+      "entry_msg": "Your scrolls appear blurry in the acrid smoke.",
+      "tileset": "gehenna"
+    },
+    "cocytus": {
+      "id": "cocytus",
+      "parent": "vestibule",
+      "min_depth": 1,
+      "max_depth": 1,
+      "floors": 7,
+      "abs_depth": 28,
+      "short_name": "Cocytus",
+      "long_name": "Cocytus",
+      "abbrev": "Coc",
+      "runes": [
+        "icy"
+      ],
+      "entry_msg": "You feel the icy cold of Cocytus seeping into your bones.",
+      "tileset": "cocytus"
+    },
+    "tartarus": {
+      "id": "tartarus",
+      "parent": "vestibule",
+      "min_depth": 1,
+      "max_depth": 1,
+      "floors": 7,
+      "abs_depth": 28,
+      "short_name": "Tartarus",
+      "long_name": "Tartarus",
+      "abbrev": "Tar",
+      "runes": [
+        "bone"
+      ],
+      "entry_msg": "A sense of desolation washes over you.",
+      "tileset": "tartarus"
+    },
+    "zot": {
+      "id": "zot",
+      "parent": "depths",
+      "min_depth": 5,
+      "max_depth": 5,
+      "floors": 5,
+      "abs_depth": 27,
+      "short_name": "Zot",
+      "long_name": "the Realm of Zot",
+      "abbrev": "Zot",
+      "runes": [
+        "golden"
+      ],
+      "entry_msg": "You feel the oppressive weight of Zot.",
+      "tileset": "zot"
+    }
+  }
+}

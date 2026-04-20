@@ -1,0 +1,193 @@
+{
+  "_comment": "DCSS potion/scroll effect data from potion.cc (0.32).",
+  "effects": {
+    "potion_curing": {
+      "id": "potion_curing",
+      "name": "Potion of Curing",
+      "hp_base": 5,
+      "hp_rand": 7,
+      "hp_avg": 8,
+      "cures": [
+        "poison",
+        "confusion"
+      ],
+      "description": "Heals 5-11 HP and cures poison/confusion."
+    },
+    "minor_potion": {
+      "id": "minor_potion",
+      "name": "Minor Healing Potion",
+      "hp_base": 5,
+      "hp_rand": 7,
+      "hp_avg": 8,
+      "cures": [
+        "poison"
+      ],
+      "description": "Basic healing, cures poison."
+    },
+    "major_potion": {
+      "id": "major_potion",
+      "name": "Potion of Heal Wounds",
+      "hp_base": 10,
+      "hp_rand": 18,
+      "hp_avg": 24,
+      "description": "Heals 10 + random2avg(28,3) HP (~24 avg)."
+    },
+    "potion_haste": {
+      "id": "potion_haste",
+      "name": "Potion of Haste",
+      "dur_base": 26,
+      "dur_rand": 15,
+      "dur_avg": 33,
+      "effect": "haste",
+      "description": "Haste for 26-40 turns."
+    },
+    "potion_might": {
+      "id": "potion_might",
+      "name": "Potion of Might",
+      "dur_base": 35,
+      "dur_rand": 40,
+      "dur_avg": 55,
+      "effect": "might",
+      "stat_bonus": {
+        "str": 5
+      },
+      "description": "Might (+damage) for 35-74 turns."
+    },
+    "potion_brilliance": {
+      "id": "potion_brilliance",
+      "name": "Potion of Brilliance",
+      "dur_base": 35,
+      "dur_rand": 40,
+      "dur_avg": 55,
+      "effect": "brilliance",
+      "stat_bonus": {
+        "int": 5
+      },
+      "description": "Brilliance (+spell power) for 35-74 turns."
+    },
+    "potion_agility": {
+      "id": "potion_agility",
+      "name": "Potion of Agility",
+      "dur_base": 35,
+      "dur_rand": 40,
+      "dur_avg": 55,
+      "effect": "agility",
+      "stat_bonus": {
+        "dex": 5
+      },
+      "description": "Agility (+EV/dex) for 35-74 turns."
+    },
+    "potion_resistance": {
+      "id": "potion_resistance",
+      "name": "Potion of Resistance",
+      "dur_base": 35,
+      "dur_rand": 40,
+      "dur_avg": 55,
+      "effect": "resistance",
+      "description": "rF+rC+rElec for 35-74 turns."
+    },
+    "potion_magic": {
+      "id": "potion_magic",
+      "name": "Potion of Magic",
+      "mp_restore": 25,
+      "description": "Restores 25 MP."
+    },
+    "mana_potion": {
+      "id": "mana_potion",
+      "name": "Mana Potion",
+      "mp_restore": 15,
+      "description": "Restores 15 MP."
+    },
+    "potion_restore": {
+      "id": "potion_restore",
+      "name": "Potion of Restore Abilities",
+      "effect": "restore_stats",
+      "description": "Restores all drained stats to full."
+    },
+    "potion_experience": {
+      "id": "potion_experience",
+      "name": "Potion of Experience",
+      "levels": 1,
+      "description": "Grants 1 experience level."
+    },
+    "scroll_teleport": {
+      "id": "scroll_teleport",
+      "name": "Scroll of Teleportation",
+      "effect": "teleport",
+      "description": "Teleports player to a random location after 3 turns."
+    },
+    "scroll_blink": {
+      "id": "scroll_blink",
+      "name": "Scroll of Blinking",
+      "effect": "blink",
+      "description": "Instantly blinks to a random nearby location."
+    },
+    "scroll_identify": {
+      "id": "scroll_identify",
+      "name": "Scroll of Identify",
+      "effect": "identify",
+      "description": "Identifies one unknown item."
+    },
+    "scroll_magic_map": {
+      "id": "scroll_magic_map",
+      "name": "Scroll of Magic Mapping",
+      "effect": "map_level",
+      "description": "Reveals the entire current floor."
+    },
+    "scroll_remove_curse": {
+      "id": "scroll_remove_curse",
+      "name": "Scroll of Remove Curse",
+      "effect": "remove_curse",
+      "description": "Removes all curses from equipped items."
+    },
+    "scroll_enchant_weapon": {
+      "id": "scroll_enchant_weapon",
+      "name": "Scroll of Enchant Weapon",
+      "effect": "enchant_weapon",
+      "description": "Adds +1 enchantment to the wielded weapon."
+    },
+    "scroll_enchant_armor": {
+      "id": "scroll_enchant_armor",
+      "name": "Scroll of Enchant Armour",
+      "effect": "enchant_armor",
+      "description": "Adds +1 enchantment to worn armour."
+    },
+    "scroll_fear": {
+      "id": "scroll_fear",
+      "name": "Scroll of Fear",
+      "effect": "fear_monsters",
+      "description": "Causes all nearby monsters to flee."
+    },
+    "scroll_vulnerability": {
+      "id": "scroll_vulnerability",
+      "name": "Scroll of Vulnerability",
+      "effect": "vulnerability",
+      "description": "Strips magic resistance from nearby monsters."
+    },
+    "scroll_immolation": {
+      "id": "scroll_immolation",
+      "name": "Scroll of Immolation",
+      "effect": "immolation",
+      "description": "Makes nearby monsters volatile, exploding on death."
+    },
+    "scroll_fog": {
+      "id": "scroll_fog",
+      "name": "Scroll of Fog",
+      "effect": "fog",
+      "description": "Fills the area with obscuring fog."
+    },
+    "scroll_holy_word": {
+      "id": "scroll_holy_word",
+      "name": "Scroll of Holy Word",
+      "effect": "holy_word",
+      "dam_undead": "3d15",
+      "description": "Damages undead/demons; stuns them."
+    },
+    "scroll_acquirement": {
+      "id": "scroll_acquirement",
+      "name": "Scroll of Acquirement",
+      "effect": "acquirement",
+      "description": "Generates a high-quality item suited to the player."
+    }
+  }
+}

@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+"""Encode DCSS weapon/armour ego (brand) data → assets/dcss_items/brands.json
+
+Weapon brands from item-name.cc weapon_brands_verbose[].
+Armour egos from item-name.cc armour_ego_name_verbose[].
+Brand weights (probability) from item-prop.cc per weapon type.
+"""
+import json
+from pathlib import Path
+
+OUT = Path(__file__).parent.parent / "assets/dcss_items/brands.json"
+OUT.parent.mkdir(parents=True, exist_ok=True)
+
+# Weapon brands — from item-name.cc weapon_brands_verbose[]
+# (SPWPN_NORMAL=0, SPWPN_FLAMING=1, SPWPN_FREEZING=2, ...)
+WEAPON_BRANDS = {
+    "normal":       {"id": "normal",        "name": "plain",        "effect": ""},
+    "flaming":      {"id": "flaming",       "name": "flaming",      "effect": "fire_damage",      "extra_dam": "d8"},
+    "freezing":     {"id": "freezing",      "name": "freezing",     "effect": "cold_damage",      "extra_dam": "d8"},
+    "holy_wrath":   {"id": "holy_wrath",    "name": "holy wrath",   "effect": "holy_damage",      "extra_dam": "d9"},
+    "electrocution":{"id": "electrocution", "name": "electrocution","effect": "elec_damage",      "extra_dam": "d10"},
+    "venom":        {"id": "venom",         "name": "venom",        "effect": "poison",           "extra_dam": "poison_6t"},
+    "protection":   {"id": "protection",    "name": "protection",   "effect": "ac_bonus",         "ac_bonus": 5},
+    "draining":     {"id": "draining",      "name": "draining",     "effect": "drain_xp",         "xp_drain": 0.5},
+    "speed":        {"id": "speed",         "name": "speed",        "effect": "attack_speed",     "delay_mult": 0.67},
+    "heavy":        {"id": "heavy",         "name": "heavy",        "effect": "bonus_damage",     "extra_dam": "d7"},
+    "vampirism":    {"id": "vampirism",     "name": "vampirism",    "effect": "lifesteal",        "heal_pct": 0.25},
+    "pain":         {"id": "pain",          "name": "pain",         "effect": "pain_damage",      "extra_dam": "d10"},
+    "antimagic":    {"id": "antimagic",     "name": "antimagic",    "effect": "drain_mp",         "mp_drain": 3},
+    "distortion":   {"id": "distortion",    "name": "distortion",   "effect": "random_teleport",  "blink_chance": 0.10},
+    "chaos":        {"id": "chaos",         "name": "chaos",        "effect": "random_brand"},
+    "penetration":  {"id": "penetration",   "name": "penetration",  "effect": "pierce_through"},
+    "reaping":      {"id": "reaping",       "name": "reaping",      "effect": "summon_skeleton",  "chance": 0.20},
+    "spectralising":{"id": "spectralising", "name": "spectralising","effect": "spectral_copy",    "chance": 0.15},
+    "vorpal":       {"id": "vorpal",        "name": "vorpal",       "effect": "bonus_damage",     "extra_dam": "d5"},
+}
+
+# Armour egos — from item-name.cc armour_ego_name_verbose[]
+ARMOUR_EGOS = {
+    "normal":          {"id": "normal",         "name": "plain",             "effect": ""},
+    "running":         {"id": "running",        "name": "running",           "effect": "speed_bonus",    "speed": 2},
+    "fire_resistance": {"id": "fire_resistance","name": "fire resistance",   "effect": "rF+"},
+    "cold_resistance": {"id": "cold_resistance","name": "cold resistance",   "effect": "rC+"},
+    "poison_resistance":{"id":"poison_resistance","name":"poison resistance", "effect": "rPois+"},
+    "see_invisible":   {"id": "see_invisible",  "name": "see invisible",     "effect": "see_invis"},
+    "invisibility":    {"id": "invisibility",   "name": "invisibility",      "effect": "invis_onhit",    "chance": 0.10},
+    "strength":        {"id": "strength",       "name": "strength",          "effect": "stat_bonus",     "stat": "str", "bonus": 3},
+    "dexterity":       {"id": "dexterity",      "name": "dexterity",         "effect": "stat_bonus",     "stat": "dex", "bonus": 3},
+    "intelligence":    {"id": "intelligence",   "name": "intelligence",      "effect": "stat_bonus",     "stat": "int", "bonus": 3},
+    "ponderousness":   {"id": "ponderousness",  "name": "ponderousness",     "effect": "move_slow",      "speed_penalty": 1},
+    "flying":          {"id": "flying",         "name": "flying",            "effect": "flight"},
+    "magic_resistance":{"id": "magic_resistance","name":"magic resistance",  "effect": "MR+"},
+    "protection":      {"id": "protection",     "name": "protection",        "effect": "ac_bonus",       "ac_bonus": 3},
+    "stealth":         {"id": "stealth",        "name": "stealth",           "effect": "stealth_bonus",  "bonus": 50},
+    "resistance":      {"id": "resistance",     "name": "resistance",        "effect": "rF+rC+"},
+    "positive_energy": {"id": "positive_energy","name": "positive energy",   "effect": "rN+"},
+    "archmagi":        {"id": "archmagi",       "name": "the Archmagi",      "effect": "spell_power",    "bonus": 2},
+    "spirit_shield":   {"id": "spirit_shield",  "name": "spirit shielding",  "effect": "mp_shields_hp"},
+    "archery":         {"id": "archery",        "name": "archery",           "effect": "ranged_bonus",   "bonus": 5},
+    "shadows":         {"id": "shadows",        "name": "shadows",           "effect": "shadow_cloak"},
+    "rampaging":       {"id": "rampaging",      "name": "rampaging",         "effect": "extra_movement"},
+}
+
+# Brand weights per weapon skill category (from item-prop.cc)
+# These are relative weights — SPWPN_NORMAL is always the most common.
+BRAND_WEIGHTS_BY_SKILL = {
+    "short_blade": [
+        ("normal", 33), ("venom", 17), ("speed", 10), ("draining", 9),
+        ("protection", 6), ("vampirism", 8), ("pain", 5),
+        ("antimagic", 3), ("distortion", 1),
+    ],
+    "long_blade": [
+        ("normal", 30), ("flaming", 10), ("freezing", 10), ("holy_wrath", 8),
+        ("electrocution", 6), ("vampirism", 7), ("pain", 5), ("heavy", 6),
+        ("draining", 5), ("speed", 3), ("distortion", 1),
+    ],
+    "axe": [
+        ("normal", 30), ("flaming", 8), ("freezing", 8), ("electrocution", 6),
+        ("venom", 6), ("draining", 7), ("heavy", 8), ("vampirism", 5),
+        ("pain", 3), ("distortion", 1),
+    ],
+    "mace": [
+        ("normal", 35), ("flaming", 7), ("freezing", 7), ("electrocution", 5),
+        ("venom", 7), ("protection", 6), ("heavy", 8), ("pain", 4),
+        ("antimagic", 3), ("distortion", 1),
+    ],
+    "polearm": [
+        ("normal", 35), ("flaming", 10), ("freezing", 10), ("venom", 8),
+        ("protection", 5), ("heavy", 7), ("draining", 5), ("distortion", 1),
+    ],
+    "staff": [
+        ("normal", 40), ("protection", 10), ("draining", 8), ("pain", 5),
+        ("antimagic", 8), ("distortion", 1),
+    ],
+    "bow": [
+        ("normal", 35), ("flaming", 15), ("freezing", 10), ("heavy", 10),
+        ("electrocution", 8), ("penetration", 6), ("venom", 5),
+    ],
+    "crossbow": [
+        ("normal", 30), ("flaming", 15), ("freezing", 10), ("heavy", 12),
+        ("electrocution", 8), ("penetration", 8), ("venom", 5), ("speed", 5),
+    ],
+}
+
+output = {
+    "_comment": "DCSS weapon/armour brand data from item-name.cc and item-prop.cc.",
+    "weapon_brands":  WEAPON_BRANDS,
+    "armour_egos":    ARMOUR_EGOS,
+    "brand_weights":  BRAND_WEIGHTS_BY_SKILL,
+}
+
+OUT.write_text(json.dumps(output, indent=2, ensure_ascii=False))
+print(f"Wrote brands.json — {len(WEAPON_BRANDS)} weapon brands, {len(ARMOUR_EGOS)} armour egos")
