@@ -2650,33 +2650,28 @@ func _on_status_pressed() -> void:
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.custom_minimum_size = Vector2(800, 1200)
+	scroll.custom_minimum_size = Vector2(920, 1500)
 	dlg.add_child(scroll)
 
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 12)
+	vb.add_theme_constant_override("separation", 20)
 	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(vb)
 
-	var lab := Label.new()
-	lab.text = _build_status_text()
-	lab.add_theme_font_size_override("font_size", 40)
-	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	vb.add_child(lab)
+	_status_build_header(vb)
+	_status_build_vitals(vb)
+	_status_build_attributes(vb)
+	_status_build_combat(vb)
+	_status_build_equipment(vb)
+	_status_build_rings(vb)
+	_status_build_trait(vb)
 
-	# Essence slots (3) — each row shows name, stat summary, and a Cast
-	# button if the essence carries an active ability.
-	if essence_system != null:
-		var hdr := Label.new()
-		hdr.text = "--- Essences ---"
-		hdr.add_theme_font_size_override("font_size", 40)
-		hdr.modulate = Color(0.85, 0.85, 1.0)
-		vb.add_child(hdr)
+	# Essence slots retained — each row handles its own cast/swap buttons.
+	if essence_system != null and essence_system.slots.size() > 0:
+		vb.add_child(_status_section_header("Essences"))
 		for i in essence_system.slots.size():
 			vb.add_child(_build_essence_row(i, dlg))
 
-	# Explicit Close at the bottom in case the OK footer is hard to reach.
 	var close_btn := Button.new()
 	close_btn.text = "Close"
 	close_btn.add_theme_font_size_override("font_size", 40)
@@ -2690,7 +2685,378 @@ func _on_status_pressed() -> void:
 		if _status_dlg == dlg: _status_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(880, 1700))
+	dlg.popup_centered(Vector2i(960, 1800))
+
+
+# ---- Status sections -----------------------------------------------------
+
+func _status_section_header(text: String) -> Label:
+	var lbl := Label.new()
+	lbl.text = text
+	lbl.add_theme_font_size_override("font_size", 40)
+	lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.40))
+	return lbl
+
+
+## Title row: doll portrait + race/job line + level/XP/turn.
+func _status_build_header(vb: VBoxContainer) -> void:
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 16)
+
+	# Paper-doll portrait using current equipment.
+	var armor_map: Dictionary = {}
+	for slot in player.equipped_armor.keys():
+		armor_map[slot] = String(player.equipped_armor[slot].get("id", ""))
+	var portrait_tex: Texture2D = TileRenderer.compose_doll(
+			player.race_id if player.race_id != "" else player.job_id,
+			player.equipped_weapon_id, armor_map)
+	if portrait_tex != null:
+		var portrait := TextureRect.new()
+		portrait.texture = portrait_tex
+		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		portrait.custom_minimum_size = Vector2(160, 160)
+		portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		header.add_child(portrait)
+
+	var text_col := VBoxContainer.new()
+	text_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(text_col)
+
+	var race_name: String = player.race_res.display_name if player.race_res else "?"
+	var job_name: String = player.job_res.display_name if player.job_res else "?"
+	var name_lbl := Label.new()
+	name_lbl.text = "%s %s" % [race_name, job_name]
+	name_lbl.add_theme_font_size_override("font_size", 56)
+	text_col.add_child(name_lbl)
+
+	var meta_lbl := Label.new()
+	meta_lbl.text = "Lv.%d   XP %d / %d   Turn %d" % [
+		player.level, player.xp, player.xp_for_next_level(),
+		TurnManager.turn_number]
+	meta_lbl.add_theme_font_size_override("font_size", 32)
+	meta_lbl.modulate = Color(0.85, 0.85, 0.95)
+	text_col.add_child(meta_lbl)
+
+	vb.add_child(header)
+
+
+## HP / MP progress bars with "current / max" overlaid text.
+func _status_build_vitals(vb: VBoxContainer) -> void:
+	var s = player.stats
+	if s == null:
+		return
+	vb.add_child(_status_vital_bar("HP", s.HP, s.hp_max,
+			Color(0.85, 0.15, 0.15), Color(0.30, 0.05, 0.05)))
+	vb.add_child(_status_vital_bar("MP", s.MP, s.mp_max,
+			Color(0.25, 0.45, 0.95), Color(0.05, 0.10, 0.30)))
+
+
+func _status_vital_bar(label: String, cur: int, maxv: int,
+		fill: Color, bg: Color) -> Control:
+	var row := HBoxContainer.new()
+	row.custom_minimum_size = Vector2(0, 72)
+	row.add_theme_constant_override("separation", 16)
+	var name_lbl := Label.new()
+	name_lbl.text = label
+	name_lbl.custom_minimum_size = Vector2(80, 0)
+	name_lbl.add_theme_font_size_override("font_size", 40)
+	row.add_child(name_lbl)
+	var bar := ProgressBar.new()
+	bar.max_value = max(1, maxv)
+	bar.value = cur
+	bar.show_percentage = false
+	bar.custom_minimum_size = Vector2(0, 56)
+	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var fill_style := StyleBoxFlat.new()
+	fill_style.bg_color = fill
+	fill_style.corner_radius_top_left = 4
+	fill_style.corner_radius_top_right = 4
+	fill_style.corner_radius_bottom_left = 4
+	fill_style.corner_radius_bottom_right = 4
+	bar.add_theme_stylebox_override("fill", fill_style)
+	var bg_style := StyleBoxFlat.new()
+	bg_style.bg_color = bg
+	bg_style.corner_radius_top_left = 4
+	bg_style.corner_radius_top_right = 4
+	bg_style.corner_radius_bottom_left = 4
+	bg_style.corner_radius_bottom_right = 4
+	bar.add_theme_stylebox_override("background", bg_style)
+	row.add_child(bar)
+	var val_lbl := Label.new()
+	val_lbl.text = "%d / %d" % [cur, maxv]
+	val_lbl.add_theme_font_size_override("font_size", 36)
+	val_lbl.custom_minimum_size = Vector2(220, 0)
+	val_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	row.add_child(val_lbl)
+	return row
+
+
+## STR / DEX / INT row — three equal cards.
+func _status_build_attributes(vb: VBoxContainer) -> void:
+	var s = player.stats
+	if s == null:
+		return
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 12)
+	h.add_child(_status_attr_card("STR", s.STR, Color(1.00, 0.55, 0.35)))
+	h.add_child(_status_attr_card("DEX", s.DEX, Color(0.40, 1.00, 0.55)))
+	h.add_child(_status_attr_card("INT", s.INT, Color(0.55, 0.70, 1.00)))
+	vb.add_child(h)
+
+
+func _status_attr_card(label: String, value: int, tint: Color) -> Control:
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(tint.r * 0.15, tint.g * 0.15, tint.b * 0.15, 0.8)
+	sb.border_color = tint
+	sb.border_width_left = 3
+	sb.border_width_top = 3
+	sb.border_width_right = 3
+	sb.border_width_bottom = 3
+	sb.corner_radius_top_left = 6
+	sb.corner_radius_top_right = 6
+	sb.corner_radius_bottom_left = 6
+	sb.corner_radius_bottom_right = 6
+	sb.content_margin_left = 16
+	sb.content_margin_right = 16
+	sb.content_margin_top = 12
+	sb.content_margin_bottom = 12
+	panel.add_theme_stylebox_override("panel", sb)
+	var col := VBoxContainer.new()
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	panel.add_child(col)
+	var name_lbl := Label.new()
+	name_lbl.text = label
+	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.add_theme_font_size_override("font_size", 32)
+	name_lbl.modulate = tint
+	col.add_child(name_lbl)
+	var val_lbl := Label.new()
+	val_lbl.text = str(value)
+	val_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	val_lbl.add_theme_font_size_override("font_size", 60)
+	col.add_child(val_lbl)
+	return panel
+
+
+## AC / EV / ATK read-out.
+func _status_build_combat(vb: VBoxContainer) -> void:
+	var s = player.stats
+	if s == null:
+		return
+	vb.add_child(_status_section_header("Combat"))
+	var w_dmg: int = WeaponRegistry.weapon_damage_for(player.equipped_weapon_id)
+	var str_bonus: int = s.STR / 3
+	var gear_dmg: int = player.gear_damage_bonus() if player.has_method("gear_damage_bonus") else 0
+	var total_atk: int = w_dmg + str_bonus + player.weapon_bonus_dmg + gear_dmg
+	var ev_bonus: int = s.EV
+	var dex_ev: int = s.DEX / 2
+	var total_ev: int = dex_ev + ev_bonus
+
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 12)
+	h.add_child(_status_stat_card("AC", s.AC,
+			"race %+d · armor %+d" % [
+				player.race_res.base_ac if player.race_res else 0,
+				s.AC - (player.race_res.base_ac if player.race_res else 0)]))
+	h.add_child(_status_stat_card("EV", total_ev,
+			"DEX/2 %+d · gear %+d" % [dex_ev, ev_bonus]))
+	h.add_child(_status_stat_card("ATK", total_atk,
+			"wpn %d · STR %+d · gear %+d" % [w_dmg, str_bonus, gear_dmg + player.weapon_bonus_dmg]))
+	vb.add_child(h)
+
+
+func _status_stat_card(label: String, value: int, sub: String) -> Control:
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.10, 0.10, 0.14, 0.85)
+	sb.border_color = Color(0.45, 0.45, 0.55)
+	sb.border_width_left = 2
+	sb.border_width_top = 2
+	sb.border_width_right = 2
+	sb.border_width_bottom = 2
+	sb.corner_radius_top_left = 6
+	sb.corner_radius_top_right = 6
+	sb.corner_radius_bottom_left = 6
+	sb.corner_radius_bottom_right = 6
+	sb.content_margin_left = 14
+	sb.content_margin_right = 14
+	sb.content_margin_top = 10
+	sb.content_margin_bottom = 10
+	panel.add_theme_stylebox_override("panel", sb)
+	var col := VBoxContainer.new()
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	panel.add_child(col)
+	var head := HBoxContainer.new()
+	head.alignment = BoxContainer.ALIGNMENT_CENTER
+	head.add_theme_constant_override("separation", 12)
+	var name_lbl := Label.new()
+	name_lbl.text = label
+	name_lbl.add_theme_font_size_override("font_size", 30)
+	name_lbl.modulate = Color(0.75, 0.80, 0.90)
+	head.add_child(name_lbl)
+	var val_lbl := Label.new()
+	val_lbl.text = str(value)
+	val_lbl.add_theme_font_size_override("font_size", 48)
+	head.add_child(val_lbl)
+	col.add_child(head)
+	var sub_lbl := Label.new()
+	sub_lbl.text = sub
+	sub_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub_lbl.add_theme_font_size_override("font_size", 22)
+	sub_lbl.modulate = Color(0.65, 0.65, 0.70)
+	col.add_child(sub_lbl)
+	return panel
+
+
+## One row per equipment slot with icon + name + stat summary.
+func _status_build_equipment(vb: VBoxContainer) -> void:
+	vb.add_child(_status_section_header("Equipment"))
+	# Weapon
+	var w_id: String = player.equipped_weapon_id
+	if w_id != "":
+		var w_dmg: int = WeaponRegistry.weapon_damage_for(w_id)
+		vb.add_child(_status_gear_row("Weapon",
+				WeaponRegistry.display_name_for(w_id),
+				"dmg %d" % w_dmg, TileRenderer.item(w_id),
+				player.equipped_weapon_cursed))
+	else:
+		vb.add_child(_status_gear_row("Weapon", "(unarmed)", "", null, false))
+	for slot in ["chest", "cloak", "legs", "boots", "helm", "gloves"]:
+		if player.equipped_armor.has(slot):
+			var a: Dictionary = player.equipped_armor[slot]
+			var aid: String = String(a.get("id", ""))
+			var bits: Array = []
+			if int(a.get("ac", 0)) != 0:
+				bits.append("AC +%d" % int(a.get("ac", 0)))
+			if int(a.get("ev_bonus", 0)) != 0:
+				bits.append("EV +%d" % int(a.get("ev_bonus", 0)))
+			vb.add_child(_status_gear_row(slot.capitalize(),
+					String(a.get("name", aid)),
+					"  ".join(PackedStringArray(bits)),
+					TileRenderer.item(aid),
+					bool(a.get("cursed", false))))
+
+
+func _status_gear_row(slot: String, display: String, sub: String,
+		tex: Texture2D, cursed: bool) -> Control:
+	var row := HBoxContainer.new()
+	row.custom_minimum_size = Vector2(0, 68)
+	row.add_theme_constant_override("separation", 12)
+	if tex != null:
+		var icon := TextureRect.new()
+		icon.texture = tex
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.custom_minimum_size = Vector2(56, 56)
+		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(icon)
+	var slot_lbl := Label.new()
+	slot_lbl.text = slot
+	slot_lbl.custom_minimum_size = Vector2(160, 0)
+	slot_lbl.add_theme_font_size_override("font_size", 26)
+	slot_lbl.modulate = Color(0.65, 0.65, 0.70)
+	row.add_child(slot_lbl)
+	var name_lbl := Label.new()
+	name_lbl.text = display + ("  (cursed)" if cursed else "")
+	name_lbl.add_theme_font_size_override("font_size", 34)
+	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(name_lbl)
+	if sub != "":
+		var sub_lbl := Label.new()
+		sub_lbl.text = sub
+		sub_lbl.add_theme_font_size_override("font_size", 26)
+		sub_lbl.modulate = Color(0.55, 0.85, 0.55)
+		sub_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		row.add_child(sub_lbl)
+	return row
+
+
+## Rings section (always shown if player has ring slots configured).
+func _status_build_rings(vb: VBoxContainer) -> void:
+	if not (player.equipped_rings is Array):
+		return
+	var cap: int = player.max_ring_slots() if player.has_method("max_ring_slots") else 2
+	if cap <= 0:
+		return
+	vb.add_child(_status_section_header("Rings (%d / %d slots)" % [
+			_count_equipped_rings(), cap]))
+	for i in cap:
+		var ring: Dictionary = {}
+		if i < player.equipped_rings.size() and typeof(player.equipped_rings[i]) == TYPE_DICTIONARY:
+			ring = player.equipped_rings[i]
+		if ring.is_empty():
+			vb.add_child(_status_gear_row("Ring %d" % (i + 1),
+					"(empty)", "", null, false))
+		else:
+			var rid: String = String(ring.get("id", ""))
+			vb.add_child(_status_gear_row("Ring %d" % (i + 1),
+					String(ring.get("name", rid)),
+					_ring_effect_summary(ring),
+					TileRenderer.item(rid),
+					false))
+
+
+func _count_equipped_rings() -> int:
+	var n: int = 0
+	for ring in player.equipped_rings:
+		if typeof(ring) == TYPE_DICTIONARY and not ring.is_empty():
+			n += 1
+	return n
+
+
+func _ring_effect_summary(ring: Dictionary) -> String:
+	var bits: Array = []
+	for key in ["str", "dex", "int_", "ac", "ev", "mp_max",
+			"dmg_bonus", "spell_power", "regen", "stealth",
+			"fire_apt", "cold_apt"]:
+		var v: int = int(ring.get(key, 0))
+		if v == 0:
+			continue
+		var label: String = {
+			"str": "STR", "dex": "DEX", "int_": "INT",
+			"ac": "AC", "ev": "EV", "mp_max": "MP",
+			"dmg_bonus": "dmg", "spell_power": "pow",
+			"regen": "regen", "stealth": "Stealth",
+			"fire_apt": "Fire", "cold_apt": "Cold",
+		}.get(key, key)
+		bits.append("%s %+d" % [label, v])
+	return "  ".join(PackedStringArray(bits))
+
+
+## Racial trait description block (only drawn when the player's race has one).
+func _status_build_trait(vb: VBoxContainer) -> void:
+	var trait_id: String = ""
+	if player.race_res != null:
+		trait_id = player.race_res.racial_trait
+	if trait_id == "":
+		return
+	vb.add_child(_status_section_header("Racial Trait"))
+	var panel := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.15, 0.12, 0.05, 0.85)
+	sb.border_color = Color(1.0, 0.85, 0.30)
+	sb.border_width_left = 2
+	sb.border_width_top = 2
+	sb.border_width_right = 2
+	sb.border_width_bottom = 2
+	sb.corner_radius_top_left = 6
+	sb.corner_radius_top_right = 6
+	sb.corner_radius_bottom_left = 6
+	sb.corner_radius_bottom_right = 6
+	sb.content_margin_left = 14
+	sb.content_margin_right = 14
+	sb.content_margin_top = 12
+	sb.content_margin_bottom = 12
+	panel.add_theme_stylebox_override("panel", sb)
+	var lbl := Label.new()
+	lbl.text = _describe_trait(trait_id)
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lbl.add_theme_font_size_override("font_size", 30)
+	panel.add_child(lbl)
+	vb.add_child(panel)
 
 
 ## One row in the Status popup per essence slot. Shows the slotted essence's
@@ -2835,11 +3201,33 @@ func _build_status_text() -> String:
 
 func _describe_trait(trait_id: String) -> String:
 	match trait_id:
-		"trollregen":     return "Troll Regeneration — recovers 1 HP every turn."
-		"spriggan_speed": return "Spriggan Speed — moves twice per enemy turn."
-		"draconian_resist": return "Draconian Scales — bonus AC and elemental resistance."
-		"minotaur_headbutt": return "Minotaur Headbutt — 25% chance for bonus melee damage."
-		"catfolk_claws":  return "Catfolk Claws — +3 damage when fighting unarmed."
+		"trollregen":            return "Troll Regeneration — recovers 2 HP every turn."
+		"spriggan_speed":        return "Spriggan Speed — moves twice per enemy turn."
+		"draconian_resist":      return "Draconian Scales — bonus AC (elemental resistance coming with element typing)."
+		"minotaur_headbutt":     return "Minotaur Headbutt — 25% chance for +2–5 bonus melee damage."
+		"catfolk_claws":         return "Catfolk Claws — +3 damage when fighting unarmed."
+		"halfling_lucky":        return "Halfling Luck — 15% chance to dodge any incoming hit entirely."
+		"deep_dwarf_dr":         return "Deep Dwarf Damage Reduction — incoming damage halved or −1."
+		"ghoul_claws":           return "Ghoul Claws — +3 damage when fighting unarmed."
+		"vine_stalker_mpregen":  return "Vine Regeneration — +1 MP per turn, +2 MP on kill."
+		"vampire_bloodfeast":    return "Blood Feast — heal 3–5 HP on every kill."
+		"barachi_xp_bonus":      return "Amphibious Insight — +25% XP from every kill."
+		"demigod_slow_xp":       return "Demigod — godly stats, but gains only 50% XP."
+		"mummy_undead":          return "Undead — no potions, 75% XP, bonus necromancy magic."
+		"djinni_flight":         return "Djinni Flight — +2 EV, glides over water and lava."
+		"tengu_flight":          return "Tengu Flight — +2 EV, can walk over water tiles."
+		"gargoyle_stone":        return "Stone Body — +4 racial AC, immune to poison."
+		"oni_magical_might":     return "Magical Might — spell power boosted by 20%."
+		"formicid_stasis":       return "Formicid Stasis — cannot be teleported or blinked."
+		"merfolk_swim":          return "Merfolk Swim — swims across water tiles."
+		"naga_poison_spit":      return "Venomous Bite — +1 damage on every melee hit."
+		"kobold_sneak":          return "Sneak — bonus melee damage scaled by Stealth skill."
+		"gnoll_jack_of_trades":  return "Jack of All Trades — every skill trains at the same rate."
+		"octopode_many_rings":   return "Many Arms — can wear up to 8 rings simultaneously."
+		"coglin_dualwield":      return "Coglin Dual-Wield — exo-suit carries two weapons (in progress)."
+		"demonspawn_mutations":  return "Demonspawn Mutations — gain random mutations as you level (in progress)."
+		"meteoran_reroll":       return "Meteoran Echo — glimpses of unlived lives (in progress)."
+		"deep_dwarf_dr":         return "Deep Dwarf — natural damage reduction."
 		_: return trait_id
 
 
