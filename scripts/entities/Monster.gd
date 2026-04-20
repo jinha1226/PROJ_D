@@ -91,8 +91,19 @@ func _mon_resist_level(element: String) -> int:
 				total += int(tail)
 			else:
 				total += 1
-	# Holiness-derived defaults (DCSS mons_class_res_*).
-	var holy: String = String(data.get("holiness", "") if "holiness" in data else "")
+	# Holiness-derived defaults (DCSS mons_class_res_*). Our MonsterData
+	# doesn't have a dedicated `holiness` field yet; read the tag off the
+	# `flags` array + `shape` instead. Resource.get() is one-arg in Godot 4,
+	# so the earlier `data.get("holiness", "")` was a parse error.
+	var holy: String = ""
+	if data.shape == "undead":
+		holy = "undead"
+	elif data.flags != null:
+		for f in data.flags:
+			var lf: String = String(f).to_lower()
+			if lf == "undead" or lf == "demonic" or lf == "nonliving" or lf == "holy":
+				holy = lf
+				break
 	match element:
 		"cold", "drain":
 			if holy == "undead" or holy == "nonliving":
