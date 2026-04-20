@@ -1,5 +1,57 @@
 class_name SpellRegistry
 extends Object
+## Two-layer spell catalog:
+##   1. SPELLS const — hand-tuned entries with damage/color/desc/effect.
+##   2. DCSS JSON (409 spells) — level, range, schools, flags. Loaded lazily.
+## SPELLS takes priority on overlap; DCSS data fills in the rest.
+
+const _DCSS_JSON := "res://assets/dcss_spells/spells.json"
+
+static var _dcss: Dictionary = {}   # id → dcss entry
+static var _loaded: bool = false
+
+
+static func _ensure_loaded() -> void:
+	if _loaded:
+		return
+	_loaded = true
+	var f := FileAccess.open(_DCSS_JSON, FileAccess.READ)
+	if f == null:
+		return
+	var parsed = JSON.parse_string(f.get_as_text())
+	f.close()
+	if not (parsed is Array):
+		return
+	for entry in parsed:
+		var sid: String = String(entry.get("id", ""))
+		if sid != "":
+			_dcss[sid] = entry
+
+
+## Merge DCSS data onto a custom entry dict (non-destructive).
+static func _enrich(id: String, base: Dictionary) -> Dictionary:
+	_ensure_loaded()
+	var d: Dictionary = base.duplicate()
+	var dc: Dictionary = _dcss.get(id, {})
+	if dc.is_empty():
+		return d
+	# Use DCSS level as difficulty if we don't have one set, or if ours is default 1.
+	if not d.has("difficulty") or int(d.get("difficulty", 1)) == 1:
+		var dc_lv: int = int(dc.get("level", 1))
+		if dc_lv > 0:
+			d["difficulty"] = dc_lv
+	# Use DCSS level as mp cost if missing.
+	if not d.has("mp"):
+		d["mp"] = int(dc.get("mp", 1))
+	# Use DCSS max_range if our range is default 9 or missing.
+	var dc_range: int = int(dc.get("max_range", -1))
+	if dc_range > 0 and (not d.has("range") or int(d.get("range", 9)) == 9):
+		d["range"] = dc_range
+	# Add DCSS flags array.
+	if not d.has("flags"):
+		d["flags"] = dc.get("flags", [])
+	return d
+
 
 const SPELLS: Dictionary = {
 	"magic_dart": {
@@ -239,8 +291,38 @@ const SCHOOL_SPELLS: Dictionary = {
 }
 
 
+## Returns spell data, enriched with DCSS level/range/flags where applicable.
+## Falls back to raw DCSS entry if not in our custom SPELLS dict.
 static func get_spell(id: String) -> Dictionary:
-	return SPELLS.get(id, {})
+	_ensure_loaded()
+	if SPELLS.has(id):
+		return _enrich(id, SPELLS[id])
+	# Pure DCSS spell — build a minimal entry from JSON data.
+	var dc: Dictionary = _dcss.get(id, {})
+	if dc.is_empty():
+		return {}
+	var schools: Array = dc.get("schools", [])
+	return {
+		"name":       String(dc.get("name", id.replace("_", " ").capitalize())),
+		"school":     schools[0] if schools.size() > 0 else "none",
+		"schools":    schools,
+		"mp":         int(dc.get("mp", 1)),
+		"difficulty": int(dc.get("level", 1)),
+		"targeting":  String(dc.get("targeting", "single")),
+		"range":      int(dc.get("max_range", 9)) if int(dc.get("max_range", -1)) > 0 else 9,
+		"effect":     "damage",
+		"flags":      dc.get("flags", []),
+		"color":      Color(0.75, 0.75, 1.0),
+		"desc":       "",
+		"min_dmg":    0,
+		"max_dmg":    int(dc.get("level", 1)) * 4,
+	}
+
+
+## True if this spell id is known to us (custom or DCSS).
+static func is_known_spell(id: String) -> bool:
+	_ensure_loaded()
+	return SPELLS.has(id) or _dcss.has(id)
 
 
 static func get_known_for_player(player: Node, skill_sys: Node) -> Array[String]:

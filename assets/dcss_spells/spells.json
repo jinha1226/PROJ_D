@@ -1,0 +1,6706 @@
+[
+  {
+    "id": "cause_fear",
+    "name": "Cause Fear",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "wl_check"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "magic_dart",
+    "name": "Magic Dart",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 1,
+    "power_cap": 25,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 1,
+    "targeting": "single"
+  },
+  {
+    "id": "fireball",
+    "name": "Fireball",
+    "schools": [
+      "conjurations",
+      "fire"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "apportation",
+    "name": "Apportation",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted",
+      "object",
+      "not_self"
+    ],
+    "level": 1,
+    "power_cap": 50,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 1,
+    "targeting": "single"
+  },
+  {
+    "id": "blastmote",
+    "name": "Volatile Blastmotes",
+    "schools": [
+      "fire",
+      "translocation"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 3,
+    "power_cap": 50,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "dig",
+    "name": "Dig",
+    "schools": [
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "bolt_of_fire",
+    "name": "Bolt of Fire",
+    "schools": [
+      "conjurations",
+      "fire"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "bolt_of_cold",
+    "name": "Bolt of Cold",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "lightning_bolt",
+    "name": "Lightning Bolt",
+    "schools": [
+      "conjurations",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "arcjolt",
+    "name": "Arcjolt",
+    "schools": [
+      "conjurations",
+      "air"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 2,
+    "max_range": 2,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "plasma_beam",
+    "name": "Plasma Beam",
+    "schools": [
+      "fire",
+      "air"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "permafrost_eruption",
+    "name": "Permafrost Eruption",
+    "schools": [
+      "cold",
+      "earth"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "blinkbolt",
+    "name": "Blinkbolt",
+    "schools": [
+      "air",
+      "translocation"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "electric_charge",
+    "name": "Vhi's Electric Charge",
+    "schools": [
+      "air",
+      "translocation"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 4,
+    "min_range": 50,
+    "max_range": 50,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "electrolunge",
+    "name": "Vhi's Electrolunge",
+    "schools": [
+      "air",
+      "translocation"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "bolt_of_magma",
+    "name": "Bolt of Magma",
+    "schools": [
+      "conjurations",
+      "fire",
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "polymorph",
+    "name": "Polymorph",
+    "schools": [
+      "alchemy",
+      "hexes"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 4,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "slow",
+    "name": "Slow",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "wl_check"
+    ],
+    "level": 1,
+    "power_cap": 25,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 1,
+    "targeting": "single"
+  },
+  {
+    "id": "haste",
+    "name": "Haste",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "helpful",
+      "hasty",
+      "self"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "petrify",
+    "name": "Petrify",
+    "schools": [
+      "alchemy",
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "wl_check"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "confuse",
+    "name": "Confuse",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "wl_check"
+    ],
+    "level": 0,
+    "power_cap": 3,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "invisibility",
+    "name": "Invisibility",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "helpful",
+      "self"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "throw_flame",
+    "name": "Throw Flame",
+    "schools": [
+      "conjurations",
+      "fire"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 2,
+    "power_cap": 50,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 2,
+    "targeting": "single"
+  },
+  {
+    "id": "throw_frost",
+    "name": "Throw Frost",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 2,
+    "power_cap": 50,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 2,
+    "targeting": "single"
+  },
+  {
+    "id": "disjunction",
+    "name": "Disjunction",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [],
+    "level": 8,
+    "power_cap": 200,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 8,
+    "targeting": "self"
+  },
+  {
+    "id": "freezing_cloud",
+    "name": "Freezing Cloud",
+    "schools": [
+      "conjurations",
+      "cold",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "freezing_gust",
+    "name": "Freezing Gust",
+    "schools": [
+      "conjurations",
+      "cold",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "mephitic_cloud",
+    "name": "Mephitic Cloud",
+    "schools": [
+      "conjurations",
+      "alchemy",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "venom_bolt",
+    "name": "Venom Bolt",
+    "schools": [
+      "conjurations",
+      "alchemy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "olgrebs_toxic_radiance",
+    "name": "Olgreb's Toxic Radiance",
+    "schools": [
+      "alchemy"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "teleport_other",
+    "name": "Teleport Other",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted",
+      "not_self",
+      "wl_check"
+    ],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "deaths_door",
+    "name": "Death's Door",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 9,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 9,
+    "targeting": "self"
+  },
+  {
+    "id": "mass_confusion",
+    "name": "Mass Confusion",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "wl_check"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "smiting",
+    "name": "Smiting",
+    "schools": [
+      "none"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "summon_small_mammal",
+    "name": "Summon Small Mammal",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 1,
+    "power_cap": 25,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 1,
+    "targeting": "self"
+  },
+  {
+    "id": "abjuration",
+    "name": "Abjuration",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 3,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "bolt_of_draining",
+    "name": "Bolt of Draining",
+    "schools": [
+      "conjurations",
+      "necromancy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "lehudibs_crystal_spear",
+    "name": "Lehudib's Crystal Spear",
+    "schools": [
+      "conjurations",
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 8,
+    "power_cap": 200,
+    "min_range": 3,
+    "max_range": 3,
+    "mp": 8,
+    "targeting": "single"
+  },
+  {
+    "id": "polar_vortex",
+    "name": "Polar Vortex",
+    "schools": [
+      "cold"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 9,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 9,
+    "targeting": "self"
+  },
+  {
+    "id": "poisonous_cloud",
+    "name": "Poisonous Cloud",
+    "schools": [
+      "conjurations",
+      "alchemy",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "fire_storm",
+    "name": "Fire Storm",
+    "schools": [
+      "conjurations",
+      "fire"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 9,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 9,
+    "targeting": "single"
+  },
+  {
+    "id": "call_down_damnation",
+    "name": "Call Down Damnation",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 9,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 9,
+    "targeting": "single"
+  },
+  {
+    "id": "call_down_lightning",
+    "name": "Call Down Lightning",
+    "schools": [
+      "conjurations",
+      "air"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "blink",
+    "name": "Blink",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "self"
+    ],
+    "level": 2,
+    "power_cap": 50,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 2,
+    "targeting": "self"
+  },
+  {
+    "id": "blink_range",
+    "name": "Blink Range",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "self"
+    ],
+    "level": 2,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 2,
+    "targeting": "self"
+  },
+  {
+    "id": "blink_away",
+    "name": "Blink Away",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "self"
+    ],
+    "level": 2,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 2,
+    "targeting": "self"
+  },
+  {
+    "id": "blink_close",
+    "name": "Blink Close",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 2,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 2,
+    "targeting": "single"
+  },
+  {
+    "id": "iskenderuns_mystic_blast",
+    "name": "Iskenderun's Mystic Blast",
+    "schools": [
+      "conjurations",
+      "translocation"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": 2,
+    "max_range": 2,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_horrible_things",
+    "name": "Summon Horrible Things",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 8,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 8,
+    "targeting": "self"
+  },
+  {
+    "id": "malign_gateway",
+    "name": "Malign Gateway",
+    "schools": [
+      "summoning",
+      "translocation"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "charming",
+    "name": "Charm",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "not_self",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 4,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "animate_dead",
+    "name": "Animate Dead",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "helpful"
+    ],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "pain",
+    "name": "Pain",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "wl_check"
+    ],
+    "level": 0,
+    "power_cap": 1,
+    "min_range": 25,
+    "max_range": 25,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "soul_splinter",
+    "name": "Soul Splinter",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "wl_check"
+    ],
+    "level": 0,
+    "power_cap": 1,
+    "min_range": 25,
+    "max_range": 25,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "vampiric_draining",
+    "name": "Vampiric Draining",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": 1,
+    "max_range": 1,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "haunt",
+    "name": "Haunt",
+    "schools": [
+      "summoning",
+      "necromancy"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "martyrs_knell",
+    "name": "Martyr's Knell",
+    "schools": [
+      "summoning",
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "borgnjors_revivification",
+    "name": "Borgnjor's Revivification",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 8,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 8,
+    "targeting": "self"
+  },
+  {
+    "id": "freeze",
+    "name": "Freeze",
+    "schools": [
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "not_self",
+      "destructive"
+    ],
+    "level": 1,
+    "power_cap": 25,
+    "min_range": 1,
+    "max_range": 1,
+    "mp": 1,
+    "targeting": "single"
+  },
+  {
+    "id": "ozocubus_refrigeration",
+    "name": "Ozocubu's Refrigeration",
+    "schools": [
+      "cold"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "sticky_flame",
+    "name": "Sticky Flame",
+    "schools": [
+      "alchemy",
+      "fire"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "destructive"
+    ],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": 1,
+    "max_range": 1,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "summon_ice_beast",
+    "name": "Summon Ice Beast",
+    "schools": [
+      "cold",
+      "summoning"
+    ],
+    "flags": [],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "ozocubus_armour",
+    "name": "Ozocubu's Armour",
+    "schools": [
+      "cold"
+    ],
+    "flags": [],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "call_imp",
+    "name": "Call Imp",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 2,
+    "power_cap": 50,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 2,
+    "targeting": "self"
+  },
+  {
+    "id": "deflect_missiles",
+    "name": "Deflect Missiles",
+    "schools": [
+      "air"
+    ],
+    "flags": [
+      "self"
+    ],
+    "level": 6,
+    "power_cap": 50,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "berserker_rage",
+    "name": "Berserker Rage",
+    "schools": [
+      "earth"
+    ],
+    "flags": [
+      "hasty",
+      "self"
+    ],
+    "level": 3,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "dispel_undead",
+    "name": "Dispel Undead",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": 1,
+    "max_range": 1,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "poison_arrow",
+    "name": "Poison Arrow",
+    "schools": [
+      "conjurations",
+      "alchemy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "banishment",
+    "name": "Banishment",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 4,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "sting",
+    "name": "Sting",
+    "schools": [
+      "conjurations",
+      "alchemy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 1,
+    "power_cap": 25,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 1,
+    "targeting": "single"
+  },
+  {
+    "id": "sublimation_of_blood",
+    "name": "Sublimation of Blood",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 2,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 2,
+    "targeting": "self"
+  },
+  {
+    "id": "tukimas_dance",
+    "name": "Tukima's Dance",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "wl_check"
+    ],
+    "level": 0,
+    "power_cap": 3,
+    "min_range": 100,
+    "max_range": 100,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "summon_demon",
+    "name": "Summon Demon",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_greater_demon",
+    "name": "Summon Greater Demon",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 0,
+    "power_cap": 7,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "self"
+  },
+  {
+    "id": "putrefaction",
+    "name": "Cigotuvi's Putrefaction",
+    "schools": [
+      "necromancy",
+      "air"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "iron_shot",
+    "name": "Iron Shot",
+    "schools": [
+      "conjurations",
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "bombard",
+    "name": "Bombard",
+    "schools": [
+      "conjurations",
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "stone_arrow",
+    "name": "Stone Arrow",
+    "schools": [
+      "conjurations",
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 3,
+    "power_cap": 50,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "shock",
+    "name": "Shock",
+    "schools": [
+      "conjurations",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 1,
+    "power_cap": 25,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 1,
+    "targeting": "single"
+  },
+  {
+    "id": "swiftness",
+    "name": "Swiftness",
+    "schools": [
+      "air"
+    ],
+    "flags": [
+      "hasty",
+      "self"
+    ],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "agonising_touch",
+    "name": "Agonising Touch",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "curse_of_agony",
+    "name": "Curse of Agony",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted",
+      "not_self",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 100,
+    "max_range": 100,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "mindburst",
+    "name": "Mindburst",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "not_self",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 6,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "death_channel",
+    "name": "Death Channel",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "helpful",
+      "self"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "symbol_of_torment",
+    "name": "Symbol of Torment",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "siphon_essence",
+    "name": "Siphon Essence",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 0,
+    "min_range": 2,
+    "max_range": 2,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "throw_icicle",
+    "name": "Throw Icicle",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "airstrike",
+    "name": "Airstrike",
+    "schools": [
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "not_self",
+      "destructive"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "momentum_strike",
+    "name": "Momentum Strike",
+    "schools": [
+      "conjurations",
+      "translocation"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 2,
+    "power_cap": 50,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 2,
+    "targeting": "single"
+  },
+  {
+    "id": "shadow_creatures",
+    "name": "Shadow Creatures",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "confusing_touch",
+    "name": "Confusing Touch",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "self",
+      "wl_check"
+    ],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "passwall",
+    "name": "Passwall",
+    "schools": [
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": 3,
+    "max_range": 3,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "ignite_poison",
+    "name": "Ignite Poison",
+    "schools": [
+      "fire",
+      "alchemy"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "call_canine_familiar",
+    "name": "Call Canine Familiar",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_dragon",
+    "name": "Summon Dragon",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 9,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 9,
+    "targeting": "self"
+  },
+  {
+    "id": "hibernation",
+    "name": "Ensorcelled Hibernation",
+    "schools": [
+      "hexes",
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "not_self",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 2,
+    "min_range": 50,
+    "max_range": 50,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "englaciation",
+    "name": "Metabolic Englaciation",
+    "schools": [
+      "hexes",
+      "cold"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "silence",
+    "name": "Silence",
+    "schools": [
+      "hexes",
+      "air"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "shatter",
+    "name": "Shatter",
+    "schools": [
+      "earth"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 9,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 9,
+    "targeting": "self"
+  },
+  {
+    "id": "dispersal",
+    "name": "Dispersal",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 1,
+    "max_range": 4,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "discharge",
+    "name": "Static Discharge",
+    "schools": [
+      "conjurations",
+      "air"
+    ],
+    "flags": [],
+    "level": 2,
+    "power_cap": 50,
+    "min_range": 1,
+    "max_range": 1,
+    "mp": 2,
+    "targeting": "self"
+  },
+  {
+    "id": "corona",
+    "name": "Corona",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 1,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "intoxicate",
+    "name": "Alistair's Intoxication",
+    "schools": [
+      "alchemy"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 150,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "lrd",
+    "name": "Lee's Rapid Deconstruction",
+    "schools": [
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "destructive"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "sandblast",
+    "name": "Sandblast",
+    "schools": [
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "not_self",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 1,
+    "min_range": 50,
+    "max_range": 50,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "simulacrum",
+    "name": "Sculpt Simulacrum",
+    "schools": [
+      "cold",
+      "alchemy"
+    ],
+    "flags": [
+      "targeted",
+      "not_self",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 6,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "conjure_ball_lightning",
+    "name": "Conjure Ball Lightning",
+    "schools": [
+      "air",
+      "conjurations"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "chain_lightning",
+    "name": "Chain Lightning",
+    "schools": [
+      "air",
+      "conjurations"
+    ],
+    "flags": [],
+    "level": 9,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 9,
+    "targeting": "self"
+  },
+  {
+    "id": "portal_projectile",
+    "name": "Portal Projectile",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 3,
+    "power_cap": 50,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "monstrous_menagerie",
+    "name": "Monstrous Menagerie",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "golubrias_passage",
+    "name": "Passage of Golubria",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted",
+      "self"
+    ],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": 2,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "fulminant_prism",
+    "name": "Fulminant Prism",
+    "schools": [
+      "conjurations",
+      "alchemy"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "paralyse",
+    "name": "Paralyse",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 4,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "minor_healing",
+    "name": "Minor Healing",
+    "schools": [
+      "none"
+    ],
+    "flags": [
+      "helpful",
+      "self"
+    ],
+    "level": 2,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 2,
+    "targeting": "self"
+  },
+  {
+    "id": "major_healing",
+    "name": "Major Healing",
+    "schools": [
+      "none"
+    ],
+    "flags": [
+      "helpful",
+      "self"
+    ],
+    "level": 6,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "woodweal",
+    "name": "Woodweal",
+    "schools": [
+      "none"
+    ],
+    "flags": [
+      "helpful",
+      "self"
+    ],
+    "level": 4,
+    "power_cap": 0,
+    "min_range": 1,
+    "max_range": 1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "hurl_damnation",
+    "name": "Hurl Damnation",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "brain_bite",
+    "name": "Brain Bite",
+    "schools": [
+      "necromancy",
+      "hexes"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 3,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "noxious_cloud",
+    "name": "Noxious Cloud",
+    "schools": [
+      "conjurations",
+      "alchemy",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "steam_ball",
+    "name": "Steam Ball",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 4,
+    "power_cap": 0,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "ufetubi_swarm",
+    "name": "Ufetubi Swarm",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_sin_beast",
+    "name": "Summon Sin Beast",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "bolt_of_devastation",
+    "name": "Bolt of Devastation",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "spit_poison",
+    "name": "Spit Poison",
+    "schools": [
+      "alchemy"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 2,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "summon_undead",
+    "name": "Summon Undead",
+    "schools": [
+      "summoning",
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "cantrip",
+    "name": "Cantrip",
+    "schools": [
+      "none"
+    ],
+    "flags": [],
+    "level": 1,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 1,
+    "targeting": "self"
+  },
+  {
+    "id": "quicksilver_bolt",
+    "name": "Quicksilver Bolt",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "not_self"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "metal_splinters",
+    "name": "Metal Splinters",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "splinterspray",
+    "name": "Splinterspray",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 4,
+    "power_cap": 0,
+    "min_range": 3,
+    "max_range": 3,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "miasma_breath",
+    "name": "Miasma Breath",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 6,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "summon_drakes",
+    "name": "Summon Drakes",
+    "schools": [
+      "summoning",
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "blink_other",
+    "name": "Blink Other",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 2,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "blink_other_close",
+    "name": "Blink Other Close",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 2,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 2,
+    "targeting": "single"
+  },
+  {
+    "id": "summon_mushrooms",
+    "name": "Summon Mushrooms",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "spit_acid",
+    "name": "Spit Acid",
+    "schools": [
+      "alchemy"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "caustic_breath",
+    "name": "Caustic Breath",
+    "schools": [
+      "conjurations",
+      "alchemy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "pyre_arrow",
+    "name": "Pyre Arrow",
+    "schools": [
+      "conjurations",
+      "fire"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "fire_breath",
+    "name": "Fire Breath",
+    "schools": [
+      "conjurations",
+      "fire"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "searing_breath",
+    "name": "Searing Breath",
+    "schools": [
+      "conjurations",
+      "fire"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "chaos_breath",
+    "name": "Chaos Breath",
+    "schools": [
+      "conjurations",
+      "none"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "cold_breath",
+    "name": "Cold Breath",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "glacial_breath",
+    "name": "Glacial Breath",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "water_elementals",
+    "name": "Summon Water Elementals",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "porkalator",
+    "name": "Porkalator",
+    "schools": [
+      "hexes",
+      "alchemy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "create_tentacles",
+    "name": "Spawn Tentacles",
+    "schools": [
+      "none"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_eyeballs",
+    "name": "Summon Eyeballs",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "haste_other",
+    "name": "Haste Other",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "helpful"
+    ],
+    "level": 0,
+    "power_cap": 6,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "earth_elementals",
+    "name": "Summon Earth Elementals",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "air_elementals",
+    "name": "Summon Air Elementals",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "fire_elementals",
+    "name": "Summon Fire Elementals",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "sleep",
+    "name": "Sleep",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "fake_mara_summon",
+    "name": "Mara Summon",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_illusion",
+    "name": "Summon Illusion",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "primal_wave",
+    "name": "Primal Wave",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "call_tide",
+    "name": "Call Tide",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "iood",
+    "name": "Orb of Destruction",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "not_self",
+      "tracer"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 8,
+    "max_range": 8,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "ink_cloud",
+    "name": "Ink Cloud",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "might",
+    "name": "Might",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "helpful",
+      "self"
+    ],
+    "level": 3,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "might_other",
+    "name": "Might Other",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "helpful",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "awaken_forest",
+    "name": "Awaken Forest",
+    "schools": [
+      "hexes",
+      "summoning"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "druids_call",
+    "name": "Druid's Call",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "brothers_in_arms",
+    "name": "Brothers in Arms",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "trogs_hand",
+    "name": "Trog's Hand",
+    "schools": [
+      "none"
+    ],
+    "flags": [
+      "self"
+    ],
+    "level": 3,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_mortal_champion",
+    "name": "Summon Mortal Champion",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "vanquished_vanguard",
+    "name": "Vanquished Vanguard",
+    "schools": [
+      "necromancy",
+      "summoning"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 4,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "summon_holies",
+    "name": "Summon Holies",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "heal_other",
+    "name": "Heal Other",
+    "schools": [
+      "none"
+    ],
+    "flags": [
+      "targeted",
+      "helpful",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 6,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "holy_flames",
+    "name": "Holy Flames",
+    "schools": [
+      "none"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "holy_breath",
+    "name": "Holy Breath",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "injury_mirror",
+    "name": "Injury Mirror",
+    "schools": [
+      "none"
+    ],
+    "flags": [
+      "self"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "drain_life",
+    "name": "Drain Life",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "ledas_liquefaction",
+    "name": "Leda's Liquefaction",
+    "schools": [
+      "earth",
+      "alchemy"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_hydra",
+    "name": "Summon Hydra",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "mesmerise",
+    "name": "Mesmerise",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "wl_check"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "hellfire_court",
+    "name": "Hellfire Court",
+    "schools": [
+      "summoning",
+      "fire"
+    ],
+    "flags": [],
+    "level": 8,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 8,
+    "targeting": "self"
+  },
+  {
+    "id": "petrifying_cloud",
+    "name": "Petrifying Cloud",
+    "schools": [
+      "conjurations",
+      "earth",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "inner_flame",
+    "name": "Inner Flame",
+    "schools": [
+      "hexes",
+      "fire"
+    ],
+    "flags": [
+      "targeted",
+      "not_self",
+      "wl_check",
+      "destructive"
+    ],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "ensnare",
+    "name": "Ensnare",
+    "schools": [
+      "conjurations",
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "greater_ensnare",
+    "name": "Greater Ensnare",
+    "schools": [
+      "conjurations",
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "thunderbolt",
+    "name": "Thunderbolt",
+    "schools": [
+      "conjurations",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 0,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "battlesphere",
+    "name": "Iskenderun's Battlesphere",
+    "schools": [
+      "conjurations",
+      "forgecraft"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_minor_demon",
+    "name": "Summon Minor Demon",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 2,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 2,
+    "targeting": "self"
+  },
+  {
+    "id": "sticks_to_snakes",
+    "name": "Sticks to Snakes",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 2,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 2,
+    "targeting": "self"
+  },
+  {
+    "id": "malmutate",
+    "name": "Malmutate",
+    "schools": [
+      "alchemy",
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 6,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "gloom",
+    "name": "Gloom",
+    "schools": [
+      "hexes",
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 3,
+    "power_cap": 50,
+    "min_range": 2,
+    "max_range": 3,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "beckoning_gale",
+    "name": "Beckoning Gale",
+    "schools": [
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "force_lance",
+    "name": "Force Lance",
+    "schools": [
+      "conjurations",
+      "translocation"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": 3,
+    "max_range": 3,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "sentinel_mark",
+    "name": "Sentinel's Mark",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "wl_check"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "word_of_recall",
+    "name": "Word of Recall",
+    "schools": [
+      "summoning",
+      "translocation"
+    ],
+    "flags": [],
+    "level": 3,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "injury_bond",
+    "name": "Injury Bond",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "helpful"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "spectral_cloud",
+    "name": "Spectral Cloud",
+    "schools": [
+      "conjurations",
+      "necromancy"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "ghostly_fireball",
+    "name": "Ghostly Fireball",
+    "schools": [
+      "conjurations",
+      "necromancy"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "call_lost_souls",
+    "name": "Call Lost Souls",
+    "schools": [
+      "summoning",
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "dimension_anchor",
+    "name": "Dimension Anchor",
+    "schools": [
+      "translocation",
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "wl_check"
+    ],
+    "level": 0,
+    "power_cap": 4,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "blink_allies_encircle",
+    "name": "Blink Allies Encircling",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "awaken_vines",
+    "name": "Awaken Vines",
+    "schools": [
+      "hexes",
+      "summoning"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "thorn_volley",
+    "name": "Volley of Thorns",
+    "schools": [
+      "conjurations",
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "cage_of_brambles",
+    "name": "Cage of Brambles",
+    "schools": [
+      "earth"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 100,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "waterstrike",
+    "name": "Waterstrike",
+    "schools": [
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "wind_blast",
+    "name": "Wind Blast",
+    "schools": [
+      "air"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 3,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "strip_willpower",
+    "name": "Strip Willpower",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "wl_check"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "fugue_of_the_fallen",
+    "name": "Fugue of the Fallen",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "self"
+    ],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_vermin",
+    "name": "Summon Vermin",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "malign_offering",
+    "name": "Malign Offering",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "searing_ray",
+    "name": "Searing Ray",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 2,
+    "power_cap": 50,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 2,
+    "targeting": "single"
+  },
+  {
+    "id": "discord",
+    "name": "Discord",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "hasty",
+      "wl_check"
+    ],
+    "level": 8,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 8,
+    "targeting": "self"
+  },
+  {
+    "id": "invisibility_other",
+    "name": "Invisibility Other",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "helpful"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "virulence",
+    "name": "Virulence",
+    "schools": [
+      "alchemy",
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "wl_check"
+    ],
+    "level": 0,
+    "power_cap": 4,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "orb_of_electricity",
+    "name": "Orb of Electricity",
+    "schools": [
+      "conjurations",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "flash_freeze",
+    "name": "Flash Freeze",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "creeping_frost",
+    "name": "Creeping Frost",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "legendary_destruction",
+    "name": "Legendary Destruction",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 8,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 8,
+    "targeting": "single"
+  },
+  {
+    "id": "forceful_invitation",
+    "name": "Forceful Invitation",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "planerend",
+    "name": "Plane Rend",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 8,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 8,
+    "targeting": "self"
+  },
+  {
+    "id": "chain_of_chaos",
+    "name": "Chain of Chaos",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [],
+    "level": 8,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 8,
+    "targeting": "self"
+  },
+  {
+    "id": "call_of_chaos",
+    "name": "Call of Chaos",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "sign_of_ruin",
+    "name": "Sign of Ruin",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "sap_magic",
+    "name": "Sap Magic",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "major_destruction",
+    "name": "Major Destruction",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 7,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "blink_allies_away",
+    "name": "Blink Allies Away",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "summon_forest",
+    "name": "Summon Forest",
+    "schools": [
+      "summoning",
+      "translocation"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "forge_lightning_spire",
+    "name": "Forge Lightning Spire",
+    "schools": [
+      "forgecraft",
+      "air"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "forge_blazeheart_golem",
+    "name": "Forge Blazeheart Golem",
+    "schools": [
+      "forgecraft",
+      "fire"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "rebounding_blaze",
+    "name": "Rebounding Blaze",
+    "schools": [
+      "conjurations",
+      "fire"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "rebounding_chill",
+    "name": "Rebounding Chill",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "glaciate",
+    "name": "Glaciate",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 9,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 9,
+    "targeting": "single"
+  },
+  {
+    "id": "dragon_call",
+    "name": "Dragon's Call",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 9,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 9,
+    "targeting": "self"
+  },
+  {
+    "id": "spellspark_servitor",
+    "name": "Spellspark Servitor",
+    "schools": [
+      "conjurations",
+      "forgecraft"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_mana_viper",
+    "name": "Summon Mana Viper",
+    "schools": [
+      "summoning",
+      "hexes"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "phantom_mirror",
+    "name": "Phantom Mirror",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "diminish_spells",
+    "name": "Diminish Spells",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 3,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "corrosive_bolt",
+    "name": "Corrosive Bolt",
+    "schools": [
+      "conjurations",
+      "alchemy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "bolt_of_light",
+    "name": "Bolt of Light",
+    "schools": [
+      "conjurations",
+      "fire",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "bolt_of_flesh",
+    "name": "Bolt of Flesh",
+    "schools": [
+      "conjurations",
+      "necromancy",
+      "summoning"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 6,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "awaken_flesh",
+    "name": "Awaken Flesh",
+    "schools": [
+      "conjurations",
+      "necromancy",
+      "hexes"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "serpent_of_hell_geh_breath",
+    "name": "gehenna serpent of hell breath",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "serpent_of_hell_coc_breath",
+    "name": "cocytus serpent of hell breath",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "serpent_of_hell_dis_breath",
+    "name": "dis serpent of hell breath",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "serpent_of_hell_tar_breath",
+    "name": "tartarus serpent of hell breath",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "summon_emperor_scorpions",
+    "name": "Summon Emperor Scorpions",
+    "schools": [
+      "summoning",
+      "alchemy"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "irradiate",
+    "name": "Irradiate",
+    "schools": [
+      "conjurations",
+      "alchemy"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 1,
+    "max_range": 1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "spit_lava",
+    "name": "Spit Lava",
+    "schools": [
+      "conjurations",
+      "fire",
+      "earth"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "electrical_bolt",
+    "name": "Electrical Bolt",
+    "schools": [
+      "conjurations",
+      "air"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "flaming_cloud",
+    "name": "Flaming Cloud",
+    "schools": [
+      "conjurations",
+      "fire"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "throw_barbs",
+    "name": "Throw Barbs",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "battlecry",
+    "name": "Battlecry",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "self"
+    ],
+    "level": 6,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "warning_cry",
+    "name": "Warning Cry",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "self"
+    ],
+    "level": 6,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "hunting_call",
+    "name": "Hunting Call",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "self"
+    ],
+    "level": 6,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "funeral_dirge",
+    "name": "Funeral Dirge",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "seal_doors",
+    "name": "Seal Doors",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "self"
+    ],
+    "level": 6,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "flay",
+    "name": "Flay",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "berserk_other",
+    "name": "Berserk Other",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "hasty",
+      "helpful"
+    ],
+    "level": 3,
+    "power_cap": 0,
+    "min_range": 3,
+    "max_range": 3,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "corrupting_pulse",
+    "name": "Corrupting Pulse",
+    "schools": [
+      "hexes",
+      "alchemy"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "siren_song",
+    "name": "Siren Song",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "wl_check"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "avatar_song",
+    "name": "Avatar Song",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "wl_check"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "paralysis_gaze",
+    "name": "Paralysis Gaze",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "confusion_gaze",
+    "name": "Confusion Gaze",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "wl_check"
+    ],
+    "level": 3,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "antimagic_gaze",
+    "name": "Antimagic Gaze",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "draining_gaze",
+    "name": "Draining Gaze",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "weakening_gaze",
+    "name": "Weakening Gaze",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "mourning_wail",
+    "name": "Mourning Wail",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 3,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "death_rattle",
+    "name": "Death Rattle",
+    "schools": [
+      "conjurations",
+      "necromancy",
+      "air"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 7,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "march_of_sorrows",
+    "name": "March of Sorrows",
+    "schools": [
+      "conjurations",
+      "necromancy",
+      "air"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 7,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "summon_scarabs",
+    "name": "Summon Scarabs",
+    "schools": [
+      "summoning",
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "throw_ally",
+    "name": "Throw Ally",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 2,
+    "power_cap": 50,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 2,
+    "targeting": "single"
+  },
+  {
+    "id": "cleansing_flame",
+    "name": "Cleansing Flame",
+    "schools": [
+      "none"
+    ],
+    "flags": [],
+    "level": 8,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 8,
+    "targeting": "self"
+  },
+  {
+    "id": "gravitas",
+    "name": "Gell's Gravitas",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "violent_unravelling",
+    "name": "Yara's Violent Unravelling",
+    "schools": [
+      "hexes",
+      "alchemy"
+    ],
+    "flags": [
+      "targeted",
+      "destructive"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "entropic_weave",
+    "name": "Entropic Weave",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "summon_executioners",
+    "name": "Summon Executioners",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 9,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 9,
+    "targeting": "self"
+  },
+  {
+    "id": "oblivion_howl",
+    "name": "Oblivion Howl",
+    "schools": [
+      "translocation",
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "wl_check"
+    ],
+    "level": 3,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "prayer_of_brilliance",
+    "name": "Prayer of Brilliance",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "helpful"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "iceblast",
+    "name": "Iceblast",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "slug_dart",
+    "name": "Slug Dart",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 1,
+    "power_cap": 25,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 1,
+    "targeting": "single"
+  },
+  {
+    "id": "fleetfoot",
+    "name": "Fleetfoot",
+    "schools": [
+      "air"
+    ],
+    "flags": [
+      "hasty",
+      "self"
+    ],
+    "level": 2,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 2,
+    "targeting": "self"
+  },
+  {
+    "id": "greater_servant_makhleb",
+    "name": "Infernal Servant",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "bind_souls",
+    "name": "Bind Souls",
+    "schools": [
+      "necromancy",
+      "cold"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "infestation",
+    "name": "Infestation",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 8,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 8,
+    "targeting": "single"
+  },
+  {
+    "id": "still_winds",
+    "name": "Still Winds",
+    "schools": [
+      "hexes",
+      "air"
+    ],
+    "flags": [
+      "self"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "resonance_strike",
+    "name": "Resonance Strike",
+    "schools": [
+      "earth"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "ghostly_sacrifice",
+    "name": "Ghostly Sacrifice",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "dream_dust",
+    "name": "Dream Dust",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 3,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "beckoning",
+    "name": "Lesser Beckoning",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted",
+      "not_self",
+      "tracer"
+    ],
+    "level": 2,
+    "power_cap": 50,
+    "min_range": 3,
+    "max_range": 5,
+    "mp": 2,
+    "targeting": "single"
+  },
+  {
+    "id": "upheaval",
+    "name": "Upheaval",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "mercury_arrow",
+    "name": "Mercury Arrow",
+    "schools": [
+      "alchemy",
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 2,
+    "power_cap": 50,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 2,
+    "targeting": "single"
+  },
+  {
+    "id": "poisonous_vapours",
+    "name": "Poisonous Vapours",
+    "schools": [
+      "alchemy",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "destructive",
+      "not_self"
+    ],
+    "level": 1,
+    "power_cap": 25,
+    "min_range": 3,
+    "max_range": 3,
+    "mp": 1,
+    "targeting": "single"
+  },
+  {
+    "id": "ignition",
+    "name": "Ignition",
+    "schools": [
+      "fire"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 8,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 8,
+    "targeting": "self"
+  },
+  {
+    "id": "borgnjors_vile_clutch",
+    "name": "Borgnjor's Vile Clutch",
+    "schools": [
+      "necromancy",
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "not_self",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "fastroot",
+    "name": "Fastroot",
+    "schools": [
+      "hexes",
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "warp_space",
+    "name": "Warp Space",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "sojourning_bolt",
+    "name": "Sojourning Bolt",
+    "schools": [
+      "conjurations",
+      "translocation"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "harpoon_shot",
+    "name": "Harpoon Shot",
+    "schools": [
+      "conjurations",
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "grasping_roots",
+    "name": "Grasping Roots",
+    "schools": [
+      "earth"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "throw_bolas",
+    "name": "Throw Bolas",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "throw_pie",
+    "name": "Throw Klown Pie",
+    "schools": [
+      "conjurations",
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "sporulate",
+    "name": "Sporulate",
+    "schools": [
+      "conjurations",
+      "earth"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "launch_sporangium",
+    "name": "Launch Sporangium",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "starburst",
+    "name": "Starburst",
+    "schools": [
+      "conjurations",
+      "fire"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "foxfire",
+    "name": "Foxfire",
+    "schools": [
+      "conjurations",
+      "fire"
+    ],
+    "flags": [],
+    "level": 1,
+    "power_cap": 25,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 1,
+    "targeting": "self"
+  },
+  {
+    "id": "marshlight",
+    "name": "Marshlight",
+    "schools": [
+      "conjurations",
+      "fire"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "hailstorm",
+    "name": "Hailstorm",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": 3,
+    "max_range": 3,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "noxious_bog",
+    "name": "Eringya's Noxious Bog",
+    "schools": [
+      "alchemy"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "agony",
+    "name": "Agony",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "dispel_undead_range",
+    "name": "Dispel Undead Range",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 100,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "frozen_ramparts",
+    "name": "Frozen Ramparts",
+    "schools": [
+      "cold"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 3,
+    "power_cap": 50,
+    "min_range": 2,
+    "max_range": 2,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "maxwells_coupling",
+    "name": "Maxwell's Capacitive Coupling",
+    "schools": [
+      "air"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 8,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 8,
+    "targeting": "self"
+  },
+  {
+    "id": "roll",
+    "name": "Roll",
+    "schools": [
+      "earth"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "hurl_sludge",
+    "name": "Hurl Sludge",
+    "schools": [
+      "alchemy",
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "summon_tzitzimitl",
+    "name": "Summon Tzitzimitl",
+    "schools": [
+      "summoning",
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 8,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 8,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_hell_sentinel",
+    "name": "Summon Hell Sentinel",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 8,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 8,
+    "targeting": "self"
+  },
+  {
+    "id": "awaken_armour",
+    "name": "Awaken Armour",
+    "schools": [
+      "forgecraft",
+      "earth"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 50,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "manifold_assault",
+    "name": "Manifold Assault",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "concentrate_venom",
+    "name": "Concentrate Venom",
+    "schools": [
+      "alchemy"
+    ],
+    "flags": [
+      "targeted",
+      "helpful"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "eruption",
+    "name": "Eruption",
+    "schools": [
+      "conjurations",
+      "fire",
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "pyroclastic_surge",
+    "name": "Pyroclastic Surge",
+    "schools": [
+      "conjurations",
+      "fire",
+      "earth"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "stunning_burst",
+    "name": "Stunning Burst",
+    "schools": [
+      "conjurations",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "corrupt_locale",
+    "name": "Corrupt",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "conjure_living_spells",
+    "name": "Conjure Living Spells",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_cactus",
+    "name": "Summon Cactus Giant",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "stoke_flames",
+    "name": "Stoke Flames",
+    "schools": [
+      "fire",
+      "conjurations"
+    ],
+    "flags": [],
+    "level": 8,
+    "power_cap": 0,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 8,
+    "targeting": "self"
+  },
+  {
+    "id": "seracfall",
+    "name": "Seracfall",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "scorch",
+    "name": "Scorch",
+    "schools": [
+      "fire"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 2,
+    "power_cap": 50,
+    "min_range": 3,
+    "max_range": 3,
+    "mp": 2,
+    "targeting": "self"
+  },
+  {
+    "id": "flame_wave",
+    "name": "Flame Wave",
+    "schools": [
+      "conjurations",
+      "fire"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": 3,
+    "max_range": 3,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "enfeeble",
+    "name": "Enfeeble",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "wl_check"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "summon_spiders",
+    "name": "Summon Spiders",
+    "schools": [
+      "summoning",
+      "alchemy"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "anguish",
+    "name": "Anguish",
+    "schools": [
+      "hexes",
+      "necromancy"
+    ],
+    "flags": [
+      "wl_check"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_scorpions",
+    "name": "Summon Scorpions",
+    "schools": [
+      "summoning",
+      "alchemy"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "shezas_dance",
+    "name": "Sheza's Dance",
+    "schools": [
+      "summoning",
+      "earth"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "divine_armament",
+    "name": "Divine Armament",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "kiss_of_death",
+    "name": "Kiss of Death",
+    "schools": [
+      "conjurations",
+      "necromancy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "not_self"
+    ],
+    "level": 1,
+    "power_cap": 25,
+    "min_range": 1,
+    "max_range": 1,
+    "mp": 1,
+    "targeting": "single"
+  },
+  {
+    "id": "jinxbite",
+    "name": "Jinxbite",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "self"
+    ],
+    "level": 2,
+    "power_cap": 50,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 2,
+    "targeting": "self"
+  },
+  {
+    "id": "sigil_of_binding",
+    "name": "Sigil of Binding",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 3,
+    "targeting": "self"
+  },
+  {
+    "id": "dimensional_bullseye",
+    "name": "Dimensional Bullseye",
+    "schools": [
+      "translocation",
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "boulder",
+    "name": "Brom's Barrelling Boulder",
+    "schools": [
+      "earth",
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "vitrify",
+    "name": "Vitrify",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "wl_check"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "vitrifying_gaze",
+    "name": "Vitrifying Gaze",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "crystallising_shot",
+    "name": "Crystallising Shot",
+    "schools": [
+      "conjurations",
+      "earth",
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 6,
+    "power_cap": 50,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "tremorstone",
+    "name": "Tremorstone",
+    "schools": [
+      "earth"
+    ],
+    "flags": [],
+    "level": 2,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 2,
+    "targeting": "self"
+  },
+  {
+    "id": "regenerate_other",
+    "name": "Regenerate Other",
+    "schools": [
+      "none"
+    ],
+    "flags": [
+      "helpful"
+    ],
+    "level": 4,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "mass_regeneration",
+    "name": "Mass Regeneration",
+    "schools": [
+      "none"
+    ],
+    "flags": [
+      "helpful"
+    ],
+    "level": 7,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "noxious_breath",
+    "name": "Noxious Breath",
+    "schools": [
+      "conjurations",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "unleash_destruction",
+    "name": "Unleash Destruction",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 3,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "hurl_torchlight",
+    "name": "Hurl Torchlight",
+    "schools": [
+      "conjurations",
+      "necromancy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "combustion_breath",
+    "name": "Combustion Breath",
+    "schools": [
+      "conjurations",
+      "fire"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "nullifying_breath",
+    "name": "Nullifying Breath",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "steam_breath",
+    "name": "Steam Breath",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 4,
+    "power_cap": 0,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "mud_breath",
+    "name": "Mud Breath",
+    "schools": [
+      "conjurations",
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "galvanic_breath",
+    "name": "Galvanic Breath",
+    "schools": [
+      "conjurations",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "piledriver",
+    "name": "Maxwell's Portable Piledriver",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "gells_gavotte",
+    "name": "Gell's Gavotte",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 1,
+    "max_range": 1,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "magnavolt",
+    "name": "Magnavolt",
+    "schools": [
+      "air",
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "destructive"
+    ],
+    "level": 0,
+    "power_cap": 7,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "fulsome_fusillade",
+    "name": "Fulsome Fusillade",
+    "schools": [
+      "alchemy",
+      "conjurations"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 8,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 8,
+    "targeting": "self"
+  },
+  {
+    "id": "rimeblight",
+    "name": "Rimeblight",
+    "schools": [
+      "necromancy",
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "destructive"
+    ],
+    "level": 0,
+    "power_cap": 7,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "hoarfrost_cannonade",
+    "name": "Hoarfrost Cannonade",
+    "schools": [
+      "forgecraft",
+      "cold"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "seismic_stomp",
+    "name": "Seismic Stomp",
+    "schools": [
+      "earth"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "hoarfrost_bullet",
+    "name": "Hoarfrost Bullet",
+    "schools": [
+      "conjurations",
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "flashing_balestra",
+    "name": "Flashing Balestra",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "phantom_blitz",
+    "name": "Phantom Blitz",
+    "schools": [
+      "conjurations",
+      "summoning"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "bestow_arms",
+    "name": "Bestow Arms",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "helpful"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 6,
+    "max_range": 6,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "hellfire_mortar",
+    "name": "Hellfire Mortar",
+    "schools": [
+      "earth",
+      "fire",
+      "forgecraft"
+    ],
+    "flags": [
+      "targeted",
+      "destructive"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "shadow_shard",
+    "name": "Shadow Shard",
+    "schools": [
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "shadow_beam",
+    "name": "Shadow Beam",
+    "schools": [
+      "conjurations"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "shadow_ball",
+    "name": "Shadowball",
+    "schools": [
+      "fire"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "creeping_shadow",
+    "name": "Creeping Shadow",
+    "schools": [
+      "cold"
+    ],
+    "flags": [
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "shadow_tempest",
+    "name": "Shadow Tempest",
+    "schools": [
+      "air"
+    ],
+    "flags": [
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "shadow_prism",
+    "name": "Shadow Prism",
+    "schools": [
+      "alchemy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "shadow_puppet",
+    "name": "Shadow Puppet",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "shadow_turret",
+    "name": "Shadow Turret",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "shadow_shot",
+    "name": "Shadow Shot",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "shadow_bind",
+    "name": "Shadow Bind",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "shadow_torpor",
+    "name": "Shadow Torpor",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "shadow_draining",
+    "name": "Shadow Draining",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 2,
+    "max_range": 2,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "grave_claw",
+    "name": "Grave Claw",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 2,
+    "power_cap": 50,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 2,
+    "targeting": "single"
+  },
+  {
+    "id": "clockwork_bee",
+    "name": "Launch Clockwork Bee",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 3,
+    "power_cap": 100,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 3,
+    "targeting": "single"
+  },
+  {
+    "id": "spike_launcher",
+    "name": "Construct Spike Launcher",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [],
+    "level": 2,
+    "power_cap": 50,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 2,
+    "targeting": "self"
+  },
+  {
+    "id": "kinetic_grapnel",
+    "name": "Kinetic Grapnel",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [
+      "targeted",
+      "tracer",
+      "destructive"
+    ],
+    "level": 1,
+    "power_cap": 25,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 1,
+    "targeting": "single"
+  },
+  {
+    "id": "diamond_sawblades",
+    "name": "Diamond Sawblades",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "shred",
+    "name": "Shred",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [],
+    "level": 1,
+    "power_cap": 200,
+    "min_range": 1,
+    "max_range": 1,
+    "mp": 1,
+    "targeting": "self"
+  },
+  {
+    "id": "surprising_crocodile",
+    "name": "Eringya's Surprising Crocodile",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": 1,
+    "max_range": 1,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "platinum_paragon",
+    "name": "Platinum Paragon",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 9,
+    "power_cap": 200,
+    "min_range": 3,
+    "max_range": 3,
+    "mp": 9,
+    "targeting": "single"
+  },
+  {
+    "id": "walking_alembic",
+    "name": "Alistair's Walking Alembic",
+    "schools": [
+      "forgecraft",
+      "alchemy"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "monarch_bomb",
+    "name": "Forge Monarch Bomb",
+    "schools": [
+      "forgecraft",
+      "fire"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "deploy_bomblet",
+    "name": "Launch Bomblet",
+    "schools": [
+      "forgecraft",
+      "fire"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 6,
+    "targeting": "single"
+  },
+  {
+    "id": "splinterfrost_shell",
+    "name": "Splinterfrost Shell",
+    "schools": [
+      "forgecraft",
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "not_self"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 1,
+    "max_range": 1,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "percussive_tempering",
+    "name": "Nazja's Percussive Tempering",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [
+      "targeted",
+      "helpful",
+      "not_self",
+      "destructive"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "all_purpose_tempering",
+    "name": "Nazja's All-Purpose Tempering",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [
+      "targeted",
+      "helpful",
+      "destructive"
+    ],
+    "level": 0,
+    "power_cap": 5,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "fortress_blast",
+    "name": "Fortress Blast",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 6,
+    "power_cap": 75,
+    "min_range": 3,
+    "max_range": 3,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "summon_seismosaurus_egg",
+    "name": "Summon Seismosaurus Egg",
+    "schools": [
+      "summoning",
+      "earth"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "phalanx_beetle",
+    "name": "Forge Phalanx Beetle",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "rending_blade",
+    "name": "Rending Blade",
+    "schools": [
+      "conjurations",
+      "forgecraft"
+    ],
+    "flags": [],
+    "level": 4,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 4,
+    "targeting": "self"
+  },
+  {
+    "id": "magma_barrage",
+    "name": "Magma Barrage",
+    "schools": [
+      "conjurations",
+      "fire",
+      "earth"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "vex",
+    "name": "Vex",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 4,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "ravenous_swarm",
+    "name": "Ravenous Swarm",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 0,
+    "power_cap": 6,
+    "min_range": 0,
+    "max_range": 0,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "dominate_undead",
+    "name": "Dominate Undead",
+    "schools": [
+      "hexes",
+      "necromancy"
+    ],
+    "flags": [
+      "wl_check"
+    ],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "detonation_catalyst",
+    "name": "Detonation Catalyst",
+    "schools": [
+      "fire",
+      "alchemy"
+    ],
+    "flags": [
+      "self"
+    ],
+    "level": 5,
+    "power_cap": 100,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 5,
+    "targeting": "self"
+  },
+  {
+    "id": "rust_breath",
+    "name": "Rust Breath",
+    "schools": [
+      "conjurations",
+      "alchemy",
+      "air"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 4,
+    "max_range": 4,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "golden_breath",
+    "name": "Golden Breath",
+    "schools": [
+      "conjurations",
+      "fire",
+      "cold",
+      "alchemy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "sphinx_sisters",
+    "name": "Sphinx Sisters",
+    "schools": [
+      "summoning",
+      "hexes"
+    ],
+    "flags": [],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 7,
+    "targeting": "self"
+  },
+  {
+    "id": "ill_omen",
+    "name": "Ill Omen",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 4,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 4,
+    "targeting": "single"
+  },
+  {
+    "id": "doom_bolt",
+    "name": "Doom Bolt",
+    "schools": [
+      "conjurations",
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 0,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "warp_body",
+    "name": "Warp Body",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 0,
+    "power_cap": 4,
+    "min_range": 200,
+    "max_range": 200,
+    "mp": 0,
+    "targeting": "single"
+  },
+  {
+    "id": "ostracise",
+    "name": "Ostracise",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 7,
+    "power_cap": 200,
+    "min_range": 3,
+    "max_range": 3,
+    "mp": 7,
+    "targeting": "single"
+  },
+  {
+    "id": "mutagenic_gaze",
+    "name": "Mutagenic Gaze",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "targeted"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "acid_ball",
+    "name": "Acid Ball",
+    "schools": [
+      "conjurations",
+      "alchemy"
+    ],
+    "flags": [
+      "targeted",
+      "tracer"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 5,
+    "max_range": 5,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "pyrrhic_recollection",
+    "name": "Pyrrhic Recollection",
+    "schools": [
+      "none"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "planar_overlay",
+    "name": "Planar Overlay",
+    "schools": [
+      "none"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "doomsaying",
+    "name": "Doomsaying",
+    "schools": [
+      "none"
+    ],
+    "flags": [],
+    "level": 6,
+    "power_cap": 200,
+    "min_range": -1,
+    "max_range": -1,
+    "mp": 6,
+    "targeting": "self"
+  },
+  {
+    "id": "sleetstrike",
+    "name": "Sleetstrike",
+    "schools": [
+      "air",
+      "cold"
+    ],
+    "flags": [
+      "targeted",
+      "destructive"
+    ],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "single"
+  },
+  {
+    "id": "landbreaker",
+    "name": "Landbreaker",
+    "schools": [
+      "earth"
+    ],
+    "flags": [],
+    "level": 5,
+    "power_cap": 200,
+    "min_range": 9,
+    "max_range": 9,
+    "mp": 5,
+    "targeting": "self"
+  }
+]
