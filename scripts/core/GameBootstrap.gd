@@ -1179,11 +1179,11 @@ func _regenerate_dungeon(going_up: bool, secondary: bool = false) -> void:
 		_restore_floor(GameManager.current_depth)
 	else:
 		_spawn_monsters_for_current_depth()
+		_spawn_dummy_items(5)
 	# Build the minimap AFTER restoring the explored-tile bitmap and spawning
 	# monsters. Doing this before _restore_floor gave us a thumbnail drawn
 	# from an empty explored set on every revisit.
 	_refresh_minimap_preview(dmap, entry_pos)
-		_spawn_dummy_items(5)
 	_refresh_actor_visibility(dmap)
 
 
