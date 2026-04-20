@@ -191,12 +191,17 @@ class _Ring extends Node2D:
 class _FloatLabel extends Node2D:
 	var label_text: String = ""
 	var label_color: Color = Color.WHITE
+	var label_size: int = 36
 	func _draw() -> void:
 		var f: Font = ThemeDB.fallback_font
 		if f == null:
 			return
+		# Outline for legibility against any tile.
+		draw_string_outline(f, Vector2.ZERO, label_text,
+				HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, 4,
+				Color(0, 0, 0, 0.9))
 		draw_string(f, Vector2.ZERO, label_text,
-				HORIZONTAL_ALIGNMENT_LEFT, -1, 13, label_color)
+				HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, label_color)
 
 
 # ---- Primitives ---------------------------------------------------------
@@ -214,18 +219,37 @@ static func flash(target: Node2D, color: Color, duration: float = 0.20) -> void:
 			target.modulate = orig)
 
 
-## Floating damage / status text. Drifts upward and fades out.
+## Floating damage / status text. Drifts upward and fades out. Size scales
+## with the numeric value in `text` when it's numeric, so big hits pop.
 static func float_text(layer: Node2D, world_px: Vector2,
 		text: String, color: Color) -> void:
+	var dmg_val: int = 0
+	if text.is_valid_int():
+		dmg_val = int(text)
 	var lbl: _FloatLabel = _FloatLabel.new()
 	lbl.label_text = text
-	lbl.label_color = color
-	lbl.position = world_px + Vector2(-10, -12)
+	var tinted: Color = color
+	if dmg_val >= 40:
+		lbl.label_size = 64
+		tinted = Color(1.0, 0.3, 0.25)
+	elif dmg_val >= 20:
+		lbl.label_size = 54
+		tinted = Color(1.0, 0.55, 0.25)
+	elif dmg_val >= 8:
+		lbl.label_size = 46
+	else:
+		lbl.label_size = 38
+	lbl.label_color = tinted
+	lbl.position = world_px + Vector2(-12, -16)
 	lbl.z_index = 100
 	layer.add_child(lbl)
+	var rise_px: float = 66.0 + clamp(float(dmg_val) * 1.2, 0.0, 40.0)
+	var duration: float = 0.85
 	var tw: Tween = lbl.create_tween()
-	tw.parallel().tween_property(lbl, "position:y", lbl.position.y - 52, 0.70)
-	tw.parallel().tween_property(lbl, "modulate:a", 0.0, 0.70).set_delay(0.18)
+	tw.parallel().tween_property(lbl, "position:y", lbl.position.y - rise_px,
+			duration).set_ease(Tween.EASE_OUT)
+	tw.parallel().tween_property(lbl, "modulate:a", 0.0, duration) \
+			.set_delay(duration * 0.35)
 	tw.tween_callback(lbl.queue_free)
 
 

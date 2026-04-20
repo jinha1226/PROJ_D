@@ -126,25 +126,59 @@ static func _show_hit_feedback(target: Node, dmg: int, color: Color) -> void:
 	if not (target is Node2D):
 		return
 	var target_2d: Node2D = target as Node2D
-	# Flash white
+	# Flash white — quicker pop so it doesn't blur the glyph in ASCII mode.
 	var prev_mod: Color = target_2d.modulate
 	target_2d.modulate = Color(3.0, 3.0, 3.0, 1.0)
 	var tw: Tween = target_2d.create_tween()
 	tw.tween_property(target_2d, "modulate", prev_mod, 0.15)
-	# Floating damage number
+	# Brief shake proportional to damage — capped so small hits don't twitch.
+	_apply_hit_shake(target_2d, dmg)
+	# Floating damage number — size scales with damage, colour shifts red as
+	# the hit gets heavier so big numbers read at a glance.
 	var label := Label.new()
 	label.text = str(dmg)
-	label.add_theme_font_size_override("font_size", 28)
-	label.add_theme_color_override("font_color", color)
+	var font_size: int
+	var text_color: Color
+	if dmg >= 40:
+		font_size = 72
+		text_color = Color(1.0, 0.3, 0.25)
+	elif dmg >= 20:
+		font_size = 60
+		text_color = Color(1.0, 0.55, 0.25)
+	elif dmg >= 8:
+		font_size = 52
+		text_color = color
+	else:
+		font_size = 44
+		text_color = color.lightened(0.15)
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", text_color)
 	label.add_theme_color_override("font_outline_color", Color(0, 0, 0))
-	label.add_theme_constant_override("outline_size", 3)
-	label.position = Vector2(-12, -24)
+	label.add_theme_constant_override("outline_size", 4)
+	label.position = Vector2(-20, -32)
 	label.z_index = 100
 	target_2d.add_child(label)
+	var rise_px: float = 60.0 + clamp(float(dmg) * 1.2, 0.0, 40.0)
+	var duration: float = 0.85
 	var tw2: Tween = label.create_tween()
-	tw2.tween_property(label, "position:y", label.position.y - 32, 0.5)
-	tw2.parallel().tween_property(label, "modulate:a", 0.0, 0.5)
+	tw2.tween_property(label, "position:y", label.position.y - rise_px, duration) \
+			.set_ease(Tween.EASE_OUT)
+	tw2.parallel().tween_property(label, "modulate:a", 0.0, duration) \
+			.set_delay(duration * 0.35)
 	tw2.tween_callback(label.queue_free)
+
+
+## Horizontal jitter on the target Node2D proportional to damage. Keeps the
+## original position via a Tween so concurrent movement tweens on the entity
+## aren't clobbered (we restore to the end-of-shake baseline).
+static func _apply_hit_shake(target: Node2D, dmg: int) -> void:
+	var amplitude: float = clamp(float(dmg) * 0.5, 3.0, 10.0)
+	var base: Vector2 = target.position
+	var tw: Tween = target.create_tween()
+	tw.tween_property(target, "position", base + Vector2(amplitude, 0), 0.04)
+	tw.tween_property(target, "position", base + Vector2(-amplitude, 0), 0.04)
+	tw.tween_property(target, "position", base + Vector2(amplitude * 0.5, 0), 0.04)
+	tw.tween_property(target, "position", base, 0.04)
 
 
 static func _show_slash_fx(target: Node) -> void:
