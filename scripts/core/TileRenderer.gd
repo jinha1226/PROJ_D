@@ -240,10 +240,71 @@ const PLAYER_RACES: Dictionary = {
 	"deep_elf":           "player/base/deep_elf_m.png",
 }
 
-## Doll overlay layers (weapon / chest / legs / boots / helm / gloves).
-## Currently unused by renderers — kept as an infra hook for future per-slot
-## compositing on the DCSS player sprite.
-const PLAYER_DOLL: Dictionary = {}
+## Doll overlay layers stacked on top of the race body sprite. Keyed by
+## slot → item_id. Missing entries render no overlay for that slot.
+##
+## Draw order (caller decides): legs → chest → boots → gloves → helm → weapon.
+## This matches DCSS's paperdoll stacking for the simplified slot set.
+const PLAYER_DOLL: Dictionary = {
+	"weapon": {
+		"dagger":          "player/hand1/dagger.png",
+		"short_sword":     "player/hand1/short_sword.png",
+		"rapier":          "player/hand1/rapier.png",
+		"saber":           "player/hand1/scimitar.png",
+		"arming_sword":    "player/hand1/long_sword_slant.png",
+		"longsword":       "player/hand1/long_sword_slant2.png",
+		"katana":          "player/hand1/katana_slant.png",
+		"greatsword":      "player/hand1/great_sword_slant.png",
+		"scimitar":        "player/hand1/scimitar.png",
+		"axe":             "player/hand1/axe_short.png",
+		"axe_medium":      "player/hand1/axe_blood.png",
+		"waraxe":          "player/hand1/axe_double.png",
+		"club":            "player/hand1/club.png",
+		"mace":            "player/hand1/mace.png",
+		"flail":           "player/hand1/flail_ball.png",
+		"spear":           "player/hand1/spear.png",
+		"longspear":       "player/hand1/spear.png",
+		"halberd":         "player/hand1/halberd.png",
+		"scythe":          "player/hand1/scythe.png",
+		"trident":         "player/hand1/trident.png",
+		"short_bow":       "player/hand1/bow.png",
+		"long_bow":        "player/hand1/great_bow.png",
+		"bow":             "player/hand1/bow.png",
+		"crossbow":        "player/hand1/arbalest.png",
+		"slingshot":       "player/hand1/sling.png",
+		"gnarled_staff":   "player/hand1/quarterstaff.png",
+		"fire_staff":      "player/hand1/great_staff.png",
+		"ice_staff":       "player/hand1/quarterstaff2.png",
+		"lightning_staff": "player/hand1/staff-artefact1.png",
+		"crystal_staff":   "player/hand1/great_staff.png",
+	},
+	"chest": {
+		"robe":          "player/body/robe_blue.png",
+		"leather_chest": "player/body/leather_armour.png",
+		"chain_chest":   "player/body/chainmail.png",
+		"plate_chest":   "player/body/plate.png",
+		"leather_armor": "player/body/leather_armour.png",
+		"chain_mail":    "player/body/chainmail.png",
+		"plate_armor":   "player/body/plate.png",
+	},
+	"legs": {
+		"leather_legs": "player/legs/leg_armour00.png",
+		"chain_legs":   "player/legs/leg_armour02.png",
+		"plate_legs":   "player/legs/leg_armour04.png",
+	},
+	"boots": {
+		"leather_boots": "player/boots/middle_brown.png",
+		"plate_boots":   "player/boots/middle_gray.png",
+	},
+	"helm": {
+		"leather_helm": "player/head/cap_black1.png",
+		"plate_helm":   "player/head/helm_plume.png",
+	},
+	"gloves": {
+		"leather_gloves": "player/gloves/glove_brown.png",
+		"plate_gloves":   "player/gloves/gauntlet_blue.png",
+	},
+}
 
 # In-process texture cache so repeated lookups don't re-load.
 static var _cache: Dictionary = {}
@@ -318,13 +379,70 @@ static func player_race(id: String) -> Texture2D:
 	return _load(String(PLAYER_RACES.get(id, "")))
 
 
-## Doll overlay texture for a slot/item — currently always null (PLAYER_DOLL
-## is empty). Callers should handle null by skipping that layer.
+## Doll overlay texture for a slot/item. Returns null if no mapping exists
+## so callers can cleanly skip that layer.
 static func doll_layer(slot: String, item_id: String) -> Texture2D:
 	if item_id == "":
 		return null
 	var slot_map: Dictionary = PLAYER_DOLL.get(slot, {})
 	return _load(String(slot_map.get(item_id, "")))
+
+
+## Compose a single texture from a race/job base + optional doll overlays,
+## ready to drop into a TextureRect (e.g. JobSelect preview cards). Slots
+## are stacked in DCSS paper-doll order: legs → chest → boots → gloves →
+## helm → weapon. `armor_by_slot` is a Dictionary of slot_id → item_id.
+## Returns the base texture unchanged if no overlays apply; null if the
+## base itself is missing.
+static func compose_doll(base_id: String, weapon_id: String = "",
+		armor_by_slot: Dictionary = {}) -> Texture2D:
+	var base: Texture2D = player_race(base_id)
+	if base == null:
+		return null
+	var base_img: Image = base.get_image()
+	if base_img == null:
+		return base
+	# Work on a copy so we never mutate the cached base.
+	var out_img: Image = Image.new()
+	out_img.copy_from(base_img)
+	if out_img.get_format() != Image.FORMAT_RGBA8:
+		out_img.convert(Image.FORMAT_RGBA8)
+	var w: int = out_img.get_width()
+	var h: int = out_img.get_height()
+	var rect: Rect2i = Rect2i(0, 0, w, h)
+
+	var stack: Array = [
+		["legs", String(armor_by_slot.get("legs", ""))],
+		["chest", String(armor_by_slot.get("chest", ""))],
+		["boots", String(armor_by_slot.get("boots", ""))],
+		["gloves", String(armor_by_slot.get("gloves", ""))],
+		["helm", String(armor_by_slot.get("helm", ""))],
+		["weapon", weapon_id],
+	]
+	for entry in stack:
+		var slot: String = entry[0]
+		var iid: String = entry[1]
+		if iid == "":
+			continue
+		var layer: Texture2D = doll_layer(slot, iid)
+		if layer == null:
+			continue
+		var limg: Image = layer.get_image()
+		if limg == null:
+			continue
+		if limg.get_format() != Image.FORMAT_RGBA8:
+			var tmp: Image = Image.new()
+			tmp.copy_from(limg)
+			tmp.convert(Image.FORMAT_RGBA8)
+			limg = tmp
+		# Crop/resize so overlay fits the base exactly.
+		if limg.get_width() != w or limg.get_height() != h:
+			limg = limg.get_region(Rect2i(0, 0,
+					min(limg.get_width(), w),
+					min(limg.get_height(), h)))
+		out_img.blend_rect(limg, rect, Vector2i.ZERO)
+
+	return ImageTexture.create_from_image(out_img)
 
 
 ## All known branch ids; useful for menus / debug.

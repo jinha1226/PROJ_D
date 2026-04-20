@@ -126,17 +126,55 @@ func _load_sprite_preset() -> void:
 
 ## DCSS player rendering: race body + equipped doll layers stacked.
 ## Order matters: base → legs → chest → boots → gloves → helm → weapon.
+## Base sprite is the race (so a deep_elf mage and a human mage look
+## different); the job just decides starting gear, which shows up through
+## the doll layers.
 func _draw() -> void:
 	if not TileRenderer.is_dcss():
 		return
-	var base: Texture2D = TileRenderer.player_race(job_id)
-	if base == null:
-		base = TileRenderer.player_race("fighter")
+	var base: Texture2D = _pick_base_sprite()
 	if base == null:
 		draw_circle(Vector2.ZERO, 10.0, Color(0.2, 0.6, 1.0))
 		return
 	var sz: Vector2 = base.get_size()
-	draw_texture_rect(base, Rect2(-sz * 0.5, sz), false)
+	var rect: Rect2 = Rect2(-sz * 0.5, sz)
+	draw_texture_rect(base, rect, false)
+
+	# Overlay doll layers in DCSS paperdoll order.
+	var legs_id: String = String(equipped_armor.get("legs", {}).get("id", ""))
+	_draw_doll_layer("legs", legs_id, rect)
+	var chest_id: String = String(equipped_armor.get("chest", {}).get("id", ""))
+	_draw_doll_layer("chest", chest_id, rect)
+	var boots_id: String = String(equipped_armor.get("boots", {}).get("id", ""))
+	_draw_doll_layer("boots", boots_id, rect)
+	var gloves_id: String = String(equipped_armor.get("gloves", {}).get("id", ""))
+	_draw_doll_layer("gloves", gloves_id, rect)
+	var helm_id: String = String(equipped_armor.get("helm", {}).get("id", ""))
+	_draw_doll_layer("helm", helm_id, rect)
+	_draw_doll_layer("weapon", equipped_weapon_id, rect)
+
+
+## Pick the base body texture: race first, fall back to job, then fighter.
+func _pick_base_sprite() -> Texture2D:
+	if race_id != "":
+		var t: Texture2D = TileRenderer.player_race(race_id)
+		if t != null:
+			return t
+	if job_id != "":
+		var t2: Texture2D = TileRenderer.player_race(job_id)
+		if t2 != null:
+			return t2
+	return TileRenderer.player_race("fighter")
+
+
+func _draw_doll_layer(slot: String, item_id: String, rect: Rect2) -> void:
+	if item_id == "":
+		return
+	var tex: Texture2D = TileRenderer.doll_layer(slot, item_id)
+	if tex == null:
+		return
+	# Overlays are drawn at the same size as the base so they align 1:1.
+	draw_texture_rect(tex, rect, false)
 
 
 ## Build a CharacterSprite preset dict reflecting the player's CURRENT

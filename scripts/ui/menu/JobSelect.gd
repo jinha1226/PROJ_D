@@ -65,8 +65,10 @@ func _make_card(j: JobData) -> Button:
 	vbox.offset_bottom = -16
 	btn.add_child(vbox)
 
-	# Job preview icon (DCSS tile if available).
-	var tex: Texture2D = TileRenderer.player_race(j.id)
+	# Job preview icon: base body (race-or-job) + starting equipment stacked
+	# as paper-doll overlays so the card shows what the character actually
+	# looks like when the game begins.
+	var tex: Texture2D = _compose_job_preview(j)
 	if tex != null:
 		var preview := TextureRect.new()
 		preview.texture = tex
@@ -130,6 +132,27 @@ func _make_card(j: JobData) -> Button:
 
 	_detail_nodes[j.id] = {"sep": sep, "detail": detail}
 	return btn
+
+
+## Build the preview texture for this job's card by stacking their starting
+## gear as doll overlays on top of the selected race body (or the job's own
+## default sprite when no race has been picked yet).
+func _compose_job_preview(j: JobData) -> Texture2D:
+	var base_id: String = String(GameManager.selected_race_id)
+	if base_id == "":
+		base_id = j.id
+	var weapon_id: String = ""
+	var armor_by_slot: Dictionary = {}
+	for eid_v in j.starting_equipment:
+		var eid: String = String(eid_v)
+		if WeaponRegistry.is_weapon(eid):
+			if weapon_id == "":
+				weapon_id = eid
+		elif ArmorRegistry.is_armor(eid):
+			var slot: String = ArmorRegistry.slot_for(eid)
+			if slot != "" and not armor_by_slot.has(slot):
+				armor_by_slot[slot] = eid
+	return TileRenderer.compose_doll(base_id, weapon_id, armor_by_slot)
 
 
 func _on_card_pressed(job_id: String) -> void:
