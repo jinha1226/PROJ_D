@@ -2497,7 +2497,8 @@ func _build_equipped_section(vb: VBoxContainer) -> void:
 		var wname: String = WeaponRegistry.display_name_for(wid)
 		if player.equipped_weapon_cursed:
 			wname += "  (cursed)"
-		_append_equipped_row(vb, "weapon", wname, TileRenderer.item(wid))
+		var winfo: Dictionary = {"id": wid, "name": wname, "kind": "weapon"}
+		_append_equipped_row(vb, "weapon", wname, TileRenderer.item(wid), winfo)
 
 	# Armor rows — stable slot order, cloak sits after chest.
 	var armor_slots: Array = ["chest", "cloak", "legs", "helm", "gloves", "boots"]
@@ -2509,7 +2510,11 @@ func _build_equipped_section(vb: VBoxContainer) -> void:
 		var aname: String = String(a.get("name", aid))
 		if bool(a.get("cursed", false)):
 			aname += "  (cursed)"
-		_append_equipped_row(vb, slot, aname, TileRenderer.item(aid))
+		var ainfo: Dictionary = a.duplicate()
+		ainfo["id"] = aid
+		ainfo["name"] = aname
+		ainfo["kind"] = "armor"
+		_append_equipped_row(vb, slot, aname, TileRenderer.item(aid), ainfo)
 
 	# Ring rows — one per slot so octopodes' eight show cleanly.
 	if player.equipped_rings is Array:
@@ -2519,14 +2524,18 @@ func _build_equipped_section(vb: VBoxContainer) -> void:
 				continue
 			var rid: String = String(ring.get("id", ""))
 			var rname: String = String(ring.get("name", rid))
-			_append_equipped_row(vb, "ring %d" % (i + 1), rname, TileRenderer.item(rid))
+			var rinfo: Dictionary = ring.duplicate()
+			rinfo["id"] = rid
+			rinfo["name"] = rname
+			rinfo["kind"] = "ring"
+			_append_equipped_row(vb, "ring %d" % (i + 1), rname, TileRenderer.item(rid), rinfo)
 
 	var sep := HSeparator.new()
 	vb.add_child(sep)
 
 
 func _append_equipped_row(vb: VBoxContainer, slot: String, display: String,
-		tex: Texture2D) -> void:
+		tex: Texture2D, item_dict: Dictionary = {}) -> void:
 	var row := HBoxContainer.new()
 	row.custom_minimum_size = Vector2(0, 56)
 	row.add_theme_constant_override("separation", 8)
@@ -2544,11 +2553,17 @@ func _append_equipped_row(vb: VBoxContainer, slot: String, display: String,
 	slot_label.custom_minimum_size = Vector2(160, 0)
 	slot_label.modulate = Color(0.7, 0.7, 0.7)
 	row.add_child(slot_label)
-	var name_label := Label.new()
-	name_label.text = display
-	name_label.add_theme_font_size_override("font_size", 32)
-	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(name_label)
+	# Name is now a flat button so a tap opens the standard item info
+	# popup — same flow as tapping an unequipped item in the list.
+	var name_btn := Button.new()
+	name_btn.text = display
+	name_btn.flat = true
+	name_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	name_btn.add_theme_font_size_override("font_size", 32)
+	name_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if not item_dict.is_empty():
+		name_btn.pressed.connect(_on_bag_info.bind(item_dict))
+	row.add_child(name_btn)
 	vb.add_child(row)
 
 

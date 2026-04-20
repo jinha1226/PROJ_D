@@ -257,7 +257,11 @@ func _on_player_turn_started() -> void:
 func _step_auto_move() -> void:
 	if not _is_auto_moving:
 		return
-	if _new_monster_in_sight():
+	# Any monster currently visible halts travel — DCSS-style "you see
+	# an enemy, freeze". The earlier "new monster only" variant slipped
+	# past hostiles that were already in FOV at the moment auto-explore
+	# started, which read as auto-move ignoring enemies.
+	if _any_monster_in_sight():
 		_cancel_auto_move()
 		return
 	if _auto_move_path.is_empty():
@@ -363,20 +367,13 @@ func _monster_is_visible(m: Node) -> bool:
 	return d <= SIGHT_RANGE
 
 
-## True iff any monster entered FOV that wasn't already known at auto-move
-## start. Newly-spotted monsters are added to the seen-set so they don't
-## stop travel again in this session.
-func _new_monster_in_sight() -> bool:
-	var spotted_new: bool = false
+## True iff any alive hostile monster is currently in FOV.
+func _any_monster_in_sight() -> bool:
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if not is_instance_valid(m) or not ("grid_pos" in m):
 			continue
 		if "is_alive" in m and not m.is_alive:
 			continue
-		if not _monster_is_visible(m):
-			continue
-		var mid: int = m.get_instance_id()
-		if not _seen_monster_ids.has(mid):
-			_seen_monster_ids[mid] = true
-			spotted_new = true
-	return spotted_new
+		if _monster_is_visible(m):
+			return true
+	return false

@@ -57,13 +57,13 @@ func generate(depth: int, run_seed: int = -1) -> void:
 ## branch (and any "basic rooms" branch). Produces a usage_grid which we
 ## then translate back into our TileType enum map.
 func _build_hyper_main() -> void:
-	var paint_cb: Callable = HyperLayout._default_floor_paint
+	var paint_cb: Callable = Callable(self, "_hyper_paint_buffered_room")
 	var options: Dictionary = {
 		"name": "Main Dungeon",
 		"width": MAP_WIDTH,
 		"height": MAP_HEIGHT,
-		"min_room_size": 4,
-		"max_room_size": 10,
+		"min_room_size": 6,
+		"max_room_size": 12,
 		"max_rooms": 16,
 		"max_room_tries": 40,
 		"max_place_tries": 80,
@@ -71,25 +71,23 @@ func _build_hyper_main() -> void:
 		"layout_floor_type": "floor",
 		"grid_initialiser": Callable(self, "_hyper_init_cell"),
 		"skip_analyse": false,
-		# One varied "code" generator — floor rectangle + added walls +
-		# buffer so adjacent rooms don't touch. A second generator with
-		# bigger min_size handles larger rooms (25%).
+		# Direct paint generator — space buffer + wall ring + floor core
+		# in one step. Skipping room_transform sidesteps Callable-resolution
+		# headaches and makes the flow easier to reason about.
 		"room_type_weights": [
 			{
 				"generator": "code",
 				"paint_callback": paint_cb,
-				"room_transform": HyperRooms.add_buffer_walls,
 				"weight": 3,
-				"min_size": 4,
-				"max_size": 8,
+				"min_size": 6,
+				"max_size": 10,
 			},
 			{
 				"generator": "code",
 				"paint_callback": paint_cb,
-				"room_transform": HyperRooms.add_buffer_walls,
 				"weight": 1,
-				"min_size": 7,
-				"max_size": 11,
+				"min_size": 10,
+				"max_size": 14,
 			},
 		],
 		"build_fixture": [
@@ -128,7 +126,7 @@ func _count_floor_tiles() -> int:
 
 
 ## Seed each usage cell as solid rock so the engine has walls to carve.
-func _hyper_init_cell(x: int, y: int) -> Dictionary:
+func _hyper_init_cell(_x: int, _y: int) -> Dictionary:
 	return {
 		"feature": "rock_wall",
 		"solid": true,
@@ -138,6 +136,35 @@ func _hyper_init_cell(x: int, y: int) -> Dictionary:
 		"vault": false,
 		"anchors": [],
 	}
+
+
+## Paint callback: produces a room cell whose outer ring is buffer space,
+## next ring is carvable wall, and the inner area is floor. Equivalent to
+## running make_code_room + add_buffer_walls but inline so we don't rely
+## on the room_transform Callable being resolved at runtime.
+func _hyper_paint_buffered_room(room: Dictionary, _options: Dictionary,
+		_chosen: Dictionary) -> Array:
+	var size: Vector2i = room["size"]
+	return [
+		{
+			"type": "space",
+			"corner1": {"x": 0, "y": 0},
+			"corner2": {"x": size.x - 1, "y": size.y - 1},
+			"usage": {"buffer": true},
+		},
+		{
+			"type": "wall",
+			"corner1": {"x": 1, "y": 1},
+			"corner2": {"x": size.x - 2, "y": size.y - 2},
+			"usage": {"carvable": true, "protect": true},
+		},
+		{
+			"type": "floor",
+			"corner1": {"x": 2, "y": 2},
+			"corner2": {"x": size.x - 3, "y": size.y - 3},
+			"open": true,
+		},
+	]
 
 
 ## Translate the finished usage_grid back into our TileType enum map +
