@@ -59,6 +59,13 @@ var _base_seed: int = 0
 var _floor_state: Dictionary = {}
 # Toggle tracking — pressing the same HUD button again closes its popup.
 var _bag_dlg: AcceptDialog = null
+# Active bag filter ("all" | "weapon" | "armor" | "potion" | "scroll" | "book").
+# Remembered across reopens so swiping/tabbing doesn't lose the user's spot.
+var _bag_category: String = "all"
+# Swipe-tracking state for the current bag dialog.
+var _bag_swipe_start_x: float = -1.0
+var _bag_swipe_start_y: float = -1.0
+const _BAG_CATEGORIES: Array = ["all", "weapon", "armor", "potion", "scroll", "book"]
 var _skills_dlg: AcceptDialog = null
 var _status_dlg: AcceptDialog = null
 var _map_dlg: AcceptDialog = null
@@ -1995,18 +2002,27 @@ func _on_bag_pressed() -> void:
 
 	var cat_tabs := HBoxContainer.new()
 	cat_tabs.add_theme_constant_override("separation", 4)
-	for cat in ["all", "weapon", "armor", "potion", "scroll", "book"]:
+	for cat in _BAG_CATEGORIES:
 		var tab_btn := Button.new()
 		tab_btn.text = cat.to_upper()
 		tab_btn.custom_minimum_size = Vector2(0, 48)
 		tab_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		tab_btn.add_theme_font_size_override("font_size", 40)
+		if cat == _bag_category:
+			# Active tab — brighter so the user sees the current filter.
+			tab_btn.modulate = Color(1.0, 1.0, 0.75)
+			tab_btn.disabled = true
 		tab_btn.pressed.connect(func():
+			_bag_category = cat
 			_bag_dlg = null
 			dlg.queue_free()
-			_open_bag_filtered(cat))
+			_on_bag_pressed())
 		cat_tabs.add_child(tab_btn)
 	vb.add_child(cat_tabs)
+
+	# Horizontal swipe cycles tabs (mobile UX).
+	vb.mouse_filter = Control.MOUSE_FILTER_PASS
+	vb.gui_input.connect(_on_bag_swipe_input)
 
 	_build_equipped_section(vb)
 
@@ -2020,15 +2036,28 @@ func _on_bag_pressed() -> void:
 	rows.add_theme_constant_override("separation", 6)
 	scroll.add_child(rows)
 
-	var items: Array = player.get_items() if player != null else []
-	if items.is_empty():
+	var all_items: Array = player.get_items() if player != null else []
+	# Build filtered view while keeping the original inventory index paired
+	# with each row — equip/use/drop handlers all take the player-inventory
+	# index, not the filtered position.
+	var visible: Array = []  # Array of {orig: int, item: Dictionary}
+	for orig_i in range(all_items.size()):
+		var it_d: Dictionary = all_items[orig_i]
+		if _bag_category == "all" or String(it_d.get("kind", "")) == _bag_category:
+			visible.append({"orig": orig_i, "item": it_d})
+	if visible.is_empty():
 		var empty := Label.new()
-		empty.text = "Inventory is empty."
+		if all_items.is_empty():
+			empty.text = "Inventory is empty."
+		else:
+			empty.text = "No %s." % _bag_category
 		empty.add_theme_font_size_override("font_size", 40)
 		rows.add_child(empty)
 	else:
-		for i in range(items.size()):
-			var it: Dictionary = items[i]
+		for entry_i in range(visible.size()):
+			var entry: Dictionary = visible[entry_i]
+			var i: int = int(entry["orig"])
+			var it: Dictionary = entry["item"]
 			var kind: String = String(it.get("kind", ""))
 			var row := HBoxContainer.new()
 			row.custom_minimum_size = Vector2(0, 80)
@@ -2084,10 +2113,56 @@ func _on_bag_pressed() -> void:
 
 
 func _open_bag_filtered(category: String) -> void:
-	if category == "all":
-		_on_bag_pressed()
-		return
+	_bag_category = category if category != "" else "all"
+	if _bag_dlg != null and is_instance_valid(_bag_dlg):
+		_bag_dlg.queue_free()
+		_bag_dlg = null
 	_on_bag_pressed()
+
+
+## Horizontal-swipe detector for the bag dialog. Left swipe → next tab,
+## right swipe → previous. Press start is recorded in `_bag_swipe_start_*`
+## so this plays nicely with ScrollContainer's own vertical drag.
+func _on_bag_swipe_input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch:
+		var st: InputEventScreenTouch = event
+		if st.pressed:
+			_bag_swipe_start_x = st.position.x
+			_bag_swipe_start_y = st.position.y
+		else:
+			_try_bag_swipe(st.position)
+		return
+	if event is InputEventMouseButton:
+		var mb: InputEventMouseButton = event
+		if mb.button_index != MOUSE_BUTTON_LEFT:
+			return
+		if mb.pressed:
+			_bag_swipe_start_x = mb.position.x
+			_bag_swipe_start_y = mb.position.y
+		else:
+			_try_bag_swipe(mb.position)
+
+
+func _try_bag_swipe(end_pos: Vector2) -> void:
+	if _bag_swipe_start_x < 0:
+		return
+	var dx: float = end_pos.x - _bag_swipe_start_x
+	var dy: float = end_pos.y - _bag_swipe_start_y
+	_bag_swipe_start_x = -1.0
+	_bag_swipe_start_y = -1.0
+	# Need a clear horizontal intent: |dx| > 120px and |dx| > 1.5*|dy|.
+	if abs(dx) < 120.0 or abs(dx) < abs(dy) * 1.5:
+		return
+	var step: int = -1 if dx > 0 else 1  # right-swipe → prev; left → next
+	_shift_bag_category(step)
+
+
+func _shift_bag_category(step: int) -> void:
+	var idx: int = _BAG_CATEGORIES.find(_bag_category)
+	if idx < 0:
+		idx = 0
+	var next_idx: int = (idx + step + _BAG_CATEGORIES.size()) % _BAG_CATEGORIES.size()
+	_open_bag_filtered(String(_BAG_CATEGORIES[next_idx]))
 
 
 ## Render the "Equipped" block at the top of the bag. Shows the current
