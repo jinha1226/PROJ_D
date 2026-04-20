@@ -894,50 +894,10 @@ func _maybe_drop_loot(monster: Monster) -> void:
 		return
 	if randf() > _LOOT_DROP_CHANCE:
 		return
-	var depth: int = GameManager.current_depth
-	var entity_layer: Node = $EntityLayer
-	var fi: FloorItem = FloorItem.new()
-	entity_layer.add_child(fi)
-	var is_cursed: bool = randf() < _CURSE_CHANCE
-	var drop_roll: float = randf()
-	if drop_roll < 0.42:
-		# Weapon drop — DCSS depth-weighted tier table.
-		var wid: String = _pick_by_depth("weapon", depth)
-		if wid.is_empty():
-			wid = "dagger"
-		var wname: String = WeaponRegistry.display_name_for(wid)
-		if is_cursed:
-			wname = "Cursed " + wname
-		fi.setup(monster.grid_pos, wid, wname, "weapon", Color(0.75, 0.75, 0.85),
-				{"cursed": is_cursed})
-	elif drop_roll < 0.70:
-		# Armour drop — DCSS depth-weighted tier table.
-		var aid: String = _pick_by_depth("armour", depth)
-		if aid.is_empty():
-			aid = "leather_armour"
-		var info: Dictionary = ArmorRegistry.get_info(aid)
-		var aname: String = String(info.get("name", aid))
-		if is_cursed:
-			aname = "Cursed " + aname
-		fi.setup(monster.grid_pos, aid, aname,
-				"armor", info.get("color", Color(0.6, 0.6, 0.7)),
-				{"ac": int(info.get("ac", 0)), "slot": String(info.get("slot", "chest")), "cursed": is_cursed})
-	elif drop_roll < 0.78:
-		# Ring drop — rarer than armor/weapon, never cursed in M1.
-		var rid: String = _RING_POOL[randi() % _RING_POOL.size()]
-		var ring_info: Dictionary = RingRegistry.get_info(rid)
-		fi.setup(monster.grid_pos, rid,
-				String(ring_info.get("name", rid)),
-				"ring",
-				ring_info.get("color", Color(0.85, 0.85, 0.90)))
-	else:
-		# Consumable drop — DCSS depth-weighted tier table.
-		var cid: String = _pick_by_depth("consumable", depth)
-		if cid.is_empty():
-			cid = "potion_curing"
-		var cinfo: Dictionary = ConsumableRegistry.get_info(cid)
-		fi.setup(monster.grid_pos, cid, String(cinfo.get("name", cid)),
-				String(cinfo.get("kind", "junk")), cinfo.get("color", Color(0.9, 0.5, 0.3)))
+	# Reuse the same distribution as floor-gen so kill drops and loose
+	# items share a single tuning surface.
+	_place_random_floor_item(monster.grid_pos, GameManager.current_depth,
+			$EntityLayer)
 
 
 ## DCSS floor-gen item placement (dungeon.cc:_builder_items). Items per
@@ -1000,6 +960,17 @@ func _place_random_floor_item(pos: Vector2i, depth: int, parent: Node) -> bool:
 		var ring_info: Dictionary = RingRegistry.get_info(rid)
 		fi.setup(pos, rid, String(ring_info.get("name", rid)), "ring",
 				ring_info.get("color", Color(0.85, 0.85, 0.90)))
+	elif drop_roll < 0.83:
+		# Wand drop: pick one of the 12 DCSS wands, roll its starting
+		# charges, stash both in `extra` so the FloorItem/inventory can
+		# track remaining charges through pickup and evocation.
+		var wand_ids: Array = WandRegistry.all_ids()
+		var wid_w: String = String(wand_ids[randi() % wand_ids.size()])
+		var wand_info: Dictionary = WandRegistry.get_info(wid_w)
+		var charges: int = WandRegistry.roll_charges(wid_w)
+		fi.setup(pos, wid_w, String(wand_info.get("name", wid_w)), "wand",
+				wand_info.get("color", Color(0.85, 0.85, 0.95)),
+				{"charges": charges})
 	else:
 		var cid: String = _pick_by_depth("consumable", depth)
 		if cid.is_empty():

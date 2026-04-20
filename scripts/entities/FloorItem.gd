@@ -77,6 +77,7 @@ func _draw() -> void:
 		"scroll": _draw_scroll(bob)
 		"weapon": _draw_weapon(bob)
 		"armor":  _draw_armor(bob)
+		"wand":   _draw_wand(bob)
 		_:        _draw_generic(bob)
 
 
@@ -303,6 +304,24 @@ func _draw_gloves(oy: float, fill: Color, shine: Color, outline: Color) -> void:
 
 
 # ── Generic / Junk ─────────────────────────────────────────────────────────
+# ── Wand ───────────────────────────────────────────────────────────────────
+# Short stick with a coloured tip. The tip colour reflects the wand's
+# energy; the shaft is a neutral brown so wands read distinct from rings.
+func _draw_wand(bob: float) -> void:
+	var oy: float = bob
+	var outline := Color(0.0, 0.0, 0.0, 0.85)
+	var shaft := Color(0.50, 0.36, 0.20)
+	var tip := color
+	draw_line(Vector2(-2.0, oy + 9.0), Vector2(2.0, oy + 9.0), Color(0, 0, 0, 0.25), 4.0)
+	# Shaft (diagonal for silhouette).
+	draw_line(Vector2(-7.0, oy + 7.0), Vector2(6.0, oy - 6.0), outline, 3.4)
+	draw_line(Vector2(-7.0, oy + 7.0), Vector2(6.0, oy - 6.0), shaft, 2.2)
+	# Glowing tip.
+	draw_circle(Vector2(6.5, oy - 6.5), 3.0, outline)
+	draw_circle(Vector2(6.5, oy - 6.5), 2.4, tip)
+	draw_circle(Vector2(5.5, oy - 7.0), 0.8, Color(1, 1, 1, 0.6))
+
+
 func _draw_generic(bob: float) -> void:
 	var oy: float = bob
 	var outline := Color(0.0, 0.0, 0.0, 0.70)

@@ -850,7 +850,7 @@ func _pickup_items_here() -> void:
 ## Fill the first empty quickslot with this consumable id, unless it's
 ## already quickslotted. Weapons/armor/junk don't go into quickslots.
 func _try_assign_quickslot(id: String, kind: String) -> void:
-	if kind != "potion" and kind != "scroll" and kind != "book":
+	if kind != "potion" and kind != "scroll" and kind != "book" and kind != "wand":
 		return
 	if quickslot_ids.has(id):
 		return
@@ -895,6 +895,14 @@ func use_item(index: int) -> void:
 		return
 	var it: Dictionary = items[index]
 	var item_id: String = String(it.get("id", ""))
+	# Wands evoke rather than consume: fire their spell at the nearest
+	# visible hostile, spend one charge, destroy the wand when the last
+	# charge is used. DCSS evoke.cc:zap_wand behaviour in miniature.
+	if String(it.get("kind", "")) == "wand" or WandRegistry.has(item_id):
+		var fired: bool = _evoke_wand(index)
+		if fired:
+			TurnManager.end_player_turn()
+		return
 	var info: Dictionary = ConsumableRegistry.get_info(item_id)
 	var consumed: bool = false
 	if info.is_empty():
@@ -922,6 +930,118 @@ func use_item(index: int) -> void:
 		inventory_changed.emit()
 		# Using an item costs a turn.
 		TurnManager.end_player_turn()
+
+
+## Evoke the wand at `items[index]` — fires its spell at the nearest
+## visible hostile, spends one charge, destroys the wand at 0. Power
+## comes from Evocations skill (DCSS: `evo_skill * 7.5 + 15` — we reuse
+## SpellRegistry.roll_damage at an evocation-scaled power so direct zap
+## wands hit as hard as they do in DCSS). Returns true on a successful
+## evocation (a turn was spent), false if there was no target or the
+## wand was empty.
+func _evoke_wand(index: int) -> bool:
+	var it: Dictionary = items[index]
+	var wand_id: String = String(it.get("id", ""))
+	var info: Dictionary = WandRegistry.get_info(wand_id)
+	if info.is_empty():
+		CombatLog.add("You don't know how to evoke this.")
+		return false
+	var charges: int = int(it.get("charges", 0))
+	if charges <= 0:
+		CombatLog.add("The %s is out of charges." % String(info.get("name", wand_id)))
+		return false
+	# Evocations skill → effective spell power. DCSS uses a flat
+	# `skill*7.5 + 15` for wands; mirror that and apply the spell's cap.
+	var evo: int = 0
+	if skill_state.has("evocations") and skill_state["evocations"] is Dictionary:
+		evo = int(skill_state["evocations"].get("level", 0))
+	var power: int = int(15 + evo * 7)
+	var spell_id: String = String(info.get("spell", ""))
+	# Find a target — MVP uses the nearest visible hostile. Targeting UI
+	# comes later; digging wands self-target (no effect for now).
+	var kind: String = String(info.get("kind", "direct"))
+	if kind == "utility_dig":
+		CombatLog.add("You carve at the rock. (wall-digging UX not yet wired)")
+		_spend_wand_charge(index, wand_id)
+		return true
+	var target: Node = _nearest_visible_hostile()
+	if target == null:
+		CombatLog.add("No visible target.")
+		return false
+	# Damage / effect dispatch.
+	if kind == "direct":
+		var dmg: int = SpellRegistry.roll_damage(spell_id, power)
+		if dmg < 0:
+			dmg = randi_range(3, 8) + power / 4  # fallback
+		target.take_damage(dmg)
+		CombatLog.add("%s hits the %s for %d!" % [String(info.get("name", wand_id)),
+				target.data.display_name if target.data else "target", dmg])
+	else:
+		_apply_wand_hex(kind, target, power, info)
+	_spend_wand_charge(index, wand_id)
+	if GameManager != null:
+		GameManager.identify(wand_id)
+	return true
+
+
+func _spend_wand_charge(index: int, wand_id: String) -> void:
+	if index < 0 or index >= items.size():
+		return
+	var it: Dictionary = items[index]
+	var charges: int = int(it.get("charges", 0)) - 1
+	it["charges"] = charges
+	items[index] = it
+	if charges <= 0:
+		CombatLog.add("The wand crumbles to dust.")
+		items.remove_at(index)
+	inventory_changed.emit()
+
+
+## Apply a DCSS-shaped hex effect from a wand (paralyse / charm / poly /
+## roots). Duration/strength scales with power per DCSS norms.
+func _apply_wand_hex(kind: String, target: Node, power: int, info: Dictionary) -> void:
+	var tname: String = target.data.display_name if ("data" in target and target.data) else "target"
+	match kind:
+		"hex_paralyse":
+			var turns: int = 2 + int(power / 30)
+			if target.has_method("set_meta"):
+				target.set_meta("_paralysis_turns", turns)
+			CombatLog.add("%s is paralysed! (%d turns)" % [tname, turns])
+		"hex_root":
+			var turns2: int = 3 + int(power / 30)
+			if target.has_method("set_meta"):
+				target.set_meta("_rooted_turns", turns2)
+			CombatLog.add("Roots entangle the %s! (%d turns)" % [tname, turns2])
+		"hex_charm":
+			# Simple fear proxy (we don't have friendly-monster support yet).
+			if target.has_method("set_meta"):
+				target.set_meta("_flee_turns", 5)
+			CombatLog.add("The %s falters, confused." % tname)
+		"hex_poly":
+			CombatLog.add("The %s warps and twists — but nothing changes (polymorph not yet modelled)." % tname)
+		_:
+			CombatLog.add("The %s writhes briefly." % tname)
+
+
+## Pick the closest visible, alive, hostile monster. Used for wand
+## evocation MVP targeting (no picker UI yet).
+func _nearest_visible_hostile() -> Node:
+	var dmap: Node = get_tree().get_first_node_in_group("dmap")
+	var best: Node = null
+	var best_d: int = 999999
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if not is_instance_valid(m) or not ("is_alive" in m) or not m.is_alive:
+			continue
+		if not ("grid_pos" in m):
+			continue
+		if dmap != null and dmap.has_method("is_tile_visible") \
+				and not dmap.is_tile_visible(m.grid_pos):
+			continue
+		var d: int = max(abs(m.grid_pos.x - grid_pos.x), abs(m.grid_pos.y - grid_pos.y))
+		if d < best_d:
+			best_d = d
+			best = m
+	return best
 
 
 func _apply_consumable_effect(info: Dictionary) -> bool:

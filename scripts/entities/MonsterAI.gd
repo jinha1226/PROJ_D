@@ -13,6 +13,25 @@ static func act(m: Monster) -> void:
 		if _should_wake(m):
 			wake(m)
 		return
+	# Paralysis (wand of paralysis, spells) — skip every turn and count
+	# down until the hex wears off. Paralysed monsters can't even flee.
+	if m.has_meta("_paralysis_turns"):
+		var pt: int = int(m.get_meta("_paralysis_turns", 0))
+		if pt > 0:
+			m.set_meta("_paralysis_turns", pt - 1)
+			if pt <= 1:
+				m.remove_meta("_paralysis_turns")
+			return
+	# Rooted — same frame as paralysis for action economy, but the monster
+	# can still strike adjacent targets (rooted ≠ helpless).
+	var rooted: bool = false
+	if m.has_meta("_rooted_turns"):
+		var rt: int = int(m.get_meta("_rooted_turns", 0))
+		if rt > 0:
+			rooted = true
+			m.set_meta("_rooted_turns", rt - 1)
+			if rt <= 1:
+				m.remove_meta("_rooted_turns")
 	# Slow hex: skip this turn and count down.
 	if m.slowed_turns > 0:
 		m.slowed_turns -= 1
@@ -42,7 +61,8 @@ static func act(m: Monster) -> void:
 	# whack the skeleton instead of running past it toward the player.
 	var target: Node = _nearest_hostile(m)
 	if target == null:
-		_maybe_wander(m)
+		if not rooted:
+			_maybe_wander(m)
 		return
 	if "is_alive" in target and not target.is_alive:
 		return
@@ -56,6 +76,10 @@ static func act(m: Monster) -> void:
 		# Companions use the same damage shape (take_damage + ac) as monsters,
 		# so melee_attack_from_monster works for either target.
 		CombatSystem.melee_attack_from_monster(m, player)
+		return
+
+	# Rooted: can't walk toward the target this turn. Just idle.
+	if rooted:
 		return
 
 	if dist <= m.sight_range:
