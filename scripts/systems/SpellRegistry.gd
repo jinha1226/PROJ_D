@@ -459,6 +459,16 @@ static func calc_spell_power(spell_id: String, player: Node) -> int:
 	if "stats" in player and player.stats != null:
 		intel = int(player.stats.INT)
 	var power: int = sk_power * intel / 10
+	# DCSS Wild Magic / Subdued Magic mutations: ±30% to spell power
+	# per level, applied before stepdown.
+	var wild: int = int(player.get_meta("_mut_wild_magic", 0)) \
+			if player.has_method("has_meta") else 0
+	var subdued: int = int(player.get_meta("_mut_subdued_magic", 0)) \
+			if player.has_method("has_meta") else 0
+	if wild > 0:
+		power = power * (10 + 3 * wild) / 10
+	if subdued > 0:
+		power = power * 10 / (10 + 3 * subdued)
 	power = _stepdown_value(power * 10, 50000, 50000, 200000) / 1000
 	# Apply DCSS spell_power_cap from our JSON when present.
 	var dc: Dictionary = _dcss.get(spell_id, {})
@@ -488,6 +498,12 @@ static func failure_rate(spell_id: String, player: Node) -> int:
 	chance -= skpow * 6 / 100
 	chance -= intel * 2
 	chance += _armour_shield_spell_penalty(player)
+	# Wild Magic: +4 fail per level. Subdued: -2 fail per level.
+	# Anti-Wizardry: +4 per level.
+	if player.has_method("has_meta"):
+		chance += 4 * int(player.get_meta("_mut_wild_magic", 0))
+		chance -= 2 * int(player.get_meta("_mut_subdued_magic", 0))
+		chance += 4 * int(player.get_meta("_mut_anti_wizardry", 0))
 	# Difficulty-by-level table from DCSS spl-cast.cc:481.
 	var diff_by_lv: Array = [0, 3, 15, 35, 70, 100, 150, 200, 260, 340]
 	var spell_level: int = _spell_level(spell_id)

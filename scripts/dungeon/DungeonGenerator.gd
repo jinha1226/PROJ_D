@@ -38,6 +38,9 @@ var altars: Dictionary = {}
 ## Shop tile → shop inventory dict. ~1-in-6 floors get a shop; the
 ## inventory is rolled at generation and serialised with the floor.
 var shops: Dictionary = {}
+## Trap tile → trap type dict. DCSS hides most traps; our MVP shows
+## them visible. Step onto the tile to trigger.
+var traps: Dictionary = {}
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 # DCSS layout_basic emits three stair pairs; cache them so _place_stairs can
@@ -75,6 +78,7 @@ func generate(depth: int, run_seed: int = -1) -> void:
 	_place_branch_entrances(depth, run_seed)
 	_place_altars()
 	_place_shops(depth)
+	_place_traps(depth)
 
 
 # ---- Builder: DCSS overlapping-boxes port --------------------------------
@@ -628,6 +632,27 @@ func _roll_shop_inventory(kind: String, depth: int) -> Array:
 	return out
 
 
+## Scatter 2-6 traps per floor. DCSS traps.cc places hidden traps; our
+## MVP places them visible (player sees before stepping) and uses a
+## small trap-type pool weighted by depth. Each trap entry stores the
+## chosen type so revisits remember which trap is where.
+func _place_traps(depth: int) -> void:
+	traps.clear()
+	var want: int = 2 + _rng.randi() % 5    # 2..6 traps
+	var types: Array = ["dart", "arrow", "spear", "teleport", "alarm"]
+	if depth >= 4:
+		types.append("net")
+	if depth >= 8:
+		types.append("bolt")
+	for _i in want:
+		var spot: Vector2i = _pick_branch_entrance_tile()
+		if spot == Vector2i(-1, -1):
+			break
+		var tt: String = String(types[_rng.randi() % types.size()])
+		map[spot.x][spot.y] = TileType.TRAP
+		traps[spot] = {"type": tt, "depth": depth}
+
+
 func _pick_branch_entrance_tile() -> Vector2i:
 	# Try up to 40 random floor tiles, preferring ones that aren't
 	# adjacent to existing stairs so entrances don't clump.
@@ -807,7 +832,7 @@ func is_walkable(p: Vector2i) -> bool:
 	var t: int = get_tile(p)
 	return t == TileType.FLOOR or t == TileType.STAIRS_DOWN or t == TileType.STAIRS_UP \
 			or t == TileType.DOOR_OPEN or t == TileType.BRANCH_ENTRANCE \
-			or t == TileType.ALTAR or t == TileType.SHOP
+			or t == TileType.ALTAR or t == TileType.SHOP or t == TileType.TRAP
 
 
 func open_door(p: Vector2i) -> void:

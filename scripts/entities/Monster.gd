@@ -209,8 +209,14 @@ func take_turn() -> void:
 	var tree: SceneTree = get_tree()
 	if tree != null:
 		var p: Node = tree.get_first_node_in_group("player")
-		if p != null and "race_res" in p and p.race_res != null:
-			player_ticks = 10 + int(p.race_res.move_speed_mod)
+		if p != null:
+			# Movement baseline: race move_speed_mod shifts the per-step tick
+			# cost. Overridden by last_action_ticks when the player's previous
+			# action was a heavy swing (greatsword delay 1.7 → 17 ticks).
+			if "race_res" in p and p.race_res != null:
+				player_ticks = 10 + int(p.race_res.move_speed_mod)
+			if "last_action_ticks" in p:
+				player_ticks = max(player_ticks, int(p.last_action_ticks))
 	_action_energy += monster_speed * player_ticks / 10
 	while is_alive and _action_energy >= 10:
 		var prev_pos: Vector2i = grid_pos

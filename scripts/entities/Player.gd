@@ -90,6 +90,12 @@ var equipped_rings: Array = []
 # with the specific item dict in inventory; we mirror it here so combat
 # doesn't have to crack open equipped_weapon each tick.
 var equipped_weapon_plus: int = 0
+## DCSS action energy: most actions cost 10 ticks, but heavy weapons
+## charge `weapon.delay * 10` on an attack swing. Monsters read this
+## via `Monster.take_turn` to accumulate the right amount of energy,
+## so a greatsword (delay 1.7) gives each nearby monster 17 energy
+## per swing instead of 10.
+var last_action_ticks: int = 10
 var skill_state: Dictionary = {}
 ## DCSS-style mutation slots. Keys are mutation ids (see
 ## assets/dcss_mutations/mutations.json); values are the current level
@@ -330,6 +336,12 @@ func _on_player_turn_started() -> void:
 	# Decrement temporary buffs.
 	if resist_turns > 0:
 		resist_turns -= 1
+	# Reset action-cost to the racial default so this turn's action
+	# starts from a clean slate. Move uses `10 + race.move_speed_mod`;
+	# attack overrides with weapon delay before the swing.
+	last_action_ticks = 10
+	if race_res != null:
+		last_action_ticks += int(race_res.move_speed_mod)
 	_tick_duration_metas()
 
 
@@ -532,6 +544,12 @@ func _apply_mutation_delta(id: String, direction: int) -> void:
 			set_meta("_mut_rF", int(get_meta("_mut_rF", 0)) - direction)
 		"cold_vulnerability":
 			set_meta("_mut_rC", int(get_meta("_mut_rC", 0)) - direction)
+		"wild_magic":
+			set_meta("_mut_wild_magic", int(get_meta("_mut_wild_magic", 0)) + direction)
+		"subdued_magic":
+			set_meta("_mut_subdued_magic", int(get_meta("_mut_subdued_magic", 0)) + direction)
+		"anti_wizardry":
+			set_meta("_mut_anti_wizardry", int(get_meta("_mut_anti_wizardry", 0)) + direction)
 		_:
 			pass  # Non-modelled mutation — recorded but has no effect.
 	stats_changed.emit()
@@ -998,16 +1016,18 @@ func _recompute_gear_stats() -> void:
 		ac += int(ring.get("ac", 0))
 		ev += int(ring.get("ev", 0))
 		stats.mp_max += int(ring.get("mp_max", 0))
-	# DCSS `player_evasion`: base 10, + (dex-10)/2, + dodging skill * 2/3,
-	# + stealth skill / 6, - body armour penalty / 10. Rounded to int.
-	var dodging_lv: int = _skill_level("dodging")
-	var stealth_lv: int = _skill_level("stealth")
-	var dex_bonus: int = (stats.DEX - 10) / 2
-	var evp_evp: int = max(0, -body_evp_raw) / 10
-	var dcss_ev: int = 10 + dex_bonus + dodging_lv * 2 / 3 + stealth_lv / 6 - evp_evp
-	ev += max(0, dcss_ev)
+	# DCSS player_evasion (player.cc:2167). The old ad-hoc formula was
+	# replaced with the faithful PlayerDefense port: it now accounts for
+	# size factor, armour-STR reduction, shield penalty, aux slots, form
+	# bonus, ring/mutation EV, and transient petrify/caught halving.
 	stats.AC = ac
-	stats.EV = max(0, ev)
+	var skill_sys: Node = null
+	if is_inside_tree():
+		skill_sys = get_tree().root.get_node_or_null("Game/SkillSystem")
+	var dcss_ev_total: int = PlayerDefense.player_evasion(self, skill_sys)
+	# `ev` at this point is the sum of legacy slot-bonus + ring-EV reads
+	# above; PlayerDefense now owns both of those so drop the double-count.
+	stats.EV = maxi(0, dcss_ev_total)
 	# Clamp MP if cap dropped below current reading.
 	if stats.MP > stats.mp_max:
 		stats.MP = stats.mp_max
@@ -2265,6 +2285,13 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 	# Sprite slash animation carries the attack feel — no position lunge.
 	# [skill-agent] route through CombatSystem so skill levels are factored in.
 	var skill_sys: Node = get_tree().root.get_node_or_null("Game/SkillSystem")
+	# Action energy cost = weapon delay * 10 (DCSS BASELINE). Monsters
+	# pick this up on their next take_turn to accumulate the right
+	# energy count for this swing.
+	var weapon_delay: float = 1.0
+	if equipped_weapon_id != "" and WeaponRegistry.is_weapon(equipped_weapon_id):
+		weapon_delay = WeaponRegistry.weapon_delay_for(equipped_weapon_id)
+	last_action_ticks = int(round(weapon_delay * 10))
 	CombatSystem.melee_attack(self, monster, skill_sys)
 	attacked.emit(monster)
 	# Combat is loud — DCSS broadcasts noise roughly proportional to the

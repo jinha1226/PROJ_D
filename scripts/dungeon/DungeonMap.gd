@@ -1,7 +1,10 @@
 class_name DungeonMap extends Node2D
 
 const TILE_SIZE: int = 32
-const EXPLORE_RADIUS: int = 6
+## DCSS LOS_DEFAULT_RANGE (defines.h). The mobile port used to run at 6 to
+## keep the visible disk small on phone screens; we now match the desktop
+## default so line-of-sight semantics line up with every other DCSS system.
+const EXPLORE_RADIUS: int = FieldOfView.LOS_DEFAULT_RANGE
 
 var generator: DungeonGenerator = null
 var _path_tiles: Array[Vector2i] = []
@@ -28,24 +31,31 @@ func render(gen: DungeonGenerator) -> void:
 
 
 ## Compute line-of-sight visibility from `center` with Chebyshev `radius`.
-## Walls block sight. Visible tiles also get marked explored.
+## Delegates to FieldOfView (DCSS 0.34 los.cc port). Walls and closed
+## doors block sight per DCSS `opacity_default`.
 func update_fov(center: Vector2i, radius: int = EXPLORE_RADIUS) -> void:
 	if generator == null:
 		return
-	_visible_tiles.clear()
-	_visible_tiles[center] = true
-	_mark_tile_explored(center)
-	for dy in range(-radius, radius + 1):
-		for dx in range(-radius, radius + 1):
-			if max(abs(dx), abs(dy)) > radius:
-				continue
-			if dx == 0 and dy == 0:
-				continue
-			var target: Vector2i = Vector2i(center.x + dx, center.y + dy)
-			if _has_los(center, target):
-				_visible_tiles[target] = true
-				_mark_tile_explored(target)
+	_visible_tiles = FieldOfView.compute(center, radius, _opaque_at)
+	for tile in _visible_tiles.keys():
+		_mark_tile_explored(tile)
 	queue_redraw()
+
+
+## Opacity callback passed to FieldOfView. Mirrors DCSS losparam.cc
+## `opacity_default`: walls → OPAQUE, closed doors → OPAQUE, everything
+## else → CLEAR. (Clouds/smoke are not implemented yet — the HALF
+## return value path is reserved.)
+func _opaque_at(cell: Vector2i) -> int:
+	if cell.x < 0 or cell.x >= DungeonGenerator.MAP_WIDTH:
+		return FieldOfView.OPC_OPAQUE
+	if cell.y < 0 or cell.y >= DungeonGenerator.MAP_HEIGHT:
+		return FieldOfView.OPC_OPAQUE
+	var t: int = generator.map[cell.x][cell.y]
+	if t == DungeonGenerator.TileType.WALL \
+			or t == DungeonGenerator.TileType.DOOR_CLOSED:
+		return FieldOfView.OPC_OPAQUE
+	return FieldOfView.OPC_CLEAR
 
 
 ## Renamed from is_visible() to avoid shadowing CanvasItem's zero-arg
@@ -85,32 +95,10 @@ func _mark_tile_explored(tile: Vector2i) -> void:
 
 ## Bresenham line-of-sight: true if no WALL lies between from and to (endpoints
 ## excluded so a wall on `to` is still visible — you can see the wall's face).
+## Forward to FieldOfView so every LOS query in the project agrees
+## with update_fov (DCSS los.cc port). Kept for legacy callers.
 func _has_los(from: Vector2i, to: Vector2i) -> bool:
-	var dx: int = abs(to.x - from.x)
-	var dy: int = abs(to.y - from.y)
-	var sx: int = 1 if from.x < to.x else -1
-	var sy: int = 1 if from.y < to.y else -1
-	var err: int = dx - dy
-	var x: int = from.x
-	var y: int = from.y
-	while true:
-		if x == to.x and y == to.y:
-			return true
-		if not (x == from.x and y == from.y):
-			if x < 0 or x >= DungeonGenerator.MAP_WIDTH:
-				return false
-			if y < 0 or y >= DungeonGenerator.MAP_HEIGHT:
-				return false
-			if generator.map[x][y] == DungeonGenerator.TileType.WALL:
-				return false
-		var e2: int = 2 * err
-		if e2 > -dy:
-			err -= dy
-			x += sx
-		if e2 < dx:
-			err += dx
-			y += sy
-	return true
+	return FieldOfView.cell_see_cell(from, to, _opaque_at)
 
 ## Show the planned auto-move path as blue-green dots.
 func show_path(path: Array[Vector2i]) -> void:
@@ -224,6 +212,16 @@ func _draw_dcss() -> void:
 					draw_colored_polygon(poly, god_col * modulate)
 					draw_polyline(poly + PackedVector2Array([poly[0]]),
 							Color(0, 0, 0, 0.8) * modulate, 1.2)
+					continue
+				DungeonGenerator.TileType.TRAP:
+					# Trap = floor backdrop + a small X glyph in muted grey.
+					# Hidden traps are a DCSS stretch goal; ours stay visible.
+					if floor_tex != null:
+						draw_texture_rect(floor_tex, rect, false, modulate)
+					var tm: Vector2 = rect.position + rect.size * 0.5
+					var tc := Color(0.80, 0.35, 0.35) * modulate
+					draw_line(tm + Vector2(-5, -5), tm + Vector2(5, 5), tc, 1.6)
+					draw_line(tm + Vector2(-5, 5), tm + Vector2(5, -5), tc, 1.6)
 					continue
 				DungeonGenerator.TileType.SHOP:
 					# Shop tile: floor + a "$" sigil in amber. Simple and

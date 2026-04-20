@@ -41,6 +41,20 @@ const SKILL_CATEGORY: Dictionary = {
 ## Weapon id → skill id. Used by combat to determine which skill a weapon trains.
 ## Mirrors WeaponRegistry.weapon_skill_for() but available as a static dict for
 ## cheap iteration / defaulting.
+## DCSS crosstrain groups (skills.cc:get_crosstrain_skills). When a
+## weapon skill gains XP, each crosstrain partner picks up 40% of that
+## XP. Axes & staves cross with polearms & maces; short-blades cross
+## with long-blades.
+const CROSSTRAIN: Dictionary = {
+	"short_blade": ["long_blade"],
+	"long_blade":  ["short_blade"],
+	"axe":         ["polearm", "mace"],
+	"staff":       ["polearm", "mace"],
+	"polearm":     ["axe", "mace", "staff"],
+	"mace":        ["axe", "polearm", "staff"],
+}
+
+
 const WEAPON_SKILL: Dictionary = {
 	"axe": "axe", "axe_medium": "axe", "waraxe": "axe",
 	"club": "mace", "mace": "mace", "flail": "mace",
@@ -227,35 +241,46 @@ func grant_xp(player: Node, amount: float, usage_tags: Array) -> Array:
 
 	var share: float = amount / float(matched.size())
 	for skill_id in matched:
-		var entry: Dictionary = st[skill_id]
-		var old_level: int = int(entry.get("level", 0))
-		if old_level >= MAX_LEVEL:
-			continue
-		# DCSS aptitude: positive apt → lower XP cost → more progress per XP.
-		# Effective share is scaled by 1/apt_to_xp_factor so that apt=+4
-		# doubles progress and apt=-4 halves it.
-		var apt: int = _aptitude_for(player, skill_id)
-		var factor: float = apt_to_xp_factor(apt)
-		var effective: float = share / max(factor, 0.1)
-		entry["xp"] = float(entry.get("xp", 0.0)) + effective
-		xp_gained.emit(player, skill_id, effective)
-		var new_level: int = old_level
-		while new_level < MAX_LEVEL:
-			var needed: float = xp_for_level(new_level + 1)
-			if float(entry["xp"]) >= needed:
-				entry["xp"] = float(entry["xp"]) - needed
-				new_level += 1
-			else:
-				break
-		if new_level != old_level:
-			entry["level"] = new_level
-			results.append({
-				"skill_id": skill_id,
-				"old_level": old_level,
-				"new_level": new_level,
-			})
-			skill_leveled_up.emit(player, skill_id, new_level)
+		_apply_skill_xp(player, st, skill_id, share, results)
+		# Crosstrain: weapon-skill XP splashes 40% to related weapon
+		# skills, matching DCSS's `get_crosstrain_skills`.
+		if CROSSTRAIN.has(skill_id):
+			var cross_share: float = share * 0.4
+			for cross_id in CROSSTRAIN[skill_id]:
+				if st.has(cross_id):
+					_apply_skill_xp(player, st, String(cross_id), cross_share, results)
 	return results
+
+
+## Apply a single skill-XP grant with DCSS aptitude scaling and
+## handle level-ups. Extracted so grant_xp + crosstrain splash can share
+## the same grant/level logic.
+func _apply_skill_xp(player: Node, st: Dictionary, skill_id: String, amount: float, results: Array) -> void:
+	var entry: Dictionary = st[skill_id]
+	var old_level: int = int(entry.get("level", 0))
+	if old_level >= MAX_LEVEL:
+		return
+	var apt: int = _aptitude_for(player, skill_id)
+	var factor: float = apt_to_xp_factor(apt)
+	var effective: float = amount / max(factor, 0.1)
+	entry["xp"] = float(entry.get("xp", 0.0)) + effective
+	xp_gained.emit(player, skill_id, effective)
+	var new_level: int = old_level
+	while new_level < MAX_LEVEL:
+		var needed: float = xp_for_level(new_level + 1)
+		if float(entry["xp"]) >= needed:
+			entry["xp"] = float(entry["xp"]) - needed
+			new_level += 1
+		else:
+			break
+	if new_level != old_level:
+		entry["level"] = new_level
+		results.append({
+			"skill_id": skill_id,
+			"old_level": old_level,
+			"new_level": new_level,
+		})
+		skill_leveled_up.emit(player, skill_id, new_level)
 
 
 ## Convenience: derive weapon skill id for a weapon id.

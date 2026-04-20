@@ -1169,6 +1169,11 @@ func _on_player_moved(new_pos: Vector2i) -> void:
 	# Any deliberate movement cancels an in-progress rest.
 	if _resting:
 		_cancel_rest("movement")
+	# Trap trigger: stepping onto a TRAP tile resolves the trap's
+	# effect once (trap tile stays for visual, like DCSS's revealed
+	# traps — player can disarm via stealth in the real game).
+	if generator != null and generator.get_tile(new_pos) == DungeonGenerator.TileType.TRAP:
+		_trigger_trap(new_pos)
 	var cam: Camera2D = $Camera2D
 	var cam_target: Vector2 = Vector2(new_pos.x * TILE_SIZE + TILE_SIZE / 2.0, new_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
 	if _cam_tween != null and _cam_tween.is_valid():
@@ -1261,6 +1266,49 @@ func _on_skill_leveled_up_for_stats(p: Node, skill_id: String, _new_level: int) 
 	if skill_id == "dodging" or skill_id == "stealth" or skill_id == "armour":
 		if player.has_method("_recompute_defense"):
 			player._recompute_defense()
+
+
+## Trigger a trap the player just stepped on. Effect depends on the
+## trap's `type` field; DCSS damage scales with depth. After firing,
+## most traps remain in place (visible reminder) but arrow/bolt/spear
+## mechanicals can wear out — we keep them for simplicity.
+func _trigger_trap(pos: Vector2i) -> void:
+	if player == null or generator == null:
+		return
+	var info: Dictionary = generator.traps.get(pos, {})
+	var ttype: String = String(info.get("type", ""))
+	var depth: int = int(info.get("depth", 1))
+	match ttype:
+		"dart":
+			var d: int = 1 + randi() % max(3 + depth / 3, 3)
+			player.take_damage(d, "physical")
+			player.set_meta("_poison_turns", 5)
+			player.set_meta("_poison_dmg", 2)
+			CombatLog.add("A poisoned dart hits you for %d!" % d)
+		"arrow":
+			var a: int = 1 + randi() % max(4 + depth / 3, 4)
+			player.take_damage(a, "physical")
+			CombatLog.add("An arrow thuds into you! (%d dmg)" % a)
+		"spear":
+			var s: int = 1 + randi() % max(6 + depth / 3, 6)
+			player.take_damage(s, "physical")
+			CombatLog.add("A spear stabs you! (%d dmg)" % s)
+		"bolt":
+			var b: int = 1 + randi() % max(5 + depth / 3, 5)
+			player.take_damage(b, "physical")
+			CombatLog.add("A crossbow bolt fires into you! (%d dmg)" % b)
+		"teleport":
+			CombatLog.add("Space wobbles — you are teleported!")
+			if player.has_method("_teleport_random"):
+				player._teleport_random()
+		"alarm":
+			CombatLog.add("An alarm blares!")
+			MonsterAI.broadcast_noise(get_tree(), pos, 30, 0)
+		"net":
+			player.set_meta("_rooted_turns", 5)
+			CombatLog.add("A net falls on you! (rooted for 5 turns)")
+		_:
+			CombatLog.add("A trap triggers, but nothing happens.")
 
 
 ## Keyboard command dispatcher. Wires the vi-key / function-key
@@ -2931,38 +2979,34 @@ func _show_targeting_hint() -> void:
 
 
 func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
-	if player == null or player.stats == null:
+	if player == null:
 		return
-	var info: Dictionary = SpellRegistry.get_spell(spell_id)
-	if info.is_empty():
+	# Route every cast through SpellCast (DCSS spl-cast.cc port): it owns
+	# silence/confusion/MP validation, pays MP up front, rolls failure,
+	# and returns the resolved power. Effect dispatch stays here because
+	# it needs the scene tree + SpellFX nodes.
+	var ctx: Dictionary = {
+		"tree": get_tree(),
+		"dmap": $DungeonLayer/DungeonMap,
+		"spellpower_fn": Callable(self, "_apply_racial_spellpower"),
+	}
+	var result: Dictionary = SpellCast.cast(player, spell_id, target, ctx)
+	var fx_layer: Node2D = $EntityLayer
+	var spret: int = int(result.get("spret", SpellCast.SPRET_ABORT))
+	if spret == SpellCast.SPRET_ABORT:
+		if result.get("message", "") != "":
+			CombatLog.add(result["message"])
 		return
-	var mp_cost: int = int(info.get("mp", 1))
-	if player.stats.MP < mp_cost:
-		CombatLog.add("Not enough MP!")
-		return
-	player.stats.MP -= mp_cost
-	player.stats_changed.emit()
-	# DCSS-ported fail / power. failure_rate handles multi-school averaging
-	# internally (spl-cast.cc raw_spell_fail + _skill_power). calc_spell_power
-	# runs the full DCSS pipeline (skills → INT → stepdown → cap).
-	var school: String = String(info.get("school", "spellcasting"))
-	var fail_pct: int = SpellRegistry.failure_rate(spell_id, player)
-	if randi() % 100 < fail_pct:
-		CombatLog.add("Spell fizzles! (%d%% fail)" % fail_pct)
-		var fx_layer_f: Node2D = $EntityLayer
-		var spell_color_f: Color = info.get("color", Color.WHITE)
-		SpellFX.cast_fizzle(fx_layer_f, player.position, school, spell_color_f)
+	if spret == SpellCast.SPRET_FAIL:
+		CombatLog.add(result.get("message", "Spell fizzles!"))
+		SpellFX.cast_fizzle(fx_layer, player.position, \
+				result.get("school", ""), result.get("spell_color", Color.WHITE))
 		TurnManager.end_player_turn()
 		return
-	var power: int = SpellRegistry.calc_spell_power(spell_id, player)
-	var staff_sch: String = WeaponRegistry.staff_spell_school(player.equipped_weapon_id)
-	if staff_sch == school or staff_sch == "":
-		power += WeaponRegistry.staff_spell_bonus(player.equipped_weapon_id)
-	power = _apply_racial_spellpower(power)
-	if player != null and player.has_method("gear_spell_power_bonus"):
-		power += int(player.gear_spell_power_bonus())
-	var spell_color: Color = info.get("color", Color.WHITE)
-	var fx_layer: Node2D = $EntityLayer
+	var info: Dictionary = result.get("info", SpellRegistry.get_spell(spell_id))
+	var power: int = int(result.get("power", 0))
+	var spell_color: Color = result.get("spell_color", Color.WHITE)
+	var school: String = String(result.get("school", "spellcasting"))
 	var targeting_type: String = String(info.get("targeting", "single"))
 	if targeting_type == "area":
 		var radius: int = int(info.get("radius", 2))
@@ -3124,58 +3168,45 @@ func _on_cast_pressed(spell_id: String, dlg: AcceptDialog) -> void:
 
 
 func _execute_cast(spell_id: String) -> Dictionary:
-	if player == null or player.stats == null:
+	# Book-menu cast path. Routes through SpellCast (DCSS spl-cast.cc
+	# port) for silence / confusion / MP / fail / power, then dispatches
+	# the effect to _cast_*_spell helpers.
+	if player == null:
 		return {"success": false, "message": "No player"}
-	# Silence (scroll / spell) suppresses all casting — DCSS
-	# silence_aura.cc behaviour, simplified to just blocking the player
-	# while the duration runs.
-	if player.has_meta("_silenced_turns"):
-		return {"success": false, "message": "You are surrounded by silence — no casting."}
-	# DCSS confusion: can't cast while confused; attempts fail and the
-	# MP is consumed regardless (represents the mental fumble).
-	if player.has_meta("_confused") and bool(player.get_meta("_confused", false)):
-		player.stats.MP = max(0, player.stats.MP - int(SpellRegistry.get_spell(spell_id).get("mp", 1)))
-		return {"success": false, "message": "You are too confused to cast!"}
-	var info: Dictionary = SpellRegistry.get_spell(spell_id)
-	if info.is_empty():
-		return {"success": false, "message": "Unknown spell: %s" % spell_id}
-
-	var mp_cost: int = int(info.get("mp", 1))
-	if player.stats.MP < mp_cost:
-		return {"success": false, "message": "Not enough MP (%d/%d)" % [player.stats.MP, mp_cost]}
-
-	player.stats.MP -= mp_cost
-	player.stats_changed.emit()
-
-	var school: String = String(info.get("school", "spellcasting"))
-	var fail_pct: int = SpellRegistry.failure_rate(spell_id, player)
-	if randi() % 100 < fail_pct:
+	var ctx: Dictionary = {
+		"tree": get_tree(),
+		"dmap": $DungeonLayer/DungeonMap,
+		"spellpower_fn": Callable(self, "_apply_racial_spellpower"),
+	}
+	var result: Dictionary = SpellCast.cast(player, spell_id, null, ctx)
+	var spret: int = int(result.get("spret", SpellCast.SPRET_ABORT))
+	var info: Dictionary = result.get("info", SpellRegistry.get_spell(spell_id))
+	var school: String = String(result.get("school", "spellcasting"))
+	if spret == SpellCast.SPRET_ABORT:
+		return {"success": false, "message": result.get("message", "")}
+	if spret == SpellCast.SPRET_FAIL:
 		var fx_layer_f: Node2D = $EntityLayer
-		var spell_color_f: Color = info.get("color", Color.WHITE)
-		SpellFX.cast_fizzle(fx_layer_f, player.position, school, spell_color_f)
-		return {"success": false, "message": "Spell fizzles! (%d%% fail)" % fail_pct}
-	var power: int = SpellRegistry.calc_spell_power(spell_id, player)
-	var staff_sch: String = WeaponRegistry.staff_spell_school(player.equipped_weapon_id)
-	if staff_sch == school or staff_sch == "":
-		power += WeaponRegistry.staff_spell_bonus(player.equipped_weapon_id)
-	power = _apply_racial_spellpower(power)
-	if player != null and player.has_method("gear_spell_power_bonus"):
-		power += int(player.gear_spell_power_bonus())
-
+		SpellFX.cast_fizzle(fx_layer_f, player.position, school, result.get("spell_color", Color.WHITE))
+		return {"success": false, "message": result.get("message", "Spell fizzles.")}
+	var power: int = int(result.get("power", 0))
+	# SpellCast.cast resolves the target node internally; pull it out so
+	# we don't run auto-picking twice.
+	var resolved_target = result.get("target", null)
 	var targeting: String = String(info.get("targeting", "single"))
 	match targeting:
 		"self":   return _cast_self_spell(spell_id, info, power)
-		"single": return _cast_single_target(spell_id, info, power)
-		"area":   return _cast_area_spell(spell_id, info, power)
+		"single": return _cast_single_target(spell_id, info, power, resolved_target)
+		"area":   return _cast_area_spell(spell_id, info, power, resolved_target)
 		_:        return {"success": true, "message": "Spell fizzles."}
 
 
-func _cast_single_target(spell_id: String, info: Dictionary, power: int) -> Dictionary:
-	var target: Monster = _find_nearest_visible_monster(int(info.get("range", 6)))
+func _cast_single_target(spell_id: String, info: Dictionary, power: int, target: Monster = null) -> Dictionary:
+	# SpellCast already resolved the target (and paid MP). Legacy callers
+	# that pass null get the old auto-pick behaviour.
 	if target == null:
-		# Refund MP — no valid target.
-		player.stats.MP = min(player.stats.mp_max, player.stats.MP + int(info.get("mp", 1)))
-		player.stats_changed.emit()
+		target = _find_nearest_visible_monster(int(info.get("range", 6)))
+	if target == null:
+		SpellCast.refund(player, int(info.get("mp", 1)))
 		return {"success": false, "message": "No visible target in range."}
 
 	var tname: String = ""
@@ -3229,11 +3260,11 @@ func _cast_single_target(spell_id: String, info: Dictionary, power: int) -> Dict
 	return {"success": true, "message": "%s → %s: %d dmg" % [String(info.get("name", spell_id)), tname, dmg], "damage": dmg}
 
 
-func _cast_area_spell(spell_id: String, info: Dictionary, power: int) -> Dictionary:
-	var center_m: Monster = _find_nearest_visible_monster(int(info.get("range", 8)))
+func _cast_area_spell(spell_id: String, info: Dictionary, power: int, center_m: Monster = null) -> Dictionary:
 	if center_m == null:
-		player.stats.MP = min(player.stats.mp_max, player.stats.MP + int(info.get("mp", 1)))
-		player.stats_changed.emit()
+		center_m = _find_nearest_visible_monster(int(info.get("range", 8)))
+	if center_m == null:
+		SpellCast.refund(player, int(info.get("mp", 1)))
 		return {"success": false, "message": "No visible target in range."}
 
 	var center: Vector2i = center_m.grid_pos

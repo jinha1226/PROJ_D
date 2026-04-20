@@ -156,6 +156,25 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 			attacker.set_meta("_backstab_used", true)
 		else:
 			dmg = int(dmg * 1.15)
+	# DCSS stab mechanic: attacking sleeping / paralysed / petrified /
+	# mesmerised / confused / held targets multiplies damage. Short-
+	# blades benefit most (4× vs the standard 1.5×) matching DCSS's
+	# stab classifications. Wakes the target as a side effect.
+	if defender.has_method("has_meta"):
+		var stabbable: bool = false
+		if "is_sleeping" in defender and defender.is_sleeping:
+			stabbable = true
+		if defender.has_meta("_paralysis_turns") or defender.has_meta("_petrified_turns") \
+				or defender.has_meta("_confused"):
+			stabbable = true
+		if stabbable:
+			var stab_mult: float = 1.5
+			if weapon_skill_id == "short_blade":
+				stab_mult = 4.0
+			elif weapon_skill_id == "long_blade":
+				stab_mult = 2.0
+			dmg = int(dmg * stab_mult)
+			CombatLog.add("Stab!")
 	# Racial passive: naga venom bite adds a flat +1 to every melee hit.
 	var race_trait: String = ""
 	if "race_res" in attacker and attacker.race_res != null:
