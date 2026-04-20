@@ -27,6 +27,11 @@ var stairs_down_pos: Vector2i = Vector2i.ZERO
 var stairs_down_pos2: Vector2i = Vector2i.ZERO
 var spawn_pos: Vector2i = Vector2i.ZERO
 var spawn_pos2: Vector2i = Vector2i.ZERO
+## Branch entrance tile locations: `{Vector2i: branch_id}`. Populated by
+## `_place_branch_entrances` after the trunk floor is built. Empty on
+## non-dungeon floors and on dungeon floors that aren't an entry depth
+## for any child branch.
+var branch_entrances: Dictionary = {}
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 # DCSS layout_basic emits three stair pairs; cache them so _place_stairs can
@@ -61,6 +66,7 @@ func generate(depth: int, run_seed: int = -1) -> void:
 		_decorate_rock_debris(6)
 	_ensure_reachability()
 	_place_stairs()
+	_place_branch_entrances(depth, run_seed)
 
 
 # ---- Builder: DCSS overlapping-boxes port --------------------------------
@@ -100,11 +106,16 @@ static func _dcss_feature_to_tile(f: String) -> int:
 
 
 func _current_branch() -> String:
+	# DungeonGenerator's tile-theming + layout builders key off the
+	# tileset_branch (main/mine/forest/swamp/volcano/…) rather than the
+	# raw DCSS branch id, so Lair can reuse the "forest" cave layout etc.
 	var mgr: Node = null
 	if Engine.get_main_loop() != null:
 		mgr = Engine.get_main_loop().root.get_node_or_null("GameManager")
 	if mgr == null:
 		return "main"
+	if mgr.has_method("tileset_branch"):
+		return mgr.call("tileset_branch")
 	return String(mgr.get("current_branch") or "main")
 
 
@@ -489,6 +500,53 @@ func _stamp_vault(template: Array, ox: int, oy: int) -> void:
 
 # ---- Reachability + stair placement ---------------------------------------
 
+## DCSS `_place_branch_entrances` — on a dungeon floor, scatter a tile
+## for each child branch whose entry-depth matches this floor. We only
+## do this while on the main trunk; child branches don't nest deeper
+## still in our port.
+func _place_branch_entrances(depth: int, run_seed: int) -> void:
+	branch_entrances.clear()
+	var mgr: Node = null
+	if Engine.get_main_loop() != null:
+		mgr = Engine.get_main_loop().root.get_node_or_null("GameManager")
+	var parent: String = "dungeon"
+	if mgr != null:
+		parent = String(mgr.get("current_branch") or "dungeon")
+	if parent != "dungeon":
+		return
+	var to_place: Array = BranchRegistry.children_entering_at(parent, depth)
+	if to_place.is_empty():
+		return
+	# Pick distinct entries per-run: only place a given branch's entrance
+	# at one specific depth in [min, max], hashed from run_seed so save/
+	# restore converges on the same placement.
+	for bid in to_place:
+		var entry_depth: int = BranchRegistry.entry_depth_for(bid, run_seed)
+		if entry_depth != depth:
+			continue
+		var pos: Vector2i = _pick_branch_entrance_tile()
+		if pos == Vector2i(-1, -1):
+			continue
+		map[pos.x][pos.y] = TileType.BRANCH_ENTRANCE
+		branch_entrances[pos] = bid
+
+
+func _pick_branch_entrance_tile() -> Vector2i:
+	# Try up to 40 random floor tiles, preferring ones that aren't
+	# adjacent to existing stairs so entrances don't clump.
+	for _i in 40:
+		var x: int = 1 + _rng.randi() % (MAP_WIDTH - 2)
+		var y: int = 1 + _rng.randi() % (MAP_HEIGHT - 2)
+		var p: Vector2i = Vector2i(x, y)
+		if map[x][y] != TileType.FLOOR:
+			continue
+		if p == spawn_pos or p == stairs_down_pos \
+				or p == spawn_pos2 or p == stairs_down_pos2:
+			continue
+		return p
+	return Vector2i(-1, -1)
+
+
 func _ensure_reachability() -> void:
 	if rooms.is_empty():
 		# Caves can still produce a playable region even without registered
@@ -650,7 +708,8 @@ func get_tile(p: Vector2i) -> int:
 
 func is_walkable(p: Vector2i) -> bool:
 	var t: int = get_tile(p)
-	return t == TileType.FLOOR or t == TileType.STAIRS_DOWN or t == TileType.STAIRS_UP or t == TileType.DOOR_OPEN
+	return t == TileType.FLOOR or t == TileType.STAIRS_DOWN or t == TileType.STAIRS_UP \
+			or t == TileType.DOOR_OPEN or t == TileType.BRANCH_ENTRANCE
 
 
 func open_door(p: Vector2i) -> void:

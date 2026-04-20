@@ -16,10 +16,15 @@ var selected_trait_id: String = ""
 # Art mode — 0 = LPC (composed), 1 = DCSS tiles. Read via TileRenderer.mode().
 # DCSS is now the default since the tile mapping is complete.
 var render_mode: int = 1
-# Current dungeon branch id (for tile theming). "main" / "forest" / "mine" /
-# "crypt" / "volcano" / "swamp" / "crystal" / "sandstone". TileRenderer.feature
-# picks the right floor/wall texture based on this.
-var current_branch: String = "main"
+## DCSS-style branch id that `current_depth` indexes into. "dungeon" on the
+## main trunk; "lair" / "orc" / "vaults" / … once the player takes a
+## branch entrance. Used as a key prefix in GameBootstrap._floor_state so
+## each branch floor saves/restores independently of the main trunk.
+var current_branch: String = "dungeon"
+## Stack of {branch, depth} entries for where to return when leaving the
+## current branch. Pushed on branch entry; popped on stairs-up off the
+## branch's floor 1.
+var branch_return_stack: Array = []
 
 # --- Item identification (per-run) ---
 # identified[id] == true once the player has drunk/read/identified a consumable.
@@ -57,6 +62,8 @@ const _SCROLL_BASE_TILES: Array = [
 
 func start_new_run(job_id: String = "fighter", race_id: String = "human", run_seed: int = -1) -> void:
 	current_depth = 1
+	current_branch = "dungeon"
+	branch_return_stack.clear()
 	current_seed = run_seed if run_seed != -1 else randi()
 	selected_race_id = race_id
 	selected_job_id = job_id
@@ -136,11 +143,52 @@ func end_run(victory: bool) -> void:
 	run_ended.emit(victory)
 
 
-## Maps depth → branch id. 5-floor segments rotate the dungeon theme so each
-## stretch of run feels distinct (also drives boss-floor tile selection).
-##   D:1-5   main      D:6-10  mine    D:11-15 forest
-##   D:16-20 swamp     D:21-25 volcano
+## Compound floor key used by GameBootstrap's save/restore cache. Each
+## branch's depth-N floor is independent, so revisiting D:10 after
+## clearing Lair:3 restores D:10 exactly as it was left.
+func floor_key() -> String:
+	return "%s:%d" % [current_branch, current_depth]
+
+
+## Tile theming bucket for DCSS TileRenderer. When we're in a real
+## branch we route the branch id through; the trunk's Dungeon still
+## rotates through thematic segments so D:1-5 vs D:11-15 look different.
+func tileset_branch() -> String:
+	if current_branch != "dungeon":
+		# Map branch id → tileset name. Some branches share a tileset.
+		match current_branch:
+			"lair": return "forest"
+			"swamp": return "swamp"
+			"shoals": return "shoals"
+			"snake": return "snake"
+			"spider": return "forest"
+			"slime": return "slime"
+			"orc": return "mine"
+			"elf": return "elf"
+			"vaults": return "vaults"
+			"crypt": return "crypt"
+			"tomb": return "crypt"
+			"zot": return "crystal"
+			"abyss", "pan": return "abyss"
+			"depths": return "sandstone"
+			_: return current_branch
+	# Main trunk thematic rotation.
+	if current_depth <= 5:
+		return "main"
+	if current_depth <= 10:
+		return "mine"
+	if current_depth <= 15:
+		return "forest"
+	if current_depth <= 20:
+		return "swamp"
+	return "volcano"
+
+
+## Legacy compat — kept so older callers (TileRenderer tile selection)
+## keep working. Prefer `tileset_branch()` going forward.
 func branch_for_depth(d: int) -> String:
+	if current_branch != "dungeon":
+		return tileset_branch()
 	if d <= 5:
 		return "main"
 	if d <= 10:
@@ -150,3 +198,23 @@ func branch_for_depth(d: int) -> String:
 	if d <= 20:
 		return "swamp"
 	return "volcano"
+
+
+## Push the current {branch, depth} and switch to the top of a new
+## branch. GameBootstrap handles the floor regen afterward.
+func enter_branch(branch_id: String) -> void:
+	branch_return_stack.push_back({"branch": current_branch, "depth": current_depth})
+	current_branch = branch_id
+	current_depth = 1
+
+
+## Pop the last parent floor off the stack (if any) and return to it.
+## Returns true if we actually left a branch; false when we're already
+## on the root. Caller still has to regenerate the floor.
+func leave_branch() -> bool:
+	if branch_return_stack.is_empty():
+		return false
+	var ret: Dictionary = branch_return_stack.pop_back()
+	current_branch = String(ret.get("branch", "dungeon"))
+	current_depth = int(ret.get("depth", 1))
+	return true

@@ -269,6 +269,7 @@ func _ready() -> void:
 	add_child(touch_input)
 	touch_input.stairs_tapped.connect(_on_stairs_tapped)
 	touch_input.stairs_up_tapped.connect(_on_stairs_up_tapped)
+	touch_input.branch_entrance_tapped.connect(_on_branch_entrance_tapped)
 	touch_input.target_selected.connect(_on_target_selected)
 	touch_input.inspect_requested.connect(_on_inspect_requested)
 
@@ -1121,9 +1122,20 @@ func _refresh_actor_visibility(dmap: DungeonMap) -> void:
 func _on_stairs_tapped(_pos: Vector2i) -> void:
 	if run_over:
 		return
-	if GameManager.current_depth >= MAX_DEPTH:
-		_end_run(true, "")
-		return
+	# Branch-aware stairs-down: on the main dungeon trunk, depth 15 (the
+	# DCSS D:15 endpoint) wins the run if the player has chosen to stop
+	# there — `MAX_DEPTH` acts as our soft cap. Inside a branch, the
+	# branch's own floor count gates further descent.
+	if GameManager.current_branch == "dungeon":
+		if GameManager.current_depth >= MAX_DEPTH:
+			_end_run(true, "")
+			return
+	else:
+		var branch_floors: int = BranchRegistry.floors_in(GameManager.current_branch)
+		if GameManager.current_depth >= branch_floors:
+			CombatLog.add("You are at the bottom of %s." % \
+					BranchRegistry.display_name(GameManager.current_branch))
+			return
 	var used_secondary: bool = (player.grid_pos == generator.stairs_down_pos2)
 	_save_current_floor()
 	GameManager.current_depth += 1
@@ -1133,12 +1145,34 @@ func _on_stairs_tapped(_pos: Vector2i) -> void:
 func _on_stairs_up_tapped(_pos: Vector2i) -> void:
 	if run_over:
 		return
+	# If we're on depth 1 of a non-trunk branch, stairs-up returns to the
+	# parent floor on the main dungeon tree instead of being a no-op.
+	if GameManager.current_branch != "dungeon" and GameManager.current_depth == 1:
+		_save_current_floor()
+		if GameManager.leave_branch():
+			_regenerate_dungeon(false, false)
+		return
 	if GameManager.current_depth <= 1:
 		return
 	var used_secondary: bool = (player.grid_pos == generator.spawn_pos2)
 	_save_current_floor()
 	GameManager.current_depth -= 1
 	_regenerate_dungeon(true, used_secondary)
+
+
+## DCSS-style branch entry: tapping onto a BRANCH_ENTRANCE tile saves
+## the current floor, pushes it onto the return stack, and rolls into
+## the child branch at depth 1.
+func _on_branch_entrance_tapped(pos: Vector2i) -> void:
+	if run_over or generator == null:
+		return
+	var branch_id: String = String(generator.branch_entrances.get(pos, ""))
+	if branch_id == "":
+		return
+	_save_current_floor()
+	GameManager.enter_branch(branch_id)
+	CombatLog.add("You enter %s." % BranchRegistry.display_name(branch_id))
+	_regenerate_dungeon(false, false)
 
 
 ## going_up=true places the player at the new floor's stairs_down (where they
@@ -1186,7 +1220,7 @@ func _regenerate_dungeon(going_up: bool, secondary: bool = false) -> void:
 	if _top_hud_ref != null and _top_hud_ref.has_method("set_depth"):
 		_top_hud_ref.set_depth(GameManager.current_depth)
 	await get_tree().process_frame
-	if _floor_state.has(GameManager.current_depth):
+	if _floor_state.has(GameManager.floor_key()):
 		_restore_floor(GameManager.current_depth)
 	else:
 		_spawn_monsters_for_current_depth()
@@ -1242,11 +1276,11 @@ func _save_current_floor() -> void:
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	if dmap != null:
 		snapshot["explored"] = dmap.explored.duplicate()
-	_floor_state[GameManager.current_depth] = snapshot
+	_floor_state[GameManager.floor_key()] = snapshot
 
 
-func _restore_floor(depth: int) -> void:
-	var snapshot: Dictionary = _floor_state.get(depth, {})
+func _restore_floor(_depth: int) -> void:
+	var snapshot: Dictionary = _floor_state.get(GameManager.floor_key(), {})
 	if snapshot.is_empty():
 		return
 	# Prefer restoring the exact tile grid we saved rather than relying on

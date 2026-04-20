@@ -195,6 +195,14 @@ func _draw_dcss() -> void:
 					if floor_tex != null:
 						draw_texture_rect(floor_tex, rect, false, modulate)
 					tex = stairs_up_tex
+				DungeonGenerator.TileType.BRANCH_ENTRANCE:
+					# Draw a stairs-down under a colour-tinted overlay so the
+					# player can tell branch portals apart from normal stairs.
+					if floor_tex != null:
+						draw_texture_rect(floor_tex, rect, false, modulate)
+					tex = stairs_dn_tex
+					# Tint the modulate downstream — we hack a draw_rect
+					# overlay after the tile draw for now.
 				DungeonGenerator.TileType.WATER:
 					tex = water_tex
 				DungeonGenerator.TileType.LAVA:
