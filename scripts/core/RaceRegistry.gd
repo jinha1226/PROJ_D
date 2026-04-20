@@ -27,7 +27,14 @@ static func fetch(id: String) -> RaceData:
 		if res != null:
 			res = res.duplicate() as RaceData
 	_ensure_loaded()
+	# DCSS splits a few species into colour/variant sub-entries
+	# (draconian_base/red/white/…). Our race selector still offers the
+	# umbrella id, so fall back to `<id>_base` when the top-level key
+	# isn't there — otherwise the race inherits .tres hardcoded stats
+	# that don't match DCSS.
 	var dcss: Dictionary = _dcss.get(id, {})
+	if dcss.is_empty() and _dcss.has(id + "_base"):
+		dcss = _dcss[id + "_base"]
 	if res == null and dcss.is_empty():
 		return null
 	if res == null:
