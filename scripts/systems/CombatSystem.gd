@@ -166,24 +166,29 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 			attacker.set_meta("_backstab_used", true)
 		else:
 			dmg = int(dmg * 1.15)
-	# DCSS stab mechanic: attacking sleeping / paralysed / petrified /
-	# mesmerised / confused / held targets multiplies damage. Short-
-	# blades benefit most (4× vs the standard 1.5×) matching DCSS's
-	# stab classifications. Wakes the target as a side effect.
-	if defender.has_method("has_meta"):
-		var stabbable: bool = false
-		if "is_sleeping" in defender and defender.is_sleeping:
-			stabbable = true
-		if defender.has_meta("_paralysis_turns") or defender.has_meta("_petrified_turns") \
-				or defender.has_meta("_confused"):
-			stabbable = true
-		if stabbable:
-			var stab_mult: float = 1.5
-			if weapon_skill_id == "short_blade":
-				stab_mult = 4.0
-			elif weapon_skill_id == "long_blade":
-				stab_mult = 2.0
-			dmg = int(dmg * stab_mult)
+	# DCSS stab (attack.cc:1426 player_stab_weapon_bonus +
+	# fight.cc:639 find_player_stab_type + 706 stab_bonus_denom):
+	#   stab_bonus = 1 for sleeping/paralysed/petrified  → full bonus
+	#              = 4 for confused/distracted/fleeing/held  → quarter
+	# Roll an attempt chance for the non-helpless stabs, then apply the
+	# damage pipeline: DEX-scaled flat bonus on good stabs, plus a pair
+	# of skill-scaled multipliers and a small random additional bonus.
+	var stab_bonus: int = _find_stab_denom(defender)
+	if stab_bonus > 0:
+		var stab_attempt: bool = true
+		if stab_bonus > 1:
+			# attack.cc:1535 — chance = (wpn_skill + stealth)/2 + dex + 1.
+			var wpn_half: int = 0
+			var stealth_half: int = 0
+			if skill_sys != null:
+				wpn_half = skill_sys.get_level(attacker, weapon_skill_id) / 2 \
+						if weapon_skill_id != "" else 0
+				stealth_half = skill_sys.get_level(attacker, "stealth") / 2
+			var atk_dex: int = attacker.stats.DEX if "stats" in attacker and attacker.stats != null else 10
+			var stab_try: int = wpn_half + stealth_half + atk_dex + 1
+			stab_attempt = (randi() % 100) < stab_try
+		if stab_attempt:
+			dmg = _apply_stab_bonus(attacker, dmg, weapon_skill_id, stab_bonus, skill_sys)
 			CombatLog.add("Stab!")
 	# Racial passive: naga venom bite adds a flat +1 to every melee hit.
 	var race_trait: String = ""
@@ -321,6 +326,97 @@ static func melee_attack_from_monster(m, defender) -> int:
 	_show_hit_feedback(defender, total, Color(1.0, 0.3, 0.3))
 	_show_slash_fx(defender)
 	return total
+
+
+## Port of fight.cc::find_player_stab_type + stab_bonus_denom. Returns:
+##   0  — no stab possible (standard hit)
+##   1  — "good stab" (sleeping / paralysed / petrified): full bonus
+##   4  — "bad stab" (confused / petrifying / held / fleeing):
+##        quarter bonus. DCSS also includes distracted/invisible/blind,
+##        which we fold into "confused" until we model those conditions.
+static func _find_stab_denom(defender) -> int:
+	if defender == null or not defender.has_method("has_meta"):
+		return 0
+	if "is_sleeping" in defender and defender.is_sleeping:
+		return 1
+	if defender.has_meta("_paralysis_turns"):
+		return 1
+	if defender.has_meta("_petrified_turns"):
+		# DCSS: petrified is full stab (1), petrifying is partial (4).
+		# We don't track the in-progress state separately yet; treat the
+		# metadata as "petrified".
+		return 1
+	if defender.has_meta("_confused"):
+		return 4
+	if defender.has_meta("_net_turns"):
+		return 4
+	if defender.has_meta("_fleeing_turns"):
+		return 4
+	return 0
+
+
+## DCSS attack.cc:1426 player_stab_weapon_bonus.
+##   stab_skill = wpn_skill*50 + stealth_skill*50
+##   good_stab  = (stab_bonus == 1)
+##   if good_stab:
+##       bonus = dex * (stab_skill + 100) / (dagger ? 500 : 1000)
+##       bonus = stepdown(bonus, 10, max=30)          # capped growth
+##       damage += bonus
+##       damage *= 10 + stab_skill / (100 * stab_bonus)
+##       damage /= 10
+##   damage *= 12 + stab_skill / (100 * stab_bonus)
+##   damage /= 12
+##   damage += random2(stab_skill / (200 * stab_bonus))
+static func _apply_stab_bonus(attacker, damage: int, wpn_skill_id: String, stab_bonus: int, skill_sys) -> int:
+	if damage <= 0:
+		damage = 1
+	var wpn_lv: int = 0
+	var stealth_lv: int = 0
+	if skill_sys != null:
+		if wpn_skill_id != "":
+			wpn_lv = skill_sys.get_level(attacker, wpn_skill_id)
+		stealth_lv = skill_sys.get_level(attacker, "stealth")
+	var stab_skill: int = wpn_lv * 50 + stealth_lv * 50
+	if stab_bonus <= 0:
+		return damage
+	if stab_bonus == 1:
+		var dex: int = 10
+		if "stats" in attacker and attacker.stats != null:
+			dex = int(attacker.stats.DEX)
+		# DCSS dagger divisor 500 vs 1000 for other short_blades.
+		var divisor: int = 1000
+		if wpn_skill_id == "short_blade" and "equipped_weapon_id" in attacker:
+			if String(attacker.equipped_weapon_id) == "dagger":
+				divisor = 500
+		var bonus: int = dex * (stab_skill + 100) / divisor
+		# DCSS stepdown_value(bonus, stepping=10, first_step=10, ceiling=30).
+		bonus = _stab_stepdown(bonus, 10, 10, 30)
+		damage += bonus
+		damage = damage * (10 + stab_skill / (100 * stab_bonus)) / 10
+	damage = damage * (12 + stab_skill / (100 * stab_bonus)) / 12
+	var tail_range: int = stab_skill / (200 * stab_bonus)
+	if tail_range > 0:
+		damage += randi() % tail_range
+	return damage
+
+
+## Simplified stepdown matching DCSS stepdown_value(bonus, step=first_step=stepping, ceiling).
+## For our usage (bonus, 10, 10, 30): when bonus ≤ 10 passes through, above
+## 10 it's log-compressed, ceiling at 30. Sufficient for the stab flat bonus
+## which rarely exceeds 30 even with maxed DEX + skill.
+static func _stab_stepdown(value: int, stepping: int, first_step: int, ceiling: int) -> int:
+	if value <= first_step:
+		return value
+	if ceiling > 0 and value > ceiling:
+		value = ceiling
+	# step * log2(1 + (v-(first_step-step))/step). first_step=stepping=10 →
+	# (value - 0)/10 = value/10 → step * log2(1 + value/step).
+	var over: float = float(value - (first_step - stepping))
+	var stepped: float = float(stepping) * log(1.0 + over / float(stepping)) / log(2.0)
+	var out: int = int(stepped)
+	if ceiling > 0 and out > ceiling:
+		out = ceiling
+	return out
 
 
 ## DCSS player::gdr_perc (player.cc:6620): `16 * sqrt(sqrt(ac))`.
