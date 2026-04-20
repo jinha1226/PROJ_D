@@ -225,6 +225,23 @@ func _draw_dcss() -> void:
 					draw_polyline(poly + PackedVector2Array([poly[0]]),
 							Color(0, 0, 0, 0.8) * modulate, 1.2)
 					continue
+				DungeonGenerator.TileType.SHOP:
+					# Shop tile: floor + a "$" sigil in amber. Simple and
+					# readable without leaning on DCSS's shop tilesets.
+					if floor_tex != null:
+						draw_texture_rect(floor_tex, rect, false, modulate)
+					var sh_mid: Vector2 = rect.position + rect.size * 0.5
+					var sh_col := Color(1.0, 0.80, 0.25) * modulate
+					draw_rect(Rect2(sh_mid - Vector2(8, 8), Vector2(16, 16)),
+							sh_col * Color(1, 1, 1, 0.25), true)
+					draw_circle(sh_mid, 7.0, sh_col)
+					draw_circle(sh_mid, 7.0, Color(0, 0, 0, 0.6) * modulate, false, 1.2)
+					# "$" tick marks inside — two short lines forming an S-like glyph
+					draw_line(sh_mid + Vector2(-3, -4), sh_mid + Vector2(3, -4),
+							Color(0, 0, 0, 0.9) * modulate, 1.2)
+					draw_line(sh_mid + Vector2(-3, 4), sh_mid + Vector2(3, 4),
+							Color(0, 0, 0, 0.9) * modulate, 1.2)
+					continue
 				DungeonGenerator.TileType.WATER:
 					tex = water_tex
 				DungeonGenerator.TileType.LAVA:

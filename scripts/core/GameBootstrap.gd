@@ -172,7 +172,12 @@ func _ready() -> void:
 				top_hud.set_hp(player.stats.HP, player.stats.hp_max)
 			if top_hud.has_method("set_mp"):
 				top_hud.set_mp(player.stats.MP, player.stats.mp_max)
+			if top_hud.has_method("set_gold"):
+				top_hud.set_gold(player.gold)
 			_update_low_hp_overlay())
+		player.inventory_changed.connect(func():
+			if top_hud.has_method("set_gold"):
+				top_hud.set_gold(player.gold))
 		if top_hud.has_method("set_hp") and player.stats != null:
 			top_hud.set_hp(player.stats.HP, player.stats.hp_max)
 			top_hud.set_mp(player.stats.MP, player.stats.mp_max)
@@ -271,6 +276,7 @@ func _ready() -> void:
 	touch_input.stairs_up_tapped.connect(_on_stairs_up_tapped)
 	touch_input.branch_entrance_tapped.connect(_on_branch_entrance_tapped)
 	touch_input.altar_tapped.connect(_on_altar_tapped)
+	touch_input.shop_tapped.connect(_on_shop_tapped)
 	touch_input.target_selected.connect(_on_target_selected)
 	touch_input.inspect_requested.connect(_on_inspect_requested)
 
@@ -891,6 +897,25 @@ const _RING_POOL: Array = [
 ]
 
 
+## DCSS gold-on-kill: only monsters that "carry" gold (humanoid,
+## intelligent, not animals/plants) drop a small pile. Amount scales
+## with the victim's HD so a stone giant gives more than an orc.
+func _maybe_drop_gold(monster: Monster) -> void:
+	if monster == null or monster.data == null or not ("grid_pos" in monster):
+		return
+	var intel: String = String(monster.data.intelligence)
+	if intel == "animal" or intel == "plant" or intel == "brainless":
+		return
+	if randf() >= 0.30:
+		return
+	var hd: int = int(monster.data.hd)
+	var amount: int = max(1, hd + randi() % max(hd * 2, 3))
+	var fi: FloorItem = FloorItem.new()
+	$EntityLayer.add_child(fi)
+	fi.setup(monster.grid_pos, "gold", "%d gold" % amount, "gold",
+			Color(1.0, 0.85, 0.30), {"gold": amount})
+
+
 func _maybe_drop_loot(monster: Monster) -> void:
 	if monster == null or not ("grid_pos" in monster):
 		return
@@ -1020,6 +1045,10 @@ func _on_monster_died(monster: Monster) -> void:
 		CombatLog.add("You kill the %s!" % String(monster.data.display_name))
 	if meta != null and monster != null and monster.data != null:
 		meta.record_kill(String(monster.data.id))
+	# DCSS gold drop: 30% of intelligent humanoid kills drop a small pile
+	# scaled by monster HD. Orcs/humans/gnolls carry purses; animals
+	# don't. Dropped as a floor pickup so the player has to step to it.
+	_maybe_drop_gold(monster)
 	# DCSS piety gain: every god who likes kills (Trog/Okawaru/Zin)
 	# rewards the player per-victim. Amount is scaled down from DCSS
 	# because our runs are shorter; cap at the god's piety_cap.
@@ -1187,6 +1216,92 @@ func _on_stairs_up_tapped(_pos: Vector2i) -> void:
 	_save_current_floor()
 	GameManager.current_depth -= 1
 	_regenerate_dungeon(true, used_secondary)
+
+
+## Shop tap: open a buying menu against the shop's rolled inventory.
+## Items are removed from the shop's list on purchase and added to the
+## player's inventory; gold decrements. Re-entering a shop floor shows
+## the same inventory minus any bought items (state persists via the
+## generator, which is saved in the floor snapshot).
+func _on_shop_tapped(pos: Vector2i) -> void:
+	if run_over or generator == null or player == null:
+		return
+	var shop: Dictionary = generator.shops.get(pos, {})
+	if shop.is_empty():
+		return
+	_open_shop_dialog(pos, shop)
+
+
+func _open_shop_dialog(pos: Vector2i, shop: Dictionary) -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null:
+		return
+	var dlg := AcceptDialog.new()
+	var kind: String = String(shop.get("kind", "general"))
+	dlg.title = "Shop — %s (you have %d gold)" % [kind.capitalize(), player.gold]
+	dlg.exclusive = false
+	dlg.ok_button_text = "Leave"
+	var vb := VBoxContainer.new()
+	dlg.add_child(vb)
+	var inventory: Array = shop.get("inventory", [])
+	if inventory.is_empty():
+		var lbl := Label.new()
+		lbl.text = "Shop is empty."
+		vb.add_child(lbl)
+	else:
+		for entry in inventory:
+			var item_id: String = String(entry.get("id", ""))
+			var price: int = int(entry.get("price", 0))
+			var name_s: String = item_id.replace("_", " ").capitalize()
+			var info_row: Dictionary = ConsumableRegistry.get_info(item_id)
+			if not info_row.is_empty():
+				name_s = String(info_row.get("name", name_s))
+			var btn := Button.new()
+			btn.text = "%s — %d gold" % [name_s, price]
+			btn.disabled = player.gold < price
+			btn.pressed.connect(_buy_from_shop.bind(pos, entry, dlg))
+			vb.add_child(btn)
+	popup_mgr.add_child(dlg)
+	dlg.popup_centered(Vector2i(760, 640))
+
+
+func _buy_from_shop(pos: Vector2i, entry: Dictionary, dlg: AcceptDialog) -> void:
+	if player == null or generator == null:
+		return
+	var shop: Dictionary = generator.shops.get(pos, {})
+	if shop.is_empty():
+		return
+	var price: int = int(entry.get("price", 0))
+	if player.gold < price:
+		CombatLog.add("You cannot afford that.")
+		return
+	player.gold -= price
+	# Hand the item over. Items slot into inventory via ConsumableRegistry
+	# (potions/scrolls) or WeaponRegistry/ArmorRegistry (gear).
+	var item_id: String = String(entry.get("id", ""))
+	var explicit_kind: String = String(entry.get("kind", ""))
+	var item_dict: Dictionary = {"id": item_id, "name": item_id.replace("_", " ").capitalize()}
+	var info_row: Dictionary = ConsumableRegistry.get_info(item_id)
+	if not info_row.is_empty():
+		item_dict = info_row
+	elif explicit_kind == "weapon":
+		item_dict = {"id": item_id, "kind": "weapon",
+				"name": WeaponRegistry.display_name_for(item_id)}
+	elif explicit_kind == "armor":
+		var ainfo: Dictionary = ArmorRegistry.get_info(item_id)
+		item_dict = {"id": item_id, "kind": "armor",
+				"name": String(ainfo.get("name", item_id)),
+				"ac": int(ainfo.get("ac", 0)),
+				"slot": String(ainfo.get("slot", "chest"))}
+	player.items.append(item_dict)
+	player.inventory_changed.emit()
+	CombatLog.add("Bought %s for %d gold." % [String(item_dict.get("name", item_id)), price])
+	shop["inventory"].erase(entry)
+	generator.shops[pos] = shop
+	# Refresh the dialog so the bought row disappears.
+	if dlg != null:
+		dlg.queue_free()
+		_open_shop_dialog(pos, shop)
 
 
 ## Altar tap: if the player is unaligned, this pledges them to the
@@ -1458,20 +1573,32 @@ func _dispatch_invocation(effect: String) -> void:
 			_summon_ally("shadow", 50, "A shadow detaches from you.")
 		# ---- Gozag ----
 		"potion_petition":
-			for i in 3:
-				var pot_ids: Array = ["potion_curing", "potion_haste", "potion_might",
-						"potion_brilliance", "potion_agility", "potion_magic"]
-				var pid: String = String(pot_ids[randi() % pot_ids.size()])
-				player.items.append(ConsumableRegistry.get_info(pid))
-			player.inventory_changed.emit()
-			CombatLog.add("Gozag sells you three potions.")
+			if player.gold < 50:
+				CombatLog.add("Gozag requires 50 gold for a petition.")
+			else:
+				player.gold -= 50
+				for i in 3:
+					var pot_ids: Array = ["potion_curing", "potion_haste", "potion_might",
+							"potion_brilliance", "potion_resistance", "potion_magic"]
+					var pid: String = String(pot_ids[randi() % pot_ids.size()])
+					player.items.append(ConsumableRegistry.get_info(pid))
+				player.inventory_changed.emit()
+				CombatLog.add("Gozag sells you three potions for 50 gold.")
 		"call_merchant":
-			CombatLog.add("Gozag summons a merchant. (stub)")
+			if player.gold < 100:
+				CombatLog.add("Gozag requires 100 gold to call a merchant.")
+			else:
+				player.gold -= 100
+				_summon_shop_near_player()
 		"bribe_branch":
-			for m in get_tree().get_nodes_in_group("monsters"):
-				if is_instance_valid(m) and m.is_alive:
-					m.set_meta("_flee_turns", 30)
-			CombatLog.add("Gold changes hands; monsters retreat.")
+			if player.gold < 250:
+				CombatLog.add("Gozag requires 250 gold to bribe the branch.")
+			else:
+				player.gold -= 250
+				for m in get_tree().get_nodes_in_group("monsters"):
+					if is_instance_valid(m) and m.is_alive:
+						m.set_meta("_flee_turns", 30)
+				CombatLog.add("Gold changes hands; monsters retreat.")
 		# ---- Qazlal ----
 		"upheaval":
 			_damage_nearest_visible(25, 50, "Upheaval tears up the floor!")
@@ -1590,6 +1717,27 @@ func _summon_ally(monster_id: String, lifetime: int, msg: String) -> void:
 	c.lifetime = lifetime
 	if msg != "":
 		CombatLog.add(msg)
+
+
+## Gozag's "Call Merchant" — turn the adjacent floor tile into a fresh
+## shop with a rolled inventory so the player can spend the rest of
+## their gold in situ.
+func _summon_shop_near_player() -> void:
+	if player == null or generator == null:
+		return
+	var tile: Vector2i = _find_free_adjacent_tile(player.grid_pos)
+	if tile == player.grid_pos:
+		CombatLog.add("No room next to you.")
+		return
+	generator.map[tile.x][tile.y] = DungeonGenerator.TileType.SHOP
+	generator.shops[tile] = {
+		"kind": "general",
+		"inventory": generator._roll_shop_inventory("general", GameManager.current_depth),
+	}
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	if dmap != null:
+		dmap.queue_redraw()
+	CombatLog.add("A merchant sets up stall at your side.")
 
 
 ## Remove one random "bad" mutation from the player, reversing its

@@ -35,6 +35,9 @@ var branch_entrances: Dictionary = {}
 ## Altar tile → god id. Temple floors get three (one per god); most
 ## dungeon floors get zero, ~12% get a single random altar.
 var altars: Dictionary = {}
+## Shop tile → shop inventory dict. ~1-in-6 floors get a shop; the
+## inventory is rolled at generation and serialised with the floor.
+var shops: Dictionary = {}
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 # DCSS layout_basic emits three stair pairs; cache them so _place_stairs can
@@ -71,6 +74,7 @@ func generate(depth: int, run_seed: int = -1) -> void:
 	_place_stairs()
 	_place_branch_entrances(depth, run_seed)
 	_place_altars()
+	_place_shops(depth)
 
 
 # ---- Builder: DCSS overlapping-boxes port --------------------------------
@@ -568,6 +572,62 @@ func _place_altars() -> void:
 		altars[spot] = chosen_god
 
 
+## DCSS shop placement: a rare (1-in-6 per floor) single shop with a
+## rolled inventory of 5-8 items. Shop "type" picks a rough theme
+## (potion shop / scroll shop / weapon shop / general). Prices are
+## rolled by category and written into the inventory so the shop UI
+## doesn't have to recompute on every visit.
+func _place_shops(depth: int) -> void:
+	shops.clear()
+	if _rng.randi() % 6 != 0:
+		return
+	var spot: Vector2i = _pick_branch_entrance_tile()
+	if spot == Vector2i(-1, -1):
+		return
+	map[spot.x][spot.y] = TileType.SHOP
+	var kind: String = ["potion", "scroll", "weapon", "armour", "general"][_rng.randi() % 5]
+	var inv: Array = _roll_shop_inventory(kind, depth)
+	shops[spot] = {"kind": kind, "inventory": inv}
+
+
+func _roll_shop_inventory(kind: String, depth: int) -> Array:
+	var out: Array = []
+	var count: int = 4 + _rng.randi() % 5   # 4..8 items
+	var pool: Array = []
+	match kind:
+		"potion":
+			for cid in ["potion_curing", "potion_heal_wounds", "potion_haste",
+					"potion_might", "potion_brilliance", "potion_magic",
+					"potion_invisibility", "potion_berserk_rage", "potion_resistance"]:
+				pool.append({"id": cid, "price_base": 40})
+		"scroll":
+			for cid in ["scroll_teleport", "scroll_blink", "scroll_identify",
+					"scroll_magic_map", "scroll_remove_curse",
+					"scroll_enchant_weapon", "scroll_enchant_armor",
+					"scroll_fog", "scroll_acquirement"]:
+				pool.append({"id": cid, "price_base": 60})
+		"weapon":
+			# Light bias per depth through the existing tier tables.
+			for wid in ["dagger", "short_sword", "rapier", "mace", "longsword",
+					"waraxe", "short_bow"]:
+				pool.append({"id": wid, "kind": "weapon", "price_base": 80})
+		"armour":
+			for aid in ["leather_armour", "ring_mail", "scale_mail",
+					"chain_mail", "plate_armour", "cloak", "helmet", "buckler"]:
+				pool.append({"id": aid, "kind": "armor", "price_base": 100})
+		_:
+			for cid in ["potion_curing", "scroll_identify", "scroll_teleport",
+					"dagger", "leather_armour", "cloak", "potion_haste"]:
+				pool.append({"id": cid, "price_base": 50})
+	pool.shuffle()
+	for i in min(count, pool.size()):
+		var entry: Dictionary = pool[i].duplicate()
+		var base: int = int(entry.get("price_base", 50))
+		entry["price"] = max(5, base + depth * 8 + _rng.randi() % 30)
+		out.append(entry)
+	return out
+
+
 func _pick_branch_entrance_tile() -> Vector2i:
 	# Try up to 40 random floor tiles, preferring ones that aren't
 	# adjacent to existing stairs so entrances don't clump.
@@ -747,7 +807,7 @@ func is_walkable(p: Vector2i) -> bool:
 	var t: int = get_tile(p)
 	return t == TileType.FLOOR or t == TileType.STAIRS_DOWN or t == TileType.STAIRS_UP \
 			or t == TileType.DOOR_OPEN or t == TileType.BRANCH_ENTRANCE \
-			or t == TileType.ALTAR
+			or t == TileType.ALTAR or t == TileType.SHOP
 
 
 func open_door(p: Vector2i) -> void:

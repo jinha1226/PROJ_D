@@ -98,6 +98,10 @@ var mutations: Dictionary = {}
 var current_god: String = ""
 var piety: int = 0
 
+## Gold currency. Gained from monster drops, floor piles, and Gozag's
+## potion_petition gambling. Spent at shops and on Gozag's bribes.
+var gold: int = 0
+
 ## DCSS transmutation state. Empty "" when in human form; set via
 ## `apply_form(id)` from talismans, the transmutations spell school,
 ## or god-granted shifts. All effect deltas (stats, HP cap, AC,
@@ -1148,6 +1152,15 @@ func _pickup_items_here() -> void:
 		if not is_instance_valid(it):
 			continue
 		if it is FloorItem and it.grid_pos == grid_pos:
+			# Gold piles go straight into the currency counter instead
+			# of the inventory. `extra.gold` carries the amount.
+			if it.kind == "gold":
+				var amount: int = int(it.extra.get("gold", 0))
+				if amount > 0:
+					gold += amount
+					CombatLog.add("Picked up %d gold." % amount)
+				it.queue_free()
+				continue
 			items.append(it.as_dict())
 			var shown: String = GameManager.display_name_for_item(
 					it.item_id, it.display_name, it.kind) if GameManager != null else it.display_name

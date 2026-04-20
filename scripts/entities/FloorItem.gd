@@ -78,6 +78,7 @@ func _draw() -> void:
 		"weapon": _draw_weapon(bob)
 		"armor":  _draw_armor(bob)
 		"wand":   _draw_wand(bob)
+		"gold":   _draw_gold(bob)
 		_:        _draw_generic(bob)
 
 
@@ -304,6 +305,23 @@ func _draw_gloves(oy: float, fill: Color, shine: Color, outline: Color) -> void:
 
 
 # ── Generic / Junk ─────────────────────────────────────────────────────────
+# ── Gold pile ──────────────────────────────────────────────────────────────
+# Three stacked coins at slight offsets. Colour is a warm yellow-gold.
+func _draw_gold(bob: float) -> void:
+	var oy: float = bob
+	var outline := Color(0.20, 0.15, 0.05, 0.85)
+	var coin := Color(1.00, 0.80, 0.20)
+	var shine := Color(1.0, 1.0, 0.7, 0.6)
+	draw_circle(Vector2(-3.0, oy + 5.0), 6.0, Color(0, 0, 0, 0.2))
+	# Three overlapping coins
+	for i in 3:
+		var cx: float = float(i - 1) * 2.0
+		var cy: float = oy + 2.0 - float(i) * 1.8
+		draw_circle(Vector2(cx, cy), 5.5, outline)
+		draw_circle(Vector2(cx, cy), 4.5, coin)
+		draw_circle(Vector2(cx - 1.5, cy - 1.5), 1.2, shine)
+
+
 # ── Wand ───────────────────────────────────────────────────────────────────
 # Short stick with a coloured tip. The tip colour reflects the wand's
 # energy; the shaft is a neutral brown so wands read distinct from rings.

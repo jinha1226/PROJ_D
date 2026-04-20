@@ -15,6 +15,7 @@ var _pulse_t: float = 0.0
 var _pulsing: bool = false
 var _depth: int = 1
 var _level: int = 1
+var _gold: int = 0
 
 
 func _ready() -> void:
@@ -58,9 +59,14 @@ func set_depth(d: int) -> void:
 	_update_xp_label()
 
 
+func set_gold(g: int) -> void:
+	_gold = g
+	_update_xp_label()
+
+
 func _update_xp_label() -> void:
 	if xp_label:
-		xp_label.text = "Lv.%d   B%dF" % [_level, _depth]
+		xp_label.text = "Lv.%d   B%dF   %d$" % [_level, _depth, _gold]
 
 
 ## GameBootstrap feeds the rebuilt minimap ImageTexture in here whenever
