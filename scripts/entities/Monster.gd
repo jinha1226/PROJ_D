@@ -22,6 +22,12 @@ var slowed_turns: int = 0
 # almost every non-boss monster (dungeon.cc:4252); MonsterAI.act() is
 # responsible for the wake check and state transition.
 var is_sleeping: bool = false
+## DCSS action-energy accumulator. Each player turn the monster adds
+## its `data.speed` (10 = normal, 15 = fast, 5 = slow); while the
+## accumulator is ≥ 10, the monster takes one action and spends 10
+## energy. A speed-15 centaur therefore averages 1.5 swings per player
+## turn; a speed-30 bat swings 3 times.
+var _action_energy: int = 10
 
 var _sprite: CharacterSprite = null
 var _has_preset: bool = false
@@ -138,14 +144,21 @@ func die() -> void:
 func take_turn() -> void:
 	if not is_alive:
 		return
-	var prev_pos: Vector2i = grid_pos
-	if boss_ai != null:
-		var p: Node = get_tree().get_first_node_in_group("player")
-		boss_ai.act(self, p)
-	else:
-		MonsterAI.act(self)
-	if _sprite and grid_pos != prev_pos:
-		_sprite.face_toward(grid_pos - prev_pos)
+	# DCSS energy model: accumulate monster speed each player turn,
+	# then spend 10 energy per action taken. Fast monsters (speed > 10)
+	# act multiple times; slow ones (speed < 10) skip some turns.
+	var speed: int = int(data.speed) if data else 10
+	_action_energy += speed
+	while is_alive and _action_energy >= 10:
+		var prev_pos: Vector2i = grid_pos
+		if boss_ai != null:
+			var p: Node = get_tree().get_first_node_in_group("player")
+			boss_ai.act(self, p)
+		else:
+			MonsterAI.act(self)
+		if _sprite and grid_pos != prev_pos:
+			_sprite.face_toward(grid_pos - prev_pos)
+		_action_energy -= 10
 		_sprite.play_anim("walk", true)
 		# Reuse a single SceneTreeTimer reference per monster — each turn
 		# overwrites the previous one. Connecting only when not already

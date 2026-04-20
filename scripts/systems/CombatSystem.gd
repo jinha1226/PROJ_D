@@ -67,21 +67,32 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	if "stats" in attacker and attacker.stats != null:
 		base_stat_atk = attacker.stats.get_attack()
 
-	# DCSS melee roll: `1 + random2(weapon_damage)` for the base, plus
-	# STR-derived bonus `(STR-10)/3`, plus a skill bonus rolled through
-	# random2avg for variance, plus fighting skill / 4. This replaces the
-	# old flat `weapon_dmg * (1 + skill/20)` formula which treated every
-	# swing as near-max damage — much too consistent vs DCSS.
-	var base_roll: int = 1 + (randi() % max(weapon_dmg, 1))
-	var str_bonus: int = 0
+	# DCSS multiplicative damage pipeline (attack.cc player path):
+	#   potential  = weapon_damage * 100  (fixed base × 100)
+	#   potential *= stat_modify_damage    (STR/DEX → 75..175% + scale)
+	#   damage     = random2(potential+1) / 100  (roll)
+	#   damage    *= apply_weapon_skill   (1.0..2.08x)
+	#   damage    *= apply_fighting_skill (1.0..1.9x)
+	# This replaces the old additive `base + str/3 + skill/2` which
+	# gave ~2× too much damage at mid-skill levels.
+	var attr: int = 10
 	if "stats" in attacker and attacker.stats != null:
-		str_bonus = max(0, (attacker.stats.STR - 10) / 3)
-	var skill_bonus: int = 0
-	if weapon_skill_level > 0:
-		# random2avg(skill+1, 2) ≈ average roll around skill/2.
-		skill_bonus = (randi() % (weapon_skill_level + 1) \
-				+ randi() % (weapon_skill_level + 1)) / 2
-	var atk: int = base_roll + str_bonus + skill_bonus + fighting_level / 4
+		# Short blades / polearms / ranged use DEX; everything else uses STR.
+		if weapon_skill_id in ["short_blade", "bow", "throwing"]:
+			attr = attacker.stats.DEX
+		else:
+			attr = attacker.stats.STR
+	var stat_mult: int = max(1, 75 + (25 * attr) / 10)  # 75 + 2.5*attr, integer
+	var potential: int = max(weapon_dmg, 1) * stat_mult
+	var base_damage: int = (randi() % (potential + 1)) / 100
+	# Weapon-skill multiplier (scale 2500, skill scaled ×100 to match DCSS
+	# internal representation).
+	var w_skill_scaled: int = weapon_skill_level * 100
+	base_damage = base_damage * (2500 + (randi() % (w_skill_scaled + 1))) / 2500
+	# Fighting-skill multiplier (scale 3000).
+	var f_skill_scaled: int = fighting_level * 100
+	base_damage = base_damage * (3000 + (randi() % (f_skill_scaled + 1))) / 3000
+	var atk: int = max(1, base_damage)
 
 	var def_ac: int = 0
 	if "ac" in defender:
@@ -93,8 +104,7 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 		def_ac = def_ac / 2
 
 	# DCSS apply_ac: AC soaks `random2(2*AC+1)` off the hit — average
-	# of AC damage blocked, with a lot of variance. Replaces the old
-	# flat `atk - def_ac` subtraction.
+	# of AC damage blocked, with a lot of variance.
 	var soak: int = (randi() % (2 * def_ac + 1)) if def_ac > 0 else 0
 	var dmg: int = max(1, atk - soak)
 	var trait_special: String = ""
@@ -171,13 +181,23 @@ static func melee_attack_from_monster(m, defender) -> int:
 		def_ac = int(defender.ac)
 
 	var hd: int = int(m.data.hd) if m.data else 1
+	# DCSS `mon_to_hit_base(hd, fighter)` = `18 + hd * (fighter ? 5 : 3) / 2`.
+	# Fighter monsters (orc_warrior, knight class etc.) flagged via the
+	# `fighter` entry in data.flags.
+	var is_fighter: bool = false
+	if m.data and "flags" in m.data:
+		for f in m.data.flags:
+			if String(f).to_lower() == "fighter":
+				is_fighter = true
+				break
+	var mhit_base: int = 18 + hd * (5 if is_fighter else 3) / 2
 	var atks: Array = m.data.attacks if m.data and "attacks" in m.data else []
 	var total: int = 0
 	var dealt_any: bool = false
 	var missed_any: bool = false
 	if atks.is_empty():
-		# Fallback for data-less monsters: old str/2+3 shape, single swing.
-		var to_hit: int = 1 + (randi() % (hd * 10 + 1))
+		# Fallback for data-less monsters: single swing vs EV.
+		var to_hit: int = randi() % (mhit_base + 1)
 		if to_hit >= def_ev:
 			var raw_f: int = max(1, (int(m.data.str) / 2 + 3) if m.data else 3)
 			total = max(0, raw_f - (randi() % (2 * def_ac + 1)))
@@ -193,8 +213,8 @@ static func melee_attack_from_monster(m, defender) -> int:
 			var chance: float = 1.0 / float(1 + i)
 			if i > 0 and randf() >= chance:
 				continue
-			# DCSS to-hit: `1 + random2(hd*10+1)` vs EV. Miss if roll < EV.
-			var to_hit_roll: int = 1 + (randi() % (hd * 10 + 1))
+			# DCSS to-hit: `random2(mhit_base+1)` vs EV. Miss if roll < EV.
+			var to_hit_roll: int = randi() % (mhit_base + 1)
 			if to_hit_roll < def_ev:
 				missed_any = true
 				continue
