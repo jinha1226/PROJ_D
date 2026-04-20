@@ -818,14 +818,64 @@ func _spawn_monsters_for_current_depth() -> void:
 const _LOOT_DROP_CHANCE: float = 0.30
 const _CURSE_CHANCE: float = 0.12
 
-# Depth-scaled weapon pools: tier1 = early game, tier2 = mid, tier3 = late.
-const _WEAPON_T1: Array = ["dagger", "club", "axe", "short_sword"]
-const _WEAPON_T2: Array = ["arming_sword", "mace", "waraxe", "rapier", "spear", "short_bow"]
-const _WEAPON_T3: Array = ["longsword", "katana", "flail", "halberd", "long_bow", "gnarled_staff",
-		"fire_staff", "ice_staff", "lightning_staff"]
-const _ARMOR_T1: Array = ["leather_chest", "leather_legs", "leather_boots", "leather_helm"]
-const _ARMOR_T2: Array = ["chain_chest", "chain_legs", "plate_boots", "plate_helm", "leather_gloves", "cloak"]
-const _ARMOR_T3: Array = ["plate_chest", "plate_legs", "plate_gloves", "plate_boots", "cloak_protection", "cloak_stealth", "cloak_resistance"]
+# Depth-scaled item generation loaded from assets/dcss_items/item_gen.json
+const _ITEM_GEN_PATH: String = "res://assets/dcss_items/item_gen.json"
+static var _item_gen: Dictionary = {}
+static var _item_gen_loaded: bool = false
+
+static func _ensure_item_gen() -> void:
+	if _item_gen_loaded:
+		return
+	_item_gen_loaded = true
+	var f := FileAccess.open(_ITEM_GEN_PATH, FileAccess.READ)
+	if f == null:
+		return
+	var parsed = JSON.parse_string(f.get_as_text())
+	f.close()
+	if parsed is Dictionary:
+		_item_gen = parsed
+
+## Pick a random item id from depth-scaled DCSS tier tables.
+## table_key = "weapon" | "armour" | "consumable"
+static func _pick_by_depth(table_key: String, depth: int) -> String:
+	_ensure_item_gen()
+	var tiers: Dictionary = _item_gen.get(table_key + "_tiers", {})
+	var by_depth: Dictionary = _item_gen.get(table_key + "_by_depth", {})
+	var d_key: String = str(clampi(depth, 1, 27))
+	var tier_weights: Array = by_depth.get(d_key, [])
+	if tiers.is_empty() or tier_weights.is_empty():
+		return ""
+	# Weighted tier selection
+	var total_w: int = 0
+	for tw in tier_weights:
+		total_w += int(tw[1])
+	var roll: int = randi() % max(total_w, 1)
+	var chosen_tier: String = ""
+	var acc: int = 0
+	for tw in tier_weights:
+		acc += int(tw[1])
+		if roll < acc:
+			chosen_tier = String(tw[0])
+			break
+	var pool = tiers.get(chosen_tier, {})
+	if pool is Array:
+		if pool.is_empty():
+			return ""
+		return String(pool[randi() % pool.size()])
+	# pool is Dictionary {id: weight}
+	var pool_dict: Dictionary = pool as Dictionary
+	if pool_dict.is_empty():
+		return ""
+	var p_total: int = 0
+	for w in pool_dict.values():
+		p_total += int(w)
+	var p_roll: int = randi() % max(p_total, 1)
+	var p_acc: int = 0
+	for id in pool_dict.keys():
+		p_acc += int(pool_dict[id])
+		if p_roll < p_acc:
+			return String(id)
+	return String(pool_dict.keys()[0])
 
 # Ring drop pool — a small chance branches into this pool instead of
 # armor/weapon/consumable on any monster drop.
@@ -837,15 +887,6 @@ const _RING_POOL: Array = [
 	"ring_fire", "ring_ice",
 ]
 
-# Consumable pools by tier.
-const _CONS_T1: Array = ["minor_potion", "mana_potion", "scroll_identify", "scroll_blink",
-		"scroll_magic_map", "potion_curing"]
-const _CONS_T2: Array = ["major_potion", "scroll_teleport", "scroll_remove_curse",
-		"scroll_enchant_weapon", "scroll_enchant_armor", "potion_might",
-		"potion_agility", "potion_brilliance", "potion_resistance", "potion_haste",
-		"potion_magic", "scroll_fear", "scroll_vulnerability"]
-const _CONS_T3: Array = ["scroll_holy_word", "scroll_immolation", "scroll_fog",
-		"scroll_acquirement", "potion_restore", "potion_experience"]
 
 func _maybe_drop_loot(monster: Monster) -> void:
 	if monster == null or not ("grid_pos" in monster):
@@ -857,35 +898,22 @@ func _maybe_drop_loot(monster: Monster) -> void:
 	var fi: FloorItem = FloorItem.new()
 	entity_layer.add_child(fi)
 	var is_cursed: bool = randf() < _CURSE_CHANCE
-	# Depth-scaled pools: deeper = better chance of tier2/3 items.
-	var tier_roll: float = randf()
-	var weapon_pool: Array
-	var armor_pool: Array
-	var cons_pool: Array
-	if depth >= 16:
-		weapon_pool = _WEAPON_T3 if tier_roll < 0.5 else (_WEAPON_T2 if tier_roll < 0.85 else _WEAPON_T1)
-		armor_pool  = _ARMOR_T3  if tier_roll < 0.4 else (_ARMOR_T2  if tier_roll < 0.80 else _ARMOR_T1)
-		cons_pool   = _CONS_T3   if tier_roll < 0.4 else (_CONS_T2   if tier_roll < 0.80 else _CONS_T1)
-	elif depth >= 8:
-		weapon_pool = _WEAPON_T2 if tier_roll < 0.55 else (_WEAPON_T3 if tier_roll < 0.70 else _WEAPON_T1)
-		armor_pool  = _ARMOR_T2  if tier_roll < 0.55 else (_ARMOR_T3  if tier_roll < 0.65 else _ARMOR_T1)
-		cons_pool   = _CONS_T2   if tier_roll < 0.55 else (_CONS_T3   if tier_roll < 0.65 else _CONS_T1)
-	else:
-		weapon_pool = _WEAPON_T1 if tier_roll < 0.65 else _WEAPON_T2
-		armor_pool  = _ARMOR_T1  if tier_roll < 0.65 else _ARMOR_T2
-		cons_pool   = _CONS_T1   if tier_roll < 0.70 else _CONS_T2
 	var drop_roll: float = randf()
 	if drop_roll < 0.42:
-		# Weapon drop.
-		var wid: String = weapon_pool[randi() % weapon_pool.size()]
+		# Weapon drop — DCSS depth-weighted tier table.
+		var wid: String = _pick_by_depth("weapon", depth)
+		if wid.is_empty():
+			wid = "dagger"
 		var wname: String = WeaponRegistry.display_name_for(wid)
 		if is_cursed:
 			wname = "Cursed " + wname
 		fi.setup(monster.grid_pos, wid, wname, "weapon", Color(0.75, 0.75, 0.85),
 				{"cursed": is_cursed})
 	elif drop_roll < 0.70:
-		# Armor drop.
-		var aid: String = armor_pool[randi() % armor_pool.size()]
+		# Armour drop — DCSS depth-weighted tier table.
+		var aid: String = _pick_by_depth("armour", depth)
+		if aid.is_empty():
+			aid = "leather_armour"
 		var info: Dictionary = ArmorRegistry.get_info(aid)
 		var aname: String = String(info.get("name", aid))
 		if is_cursed:
@@ -902,8 +930,10 @@ func _maybe_drop_loot(monster: Monster) -> void:
 				"ring",
 				ring_info.get("color", Color(0.85, 0.85, 0.90)))
 	else:
-		# Consumable drop.
-		var cid: String = cons_pool[randi() % cons_pool.size()]
+		# Consumable drop — DCSS depth-weighted tier table.
+		var cid: String = _pick_by_depth("consumable", depth)
+		if cid.is_empty():
+			cid = "potion_curing"
 		var cinfo: Dictionary = ConsumableRegistry.get_info(cid)
 		fi.setup(monster.grid_pos, cid, String(cinfo.get("name", cid)),
 				String(cinfo.get("kind", "junk")), cinfo.get("color", Color(0.9, 0.5, 0.3)))
@@ -914,11 +944,6 @@ func _spawn_dummy_items(_count: int) -> void:
 	var depth: int = GameManager.current_depth
 	var item_count: int = clamp(4 + depth / 2, 5, 12)
 	var entity_layer: Node = $EntityLayer
-	var depth_pool: Array = _CONS_T1.duplicate()
-	if depth >= 6:
-		depth_pool.append_array(_CONS_T2)
-	if depth >= 14:
-		depth_pool.append_array(_CONS_T3)
 	var placed: int = 0
 	var attempts: int = 0
 	while placed < item_count and attempts < 400:
@@ -930,7 +955,9 @@ func _spawn_dummy_items(_count: int) -> void:
 			continue
 		if gp == player.grid_pos:
 			continue
-		var iid: String = String(depth_pool[randi() % depth_pool.size()])
+		var iid: String = _pick_by_depth("consumable", depth)
+		if iid.is_empty():
+			iid = "potion_curing"
 		var info: Dictionary = ConsumableRegistry.get_info(iid)
 		if info.is_empty():
 			continue

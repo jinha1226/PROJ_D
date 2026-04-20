@@ -1,0 +1,1468 @@
+{
+  "_comment": "DCSS-based depth-scaled item generation tables.",
+  "weapon_tiers": {
+    "common": {
+      "club": 2,
+      "dagger": 2,
+      "hand_axe": 1,
+      "mace": 1,
+      "short_sword": 1,
+      "spear": 1,
+      "whip": 1
+    },
+    "mid": {
+      "flail": 2,
+      "long_sword": 2,
+      "falchion": 2,
+      "rapier": 2,
+      "war_axe": 2,
+      "trident": 2,
+      "quarterstaff": 1,
+      "shortbow": 1,
+      "orcbow": 1
+    },
+    "good": {
+      "scimitar": 2,
+      "halberd": 2,
+      "morningstar": 2,
+      "broad_axe": 2,
+      "glaive": 2,
+      "arbalest": 2,
+      "longbow": 2,
+      "battleaxe": 1,
+      "eveningstar": 1,
+      "dire_flail": 1,
+      "lajatang": 1
+    },
+    "rare": {
+      "great_sword": 2,
+      "demon_blade": 2,
+      "executioners_axe": 2,
+      "bardiche": 2,
+      "triple_sword": 1,
+      "quick_blade": 1,
+      "lajatang": 2,
+      "double_sword": 1
+    }
+  },
+  "weapon_by_depth": {
+    "1": [
+      [
+        "common",
+        70
+      ],
+      [
+        "mid",
+        25
+      ],
+      [
+        "good",
+        5
+      ],
+      [
+        "rare",
+        0
+      ]
+    ],
+    "2": [
+      [
+        "common",
+        70
+      ],
+      [
+        "mid",
+        25
+      ],
+      [
+        "good",
+        5
+      ],
+      [
+        "rare",
+        0
+      ]
+    ],
+    "3": [
+      [
+        "common",
+        70
+      ],
+      [
+        "mid",
+        25
+      ],
+      [
+        "good",
+        5
+      ],
+      [
+        "rare",
+        0
+      ]
+    ],
+    "4": [
+      [
+        "common",
+        70
+      ],
+      [
+        "mid",
+        25
+      ],
+      [
+        "good",
+        5
+      ],
+      [
+        "rare",
+        0
+      ]
+    ],
+    "5": [
+      [
+        "common",
+        70
+      ],
+      [
+        "mid",
+        25
+      ],
+      [
+        "good",
+        5
+      ],
+      [
+        "rare",
+        0
+      ]
+    ],
+    "6": [
+      [
+        "common",
+        30
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        18
+      ],
+      [
+        "rare",
+        2
+      ]
+    ],
+    "7": [
+      [
+        "common",
+        30
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        18
+      ],
+      [
+        "rare",
+        2
+      ]
+    ],
+    "8": [
+      [
+        "common",
+        30
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        18
+      ],
+      [
+        "rare",
+        2
+      ]
+    ],
+    "9": [
+      [
+        "common",
+        30
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        18
+      ],
+      [
+        "rare",
+        2
+      ]
+    ],
+    "10": [
+      [
+        "common",
+        30
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        18
+      ],
+      [
+        "rare",
+        2
+      ]
+    ],
+    "11": [
+      [
+        "common",
+        30
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        18
+      ],
+      [
+        "rare",
+        2
+      ]
+    ],
+    "12": [
+      [
+        "common",
+        30
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        18
+      ],
+      [
+        "rare",
+        2
+      ]
+    ],
+    "13": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        25
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        15
+      ]
+    ],
+    "14": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        25
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        15
+      ]
+    ],
+    "15": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        25
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        15
+      ]
+    ],
+    "16": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        25
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        15
+      ]
+    ],
+    "17": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        25
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        15
+      ]
+    ],
+    "18": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        25
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        15
+      ]
+    ],
+    "19": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        25
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        15
+      ]
+    ],
+    "20": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        25
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        15
+      ]
+    ],
+    "21": [
+      [
+        "common",
+        5
+      ],
+      [
+        "mid",
+        10
+      ],
+      [
+        "good",
+        35
+      ],
+      [
+        "rare",
+        50
+      ]
+    ],
+    "22": [
+      [
+        "common",
+        5
+      ],
+      [
+        "mid",
+        10
+      ],
+      [
+        "good",
+        35
+      ],
+      [
+        "rare",
+        50
+      ]
+    ],
+    "23": [
+      [
+        "common",
+        5
+      ],
+      [
+        "mid",
+        10
+      ],
+      [
+        "good",
+        35
+      ],
+      [
+        "rare",
+        50
+      ]
+    ],
+    "24": [
+      [
+        "common",
+        5
+      ],
+      [
+        "mid",
+        10
+      ],
+      [
+        "good",
+        35
+      ],
+      [
+        "rare",
+        50
+      ]
+    ],
+    "25": [
+      [
+        "common",
+        5
+      ],
+      [
+        "mid",
+        10
+      ],
+      [
+        "good",
+        35
+      ],
+      [
+        "rare",
+        50
+      ]
+    ],
+    "26": [
+      [
+        "common",
+        5
+      ],
+      [
+        "mid",
+        10
+      ],
+      [
+        "good",
+        35
+      ],
+      [
+        "rare",
+        50
+      ]
+    ],
+    "27": [
+      [
+        "common",
+        5
+      ],
+      [
+        "mid",
+        10
+      ],
+      [
+        "good",
+        35
+      ],
+      [
+        "rare",
+        50
+      ]
+    ]
+  },
+  "armour_tiers": {
+    "common": {
+      "robe": 2,
+      "leather_armour": 2,
+      "ring_mail": 1
+    },
+    "mid": {
+      "scale_mail": 2,
+      "chain_mail": 2,
+      "robe": 1,
+      "leather_armour": 1
+    },
+    "good": {
+      "plate_armour": 2,
+      "chain_mail": 1,
+      "troll_leather_armour": 1
+    },
+    "rare": {
+      "crystal_plate_armour": 2,
+      "plate_armour": 1
+    },
+    "aux": {
+      "buckler": 3,
+      "kite_shield": 2,
+      "tower_shield": 1,
+      "helmet": 3,
+      "gloves": 2,
+      "boots": 2,
+      "cloak": 2,
+      "hat": 1
+    }
+  },
+  "armour_by_depth": {
+    "1": [
+      [
+        "common",
+        75
+      ],
+      [
+        "mid",
+        20
+      ],
+      [
+        "good",
+        5
+      ],
+      [
+        "rare",
+        0
+      ]
+    ],
+    "2": [
+      [
+        "common",
+        75
+      ],
+      [
+        "mid",
+        20
+      ],
+      [
+        "good",
+        5
+      ],
+      [
+        "rare",
+        0
+      ]
+    ],
+    "3": [
+      [
+        "common",
+        75
+      ],
+      [
+        "mid",
+        20
+      ],
+      [
+        "good",
+        5
+      ],
+      [
+        "rare",
+        0
+      ]
+    ],
+    "4": [
+      [
+        "common",
+        75
+      ],
+      [
+        "mid",
+        20
+      ],
+      [
+        "good",
+        5
+      ],
+      [
+        "rare",
+        0
+      ]
+    ],
+    "5": [
+      [
+        "common",
+        75
+      ],
+      [
+        "mid",
+        20
+      ],
+      [
+        "good",
+        5
+      ],
+      [
+        "rare",
+        0
+      ]
+    ],
+    "6": [
+      [
+        "common",
+        30
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        18
+      ],
+      [
+        "rare",
+        2
+      ]
+    ],
+    "7": [
+      [
+        "common",
+        30
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        18
+      ],
+      [
+        "rare",
+        2
+      ]
+    ],
+    "8": [
+      [
+        "common",
+        30
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        18
+      ],
+      [
+        "rare",
+        2
+      ]
+    ],
+    "9": [
+      [
+        "common",
+        30
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        18
+      ],
+      [
+        "rare",
+        2
+      ]
+    ],
+    "10": [
+      [
+        "common",
+        30
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        18
+      ],
+      [
+        "rare",
+        2
+      ]
+    ],
+    "11": [
+      [
+        "common",
+        30
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        18
+      ],
+      [
+        "rare",
+        2
+      ]
+    ],
+    "12": [
+      [
+        "common",
+        30
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        18
+      ],
+      [
+        "rare",
+        2
+      ]
+    ],
+    "13": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        30
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        10
+      ]
+    ],
+    "14": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        30
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        10
+      ]
+    ],
+    "15": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        30
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        10
+      ]
+    ],
+    "16": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        30
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        10
+      ]
+    ],
+    "17": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        30
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        10
+      ]
+    ],
+    "18": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        30
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        10
+      ]
+    ],
+    "19": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        30
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        10
+      ]
+    ],
+    "20": [
+      [
+        "common",
+        10
+      ],
+      [
+        "mid",
+        30
+      ],
+      [
+        "good",
+        50
+      ],
+      [
+        "rare",
+        10
+      ]
+    ],
+    "21": [
+      [
+        "common",
+        5
+      ],
+      [
+        "mid",
+        10
+      ],
+      [
+        "good",
+        40
+      ],
+      [
+        "rare",
+        45
+      ]
+    ],
+    "22": [
+      [
+        "common",
+        5
+      ],
+      [
+        "mid",
+        10
+      ],
+      [
+        "good",
+        40
+      ],
+      [
+        "rare",
+        45
+      ]
+    ],
+    "23": [
+      [
+        "common",
+        5
+      ],
+      [
+        "mid",
+        10
+      ],
+      [
+        "good",
+        40
+      ],
+      [
+        "rare",
+        45
+      ]
+    ],
+    "24": [
+      [
+        "common",
+        5
+      ],
+      [
+        "mid",
+        10
+      ],
+      [
+        "good",
+        40
+      ],
+      [
+        "rare",
+        45
+      ]
+    ],
+    "25": [
+      [
+        "common",
+        5
+      ],
+      [
+        "mid",
+        10
+      ],
+      [
+        "good",
+        40
+      ],
+      [
+        "rare",
+        45
+      ]
+    ],
+    "26": [
+      [
+        "common",
+        5
+      ],
+      [
+        "mid",
+        10
+      ],
+      [
+        "good",
+        40
+      ],
+      [
+        "rare",
+        45
+      ]
+    ],
+    "27": [
+      [
+        "common",
+        5
+      ],
+      [
+        "mid",
+        10
+      ],
+      [
+        "good",
+        40
+      ],
+      [
+        "rare",
+        45
+      ]
+    ]
+  },
+  "consumable_tiers": {
+    "common": [
+      "minor_potion",
+      "potion_curing",
+      "scroll_identify",
+      "scroll_blink",
+      "scroll_teleport"
+    ],
+    "mid": [
+      "major_potion",
+      "mana_potion",
+      "potion_haste",
+      "potion_might",
+      "potion_brilliance",
+      "potion_agility",
+      "scroll_magic_map",
+      "scroll_enchant_weapon",
+      "scroll_enchant_armor",
+      "scroll_remove_curse",
+      "scroll_fear"
+    ],
+    "good": [
+      "potion_resistance",
+      "potion_magic",
+      "potion_restore",
+      "scroll_vulnerability",
+      "scroll_immolation",
+      "scroll_fog",
+      "scroll_holy_word",
+      "scroll_acquirement"
+    ]
+  },
+  "consumable_by_depth": {
+    "1": [
+      [
+        "common",
+        80
+      ],
+      [
+        "mid",
+        18
+      ],
+      [
+        "good",
+        2
+      ]
+    ],
+    "2": [
+      [
+        "common",
+        80
+      ],
+      [
+        "mid",
+        18
+      ],
+      [
+        "good",
+        2
+      ]
+    ],
+    "3": [
+      [
+        "common",
+        80
+      ],
+      [
+        "mid",
+        18
+      ],
+      [
+        "good",
+        2
+      ]
+    ],
+    "4": [
+      [
+        "common",
+        80
+      ],
+      [
+        "mid",
+        18
+      ],
+      [
+        "good",
+        2
+      ]
+    ],
+    "5": [
+      [
+        "common",
+        80
+      ],
+      [
+        "mid",
+        18
+      ],
+      [
+        "good",
+        2
+      ]
+    ],
+    "6": [
+      [
+        "common",
+        40
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        10
+      ]
+    ],
+    "7": [
+      [
+        "common",
+        40
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        10
+      ]
+    ],
+    "8": [
+      [
+        "common",
+        40
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        10
+      ]
+    ],
+    "9": [
+      [
+        "common",
+        40
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        10
+      ]
+    ],
+    "10": [
+      [
+        "common",
+        40
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        10
+      ]
+    ],
+    "11": [
+      [
+        "common",
+        40
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        10
+      ]
+    ],
+    "12": [
+      [
+        "common",
+        40
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        10
+      ]
+    ],
+    "13": [
+      [
+        "common",
+        40
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        10
+      ]
+    ],
+    "14": [
+      [
+        "common",
+        40
+      ],
+      [
+        "mid",
+        50
+      ],
+      [
+        "good",
+        10
+      ]
+    ],
+    "15": [
+      [
+        "common",
+        20
+      ],
+      [
+        "mid",
+        45
+      ],
+      [
+        "good",
+        35
+      ]
+    ],
+    "16": [
+      [
+        "common",
+        20
+      ],
+      [
+        "mid",
+        45
+      ],
+      [
+        "good",
+        35
+      ]
+    ],
+    "17": [
+      [
+        "common",
+        20
+      ],
+      [
+        "mid",
+        45
+      ],
+      [
+        "good",
+        35
+      ]
+    ],
+    "18": [
+      [
+        "common",
+        20
+      ],
+      [
+        "mid",
+        45
+      ],
+      [
+        "good",
+        35
+      ]
+    ],
+    "19": [
+      [
+        "common",
+        20
+      ],
+      [
+        "mid",
+        45
+      ],
+      [
+        "good",
+        35
+      ]
+    ],
+    "20": [
+      [
+        "common",
+        20
+      ],
+      [
+        "mid",
+        45
+      ],
+      [
+        "good",
+        35
+      ]
+    ],
+    "21": [
+      [
+        "common",
+        20
+      ],
+      [
+        "mid",
+        45
+      ],
+      [
+        "good",
+        35
+      ]
+    ],
+    "22": [
+      [
+        "common",
+        20
+      ],
+      [
+        "mid",
+        45
+      ],
+      [
+        "good",
+        35
+      ]
+    ],
+    "23": [
+      [
+        "common",
+        20
+      ],
+      [
+        "mid",
+        45
+      ],
+      [
+        "good",
+        35
+      ]
+    ],
+    "24": [
+      [
+        "common",
+        20
+      ],
+      [
+        "mid",
+        45
+      ],
+      [
+        "good",
+        35
+      ]
+    ],
+    "25": [
+      [
+        "common",
+        20
+      ],
+      [
+        "mid",
+        45
+      ],
+      [
+        "good",
+        35
+      ]
+    ],
+    "26": [
+      [
+        "common",
+        20
+      ],
+      [
+        "mid",
+        45
+      ],
+      [
+        "good",
+        35
+      ]
+    ],
+    "27": [
+      [
+        "common",
+        20
+      ],
+      [
+        "mid",
+        45
+      ],
+      [
+        "good",
+        35
+      ]
+    ]
+  }
+}
