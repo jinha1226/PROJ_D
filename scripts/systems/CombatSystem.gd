@@ -31,6 +31,9 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	elif weapon_id == "" and "race_res" in attacker and attacker.race_res != null \
 			and attacker.race_res.racial_trait == "catfolk_claws":
 		weapon_dmg += 3
+	elif weapon_id == "" and "race_res" in attacker and attacker.race_res != null \
+			and attacker.race_res.racial_trait == "ghoul_claws":
+		weapon_dmg += 3
 
 	var weapon_skill_id: String = WeaponRegistry.weapon_skill_for(weapon_id)
 	var weapon_skill_level: int = 0

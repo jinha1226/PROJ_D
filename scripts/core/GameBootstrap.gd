@@ -342,10 +342,21 @@ func _apply_passive_racial_traits() -> void:
 		special = player.trait_res.special
 	elif player.race_res != null:
 		special = player.race_res.racial_trait
-	if special == "regen":
-		if player.stats.HP < player.stats.hp_max:
-			player.stats.HP = min(player.stats.hp_max, player.stats.HP + 1)
-			player.stats_changed.emit()
+	match special:
+		"regen":
+			if player.stats.HP < player.stats.hp_max:
+				player.stats.HP = min(player.stats.hp_max, player.stats.HP + 1)
+				player.stats_changed.emit()
+		"trollregen":
+			# Trolls regen fast — 2 HP/turn as long as not capped.
+			if player.stats.HP < player.stats.hp_max:
+				player.stats.HP = min(player.stats.hp_max, player.stats.HP + 2)
+				player.stats_changed.emit()
+		"vine_stalker_mpregen":
+			# Plant-ish MP trickle; stacks with the bigger kill-bonus pulse.
+			if player.stats.MP < player.stats.mp_max:
+				player.stats.MP = min(player.stats.mp_max, player.stats.MP + 1)
+				player.stats_changed.emit()
 
 
 ## Every frame make sure monsters/items don't leak into unexplored tiles.
@@ -886,6 +897,9 @@ func _on_monster_died(monster: Monster) -> void:
 			var heal: int = max(1, int(player.stats.hp_max * 0.2))
 			player.stats.HP = min(player.stats.hp_max, player.stats.HP + heal)
 			player.stats_changed.emit()
+	# Racial kill bonuses (vampire bloodfeast, vine-stalker MP pulse, …).
+	if player != null and player.has_method("apply_kill_bonuses"):
+		player.apply_kill_bonuses(monster)
 	if essence_system != null:
 		essence_system.try_drop_from_monster(monster)
 	# M1: small chance of loot drop at death tile.
@@ -895,6 +909,9 @@ func _on_monster_died(monster: Monster) -> void:
 		var xp_gain: int = int(monster.data.xp_value)
 		if xp_gain <= 0:
 			xp_gain = max(1, int(monster.data.tier) * 8)
+		# Racial XP modifiers: barachi absorb more, demigod/mummy learn slow.
+		xp_gain = int(round(float(xp_gain) * _racial_xp_multiplier()))
+		xp_gain = max(1, xp_gain)
 		var tags: Array = []
 		var wskill: String = player.get_current_weapon_skill()
 		if wskill != "":
@@ -908,6 +925,33 @@ func _on_monster_died(monster: Monster) -> void:
 		# Player-level XP: same magnitude as skill grant. Player.grant_xp handles
 		# rollover and emits leveled_up for the popup flow.
 		player.grant_xp(xp_gain)
+
+
+## Oni (and any future magical-might race) get a 20% spell power bump so
+## their conjurations hit harder than the base formula suggests.
+func _apply_racial_spellpower(power: int) -> int:
+	if player == null or player.race_res == null:
+		return power
+	if player.race_res.racial_trait == "oni_magical_might":
+		return int(round(float(power) * 1.2))
+	return power
+
+
+## Global XP multiplier sourced from the player's racial trait. Applied to
+## both skill XP and character XP on every kill so the curve stays
+## consistent with the DCSS feel of slow-leveling demigods and XP-chugging
+## barachi.
+func _racial_xp_multiplier() -> float:
+	if player == null:
+		return 1.0
+	var race_trait: String = ""
+	if player.race_res != null:
+		race_trait = player.race_res.racial_trait
+	match race_trait:
+		"barachi_xp_bonus": return 1.25
+		"demigod_slow_xp":  return 0.50
+		"mummy_undead":     return 0.75
+		_:                  return 1.0
 
 
 func _on_player_moved(new_pos: Vector2i) -> void:
@@ -1501,6 +1545,23 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 	lv_lab.add_theme_font_size_override("font_size", 40)
 	lv_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	row.add_child(lv_lab)
+
+	# Racial aptitude label (+2 / 0 / -3) — green for positive, red for
+	# negative. Gives the player an instant read on why a given skill
+	# trains fast or slow for this race.
+	var apt_lab := Label.new()
+	apt_lab.text = _format_aptitude(skill_id)
+	apt_lab.add_theme_font_size_override("font_size", 40)
+	apt_lab.custom_minimum_size = Vector2(90, 0)
+	apt_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	var apt_val: int = _player_aptitude(skill_id)
+	if apt_val > 0:
+		apt_lab.add_theme_color_override("font_color", Color(0.55, 1.0, 0.55))
+	elif apt_val < 0:
+		apt_lab.add_theme_color_override("font_color", Color(1.0, 0.55, 0.55))
+	else:
+		apt_lab.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	row.add_child(apt_lab)
 	outer.add_child(row)
 
 	var info_line := Label.new()
@@ -1520,6 +1581,24 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 
 	outer.add_child(HSeparator.new())
 	return outer
+
+
+## Current aptitude integer for `skill_id` pulled from the player's race
+## resource. 0 when not set (baseline human behaviour).
+func _player_aptitude(skill_id: String) -> int:
+	if player == null or player.race_res == null:
+		return 0
+	var apts: Dictionary = player.race_res.skill_aptitudes
+	return int(apts.get(skill_id, 0))
+
+
+## Signed-integer aptitude formatted for the skill row (`"+3"`, `"0"`,
+## `"-2"`) — padded width is handled by the label's custom_minimum_size.
+func _format_aptitude(skill_id: String) -> String:
+	var v: int = _player_aptitude(skill_id)
+	if v == 0:
+		return "0"
+	return "%+d" % v
 
 
 func _count_trained_skills() -> int:
@@ -1759,6 +1838,7 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 		return
 	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
 	var power: int = eff_school2 + sc_lv / 2 + int_bonus
+	power = _apply_racial_spellpower(power)
 	var spell_color: Color = info.get("color", Color.WHITE)
 	var fx_layer: Node2D = $EntityLayer
 	var targeting_type: String = String(info.get("targeting", "single"))
@@ -1924,6 +2004,7 @@ func _execute_cast(spell_id: String) -> Dictionary:
 		return {"success": false, "message": "Spell fizzles! (%d%% fail)" % int(fail * 100)}
 	var int_bonus: int = player.stats.INT / 3 if player.stats else 0
 	var power: int = eff_school + sc_lv / 2 + int_bonus
+	power = _apply_racial_spellpower(power)
 
 	var targeting: String = String(info.get("targeting", "single"))
 	match targeting:

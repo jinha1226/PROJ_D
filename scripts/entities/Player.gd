@@ -284,7 +284,17 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 	s.mp_max = mp_total
 	s.MP = mp_total
 	s.AC = p_trait.ac_bonus if p_trait else 0
+	# Race base_ac (gargoyle stone skin, deep_dwarf plating, coglin exo-suit)
+	# stacks on top of trait AC; armour bonuses get added later via
+	# _recompute_defense when equipment loads.
+	if race != null:
+		s.AC += race.base_ac
 	s.EV = 0
+	# Innate evasion bump for flying races — DCSS's tengu/djinni aren't
+	# grounded so they slip more attacks.
+	var race_trait: String = race.racial_trait if race != null else ""
+	if race_trait == "djinni_flight" or race_trait == "tengu_flight":
+		s.EV += 2
 	stats = s
 	base_stats = s.clone()
 
@@ -402,6 +412,33 @@ func equip_weapon(weapon_id: String) -> String:
 	stats_changed.emit()
 	_load_sprite_preset()
 	return prev
+
+
+## Current racial trait id — the trait_res takes precedence if the player
+## picked a trait card that overrides the race's innate behaviour.
+func _racial_trait_id() -> String:
+	if trait_res != null and trait_res.special != "":
+		return String(trait_res.special)
+	if race_res != null:
+		return String(race_res.racial_trait)
+	return ""
+
+
+## Called by GameBootstrap when a monster the player was involved with dies.
+## Applies heal-on-kill / MP-on-kill racial traits.
+func apply_kill_bonuses(_monster: Node) -> void:
+	if not is_alive or stats == null:
+		return
+	match _racial_trait_id():
+		"vampire_bloodfeast":
+			var heal: int = randi_range(3, 5)
+			stats.HP = min(stats.hp_max, stats.HP + heal)
+			stats_changed.emit()
+			CombatLog.add("Life essence feeds you (+%d HP)." % heal)
+		"vine_stalker_mpregen":
+			var mp: int = 2
+			stats.MP = min(stats.mp_max, stats.MP + mp)
+			stats_changed.emit()
 
 
 ## Auto-enable the skill that `weapon_id` trains so the next kill's XP flows
@@ -1059,6 +1096,17 @@ func take_damage(amount: int) -> void:
 		return
 	if resist_turns > 0:
 		amount = max(1, amount / 2)
+	# --- Racial trait mitigation ---
+	var trait_id: String = _racial_trait_id()
+	if trait_id == "halfling_lucky" and randf() < 0.15:
+		CombatLog.add("Halfling luck — you dodge entirely!")
+		return
+	if trait_id == "deep_dwarf_dr":
+		# Roughly DCSS: halve damage at 50% odds, subtract 1 otherwise.
+		if amount >= 4 and randf() < 0.5:
+			amount = max(1, amount / 2)
+		else:
+			amount = max(1, amount - 1)
 	stats.HP -= amount
 	damaged.emit(amount)
 	if stats.HP <= 0:
