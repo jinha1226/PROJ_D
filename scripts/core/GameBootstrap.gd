@@ -2334,6 +2334,11 @@ func _on_cast_pressed(spell_id: String, dlg: AcceptDialog) -> void:
 func _execute_cast(spell_id: String) -> Dictionary:
 	if player == null or player.stats == null:
 		return {"success": false, "message": "No player"}
+	# Silence (scroll / spell) suppresses all casting — DCSS
+	# silence_aura.cc behaviour, simplified to just blocking the player
+	# while the duration runs.
+	if player.has_meta("_silenced_turns"):
+		return {"success": false, "message": "You are surrounded by silence — no casting."}
 	var info: Dictionary = SpellRegistry.get_spell(spell_id)
 	if info.is_empty():
 		return {"success": false, "message": "Unknown spell: %s" % spell_id}

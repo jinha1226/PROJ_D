@@ -5,6 +5,19 @@ class_name MonsterAI
 static func act(m: Monster) -> void:
 	if not m.is_alive:
 		return
+	# Poison DoT — ticked at the start of the monster's turn so the damage
+	# hits before it gets to swing. Scroll of Poison / Alchemist spells
+	# stash `_poison_turns` + `_poison_dmg` on the target.
+	if m.has_meta("_poison_turns"):
+		var pt: int = int(m.get_meta("_poison_turns", 0))
+		if pt > 0:
+			m.take_damage(int(m.get_meta("_poison_dmg", 2)))
+			m.set_meta("_poison_turns", pt - 1)
+			if pt <= 1:
+				m.remove_meta("_poison_turns")
+				m.remove_meta("_poison_dmg")
+			if not m.is_alive:
+				return
 	# DCSS BEH_SLEEP handling. A sleeping monster first checks whether the
 	# player (or a companion) is in its sight line; if so it wakes and
 	# skips its first turn (DCSS charges a full-turn wake-up latency).

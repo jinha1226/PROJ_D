@@ -309,6 +309,7 @@ func _tick_duration_metas() -> void:
 	_tick_simple_meta("_haste_turns")
 	_tick_simple_meta("_enlightened_turns")
 	_tick_simple_meta("_invisible_turns")
+	_tick_simple_meta("_silenced_turns")
 	# Ambrosia: confusion while the duration runs, HP/MP regen each tick.
 	if has_meta("_ambrosia_turns"):
 		var at: int = int(get_meta("_ambrosia_turns", 0))
@@ -1097,6 +1098,85 @@ func _apply_wand_hex(kind: String, target: Node, power: int, info: Dictionary) -
 			CombatLog.add("The %s writhes briefly." % tname)
 
 
+## Return up to `count` walkable, unoccupied 8-neighbour tiles around the
+## player. Used by scroll-of-summoning and scroll-of-butterflies to place
+## friendly summons next to the caster.
+func _adjacent_free_tiles(count: int) -> Array:
+	var out: Array = []
+	if generator == null:
+		return out
+	var candidates: Array = []
+	for dy in [-1, 0, 1]:
+		for dx in [-1, 0, 1]:
+			if dx == 0 and dy == 0:
+				continue
+			candidates.append(grid_pos + Vector2i(dx, dy))
+	candidates.shuffle()
+	for p in candidates:
+		if out.size() >= count:
+			break
+		if not generator.is_walkable(p):
+			continue
+		if _tile_has_actor(p):
+			continue
+		out.append(p)
+	return out
+
+
+func _tile_has_actor(p: Vector2i) -> bool:
+	if p == grid_pos:
+		return true
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if is_instance_valid(m) and "grid_pos" in m and m.grid_pos == p:
+			return true
+	for c in get_tree().get_nodes_in_group("companions"):
+		if is_instance_valid(c) and "grid_pos" in c and c.grid_pos == p:
+			return true
+	return false
+
+
+## Spawn a short-lived friendly monster at `tile`. Used by
+## scroll_summoning / scroll_butterflies / (later) summon spells. Uses
+## the Companion scene so the tile-existing companion AI handles it; we
+## pick a reasonable default id (`small_mammal`) when the caller didn't
+## specify one.
+func _spawn_temp_ally_at(tile: Vector2i, monster_id: String = "small_mammal") -> Monster:
+	var path: String = "res://resources/monsters/%s.tres" % monster_id
+	var mdata: MonsterData = null
+	if ResourceLoader.exists(path):
+		mdata = load(path)
+	if mdata == null:
+		mdata = MonsterRegistry.fetch(monster_id)
+	if mdata == null:
+		return null
+	var scene: PackedScene = load("res://scenes/entities/Companion.tscn")
+	if scene == null:
+		return null
+	var ally: Node = scene.instantiate()
+	var entity_layer: Node = get_tree().get_first_node_in_group("entity_layer")
+	if entity_layer == null:
+		entity_layer = get_parent()
+	entity_layer.add_child(ally)
+	if ally.has_method("setup"):
+		ally.setup(generator, tile, mdata)
+	if "lifetime" in ally:
+		ally.lifetime = 30  # ~30 turns
+	return ally
+
+
+func _is_undead(m: Node) -> bool:
+	if m == null or not ("data" in m) or m.data == null:
+		return false
+	var shape: String = String(m.data.shape if "shape" in m.data else "")
+	if shape == "undead":
+		return true
+	var flags: Array = m.data.flags if "flags" in m.data else []
+	for f in flags:
+		if String(f).to_lower().begins_with("undead"):
+			return true
+	return false
+
+
 ## Pick the closest visible, alive, hostile monster. Used for wand
 ## evocation MVP targeting (no picker UI yet).
 func _nearest_visible_hostile() -> Node:
@@ -1412,6 +1492,101 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 					m.move_to_grid(all_tiles[idx])
 					count += 1
 			CombatLog.add("A thick fog scatters your foes! (%d displaced)" % count)
+			return true
+		"noise":
+			# DCSS scroll_effect.cc:noise — wakes every sleeping monster on
+			# the floor regardless of LOS. Equivalent of "you shouted!"
+			var woke: int = 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+					continue
+				if m.is_sleeping:
+					MonsterAI.wake(m)
+					woke += 1
+			CombatLog.add("The scroll shrieks! (%d monsters woken)" % woke)
+			return true
+		"summoning":
+			# DCSS: summons a small group of temporary allies. We spawn `count`
+			# companions on walkable tiles around the player.
+			var want: int = int(info.get("count", 3))
+			var summoned: int = 0
+			var gb: Node = get_tree().root.get_node_or_null("Game")
+			for tile in _adjacent_free_tiles(want):
+				var ally: Monster = _spawn_temp_ally_at(tile)
+				if ally != null:
+					summoned += 1
+			CombatLog.add("The scroll summons allies. (%d appeared)" % summoned)
+			return true
+		"torment":
+			# DCSS torment: halves every non-undead living creature's HP
+			# within LOS (undead are immune). We approximate "non-undead" by
+			# excluding monsters with the "undead" flag or `shape: undead`.
+			var dmap: Node = get_tree().get_first_node_in_group("dmap")
+			var affected: int = 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+					continue
+				if dmap != null and dmap.has_method("is_tile_visible") \
+						and not dmap.is_tile_visible(m.grid_pos):
+					continue
+				if _is_undead(m):
+					continue
+				var half: int = max(1, m.hp / 2)
+				m.take_damage(half)
+				affected += 1
+			CombatLog.add("A wave of agony washes over the living. (%d struck)" % affected)
+			return true
+		"brand_weapon":
+			# Permanent weapon ego. We roll from a small set of elemental
+			# brands that map to flags combat already handles.
+			if equipped_weapon_id == "":
+				CombatLog.add("You are wielding nothing to brand.")
+				return false
+			var brands: Array = ["flaming", "freezing", "electrocution", "venom", "holy_wrath"]
+			var picked: String = String(brands[randi() % brands.size()])
+			set_meta("_weapon_brand_" + equipped_weapon_id, picked)
+			CombatLog.add("Your %s glows with %s energy!" % [
+					WeaponRegistry.display_name_for(equipped_weapon_id), picked.replace("_", " ")])
+			return true
+		"silence":
+			var dur_s: int = int(info.get("dur_base", 12)) + (randi() % max(int(info.get("dur_rand", 8)), 1))
+			set_meta("_silenced_turns", int(get_meta("_silenced_turns", 0)) + dur_s)
+			CombatLog.add("Dead silence falls. (%d turns of silence)" % dur_s)
+			return true
+		"amnesia":
+			if learned_spells.is_empty():
+				CombatLog.add("You have no spells to forget.")
+				return false
+			var idx_f: int = randi() % learned_spells.size()
+			var forgotten: String = String(learned_spells[idx_f])
+			learned_spells.remove_at(idx_f)
+			spells_learned.emit()
+			CombatLog.add("You forget how to cast %s." % forgotten.replace("_", " ").capitalize())
+			return true
+		"poison_scroll":
+			var dmap_p: Node = get_tree().get_first_node_in_group("dmap")
+			var pcount: int = 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+					continue
+				if dmap_p != null and dmap_p.has_method("is_tile_visible") \
+						and not dmap_p.is_tile_visible(m.grid_pos):
+					continue
+				m.set_meta("_poison_turns", 5)
+				m.set_meta("_poison_dmg", 3)
+				pcount += 1
+			CombatLog.add("A toxic cloud settles on every enemy you see. (%d poisoned)" % pcount)
+			return true
+		"butterflies":
+			# DCSS butterflies: noisy, harmless friendly summons. We use
+			# Monster.tscn with "butterfly" data, spawned as temp companions.
+			var bf_want: int = int(info.get("count", 5))
+			var bf_placed: int = 0
+			for tile in _adjacent_free_tiles(bf_want):
+				var bf: Monster = _spawn_temp_ally_at(tile, "butterfly")
+				if bf != null:
+					bf_placed += 1
+			CombatLog.add("A cloud of butterflies erupts around you! (%d)" % bf_placed)
 			return true
 		"acquirement":
 			if generator == null:

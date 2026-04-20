@@ -12,6 +12,23 @@ static func roll_damage(attacker_atk: int, defender_ac: int) -> int:
 	return max(1, attacker_atk - defender_ac + randi_range(-2, 2))
 
 
+## Holy-wrath brand target check: DCSS triggers extra damage on undead
+## and demonic creatures. We key off the "undead" shape or an "undead"/
+## "demonic" flag on the monster data.
+static func _is_undead_or_demon(defender) -> bool:
+	if defender == null or not ("data" in defender) or defender.data == null:
+		return false
+	var shape: String = String(defender.data.shape if "shape" in defender.data else "")
+	if shape == "undead":
+		return true
+	var flags: Array = defender.data.flags if "flags" in defender.data else []
+	for f in flags:
+		var lf: String = String(f).to_lower()
+		if lf == "undead" or lf == "demonic":
+			return true
+	return false
+
+
 ## Player → defender melee. `skill_sys` is a SkillSystem instance; if null,
 ## skills contribute 0 (useful for pre-init / test paths). Returns damage.
 static func melee_attack(attacker, defender, skill_sys = null) -> int:
@@ -101,6 +118,20 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	# Flat damage bonus from rings of slaying / ring of fire / etc.
 	if attacker.has_method("gear_damage_bonus"):
 		dmg += int(attacker.gear_damage_bonus())
+	# DCSS weapon brand: Scroll of Brand Weapon stamps a permanent brand
+	# onto the wielded weapon; each brand adds a flat elemental proc on top
+	# of the base physical damage.
+	var brand_key: String = "_weapon_brand_" + weapon_id
+	if weapon_id != "" and attacker.has_method("has_meta") and attacker.has_meta(brand_key):
+		var brand: String = String(attacker.get_meta(brand_key))
+		var brand_dmg: int = 0
+		match brand:
+			"flaming":        brand_dmg = randi_range(1, 6)
+			"freezing":       brand_dmg = randi_range(1, 6)
+			"electrocution":  brand_dmg = randi_range(1, 4) * (2 if randi() % 4 == 0 else 1)
+			"venom":          brand_dmg = randi_range(1, 4)
+			"holy_wrath":     brand_dmg = randi_range(2, 5) if _is_undead_or_demon(defender) else 0
+		dmg += brand_dmg
 	if defender.has_method("take_damage"):
 		defender.take_damage(dmg)
 	var def_name: String = ""
