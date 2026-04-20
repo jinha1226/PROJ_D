@@ -84,6 +84,12 @@ var equipped_rings: Array = []
 # doesn't have to crack open equipped_weapon each tick.
 var equipped_weapon_plus: int = 0
 var skill_state: Dictionary = {}
+## DCSS-style mutation slots. Keys are mutation ids (see
+## assets/dcss_mutations/mutations.json); values are the current level
+## (1..mutation.levels). Stat/HP/MP deltas from each mutation are
+## applied at the moment `apply_mutation` bumps the level, and reversed
+## on `remove_mutation`.
+var mutations: Dictionary = {}
 # Memorised spell ids. Seeded from job.starting_spells at setup and
 # extended by reading spellbooks. Drives the MAGIC menu and what the
 # player is allowed to cast.
@@ -354,6 +360,90 @@ func _tick_duration_metas() -> void:
 			CombatLog.add("You return to your usual form.")
 		else:
 			set_meta("_tree_turns", tt)
+
+
+## DCSS mutation: bump the level on `id`, up to its max. Applies the
+## stat/HP/MP/resist effect delta immediately. Returns true on success,
+## false if the mutation is already maxed or unknown.
+func apply_mutation(id: String) -> bool:
+	if not MutationRegistry.has(id):
+		return false
+	var cur: int = int(mutations.get(id, 0))
+	var cap: int = MutationRegistry.levels_for(id)
+	if cur >= cap:
+		return false
+	mutations[id] = cur + 1
+	_apply_mutation_delta(id, +1)
+	return true
+
+
+## Remove one level of `id`. Reverses the stat delta. Returns true if a
+## level was actually removed.
+func remove_mutation(id: String) -> bool:
+	var cur: int = int(mutations.get(id, 0))
+	if cur <= 0:
+		return false
+	mutations[id] = cur - 1
+	if mutations[id] == 0:
+		mutations.erase(id)
+	_apply_mutation_delta(id, -1)
+	return true
+
+
+## One step of mutation effect. `direction` is +1 on gain, -1 on loss.
+## We only model a subset of DCSS's 200+ mutations — the ones that map
+## to stats, HP/MP caps, AC, or resists. Non-modelled mutations still
+## appear in the mutations dict so they show up in character dumps, but
+## have no mechanical effect yet.
+func _apply_mutation_delta(id: String, direction: int) -> void:
+	if stats == null:
+		return
+	match id:
+		"strong": stats.STR += 2 * direction
+		"weak":   stats.STR -= 2 * direction
+		"clever": stats.INT += 2 * direction
+		"dopey":  stats.INT -= 2 * direction
+		"agile":  stats.DEX += 2 * direction
+		"clumsy": stats.DEX -= 2 * direction
+		"robust":
+			var bump: int = max(1, stats.hp_max / 10)
+			stats.hp_max += bump * direction
+			if direction > 0: stats.HP += bump
+			else: stats.HP = min(stats.HP, stats.hp_max)
+		"frail":
+			var bump_f: int = max(1, stats.hp_max / 10)
+			stats.hp_max = max(1, stats.hp_max - bump_f * direction)
+			stats.HP = min(stats.HP, stats.hp_max)
+		"high_magic":
+			stats.mp_max += max(1, stats.mp_max / 10) * direction
+			if direction > 0: stats.MP = min(stats.mp_max, stats.MP + max(1, stats.mp_max / 10))
+			else: stats.MP = min(stats.MP, stats.mp_max)
+		"low_magic":
+			stats.mp_max = max(1, stats.mp_max - max(1, stats.mp_max / 10) * direction)
+			stats.MP = min(stats.MP, stats.mp_max)
+		"flat_hp":
+			stats.hp_max += 4 * direction
+			if direction > 0: stats.HP += 4
+			else: stats.HP = min(stats.HP, stats.hp_max)
+		"tough_skin", "rugged_brown_scales", "icy_blue_scales", \
+				"iridescent_scales", "molten_scales", "shaggy_fur":
+			stats.AC += 1 * direction
+		# Resistance mutations: flags the combat system can query.
+		"heat_resistance":
+			set_meta("_mut_rF", int(get_meta("_mut_rF", 0)) + direction)
+		"cold_resistance":
+			set_meta("_mut_rC", int(get_meta("_mut_rC", 0)) + direction)
+		"poison_resistance":
+			set_meta("_mut_rPois", int(get_meta("_mut_rPois", 0)) + direction)
+		"shock_resistance":
+			set_meta("_mut_rElec", int(get_meta("_mut_rElec", 0)) + direction)
+		"heat_vulnerability":
+			set_meta("_mut_rF", int(get_meta("_mut_rF", 0)) - direction)
+		"cold_vulnerability":
+			set_meta("_mut_rC", int(get_meta("_mut_rC", 0)) - direction)
+		_:
+			pass  # Non-modelled mutation — recorded but has no effect.
+	stats_changed.emit()
 
 
 ## Generic `_<name>_turns` meta countdown. Removes the meta at 0.
@@ -1408,10 +1498,21 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 			CombatLog.add("You go berserk! (%d turns)" % dur_b)
 			return true
 		"mutation":
-			# Mutation system is still pending — for now, log and bank the
-			# intent so Mutations.gd (future commit) can consume it.
-			set_meta("_pending_mutations", int(get_meta("_pending_mutations", 0)) + 1)
-			CombatLog.add("Your flesh writhes and resettles. (mutation queued)")
+			# DCSS potion_mutation grants 2-4 random rolls, each a coin-flip
+			# between adding a good mutation or adding a bad one. Net effect
+			# is "you're probably a bit different now".
+			var rolls: int = randi_range(2, 4)
+			var applied: Array = []
+			for i in rolls:
+				var polarity: String = "good" if randf() < 0.45 else ("bad" if randf() < 0.55 else "")
+				var mid: String = MutationRegistry.pick_random(polarity)
+				if mid == "" or not apply_mutation(mid):
+					continue
+				applied.append(mid)
+			if applied.is_empty():
+				CombatLog.add("You shiver, but nothing changes.")
+			else:
+				CombatLog.add("Your body transforms! (" + ", ".join(applied) + ")")
 			return true
 		"lignify":
 			var dur_l: int = int(info.get("dur_base", 35)) + (randi() % max(int(info.get("dur_rand", 15)), 1))

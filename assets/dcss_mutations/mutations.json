@@ -1,0 +1,2041 @@
+{
+ "accursed": {
+  "desc": "accursed",
+  "flags": [
+   "bad"
+  ],
+  "id": "accursed",
+  "levels": 1,
+  "weight": 0
+ },
+ "acid_resistance": {
+  "desc": "acid resistance",
+  "flags": [
+   "good",
+   "substance"
+  ],
+  "id": "acid_resistance",
+  "levels": 1,
+  "weight": 0
+ },
+ "acidic_bite": {
+  "desc": "acidic bite",
+  "flags": [
+   "good",
+   "jiyva",
+   "anatomy"
+  ],
+  "id": "acidic_bite",
+  "levels": 1,
+  "weight": 0
+ },
+ "acrobatic": {
+  "desc": "acrobatic",
+  "flags": [
+   "good"
+  ],
+  "id": "acrobatic",
+  "levels": 1,
+  "weight": 0
+ },
+ "acute_vision": {
+  "desc": "see invisible",
+  "flags": [
+   "good"
+  ],
+  "id": "acute_vision",
+  "levels": 1,
+  "weight": 2
+ },
+ "agile": {
+  "desc": "agile",
+  "flags": [
+   "good"
+  ],
+  "id": "agile",
+  "levels": 2,
+  "weight": 7
+ },
+ "antennae": {
+  "desc": "antennae",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "antennae",
+  "levels": 3,
+  "weight": 4
+ },
+ "anti_wizardry": {
+  "desc": "disrupted magic",
+  "flags": [
+   "bad"
+  ],
+  "id": "anti_wizardry",
+  "levels": 3,
+  "weight": 0
+ },
+ "antimagic_bite": {
+  "desc": "antimagic bite",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "antimagic_bite",
+  "levels": 1,
+  "weight": 0
+ },
+ "armoured_tail": {
+  "desc": "armoured tail",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "armoured_tail",
+  "levels": 2,
+  "weight": 0
+ },
+ "artefact_enchanting": {
+  "desc": "artefact enchanting",
+  "flags": [
+   "good"
+  ],
+  "id": "artefact_enchanting",
+  "levels": 1,
+  "weight": 0
+ },
+ "augmentation": {
+  "desc": "augmentation",
+  "flags": [
+   "good"
+  ],
+  "id": "augmentation",
+  "levels": 3,
+  "weight": 0
+ },
+ "beak": {
+  "desc": "beak",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "beak",
+  "levels": 1,
+  "weight": 1
+ },
+ "big_brain": {
+  "desc": "big brain",
+  "flags": [
+   "good"
+  ],
+  "id": "big_brain",
+  "levels": 3,
+  "weight": 0
+ },
+ "big_wings": {
+  "desc": "big wings",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "big_wings",
+  "levels": 1,
+  "weight": 4
+ },
+ "black_mark": {
+  "desc": "black mark",
+  "flags": [
+   "good"
+  ],
+  "id": "black_mark",
+  "levels": 1,
+  "weight": 0
+ },
+ "booming_voice": {
+  "desc": "booming voice",
+  "flags": [
+   "bad"
+  ],
+  "id": "booming_voice",
+  "levels": 1,
+  "weight": 3
+ },
+ "camouflage": {
+  "desc": "camouflage",
+  "flags": [
+   "good",
+   "substance"
+  ],
+  "id": "camouflage",
+  "levels": 3,
+  "weight": 1
+ },
+ "clarity": {
+  "desc": "clarity",
+  "flags": [
+   "good"
+  ],
+  "id": "clarity",
+  "levels": 1,
+  "weight": 6
+ },
+ "claws": {
+  "desc": "claws",
+  "flags": [
+   "good",
+   "anatomy",
+   "need_hands"
+  ],
+  "id": "claws",
+  "levels": 3,
+  "weight": 2
+ },
+ "clever": {
+  "desc": "clever",
+  "flags": [
+   "good"
+  ],
+  "id": "clever",
+  "levels": 2,
+  "weight": 7
+ },
+ "clumsy": {
+  "desc": "clumsy",
+  "flags": [
+   "bad"
+  ],
+  "id": "clumsy",
+  "levels": 2,
+  "weight": 8
+ },
+ "cold_blooded": {
+  "desc": "cold-blooded",
+  "flags": [
+   "bad",
+   "need_blood"
+  ],
+  "id": "cold_blooded",
+  "levels": 1,
+  "weight": 0
+ },
+ "cold_resistance": {
+  "desc": "cold resistance",
+  "flags": [
+   "good",
+   "substance"
+  ],
+  "id": "cold_resistance",
+  "levels": 3,
+  "weight": 4
+ },
+ "cold_vulnerability": {
+  "desc": "cold vulnerability",
+  "flags": [
+   "bad",
+   "substance"
+  ],
+  "id": "cold_vulnerability",
+  "levels": 3,
+  "weight": 3
+ },
+ "condensation_shield": {
+  "desc": "condensation shield",
+  "flags": [
+   "good"
+  ],
+  "id": "condensation_shield",
+  "levels": 1,
+  "weight": 0
+ },
+ "constricting_tail": {
+  "desc": "naga tail",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "constricting_tail",
+  "levels": 2,
+  "weight": 0
+ },
+ "contamination_susceptible": {
+  "desc": "contamination susceptible",
+  "flags": [
+   "bad"
+  ],
+  "id": "contamination_susceptible",
+  "levels": 1,
+  "weight": 0
+ },
+ "corrupting_presence": {
+  "desc": "corrupting presence",
+  "flags": [
+   "good"
+  ],
+  "id": "corrupting_presence",
+  "levels": 2,
+  "weight": 0
+ },
+ "cowardice": {
+  "desc": "cowardly",
+  "flags": [
+   "bad"
+  ],
+  "id": "cowardice",
+  "levels": 1,
+  "weight": 0
+ },
+ "daystalker": {
+  "desc": "+LOS",
+  "flags": [
+   "good"
+  ],
+  "id": "daystalker",
+  "levels": 1,
+  "weight": 0
+ },
+ "deformed": {
+  "desc": "deformed body",
+  "flags": [
+   "bad",
+   "anatomy"
+  ],
+  "id": "deformed",
+  "levels": 1,
+  "weight": 8
+ },
+ "demonic_guardian": {
+  "desc": "demonic guardian",
+  "flags": [
+   "good"
+  ],
+  "id": "demonic_guardian",
+  "levels": 3,
+  "weight": 0
+ },
+ "demonic_magic": {
+  "desc": "demonic magic",
+  "flags": [
+   "good"
+  ],
+  "id": "demonic_magic",
+  "levels": 3,
+  "weight": 0
+ },
+ "demonic_touch": {
+  "desc": "demonic touch",
+  "flags": [
+   "good",
+   "anatomy",
+   "need_hands"
+  ],
+  "id": "demonic_touch",
+  "levels": 3,
+  "weight": 0
+ },
+ "demonic_will": {
+  "desc": "demonic willpower",
+  "flags": [
+   "good"
+  ],
+  "id": "demonic_will",
+  "levels": 1,
+  "weight": 0
+ },
+ "devolution": {
+  "desc": "devolution",
+  "flags": [
+   "bad"
+  ],
+  "id": "devolution",
+  "levels": 2,
+  "weight": 4
+ },
+ "devour_on_kill": {
+  "desc": "devour on kill",
+  "flags": [
+   "good"
+  ],
+  "id": "devour_on_kill",
+  "levels": 1,
+  "weight": 0
+ },
+ "distortion_field": {
+  "desc": "repulsion field",
+  "flags": [
+   "good"
+  ],
+  "id": "distortion_field",
+  "levels": 3,
+  "weight": 0
+ },
+ "distributed_training": {
+  "desc": "distributed training",
+  "flags": [
+   "good"
+  ],
+  "id": "distributed_training",
+  "levels": 1,
+  "weight": 0
+ },
+ "divine_attrs": {
+  "desc": "divine attributes",
+  "flags": [
+   "good"
+  ],
+  "id": "divine_attrs",
+  "levels": 1,
+  "weight": 0
+ },
+ "dopey": {
+  "desc": "dopey",
+  "flags": [
+   "bad"
+  ],
+  "id": "dopey",
+  "levels": 2,
+  "weight": 8
+ },
+ "double_potion_heal": {
+  "desc": "double potion healing",
+  "flags": [
+   "good"
+  ],
+  "id": "double_potion_heal",
+  "levels": 1,
+  "weight": 0
+ },
+ "drunken_brawling": {
+  "desc": "drunken brawling",
+  "flags": [
+   "good"
+  ],
+  "id": "drunken_brawling",
+  "levels": 1,
+  "weight": 0
+ },
+ "east_wind": {
+  "desc": "East Wind's embodiment",
+  "flags": [
+   "good"
+  ],
+  "id": "east_wind",
+  "levels": 1,
+  "weight": 0
+ },
+ "efficient_magic": {
+  "desc": "efficient magic",
+  "flags": [
+   "good"
+  ],
+  "id": "efficient_magic",
+  "levels": 2,
+  "weight": 4
+ },
+ "efficient_metabolism": {
+  "desc": "efficient metabolism",
+  "flags": [
+   "good"
+  ],
+  "id": "efficient_metabolism",
+  "levels": 1,
+  "weight": 3
+ },
+ "ephemeral_shield": {
+  "desc": "ephemeral shield",
+  "flags": [
+   "good"
+  ],
+  "id": "ephemeral_shield",
+  "levels": 1,
+  "weight": 4
+ },
+ "evolution": {
+  "desc": "evolution",
+  "flags": [
+   "good"
+  ],
+  "id": "evolution",
+  "levels": 2,
+  "weight": 4
+ },
+ "explore_regen": {
+  "desc": "explore regen",
+  "flags": [
+   "good"
+  ],
+  "id": "explore_regen",
+  "levels": 1,
+  "weight": 0
+ },
+ "eyeballs": {
+  "desc": "eyeballs",
+  "flags": [
+   "good",
+   "jiyva",
+   "anatomy"
+  ],
+  "id": "eyeballs",
+  "levels": 3,
+  "weight": 0
+ },
+ "faith": {
+  "desc": "faith",
+  "flags": [
+   "good"
+  ],
+  "id": "faith",
+  "levels": 1,
+  "weight": 0
+ },
+ "fangs": {
+  "desc": "fangs",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "fangs",
+  "levels": 3,
+  "weight": 1
+ },
+ "fast": {
+  "desc": "speed",
+  "flags": [
+   "good"
+  ],
+  "id": "fast",
+  "levels": 3,
+  "weight": 0
+ },
+ "feed_off_suffering": {
+  "desc": "feed off suffering",
+  "flags": [
+   "good"
+  ],
+  "id": "feed_off_suffering",
+  "levels": 2,
+  "weight": 4
+ },
+ "flame_cloud_immunity": {
+  "desc": "flame cloud immunity",
+  "flags": [
+   "good"
+  ],
+  "id": "flame_cloud_immunity",
+  "levels": 1,
+  "weight": 0
+ },
+ "flat_hp": {
+  "desc": "extra vitality",
+  "flags": [
+   "good"
+  ],
+  "id": "flat_hp",
+  "levels": 3,
+  "weight": 0
+ },
+ "float": {
+  "desc": "float",
+  "flags": [
+   "good"
+  ],
+  "id": "float",
+  "levels": 1,
+  "weight": 0
+ },
+ "forlorn": {
+  "desc": "forlorn",
+  "flags": [
+   "bad"
+  ],
+  "id": "forlorn",
+  "levels": 1,
+  "weight": 0
+ },
+ "formless": {
+  "desc": "formless",
+  "flags": [
+   "good"
+  ],
+  "id": "formless",
+  "levels": 2,
+  "weight": 0
+ },
+ "foul_shadow": {
+  "desc": "foul shadow",
+  "flags": [
+   "good"
+  ],
+  "id": "foul_shadow",
+  "levels": 3,
+  "weight": 0
+ },
+ "foul_stench": {
+  "desc": "foul stench",
+  "flags": [
+   "good"
+  ],
+  "id": "foul_stench",
+  "levels": 3,
+  "weight": 0
+ },
+ "frail": {
+  "desc": "frail",
+  "flags": [
+   "bad"
+  ],
+  "id": "frail",
+  "levels": 3,
+  "weight": 10
+ },
+ "freezing_cloud_immunity": {
+  "desc": "freezing cloud immunity",
+  "flags": [
+   "good"
+  ],
+  "id": "freezing_cloud_immunity",
+  "levels": 1,
+  "weight": 0
+ },
+ "frog_legs": {
+  "desc": "frog-like legs",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "frog_legs",
+  "levels": 2,
+  "weight": 0
+ },
+ "gelatinous_body": {
+  "desc": "gelatinous body",
+  "flags": [
+   "good",
+   "jiyva",
+   "substance"
+  ],
+  "id": "gelatinous_body",
+  "levels": 3,
+  "weight": 0
+ },
+ "heat_resistance": {
+  "desc": "fire resistance",
+  "flags": [
+   "good",
+   "substance"
+  ],
+  "id": "heat_resistance",
+  "levels": 3,
+  "weight": 4
+ },
+ "heat_vulnerability": {
+  "desc": "heat vulnerability",
+  "flags": [
+   "bad",
+   "substance"
+  ],
+  "id": "heat_vulnerability",
+  "levels": 3,
+  "weight": 3
+ },
+ "hex_enhancer": {
+  "desc": "bedevilling",
+  "flags": [
+   "good"
+  ],
+  "id": "hex_enhancer",
+  "levels": 1,
+  "weight": 0
+ },
+ "high_magic": {
+  "desc": "high MP",
+  "flags": [
+   "good"
+  ],
+  "id": "high_magic",
+  "levels": 3,
+  "weight": 2
+ },
+ "hooves": {
+  "desc": "hooves",
+  "flags": [
+   "good",
+   "anatomy",
+   "need_feet"
+  ],
+  "id": "hooves",
+  "levels": 3,
+  "weight": 5
+ },
+ "horns": {
+  "desc": "horns",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "horns",
+  "levels": 3,
+  "weight": 7
+ },
+ "hp_casting": {
+  "desc": "HP casting",
+  "flags": [
+   "good"
+  ],
+  "id": "hp_casting",
+  "levels": 1,
+  "weight": 0
+ },
+ "hurl_damnation": {
+  "desc": "hurl damnation",
+  "flags": [
+   "good"
+  ],
+  "id": "hurl_damnation",
+  "levels": 1,
+  "weight": 0
+ },
+ "icemail": {
+  "desc": "icemail",
+  "flags": [
+   "good"
+  ],
+  "id": "icemail",
+  "levels": 2,
+  "weight": 0
+ },
+ "icy_blue_scales": {
+  "desc": "icy blue scales",
+  "flags": [
+   "good",
+   "substance",
+   "anatomy",
+   "scales"
+  ],
+  "id": "icy_blue_scales",
+  "levels": 3,
+  "weight": 0
+ },
+ "ignite_blood": {
+  "desc": "ignite blood",
+  "flags": [
+   "good"
+  ],
+  "id": "ignite_blood",
+  "levels": 3,
+  "weight": 0
+ },
+ "inexperienced": {
+  "desc": "inexperienced",
+  "flags": [
+   "bad"
+  ],
+  "id": "inexperienced",
+  "levels": 3,
+  "weight": 0
+ },
+ "inhibited_regeneration": {
+  "desc": "inhibited regeneration",
+  "flags": [
+   "bad"
+  ],
+  "id": "inhibited_regeneration",
+  "levels": 1,
+  "weight": 3
+ },
+ "initially_attractive": {
+  "desc": "initially attractive",
+  "flags": [
+   "bad"
+  ],
+  "id": "initially_attractive",
+  "levels": 2,
+  "weight": 4
+ },
+ "innate_caster": {
+  "desc": "innate caster",
+  "flags": [
+   "good"
+  ],
+  "id": "innate_caster",
+  "levels": 1,
+  "weight": 0
+ },
+ "inviolate_magic": {
+  "desc": "inviolate magic",
+  "flags": [
+   "good"
+  ],
+  "id": "inviolate_magic",
+  "levels": 1,
+  "weight": 0
+ },
+ "iridescent_scales": {
+  "desc": "iridescent scales",
+  "flags": [
+   "good",
+   "substance",
+   "anatomy",
+   "scales"
+  ],
+  "id": "iridescent_scales",
+  "levels": 3,
+  "weight": 10
+ },
+ "iron_fused_scales": {
+  "desc": "iron-fused scales",
+  "flags": [
+   "good",
+   "anatomy",
+   "substance"
+  ],
+  "id": "iron_fused_scales",
+  "levels": 1,
+  "weight": 0
+ },
+ "jelly_growth": {
+  "desc": "jelly sensing items",
+  "flags": [
+   "good",
+   "jiyva"
+  ],
+  "id": "jelly_growth",
+  "levels": 1,
+  "weight": 0
+ },
+ "jelly_missile": {
+  "desc": "jelly absorbing missiles",
+  "flags": [
+   "good",
+   "jiyva"
+  ],
+  "id": "jelly_missile",
+  "levels": 1,
+  "weight": 0
+ },
+ "large_bone_plates": {
+  "desc": "large bone plates",
+  "flags": [
+   "good",
+   "substance",
+   "anatomy"
+  ],
+  "id": "large_bone_plates",
+  "levels": 3,
+  "weight": 2
+ },
+ "low_magic": {
+  "desc": "low MP",
+  "flags": [
+   "bad"
+  ],
+  "id": "low_magic",
+  "levels": 3,
+  "weight": 9
+ },
+ "lucky": {
+  "desc": "lucky",
+  "flags": [
+   "good"
+  ],
+  "id": "lucky",
+  "levels": 2,
+  "weight": 4
+ },
+ "makhleb_destruction_coc": {
+  "desc": "Cocytus destruction",
+  "flags": [
+   "good"
+  ],
+  "id": "makhleb_destruction_coc",
+  "levels": 1,
+  "weight": 0
+ },
+ "makhleb_destruction_dis": {
+  "desc": "Dis destruction",
+  "flags": [
+   "good"
+  ],
+  "id": "makhleb_destruction_dis",
+  "levels": 1,
+  "weight": 0
+ },
+ "makhleb_destruction_geh": {
+  "desc": "Gehenna destruction",
+  "flags": [
+   "good"
+  ],
+  "id": "makhleb_destruction_geh",
+  "levels": 1,
+  "weight": 0
+ },
+ "makhleb_destruction_tar": {
+  "desc": "Tartarus destruction",
+  "flags": [
+   "good"
+  ],
+  "id": "makhleb_destruction_tar",
+  "levels": 1,
+  "weight": 0
+ },
+ "makhleb_mark_annihilation": {
+  "desc": "Mark of Annihilation",
+  "flags": [
+   "makhleb"
+  ],
+  "id": "makhleb_mark_annihilation",
+  "levels": 1,
+  "weight": 0
+ },
+ "makhleb_mark_atrocity": {
+  "desc": "Mark of Atrocity",
+  "flags": [
+   "makhleb"
+  ],
+  "id": "makhleb_mark_atrocity",
+  "levels": 1,
+  "weight": 0
+ },
+ "makhleb_mark_carnage": {
+  "desc": "Mark of Carnage",
+  "flags": [
+   "makhleb"
+  ],
+  "id": "makhleb_mark_carnage",
+  "levels": 1,
+  "weight": 0
+ },
+ "makhleb_mark_celebrant": {
+  "desc": "Mark of the Celebrant",
+  "flags": [
+   "makhleb"
+  ],
+  "id": "makhleb_mark_celebrant",
+  "levels": 1,
+  "weight": 0
+ },
+ "makhleb_mark_execution": {
+  "desc": "Mark of Execution",
+  "flags": [
+   "makhleb"
+  ],
+  "id": "makhleb_mark_execution",
+  "levels": 1,
+  "weight": 0
+ },
+ "makhleb_mark_fanatic": {
+  "desc": "Mark of the Fanatic",
+  "flags": [
+   "makhleb"
+  ],
+  "id": "makhleb_mark_fanatic",
+  "levels": 1,
+  "weight": 0
+ },
+ "makhleb_mark_haemoclasm": {
+  "desc": "Mark of Haemoclasm",
+  "flags": [
+   "makhleb"
+  ],
+  "id": "makhleb_mark_haemoclasm",
+  "levels": 1,
+  "weight": 0
+ },
+ "makhleb_mark_legion": {
+  "desc": "Mark of the Legion",
+  "flags": [
+   "makhleb"
+  ],
+  "id": "makhleb_mark_legion",
+  "levels": 1,
+  "weight": 0
+ },
+ "makhleb_mark_tyrant": {
+  "desc": "Mark of the Tyrant",
+  "flags": [
+   "makhleb"
+  ],
+  "id": "makhleb_mark_tyrant",
+  "levels": 1,
+  "weight": 0
+ },
+ "mana_link": {
+  "desc": "magic link",
+  "flags": [
+   "good"
+  ],
+  "id": "mana_link",
+  "levels": 1,
+  "weight": 0
+ },
+ "mana_regeneration": {
+  "desc": "magic regeneration",
+  "flags": [
+   "good"
+  ],
+  "id": "mana_regeneration",
+  "levels": 1,
+  "weight": 0
+ },
+ "mana_shield": {
+  "desc": "magic shield",
+  "flags": [
+   "good"
+  ],
+  "id": "mana_shield",
+  "levels": 1,
+  "weight": 0
+ },
+ "meek": {
+  "desc": "meek",
+  "flags": [
+   "bad"
+  ],
+  "id": "meek",
+  "levels": 3,
+  "weight": 3
+ },
+ "mertail": {
+  "desc": "mertail",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "mertail",
+  "levels": 1,
+  "weight": 0
+ },
+ "missing_eye": {
+  "desc": "missing an eye",
+  "flags": [
+   "bad"
+  ],
+  "id": "missing_eye",
+  "levels": 1,
+  "weight": 0
+ },
+ "missing_hand": {
+  "desc": "missing a hand",
+  "flags": [
+   "bad"
+  ],
+  "id": "missing_hand",
+  "levels": 1,
+  "weight": 0
+ },
+ "mnemophage": {
+  "desc": "mnemnophage",
+  "flags": [
+   "good"
+  ],
+  "id": "mnemophage",
+  "levels": 1,
+  "weight": 0
+ },
+ "molten_scales": {
+  "desc": "molten scales",
+  "flags": [
+   "good",
+   "substance",
+   "anatomy",
+   "scales"
+  ],
+  "id": "molten_scales",
+  "levels": 3,
+  "weight": 0
+ },
+ "mp_wands": {
+  "desc": "MP-powered wands",
+  "flags": [
+   "good"
+  ],
+  "id": "mp_wands",
+  "levels": 1,
+  "weight": 7
+ },
+ "multilived": {
+  "desc": "multi-lived",
+  "flags": [
+   "good"
+  ],
+  "id": "multilived",
+  "levels": 1,
+  "weight": 0
+ },
+ "mutation_resistance": {
+  "desc": "mutation resistance",
+  "flags": [
+   "good"
+  ],
+  "id": "mutation_resistance",
+  "levels": 3,
+  "weight": 4
+ },
+ "necro_enhancer": {
+  "desc": "in touch with death",
+  "flags": [
+   "good"
+  ],
+  "id": "necro_enhancer",
+  "levels": 2,
+  "weight": 0
+ },
+ "negative_energy_resistance": {
+  "desc": "negative energy resistance",
+  "flags": [
+   "good",
+   "substance"
+  ],
+  "id": "negative_energy_resistance",
+  "levels": 3,
+  "weight": 0
+ },
+ "nightstalker": {
+  "desc": "nightstalker",
+  "flags": [
+   "good"
+  ],
+  "id": "nightstalker",
+  "levels": 3,
+  "weight": 0
+ },
+ "nimble_swimmer": {
+  "desc": "nimble swimmer",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "nimble_swimmer",
+  "levels": 2,
+  "weight": 0
+ },
+ "no_air_magic": {
+  "desc": "no air magic",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_air_magic",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_alchemy_magic": {
+  "desc": "no alchemy magic",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_alchemy_magic",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_armour": {
+  "desc": "no armour",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_armour",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_armour_skill": {
+  "desc": "inability to train armour",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_armour_skill",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_artifice": {
+  "desc": "inability to use devices",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_artifice",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_conjuration_magic": {
+  "desc": "no conjurations magic",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_conjuration_magic",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_dodging": {
+  "desc": "inability to train dodging",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_dodging",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_drink": {
+  "desc": "no potions",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_drink",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_earth_magic": {
+  "desc": "no earth magic",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_earth_magic",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_fire_magic": {
+  "desc": "no fire magic",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_fire_magic",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_forgecraft_magic": {
+  "desc": "no forgecraft magic",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_forgecraft_magic",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_forms": {
+  "desc": "no forms",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_forms",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_grasping": {
+  "desc": "no weapons or thrown items",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_grasping",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_hexes_magic": {
+  "desc": "no hexes magic",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_hexes_magic",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_ice_magic": {
+  "desc": "no ice magic",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_ice_magic",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_jewellery": {
+  "desc": "no jewellery",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_jewellery",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_love": {
+  "desc": "hated by all",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_love",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_necromancy_magic": {
+  "desc": "no necromancy magic",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_necromancy_magic",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_potion_heal": {
+  "desc": "no potion heal",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_potion_heal",
+  "levels": 2,
+  "weight": 3
+ },
+ "no_regeneration": {
+  "desc": "no regeneration",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_regeneration",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_stealth": {
+  "desc": "no stealth",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_stealth",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_summoning_magic": {
+  "desc": "no summoning magic",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_summoning_magic",
+  "levels": 1,
+  "weight": 0
+ },
+ "no_translocation_magic": {
+  "desc": "no translocations magic",
+  "flags": [
+   "bad"
+  ],
+  "id": "no_translocation_magic",
+  "levels": 1,
+  "weight": 0
+ },
+ "north_wind": {
+  "desc": "North Wind's embodiment",
+  "flags": [
+   "good"
+  ],
+  "id": "north_wind",
+  "levels": 1,
+  "weight": 0
+ },
+ "ooze_flood": {
+  "desc": "ooze flood",
+  "flags": [
+   "good",
+   "jiyva",
+   "substance"
+  ],
+  "id": "ooze_flood",
+  "levels": 1,
+  "weight": 0
+ },
+ "passive_freeze": {
+  "desc": "passive freeze",
+  "flags": [
+   "good"
+  ],
+  "id": "passive_freeze",
+  "levels": 1,
+  "weight": 1
+ },
+ "passive_mapping": {
+  "desc": "sense surroundings",
+  "flags": [
+   "good"
+  ],
+  "id": "passive_mapping",
+  "levels": 2,
+  "weight": 3
+ },
+ "paws": {
+  "desc": "stealthy paws",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "paws",
+  "levels": 1,
+  "weight": 0
+ },
+ "persistent_drain": {
+  "desc": "persistent drain",
+  "flags": [
+   "bad"
+  ],
+  "id": "persistent_drain",
+  "levels": 1,
+  "weight": 5
+ },
+ "physical_vulnerability": {
+  "desc": "reduced AC",
+  "flags": [
+   "bad"
+  ],
+  "id": "physical_vulnerability",
+  "levels": 3,
+  "weight": 0
+ },
+ "poison_resistance": {
+  "desc": "poison resistance",
+  "flags": [
+   "good",
+   "substance"
+  ],
+  "id": "poison_resistance",
+  "levels": 1,
+  "weight": 4
+ },
+ "poor_constitution": {
+  "desc": "poor constitution",
+  "flags": [
+   "bad"
+  ],
+  "id": "poor_constitution",
+  "levels": 2,
+  "weight": 10
+ },
+ "potion_fungus": {
+  "desc": "potion fungus",
+  "flags": [
+   "bad"
+  ],
+  "id": "potion_fungus",
+  "levels": 1,
+  "weight": 4
+ },
+ "powered_by_death": {
+  "desc": "powered by death",
+  "flags": [
+   "good"
+  ],
+  "id": "powered_by_death",
+  "levels": 3,
+  "weight": 0
+ },
+ "powered_by_pain": {
+  "desc": "powered by pain",
+  "flags": [
+   "good"
+  ],
+  "id": "powered_by_pain",
+  "levels": 3,
+  "weight": 0
+ },
+ "protean_grace": {
+  "desc": "protean grace",
+  "flags": [
+   "good"
+  ],
+  "id": "protean_grace",
+  "levels": 1,
+  "weight": 2
+ },
+ "pseudopods": {
+  "desc": "pseudopods",
+  "flags": [
+   "good",
+   "jiyva",
+   "anatomy"
+  ],
+  "id": "pseudopods",
+  "levels": 3,
+  "weight": 0
+ },
+ "quadrumanous": {
+  "desc": "four strong arms",
+  "flags": [
+   "good"
+  ],
+  "id": "quadrumanous",
+  "levels": 1,
+  "weight": 0
+ },
+ "reckless": {
+  "desc": "reckless",
+  "flags": [
+   "bad"
+  ],
+  "id": "reckless",
+  "levels": 1,
+  "weight": 2
+ },
+ "reflexive_headbutt": {
+  "desc": "retaliatory headbutt",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "reflexive_headbutt",
+  "levels": 1,
+  "weight": 0
+ },
+ "regeneration": {
+  "desc": "regeneration",
+  "flags": [
+   "good"
+  ],
+  "id": "regeneration",
+  "levels": 3,
+  "weight": 2
+ },
+ "renounce_potions": {
+  "desc": "renounce potions",
+  "flags": [
+   "bad"
+  ],
+  "id": "renounce_potions",
+  "levels": 1,
+  "weight": 0
+ },
+ "renounce_scrolls": {
+  "desc": "renounce scrolls",
+  "flags": [
+   "bad"
+  ],
+  "id": "renounce_scrolls",
+  "levels": 1,
+  "weight": 0
+ },
+ "robust": {
+  "desc": "robust",
+  "flags": [
+   "good"
+  ],
+  "id": "robust",
+  "levels": 3,
+  "weight": 5
+ },
+ "rugged_brown_scales": {
+  "desc": "rugged brown scales",
+  "flags": [
+   "good",
+   "substance",
+   "anatomy",
+   "scales"
+  ],
+  "id": "rugged_brown_scales",
+  "levels": 3,
+  "weight": 0
+ },
+ "runic_magic": {
+  "desc": "runic magic",
+  "flags": [
+   "good"
+  ],
+  "id": "runic_magic",
+  "levels": 1,
+  "weight": 0
+ },
+ "sanguine_armour": {
+  "desc": "sanguine armour",
+  "flags": [
+   "good",
+   "need_blood"
+  ],
+  "id": "sanguine_armour",
+  "levels": 3,
+  "weight": 0
+ },
+ "scream": {
+  "desc": "screaming",
+  "flags": [
+   "bad"
+  ],
+  "id": "scream",
+  "levels": 2,
+  "weight": 6
+ },
+ "shaggy_fur": {
+  "desc": "shaggy fur",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "shaggy_fur",
+  "levels": 3,
+  "weight": 2
+ },
+ "sharp_scales": {
+  "desc": "sharp scales",
+  "flags": [
+   "good",
+   "substance",
+   "anatomy",
+   "scales"
+  ],
+  "id": "sharp_scales",
+  "levels": 3,
+  "weight": 0
+ },
+ "shock_resistance": {
+  "desc": "electricity resistance",
+  "flags": [
+   "good",
+   "substance"
+  ],
+  "id": "shock_resistance",
+  "levels": 1,
+  "weight": 2
+ },
+ "shock_vulnerability": {
+  "desc": "electricity vulnerability",
+  "flags": [
+   "bad",
+   "substance"
+  ],
+  "id": "shock_vulnerability",
+  "levels": 1,
+  "weight": 2
+ },
+ "short_lifespan": {
+  "desc": "otherworldly",
+  "flags": [
+   "bad"
+  ],
+  "id": "short_lifespan",
+  "levels": 1,
+  "weight": 0
+ },
+ "silence_aura": {
+  "desc": "aura of silence",
+  "flags": [
+   "good"
+  ],
+  "id": "silence_aura",
+  "levels": 1,
+  "weight": 0
+ },
+ "slime_shroud": {
+  "desc": "slime shroud",
+  "flags": [
+   "good",
+   "jiyva"
+  ],
+  "id": "slime_shroud",
+  "levels": 1,
+  "weight": 0
+ },
+ "slimy_green_scales": {
+  "desc": "slimy green scales",
+  "flags": [
+   "good",
+   "substance",
+   "anatomy",
+   "scales"
+  ],
+  "id": "slimy_green_scales",
+  "levels": 3,
+  "weight": 0
+ },
+ "slow": {
+  "desc": "slowness",
+  "flags": [
+   "bad"
+  ],
+  "id": "slow",
+  "levels": 3,
+  "weight": 0
+ },
+ "slow_reflexes": {
+  "desc": "reduced EV",
+  "flags": [
+   "bad"
+  ],
+  "id": "slow_reflexes",
+  "levels": 3,
+  "weight": 0
+ },
+ "slow_wield": {
+  "desc": "slow wielding",
+  "flags": [
+   "bad"
+  ],
+  "id": "slow_wield",
+  "levels": 1,
+  "weight": 0
+ },
+ "south_wind": {
+  "desc": "South Wind's embodiment",
+  "flags": [
+   "good"
+  ],
+  "id": "south_wind",
+  "levels": 1,
+  "weight": 0
+ },
+ "spatial_entanglement": {
+  "desc": "spatial entanglement",
+  "flags": [
+   "bad"
+  ],
+  "id": "spatial_entanglement",
+  "levels": 1,
+  "weight": 2
+ },
+ "spellclaws": {
+  "desc": "spellclaws",
+  "flags": [
+   "good"
+  ],
+  "id": "spellclaws",
+  "levels": 1,
+  "weight": 0
+ },
+ "spiny": {
+  "desc": "spiny",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "spiny",
+  "levels": 3,
+  "weight": 0
+ },
+ "spit_poison": {
+  "desc": "spit poison",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "spit_poison",
+  "levels": 2,
+  "weight": 8
+ },
+ "spiteful_blood": {
+  "desc": "spiteful blood",
+  "flags": [
+   "bad",
+   "need_blood"
+  ],
+  "id": "spiteful_blood",
+  "levels": 2,
+  "weight": 2
+ },
+ "stampede": {
+  "desc": "stampede",
+  "flags": [
+   "good"
+  ],
+  "id": "stampede",
+  "levels": 2,
+  "weight": 0
+ },
+ "steam_resistance": {
+  "desc": "steam resistance",
+  "flags": [
+   "good",
+   "substance"
+  ],
+  "id": "steam_resistance",
+  "levels": 1,
+  "weight": 0
+ },
+ "stinger": {
+  "desc": "stinger",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "stinger",
+  "levels": 3,
+  "weight": 8
+ },
+ "stone_body": {
+  "desc": "stone body",
+  "flags": [
+   "good",
+   "substance"
+  ],
+  "id": "stone_body",
+  "levels": 1,
+  "weight": 0
+ },
+ "strong": {
+  "desc": "strong",
+  "flags": [
+   "good"
+  ],
+  "id": "strong",
+  "levels": 2,
+  "weight": 7
+ },
+ "strong_willed": {
+  "desc": "strong-willed",
+  "flags": [
+   "good"
+  ],
+  "id": "strong_willed",
+  "levels": 3,
+  "weight": 5
+ },
+ "sturdy_frame": {
+  "desc": "sturdy frame",
+  "flags": [
+   "good"
+  ],
+  "id": "sturdy_frame",
+  "levels": 3,
+  "weight": 2
+ },
+ "subdued_magic": {
+  "desc": "subdued magic",
+  "flags": [
+   "bad"
+  ],
+  "id": "subdued_magic",
+  "levels": 3,
+  "weight": 6
+ },
+ "talons": {
+  "desc": "talons",
+  "flags": [
+   "good",
+   "anatomy",
+   "need_feet"
+  ],
+  "id": "talons",
+  "levels": 3,
+  "weight": 5
+ },
+ "teleportitis": {
+  "desc": "teleportitis",
+  "flags": [
+   "bad"
+  ],
+  "id": "teleportitis",
+  "levels": 2,
+  "weight": 3
+ },
+ "temperature_sensitivity": {
+  "desc": "temperature sensitive",
+  "flags": [
+   "bad"
+  ],
+  "id": "temperature_sensitivity",
+  "levels": 1,
+  "weight": 0
+ },
+ "tendrils": {
+  "desc": "tendrils",
+  "flags": [
+   "good",
+   "jiyva",
+   "anatomy"
+  ],
+  "id": "tendrils",
+  "levels": 1,
+  "weight": 0
+ },
+ "tengu_flight": {
+  "desc": "evasive flight",
+  "flags": [
+   "good"
+  ],
+  "id": "tengu_flight",
+  "levels": 1,
+  "weight": 0
+ },
+ "tentacle_arms": {
+  "desc": "tentacles",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "tentacle_arms",
+  "levels": 1,
+  "weight": 0
+ },
+ "tentacle_spike": {
+  "desc": "tentacle spike",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "tentacle_spike",
+  "levels": 3,
+  "weight": 10
+ },
+ "thin_metallic_scales": {
+  "desc": "thin metallic scales",
+  "flags": [
+   "good",
+   "substance",
+   "anatomy",
+   "scales"
+  ],
+  "id": "thin_metallic_scales",
+  "levels": 3,
+  "weight": 0
+ },
+ "thin_skeletal_structure": {
+  "desc": "thin skeletal structure",
+  "flags": [
+   "good",
+   "need_bones"
+  ],
+  "id": "thin_skeletal_structure",
+  "levels": 3,
+  "weight": 2
+ },
+ "time_warped_blood": {
+  "desc": "time-warped blood",
+  "flags": [
+   "good",
+   "need_blood"
+  ],
+  "id": "time_warped_blood",
+  "levels": 2,
+  "weight": 2
+ },
+ "torment_resistance": {
+  "desc": "torment resistance",
+  "flags": [
+   "good",
+   "substance"
+  ],
+  "id": "torment_resistance",
+  "levels": 2,
+  "weight": 0
+ },
+ "tough_skin": {
+  "desc": "tough skin",
+  "flags": [
+   "good",
+   "anatomy",
+   "substance"
+  ],
+  "id": "tough_skin",
+  "levels": 3,
+  "weight": 2
+ },
+ "translucent_skin": {
+  "desc": "translucent skin",
+  "flags": [
+   "good",
+   "jiyva",
+   "substance"
+  ],
+  "id": "translucent_skin",
+  "levels": 3,
+  "weight": 0
+ },
+ "treasure_sense": {
+  "desc": "treasure sense",
+  "flags": [
+   "good"
+  ],
+  "id": "treasure_sense",
+  "levels": 1,
+  "weight": 0
+ },
+ "trickster": {
+  "desc": "trickster",
+  "flags": [
+   "good"
+  ],
+  "id": "trickster",
+  "levels": 1,
+  "weight": 0
+ },
+ "unskilled": {
+  "desc": "unskilled",
+  "flags": [
+   "bad"
+  ],
+  "id": "unskilled",
+  "levels": 3,
+  "weight": 0
+ },
+ "warmup_strikes": {
+  "desc": "warmup strikes",
+  "flags": [
+   "bad",
+   "anatomy"
+  ],
+  "id": "warmup_strikes",
+  "levels": 1,
+  "weight": 0
+ },
+ "weak": {
+  "desc": "weak",
+  "flags": [
+   "bad"
+  ],
+  "id": "weak",
+  "levels": 2,
+  "weight": 8
+ },
+ "weak_willed": {
+  "desc": "weak-willed",
+  "flags": [
+   "bad"
+  ],
+  "id": "weak_willed",
+  "levels": 3,
+  "weight": 0
+ },
+ "weakness_stinger": {
+  "desc": "weakness stinger",
+  "flags": [
+   "good",
+   "anatomy"
+  ],
+  "id": "weakness_stinger",
+  "levels": 3,
+  "weight": 0
+ },
+ "west_wind": {
+  "desc": "West Wind's embodiment",
+  "flags": [
+   "good"
+  ],
+  "id": "west_wind",
+  "levels": 1,
+  "weight": 0
+ },
+ "wield_offhand": {
+  "desc": "off-hand wielding",
+  "flags": [
+   "good"
+  ],
+  "id": "wield_offhand",
+  "levels": 1,
+  "weight": 0
+ },
+ "wild_magic": {
+  "desc": "wild magic",
+  "flags": [
+   "good"
+  ],
+  "id": "wild_magic",
+  "levels": 3,
+  "weight": 6
+ },
+ "word_of_chaos": {
+  "desc": "word of chaos",
+  "flags": [
+   "good"
+  ],
+  "id": "word_of_chaos",
+  "levels": 1,
+  "weight": 0
+ },
+ "yellow_scales": {
+  "desc": "yellow scales",
+  "flags": [
+   "good",
+   "substance",
+   "anatomy",
+   "scales"
+  ],
+  "id": "yellow_scales",
+  "levels": 3,
+  "weight": 0
+ }
+}
