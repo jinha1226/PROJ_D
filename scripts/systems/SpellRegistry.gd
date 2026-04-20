@@ -445,9 +445,10 @@ static func _skill_power(spell_id: String) -> int:
 static var _current_casting_player: Node = null
 
 
-## DCSS calc_spell_power (spl-cast.cc:550). Runs the spell-power pipeline
-## end-to-end: _skill_power → intel → stepdown → cap. Ignores mutations,
-## wizardry gear, berserk, form bonuses — we'll wire those in later.
+## DCSS calc_spell_power (spl-cast.cc:550). Runs the spell-power
+## pipeline end-to-end: _skill_power → intel → enhancer ×1.5 →
+## Wild/Subdued → stepdown → cap. Post-stepdown multipliers (horror,
+## diminished, claustrophobia) remain TODO.
 static func calc_spell_power(spell_id: String, player: Node) -> int:
 	_ensure_loaded()
 	if player == null:
@@ -459,6 +460,12 @@ static func calc_spell_power(spell_id: String, player: Node) -> int:
 	if "stats" in player and player.stats != null:
 		intel = int(player.stats.INT)
 	var power: int = sk_power * intel / 10
+	# DCSS _apply_enhancement (spl-cast.cc:672). Each positive enhancer
+	# level multiplies power by 1.5; each negative level halves it. This
+	# replaces the old additive `staff_spell_bonus` caller hack, which
+	# over-rewarded high-skill casters and under-rewarded low-skill ones.
+	var enh: int = _enhancer_levels(spell_id, player)
+	power = _apply_enhancement(power, enh)
 	# DCSS Wild Magic / Subdued Magic mutations: ±30% to spell power
 	# per level, applied before stepdown.
 	var wild: int = int(player.get_meta("_mut_wild_magic", 0)) \
@@ -476,6 +483,40 @@ static func calc_spell_power(spell_id: String, player: Node) -> int:
 	if cap > 0:
 		power = min(power, cap)
 	return max(0, power)
+
+
+## DCSS _apply_enhancement (spl-cast.cc:672). Positive levels: ×1.5
+## each; negative levels: ÷2 each.
+static func _apply_enhancement(power: int, levels: int) -> int:
+	if levels > 0:
+		for i in levels:
+			power = power * 15 / 10
+	elif levels < 0:
+		for i in -levels:
+			power = power / 2
+	return power
+
+
+## Sum enhancer levels for the given spell / player. Mirrors DCSS
+## _spell_enhancement but only counts what our data model tracks:
+##   +1  per matching magic staff equipped (WeaponRegistry.staff_spell_school)
+##   +1  per matching elemental ring (ring_of_fire/cold/… when implemented)
+##   -1  per level of MUT_ANTI_WIZARDRY mutation
+static func _enhancer_levels(spell_id: String, player: Node) -> int:
+	var lvl: int = 0
+	# Staff school match.
+	if "equipped_weapon_id" in player:
+		var staff_sch: String = WeaponRegistry.staff_spell_school(player.equipped_weapon_id)
+		if staff_sch != "":
+			var schools: Array = get_schools(spell_id)
+			for s in schools:
+				if String(s) == staff_sch:
+					lvl += 1
+					break
+	# Anti-wizardry mutation is a global negative enhancer.
+	if player.has_method("has_meta"):
+		lvl -= int(player.get_meta("_mut_anti_wizardry", 0))
+	return lvl
 
 
 ## DCSS raw_spell_fail (spl-cast.cc:455). Polynomial interpolation of a

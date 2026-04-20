@@ -104,12 +104,11 @@ static func cast(player: Node, spell_id: String, target, ctx: Dictionary) -> Dic
 			"mp_cost": cost,
 		}
 
-	# Power (spl-cast.cc:550 calc_spell_power + staff/racial/gear bonuses).
+	# Power (spl-cast.cc:550 calc_spell_power). Staff enhancement is now
+	# baked into calc_spell_power via _apply_enhancement (×1.5 per match);
+	# we only add gear/racial flat bonuses that live outside DCSS.
 	var power: int = SpellRegistry.calc_spell_power(spell_id, player)
-	var staff_sch: String = WeaponRegistry.staff_spell_school(player.equipped_weapon_id)
 	var school: String = String(info.get("school", "spellcasting"))
-	if staff_sch == school or staff_sch == "":
-		power += WeaponRegistry.staff_spell_bonus(player.equipped_weapon_id)
 	if player.has_method("gear_spell_power_bonus"):
 		power += int(player.gear_spell_power_bonus())
 	if ctx.has("spellpower_fn"):
