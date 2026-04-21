@@ -84,7 +84,14 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 - [ ] **Invocations skill power scaling** — god abilities don't scale with invocation level.
 - [x] **Walking noise** — 2b243722: Player.try_move emits a body-armour-EVP-scaled DCSSNoise pulse (plate=loud, robe=silent). Stealth still trims.
 - [x] **Monster shout** — 32dd5259: MonsterAI.wake emits HD-scaled DCSSNoise (hiss 4 → roar 12). Silent-shape jellies and silent-flag mobs muzzled. Wave propagates through walls via the noise grid.
-- [ ] **Unrandarts** — 0 of ~200 implemented (unique named items with hardcoded effects, e.g. Singing Sword, Bow of Krishna).
+- [~] **Unrandarts** — 12/~200 (29629b76). UnrandartRegistry holds
+  entries; WeaponRegistry / ArmorRegistry synthesize rows on demand
+  for `unrand_` ids. Shipped: Singing Sword, Bow of Krishna, Plutonium
+  Sword, Mace of Variability, Wucad Mu's Staff, Skullcrusher, Storm
+  Bow, Robe of Augmentation, Cloak of the Thief, Hat of the Alchemist,
+  Ring of Shaolin, Amulet of Bloodlust. Effects reuse existing brands/
+  egos/ring props — no per-artefact special code. Drops at 1.5% per
+  item roll from depth ≥ 5. Expansion = just append entries.
 - [x] **Randart generation** — 2e17d103: RandartGenerator.gd with 17-prop weighted pool, depth-scaled 1-4 properties, "the Adj Noun" names. Rings only (amulets TBD). Floor drops 15% randart at depth≥4. Equip + tooltip wired.
 - [ ] **Identification system** — all items pre-identified; DCSS hides potion/scroll/ring/armour appearances until identified.
 - [x] **Player willpower stat** — b842a303: Stats.WL seeded from _race_base_wl (formicid=270 immune, mummy/vine=80, …). _recompute_gear_stats: WL=base+XL*3+willpower_ego*40. willpower_check(hd): random(0..hd*5+30)<WL. Wired in MonsterAI hex branch: confuse/paralyse/slow/fear/charm check WL first. 7-level resist display fixed (rF+ shows "+", not "++"). _apply_elem_resist: rl≥3=immune, -1=×1.5, -2=×2, ≤-3=×3. get_resist() unified source for all racial intrinsics + gear + mutations. Status panel: 5 elemental + WL/rCorr/rMut row.
