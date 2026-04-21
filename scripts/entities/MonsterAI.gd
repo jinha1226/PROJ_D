@@ -182,10 +182,14 @@ static func _should_flee_from_low_hp(m: Monster) -> bool:
 	var book_id: String = String(m.data.spells_book) if "spells_book" in m.data else ""
 	if book_id != "":
 		return false
-	if "flags" in m.data:
-		var flags_s: String = String(m.data.flags)
-		if "ARCHER" in flags_s or "THROWER" in flags_s or "SPELLCASTER" in flags_s:
-			return false
+	if "flags" in m.data and m.data.flags != null:
+		# MonsterData.flags is an Array[String]. Can't blanket-stringify
+		# it in Godot 4 (no String(Array[String]) constructor); iterate
+		# instead and bail on any archer/spellcaster tag.
+		for f in m.data.flags:
+			var fu: String = String(f).to_upper()
+			if fu == "ARCHER" or fu == "THROWER" or fu == "SPELLCASTER":
+				return false
 	var max_hp: int = int(m.data.hp) if m.data.hp > 0 else 10
 	# Already fled once? Require a full heal past 40% to re-trigger.
 	if m.has_meta("_has_fled"):
