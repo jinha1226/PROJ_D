@@ -2194,14 +2194,57 @@ func _dispatch_invocation(effect: String) -> void:
 			CombatLog.add("Your weapon oozes acidic slime.")
 		# ---- Fedhas ----
 		"sunlight":
+			# DCSS Sunlight: dispels invisibility, reveals the area,
+			# and damages undead/demonic. We add the undead bonus to
+			# the existing reveal_all path.
 			var dmap_s: DungeonMap = $DungeonLayer/DungeonMap
 			if dmap_s != null and dmap_s.has_method("reveal_all"):
 				dmap_s.reveal_all()
-			CombatLog.add("Sunlight floods the level.")
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not m.is_alive:
+					continue
+				if not dmap_s.is_tile_visible(m.grid_pos):
+					continue
+				var hol_s: String = ""
+				if m.data and m.data.shape == "undead":
+					hol_s = "undead"
+				elif m.data and m.data.flags != null:
+					for f in m.data.flags:
+						if String(f).to_lower() == "demonic":
+							hol_s = "demonic"
+							break
+				if hol_s != "":
+					m.take_damage(randi_range(12, 24), "holy")
+			CombatLog.add("Sunlight sears the shadows.")
 		"plant_ring":
-			CombatLog.add("Plants rise around you (decorative for now).")
+			# Summon 2-4 plants around the player, same pattern as other
+			# ally summons but short-lived (20 turns). Acts as a temporary
+			# fence of cover against enemies.
+			for i in randi_range(2, 4):
+				_summon_ally("plant", 20, "")
+			CombatLog.add("Verdant plants burst from the ground around you.")
 		"rain":
-			CombatLog.add("Rain soaks the floor.")
+			# DCSS Rain: converts floor → shallow water over a radius and
+			# douses fires. We convert nearby tiles to WATER (DCSS water
+			# impedes movement for non-amphibious — matches via
+			# _player_can_walk_on).
+			if generator != null:
+				var dmap_r: DungeonMap = $DungeonLayer/DungeonMap
+				for dx in range(-4, 5):
+					for dy in range(-4, 5):
+						var cc: Vector2i = player.grid_pos + Vector2i(dx, dy)
+						if cc.x < 0 or cc.x >= DungeonGenerator.MAP_WIDTH:
+							continue
+						if cc.y < 0 or cc.y >= DungeonGenerator.MAP_HEIGHT:
+							continue
+						if generator.get_tile(cc) == DungeonGenerator.TileType.FLOOR \
+								and abs(dx) + abs(dy) >= 2 \
+								and abs(dx) + abs(dy) <= 5:
+							if randf() < 0.35:
+								generator.map[cc.x][cc.y] = DungeonGenerator.TileType.WATER
+				if dmap_r != null:
+					dmap_r.render(generator)
+			CombatLog.add("Rain floods the area with fresh water.")
 		# ---- Cheibriados ----
 		"bend_time":
 			for m in get_tree().get_nodes_in_group("monsters"):
@@ -2230,7 +2273,22 @@ func _dispatch_invocation(effect: String) -> void:
 				bn_t.take_damage(9999)
 				CombatLog.add("The %s vanishes into the Abyss!" % _mon_name(bn_t))
 		"corrupt_level":
-			CombatLog.add("The level writhes and corrupts (cosmetic for now).")
+			# DCSS Lugonu Corrupt: twists the level into an Abyss-like
+			# chaos zone. Full-floor warp is beyond our scope, so we
+			# banish the 5 most-dangerous monsters (highest HD) and
+			# confuse the rest for 15 turns.
+			var mons_list: Array = []
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if is_instance_valid(m) and m is Monster and m.is_alive:
+					mons_list.append(m)
+			mons_list.sort_custom(func(a, b):
+				return int(a.data.hd) > int(b.data.hd))
+			for i in min(5, mons_list.size()):
+				var victim: Monster = mons_list[i]
+				victim.take_damage(9999)
+			for m in mons_list.slice(5):
+				m.set_meta("_confusion_turns", 15)
+			CombatLog.add("The dungeon writhes — Lugonu corrupts everything in sight!")
 		# ---- Ashenzari ----
 		"scry":
 			var dmap_y: DungeonMap = $DungeonLayer/DungeonMap
@@ -2326,11 +2384,52 @@ func _dispatch_invocation(effect: String) -> void:
 			CombatLog.add("Heavenly storm girds your attacks.")
 		# ---- Hepliaklqana ----
 		"recall_ancestor":
+			# DCSS Heplia: summons a persistent ancestor companion. We
+			# use a generic orc_knight stand-in since we don't yet
+			# model ancestor class choice.
 			_summon_ally("orc_knight", 999, "Your ancestor answers the call.")
 		"idealise":
-			CombatLog.add("Your ancestor gleams with potential.")
+			# DCSS Idealise: heal + haste every companion. Approx via
+			# the _haste_turns meta the action pipeline already reads.
+			var idealised: int = 0
+			for c in get_tree().get_nodes_in_group("companions"):
+				if is_instance_valid(c) and c.is_alive:
+					if "hp" in c and "data" in c and c.data != null:
+						c.hp = int(c.data.hp)
+					if c.has_method("set_meta"):
+						c.set_meta("_haste_turns", 20)
+					idealised += 1
+			if idealised > 0:
+				CombatLog.add("Your %d allies blaze with ancestral power!" % idealised)
+			else:
+				CombatLog.add("No allies answer the call.")
 		"transference":
-			CombatLog.add("You swap places with your ancestor. (stub)")
+			# Swap positions with the nearest ally (companion) so the
+			# player can duck out of melee range. DCSS also hurts nearby
+			# enemies — we skip that for simplicity.
+			var closest: Node = null
+			var closest_d: int = 999999
+			for c in get_tree().get_nodes_in_group("companions"):
+				if not is_instance_valid(c) or not c.is_alive:
+					continue
+				var d: int = maxi(abs(c.grid_pos.x - player.grid_pos.x),
+						abs(c.grid_pos.y - player.grid_pos.y))
+				if d < closest_d:
+					closest_d = d
+					closest = c
+			if closest != null:
+				var old_p: Vector2i = player.grid_pos
+				player.grid_pos = closest.grid_pos
+				player.position = Vector2(
+						player.grid_pos.x * TILE_SIZE + TILE_SIZE / 2.0,
+						player.grid_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
+				closest.grid_pos = old_p
+				closest.position = Vector2(
+						old_p.x * TILE_SIZE + TILE_SIZE / 2.0,
+						old_p.y * TILE_SIZE + TILE_SIZE / 2.0)
+				CombatLog.add("You swap places with your ancestor.")
+			else:
+				CombatLog.add("No ally to bind with.")
 		# ---- Ignis ----
 		"fiery_armour":
 			player.set_meta("_fiery_armour_turns", 30)
