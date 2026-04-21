@@ -386,7 +386,69 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 		CombatLog.add("You hit the %s for %d." % [def_name, dmg])
 	_show_hit_feedback(defender, dmg, Color(1.0, 1.0, 0.3))
 	_show_slash_fx(defender)
+	# DCSS Beogh orc conversion — a Beogh-aligned player has a piety-
+	# scaled chance per hit to break an orc's resolve and convert them
+	# to a follower. Skipped if the hit killed the target.
+	if defender is Monster and defender.is_alive:
+		_maybe_beogh_convert(attacker, defender)
 	return dmg
+
+
+## DCSS Beogh-conversion check. Called after a successful player melee
+## swing. When the player worships Beogh and lands a hit on an orc,
+## there's a piety-scaled chance (5-20%) the orc switches sides and
+## becomes a Companion. Tracked once per monster via `_beogh_converted`
+## meta so repeated hits don't retry indefinitely.
+static func _maybe_beogh_convert(attacker, defender: Monster) -> void:
+	if attacker == null or defender == null or defender.data == null:
+		return
+	# Player-only path — monsters don't inherit from Player's faith.
+	if not ("current_god" in attacker):
+		return
+	if String(attacker.current_god) != "beogh":
+		return
+	if defender.has_meta("_beogh_converted"):
+		return
+	# Orc species gate. DCSS tags them with genus "orc"; our JSON keeps
+	# that plus the id-prefix convention.
+	var is_orc: bool = false
+	if "id" in defender.data:
+		var id_s: String = String(defender.data.id)
+		if id_s.begins_with("orc") or id_s == "orc" or "orc_" in id_s:
+			is_orc = true
+	if not is_orc:
+		return
+	# Conversion chance scales with piety (10 at 0 → 20 at 200). DCSS
+	# uses a more complex formula (god-gift timer + HD cap) but this is
+	# the right magnitude for our pace.
+	var piety: int = int(attacker.piety) if "piety" in attacker else 0
+	var pct: int = 10 + piety / 20
+	if randi() % 100 >= pct:
+		return
+	defender.set_meta("_beogh_converted", true)
+	# Swap Monster → Companion so CompanionAI (targets hostiles, not
+	# player) takes over. Reuse the same MonsterData block for stats.
+	var orc_pos: Vector2i = defender.grid_pos
+	var orc_data: MonsterData = defender.data
+	var orc_hp: int = defender.hp
+	var gen: Node = defender.generator
+	var tree: SceneTree = defender.get_tree()
+	# Tear down the monster entity before spawning the companion so the
+	# tile isn't double-occupied. TurnManager deregister + queue_free.
+	TurnManager.unregister_actor(defender)
+	defender.queue_free()
+	# Instantiate the Companion. GameBootstrap preloads a scene but we
+	# don't have direct access here; go through the path-based load.
+	var scene: PackedScene = load("res://scenes/entities/Companion.tscn")
+	if scene == null:
+		return
+	var comp = scene.instantiate()
+	comp.add_to_group("companions")
+	tree.current_scene.add_child(comp)
+	comp.setup(gen, orc_pos, orc_data)
+	comp.hp = maxi(1, orc_hp)  # preserve the damage you just dealt
+	CombatLog.add("The %s kneels and joins your cause." % \
+			String(orc_data.display_name))
 
 
 ## Player ranged attack. Walks a beam from attacker to target_pos,

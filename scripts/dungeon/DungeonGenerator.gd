@@ -60,8 +60,16 @@ func generate(depth: int, run_seed: int = -1) -> void:
 	var branch: String = _current_branch()
 	match branch:
 		"main":    _build_dcss_overlapping_boxes(depth)
-		"mine":    _build_caves(); _decorate_rock_debris(8)
-		"forest":  _build_caves(); _decorate_trees(22)
+		# Orcish Mines — rougher caves, more rock debris, a few bigger
+		# rooms to simulate the mined-out caverns. DCSS Mines use open
+		# layouts with pillar-rooms; our closest approximation is wider
+		# caves + extra debris.
+		"mine":    _build_caves(); _decorate_rock_debris(14)
+		# Lair — classic forest tileset with dense trees plus a couple
+		# of small freshwater ponds so animals have terrain to lurk in.
+		# Previously trees-only felt dry for a "wild lair" floor.
+		"forest":  _build_caves(); _decorate_trees(28); \
+				_place_pools(TileType.WATER, 2, 2, 5)
 		"swamp":   _build_caves(); _decorate_trees(10); _place_pools(TileType.WATER, 4, 4, 9)
 		"volcano": _build_caves(); _place_pools(TileType.LAVA, 3, 3, 7)
 		_:         _build_dcss_overlapping_boxes(depth)

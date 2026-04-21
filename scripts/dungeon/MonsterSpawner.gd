@@ -30,6 +30,22 @@ const _BANDS: Dictionary = {
 	"yaktaur":         {"follower": "yaktaur",        "min": 1, "max": 3},
 	"two_headed_ogre": {"follower": "ogre",           "min": 1, "max": 3},
 	"hobgoblin":       {"follower": "hobgoblin",      "min": 2, "max": 4},
+	# --- Lair / Forest bands (DCSS mon-place: wolves hunt in packs,
+	#     yaks roam in herds, spiders clutch together). Makes branch
+	#     entrances feel appropriately wild instead of single foes.
+	"wolf":            {"follower": "wolf",           "min": 2, "max": 4},
+	"warg":            {"follower": "wolf",           "min": 2, "max": 4},
+	"yak":             {"follower": "yak",            "min": 2, "max": 4},
+	"hell_hound":      {"follower": "hell_hound",     "min": 1, "max": 3},
+	"bear":            {"follower": "bear",           "min": 1, "max": 2},
+	"adder":           {"follower": "adder",          "min": 1, "max": 2},
+	"elephant":        {"follower": "elephant",       "min": 1, "max": 2},
+	"hippogriff":      {"follower": "hippogriff",     "min": 1, "max": 3},
+	# --- Snake / Spider sub-branch flavour (fang / spinneret packs) ---
+	"black_mamba":     {"follower": "adder",          "min": 1, "max": 3},
+	"anaconda":        {"follower": "black_mamba",    "min": 1, "max": 2},
+	"spider":          {"follower": "spider",         "min": 1, "max": 3},
+	"redback":         {"follower": "redback",        "min": 1, "max": 2},
 }
 
 
