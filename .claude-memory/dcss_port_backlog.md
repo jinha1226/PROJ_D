@@ -29,20 +29,31 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 
 ## 🟡 Medium (partial implementations)
 
-- [x] **Monster AI intelligence** — PARTIAL (d7edc8ea). Flee tightened
-  (25%→10%, human-only, non-caster, one-shot `_has_fled` flag reset at
-  40% HP). Caster kiting wired: adjacent casters try cast first, else
-  step-back-to-regain-range, else melee. Still missing: `_should_cast_spell`
-  tracer beam, friendly-fire check, emergency-slot priority, cautious flag.
+- [x] **Monster AI intelligence** — DONE (d7edc8ea + 479a851a). Flee
+  tightened (25%→10%, human-only, non-caster, one-shot `_has_fled` flag
+  reset at 40% HP). Caster kiting: adjacent casters cast→kite→melee.
+  Emergency slot priority: spellbook rows flagged `emergency` gated off
+  above 33% HP, tripled below; non-emergency rows halved below. Silence
+  only filters `vocal` rows (wizard/priest) rather than aborting the
+  whole cast so breath weapons still fire at silenced targets. Friendly-
+  fire tracer: `_beam_friendly_fire` walks Bresenham caster→target and
+  rejects zap spells whose path crosses another hostile. Remaining nice-
+  to-have: DCSS `cautious` flag for monsters that won't approach if
+  can't retaliate (very minor, not wired yet).
 - [x] **Monster energy types** — DONE (d7edc8ea). MonsterData exports
   move/attack/spell/missile/swim energy (default 10/6). MonsterRegistry
   applies mon-data.h overrides for naga (move=14), bat (move=5), centaur
   (move=6, missile=7), fire_dragon (attack=15), jelly (move=14,attack=14),
   adder (attack=8), wasp, spriggan, etc. MonsterAI.act returns the
   action cost; Monster.take_turn drains _action_energy by that cost.
-- [ ] **Monster pack/tactical behaviour** — leader follow, tactical
-  retreat, ranged support. Still scatters. (Caster kiting shipped under
-  AI-intelligence above, but pack formation/cover/flanking unstarted.)
+- [x] **Monster pack/tactical behaviour** — PARTIAL (479a851a). Pack
+  formation: `_maybe_wander` now steers toward the nearest hostile-side
+  monster within 6 tiles when the gap is ≥3, so bands stay clustered
+  instead of drifting. Caster kiting shipped under AI-intelligence.
+  Tactical retreat (explicit fall-back-to-ally-line beyond the
+  formation tendency) and cover/flanking still minimal — skipped
+  because the game has no ranged-attack flow yet, so there's no
+  "covered" state to coordinate around.
 - [ ] **Transformation forms** — FormRegistry has 5-6; DCSS has Dragon, Statue, Tree, Hydra, Lich, Bat Swarm, Fungus, Pig, Spider, Flux and form-specific stats/abilities.
 - [x] **Poison levels** — DONE (d7edc8ea + earlier). Player had 3-level
   stack from session 5; this session added Monster.apply_poison mirroring
