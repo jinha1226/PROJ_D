@@ -783,6 +783,9 @@ static func _player_stealth_scaled(player: Node) -> int:
 		dex = int(player.stats.DEX)
 	var sk: int = _player_stealth(player)
 	var stealth: int = dex * 3 + sk * 15
+	# MUT_NIGHTSTALKER: +2 stealth per level. Set by apply_mutation.
+	if player.has_method("has_meta") and player.has_meta("_mut_night_stealth"):
+		stealth += int(player.get_meta("_mut_night_stealth", 0)) * 10
 	# Body armour stealth penalty: DCSS uses `player_armour_stealth_penalty`,
 	# which reads body_armour PARM_EVASION. Approximate with our stored
 	# ev_penalty on the chest slot (encumbrance tier).
