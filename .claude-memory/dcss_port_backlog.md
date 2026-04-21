@@ -64,16 +64,24 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 
 When a backlog item lands, replace its `[ ]` with `[x] (<commit-hash>)` and note which parts are left (if partial). Do NOT delete — the history matters for later retrospectives.
 
-## Active picks (top-of-stack — updated 2026-04-21 session 6)
+## Active picks (top-of-stack — updated 2026-04-21 session 7)
 
-**UI upgrade in flight** — plan at `docs/superpowers/plans/2026-04-21-ui-upgrade.md`,
-spec at `docs/superpowers/specs/2026-04-21-ui-upgrade-design.md`. Tasks
-1-3 shipped (GameDialog + UICards + Status migration with CanvasLayer
-nesting fix). Resume at task 4 (Skills + ACTIVE Training/Learned split),
-then 5 Bag, 6 Magic, 7 Map, 8 remaining popups. Every dialog attaches
-via `self.add_child(dlg)` per the canvaslayer-nesting feedback memory.
+**UI upgrade COMPLETE** — plan at `docs/superpowers/plans/2026-04-21-ui-upgrade.md`
+fully shipped across tasks 1-8.
+- Task 1-3 landed session 6 (GameDialog scaffold + UICards + Status).
+- Session 7 landed the real root-cause fix for the "Status won't open"
+  bug (b6120b70) — `accept_event()` is Control-only, call
+  `get_viewport().set_input_as_handled()` from a CanvasLayer instead.
+  The session-6 "nested CanvasLayer" diagnosis was wrong; nesting
+  CanvasLayers DOES render, the parse error was the real problem.
+- Session 7 also shipped Tasks 4-8: Skills ACTIVE Training/Learned
+  split (3eb86e99), Bag equipped 2-col card grid (3df8c901), Magic
+  school pills + accent Pow/Fail (36a91f08), Map Current-Floor card
+  + Legend (1c26527d), and the 10-dialog mass migration to GameDialog
+  (cdd1f2b2). Zero AcceptDialog references remain in GameBootstrap.
+- Side-fix: rPois displays as `+++` for innate-immune species (f28d091c).
 
-After UI upgrade lands, return to the DCSS-port queue below.
+Back on the DCSS-port queue below.
 
 Gods deferred per user direction — don't start god invocation parity
 unless explicitly asked. User's queued order:
