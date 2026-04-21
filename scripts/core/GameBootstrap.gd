@@ -1157,6 +1157,64 @@ func _on_monster_died(monster: Monster) -> void:
 		player.grant_xp(xp_gain)
 
 
+## In-game help dialog. A bundled substitute for DCSS's ~15 reference
+## sections — covers the information a new player actually needs in
+## the first hour: controls, combat math, skills, identification,
+## gods, save/restart. Dialog lives under GameDialog so it inherits
+## the same dim/panel/close chrome as the rest of the UI.
+func _show_help_dialog() -> void:
+	var dlg := GameDialog.create("Help", Vector2i(960, 1700))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
+	vb.add_theme_constant_override("separation", 14)
+
+	var sections: Array = [
+		["Controls", """Tap: move / attack / pickup
+Long-press: inspect tile
+? : this help
+I : bag    Z : magic
+Q : quaff  R : read   E : evoke
+F : fire ranged   A : invocations
+, : pickup   >< : stairs
+X : examine   S/space : rest
+Esc : cancel / close dialog"""],
+		["Combat basics", """Damage = weapon × (1 + weapon_skill/30) × (1 + fighting/30)
+To-hit beats the target's EV (dodge).
+AC soaks random 0..AC of the hit.
+Shields (SH) roll a separate block — past the block, damage still falls through AC.
+Range penalty: -3 to-hit per tile past 2."""],
+		["Skills", """Weapon skills: DMG + to-hit + faster swings.
+Fighting: DMG × + HP.
+Armour: body-AC multiplier (1 + lv/10).
+Dodging: EV bonus.
+Shields: SH block + shield EV penalty ↓.
+Spellcasting: fail ↓ + MP + memory cap.
+School skills: spell power for that school.
+Stealth: monsters wake slower + stab bonus.
+Evocations: wand / essence power."""],
+		["Identification", """Potions and scrolls show a pseudonym (Red Potion, Scroll labeled ZUN TAB) until you drink/read them.
+Rings and amulets show a metal/shape pseudonym (Silver Ring) until you equip them.
+Unrandarts (the X) are always identified — you see the artefact name on pickup.
+Randarts (the Adj Noun) show rolled name; equip to reveal props."""],
+		["Gods & piety", """Altars (☥) let you pledge. Kill enemies to earn piety; spend at the Abilities menu (A).
+Per-god conducts: killing the wrong kind of foe loses piety (Beogh frowns on orc-kin slayers, Fedhas on plant-burners, etc.).
+Amulet of Faith gives +50% piety on gains.
+Stasis blocks all teleports."""],
+		["Status effects", """Slow / Petrifying / Exhausted — half speed via alternating skip.
+Paralysis / Petrified / Frozen — full action block.
+Weak — -33% melee damage.
+Poison stacks in 3 levels; rPois+ one-shots a level."""],
+	]
+	for s in sections:
+		vb.add_child(UICards.section_header(String(s[0])))
+		var body := Label.new()
+		body.text = String(s[1])
+		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		body.add_theme_font_size_override("font_size", 34)
+		body.modulate = Color(0.88, 0.88, 0.95)
+		vb.add_child(body)
+
+
 ## DCSS per-god kill conducts. Returns the adjusted piety gain for this
 ## kill (negative = piety loss). Bonuses fire on favoured victims
 ## (TSO evil-kill, Yred holy-kill), penalties on disliked victims
@@ -1518,6 +1576,8 @@ func _on_key_action(action: String) -> void:
 				_targeting_spell = ""
 				touch_input.targeting_mode = true
 				CombatLog.add("Fire at which tile? Tap to aim, Esc to cancel.")
+		"help":
+			_show_help_dialog()
 		"cancel":
 			# Close any active popup. GameDialog auto-closes on Esc,
 			# but the path here also ensures targeting mode releases.
@@ -2656,6 +2716,10 @@ func _end_run(victory: bool, killer: String) -> void:
 	var depth_reached: int = GameManager.current_depth
 	var shards_gained: int = meta.record_run_end(depth_reached, victory)
 	GameManager.end_run(victory)
+	# DCSS morgue dump — write a text record of the run to user:// so the
+	# player can review what happened after the result screen closes.
+	# Safely best-effort: file failures don't block the result screen.
+	_write_morgue_dump(victory, killer, depth_reached)
 	var screen: CanvasLayer = RESULT_SCREEN_SCENE.instantiate()
 	add_child(screen)
 	screen.show_result({
@@ -2667,6 +2731,72 @@ func _end_run(victory: bool, killer: String) -> void:
 		"shards_total": meta.rune_shards,
 		"killer": killer,
 	})
+
+
+## DCSS morgue-style death log. Dumps stats, skills, equipment, kills,
+## resists and cause of death to user://morgues/morgue-<stamp>.txt so
+## the player (and post-hoc bug-hunts) have a record. Best-effort —
+## never raises; a file-write failure just logs a warning.
+func _write_morgue_dump(victory: bool, killer: String, depth: int) -> void:
+	if player == null:
+		return
+	var dir := DirAccess.open("user://")
+	if dir != null and not dir.dir_exists("morgues"):
+		dir.make_dir("morgues")
+	var stamp: String = Time.get_datetime_string_from_system().replace(":", "-")
+	var path: String = "user://morgues/morgue-%s.txt" % stamp
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	if f == null:
+		push_warning("morgue dump: couldn't open %s" % path)
+		return
+	var race_name: String = player.race_res.display_name if player.race_res else "?"
+	var job_name: String = player.job_res.display_name if player.job_res else "?"
+	var god_name: String = "Unaligned"
+	if player.current_god != "":
+		god_name = String(GodRegistry.get_info(player.current_god).get("title", player.current_god))
+	f.store_line("=== PROJ_D Morgue ===")
+	f.store_line("Timestamp : %s" % stamp)
+	f.store_line("Outcome   : %s" % ("VICTORY" if victory else "DEATH"))
+	if not victory and killer != "":
+		f.store_line("Slain by  : %s" % killer)
+	f.store_line("")
+	f.store_line("Character : %s %s (Lv %d)" % [race_name, job_name, player.level])
+	f.store_line("God       : %s  (piety %d)" % [god_name, int(player.piety)])
+	f.store_line("Depth     : %s %d" % [
+			BranchRegistry.display_name(GameManager.current_branch), depth])
+	f.store_line("Turns     : %d" % TurnManager.turn_number)
+	f.store_line("Kills     : %d" % kill_count)
+	var s = player.stats
+	if s != null:
+		f.store_line("")
+		f.store_line("HP %d/%d    MP %d/%d" % [s.HP, s.hp_max, s.MP, s.mp_max])
+		f.store_line("STR %d  DEX %d  INT %d" % [s.STR, s.DEX, s.INT])
+		f.store_line("AC %d  EV %d  SH %d  WL %d" % [s.AC, s.EV, s.SH, s.WL])
+	if player.equipped_weapon_id != "":
+		f.store_line("")
+		f.store_line("Weapon : %s +%d" % [
+				WeaponRegistry.display_name_for(player.equipped_weapon_id),
+				player.equipped_weapon_plus])
+	if not player.equipped_armor.is_empty():
+		f.store_line("Armor  :")
+		for slot in player.equipped_armor.keys():
+			var a: Dictionary = player.equipped_armor[slot]
+			f.store_line("  %s: %s +%d" % [
+					String(slot), String(a.get("name", "?")),
+					int(a.get("plus", 0))])
+	f.store_line("")
+	f.store_line("Resistances: rF %d  rC %d  rElec %d  rPois %d  rN %d" % [
+			player.get_resist("fire"), player.get_resist("cold"),
+			player.get_resist("elec"), player.get_resist("poison"),
+			player.get_resist("neg")])
+	if player.learned_spells.size() > 0:
+		f.store_line("")
+		f.store_line("Known spells (%d / %d memory):" % [
+				player.used_spell_levels(), player.max_spell_levels()])
+		for sp in player.learned_spells:
+			f.store_line("  %s" % SpellRegistry.get_spell(String(sp)).get("name", sp))
+	f.close()
+	CombatLog.add("Morgue saved to %s" % path)
 
 
 # [skill-ui-agent] ---- skill UI wiring ------------------------------------
