@@ -46,6 +46,18 @@ const _SCROLL_LABELS: Array = [
 	"BLINKY", "KRULL", "ZEMA", "VORAL", "XENO", "AFOR PLI", "JEBA QI",
 	"NEMIS", "PRUX", "GOROM",
 ]
+# Rings wear a metal/material descriptor ("silver ring of dexterity"
+# presents as just "silver ring" until identified). Amulets use shape
+# + material likewise ("brass amulet" → "amulet of faith").
+const _RING_DESCRIPTORS: Array = [
+	"Wooden", "Silver", "Golden", "Iron", "Steel", "Bronze", "Brass",
+	"Copper", "Granite", "Ivory", "Ruby", "Marble", "Jade", "Glass",
+	"Agate", "Diamond", "Emerald", "Onyx",
+]
+const _AMULET_DESCRIPTORS: Array = [
+	"Amber", "Silver", "Golden", "Bronze", "Jeweled", "Fluorescent",
+	"Platinum", "Zirconium", "Cameo", "Pearl", "Emerald", "Ruby",
+]
 
 # DCSS base-tile filenames (stem only; consumable_base_path prepends the
 # full item/potion/ or item/scroll/ path). Files live under
@@ -91,7 +103,11 @@ func is_identified(id: String) -> bool:
 func display_name_for_item(id: String, fallback: String, kind: String) -> String:
 	if identified.has(id):
 		return fallback
-	if kind == "potion" or kind == "scroll":
+	# Randarts always render with their rolled artefact name — the
+	# pseudonym system is only for base-item identification.
+	if id.begins_with("randart_"):
+		return fallback
+	if kind == "potion" or kind == "scroll" or kind == "ring" or kind == "amulet":
 		_ensure_pseudonyms()
 		return String(_pseudonyms.get(id, fallback))
 	return fallback
@@ -124,6 +140,25 @@ func _ensure_pseudonyms() -> void:
 	for i in scroll_ids.size():
 		_pseudonyms[scroll_ids[i]] = "Scroll labeled %s" % sl[i % sl.size()]
 		_consumable_bases[scroll_ids[i]] = sb[i % sb.size()]
+	# Ring / amulet base-item pseudonyms. Randarts are excluded at the
+	# display-name level so this just covers ring_fire, ring_strength,
+	# amulet_faith, etc. — the "standard" DCSS jewellery catalogue.
+	var ring_ids: Array = []
+	for rid in RingRegistry.all_ids():
+		if not String(rid).begins_with("randart_"):
+			ring_ids.append(rid)
+	var rd: Array = _RING_DESCRIPTORS.duplicate()
+	rd.shuffle()
+	for i in ring_ids.size():
+		_pseudonyms[ring_ids[i]] = "%s Ring" % rd[i % rd.size()]
+	var amu_ids: Array = []
+	for aid in AmuletRegistry.all_ids():
+		if not String(aid).begins_with("randart_"):
+			amu_ids.append(aid)
+	var ad: Array = _AMULET_DESCRIPTORS.duplicate()
+	ad.shuffle()
+	for i in amu_ids.size():
+		_pseudonyms[amu_ids[i]] = "%s Amulet" % ad[i % ad.size()]
 
 
 ## DCSS base tile filename (stem) for a consumable id, paired with the kind.

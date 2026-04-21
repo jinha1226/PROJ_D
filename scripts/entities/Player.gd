@@ -1211,6 +1211,12 @@ func equip_ring(ring: Dictionary, slot_index: int = -1) -> Dictionary:
 		equipped_rings.append({})
 	var prev: Dictionary = equipped_rings[slot_index] if typeof(equipped_rings[slot_index]) == TYPE_DICTIONARY else {}
 	equipped_rings[slot_index] = ring
+	# DCSS item-use.cc: putting on a ring identifies its base type (the
+	# stat-ring flavour reveals when equipped). Randarts are opaque until
+	# scrolls of identify hit them (their rolled props stay hidden).
+	var r_id: String = String(ring.get("id", ""))
+	if r_id != "" and not r_id.begins_with("randart_") and GameManager != null:
+		GameManager.identify(r_id)
 	_recompute_gear_stats()
 	return prev
 
@@ -1230,6 +1236,9 @@ func unequip_ring(slot_index: int) -> Dictionary:
 func equip_amulet(amulet: Dictionary) -> Dictionary:
 	var prev: Dictionary = equipped_amulet.duplicate()
 	equipped_amulet = amulet
+	var a_id: String = String(amulet.get("id", ""))
+	if a_id != "" and not a_id.begins_with("randart_") and GameManager != null:
+		GameManager.identify(a_id)
 	_recompute_gear_stats()
 	return prev
 
