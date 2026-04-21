@@ -57,6 +57,11 @@ func _ready() -> void:
 		_ratio = get_meta("_pending_ratio")
 		remove_meta("_pending_ratio")
 	_resize_from_viewport()
+	# A second pass after the frame settles — on mobile web the viewport
+	# reports its final size only after canvas layout, so the _ready-time
+	# compute can use a stale width. call_deferred picks up the settled
+	# value a frame later.
+	call_deferred("_resize_from_viewport")
 	# Re-fit on viewport changes (orientation flip, resize on desktop).
 	var vp: Viewport = get_viewport()
 	if vp != null and not vp.size_changed.is_connected(_resize_from_viewport):
