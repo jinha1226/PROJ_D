@@ -263,27 +263,119 @@ static func _try_cast_at(m: Monster, target: Node) -> bool:
 	# Silence zone around the target: DCSS suppresses wizard/priest casts.
 	if target != null and "has_meta" in target and target.has_method("has_meta") \
 			and target.has_meta("_silenced_turns"):
-		return false
-	# Pick a spell weighted by freq. Total weight also gates whether we cast
-	# at all: a book summing to 60 weight casts 60/200 = 30% of turns.
-	var total_w: int = 0
+		# Silence only stops "vocal" spells in DCSS (wizard/priest), not
+		# "natural"/"breath"/"magical" ones. Filter instead of aborting.
+		var filtered: Array = []
+		for row in rows:
+			var flags_v: Variant = row.get("flags", [])
+			var is_vocal: bool = typeof(flags_v) == TYPE_ARRAY and "vocal" in flags_v
+			if not is_vocal:
+				filtered.append(row)
+		rows = filtered
+		if rows.is_empty():
+			return false
+	# DCSS emergency slot priority: monsters under 33% HP bias heavily
+	# toward "emergency" flagged spells (heal_self / blink_self / haste_other /
+	# swiftness). Non-emergency rows get their freq halved when low, and
+	# emergency rows' freq is tripled — but only when low. Healthy
+	# monsters never pick an emergency spell at all so a fresh gnoll
+	# shaman doesn't blink away on turn 1.
+	var max_hp: int = int(m.data.hp) if m.data.hp > 0 else 10
+	var low_hp: bool = m.hp * 3 <= max_hp
+	var effective: Array = []
 	for row in rows:
-		total_w += int(row.get("freq", 0))
+		var flags_v: Variant = row.get("flags", [])
+		var is_emergency: bool = typeof(flags_v) == TYPE_ARRAY and "emergency" in flags_v
+		var eff_freq: int = int(row.get("freq", 0))
+		if is_emergency:
+			if not low_hp:
+				continue  # gate: healthy mobs never pick emergency
+			eff_freq *= 3
+		elif low_hp:
+			eff_freq = maxi(1, eff_freq / 2)
+		if eff_freq <= 0:
+			continue
+		# DCSS tracer: single-target beam spells won't fire if another
+		# hostile monster stands between the caster and the target.
+		# _beam_friendly_fire looks up the spell's "pierce"/beam nature
+		# via SpellRegistry.element_for (a spell with an element is our
+		# zap list, all of which travel in a line).
+		if target != null and _beam_friendly_fire(m, target, String(row.get("spell", ""))):
+			continue
+		effective.append({"spell": String(row.get("spell", "")), "freq": eff_freq})
+	if effective.is_empty():
+		return false
+	var total_w: int = 0
+	for e in effective:
+		total_w += int(e["freq"])
 	if total_w <= 0:
 		return false
 	if randi() % 200 >= total_w:
 		return false
 	var roll: int = randi() % total_w
 	var acc: int = 0
-	var picked: Dictionary = {}
-	for row in rows:
-		acc += int(row.get("freq", 0))
+	var picked_id: String = ""
+	for e in effective:
+		acc += int(e["freq"])
 		if roll < acc:
-			picked = row
+			picked_id = String(e["spell"])
 			break
-	if picked.is_empty():
+	if picked_id == "":
 		return false
-	return _apply_mon_spell(m, target, String(picked.get("spell", "")))
+	return _apply_mon_spell(m, target, picked_id)
+
+
+## DCSS friendly-fire tracer. For a damage-dealing beam spell from `m`
+## toward `target`, sweep a Bresenham line from caster to target; return
+## true if any other hostile monster sits on the path. Non-damage /
+## non-beam spells (self-buffs, summons, hexes) always return false so
+## casters still pick them freely.
+static func _beam_friendly_fire(m: Monster, target: Node, spell_id: String) -> bool:
+	if spell_id == "" or m == null or target == null:
+		return false
+	# Only filter damage spells — SpellRegistry.element_for returns "" for
+	# non-zap effects like summon / heal / haste.
+	var elem: String = SpellRegistry.element_for(spell_id)
+	if elem == "":
+		return false
+	var from: Vector2i = m.grid_pos
+	var to: Vector2i = target.grid_pos
+	if from == to:
+		return false
+	# Build a candidate occupancy dict once per check so we don't rescan
+	# the monsters group for every cell along the path.
+	var occupants: Dictionary = {}
+	for other in m.get_tree().get_nodes_in_group("monsters"):
+		if other == m or not is_instance_valid(other):
+			continue
+		if not (other is Monster) or not other.is_alive:
+			continue
+		occupants[other.grid_pos] = true
+	# Bresenham supercover from `from` to `to`. Skip both endpoints —
+	# we only care about cells between caster and target.
+	var dx: int = to.x - from.x
+	var dy: int = to.y - from.y
+	var sx: int = 1 if dx > 0 else (-1 if dx < 0 else 0)
+	var sy: int = 1 if dy > 0 else (-1 if dy < 0 else 0)
+	var adx: int = absi(dx)
+	var ady: int = absi(dy)
+	var x: int = from.x
+	var y: int = from.y
+	var err: int = adx - ady
+	while Vector2i(x, y) != to:
+		var e2: int = 2 * err
+		if e2 > -ady:
+			err -= ady
+			x += sx
+		if e2 < adx:
+			err += adx
+			y += sy
+		var cell: Vector2i = Vector2i(x, y)
+		if cell == to:
+			break
+		if occupants.has(cell):
+			return true
+	return false
 
 
 ## Apply a cast spell from monster `m` onto `target`. We key off the
@@ -730,9 +822,22 @@ static func _step_away_from(m: Monster, threat: Vector2i) -> void:
 	_maybe_wander(m)
 
 
+## DCSS pack formation: when wandering without a target, a monster
+## prefers to stay near its pack rather than drift off solo. Picks the
+## nearest ally within ~6 tiles and steps toward them; fully random
+## wander only kicks in when truly isolated. Cuts the "pack scattered
+## across the map" problem after the first engagement.
 static func _maybe_wander(m: Monster) -> void:
 	if randf() >= 0.5:
 		return
+	var ally: Node = _nearest_ally(m, 6)
+	if ally != null:
+		var gap: int = _cheb(m.grid_pos, ally.grid_pos)
+		# Already close (≤2 tiles): a bit of jitter looks natural. Stepping
+		# right on top just produces a conga line.
+		if gap >= 3:
+			_step_toward(m, ally.grid_pos)
+			return
 	var dirs: Array = [
 		Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1),
 		Vector2i(1, 1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(-1, -1),
@@ -743,6 +848,26 @@ static func _maybe_wander(m: Monster) -> void:
 		if _can_enter(m, nxt):
 			_move_to(m, nxt)
 			return
+
+
+## Nearest same-side monster within `max_dist` Chebyshev tiles. "Ally"
+## for a hostile mob means another hostile Monster (not a Companion,
+## not the player). Null if isolated.
+static func _nearest_ally(m: Monster, max_dist: int) -> Node:
+	if m == null or m.get_tree() == null:
+		return null
+	var best: Monster = null
+	var best_d: int = max_dist + 1
+	for other in m.get_tree().get_nodes_in_group("monsters"):
+		if other == m or not is_instance_valid(other):
+			continue
+		if not (other is Monster) or not other.is_alive:
+			continue
+		var d: int = _cheb(m.grid_pos, other.grid_pos)
+		if d < best_d:
+			best_d = d
+			best = other
+	return best
 
 
 static func _move_to(m: Monster, pos: Vector2i) -> void:
