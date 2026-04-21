@@ -18,14 +18,23 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 - [x] **Body-armour egos — full roster** — 32dd5259: ArmorRegistry.EGOS with 27 entries; roll_ego rolls 6-25% by depth; Player._recompute_gear_stats folds stat/resist/flag effects. Harm ego wired to take_damage & melee_attack. Remaining partial: RAMPAGING/REFLECTION/SPIRIT_SHIELD/FLYING/MAYHEM need per-system handlers beyond just the flag.
 - [x] **Amulet roster** — 5c2c6d18: AmuletRegistry.gd with 9 entries (Faith/Magic Mastery/Regen/Acrobat/Reflection/Stasis/Guardian Spirit/Gourmand/Nothing). equip_amulet slot on Player; spirit_shield splits HP→MP; stasis blocks tele/blink; acrobat +5 EV on non-combat turns; faith +50% piety; floor drops 2%; bag UI + TileRenderer tiles.
 - [ ] **Portal vaults** (timed mini-branches) — not implemented at all: Sewers, Ossuary, Bailey, Volcano, Icecave, Wizlab, Trove, Labyrinth, Desolation, Gauntlet. Mid-game interest driver in DCSS.
-- [ ] **Branch theming**:
-  - Orcish Mines: Beogh worship converts orcs to allies
-  - Elven Halls: elf faction packs
-  - Lair branches (Swamp / Snake / Spider / Shoals): terrain-specific tile effects (water movement, poison clouds)
-  - Slime Pits: acidic walls
-  - Vaults / Zot: vault-entry lockouts
-  - Crypt / Tomb: undead-heavy spawn weights
-  - Hell 7-floor, Pan 7-floor, Abyss — data only, no special gen
+- [~] **Branch theming** — PARTIAL (89229a3f):
+  - [x] Orcish Mines: Beogh orc conversion wired (CombatSystem.
+    _maybe_beogh_convert on melee hit, piety-scaled 10-20% chance,
+    swaps Monster → Companion reusing the same MonsterData + hp).
+    Mines density bumped (debris 8→14) for grittier feel.
+  - [x] Lair: trees 22→28, 2-5 small water ponds via _place_pools.
+    Wolf/warg/yak/bear/elephant/hippogriff pack bands added.
+    Snake/Spider sub-branch bands (black_mamba, anaconda, spider,
+    redback) land simultaneously.
+  - [ ] Elven Halls: elf faction packs (deep_elf_fighter band exists
+    but no elf-specific flavor rules)
+  - [ ] Slime Pits: acidic walls (needs new tile behaviour + wall-
+    touch damage)
+  - [ ] Vaults / Zot: vault-entry lockouts (needs timer mechanic)
+  - [ ] Crypt / Tomb: undead-heavy spawn weights (population pools
+    already route there; tuning TBD)
+  - [ ] Hell 7-floor, Pan 7-floor, Abyss — data only, no special gen
 
 ## 🟡 Medium (partial implementations)
 
