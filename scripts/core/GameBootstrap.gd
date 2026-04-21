@@ -1296,6 +1296,14 @@ func _on_skill_leveled_up_for_stats(p: Node, skill_id: String, _new_level: int) 
 	if skill_id == "dodging" or skill_id == "stealth" or skill_id == "armour":
 		if player.has_method("_recompute_defense"):
 			player._recompute_defense()
+	# DCSS calc_hp / calc_mp recomputes live on every query, so a fighting
+	# / spellcasting level bump should flow through to HP / MP immediately.
+	# We call _apply_level_up_growth (reused from XL level-up) because it
+	# already folds fighting + spellcasting into the max-HP/MP formula and
+	# preserves the current HP / MP ratio across the change.
+	if skill_id == "fighting" or skill_id == "spellcasting":
+		if player.has_method("_apply_level_up_growth"):
+			player._apply_level_up_growth()
 
 
 ## Trigger a trap the player just stepped on. Effect depends on the
@@ -2726,7 +2734,7 @@ const _SKILL_DESCS: Dictionary = {
 	"sling": "Sling DMG +5%/lv",
 	"throwing": "Throw DMG +5%/lv",
 	"unarmed_combat": "Fist DMG +1 per 3 lv + faster swings",
-	"fighting": "Melee DMG +2/lv",
+	"fighting": "Melee DMG +2/lv, HP scales with XL × fighting",
 	"armour": "AC +1 per 4 lv",
 	"dodging": "EV +1 per 3 lv",
 	"shields": "Block 5%/lv",
