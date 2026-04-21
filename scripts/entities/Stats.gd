@@ -8,6 +8,10 @@ extends Resource
 @export var MP: int = 10
 @export var AC: int = 0
 @export var EV: int = 0
+## DCSS shield_class score (SH). Zero unless a shield is equipped; grows
+## with shields skill + shield base AC + enchant. Block rolls scale off
+## this value via random2(SH * 2) / 3 - 1.
+@export var SH: int = 0
 @export var hp_max: int = 20
 @export var mp_max: int = 10
 ## DCSS Willpower (MR). Each 40 points = one pip (★). Formicid = 270 (immune).
@@ -28,6 +32,7 @@ func clone() -> Stats:
 	s.MP = MP
 	s.AC = AC
 	s.EV = EV
+	s.SH = SH
 	s.hp_max = hp_max
 	s.mp_max = mp_max
 	s.WL = WL

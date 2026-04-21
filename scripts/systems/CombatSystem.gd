@@ -544,6 +544,44 @@ static func ranged_attack(attacker, target, target_pos: Vector2i, skill_sys = nu
 	return dmg
 
 
+## DCSS shield_bonus (player.cc:shield_bonus). Roll a block against the
+## attacker's already-made to-hit roll. Returns true if the swing was
+## blocked. Each successful block this turn raises the next block's
+## bar via the `_shield_blocks_this_turn` counter, matching DCSS's
+## incoming-attack fatigue.
+static func _attempt_shield_block(defender, attacker_hit_roll: int) -> bool:
+	if defender == null:
+		return false
+	if not ("stats" in defender) or defender.stats == null:
+		return false
+	var sh: int = int(defender.stats.SH) if "SH" in defender.stats else 0
+	if sh <= 0:
+		return false
+	# Incoming-attack penalty: each block already performed costs SH / 4.
+	var prior_blocks: int = 0
+	if defender.has_method("has_meta") \
+			and defender.has_meta("_shield_blocks_this_turn"):
+		prior_blocks = int(defender.get_meta("_shield_blocks_this_turn", 0))
+	var effective_sh: int = maxi(0, sh - prior_blocks * sh / 4)
+	if effective_sh <= 0:
+		return false
+	# DCSS roll: random2avg(sh * 2, 2) / 3 - 1. We approximate random2avg
+	# with the average of two random2 rolls so the block value clusters
+	# around SH rather than being flat-uniform.
+	var r1: int = randi() % (effective_sh * 2)
+	var r2: int = randi() % (effective_sh * 2)
+	var block_roll: int = (r1 + r2) / 2 / 3 - 1
+	if block_roll <= attacker_hit_roll:
+		return false
+	if defender.has_method("set_meta"):
+		defender.set_meta("_shield_blocks_this_turn", prior_blocks + 1)
+	var def_name: String = "you"
+	# Player-specific log phrasing. Monster-vs-monster blocks quietly.
+	if "is_in_group" in defender and defender.is_in_group("player"):
+		CombatLog.add("You block the attack with your shield.")
+	return true
+
+
 ## Monster → player melee. Monsters don't have skills in M1, so this path
 ## keeps the legacy formula.
 static func melee_attack_from_monster(m, defender) -> int:
@@ -596,6 +634,14 @@ static func melee_attack_from_monster(m, defender) -> int:
 			# DCSS to-hit: `random2(mhit_base+1)` vs EV. Miss if roll < EV.
 			var to_hit_roll: int = randi() % (mhit_base + 1)
 			if to_hit_roll < def_ev:
+				missed_any = true
+				continue
+			# DCSS shield_bonus check (player.cc:shield_bonus + fight.cc).
+			# Shield block rolls `random2(SH * 2) / 3 - 1`; if that beats
+			# the attacker's to-hit roll, the swing is blocked outright.
+			# Each block gets 25% harder per prior block this turn so
+			# tower-shielders can't infinitely parry a multi-attack beast.
+			if _attempt_shield_block(defender, to_hit_roll):
 				missed_any = true
 				continue
 			# Each connecting swing: 1 + random2(base), then AC soaks

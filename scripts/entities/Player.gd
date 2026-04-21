@@ -368,6 +368,12 @@ func _on_player_turn_started() -> void:
 	# Acrobat: assume active until a melee/cast action clears the flag.
 	if has_meta("_amulet_acrobat"):
 		set_meta("_acrobat_active", true)
+	# Reset the per-turn shield-block counter so the next round of
+	# monster swings starts from a fresh SH — DCSS applies fatigue
+	# WITHIN a turn (several attacks from one beast) but not ACROSS
+	# turns.
+	if has_meta("_shield_blocks_this_turn"):
+		remove_meta("_shield_blocks_this_turn")
 	_tick_duration_metas()
 
 
@@ -1362,6 +1368,13 @@ func _recompute_gear_stats() -> void:
 	# with investment (skill 10 ≈ +100% base AC). We track it outside
 	# the slot loop so aux slots (helmet/gloves) keep their flat AC.
 	var armour_skill_lv: int = _skill_level("armour")
+	# DCSS player::shield_class. Shield slot gives a block score SH:
+	#   sh = shield_base_ac * 2 + plus * 2
+	#      + (shields_skill * (shield_base_ac * 2 + 13)) / 10
+	# Buckler/kite/tower base AC is 3/8/13 so tower+skill20 ≈ SH 104.
+	# Reset each recompute; re-set below if a shield is equipped.
+	stats.SH = 0
+	var shields_skill_lv: int = _skill_level("shields")
 	for slot_key in equipped_armor.keys():
 		var slot_dict: Dictionary = equipped_armor[slot_key]
 		ac += int(slot_dict.get("ac", 0))
@@ -1374,6 +1387,13 @@ func _recompute_gear_stats() -> void:
 			var body_base_ac: int = int(slot_dict.get("ac", 0))
 			if body_base_ac > 0 and armour_skill_lv > 0:
 				ac += body_base_ac * armour_skill_lv / 10
+		elif slot_key == "shield":
+			var shield_base: int = int(slot_dict.get("ac", 0))
+			if shield_base > 0:
+				var shield_plus: int = int(slot_dict.get("plus", 0))
+				var sh: int = shield_base * 2 + shield_plus * 2
+				sh += shields_skill_lv * (shield_base * 2 + 13) / 10
+				stats.SH = sh
 		var ego_id: String = String(slot_dict.get("ego", ""))
 		if ego_id != "":
 			var ego: Dictionary = ArmorRegistry.ego_info(ego_id)

@@ -1293,7 +1293,8 @@ func _on_stairs_up_tapped(_pos: Vector2i) -> void:
 func _on_skill_leveled_up_for_stats(p: Node, skill_id: String, _new_level: int) -> void:
 	if p != player or player == null:
 		return
-	if skill_id == "dodging" or skill_id == "stealth" or skill_id == "armour":
+	if skill_id == "dodging" or skill_id == "stealth" or skill_id == "armour" \
+			or skill_id == "shields":
 		if player.has_method("_recompute_defense"):
 			player._recompute_defense()
 	# DCSS calc_hp / calc_mp recomputes live on every query, so a fighting
@@ -2737,7 +2738,7 @@ const _SKILL_DESCS: Dictionary = {
 	"fighting": "Melee DMG × 1 + lv/30, HP += XL × lv / 14",
 	"armour": "Body AC × (1 + lv/10), body-armour EV penalty scaled down",
 	"dodging": "EV += (dodging × 10 × DEX × 8) / (2000 − 100 × size)",
-	"shields": "Shield EV penalty scaled down; SH block TBD",
+	"shields": "SH = base×2 + plus×2 + lv×(base×2+13)/10; EV penalty ↓",
 	"spellcasting": "Max memorised spells += lv/3, fail −3%/lv, MP += lv/2",
 	"conjurations": "Conj power +2/lv",
 	"fire": "Fire power +2/lv",
@@ -4695,6 +4696,8 @@ func _status_build_combat(vb: VBoxContainer) -> void:
 				s.AC - (player.race_res.base_ac if player.race_res else 0)]))
 	h.add_child(_status_stat_card("EV", total_ev,
 			"DEX/2 %+d · gear %+d" % [dex_ev, ev_bonus]))
+	h.add_child(_status_stat_card("SH", s.SH,
+			"shield block score"))
 	h.add_child(_status_stat_card("ATK", total_atk,
 			"wpn %d · STR %+d · gear %+d" % [w_dmg, str_bonus, gear_dmg + player.weapon_bonus_dmg]))
 	vb.add_child(h)
