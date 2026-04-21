@@ -54,7 +54,16 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
   formation tendency) and cover/flanking still minimal — skipped
   because the game has no ranged-attack flow yet, so there's no
   "covered" state to coordinate around.
-- [ ] **Transformation forms** — FormRegistry has 5-6; DCSS has Dragon, Statue, Tree, Hydra, Lich, Bat Swarm, Fungus, Pig, Spider, Flux and form-specific stats/abilities.
+- [x] **Transformation forms** — DONE (3977c398 + pre-existing). Form
+  JSON already had 30 forms (dragon/statue/tree/hydra-ish/bat/bat_swarm/
+  spider/serpent/storm/sphinx/death/...). apply_form previously applied
+  only generic stat/AC/HP deltas; now it also reads per-form
+  unarmed_base (→ CombatSystem melee bonus when weaponless), move_speed
+  (< 10 → _form_move_bonus for fast forms), size (→ _form_size_factor
+  read by PlayerDefense), and melds (slot list stashed for UI). Scaling
+  with a shapeshifting skill is still flat — our SKILL_IDS has no
+  transmutation school, so unarmed_scaling / ac_scaling are no-ops for
+  now (revisit when a Shapeshifting skill lands).
 - [x] **Poison levels** — DONE (d7edc8ea + earlier). Player had 3-level
   stack from session 5; this session added Monster.apply_poison mirroring
   it. Venom brands / naga tail slap / AF_POISON monster flavour / scroll
@@ -76,8 +85,17 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 - [x] **Cleaving** — 2b243722: WeaponRegistry.weapon_cleaves, axes+bardiche. Flank tiles attacked after main swing.
 - [x] **Reach** — 2b243722: WeaponRegistry.weapon_reach, polearms=2. Middle-tile clearance enforced; TouchInput auto-routes 2-tile taps.
 - [x] **Auxiliary attacks** — 2b243722: minotaur/naga/tengu/centaur/draconian/octopode each fire ~1/3 on connecting hits. Damage scaled by XL. Simpler than DCSS full formula.
-- [ ] **Ranged-combat range penalty** — bow/xbow accuracy doesn't fall off with distance. (Our game currently lacks an explicit ranged-attack flow, so skipped until that lands.)
-- [ ] **Projectile path fidelity** — missiles don't divert or skim walls.
+- [x] **Ranged-combat range penalty** — DONE (b497954c). CombatSystem.
+  ranged_attack applies -3 to-hit per tile past 2 (DCSS ranged_penalty).
+  Monster archer path has the same penalty. Player "fire" action (KEY_F)
+  enters targeting mode; cap range 7 tiles. MonsterData gains
+  ranged_damage/ranged_range + MonsterRegistry._RANGED_OVERRIDES table
+  for centaur/yaktaur/deep_elf_archer/kobold_brigand/satyr/faun/
+  merfolk_javelineer/orc_warrior/centaur_warrior/yaktaur_captain.
+- [x] **Projectile path fidelity** — DONE (b497954c). Ranged attacks
+  now walk a bresenham line from attacker to target (Monster side uses
+  _path_has_ally guard; player side routes through CombatSystem).
+  Walls stop the shot; hostile allies on the path abort the cast.
 - [ ] **God conducts** — only Trog's cast-anger wired. Zin mutation/chaos, TSO evil-kill-bonus, Elyvilon neutral-kill-penalty, Cheibriados haste-ban, Yredelemnul holy-kill-bonus, Beogh orc-kill-penalty, Fedhas burn-plant-penalty, Okawaru summon/ally-ban.
 - [ ] **Morgue / character dump** — no death-log file written.
 - [ ] **High score board** — minimal.
