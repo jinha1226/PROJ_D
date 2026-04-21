@@ -681,6 +681,83 @@ func _apply_mutation_delta(id: String, direction: int) -> void:
 			set_meta("_mut_subdued_magic", int(get_meta("_mut_subdued_magic", 0)) + direction)
 		"anti_wizardry":
 			set_meta("_mut_anti_wizardry", int(get_meta("_mut_anti_wizardry", 0)) + direction)
+		# --- Additional mutation effect handlers (session 15 batch) ---
+		"regeneration", "regen":
+			# DCSS MUT_REGENERATION grants +20 HP regen per 3 levels
+			# (additive to the DCSS base rate). We route the bonus
+			# through player_regen_bonus() (read by the per-turn tick).
+			set_meta("_mut_regen", int(get_meta("_mut_regen", 0)) + direction)
+		"inhibited_regeneration":
+			set_meta("_mut_regen", int(get_meta("_mut_regen", 0)) - direction)
+		"fast_metabolism":
+			# No hunger system yet; tracked for future Nemelex / worship.
+			set_meta("_mut_fast_metab", int(get_meta("_mut_fast_metab", 0)) + direction)
+		"slow_metabolism":
+			set_meta("_mut_fast_metab", int(get_meta("_mut_fast_metab", 0)) - direction)
+		"see_invisible":
+			set_meta("_mut_see_invis", int(get_meta("_mut_see_invis", 0)) + direction)
+		"telepathy":
+			set_meta("_mut_telepathy", int(get_meta("_mut_telepathy", 0)) + direction)
+		"stochastic_torment_resistance", "magic_resistance":
+			# DCSS: each level adds +40 WL (one pip). _recompute_gear_stats
+			# reads _mut_wl_bonus when recomputing stats.WL.
+			set_meta("_mut_wl_bonus", int(get_meta("_mut_wl_bonus", 0)) + direction)
+		"torment_resistance":
+			# MUT_TORMENT_RESISTANCE — takes damage instead of being torment-hit.
+			# Same flag pattern.
+			set_meta("_mut_rN_torment", int(get_meta("_mut_rN_torment", 0)) + direction)
+		"acute_vision":
+			# MUT_ACUTE_VISION: +3 FOV radius.
+			set_meta("_mut_fov_bonus", int(get_meta("_mut_fov_bonus", 0)) + 2 * direction)
+		"blurry_vision":
+			# -1 FOV radius per level.
+			set_meta("_mut_fov_bonus", int(get_meta("_mut_fov_bonus", 0)) - direction)
+		"deformed":
+			# -30% of body-armour AC (rough approx of DCSS's handling).
+			# Recompute picks it up next time.
+			set_meta("_mut_deformed", int(get_meta("_mut_deformed", 0)) + direction)
+		"fast":
+			# MUT_FAST — +1 speed_mod (one extra move per 4 turns).
+			set_meta("_mut_fast", int(get_meta("_mut_fast", 0)) + direction)
+		"slow":
+			set_meta("_mut_slow", int(get_meta("_mut_slow", 0)) + direction)
+		"antennae":
+			# MUT_ANTENNAE: see-through-walls radius small boost.
+			set_meta("_mut_antennae", int(get_meta("_mut_antennae", 0)) + direction)
+		"stingers", "horns", "claws", "hooves":
+			# Aux-attack mutations — each level adds to _mut_aux_<kind>.
+			# CombatSystem reads these when doing post-hit aux rolls.
+			set_meta("_mut_aux_" + id, \
+					int(get_meta("_mut_aux_" + id, 0)) + direction)
+		"berserk":
+			# MUT_BERSERK: chance to auto-berserk on taking damage.
+			set_meta("_mut_berserkitis", int(get_meta("_mut_berserkitis", 0)) + direction)
+		"deterioration":
+			# -5 max HP per level.
+			stats.hp_max = max(1, stats.hp_max - 5 * direction)
+			stats.HP = min(stats.HP, stats.hp_max)
+		"evolution":
+			# Each turn tiny chance to gain/lose a mutation. Flag only.
+			set_meta("_mut_evolution", int(get_meta("_mut_evolution", 0)) + direction)
+		"thin_skeletal_structure":
+			# +2 EV, -2 STR per level (summary — DCSS also reduces HP).
+			stats.STR -= 2 * direction
+		"powered_by_death":
+			# +regen near corpses (flag for per-turn tick).
+			set_meta("_mut_pbd", int(get_meta("_mut_pbd", 0)) + direction)
+		"powered_by_pain":
+			# On-damage power boost.
+			set_meta("_mut_pbp", int(get_meta("_mut_pbp", 0)) + direction)
+		"nightstalker":
+			# +2 stealth per level, FOV -1 (night affinity).
+			set_meta("_mut_night_stealth", \
+					int(get_meta("_mut_night_stealth", 0)) + 2 * direction)
+			set_meta("_mut_fov_bonus", \
+					int(get_meta("_mut_fov_bonus", 0)) - direction)
+		"herbivore":
+			set_meta("_mut_herbivore", int(get_meta("_mut_herbivore", 0)) + direction)
+		"carnivore":
+			set_meta("_mut_carnivore", int(get_meta("_mut_carnivore", 0)) + direction)
 		_:
 			pass  # Non-modelled mutation — recorded but has no effect.
 	stats_changed.emit()
@@ -934,10 +1011,13 @@ func _apply_elem_resist(amount: int, element: String) -> int:
 
 
 ## FOV radius to use when computing line-of-sight. Blind = 2 tiles.
+## Acute vision mutation extends; blurry / nightstalker shrink.
 func get_fov_radius() -> int:
 	if has_meta("_blind_turns"):
 		return 2
-	return FieldOfView.LOS_DEFAULT_RANGE
+	var r: int = FieldOfView.LOS_DEFAULT_RANGE
+	r += int(get_meta("_mut_fov_bonus", 0))
+	return maxi(2, r)
 
 
 ## DCSS Frozen: brief full-action block after heavy cold damage.
@@ -1812,6 +1892,21 @@ func try_move(delta: Vector2i) -> bool:
 	# rampage.
 	if has_meta("_ego_rampage") and _move_is_toward_hostile(delta):
 		speed_mod = maxi(speed_mod, 1)
+	# MUT_FAST / MUT_SLOW: each level shifts one tick of speed.
+	var mut_fast: int = int(get_meta("_mut_fast", 0))
+	var mut_slow: int = int(get_meta("_mut_slow", 0))
+	if mut_fast > 0:
+		speed_mod = maxi(speed_mod, mut_fast)
+	elif mut_slow > 0:
+		# Slow mutation: occasional skip via the _slow_skip gate already
+		# used by the slow/petrifying paths.
+		if has_meta("_slow_skip"):
+			remove_meta("_slow_skip")
+			CombatLog.add("Your slow mutation drags at you...")
+			TurnManager.end_player_turn()
+			return false
+		else:
+			set_meta("_slow_skip", true)
 	if speed_mod > 0:
 		_free_move_counter += 1
 		if _free_move_counter < speed_mod:
@@ -3086,6 +3181,15 @@ func take_damage(amount: int, element: String = "") -> void:
 	# resist level for that element before any generic mitigation.
 	if element != "":
 		amount = _apply_elem_resist(amount, element)
+	# MUT_BERSERK (berserkitis). DCSS: on taking damage, 1/8 chance per
+	# mutation level to auto-berserk (rage sets in unbidden). Only fires
+	# when not already raging / exhausted, and skips if the hit is fatal.
+	var berserkitis: int = int(get_meta("_mut_berserkitis", 0))
+	if berserkitis > 0 and not has_meta("_berserk_turns") \
+			and not has_meta("_exhausted_turns") and is_alive:
+		if randi() % 8 < berserkitis and stats != null and stats.HP > amount:
+			CombatLog.add("A rage takes you!")
+			_apply_consumable_effect({"effect": "berserk", "dur_base": 11, "dur_rand": 8})
 	# DCSS SPARM_HARM ego — scarf/robe of harm increases dmg both ways
 	# by 30%. Here we handle the "dmg taken" half; the "dmg dealt" half
 	# is applied in CombatSystem.melee_attack via the same meta.
