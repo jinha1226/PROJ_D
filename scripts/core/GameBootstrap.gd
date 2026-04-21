@@ -549,7 +549,7 @@ func _on_quickslot_pressed(index: int) -> void:
 func _open_quickslot_picker(slot_index: int) -> void:
 	if player == null:
 		return
-	var dlg := GameDialog.create("Assign Quickslot %d" % (slot_index + 1), Vector2i(800, 1400))
+	var dlg := GameDialog.create("Assign Quickslot %d" % (slot_index + 1), Vector2i(960, 1400))
 	add_child(dlg)
 	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 6)
@@ -677,7 +677,7 @@ func _on_inspect_requested(pos: Vector2i) -> void:
 		lines.append("Turn: %d" % TurnManager.turn_number)
 	if lines.is_empty():
 		return
-	var dlg := GameDialog.create("Inspect", Vector2i(700, 600))
+	var dlg := GameDialog.create("Inspect", Vector2i(960, 600))
 	add_child(dlg)
 	var vb: VBoxContainer = dlg.body()
 	var lbl := Label.new()
@@ -757,7 +757,7 @@ func _on_auto_attack_pressed() -> void:
 
 
 func _on_menu_pressed() -> void:
-	var dlg := GameDialog.create("Menu", Vector2i(720, 700))
+	var dlg := GameDialog.create("Menu", Vector2i(960, 700))
 	add_child(dlg)
 	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 16)
@@ -1218,7 +1218,7 @@ func _on_monster_died(monster: Monster) -> void:
 ## gods, save/restart. Dialog lives under GameDialog so it inherits
 ## the same dim/panel/close chrome as the rest of the UI.
 func _show_help_dialog() -> void:
-	var dlg := GameDialog.create("Help", Vector2i(960, 1700))
+	var dlg := GameDialog.create("Help", Vector2i(960, 1800))
 	add_child(dlg)
 	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 14)
@@ -1824,7 +1824,7 @@ func _on_shop_tapped(pos: Vector2i) -> void:
 func _open_shop_dialog(pos: Vector2i, shop: Dictionary) -> void:
 	var kind: String = String(shop.get("kind", "general"))
 	var title: String = "Shop — %s (you have %d gold)" % [kind.capitalize(), player.gold]
-	var dlg := GameDialog.create(title, Vector2i(800, 900))
+	var dlg := GameDialog.create(title, Vector2i(960, 1200))
 	add_child(dlg)
 	var vb: VBoxContainer = dlg.body()
 	var inventory: Array = shop.get("inventory", [])
@@ -1918,7 +1918,7 @@ func _on_altar_tapped(pos: Vector2i) -> void:
 ## pair. First-time players can read the actual contract before
 ## committing to a permanent pledge.
 func _show_altar_guide(god_id: String, info: Dictionary) -> void:
-	var dlg := GameDialog.create(String(info.get("title", god_id)), Vector2i(900, 1300))
+	var dlg := GameDialog.create(String(info.get("title", god_id)), Vector2i(960, 1400))
 	add_child(dlg)
 	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 20)
@@ -1966,7 +1966,7 @@ func _show_invocations_menu() -> void:
 	var god: Dictionary = GodRegistry.get_info(player.current_god)
 	var title: String = "%s — Piety %d/%d" % [String(god.get("title", "")), player.piety,
 			int(god.get("piety_cap", 200))]
-	var dlg := GameDialog.create(title, Vector2i(720, 900))
+	var dlg := GameDialog.create(title, Vector2i(960, 1100))
 	add_child(dlg)
 	var vb: VBoxContainer = dlg.body()
 	for inv_id in god.get("invocations", []):
@@ -2845,7 +2845,7 @@ func _on_identify_one_requested() -> void:
 		if ConsumableRegistry.has(iid) and not GameManager.is_identified(iid):
 			seen_ids[iid] = true
 			unidentified.append(it)
-	var dlg := GameDialog.create("Identify Which?", Vector2i(800, 1000))
+	var dlg := GameDialog.create("Identify Which?", Vector2i(960, 1200))
 	add_child(dlg)
 	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 8)
@@ -2884,7 +2884,7 @@ func _on_enchant_one_requested(kind: String) -> void:
 		return
 	_close_all_dialogs()
 	var title: String = "Enchant Which Weapon?" if kind == "weapon" else "Enchant Which Armour?"
-	var dlg := GameDialog.create(title, Vector2i(900, 1200))
+	var dlg := GameDialog.create(title, Vector2i(960, 1200))
 	add_child(dlg)
 	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 8)
@@ -3255,13 +3255,17 @@ func _open_skills_dialog(category: String = "active") -> void:
 	if player == null:
 		return
 
-	var dlg := GameDialog.create("Skills", Vector2i(960, 1500))
+	var dlg := GameDialog.create("Skills", Vector2i(960, 1800))
 	add_child(dlg)
 	_skills_dlg = dlg
 	dlg.set_on_close(func():
 		if _skills_dlg == dlg: _skills_dlg = null)
 
 	var vb: VBoxContainer = dlg.body()
+
+	var hint := UICards.dim_hint("Tap name to toggle.  Long-press for details.")
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vb.add_child(hint)
 
 	var tabs_hbox := HBoxContainer.new()
 	tabs_hbox.add_theme_constant_override("separation", 4)
@@ -3397,17 +3401,28 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 	row.custom_minimum_size = Vector2(0, 88)
 	row.add_theme_constant_override("separation", 8)
 
-	var chk := CheckBox.new()
-	chk.button_pressed = bool(entry.get("training", false))
-	chk.custom_minimum_size = Vector2(64, 64)
-	chk.toggled.connect(_on_skill_training_toggled.bind(skill_id))
-	row.add_child(chk)
-
-	var name_lab := Label.new()
-	name_lab.text = String(SkillRow.SKILL_NAMES.get(skill_id, skill_id))
-	name_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_lab.add_theme_font_size_override("font_size", 48)
-	row.add_child(name_lab)
+	# Skill-name button replaces the old checkbox + label pair:
+	#   tap  → toggle training on/off
+	#   long-press → show the description popup
+	# Training status is indicated by colour (green = training, grey =
+	# idle) and a leading ▶ bullet.
+	var is_training_now: bool = bool(entry.get("training", false))
+	var name_btn := Button.new()
+	name_btn.flat = true
+	name_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	name_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_btn.text = ("▶ " if is_training_now else "  ") \
+			+ String(SkillRow.SKILL_NAMES.get(skill_id, skill_id))
+	name_btn.add_theme_font_size_override("font_size", 48)
+	name_btn.add_theme_color_override("font_color",
+			Color(0.55, 1.00, 0.55) if is_training_now \
+			else Color(0.80, 0.80, 0.85))
+	# Per-button state for long-press detection. Stored via set_meta so
+	# the lambdas below share it without capturing a mutable closure var.
+	name_btn.set_meta("_press_start_ms", -1)
+	name_btn.set_meta("_long_press_fired", false)
+	name_btn.gui_input.connect(_on_skill_button_input.bind(name_btn, skill_id))
+	row.add_child(name_btn)
 
 	var level: int = int(entry.get("level", 0))
 	var xp: float = float(entry.get("xp", 0.0))
@@ -3436,26 +3451,109 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 	row.add_child(apt_lab)
 	outer.add_child(row)
 
-	var info_line := Label.new()
-	var desc_text: String = String(_SKILL_DESCS.get(skill_id, ""))
+	# Terse under-row info — just XP progress + split ratio. The full
+	# description now lives behind the long-press popup to keep the
+	# Skills list scannable.
 	var is_training: bool = bool(entry.get("training", false))
-	var parts: Array = [desc_text]
-	# Show XP as soon as the skill is being trained (or has any level) so
-	# the player sees progress from the very first kill instead of having
-	# to wait for the first level-up.
+	var parts: Array = []
 	if (is_training or level > 0) and level < SkillSystem.MAX_LEVEL:
 		parts.append("XP %d/%d" % [int(xp), int(need)])
 	if not skill_system.auto_training and is_training:
 		var trained_count: int = _count_trained_skills()
 		if trained_count > 0:
 			parts.append("%d%% XP" % int(100.0 / trained_count))
-	info_line.text = "  |  ".join(PackedStringArray(parts))
-	info_line.add_theme_font_size_override("font_size", 42)
-	info_line.modulate = Color(0.6, 0.75, 0.6)
-	outer.add_child(info_line)
+	if not parts.is_empty():
+		var info_line := Label.new()
+		info_line.text = "  |  ".join(PackedStringArray(parts))
+		info_line.add_theme_font_size_override("font_size", 40)
+		info_line.modulate = Color(0.65, 0.80, 0.65)
+		outer.add_child(info_line)
 
 	outer.add_child(HSeparator.new())
 	return outer
+
+
+## Long-press-aware input handler for skill rows. A tap toggles the
+## skill's training flag; holding past 400ms opens the description
+## popup instead. Implemented via press timestamp recorded on
+## button-down, checked on button-up + a periodic poll during the
+## gui_input stream so the popup fires while the finger is still on
+## the button.
+const _SKILL_LONG_PRESS_MS: int = 400
+
+func _on_skill_button_input(event: InputEvent, btn: Button, skill_id: String) -> void:
+	var is_down := false
+	var is_up := false
+	if event is InputEventMouseButton:
+		if event.button_index != MOUSE_BUTTON_LEFT:
+			return
+		is_down = event.pressed
+		is_up = not event.pressed
+	elif event is InputEventScreenTouch:
+		is_down = event.pressed
+		is_up = not event.pressed
+	else:
+		return
+	if is_down:
+		btn.set_meta("_press_start_ms", Time.get_ticks_msec())
+		btn.set_meta("_long_press_fired", false)
+		# Defer a long-press check — if the user is still holding after
+		# _SKILL_LONG_PRESS_MS, trigger the description popup.
+		var press_id: int = Time.get_ticks_msec()
+		btn.set_meta("_press_id", press_id)
+		get_tree().create_timer(_SKILL_LONG_PRESS_MS / 1000.0).timeout.connect(
+				func():
+					if is_instance_valid(btn) \
+							and int(btn.get_meta("_press_id", -1)) == press_id \
+							and int(btn.get_meta("_press_start_ms", -1)) > 0:
+						btn.set_meta("_long_press_fired", true)
+						_show_skill_desc_popup(skill_id))
+	elif is_up:
+		var start_ms: int = int(btn.get_meta("_press_start_ms", -1))
+		var long_fired: bool = bool(btn.get_meta("_long_press_fired", false))
+		btn.set_meta("_press_start_ms", -1)
+		if long_fired:
+			return  # popup already shown; don't toggle training
+		if start_ms > 0:
+			var held_ms: int = Time.get_ticks_msec() - start_ms
+			if held_ms < _SKILL_LONG_PRESS_MS:
+				# Short tap — flip training state. Reuse the existing
+				# handler so the "ACTIVE tab rebuild" path fires.
+				var currently: bool = false
+				if "skill_state" in player:
+					var st: Dictionary = player.skill_state.get(skill_id, {})
+					currently = bool(st.get("training", false))
+				_on_skill_training_toggled(not currently, skill_id)
+
+
+## Description popup for a single skill. Opens on long-press of the
+## name button in the Skills dialog. Lightweight — title + desc text.
+func _show_skill_desc_popup(skill_id: String) -> void:
+	var name_s: String = String(SkillRow.SKILL_NAMES.get(skill_id, skill_id))
+	var dlg := GameDialog.create(name_s, Vector2i(960, 800))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
+	vb.add_theme_constant_override("separation", 12)
+	var apt_val: int = _player_aptitude(skill_id)
+	var apt_str: String = "+%d" % apt_val if apt_val > 0 else str(apt_val)
+	vb.add_child(UICards.section_header("%s  (aptitude %s)" % [name_s, apt_str]))
+	var desc := Label.new()
+	desc.text = String(_SKILL_DESCS.get(skill_id, "No description available."))
+	desc.add_theme_font_size_override("font_size", 38)
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	desc.modulate = Color(0.88, 0.88, 0.95)
+	vb.add_child(desc)
+	# Show current level + XP progress underneath.
+	if "skill_state" in player:
+		var st: Dictionary = player.skill_state.get(skill_id, {})
+		var lv: int = int(st.get("level", 0))
+		var xp: float = float(st.get("xp", 0.0))
+		var need: float = SkillSystem.xp_for_level(lv + 1)
+		vb.add_child(UICards.section_header("Progress"))
+		var prog := Label.new()
+		prog.text = "Level %d  ·  %d / %d XP" % [lv, int(xp), int(need)]
+		prog.add_theme_font_size_override("font_size", 40)
+		vb.add_child(prog)
 
 
 ## Current aptitude integer for `skill_id` pulled from the player's race
@@ -3496,7 +3594,7 @@ func _count_trained_skills() -> int:
 func _open_magic_dialog() -> void:
 	if player == null:
 		return
-	var dlg := GameDialog.create("Magic", Vector2i(960, 1500))
+	var dlg := GameDialog.create("Magic", Vector2i(960, 1800))
 	add_child(dlg)
 	_magic_dlg = dlg
 	dlg.set_on_close(func():
@@ -3627,7 +3725,7 @@ func _show_spell_info(spell_id: String) -> void:
 	var info: Dictionary = SpellRegistry.get_spell(spell_id)
 	if info.is_empty():
 		return
-	var dlg := GameDialog.create(String(info.get("name", spell_id)), Vector2i(920, 900))
+	var dlg := GameDialog.create(String(info.get("name", spell_id)), Vector2i(960, 1100))
 	add_child(dlg)
 	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 12)
@@ -4257,7 +4355,7 @@ func _on_bag_pressed() -> void:
 	if player == null:
 		return
 
-	var dlg := GameDialog.create("Bag", Vector2i(960, 1700))
+	var dlg := GameDialog.create("Bag", Vector2i(960, 1800))
 	add_child(dlg)
 	_bag_dlg = dlg
 	dlg.set_on_close(func():
@@ -4926,7 +5024,7 @@ func _build_bag_item_thumbnail(iid: String, kind: String) -> Control:
 
 func _on_bag_info(it: Dictionary) -> void:
 	# Do NOT close the bag — info opens on top and bag stays alive.
-	var dlg := GameDialog.create(String(it.get("name", "Item")), Vector2i(920, 900))
+	var dlg := GameDialog.create(String(it.get("name", "Item")), Vector2i(960, 1100))
 	add_child(dlg)
 	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 12)
@@ -5806,7 +5904,7 @@ func _on_minimap_pressed() -> void:
 
 	var mm_w: int = DungeonGenerator.MAP_WIDTH * _MM_SCALE
 	var mm_h: int = DungeonGenerator.MAP_HEIGHT * _MM_SCALE
-	var dlg := GameDialog.create("Map", Vector2i(max(mm_w + 80, 960), mm_h + 520))
+	var dlg := GameDialog.create("Map", Vector2i(960, mm_h + 520))
 	add_child(dlg)
 	_map_dlg = dlg
 	dlg.set_on_close(func():
