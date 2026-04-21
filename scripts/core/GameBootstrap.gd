@@ -2734,11 +2734,11 @@ const _SKILL_DESCS: Dictionary = {
 	"sling": "Sling DMG +5%/lv",
 	"throwing": "Throw DMG +5%/lv",
 	"unarmed_combat": "Fist DMG +1 per 3 lv + faster swings",
-	"fighting": "Melee DMG +2/lv, HP scales with XL × fighting",
-	"armour": "AC +1 per 4 lv",
-	"dodging": "EV +1 per 3 lv",
-	"shields": "Block 5%/lv",
-	"spellcasting": "Fail rate -3%/lv, MP +1/lv",
+	"fighting": "Melee DMG × 1 + lv/30, HP += XL × lv / 14",
+	"armour": "Body AC × (1 + lv/10), body-armour EV penalty scaled down",
+	"dodging": "EV += (dodging × 10 × DEX × 8) / (2000 − 100 × size)",
+	"shields": "Shield EV penalty scaled down; SH block TBD",
+	"spellcasting": "Max memorised spells += lv/3, fail −3%/lv, MP += lv/2",
 	"conjurations": "Conj power +2/lv",
 	"fire": "Fire power +2/lv",
 	"cold": "Ice power +2/lv",
@@ -2867,8 +2867,10 @@ func _open_magic_dialog() -> void:
 		if _magic_dlg == dlg: _magic_dlg = null)
 	var vb: VBoxContainer = dlg.body()
 
-	# MP readout sits as the first body row so it's visible over the
-	# scrollable spell list.
+	# MP + memory readouts sit as the first body rows so they're visible
+	# over the scrollable spell list. DCSS shows spell-levels used/cap
+	# right under MP — essential for knowing how many more spells you
+	# can learn before Spellcasting ticks up.
 	var cur_mp: int = player.stats.MP if player.stats != null else 0
 	var max_mp: int = player.stats.mp_max if player.stats != null else 0
 	var mp_lab := Label.new()
@@ -2876,6 +2878,15 @@ func _open_magic_dialog() -> void:
 	mp_lab.add_theme_font_size_override("font_size", 48)
 	mp_lab.modulate = Color(0.45, 0.7, 1.0)
 	vb.add_child(mp_lab)
+
+	var used_lv: int = player.used_spell_levels() if player.has_method("used_spell_levels") else 0
+	var cap_lv: int = player.max_spell_levels() if player.has_method("max_spell_levels") else 0
+	var mem_lab := Label.new()
+	mem_lab.text = "Memory  %d / %d spell levels" % [used_lv, cap_lv]
+	mem_lab.add_theme_font_size_override("font_size", 40)
+	mem_lab.modulate = Color(0.85, 0.80, 0.35) if used_lv < cap_lv \
+			else Color(0.95, 0.45, 0.35)
+	vb.add_child(mem_lab)
 
 	vb.add_child(UICards.section_header("Known Spells"))
 

@@ -44,6 +44,27 @@ const _HP_PER_LEVEL: int = 5  # fallback if race_res missing
 const _MP_PER_LEVEL: int = 3
 
 
+## DCSS player_spell_levels(xl, spellcasting). Max total difficulty
+## of memorised spells. Per player.cc: sl = min(xl, 27)/2 + spellcasting/3.
+## Each spell's `difficulty` field (SpellRegistry) eats into this pool.
+func max_spell_levels() -> int:
+	var xl: int = level
+	var sp: int = _skill_level("spellcasting")
+	return min(xl, 27) / 2 + sp / 3
+
+
+func used_spell_levels() -> int:
+	var total: int = 0
+	for sid in learned_spells:
+		total += _spell_difficulty(String(sid))
+	return total
+
+
+func _spell_difficulty(spell_id: String) -> int:
+	var info: Dictionary = SpellRegistry.get_spell(spell_id)
+	return int(info.get("difficulty", 1)) if not info.is_empty() else 1
+
+
 ## DCSS get_real_hp (player.cc:4160) — base HP from XL + fighting skill, then
 ## scaled by species hp_mod. Excludes transient bonuses (berserk, artifacts,
 ## mutations) which we don't model yet.
@@ -1336,6 +1357,11 @@ func _recompute_gear_stats() -> void:
 	# egos. Each equipped armour may carry an "ego" string resolved
 	# against ArmorRegistry.EGOS; its stat_bonus / resists / flag
 	# contributions fold into the player here.
+	# DCSS player.cc _armour_plus_to_ac: body armour's base AC gets
+	# multiplied by armour_skill / 10, so heavy plate scales massively
+	# with investment (skill 10 ≈ +100% base AC). We track it outside
+	# the slot loop so aux slots (helmet/gloves) keep their flat AC.
+	var armour_skill_lv: int = _skill_level("armour")
 	for slot_key in equipped_armor.keys():
 		var slot_dict: Dictionary = equipped_armor[slot_key]
 		ac += int(slot_dict.get("ac", 0))
@@ -1343,6 +1369,11 @@ func _recompute_gear_stats() -> void:
 		ev += int(slot_dict.get("ev_bonus", 0))
 		if slot_key == "chest":
 			body_evp_raw = int(slot_dict.get("ev_penalty", 0))
+			# Armour-skill AC bonus applies ONLY to body armour base AC
+			# in DCSS (helmet/gloves/boots don't benefit from Armour).
+			var body_base_ac: int = int(slot_dict.get("ac", 0))
+			if body_base_ac > 0 and armour_skill_lv > 0:
+				ac += body_base_ac * armour_skill_lv / 10
 		var ego_id: String = String(slot_dict.get("ego", ""))
 		if ego_id != "":
 			var ego: Dictionary = ArmorRegistry.ego_info(ego_id)
@@ -2210,15 +2241,31 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 			return true
 		"learn_spells":
 			var newly: Array[String] = []
+			var rejected: Array[String] = []
+			var cap: int = max_spell_levels()
+			var used: int = used_spell_levels()
 			for sp in info.get("spells", []):
 				var spell_id: String = String(sp)
-				if spell_id != "" and not learned_spells.has(spell_id):
-					learned_spells.append(spell_id)
-					newly.append(spell_id)
-			if newly.is_empty():
-				CombatLog.add("You already know these spells.")
-			else:
+				if spell_id == "" or learned_spells.has(spell_id):
+					continue
+				# DCSS memorisation cap. Each spell costs its difficulty in
+				# spell-levels; refusing past the budget mirrors the
+				# "your head is too full" prompt in DCSS. Player has to
+				# grind Spellcasting or level up to make room.
+				var cost: int = _spell_difficulty(spell_id)
+				if used + cost > cap:
+					rejected.append(spell_id)
+					continue
+				learned_spells.append(spell_id)
+				used += cost
+				newly.append(spell_id)
+			if not newly.is_empty():
 				CombatLog.add("Learned: %s" % ", ".join(newly))
+			if not rejected.is_empty():
+				CombatLog.add("Your memory is full; couldn't learn: %s" \
+						% ", ".join(rejected))
+			if newly.is_empty() and rejected.is_empty():
+				CombatLog.add("You already know these spells.")
 			spells_learned.emit()
 			return true
 		"curing":
