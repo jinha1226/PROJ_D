@@ -123,6 +123,29 @@ static func weapon_skill_for(id: String) -> String:
 	return String(_lookup(id).get("skill", ""))
 
 
+## DCSS item-prop.cc:weapon_reach. Polearms reach 2 tiles; every
+## other weapon has reach 1 (adjacent). We don't model UNRAND_RIFT
+## / UNRAND_LOCHABER so those special cases aren't wired yet.
+static func weapon_reach(id: String) -> int:
+	if weapon_skill_for(id) == "polearm":
+		return 2
+	return 1
+
+
+## DCSS fight.cc::cleave_targets. Axes and the great mace / double
+## sword cleave into tiles adjacent to the primary target when the
+## attacker wields them. Returns true for axe-like weapons.
+static func weapon_cleaves(id: String) -> bool:
+	# Axe skill family + the "executioner's axe" / "bardiche" cleave
+	# behaviour. Bardiche is technically a polearm with reach but
+	# DCSS also grants it cleave in melee; we follow that.
+	if weapon_skill_for(id) == "axe":
+		return true
+	if id == "bardiche":
+		return true
+	return false
+
+
 static func weapon_delay_for(id: String) -> float:
 	var d = _lookup(id).get("delay", 1.0)
 	return float(d)

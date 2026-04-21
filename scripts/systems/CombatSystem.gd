@@ -168,7 +168,49 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 		trait_special = attacker.trait_res.special
 	elif "race_res" in attacker and attacker.race_res != null:
 		trait_special = attacker.race_res.racial_trait
-	if trait_special == "fierce" or trait_special == "minotaur_headbutt":
+	# DCSS melee-attack.cc:handle_phase_aux — after the main hit lands,
+	# racial auxiliary attacks fire at ~1/3 each. Each aux rolls its
+	# own damage and applies before the combined total is dealt; stays
+	# on the main target so the UI reads as one hit.
+	var race_trait_aux: String = ""
+	if "race_res" in attacker and attacker.race_res != null:
+		race_trait_aux = String(attacker.race_res.racial_trait)
+	var xl: int = 1
+	if attacker.has_method("get") and attacker.get("level") != null:
+		xl = int(attacker.level)
+	match race_trait_aux:
+		"minotaur_headbutt":
+			# DCSS: base 5 + random2(XL) (weaker than DCSS real formula
+			# but reads correctly).
+			if randf() < 0.35:
+				var hb: int = 5 + (randi() % maxi(1, xl))
+				dmg += hb
+				CombatLog.add("You headbutt!")
+		"naga_tail_slap":
+			if randf() < 0.33:
+				var ts: int = 3 + (randi() % maxi(1, xl))
+				dmg += ts
+				if defender.has_method("set_meta"):
+					defender.set_meta("_poison_turns", 3)
+					defender.set_meta("_poison_dmg", 1)
+				CombatLog.add("Your tail slap envenoms!")
+		"tengu_kick":
+			if randf() < 0.33:
+				dmg += 4 + (randi() % maxi(1, xl / 2 + 1))
+				CombatLog.add("You kick!")
+		"centaur_kick":
+			if randf() < 0.33:
+				dmg += 6 + (randi() % maxi(1, xl))
+				CombatLog.add("You kick!")
+		"draconian_tail":
+			if randf() < 0.25:
+				dmg += 3 + (randi() % maxi(1, xl / 2 + 1))
+				CombatLog.add("Your tail strikes!")
+		"octopode_tentacle":
+			if randf() < 0.33:
+				dmg += 2 + (randi() % 4)
+				CombatLog.add("Your tentacles lash!")
+	if trait_special == "fierce":
 		if randf() < 0.25:
 			dmg += randi_range(2, 5)
 	if trait_special == "war_cry" and "stats" in attacker and attacker.stats != null:

@@ -1253,6 +1253,16 @@ func try_move(delta: Vector2i) -> bool:
 		_walk_idle_timer = get_tree().create_timer(0.2)
 		_walk_idle_timer.timeout.connect(_return_to_idle)
 	moved.emit(grid_pos)
+	# DCSS shout.cc idea: heavy body armour broadcasts footsteps. We
+	# skip the cast-noise path and emit a small direct pulse whose
+	# loudness is proportional to unadjusted body armour penalty
+	# (plate = 5-ish, robe = 0). Stealth skill trims it as usual.
+	var evp_raw: int = 0
+	if equipped_armor.has("chest"):
+		evp_raw = absi(int(equipped_armor["chest"].get("ev_penalty", 0))) / 10
+	if evp_raw > 0:
+		MonsterAI.broadcast_noise(get_tree(), grid_pos, evp_raw + 2,
+				_skill_level("stealth"))
 	var should_end_turn: bool = true
 	var speed_mod: int = 0
 	if trait_res != null and trait_res.special == "swift":
@@ -2286,11 +2296,26 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 	var monster: Node = _monster_at(target_pos)
 	if monster == null:
 		return null
-	# Chebyshev adjacency check.
+	# DCSS reach check (item-prop.cc:2323). Polearms hit at distance 2;
+	# everything else is plain Chebyshev adjacent. The 2-tile reach
+	# also needs a clear middle cell (no wall, no blocking monster)
+	# to emulate the shaft's line-of-fire.
+	var reach: int = WeaponRegistry.weapon_reach(equipped_weapon_id)
 	var dx: int = abs(target_pos.x - grid_pos.x)
 	var dy: int = abs(target_pos.y - grid_pos.y)
-	if max(dx, dy) > 1:
+	var ccdist: int = maxi(dx, dy)
+	if ccdist > reach:
 		return null
+	if ccdist == 2:
+		# Middle tile must be walkable-ish (not a wall, not another
+		# monster). Diagonal-2 reaches use the midpoint of the line.
+		var mid: Vector2i = grid_pos + Vector2i(
+				sign(target_pos.x - grid_pos.x),
+				sign(target_pos.y - grid_pos.y))
+		if generator != null and not generator.is_walkable(mid):
+			return null
+		if _monster_at(mid) != null:
+			return null
 	var delta := Vector2i(sign(target_pos.x - grid_pos.x), sign(target_pos.y - grid_pos.y))
 	if _sprite:
 		_sprite.face_toward(delta)
@@ -2328,6 +2353,30 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 	last_action_ticks = delay_10
 	CombatSystem.melee_attack(self, monster, skill_sys)
 	attacked.emit(monster)
+	# DCSS fight.cc cleave_targets — axes hit the two tiles flanking
+	# the primary target (perpendicular to the swing direction). Each
+	# cleave swing rolls independently so skill/RNG still matters.
+	if WeaponRegistry.weapon_cleaves(equipped_weapon_id):
+		var facing := Vector2i(
+				sign(target_pos.x - grid_pos.x),
+				sign(target_pos.y - grid_pos.y))
+		var flank_a: Vector2i
+		var flank_b: Vector2i
+		if facing.x == 0:
+			flank_a = target_pos + Vector2i(1, 0)
+			flank_b = target_pos + Vector2i(-1, 0)
+		elif facing.y == 0:
+			flank_a = target_pos + Vector2i(0, 1)
+			flank_b = target_pos + Vector2i(0, -1)
+		else:
+			# Diagonal swing — the flanks are the two orthogonals sharing
+			# a side with both the attacker and target tiles.
+			flank_a = Vector2i(grid_pos.x + facing.x, grid_pos.y)
+			flank_b = Vector2i(grid_pos.x, grid_pos.y + facing.y)
+		for flank in [flank_a, flank_b]:
+			var m2: Node = _monster_at(flank)
+			if m2 != null and "is_alive" in m2 and m2.is_alive:
+				CombatSystem.melee_attack(self, m2, skill_sys)
 	# Combat is loud — DCSS broadcasts noise roughly proportional to the
 	# attacker's weapon/size. We key off stealth skill so high-stealth
 	# rogues can pick off isolated targets without waking the whole room.

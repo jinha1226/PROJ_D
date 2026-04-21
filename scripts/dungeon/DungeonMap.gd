@@ -14,6 +14,15 @@ var explored: PackedByteArray = PackedByteArray()
 # with line-of-sight through walls blocked). Recomputed on update_fov().
 var _visible_tiles: Dictionary = {}
 var danger_tiles: Array[Vector2i] = []
+# AoE preview overlay — tiles an area spell would damage if cast.
+# Painted in transparent orange so the player can see the explosion
+# radius before committing a tap. Populated by GameBootstrap's
+# targeting-hint flow when an area spell enters targeting mode.
+var aoe_preview_tiles: Array[Vector2i] = []
+# Beam preview — cell list of the ray from player toward each visible
+# hostile for a targeted zap. Painted as a cyan trail so wall-hit
+# cases are obvious before casting.
+var beam_preview_tiles: Array[Vector2i] = []
 
 
 func render(gen: DungeonGenerator) -> void:
@@ -142,8 +151,25 @@ func _draw() -> void:
 		_draw_dcss()
 	else:
 		_draw_lpc()
-	# Danger tile overlay — red pulsing squares for boss telegraphed attacks.
-	var danger_color: Color = Color(1.0, 0.15, 0.1, 0.35)
+	# Beam preview — cyan trail along the ray toward each visible enemy.
+	# Drawn first so AoE / danger overlays layer on top.
+	var beam_color: Color = Color(0.25, 0.75, 0.95, 0.30)
+	for tile in beam_preview_tiles:
+		if not is_explored(tile):
+			continue
+		var rect_b := Rect2(tile.x * TILE_SIZE, tile.y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+		draw_rect(rect_b, beam_color, true)
+	# AoE preview — translucent orange for blast radius. Drawn under
+	# the enemy (danger) markers so both are visible when they overlap.
+	var aoe_color: Color = Color(1.0, 0.60, 0.20, 0.26)
+	for tile in aoe_preview_tiles:
+		if not is_explored(tile):
+			continue
+		var rect_a := Rect2(tile.x * TILE_SIZE, tile.y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+		draw_rect(rect_a, aoe_color, true)
+	# Danger tile overlay — red pulsing squares for boss telegraphed attacks
+	# + enemy markers during targeting.
+	var danger_color: Color = Color(1.0, 0.15, 0.1, 0.45)
 	for tile in danger_tiles:
 		if not is_explored(tile):
 			continue

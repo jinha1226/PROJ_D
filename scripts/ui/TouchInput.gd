@@ -214,6 +214,14 @@ func _on_tap(grid: Vector2i) -> void:
 		# Adjacent: move (or attack if monster there — handled in try_move).
 		player.try_move(delta)
 		return
+	# Reach-weapon support: tapping a monster 2 tiles away with a polearm
+	# triggers a reach attack instead of starting pathfinding. This lands
+	# the reach hit without the spearman having to sidle up.
+	if cheb == 2 and player.has_method("try_attack_at"):
+		var weapon_reach: int = WeaponRegistry.weapon_reach(player.equipped_weapon_id) \
+				if "equipped_weapon_id" in player else 1
+		if weapon_reach >= 2 and player.try_attack_at(grid) != null:
+			return
 	# Distant tap: attempt A* auto-move.
 	if generator.get_tile(grid) == DungeonGenerator.TileType.STAIRS_DOWN and grid == player.grid_pos:
 		stairs_tapped.emit(grid)

@@ -3012,6 +3012,8 @@ func _on_target_selected(pos: Vector2i) -> void:
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	if dmap != null:
 		dmap.danger_tiles.clear()
+		dmap.aoe_preview_tiles.clear()
+		dmap.beam_preview_tiles.clear()
 		dmap.queue_redraw()
 	if _targeting_spell == "":
 		return
@@ -3049,7 +3051,12 @@ func _show_targeting_hint() -> void:
 		return
 	var info: Dictionary = SpellRegistry.get_spell(_targeting_spell)
 	var spell_range: int = int(info.get("range", 6))
+	var targeting_type: String = String(info.get("targeting", "single"))
+	var aoe_radius: int = int(info.get("radius", 0))
 	var targets: Array[Vector2i] = []
+	var aoe_preview: Array[Vector2i] = []
+	var beam_preview: Array[Vector2i] = []
+	var seen_enemies: Array = []
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
 			continue
@@ -3057,7 +3064,43 @@ func _show_targeting_hint() -> void:
 			continue
 		if player.grid_pos.distance_to(m.grid_pos) <= float(spell_range):
 			targets.append(m.grid_pos)
+			seen_enemies.append(m)
 	dmap.danger_tiles = targets
+	# DCSS targeter preview — populate the AoE radius for area spells
+	# and the beam path for single-target zaps, so the player can see
+	# exactly which tiles would be hit before committing the tap.
+	if targeting_type == "area" and aoe_radius > 0:
+		var seen: Dictionary = {}
+		for m in seen_enemies:
+			var cx: int = m.grid_pos.x
+			var cy: int = m.grid_pos.y
+			for dy in range(-aoe_radius, aoe_radius + 1):
+				for dx in range(-aoe_radius, aoe_radius + 1):
+					if maxi(absi(dx), absi(dy)) > aoe_radius:
+						continue
+					var cell: Vector2i = Vector2i(cx + dx, cy + dy)
+					if seen.has(cell):
+						continue
+					seen[cell] = true
+					aoe_preview.append(cell)
+	elif targeting_type == "single":
+		# Beam preview: trace the line from player to each visible foe
+		# so walls and allied blockers in the way are obvious.
+		var opaque_cb: Callable = func(cell: Vector2i) -> int:
+			return dmap._opaque_at(cell) if dmap != null else 0
+		var mon_cb: Callable = func(_cell: Vector2i):
+			return null  # preview doesn't need monster lookups; pierce is visual only
+		var pierce: bool = Beam.should_pierce(_targeting_spell)
+		var seen2: Dictionary = {}
+		for m in seen_enemies:
+			var trace: Dictionary = Beam.trace(player.grid_pos, m.grid_pos,
+					spell_range, pierce, opaque_cb, mon_cb)
+			for cell in trace.get("cells", []):
+				if not seen2.has(cell):
+					seen2[cell] = true
+					beam_preview.append(cell)
+	dmap.aoe_preview_tiles = aoe_preview
+	dmap.beam_preview_tiles = beam_preview
 	dmap.queue_redraw()
 	CombatLog.add("Target a tile to cast %s. Tap empty space to cancel." % String(info.get("name", _targeting_spell)))
 
