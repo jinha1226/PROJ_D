@@ -233,10 +233,16 @@ static func _missile_cost(m: Monster) -> int:
 static func _try_ranged_at(m: Monster, target: Node, dist: int) -> bool:
 	if m == null or m.data == null or target == null:
 		return false
+	# Property gate: cached .tres files from before session-14 can still
+	# lack `ranged_damage` / `ranged_range`, which would crash the
+	# direct property read. `in` check is cheap and falls back to the
+	# "no ranged attack" branch on missing fields.
+	if not ("ranged_damage" in m.data):
+		return false
 	var rdmg: int = int(m.data.ranged_damage)
 	if rdmg <= 0:
 		return false
-	var rrange: int = int(m.data.ranged_range)
+	var rrange: int = int(m.data.ranged_range) if "ranged_range" in m.data else 7
 	if rrange <= 0 or dist > rrange:
 		return false
 	# Very close — the melee branch above handles dist==1. Between 2 and

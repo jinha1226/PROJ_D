@@ -257,8 +257,13 @@ static func _apply_ranged_overrides(d: MonsterData, id: String) -> void:
 	if not _RANGED_OVERRIDES.has(id):
 		return
 	var o: Dictionary = _RANGED_OVERRIDES[id]
-	d.ranged_damage = int(o.get("damage", 0))
-	d.ranged_range = int(o.get("range", 7))
+	# Property gate: cached .tres from pre-session-14 may lack these
+	# fields. Skip the override silently rather than tripping a
+	# set-nonexistent-property error that would poison the cache.
+	if "ranged_damage" in d:
+		d.ranged_damage = int(o.get("damage", 0))
+	if "ranged_range" in d:
+		d.ranged_range = int(o.get("range", 7))
 
 
 static func _apply_energy_overrides(d: MonsterData, id: String) -> void:
@@ -273,15 +278,17 @@ static func _apply_energy_overrides(d: MonsterData, id: String) -> void:
 				break
 	if typeof(o) != TYPE_DICTIONARY:
 		return
-	if o.has("move"):
+	# Same property gate as the ranged override — silently skip missing
+	# fields on stale .tres so cached resources don't crash the load.
+	if o.has("move") and "move_energy" in d:
 		d.move_energy = int(o["move"])
-	if o.has("attack"):
+	if o.has("attack") and "attack_energy" in d:
 		d.attack_energy = int(o["attack"])
-	if o.has("spell"):
+	if o.has("spell") and "spell_energy" in d:
 		d.spell_energy = int(o["spell"])
-	if o.has("missile"):
+	if o.has("missile") and "missile_energy" in d:
 		d.missile_energy = int(o["missile"])
-	if o.has("swim"):
+	if o.has("swim") and "swim_energy" in d:
 		d.swim_energy = int(o["swim"])
 
 
