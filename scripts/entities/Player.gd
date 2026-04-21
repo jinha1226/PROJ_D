@@ -673,6 +673,37 @@ func apply_form(form_id: String) -> bool:
 		set_meta("_flying", true)
 	if bool(info.get("can_swim", false)):
 		set_meta("_swimming", true)
+	# DCSS form-specific unarmed damage. CombatSystem.melee_attack reads
+	# _form_unarmed_base when the player is weaponless so dragon fists
+	# actually hit hard (base 8), tree fists are sturdy (base 9),
+	# storm form is devastating (base 24), etc.
+	var ubase: int = int(info.get("unarmed_base", 0))
+	if ubase > 0:
+		set_meta("_form_unarmed_base", ubase)
+	# Form movement bonus. DCSS speed 10 is baseline; 5 means the form
+	# moves at 2× normal pace (bat/bat_swarm). Map to free-move bonus
+	# so the player skips the turn-end when moving in fast forms.
+	var mspeed: int = int(info.get("move_speed", 10))
+	if mspeed < 10:
+		set_meta("_form_move_bonus", 10 - mspeed)  # bat=5 → +5 free-move tokens
+	# Equipment melding. DCSS locks certain slots when a form is active
+	# (statue melds body/gloves/boots/barding; dragon melds "physical").
+	# Record the slot list so the Status panel / item info tooltip can
+	# flag equipped gear as suppressed. Mechanical effect (stat removal)
+	# not yet wired — the Status display is the high-value piece.
+	if info.get("melds"):
+		set_meta("_form_melds", info["melds"])
+	# Size override. DCSS `SIZE_MEDIUM` = 3; factor = 2*(3-size). So
+	# a dragon form (giant=5) has factor -4 (much easier to hit), a
+	# spider (little=1) has factor +4 (hard to hit). PlayerDefense
+	# reads `_form_size_factor` before the racial fallback.
+	var size_name: String = String(info.get("size", "medium"))
+	var size_lookup: Dictionary = {
+		"tiny": 6, "little": 4, "small": 2, "medium": 0,
+		"large": -2, "big": -3, "giant": -4,
+	}
+	if size_lookup.has(size_name) and size_name != "medium":
+		set_meta("_form_size_factor", int(size_lookup[size_name]))
 	current_form = form_id
 	stats_changed.emit()
 	CombatLog.add("You transform into %s." % String(info.get("description",
@@ -695,6 +726,10 @@ func clear_form() -> void:
 		remove_meta("_form_r%s" % String(r))
 	remove_meta("_flying")
 	remove_meta("_swimming")
+	remove_meta("_form_unarmed_base")
+	remove_meta("_form_move_bonus")
+	remove_meta("_form_melds")
+	remove_meta("_form_size_factor")
 	_form_baseline.clear()
 	current_form = ""
 	stats_changed.emit()
@@ -1646,6 +1681,10 @@ func try_move(delta: Vector2i) -> bool:
 		speed_mod = 3
 	elif race_res != null and race_res.move_speed_mod > 0:
 		speed_mod = race_res.move_speed_mod
+	# Forms override the race bonus when they're faster — a swift-trait
+	# human in bat form still moves at bat pace, not swift pace.
+	if has_meta("_form_move_bonus"):
+		speed_mod = maxi(speed_mod, int(get_meta("_form_move_bonus", 0)))
 	if speed_mod > 0:
 		_free_move_counter += 1
 		if _free_move_counter < speed_mod:

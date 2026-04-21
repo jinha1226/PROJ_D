@@ -67,6 +67,11 @@ static func _player_evasion_raw(player: Node, skill_system, scale: int) -> int:
 static func _size_factor(player: Node) -> int:
 	if player == null:
 		return 0
+	# Active form overrides racial size (dragon = giant, spider = little,
+	# statue = large). DCSS does the same — a medium species in dragon
+	# form is a sitting duck on EV but tanks through AC instead.
+	if player.has_method("has_meta") and player.has_meta("_form_size_factor"):
+		return int(player.get_meta("_form_size_factor", 0))
 	if "race_res" in player and player.race_res != null:
 		if "size_factor" in player.race_res:
 			return int(player.race_res.size_factor)

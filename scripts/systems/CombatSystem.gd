@@ -56,6 +56,12 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	elif weapon_id == "" and "race_res" in attacker and attacker.race_res != null \
 			and attacker.race_res.racial_trait == "ghoul_claws":
 		weapon_dmg += 3
+	# DCSS form-specific fist damage. Dragon form adds +8 base, storm
+	# form +24, tree +9, etc. Stacks above the racial claws bump for
+	# players who pick a clawed race and transform.
+	if weapon_id == "" and attacker.has_method("has_meta") \
+			and attacker.has_meta("_form_unarmed_base"):
+		weapon_dmg += int(attacker.get_meta("_form_unarmed_base", 0))
 
 	# Unarmed swings train "unarmed_combat" (DCSS SK_UNARMED_COMBAT) and
 	# its level scales both damage (via the weapon-skill multiplier) and
