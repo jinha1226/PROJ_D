@@ -58,7 +58,7 @@ var _base_seed: int = 0
 # stay gone. Keyed by int depth.
 var _floor_state: Dictionary = {}
 # Toggle tracking — pressing the same HUD button again closes its popup.
-var _bag_dlg: AcceptDialog = null
+var _bag_dlg: GameDialog = null
 var _suppress_bag_reopen: bool = false
 # Active bag filter ("all" | "weapon" | "armor" | "potion" | "scroll" | "book").
 # Remembered across reopens so swiping/tabbing doesn't lose the user's spot.
@@ -3623,30 +3623,15 @@ func _on_bag_pressed() -> void:
 		_close_all_dialogs()
 		return
 	_close_all_dialogs()
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null:
+	if player == null:
 		return
-	var dlg := AcceptDialog.new()
-	dlg.exclusive = false
-	dlg.title = "Bag"
-	dlg.ok_button_text = "Close"
-	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 8)
-	dlg.add_child(vb)
-	var header := HBoxContainer.new()
-	header.add_theme_constant_override("separation", 8)
-	var bag_title := Label.new()
-	bag_title.text = "Bag"
-	bag_title.add_theme_font_size_override("font_size", 40)
-	bag_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	header.add_child(bag_title)
-	var bag_close := Button.new()
-	bag_close.text = "X"
-	bag_close.custom_minimum_size = Vector2(120, 120)
-	bag_close.add_theme_font_size_override("font_size", 48)
-	bag_close.pressed.connect(dlg.queue_free)
-	header.add_child(bag_close)
-	vb.add_child(header)
+
+	var dlg := GameDialog.create("Bag", Vector2i(960, 1700))
+	add_child(dlg)
+	_bag_dlg = dlg
+	dlg.set_on_close(func():
+		if _bag_dlg == dlg: _bag_dlg = null)
+	var vb: VBoxContainer = dlg.body()
 
 	var cat_tabs := HBoxContainer.new()
 	cat_tabs.add_theme_constant_override("separation", 4)
@@ -3657,13 +3642,11 @@ func _on_bag_pressed() -> void:
 		tab_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		tab_btn.add_theme_font_size_override("font_size", 44)
 		if cat == _bag_category:
-			# Active tab — brighter so the user sees the current filter.
 			tab_btn.modulate = Color(1.0, 1.0, 0.75)
 			tab_btn.disabled = true
 		tab_btn.pressed.connect(func():
 			_bag_category = cat
-			_bag_dlg = null
-			dlg.queue_free()
+			dlg.close()
 			_on_bag_pressed())
 		cat_tabs.add_child(tab_btn)
 	vb.add_child(cat_tabs)
@@ -3674,15 +3657,10 @@ func _on_bag_pressed() -> void:
 
 	_build_equipped_section(vb)
 
-	var scroll := ScrollContainer.new(); scroll.scroll_deadzone = 20
-	scroll.custom_minimum_size = Vector2(0, 1300)
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	vb.add_child(scroll)
 	var rows := VBoxContainer.new()
 	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rows.add_theme_constant_override("separation", 6)
-	scroll.add_child(rows)
+	vb.add_child(rows)
 
 	var all_items: Array = player.get_items() if player != null else []
 	# Build filtered view while keeping the original inventory index paired
@@ -3769,21 +3747,12 @@ func _on_bag_pressed() -> void:
 			drop_btn.pressed.connect(_on_bag_drop.bind(i, dlg))
 			row.add_child(drop_btn)
 			rows.add_child(row)
-	popup_mgr.add_child(dlg)
-	_bag_dlg = dlg
-	dlg.tree_exited.connect(func():
-		if _bag_dlg == dlg: _bag_dlg = null)
-	dlg.confirmed.connect(dlg.queue_free)
-	dlg.canceled.connect(dlg.queue_free)
-	dlg.close_requested.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(960, 1700))
 
 
 func _open_bag_filtered(category: String) -> void:
 	_bag_category = category if category != "" else "all"
 	if _bag_dlg != null and is_instance_valid(_bag_dlg):
-		_bag_dlg.queue_free()
-		_bag_dlg = null
+		_bag_dlg.close()
 	_on_bag_pressed()
 
 
@@ -3875,41 +3844,70 @@ func _try_skills_swipe(end_pos: Vector2) -> void:
 	_open_skills_dialog(String(_SKILL_CATEGORIES[next_idx]))
 
 
-## Render the "Equipped" block at the top of the bag. Shows the current
-## weapon + every armor slot the player has filled, with icon + name.
-## Silently renders nothing if the player has nothing equipped.
+## Canonical slot tints used by the Equipped card grid.
+const _EQUIP_TINTS: Dictionary = {
+	"weapon": Color(1.00, 0.70, 0.40),
+	"chest":  Color(0.65, 0.80, 0.95),
+	"cloak":  Color(0.70, 0.60, 0.95),
+	"legs":   Color(0.55, 0.75, 0.90),
+	"helm":   Color(0.60, 0.85, 0.95),
+	"gloves": Color(0.50, 0.80, 0.85),
+	"boots":  Color(0.65, 0.75, 0.85),
+	"ring":   Color(0.85, 0.80, 0.95),
+	"amulet": Color(1.00, 0.90, 0.30),
+}
+
+
+## Render the "Equipped" block as a 2-column card grid. Always shows
+## Weapon / Body(chest) / Amulet placeholders even when empty, plus one
+## extra card per filled cloak/legs/helm/gloves/boots slot and per
+## filled ring slot (octopodes' 8 rings each get their own card).
+## Tapping a card opens the same info popup as the bag list rows.
 func _build_equipped_section(vb: VBoxContainer) -> void:
 	if player == null:
 		return
-	var has_any: bool = false
-	if player.equipped_weapon_id != "":
-		has_any = true
-	if not has_any and player.equipped_armor is Dictionary and not player.equipped_armor.is_empty():
-		has_any = true
-	if not has_any:
-		return
+	vb.add_child(UICards.section_header("Equipped"))
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("v_separation", 8)
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
-	var header := Label.new()
-	header.text = "Equipped"
-	header.add_theme_font_size_override("font_size", 44)
-	header.modulate = Color(0.85, 0.85, 0.7)
-	vb.add_child(header)
-
-	# Weapon row
-	if player.equipped_weapon_id != "":
-		var wid: String = player.equipped_weapon_id
-		var wname: String = WeaponRegistry.display_name_for(wid)
+	# Weapon — always shown so the player sees unarmed status at a glance.
+	var wid: String = player.equipped_weapon_id
+	var winfo: Dictionary = {}
+	var wname := "—"
+	if wid != "":
+		wname = WeaponRegistry.display_name_for(wid)
 		if player.equipped_weapon_plus > 0:
 			wname = "%s +%d" % [wname, player.equipped_weapon_plus]
 		if player.equipped_weapon_cursed:
 			wname += "  (cursed)"
-		var winfo: Dictionary = {"id": wid, "name": wname, "kind": "weapon",
+		winfo = {"id": wid, "name": wname, "kind": "weapon",
 				"plus": player.equipped_weapon_plus}
-		_append_equipped_row(vb, "weapon", wname, TileRenderer.item(wid), winfo)
+	grid.add_child(_equipped_card("Weapon", wid, wname,
+			_EQUIP_TINTS["weapon"], winfo))
 
-	# Armor rows — stable slot order, cloak sits after chest.
-	var armor_slots: Array = ["chest", "cloak", "legs", "helm", "gloves", "boots"]
-	for slot in armor_slots:
+	# Body (chest) — always shown; "—" if unarmored.
+	var chest: Dictionary = player.equipped_armor.get("chest", {})
+	var cname := "—"
+	var cid := ""
+	var cinfo: Dictionary = {}
+	if not chest.is_empty():
+		cid = String(chest.get("id", ""))
+		cname = String(chest.get("name", cid))
+		var cp: int = int(chest.get("plus", 0))
+		if cp > 0:
+			cname = "%s +%d" % [cname, cp]
+		if bool(chest.get("cursed", false)):
+			cname += "  (cursed)"
+		cinfo = chest.duplicate()
+		cinfo["kind"] = "armor"
+	grid.add_child(_equipped_card("Body", cid, cname,
+			_EQUIP_TINTS["chest"], cinfo))
+
+	# Secondary armor slots — only shown when filled.
+	for slot in ["cloak", "legs", "helm", "gloves", "boots"]:
 		if not player.equipped_armor.has(slot):
 			continue
 		var a: Dictionary = player.equipped_armor[slot]
@@ -3921,68 +3919,104 @@ func _build_equipped_section(vb: VBoxContainer) -> void:
 		if bool(a.get("cursed", false)):
 			aname += "  (cursed)"
 		var ainfo: Dictionary = a.duplicate()
-		ainfo["id"] = aid
-		ainfo["name"] = aname
 		ainfo["kind"] = "armor"
-		_append_equipped_row(vb, slot, aname, TileRenderer.item(aid), ainfo)
+		grid.add_child(_equipped_card(slot.capitalize(), aid, aname,
+				_EQUIP_TINTS.get(slot, Color(0.60, 0.60, 0.70)), ainfo))
 
-	# Ring rows — one per slot so octopodes' eight show cleanly.
+	# Ring slots — one card per filled slot; empty slots hidden so
+	# 1-ring races don't see an empty second slot, but octopodes with
+	# 8 rings each get their own card.
 	if player.equipped_rings is Array:
 		for i in player.equipped_rings.size():
-			var ring: Dictionary = player.equipped_rings[i] if typeof(player.equipped_rings[i]) == TYPE_DICTIONARY else {}
+			var ring: Dictionary = {}
+			if typeof(player.equipped_rings[i]) == TYPE_DICTIONARY:
+				ring = player.equipped_rings[i]
 			if ring.is_empty():
 				continue
 			var rid: String = String(ring.get("id", ""))
 			var rname: String = String(ring.get("name", rid))
 			var rinfo: Dictionary = ring.duplicate()
-			rinfo["id"] = rid
-			rinfo["name"] = rname
 			rinfo["kind"] = "ring"
-			_append_equipped_row(vb, "ring %d" % (i + 1), rname, TileRenderer.item(rid), rinfo)
+			grid.add_child(_equipped_card("Ring %d" % (i + 1), rid, rname,
+					_EQUIP_TINTS["ring"], rinfo))
 
-	# Amulet row.
-	if "equipped_amulet" in player and not player.equipped_amulet.is_empty():
-		var amid: String = String(player.equipped_amulet.get("id", ""))
-		var amname: String = String(player.equipped_amulet.get("name", amid))
-		var aminfo: Dictionary = player.equipped_amulet.duplicate()
-		aminfo["id"] = amid
-		aminfo["name"] = amname
+	# Amulet — always shown.
+	var am: Dictionary = {}
+	if "equipped_amulet" in player and player.equipped_amulet is Dictionary:
+		am = player.equipped_amulet
+	var amname := "—"
+	var amid := ""
+	var aminfo: Dictionary = {}
+	if not am.is_empty():
+		amid = String(am.get("id", ""))
+		amname = String(am.get("name", amid))
+		aminfo = am.duplicate()
 		aminfo["kind"] = "amulet"
-		_append_equipped_row(vb, "amulet", amname, TileRenderer.item(amid), aminfo)
+	grid.add_child(_equipped_card("Amulet", amid, amname,
+			_EQUIP_TINTS["amulet"], aminfo))
 
-	var sep := HSeparator.new()
-	vb.add_child(sep)
+	vb.add_child(grid)
 
 
-func _append_equipped_row(vb: VBoxContainer, slot: String, display: String,
-		tex: Texture2D, item_dict: Dictionary = {}) -> void:
-	var row := HBoxContainer.new()
-	row.custom_minimum_size = Vector2(0, 88)
-	row.add_theme_constant_override("separation", 8)
-	if tex != null:
-		var icon := TextureRect.new()
-		icon.texture = tex
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.custom_minimum_size = Vector2(56, 56)
-		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		row.add_child(icon)
-	var slot_label := Label.new()
-	slot_label.text = slot.capitalize() + ":"
-	slot_label.add_theme_font_size_override("font_size", 42)
-	slot_label.custom_minimum_size = Vector2(190, 0)
-	slot_label.modulate = Color(0.7, 0.7, 0.7)
-	row.add_child(slot_label)
-	var name_btn := Button.new()
-	name_btn.text = display
-	name_btn.flat = true
-	name_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	name_btn.add_theme_font_size_override("font_size", 44)
-	name_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+## One card in the Equipped grid. Tapping the card fires the same
+## info popup as bag list rows when the slot is filled.
+func _equipped_card(slot: String, item_id: String, name: String,
+		tint: Color, item_dict: Dictionary = {}) -> Control:
+	var panel: PanelContainer = UICards.card(tint)
+	var col := VBoxContainer.new()
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	col.add_theme_constant_override("separation", 4)
+	panel.add_child(col)
+
+	var slot_lbl := Label.new()
+	slot_lbl.text = slot
+	slot_lbl.add_theme_font_size_override("font_size", 30)
+	slot_lbl.add_theme_color_override("font_color", tint)
+	slot_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	col.add_child(slot_lbl)
+
+	var body_row := HBoxContainer.new()
+	body_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	body_row.add_theme_constant_override("separation", 8)
+	col.add_child(body_row)
+
+	if item_id != "":
+		var tex: Texture2D = TileRenderer.item(item_id)
+		if tex != null:
+			var icon := TextureRect.new()
+			icon.texture = tex
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon.custom_minimum_size = Vector2(48, 48)
+			icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			body_row.add_child(icon)
+
+	var name_lbl := Label.new()
+	name_lbl.text = name
+	name_lbl.add_theme_font_size_override("font_size", 32)
+	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_row.add_child(name_lbl)
+
+	# Make the whole card tappable when a real item lives here. A Control
+	# overlay is fragile against the PanelContainer's layout — easier to
+	# listen for clicks on the panel itself via gui_input.
 	if not item_dict.is_empty():
-		name_btn.pressed.connect(_on_bag_info.bind(item_dict))
-	row.add_child(name_btn)
-	vb.add_child(row)
+		panel.mouse_filter = Control.MOUSE_FILTER_STOP
+		panel.gui_input.connect(_on_equipped_card_input.bind(item_dict))
+
+	return panel
+
+
+func _on_equipped_card_input(event: InputEvent, item_dict: Dictionary) -> void:
+	var is_click := false
+	if event is InputEventMouseButton:
+		is_click = event.pressed and event.button_index == MOUSE_BUTTON_LEFT
+	elif event is InputEventScreenTouch:
+		is_click = event.pressed
+	if is_click:
+		_on_bag_info(item_dict)
 
 
 ## Build a multi-line tooltip string comparing this item to what the
@@ -4297,18 +4331,18 @@ func _on_bag_info(it: Dictionary) -> void:
 	dlg.popup_centered(Vector2i(920, 900))
 
 
-func _on_bag_use(idx: int, dlg: AcceptDialog) -> void:
+func _on_bag_use(idx: int, dlg: GameDialog) -> void:
 	_suppress_bag_reopen = false
 	if player != null:
 		player.use_item(idx)
 	_bag_dlg = null  # Clear BEFORE reopening so toggle check doesn't see stale ref.
-	dlg.queue_free()
+	dlg.close()
 	if not _suppress_bag_reopen:
 		_on_bag_pressed()
 	_suppress_bag_reopen = false
 
 
-func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
+func _on_bag_equip(idx: int, dlg: GameDialog) -> void:
 	if player != null:
 		var items: Array = player.get_items()
 		if idx >= 0 and idx < items.size():
@@ -4406,15 +4440,15 @@ func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
 					items.append(prev_amu)
 			player.inventory_changed.emit()
 	_bag_dlg = null
-	dlg.queue_free()
+	dlg.close()
 	_on_bag_pressed()
 
 
-func _on_bag_drop(idx: int, dlg: AcceptDialog) -> void:
+func _on_bag_drop(idx: int, dlg: GameDialog) -> void:
 	if player != null:
 		player.drop_item(idx)
 	_bag_dlg = null
-	dlg.queue_free()
+	dlg.close()
 	_on_bag_pressed()
 
 
