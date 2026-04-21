@@ -3562,17 +3562,131 @@ func _show_skill_desc_popup(skill_id: String) -> void:
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc.modulate = Color(0.88, 0.88, 0.95)
 	vb.add_child(desc)
-	# Show current level + XP progress underneath.
+	# Progress — current level + XP.
+	var lv: int = 0
+	var xp: float = 0.0
 	if "skill_state" in player:
 		var st: Dictionary = player.skill_state.get(skill_id, {})
-		var lv: int = int(st.get("level", 0))
-		var xp: float = float(st.get("xp", 0.0))
-		var need: float = SkillSystem.xp_for_level(lv + 1)
-		vb.add_child(UICards.section_header("Progress"))
-		var prog := Label.new()
-		prog.text = "Level %d  ·  %d / %d XP" % [lv, int(xp), int(need)]
-		prog.add_theme_font_size_override("font_size", 40)
-		vb.add_child(prog)
+		lv = int(st.get("level", 0))
+		xp = float(st.get("xp", 0.0))
+	var need: float = SkillSystem.xp_for_level(lv + 1)
+	vb.add_child(UICards.section_header("Progress"))
+	var prog := Label.new()
+	prog.text = "Level %d  ·  %d / %d XP" % [lv, int(xp), int(need)]
+	prog.add_theme_font_size_override("font_size", 40)
+	vb.add_child(prog)
+	# Current-level effects. Each skill rolls its own formula —
+	# _skill_effects_at_level returns an array of "label: value" lines
+	# so the player sees exactly what their current investment buys.
+	var effect_lines: Array = _skill_effects_at_level(skill_id, lv)
+	if not effect_lines.is_empty():
+		vb.add_child(UICards.section_header("At Lv.%d" % lv))
+		for line_s in effect_lines:
+			var eff_lbl := Label.new()
+			eff_lbl.text = String(line_s)
+			eff_lbl.add_theme_font_size_override("font_size", 34)
+			eff_lbl.modulate = Color(0.85, 0.92, 0.75)
+			eff_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			vb.add_child(eff_lbl)
+
+
+## Per-skill "what does this do at Lv.N" summary for the long-press
+## popup. Returns an array of strings, one effect per line. Numbers
+## pull from the same formulas the combat / gear / skill pipelines
+## actually use so what you see is what you get.
+func _skill_effects_at_level(skill_id: String, lv: int) -> Array:
+	var out: Array = []
+	# Weapon skills (all route through the same DCSS melee pipeline).
+	var weapon_skills: Array = ["axe", "short_blade", "long_blade", "mace",
+			"polearm", "staff", "bow", "crossbow", "sling", "throwing",
+			"unarmed_combat"]
+	if weapon_skills.has(skill_id):
+		# DCSS: damage × random2(1 + lv*100) / 2500 averages ~lv/50.
+		# Also: attack_delay -= min(lv, 10) * 10 / 20 ticks (half at skill 10).
+		var dmg_avg_pct: int = lv * 2  # rough: ~2% per skill level averaged
+		var delay_cut: int = mini(lv, 10) * 10 / 20  # in 0.1-tick units
+		out.append("Damage: up to +%d%% per swing (average +%d%%)" % \
+				[lv * 4, dmg_avg_pct])
+		out.append("Attack delay: −%.1f ticks (mindelay at Lv.10)" % (float(delay_cut) / 10.0))
+		out.append("To-hit: random2(%d+1)/100 roll added" % (lv * 100))
+		if skill_id == "unarmed_combat":
+			out.append("Fists: +%d flat damage (lv/3)" % (lv / 3))
+		return out
+	match skill_id:
+		"fighting":
+			# HP formula: xl * fighting * 5 / 70 + (fighting * 3 + 1) / 2.
+			var xl: int = player.level if player != null else 1
+			var hp_gain: int = xl * lv * 5 / 70 + (lv * 3 + 1) / 2
+			out.append("HP: +%d (XL %d × %d × 5 / 70 + constant)" % [hp_gain, xl, lv])
+			out.append("Damage: random2(%d+1)/3000 multiplier on every swing" % (lv * 100))
+			return out
+		"armour":
+			# Body AC × (1 + lv/10). Also body-armour EV penalty reduction.
+			out.append("Body AC × %.2f (base AC multiplied by 1 + lv/10)" % \
+					(1.0 + float(lv) / 10.0))
+			var reduce_pct: int = mini(lv * 10, 100)  # 100% at lv10
+			out.append("Body-armour EV penalty: %d%% mitigated" % reduce_pct)
+			return out
+		"dodging":
+			# (800 + lv*10*dex*8) / (20 - size) / 100 scaled EV.
+			var dex: int = int(player.stats.DEX) if player != null and player.stats != null else 10
+			var ev_gain: int = lv * 10 * dex * 8 / 2000
+			out.append("EV: +%d (lv × DEX × 4 / 100)" % ev_gain)
+			out.append("Formula: (800 + lv × 10 × DEX × 8) / (20 − size) / 100")
+			return out
+		"shields":
+			# SH = base*2 + plus*2 + lv*(base*2+13)/10.
+			var sh_buckler: int = 6 + lv * 19 / 10
+			var sh_kite: int = 16 + lv * 29 / 10
+			var sh_tower: int = 26 + lv * 39 / 10
+			out.append("SH (buckler): %d" % sh_buckler)
+			out.append("SH (kite):    %d" % sh_kite)
+			out.append("SH (tower):   %d" % sh_tower)
+			out.append("Shield EV penalty: %d%% mitigated" % mini(lv * 4, 100))
+			return out
+		"stealth":
+			# player_stealth = dex*3 + lv*15 - armour_pen² * 2/3.
+			var dex2: int = int(player.stats.DEX) if player != null and player.stats != null else 10
+			out.append("Stealth score: DEX×3 + lv×15 = %d + %d = %d" % \
+					[dex2 * 3, lv * 15, dex2 * 3 + lv * 15])
+			out.append("Monster wake: harder with higher stealth")
+			out.append("Stab damage: ×(lv+10)/10 on sleeping/paralysed foes")
+			return out
+		"spellcasting":
+			# Max spell levels: XL/2 + lv/3.
+			var xl2: int = player.level if player != null else 1
+			var max_mem: int = mini(xl2, 27) / 2 + lv / 3
+			out.append("Max memorised spell levels: %d (XL/2 + lv/3)" % max_mem)
+			out.append("MP bonus: scales with XL + lv (half of highest school)")
+			out.append("Spell fail: polynomial reduction (−3% per lv approx)")
+			return out
+		"conjurations", "fire", "cold", "earth", "air", "necromancy", \
+				"hexes", "translocations", "summonings":
+			# Spell power averages across schools. Each level adds ~2 to
+			# a one-school spell's power (DCSS calc_spell_power).
+			out.append("Spell power: +%d to %s-school spells" % [lv * 2, skill_id])
+			out.append("Multi-school spells: uses the AVERAGE of matched schools")
+			out.append("Failure rate: min(matched school skills) lowers it")
+			return out
+		"evocations":
+			# Wand power = 15 + lv*7.
+			var wand_pow: int = 15 + lv * 7
+			out.append("Wand power: %d (base 15 + lv × 7)" % wand_pow)
+			out.append("Evocable range / duration scales proportionally")
+			return out
+		"shapeshifting":
+			# Form unarmed += unarmed_scaling × lv / 10; same for ac.
+			out.append("Form unarmed bonus: + (form.unarmed_scaling × %d) / 10" % lv)
+			out.append("Form AC bonus: + (form.ac_scaling × %d) / 10" % lv)
+			out.append("Dragon (scale 10): +%d unarmed, (scale 6 ac): +%d AC" % \
+					[lv, lv * 6 / 10])
+			return out
+		"essence_channeling":
+			# Custom — essence active-ability power scales with level.
+			out.append("Essence active power: +%d%% (lv × 5)" % (lv * 5))
+			out.append("Essence cooldowns: −%d%% (lv × 2)" % mini(lv * 2, 50))
+			return out
+	return out
 
 
 ## Current aptitude integer for `skill_id` pulled from the player's race
