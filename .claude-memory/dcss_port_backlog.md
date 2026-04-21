@@ -15,7 +15,13 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
   - Ashenzari: curse-proportional skill boost passive; Scry/Transfer Knowledge
 - [ ] **God passives unrelated to invocations**: Vehumet MP discount on destructive spells, Cheibriados speed-proportional bonus, Gozag gold-only economy, Ru sacrifice system.
 - [x] **Weapon brands — full DCSS roster** — 32dd5259: added drain/distortion/antimagic/protection/pain/vorpal/reaping/chaos. Remaining gaps: penetration (needs ranged attack flow), reaching (already covered by polearm reach).
-- [x] **Body-armour egos — full roster** — 32dd5259: ArmorRegistry.EGOS with 27 entries; roll_ego rolls 6-25% by depth; Player._recompute_gear_stats folds stat/resist/flag effects. Harm ego wired to take_damage & melee_attack. Remaining partial: RAMPAGING/REFLECTION/SPIRIT_SHIELD/FLYING/MAYHEM need per-system handlers beyond just the flag.
+- [x] **Body-armour egos — full roster** — 32dd5259 + 4ec67fdd:
+  27 entries in ArmorRegistry.EGOS; all five outstanding flag
+  handlers now wired — FLYING plumbs into `_flying`, REFLECTION
+  bounces 25% of archer shots back at the shooter, RAMPAGING grants
+  +1 speed_mod on moves toward visible hostiles, MAYHEM fears nearby
+  enemies (radius 3) on a killing blow, SPIRIT_SHIELD was already
+  splitting HP→MP via Player.take_damage.
 - [x] **Amulet roster** — 5c2c6d18: AmuletRegistry.gd with 9 entries (Faith/Magic Mastery/Regen/Acrobat/Reflection/Stasis/Guardian Spirit/Gourmand/Nothing). equip_amulet slot on Player; spirit_shield splits HP→MP; stasis blocks tele/blink; acrobat +5 EV on non-combat turns; faith +50% piety; floor drops 2%; bag UI + TileRenderer tiles.
 - [ ] **Portal vaults** (timed mini-branches) — not implemented at all: Sewers, Ossuary, Bailey, Volcano, Icecave, Wizlab, Trove, Labyrinth, Desolation, Gauntlet. Mid-game interest driver in DCSS.
 - [~] **Branch theming** — PARTIAL (89229a3f):
@@ -38,17 +44,11 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 
 ## 🟡 Medium (partial implementations)
 
-- [x] **Monster AI intelligence** — DONE (d7edc8ea + 479a851a). Flee
-  tightened (25%→10%, human-only, non-caster, one-shot `_has_fled` flag
-  reset at 40% HP). Caster kiting: adjacent casters cast→kite→melee.
-  Emergency slot priority: spellbook rows flagged `emergency` gated off
-  above 33% HP, tripled below; non-emergency rows halved below. Silence
-  only filters `vocal` rows (wizard/priest) rather than aborting the
-  whole cast so breath weapons still fire at silenced targets. Friendly-
-  fire tracer: `_beam_friendly_fire` walks Bresenham caster→target and
-  rejects zap spells whose path crosses another hostile. Remaining nice-
-  to-have: DCSS `cautious` flag for monsters that won't approach if
-  can't retaliate (very minor, not wired yet).
+- [x] **Monster AI intelligence** — DONE (d7edc8ea + 479a851a + 4ec67fdd).
+  Flee tightened, caster kiting, emergency slot priority, silence per-row
+  filter, friendly-fire tracer. Final closer: DCSS `cautious` flag now
+  read — cautious non-casters with no ranged attack hold position instead
+  of walking into a swing. All AI-intel items closed.
 - [x] **Monster energy types** — DONE (d7edc8ea). MonsterData exports
   move/attack/spell/missile/swim energy (default 10/6). MonsterRegistry
   applies mon-data.h overrides for naga (move=14), bat (move=5), centaur
@@ -112,12 +112,29 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
   now walk a bresenham line from attacker to target (Monster side uses
   _path_has_ally guard; player side routes through CombatSystem).
   Walls stop the shot; hostile allies on the path abort the cast.
-- [ ] **God conducts** — only Trog's cast-anger wired. Zin mutation/chaos, TSO evil-kill-bonus, Elyvilon neutral-kill-penalty, Cheibriados haste-ban, Yredelemnul holy-kill-bonus, Beogh orc-kill-penalty, Fedhas burn-plant-penalty, Okawaru summon/ally-ban.
-- [ ] **Morgue / character dump** — no death-log file written.
-- [ ] **High score board** — minimal.
-- [ ] **Help pages / in-game docs** — minimal; DCSS ships ~15 reference sections.
-- [ ] **Macros** — none.
-- [ ] **Command search** — `?/` lookup missing.
+- [x] **God conducts** — DONE (4ec67fdd). _apply_god_conduct runs
+  between kill_piety and cap-clamp: TSO +50% evil kills, Yred +2 holy
+  / -1 undead, Zin +1 demonic / -1 chaos/shapeshifters, Elyvilon -1
+  non-evil kills, Beogh -3 orc kills, Fedhas -2 plant kills. Negative
+  gains trigger a "X frowns at you" log + piety loss. Remaining
+  content-gated: Cheibriados haste-ban (enforced at buff sites, not
+  kill-time), Okawaru summon/ally-ban (needs summoning flow).
+- [x] **Morgue / character dump** — DONE (2ce736ad). user://morgues/
+  morgue-<stamp>.txt on run-end with outcome/slayer/character/god/
+  depth/turns/kills/stats/AC/EV/SH/WL/equipped gear/resistances/
+  learned spells + memory usage.
+- [x] **High score board** — DONE (2cfc1429). MetaProgression now
+  keeps a 50-entry `runs_history` array with full per-run context
+  (race/job/god/level/depth/branch/turns/kills/victory/killer/
+  timestamp). `get_top_runs(n)` returns sorted leaderboard for the
+  main-menu UI when that lands. Data persists via SaveManager.
+- [x] **Help pages / in-game docs** — DONE (2ce736ad). KEY_? opens a
+  GameDialog with 6 sections (Controls / Combat basics / Skills /
+  Identification / Gods & piety / Status effects). Substitute for
+  DCSS's ~15 ref pages.
+- [ ] **Macros** — none (low priority on mobile).
+- [ ] **Command search** — `?/` lookup missing (would need a
+  search-across-JSON dialog; deferred).
 - [x] **AoE targeter preview** — 2b243722: orange AoE overlay (area spells) + cyan beam trail (single-target zaps) painted during targeting mode. Cleared on target-select.
 
 ## Crossing off
