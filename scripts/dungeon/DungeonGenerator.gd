@@ -764,10 +764,20 @@ func _place_stairs() -> void:
 	# endpoints align with the stairs (otherwise stairs show up in odd spots
 	# because room centres don't sit on corridor ends).
 	if _dcss_stairs_up.size() >= 1 and _dcss_stairs_down.size() >= 1:
-		spawn_pos = _dcss_stairs_up[0]
-		stairs_down_pos = _dcss_stairs_down[0]
-		spawn_pos2 = _dcss_stairs_up[1] if _dcss_stairs_up.size() >= 2 else spawn_pos
-		stairs_down_pos2 = _dcss_stairs_down[1] if _dcss_stairs_down.size() >= 2 else stairs_down_pos
+		# DCSS layout can drop stair glyphs on wall-pocket coordinates
+		# when the trail walker hits a dead end. Re-anchor each stair to
+		# the nearest walkable tile that has at least one walkable 4-
+		# neighbour so descending doesn't strand the player.
+		spawn_pos = _ensure_stair_has_exit(_dcss_stairs_up[0])
+		stairs_down_pos = _ensure_stair_has_exit(_dcss_stairs_down[0])
+		spawn_pos2 = _ensure_stair_has_exit(_dcss_stairs_up[1]) if _dcss_stairs_up.size() >= 2 else spawn_pos
+		stairs_down_pos2 = _ensure_stair_has_exit(_dcss_stairs_down[1]) if _dcss_stairs_down.size() >= 2 else stairs_down_pos
+		map[spawn_pos.x][spawn_pos.y] = TileType.STAIRS_UP
+		map[stairs_down_pos.x][stairs_down_pos.y] = TileType.STAIRS_DOWN
+		if spawn_pos2 != spawn_pos:
+			map[spawn_pos2.x][spawn_pos2.y] = TileType.STAIRS_UP
+		if stairs_down_pos2 != stairs_down_pos:
+			map[stairs_down_pos2.x][stairs_down_pos2.y] = TileType.STAIRS_DOWN
 		return
 	if rooms.is_empty():
 		spawn_pos = Vector2i(MAP_WIDTH / 2, MAP_HEIGHT / 2)
@@ -827,6 +837,48 @@ func _pick_floor_tile_near(hint: Vector2i) -> Vector2i:
 				if _in_bounds(p) and map[p.x][p.y] == TileType.FLOOR:
 					return p
 	return Vector2i(MAP_WIDTH / 2, MAP_HEIGHT / 2)
+
+
+## Given a stair coordinate, return the nearest position where the
+## stair tile is (a) on floor and (b) has at least one walkable
+## 4-neighbour. This guards against layouts that drop stair glyphs
+## at wall pockets with all four cardinal neighbours solid, which
+## traps the player on arrival. Starts from the input and expands
+## outward in rings; falls back to the map centre if nothing fits.
+func _ensure_stair_has_exit(hint: Vector2i) -> Vector2i:
+	if _stair_tile_ok(hint):
+		return hint
+	for r in range(1, max(MAP_WIDTH, MAP_HEIGHT)):
+		for dx in range(-r, r + 1):
+			for dy in range(-r, r + 1):
+				if absi(dx) != r and absi(dy) != r:
+					continue  # only ring cells, not interior
+				var p: Vector2i = hint + Vector2i(dx, dy)
+				if _stair_tile_ok(p):
+					return p
+	return _pick_floor_tile_near(hint)
+
+
+## `hint` is usable for a stair iff (a) it's in bounds, (b) already
+## floor (or convertible — we only accept floor to keep the logic
+## simple), and (c) at least one of its 4 cardinal neighbours is
+## walkable (FLOOR or open-door terrain).
+func _stair_tile_ok(p: Vector2i) -> bool:
+	if not _in_bounds(p):
+		return false
+	var t: int = map[p.x][p.y]
+	if t != TileType.FLOOR and t != TileType.STAIRS_UP and t != TileType.STAIRS_DOWN:
+		return false
+	for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+		var n: Vector2i = p + d
+		if not _in_bounds(n):
+			continue
+		var nt: int = map[n.x][n.y]
+		if nt == TileType.FLOOR or nt == TileType.DOOR_OPEN \
+				or nt == TileType.DOOR_CLOSED \
+				or nt == TileType.STAIRS_UP or nt == TileType.STAIRS_DOWN:
+			return true
+	return false
 
 
 func _in_bounds(p: Vector2i) -> bool:

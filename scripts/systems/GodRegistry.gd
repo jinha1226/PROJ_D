@@ -290,6 +290,41 @@ const INVOCATIONS: Dictionary = {
 }
 
 
+## Beginner-focused guides. Each entry tells the player: (a) how to
+## please this god (what actions grant piety), and (b) what you get
+## at each ★ / *** piety milestone. Read by the altar popup and the
+## status panel so first-time players understand the deal before
+## committing to a pledge.
+const GUIDES: Dictionary = {
+	"trog": "Please by: killing enemies (especially casters).\nHates: casting spells (any cast angers Trog).\nGifts: random weapons at high piety.\nKey powers: Berserk (rage), Hand of Trog (berserker ally), Brothers in Arms (3 deep trolls).",
+	"okawaru": "Please by: winning solo fights (no allies).\nHates: summoning, taking allies.\nGifts: weapons and armour at milestone piety.\nKey powers: Heroism (+skill), Finesse (extra attack), Duel (pull a foe to a private arena).",
+	"makhleb": "Please by: murdering anything, fast and often.\nGifts: chaos powers; no gear.\nKey powers: Minor/Major Destruction (random blasts), Summon Demon.\nEach kill auto-heals a little HP while pledged.",
+	"uskayaw": "Please by: killing quickly (multiple kills per turn = bigger piety).\nHates: idling in combat.\nKey powers: Stomp (AoE), Line Pass (dash-attack row).\nPiety decays fast; keep the dance going.",
+	"zin": "Please by: killing unclean/chaotic things.\nHates: mutating yourself, using hexes/chaos.\nGifts: heals, mutation-suppression, imprisonment of foes.\nKey powers: Vitalisation (big heal), Sanctuary (12-turn untouchable), Imprison.",
+	"the_shining_one": "Please by: killing evil/undead/demonic beings.\nHates: stabbing, poisoning, using evil spells.\nGifts: halo aura, divine shield.\nKey powers: Divine Shield (+6 AC), Cleansing Flame (holy AoE), Summon Angel.",
+	"elyvilon": "Please by: healing yourself/allies; pacifying (not killing) foes.\nHates: killing pacified/neutral creatures.\nGifts: healing magic scaling with piety.\nKey powers: Lesser/Greater Healing, Pacify (turn foes neutral).",
+	"vehumet": "Please by: killing things with destructive spells.\nGifts: new offensive spells at milestones (automatic).\nKey passive: destructive spells cost less MP as piety rises.\nNo special hates — just keep casting.",
+	"sif_muna": "Please by: casting any spell to train it.\nGifts: spellbooks at milestones.\nKey powers: Channel Mana (free MP restore), Divine Exegesis (cast any known spell), Forget Spell (amnesia).",
+	"kikubaaqudgha": "Please by: killing with necromancy.\nHates: holy actions.\nGifts: necromancy books, gains a corpse whenever you kill.\nKey powers: Receive Corpses, Torment (halves all non-undead HP), Unearthly Bond.",
+	"nemelex_xobeh": "Please by: killing (any).\nGifts: decks of random cards.\nKey powers: Draw Card (random effect), Stack Five (pick-one-of-five).\nChaos patron — expect surprises, good and bad.",
+	"xom": "No piety. Xom is amused by your existence — sometimes helps, sometimes harms, always random.\nCan't pledge via altar unless you really want chaos.\nActs on random turns when bored.",
+	"yredelemnul": "Please by: killing in general; killing living things with drain.\nHates: holy acts.\nGifts: undead allies, life drain.\nKey powers: Animate Dead, Drain Life (AoE drain + self-heal), Enslave Soul.",
+	"beogh": "Orcs only. Please by: killing non-orc foes while orcs nearby watch.\nGifts: orc followers convert to your side.\nKey powers: Recall Followers (teleport allies), Smite.",
+	"jiyva": "Please by: feeding items to jellies (walk up, drop item).\nGifts: mutations (usually good), jelly allies.\nKey powers: Jelly Prayer, Cure Bad Mutation, Slimify (weapon dissolves foes).",
+	"fedhas": "Please by: killing living things in plant-filled areas.\nHates: burning plants.\nGifts: plant allies, growth magic.\nKey powers: Sunlight (reveal+damage), Plant Ring (cover), Rain (flood).",
+	"cheibriados": "Please by: moving slowly and killing HASTED foes.\nHates: haste self-cast, rushing.\nGifts: huge HP/stat boosts for patience.\nKey powers: Bend Time (slow all foes), Slouch (damage fast enemies).",
+	"lugonu": "Please by: killing in the Abyss; banishing foes.\nGifts: space-warping abilities.\nKey powers: Bend Space (1-tile teleport), Banishment (send foe to Abyss), Corrupt Level.",
+	"ashenzari": "Please by: being cursed (many items) and identifying things.\nGifts: +skill levels proportional to curses worn.\nKey powers: Scry (see through walls), Transfer Knowledge (skill swap).",
+	"dithmenos": "Please by: killing while unseen; staying in darkness.\nGifts: shadow allies, invisibility aid.\nKey powers: Shadow Step (teleport into shadow), Shadow Form, Summon Shadow.",
+	"gozag": "No piety. Spend GOLD instead.\nGifts: potions, shops, bribed monsters.\nKey powers: Potion Petition, Call Merchant, Bribe Branch (turn whole floor friendly).\nBest for rich runs.",
+	"qazlal": "Please by: killing with elemental force.\nGifts: cloud protection around you.\nKey powers: Upheaval (bolt/flame/ice), Elemental Force (clouds do more), Disaster Area (massive AoE).",
+	"ru": "Please by: sacrificing body parts / skills at the altar.\nGifts: massive passives per sacrifice (must permanently give something up).\nKey powers: Draw Out Power (big burst after rest), Apocalypse.",
+	"wu_jian": "Please by: landing wall-jumps, whirlwinds, movement-based attacks.\nGifts: martial-art passives.\nKey powers: Wall Jump (leap + cleave), Heavenly Storm (cloud of strikes).\nPositioning god.",
+	"hepliaklqana": "Please by: killing enemies while your ancestor is alive.\nGifts: stronger ancestor.\nKey powers: Recall Ancestor (teleport ally), Idealise (buff ancestor), Transference (swap places).\nAncestor acts with you as a partner.",
+	"ignis": "Dying god — only 3 invocations ever.\nPlease by: killing enemies.\nKey powers: Fiery Armour, Foxfire Swarm, Rising Flame.\nEach invoke consumes one of the 3 uses — choose wisely.",
+}
+
+
 static func has(id: String) -> bool:
 	return GODS.has(id)
 
@@ -300,6 +335,15 @@ static func get_info(id: String) -> Dictionary:
 
 static func all_ids() -> Array:
 	return GODS.keys()
+
+
+## Beginner-friendly teaching text for this god — covers how to earn
+## piety, what's forbidden, and the top invocations. Falls back to
+## the short `desc` when the id isn't in the GUIDES dict.
+static func get_guide(id: String) -> String:
+	if GUIDES.has(id):
+		return String(GUIDES[id])
+	return String(get_info(id).get("desc", ""))
 
 
 static func invocation(id: String) -> Dictionary:

@@ -1495,16 +1495,72 @@ func _on_altar_tapped(pos: Vector2i) -> void:
 	var info: Dictionary = GodRegistry.get_info(god_id)
 	if info.is_empty():
 		return
-	if player.current_god == "":
-		player.current_god = god_id
-		player.piety = 10  # DCSS seeds new converts with a little piety
-		CombatLog.add("You pledge yourself to %s." % String(info.get("title", god_id)))
-		return
+	# Already pledged to this god → open the invocations menu directly.
 	if player.current_god == god_id:
 		_show_invocations_menu()
 		return
-	CombatLog.add("You are already pledged to %s." % \
-			GodRegistry.get_info(player.current_god).get("title", player.current_god))
+	if player.current_god != "":
+		CombatLog.add("You are already pledged to %s." % \
+				GodRegistry.get_info(player.current_god).get("title", player.current_god))
+		return
+	_show_altar_guide(god_id, info)
+
+
+## Altar pledge prompt — shows the beginner guide (how to please the
+## god, what powers unlock, what not to do) and a Pledge / Cancel
+## pair. First-time players can read the actual contract before
+## committing to a permanent pledge.
+func _show_altar_guide(god_id: String, info: Dictionary) -> void:
+	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
+	if popup_mgr == null:
+		return
+	var dlg := AcceptDialog.new()
+	dlg.exclusive = false
+	dlg.title = String(info.get("title", god_id))
+	dlg.ok_button_text = "Cancel"
+
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 20)
+	dlg.add_child(vb)
+
+	var name_lbl := Label.new()
+	name_lbl.text = String(info.get("title", god_id))
+	name_lbl.add_theme_font_size_override("font_size", 56)
+	name_lbl.add_theme_color_override("font_color", info.get("color", Color.WHITE))
+	vb.add_child(name_lbl)
+
+	var desc_lbl := Label.new()
+	desc_lbl.text = String(info.get("desc", ""))
+	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	desc_lbl.add_theme_font_size_override("font_size", 40)
+	desc_lbl.modulate = Color(0.85, 0.85, 0.95)
+	desc_lbl.custom_minimum_size = Vector2(820, 0)
+	vb.add_child(desc_lbl)
+
+	vb.add_child(HSeparator.new())
+
+	var guide_lbl := Label.new()
+	guide_lbl.text = GodRegistry.get_guide(god_id)
+	guide_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	guide_lbl.add_theme_font_size_override("font_size", 34)
+	guide_lbl.custom_minimum_size = Vector2(820, 0)
+	vb.add_child(guide_lbl)
+
+	vb.add_child(HSeparator.new())
+
+	var pledge_btn := Button.new()
+	pledge_btn.text = "Pledge yourself to %s" % String(info.get("name", god_id))
+	pledge_btn.add_theme_font_size_override("font_size", 42)
+	pledge_btn.custom_minimum_size = Vector2(0, 112)
+	pledge_btn.pressed.connect(func():
+		player.current_god = god_id
+		player.piety = 10
+		CombatLog.add("You pledge yourself to %s." % String(info.get("title", god_id)))
+		dlg.queue_free())
+	vb.add_child(pledge_btn)
+
+	popup_mgr.add_child(dlg)
+	dlg.popup_centered(Vector2i(900, 1100))
 
 
 ## Open a popup listing the current god's invocations. Greyed rows are
@@ -4170,6 +4226,7 @@ func _on_status_pressed() -> void:
 
 	_status_build_header(vb)
 	_status_build_vitals(vb)
+	_status_build_piety(vb)
 	_status_build_attributes(vb)
 	_status_build_combat(vb)
 	_status_build_equipment(vb)
@@ -4204,9 +4261,58 @@ func _on_status_pressed() -> void:
 func _status_section_header(text: String) -> Label:
 	var lbl := Label.new()
 	lbl.text = text
-	lbl.add_theme_font_size_override("font_size", 40)
+	# Bumped from 40 → 52 per user "상태창에 글씨를 전체적으로 좀 크게" —
+	# section headers anchor each card, so they take the biggest lift.
+	lbl.add_theme_font_size_override("font_size", 52)
 	lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.40))
 	return lbl
+
+
+## Piety card — shows current god portrait, piety bar, and per-kill
+## gain. Rendered just below the vital bars so a new pledge is
+## visible without scrolling. Absent if the player hasn't pledged.
+func _status_build_piety(vb: VBoxContainer) -> void:
+	if player == null or player.current_god == "":
+		return
+	var info: Dictionary = GodRegistry.get_info(player.current_god)
+	if info.is_empty():
+		return
+	vb.add_child(_status_section_header("Faith"))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 16)
+	var name_lbl := Label.new()
+	name_lbl.text = String(info.get("title", player.current_god))
+	name_lbl.custom_minimum_size = Vector2(360, 0)
+	name_lbl.add_theme_font_size_override("font_size", 42)
+	name_lbl.add_theme_color_override("font_color", info.get("color", Color.WHITE))
+	row.add_child(name_lbl)
+	var cap: int = int(info.get("piety_cap", 200))
+	var bar := ProgressBar.new()
+	bar.max_value = maxi(1, cap)
+	bar.value = int(player.piety)
+	bar.show_percentage = false
+	bar.custom_minimum_size = Vector2(0, 56)
+	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = info.get("color", Color(0.85, 0.70, 0.30))
+	for c in ["corner_radius_top_left", "corner_radius_top_right",
+			"corner_radius_bottom_left", "corner_radius_bottom_right"]:
+		fill.set(c, 4)
+	bar.add_theme_stylebox_override("fill", fill)
+	row.add_child(bar)
+	var val_lbl := Label.new()
+	val_lbl.text = "%d / %d" % [int(player.piety), cap]
+	val_lbl.add_theme_font_size_override("font_size", 40)
+	val_lbl.custom_minimum_size = Vector2(240, 0)
+	row.add_child(val_lbl)
+	vb.add_child(row)
+	# "+N piety per kill" hint so the player knows if their god is a
+	# kill-piety god or a gold/sacrifice-piety god.
+	var hint := Label.new()
+	hint.text = "+%d piety per kill" % int(info.get("kill_piety", 0))
+	hint.add_theme_font_size_override("font_size", 34)
+	hint.modulate = Color(0.78, 0.78, 0.85)
+	vb.add_child(hint)
 
 
 ## Title row: doll portrait + race/job line + level/XP/turn.
@@ -4244,7 +4350,7 @@ func _status_build_header(vb: VBoxContainer) -> void:
 	meta_lbl.text = "Lv.%d   XP %d / %d   Turn %d" % [
 		player.level, player.xp, player.xp_for_next_level(),
 		TurnManager.turn_number]
-	meta_lbl.add_theme_font_size_override("font_size", 32)
+	meta_lbl.add_theme_font_size_override("font_size", 40)
 	meta_lbl.modulate = Color(0.85, 0.85, 0.95)
 	text_col.add_child(meta_lbl)
 
@@ -4268,7 +4374,7 @@ func _status_build_vitals(vb: VBoxContainer) -> void:
 	var regen_lbl := Label.new()
 	regen_lbl.text = "Regen  HP %.2f/turn   MP %.2f/turn" \
 			% [float(hp_rate) / 100.0, float(mp_rate) / 100.0]
-	regen_lbl.add_theme_font_size_override("font_size", 32)
+	regen_lbl.add_theme_font_size_override("font_size", 40)
 	regen_lbl.modulate = Color(0.78, 0.78, 0.85)
 	vb.add_child(regen_lbl)
 
@@ -4281,7 +4387,7 @@ func _status_vital_bar(label: String, cur: int, maxv: int,
 	var name_lbl := Label.new()
 	name_lbl.text = label
 	name_lbl.custom_minimum_size = Vector2(80, 0)
-	name_lbl.add_theme_font_size_override("font_size", 40)
+	name_lbl.add_theme_font_size_override("font_size", 48)
 	row.add_child(name_lbl)
 	var bar := ProgressBar.new()
 	bar.max_value = max(1, maxv)
@@ -4306,8 +4412,8 @@ func _status_vital_bar(label: String, cur: int, maxv: int,
 	row.add_child(bar)
 	var val_lbl := Label.new()
 	val_lbl.text = "%d / %d" % [cur, maxv]
-	val_lbl.add_theme_font_size_override("font_size", 36)
-	val_lbl.custom_minimum_size = Vector2(220, 0)
+	val_lbl.add_theme_font_size_override("font_size", 42)
+	val_lbl.custom_minimum_size = Vector2(240, 0)
 	val_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	row.add_child(val_lbl)
 	return row
@@ -4351,13 +4457,13 @@ func _status_attr_card(label: String, value: int, tint: Color) -> Control:
 	var name_lbl := Label.new()
 	name_lbl.text = label
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_lbl.add_theme_font_size_override("font_size", 32)
+	name_lbl.add_theme_font_size_override("font_size", 38)
 	name_lbl.modulate = tint
 	col.add_child(name_lbl)
 	var val_lbl := Label.new()
 	val_lbl.text = str(value)
 	val_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	val_lbl.add_theme_font_size_override("font_size", 60)
+	val_lbl.add_theme_font_size_override("font_size", 72)
 	col.add_child(val_lbl)
 	return panel
 
@@ -4416,18 +4522,18 @@ func _status_stat_card(label: String, value: int, sub: String) -> Control:
 	head.add_theme_constant_override("separation", 12)
 	var name_lbl := Label.new()
 	name_lbl.text = label
-	name_lbl.add_theme_font_size_override("font_size", 30)
+	name_lbl.add_theme_font_size_override("font_size", 38)
 	name_lbl.modulate = Color(0.75, 0.80, 0.90)
 	head.add_child(name_lbl)
 	var val_lbl := Label.new()
 	val_lbl.text = str(value)
-	val_lbl.add_theme_font_size_override("font_size", 48)
+	val_lbl.add_theme_font_size_override("font_size", 58)
 	head.add_child(val_lbl)
 	col.add_child(head)
 	var sub_lbl := Label.new()
 	sub_lbl.text = sub
 	sub_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sub_lbl.add_theme_font_size_override("font_size", 22)
+	sub_lbl.add_theme_font_size_override("font_size", 28)
 	sub_lbl.modulate = Color(0.65, 0.65, 0.70)
 	col.add_child(sub_lbl)
 	return panel
@@ -4477,19 +4583,19 @@ func _status_gear_row(slot: String, display: String, sub: String,
 		row.add_child(icon)
 	var slot_lbl := Label.new()
 	slot_lbl.text = slot
-	slot_lbl.custom_minimum_size = Vector2(160, 0)
-	slot_lbl.add_theme_font_size_override("font_size", 26)
+	slot_lbl.custom_minimum_size = Vector2(180, 0)
+	slot_lbl.add_theme_font_size_override("font_size", 32)
 	slot_lbl.modulate = Color(0.65, 0.65, 0.70)
 	row.add_child(slot_lbl)
 	var name_lbl := Label.new()
 	name_lbl.text = display + ("  (cursed)" if cursed else "")
-	name_lbl.add_theme_font_size_override("font_size", 34)
+	name_lbl.add_theme_font_size_override("font_size", 40)
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(name_lbl)
 	if sub != "":
 		var sub_lbl := Label.new()
 		sub_lbl.text = sub
-		sub_lbl.add_theme_font_size_override("font_size", 26)
+		sub_lbl.add_theme_font_size_override("font_size", 32)
 		sub_lbl.modulate = Color(0.55, 0.85, 0.55)
 		sub_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		row.add_child(sub_lbl)
@@ -4628,7 +4734,7 @@ func _status_resist_card(label: String, value: int, tint: Color) -> Control:
 	var name_lbl := Label.new()
 	name_lbl.text = label
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_lbl.add_theme_font_size_override("font_size", 30)
+	name_lbl.add_theme_font_size_override("font_size", 38)
 	name_lbl.modulate = tint
 	col.add_child(name_lbl)
 	var val_lbl := Label.new()
@@ -4638,7 +4744,7 @@ func _status_resist_card(label: String, value: int, tint: Color) -> Control:
 	else:
 		val_lbl.text = "+" + "+".repeat(max(1, value)) if value > 0 else "-" + "-".repeat(max(1, -value))
 	val_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	val_lbl.add_theme_font_size_override("font_size", 36)
+	val_lbl.add_theme_font_size_override("font_size", 44)
 	col.add_child(val_lbl)
 	return panel
 
@@ -4670,7 +4776,7 @@ func _status_build_trait(vb: VBoxContainer) -> void:
 	var lbl := Label.new()
 	lbl.text = _describe_trait(trait_id)
 	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	lbl.add_theme_font_size_override("font_size", 30)
+	lbl.add_theme_font_size_override("font_size", 38)
 	panel.add_child(lbl)
 	vb.add_child(panel)
 
