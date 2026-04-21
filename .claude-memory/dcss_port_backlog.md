@@ -41,9 +41,9 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 - [x] **Walking noise** — 2b243722: Player.try_move emits a body-armour-EVP-scaled DCSSNoise pulse (plate=loud, robe=silent). Stealth still trims.
 - [x] **Monster shout** — 32dd5259: MonsterAI.wake emits HD-scaled DCSSNoise (hiss 4 → roar 12). Silent-shape jellies and silent-flag mobs muzzled. Wave propagates through walls via the noise grid.
 - [ ] **Unrandarts** — 0 of ~200 implemented (unique named items with hardcoded effects, e.g. Singing Sword, Bow of Krishna).
-- [ ] **Randart generation** — random-property artefacts not produced by the item gen.
+- [x] **Randart generation** — 2e17d103: RandartGenerator.gd with 17-prop weighted pool, depth-scaled 1-4 properties, "the Adj Noun" names. Rings only (amulets TBD). Floor drops 15% randart at depth≥4. Equip + tooltip wired.
 - [ ] **Identification system** — all items pre-identified; DCSS hides potion/scroll/ring/armour appearances until identified.
-- [ ] **Player willpower stat** — missing; monsters have `will`, so hex spells land on the player without resist roll.
+- [x] **Player willpower stat** — b842a303: Stats.WL seeded from _race_base_wl (formicid=270 immune, mummy/vine=80, …). _recompute_gear_stats: WL=base+XL*3+willpower_ego*40. willpower_check(hd): random(0..hd*5+30)<WL. Wired in MonsterAI hex branch: confuse/paralyse/slow/fear/charm check WL first. 7-level resist display fixed (rF+ shows "+", not "++"). _apply_elem_resist: rl≥3=immune, -1=×1.5, -2=×2, ≤-3=×3. get_resist() unified source for all racial intrinsics + gear + mutations. Status panel: 5 elemental + WL/rCorr/rMut row.
 
 ## 🟢 Small (QoL, nuance)
 
@@ -64,22 +64,19 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 
 When a backlog item lands, replace its `[ ]` with `[x] (<commit-hash>)` and note which parts are left (if partial). Do NOT delete — the history matters for later retrospectives.
 
-## Active picks (top-of-stack — updated 2026-04-21 session end)
+## Active picks (top-of-stack — updated 2026-04-21 session 2)
 
 Gods deferred per user direction — don't start god invocation parity
-unless explicitly asked. User's queued order from the last session:
+unless explicitly asked. User's queued order:
 
 1. ~~**Amulet roster**~~ — DONE 5c2c6d18
-2. **Ring multi-stat coverage + randart generation** — current ring pool
-   is single-stat (ring_str etc.). Add multi-property rolls; feeds
-   the same code path that serves amulets.
-3. **Player willpower stat** (🟡) — add Stats.WL, compute from
-   racial/job base + XL * 3 + jewellery willpower ego + mutation.
-   Route all hex damage/effect rolls through `willpower_check(spell_hd)`
-   matching mon-cast.cc. Currently hexes auto-land on player.
-4. **Resistance / immunity expansion** — rMut, rCorr, MR integration,
-   sInv (already flagged), Harm (already), Spirit Shield. Most of
-   these become `has_meta("_ego_X")` reads once willpower lands.
+2. ~~**Ring multi-stat coverage + randart generation**~~ — DONE 2e17d103
+3. ~~**Player willpower stat + hex resist + 7-level resist**~~ — DONE b842a303
+4. **Status effect breadth** (🟡) — poison 3-level stacking, Frozen,
+   Petrifying→Petrified transition (partial — tick exists), Blind,
+   Corona, Enthralled, Silenced expansion, Exhausted (exists),
+   Mesmerised (exists), Weakness, Daze. Paralysis/Slow/Fear/Charm
+   durations now tick but no gameplay effects beyond movement block.
 5. **Status effect breadth** (🟡) — poison 3-level stacking, Frozen,
    Petrifying→Petrified transition, Blind, Corona, Enthralled,
    Silenced expansion, Exhausted, Mesmerised, Weakness, Daze. Each
