@@ -14,3 +14,8 @@ The project's 1st goal is to **replicate Dungeon Crawl Stone Soup (DCSS) as fait
 - UX layer (controls, inventory screen, quickslots, auto-explore, combat feedback, touch interactions): apply Pixel Dungeon mobile idioms.
 - Push back on proposals that simplify DCSS away ("let's combine these three skills"), unless the user explicitly asks for that simplification.
 - When the user asks to "restore" or "un-simplify" something, assume they want the DCSS-aligned version.
+
+**2026-04-22 sequencing pivot**: finish the faithful port FIRST, then
+do the Pixel Dungeon mobilization as a second pass. Optional "original
+DCSS experience" toggle / post-clear unlock exposes both presentations
+on top of the same ported systems. Details in `project_direction.md`.

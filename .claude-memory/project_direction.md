@@ -1,27 +1,74 @@
 ---
 name: PROJ_D next-phase direction
-description: 2026-04-21 user decision on post-DCSS-core work. Marketplace/companions over god-full-parity.
+description: 2026-04-22 direction pivot — complete faithful DCSS port FIRST, then Pixel Dungeon mobilize as a second pass. Optional "original DCSS experience" mode toggle.
 type: project
 originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 ---
-## 2026-04-21 direction decision
 
-User weighed three paths after wholesale DCSS ports stabilized:
-1. Finish 26 gods to full parity (Vehumet MP discount, Okawaru gifts, Ru sacrifices, Gozag gold economy, Ashenzari curse-boost, etc.)
-2. Expand essence system (drops / fusion / upgrades / synergy with gods)
-3. Village hub + companions
+## 2026-04-22 direction pivot (supersedes 2026-04-21 village-first plan)
 
-**Decision logged but not started:** prefer village + companions as the long-run identity differentiator (distinguishes us from a plain DCSS port), with god-parity only bumped for the 4-5 most popular deities (Trog / Makhleb / Okawaru / Sif Muna / Ashenzari) as a side task.
+User locked in the sequencing question: **complete the faithful DCSS
+0.34 port first, THEN do the Pixel Dungeon mobile simplification as a
+second pass on top of a finished base**. Rationale: don't simplify
+systems you haven't fully understood / implemented yet. A toggle or
+post-clear unlock can expose the "original DCSS experience" alongside
+the mobilized default for players who want it.
 
-**Companion AI concern raised**: user worries about path-jam / stuck-on-stairs / friendly-fire. Mitigations pre-agreed:
-- Start with **1 companion max** (N≥2 is the pathing-hell inflection point)
-- Escape hatch: if companion >3 turns out of LOS, teleport to player's side
-- Reuse existing `scripts/entities/Companion.gd` + `CompanionAI.gd` (already ~200 lines shipping via god invocations) rather than a fresh AI tree
+### What this means in practice
 
-**Suggested order if resumed:**
-1. Village/town static hub (zero AI risk, biggest UX payoff) — 3-4 sessions
-2. Companion recruitment + persistence across floors — 2 sessions
-3. Essence system expansion (drops/synergy) — 1-2 sessions
-4. Selected god full-parity — ad hoc, 1 god per session
+1. **Current phase — port completion.** Everything not yet ported or
+   only flag-registered needs real implementation. Accept the scope.
+2. **Next phase — mobilization layer.** UX compression, help scaffolds,
+   progression pruning, glance-and-tap friendliness. The port becomes
+   the backing store; mobile UX is a presentation layer.
+3. **Option toggle** (future): settings switch between "faithful
+   DCSS" and "mobilized" presentations — same systems, different UX.
 
-Do NOT start on companion AI without first stabilising floor-transition persistence (companion follow-up-stairs + reappear-near-player logic).
+### Retracted
+
+The 2026-04-21 plan that deferred 26-god parity in favor of
+village+companions is now deprioritized. Village + companions still
+live as a long-run differentiator, but they come AFTER faithful port
+completion.
+
+### Order for port completion (rough, based on gaps as of 2026-04-22)
+
+1. **Gods — 26-deity full parity** (the single biggest gap)
+   - Invocations (per-god abilities scaled by Invocations skill)
+   - Passives (Vehumet/Chei/Gozag/Ru/etc.)
+   - Conducts (done for 7/26; expand to all)
+   - Gifts (Trog/Okawaru weapons, Sif spellbooks, etc.)
+2. **Portal vaults** — 10 types (Sewer/Ossuary/Bailey/Volcano/Icecave/
+   Wizlab/Trove/Labyrinth/Desolation/Gauntlet). Timed mini-branches.
+3. **Unrandart roster** — expand 22 → 200 entries. Data-entry heavy.
+4. **Transformation full scaling** — add Shapeshifting skill so
+   unarmed_scaling / ac_scaling fire.
+5. **Status effects rest** — Silenced zone (needs aura monsters),
+   Enthralled (needs friendly-monster state), Liquefaction (needs
+   Liquefy Earth spell + LIQUEFIED tile).
+6. **Mutations effects** — 216 mutations data loaded; many have no
+   mechanical handler yet.
+7. **Branch visual differentiation** — acid floor tile, glass /
+   translucent walls, crystal walls (Zot), tombstones (Crypt).
+8. **Beam fills** — set-on-fire (burn_wall), beam bouncing
+   (lightning), reflection for spells (not just missiles).
+9. **Full ranged combat** — throwing-vs-firing split, ammo (if we
+   keep DCSS pre-0.30 style), range-band UI.
+10. **Floor gen for every branch** — Hell/Pan/Abyss/Zot special
+    layouts (not just the default overlapping-boxes fallback).
+
+### What NOT to start yet
+
+- Village hub / companion expansion beyond what's shipped.
+- Mobile-specific UX cuts (those come in Phase 2).
+- New non-DCSS systems (Essence is already custom enough — freeze
+  scope until port is complete).
+
+### How to apply
+
+- Every new PR should ask: "does this close a DCSS-parity gap or
+  does it add non-DCSS scope?" Non-DCSS scope is deferred.
+- Keep referencing crawl/source/ in code comments so the port remains
+  auditable.
+- When porting a new system, match DCSS formulas first, simplify
+  later during Phase 2.
