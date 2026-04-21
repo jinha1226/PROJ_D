@@ -34,7 +34,7 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 - [ ] **Monster pack/tactical behaviour** — leader follow, tactical retreat, ranged support. Currently packs scatter.
 - [ ] **Transformation forms** — FormRegistry has 5-6; DCSS has Dragon, Statue, Tree, Hydra, Lich, Bat Swarm, Fungus, Pig, Spider, Flux and form-specific stats/abilities.
 - [ ] **Poison levels** — single DoT scalar; DCSS has 3 levels + per-level resist scaling.
-- [ ] **Status effects** — Berserk (no post-rage fatigue), Frozen, Petrifying→Petrified transition, Blind, Corona, Enthralled, Silenced (partial), Exhausted, Mesmerised, Weakness, Daze, Liquefaction.
+- [x] **Status effects (core)** — f71a217c: Slow/Fear/Charm/Blind/Corona/Daze gameplay wired. Poison 3-level stacking. Remaining: Frozen, Weakness, Silenced expansion, Enthralled, Liquefaction.
 - [ ] **Dungeon-feature tile behaviour** — lava/water blocking certain monsters, Teleport trap destination targeting, Zot/Shaft/Golubria traps, glass walls, translucent stone.
 - [ ] **Unarmed Combat skill** — skill doesn't exist; monk/brawler unarmed damage is flat.
 - [ ] **Invocations skill power scaling** — god abilities don't scale with invocation level.
@@ -72,11 +72,10 @@ unless explicitly asked. User's queued order:
 1. ~~**Amulet roster**~~ — DONE 5c2c6d18
 2. ~~**Ring multi-stat coverage + randart generation**~~ — DONE 2e17d103
 3. ~~**Player willpower stat + hex resist + 7-level resist**~~ — DONE b842a303
-4. **Status effect breadth** (🟡) — poison 3-level stacking, Frozen,
-   Petrifying→Petrified transition (partial — tick exists), Blind,
-   Corona, Enthralled, Silenced expansion, Exhausted (exists),
-   Mesmerised (exists), Weakness, Daze. Paralysis/Slow/Fear/Charm
-   durations now tick but no gameplay effects beyond movement block.
+4. ~~**Status effect breadth (core)**~~ — f71a217c: Slow=half-speed(_slow_skip alt), Fear=block-toward-monster, Charm=no-attack, Blind=FOV→2+EV-5, Corona=stealth→0, Daze=33%scatter+EV-2, Poison 3-level(apply_poison helper, rPois check, stacking). MonsterAI: blind/corona/daze/slow/fear/charm spells wired. Remaining: Frozen, Weakness, Silenced expansion, Enthralled.
+5. **Dungeon tile behaviour** — Lava/Water blocking, Teleport trap, Shaft, glass walls.
+6. **Unarmed Combat skill** — new skill id, XP on unarmed swings, damage scaling.
+7. **Identification system** — randomize appearances per run, appearance_id + identified flag.
 5. **Status effect breadth** (🟡) — poison 3-level stacking, Frozen,
    Petrifying→Petrified transition, Blind, Corona, Enthralled,
    Silenced expansion, Exhausted, Mesmerised, Weakness, Daze. Each
