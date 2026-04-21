@@ -75,7 +75,7 @@ var _skills_swipe_category: String = ""
 var _skills_swipe_start_x: float = -1.0
 var _skills_swipe_start_y: float = -1.0
 var _skills_dlg: AcceptDialog = null
-var _status_dlg: AcceptDialog = null
+var _status_dlg: GameDialog = null
 var _map_dlg: AcceptDialog = null
 var _magic_dlg: AcceptDialog = null
 var _combat_log_label: Label = null
@@ -4426,22 +4426,14 @@ func _on_status_pressed() -> void:
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null or player == null:
 		return
-	var dlg := AcceptDialog.new()
-	dlg.exclusive = false
-	dlg.title = "Status"
-	dlg.ok_button_text = "Close"
 
-	var scroll := ScrollContainer.new(); scroll.scroll_deadzone = 20
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.custom_minimum_size = Vector2(920, 1500)
-	dlg.add_child(scroll)
+	var dlg := GameDialog.create("Status", Vector2i(960, 1800))
+	popup_mgr.add_child(dlg)
+	_status_dlg = dlg
+	dlg.set_on_close(func():
+		if _status_dlg == dlg: _status_dlg = null)
 
-	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 20)
-	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(vb)
-
+	var vb: VBoxContainer = dlg.body()
 	_status_build_header(vb)
 	_status_build_vitals(vb)
 	_status_build_piety(vb)
@@ -4458,32 +4450,11 @@ func _on_status_pressed() -> void:
 		for i in essence_system.slots.size():
 			vb.add_child(_build_essence_row(i, dlg))
 
-	var close_btn := Button.new()
-	close_btn.text = "Close"
-	close_btn.add_theme_font_size_override("font_size", 40)
-	close_btn.custom_minimum_size = Vector2(0, 96)
-	close_btn.pressed.connect(dlg.queue_free)
-	vb.add_child(close_btn)
-
-	popup_mgr.add_child(dlg)
-	_status_dlg = dlg
-	dlg.tree_exited.connect(func():
-		if _status_dlg == dlg: _status_dlg = null)
-	dlg.confirmed.connect(dlg.queue_free)
-	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(960, 1800))
-
 
 # ---- Status sections -----------------------------------------------------
 
 func _status_section_header(text: String) -> Label:
-	var lbl := Label.new()
-	lbl.text = text
-	# Bumped from 40 → 52 per user "상태창에 글씨를 전체적으로 좀 크게" —
-	# section headers anchor each card, so they take the biggest lift.
-	lbl.add_theme_font_size_override("font_size", 52)
-	lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.40))
-	return lbl
+	return UICards.section_header(text)
 
 
 ## Piety card — shows current god portrait, piety bar, and per-kill
@@ -4651,24 +4622,7 @@ func _status_build_attributes(vb: VBoxContainer) -> void:
 
 
 func _status_attr_card(label: String, value: int, tint: Color) -> Control:
-	var panel := PanelContainer.new()
-	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(tint.r * 0.15, tint.g * 0.15, tint.b * 0.15, 0.8)
-	sb.border_color = tint
-	sb.border_width_left = 3
-	sb.border_width_top = 3
-	sb.border_width_right = 3
-	sb.border_width_bottom = 3
-	sb.corner_radius_top_left = 6
-	sb.corner_radius_top_right = 6
-	sb.corner_radius_bottom_left = 6
-	sb.corner_radius_bottom_right = 6
-	sb.content_margin_left = 16
-	sb.content_margin_right = 16
-	sb.content_margin_top = 12
-	sb.content_margin_bottom = 12
-	panel.add_theme_stylebox_override("panel", sb)
+	var panel: PanelContainer = UICards.card(tint)
 	var col := VBoxContainer.new()
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
 	panel.add_child(col)
@@ -4995,7 +4949,7 @@ func _status_build_trait(vb: VBoxContainer) -> void:
 ## One row in the Status popup per essence slot. Shows the slotted essence's
 ## name + stat summary, a Swap button, and (when the essence has an active
 ## ability) a Cast button that funnels through EssenceSystem.invoke.
-func _build_essence_row(slot_idx: int, status_dlg: AcceptDialog) -> Control:
+func _build_essence_row(slot_idx: int, status_dlg: GameDialog) -> Control:
 	var row := VBoxContainer.new()
 	row.add_theme_constant_override("separation", 4)
 	row.custom_minimum_size = Vector2(0, 120)
@@ -5048,20 +5002,20 @@ func _build_essence_row(slot_idx: int, status_dlg: AcceptDialog) -> Control:
 	return row
 
 
-func _on_cast_essence_ability(slot_idx: int, status_dlg: AcceptDialog) -> void:
+func _on_cast_essence_ability(slot_idx: int, status_dlg: GameDialog) -> void:
 	if essence_system == null:
 		return
 	var ok: bool = essence_system.invoke(slot_idx)
-	status_dlg.queue_free()
+	status_dlg.close()
 	if ok:
 		TurnManager.end_player_turn()
 
 
-func _on_swap_essence_slot(slot_idx: int, status_dlg: AcceptDialog) -> void:
+func _on_swap_essence_slot(slot_idx: int, status_dlg: GameDialog) -> void:
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null or essence_system == null:
 		return
-	status_dlg.queue_free()
+	status_dlg.close()
 	var current: EssenceData = essence_system.slots[slot_idx]
 	var current_id: String = current.id if current != null else ""
 	var inv_ids: Array = []
