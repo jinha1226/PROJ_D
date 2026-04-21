@@ -14,6 +14,7 @@ const SKILL_NAMES: Dictionary = {
 	"crossbow": "Crossbows",
 	"sling": "Slings",
 	"throwing": "Throwing",
+	"unarmed_combat": "Unarmed Combat",
 	"fighting": "Fighting",
 	"armour": "Armour",
 	"dodging": "Dodging",

@@ -2696,6 +2696,7 @@ const _SKILL_DESCS: Dictionary = {
 	"crossbow": "Crossbow DMG +5%/lv",
 	"sling": "Sling DMG +5%/lv",
 	"throwing": "Throw DMG +5%/lv",
+	"unarmed_combat": "Fist DMG +1 per 3 lv + faster swings",
 	"fighting": "Melee DMG +2/lv",
 	"armour": "AC +1 per 4 lv",
 	"dodging": "EV +1 per 3 lv",
@@ -2790,6 +2791,11 @@ func _player_aptitude(skill_id: String) -> int:
 	if player == null or player.race_res == null:
 		return 0
 	var apts: Dictionary = player.race_res.skill_aptitudes
+	# DCSS aptitude JSON uses "unarmed" as the key; our internal skill id
+	# is "unarmed_combat" (matches SK_UNARMED_COMBAT). Alias-lookup so
+	# species-authored aptitudes still apply.
+	if skill_id == "unarmed_combat" and not apts.has(skill_id):
+		return int(apts.get("unarmed", 0))
 	return int(apts.get(skill_id, 0))
 
 

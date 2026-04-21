@@ -57,7 +57,16 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 			and attacker.race_res.racial_trait == "ghoul_claws":
 		weapon_dmg += 3
 
+	# Unarmed swings train "unarmed_combat" (DCSS SK_UNARMED_COMBAT) and
+	# its level scales both damage (via the weapon-skill multiplier) and
+	# attack-delay mindelay just like any other weapon school.
 	var weapon_skill_id: String = WeaponRegistry.weapon_skill_for(weapon_id)
+	if weapon_id == "":
+		weapon_skill_id = "unarmed_combat"
+		# DCSS unarmed: +1 damage per 3 skill levels on top of the skill
+		# multiplier. Keeps fists scaling into the late game.
+		if skill_sys != null:
+			weapon_dmg += skill_sys.get_level(attacker, "unarmed_combat") / 3
 	var weapon_skill_level: int = 0
 	var fighting_level: int = 0
 	if skill_sys != null:

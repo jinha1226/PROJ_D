@@ -14,7 +14,7 @@ var auto_training: bool = true
 const SKILL_IDS: Array = [
 	# Weapons
 	"axe", "short_blade", "long_blade", "mace", "polearm", "staff",
-	"bow", "crossbow", "sling", "throwing",
+	"bow", "crossbow", "sling", "throwing", "unarmed_combat",
 	# Defense
 	"fighting", "armour", "dodging", "shields",
 	# Magic (reserved for M2 but defined)
@@ -28,6 +28,7 @@ const SKILL_CATEGORY: Dictionary = {
 	"axe": "weapon", "short_blade": "weapon", "long_blade": "weapon",
 	"mace": "weapon", "polearm": "weapon", "staff": "weapon",
 	"bow": "weapon", "crossbow": "weapon", "sling": "weapon", "throwing": "weapon",
+	"unarmed_combat": "weapon",
 
 	"fighting": "defense", "armour": "defense", "dodging": "defense", "shields": "defense",
 

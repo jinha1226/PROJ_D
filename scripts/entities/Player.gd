@@ -1408,8 +1408,11 @@ func gear_damage_reduction() -> int:
 
 
 func get_current_weapon_skill() -> String:
+	# Unarmed swings train "unarmed_combat" — the DCSS SK_UNARMED_COMBAT
+	# skill, which scales fist damage and drops mindelay like any other
+	# weapon skill.
 	if equipped_weapon_id == "":
-		return ""
+		return "unarmed_combat"
 	return WeaponRegistry.weapon_skill_for(equipped_weapon_id)
 
 
@@ -2764,7 +2767,12 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 	if equipped_weapon_id != "" and WeaponRegistry.is_weapon(equipped_weapon_id):
 		weapon_delay_base = WeaponRegistry.weapon_delay_for(equipped_weapon_id)
 	var delay_10: int = int(round(weapon_delay_base * 10))
+	# Unarmed routes through the "unarmed_combat" skill for delay
+	# reduction, matching DCSS where SK_UNARMED_COMBAT governs fist
+	# attack delay too (player-act.cc: player_adjust_delay_with_skill).
 	var wpn_skill_id: String = WeaponRegistry.weapon_skill_for(equipped_weapon_id)
+	if equipped_weapon_id == "":
+		wpn_skill_id = "unarmed_combat"
 	var wpn_sklev: int = 0
 	if skill_sys != null and wpn_skill_id != "":
 		wpn_sklev = skill_sys.get_level(self, wpn_skill_id)
