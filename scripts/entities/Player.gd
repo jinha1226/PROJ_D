@@ -1135,7 +1135,7 @@ func _get_trait_equipment(trait_id: String) -> Dictionary:
 	return {}
 
 
-func equip_weapon(weapon_id: String, plus: int = 0) -> String:
+func equip_weapon(weapon_id: String, plus: int = 0, brand: String = "") -> String:
 	if equipped_weapon_cursed and equipped_weapon_id != "":
 		CombatLog.add("The %s is cursed and won't come off!" % WeaponRegistry.display_name_for(equipped_weapon_id))
 		return equipped_weapon_id
@@ -1143,6 +1143,12 @@ func equip_weapon(weapon_id: String, plus: int = 0) -> String:
 	equipped_weapon_id = weapon_id
 	equipped_weapon_plus = plus
 	equipped_weapon_cursed = false
+	# Unrandart / scroll-of-brand weapons carry a brand meta the combat
+	# system reads on every swing. Setting it here so the brand follows
+	# the weapon across unequip/re-equip cycles (the meta is keyed by
+	# weapon id, not slot).
+	if brand != "" and weapon_id != "":
+		set_meta("_weapon_brand_" + weapon_id, brand)
 	_auto_train_weapon_skill(weapon_id)
 	stats_changed.emit()
 	_load_sprite_preset()
@@ -1250,7 +1256,8 @@ func equip_ring(ring: Dictionary, slot_index: int = -1) -> Dictionary:
 	# stat-ring flavour reveals when equipped). Randarts are opaque until
 	# scrolls of identify hit them (their rolled props stay hidden).
 	var r_id: String = String(ring.get("id", ""))
-	if r_id != "" and not r_id.begins_with("randart_") and GameManager != null:
+	if r_id != "" and not r_id.begins_with("randart_") \
+			and not r_id.begins_with("unrand_") and GameManager != null:
 		GameManager.identify(r_id)
 	_recompute_gear_stats()
 	return prev
@@ -1272,7 +1279,8 @@ func equip_amulet(amulet: Dictionary) -> Dictionary:
 	var prev: Dictionary = equipped_amulet.duplicate()
 	equipped_amulet = amulet
 	var a_id: String = String(amulet.get("id", ""))
-	if a_id != "" and not a_id.begins_with("randart_") and GameManager != null:
+	if a_id != "" and not a_id.begins_with("randart_") \
+			and not a_id.begins_with("unrand_") and GameManager != null:
 		GameManager.identify(a_id)
 	_recompute_gear_stats()
 	return prev

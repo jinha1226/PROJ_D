@@ -72,11 +72,26 @@ static func _ensure_loaded() -> void:
 
 static func _lookup(id: String) -> Dictionary:
 	_ensure_loaded()
+	# Unrandart armors share the same shape as base rows (name/slot/ac/
+	# ev_penalty/color) so equip + tooltip paths don't need a special
+	# case. We just synthesize the row on demand.
+	if id.begins_with("unrand_") and UnrandartRegistry.has(id):
+		var u: Dictionary = UnrandartRegistry.get_info(id)
+		if String(u.get("kind", "")) == "armor":
+			return {
+				"name":       String(u.get("name", id)),
+				"slot":       String(u.get("slot", "chest")),
+				"ac":         int(u.get("ac", 0)),
+				"ev_penalty": int(u.get("ev_penalty", 0)),
+				"color":      u.get("color", Color.WHITE),
+			}
 	return _merged.get(id, {})
 
 
 static func is_armor(id: String) -> bool:
 	_ensure_loaded()
+	if id.begins_with("unrand_") and UnrandartRegistry.has(id):
+		return String(UnrandartRegistry.get_info(id).get("kind", "")) == "armor"
 	return _merged.has(id)
 
 

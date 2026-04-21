@@ -978,6 +978,18 @@ func _place_random_floor_item(pos: Vector2i, depth: int, parent: Node) -> bool:
 	var drop_roll: float = randf()
 	var fi: FloorItem = FloorItem.new()
 	parent.add_child(fi)
+	# DCSS unrandart drop — 1.5% chance per item at depth ≥ 5. Each
+	# unrand is a uniquely-named artefact; UnrandartRegistry picks one
+	# at random from those whose min_depth gates are satisfied. Unrands
+	# are never cursed and bypass the rest of the category rolls.
+	if depth >= 5 and randf() < 0.015:
+		var urid: String = UnrandartRegistry.roll_for_depth(depth)
+		if urid != "":
+			var udict: Dictionary = UnrandartRegistry.make_item(urid)
+			var ucolor: Color = udict.get("color", Color(1, 1, 1))
+			fi.setup(pos, urid, String(udict.get("name", urid)),
+					String(udict.get("kind", "weapon")), ucolor, udict)
+			return true
 	if drop_roll < 0.42:
 		var wid: String = _pick_by_depth("weapon", depth)
 		if wid.is_empty():
@@ -4292,9 +4304,10 @@ func _on_bag_equip(idx: int, dlg: GameDialog) -> void:
 			if kind == "weapon":
 				var wid: String = String(it.get("id", ""))
 				var new_plus: int = int(it.get("plus", 0))
+				var new_brand: String = String(it.get("brand", ""))
 				var prev_id: String = player.equipped_weapon_id
 				var prev_plus: int = player.equipped_weapon_plus
-				var returned_id: String = player.equip_weapon(wid, new_plus)
+				var returned_id: String = player.equip_weapon(wid, new_plus, new_brand)
 				if returned_id == wid:
 					# equip_weapon returned same id → was blocked (cursed).
 					items.insert(idx, it)
@@ -4326,8 +4339,17 @@ func _on_bag_equip(idx: int, dlg: GameDialog) -> void:
 				if bool(it.get("cursed", false)):
 					armor_info["cursed"] = true
 				# Carry the enchant level over onto the armor slot dict
-				# so the equipped AC calc sees it.
+				# so the equipped AC calc sees it. Ego comes from the
+				# item dict (floor gen rolled it; unrands have a fixed
+				# ego); the armor_info lookup doesn't include egos so
+				# this copy is the single-source-of-truth for the slot.
 				armor_info["plus"] = int(it.get("plus", 0))
+				if it.has("ego"):
+					armor_info["ego"] = String(it.get("ego", ""))
+				# Preserve the unrand's display name ("the Cloak of the
+				# Thief") rather than the base ("cloak").
+				if bool(it.get("unrand", false)):
+					armor_info["name"] = String(it.get("name", armor_info.get("name", aid)))
 				var prev_armor: Dictionary = player.equip_armor(armor_info)
 				if bool(it.get("cursed", false)):
 					CombatLog.add("The %s is cursed!" % String(armor_info.get("name", aid)))
@@ -4344,7 +4366,10 @@ func _on_bag_equip(idx: int, dlg: GameDialog) -> void:
 			elif kind == "ring":
 				var rid: String = String(it.get("id", ""))
 				var ring_info: Dictionary
-				if it.get("randart", false):
+				# Randarts + unrands both carry their stat props on the
+				# item dict (no base registry entry). Dup the whole dict
+				# so the equip path sees ring_info["props"] directly.
+				if it.get("randart", false) or it.get("unrand", false):
 					ring_info = it.duplicate(true)
 				else:
 					ring_info = RingRegistry.get_info(rid)
@@ -4364,7 +4389,23 @@ func _on_bag_equip(idx: int, dlg: GameDialog) -> void:
 					items.append(prev_ring)
 			elif kind == "amulet":
 				var amid: String = String(it.get("id", ""))
-				var amu_info: Dictionary = AmuletRegistry.get_info(amid)
+				var amu_info: Dictionary
+				if bool(it.get("unrand", false)):
+					# Unrand amulets fall back onto their `base` amulet
+					# for mechanics (e.g. acrobat passive). Start from
+					# the base dict then overlay the unrand's name +
+					# props so the stat bonuses layer correctly.
+					var base_id: String = String(it.get("base", ""))
+					amu_info = AmuletRegistry.get_info(base_id) if base_id != "" else {}
+					if amu_info.is_empty():
+						amu_info = {}
+					amu_info["id"] = amid
+					amu_info["name"] = String(it.get("name", amid))
+					amu_info["unrand"] = true
+					if it.has("props"):
+						amu_info["props"] = it.get("props", {})
+				else:
+					amu_info = AmuletRegistry.get_info(amid)
 				if amu_info.is_empty():
 					amu_info = {
 						"id": amid,

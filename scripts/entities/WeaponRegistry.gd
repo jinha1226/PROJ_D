@@ -107,11 +107,25 @@ static func _ensure_loaded() -> void:
 
 static func _lookup(id: String) -> Dictionary:
 	_ensure_loaded()
+	# Unrandart weapons fall through here — UnrandartRegistry hands back
+	# a dict shaped the same as a regular weapon row ({dmg, skill, delay,
+	# name}) so all the existing getters just work.
+	if id.begins_with("unrand_") and UnrandartRegistry.has(id):
+		var u: Dictionary = UnrandartRegistry.get_info(id)
+		if String(u.get("kind", "")) == "weapon":
+			return {
+				"dmg":   int(u.get("dmg", 0)),
+				"skill": String(u.get("skill", "")),
+				"delay": float(u.get("delay", 1.0)),
+				"name":  String(u.get("name", id)),
+			}
 	return _merged.get(id, {})
 
 
 static func is_weapon(id: String) -> bool:
 	_ensure_loaded()
+	if id.begins_with("unrand_") and UnrandartRegistry.has(id):
+		return String(UnrandartRegistry.get_info(id).get("kind", "")) == "weapon"
 	return _merged.has(id)
 
 
@@ -158,6 +172,9 @@ static func all_weapon_ids() -> Array:
 
 static func display_name_for(id: String) -> String:
 	_ensure_loaded()
+	# Unrands carry their artefact name directly on the registry entry.
+	if id.begins_with("unrand_") and UnrandartRegistry.has(id):
+		return String(UnrandartRegistry.get_info(id).get("name", id))
 	var dcss_name: String = String(_dcss.get(id, {}).get("name", ""))
 	if dcss_name != "":
 		return dcss_name

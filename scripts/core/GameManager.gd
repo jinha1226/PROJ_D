@@ -103,9 +103,9 @@ func is_identified(id: String) -> bool:
 func display_name_for_item(id: String, fallback: String, kind: String) -> String:
 	if identified.has(id):
 		return fallback
-	# Randarts always render with their rolled artefact name — the
-	# pseudonym system is only for base-item identification.
-	if id.begins_with("randart_"):
+	# Randarts + unrandarts always render with their artefact name —
+	# the pseudonym system is only for base-item identification.
+	if id.begins_with("randart_") or id.begins_with("unrand_"):
 		return fallback
 	if kind == "potion" or kind == "scroll" or kind == "ring" or kind == "amulet":
 		_ensure_pseudonyms()
