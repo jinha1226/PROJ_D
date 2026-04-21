@@ -73,21 +73,17 @@ unless explicitly asked. User's queued order:
 2. ~~**Ring multi-stat coverage + randart generation**~~ — DONE 2e17d103
 3. ~~**Player willpower stat + hex resist + 7-level resist**~~ — DONE b842a303
 4. ~~**Status effect breadth (core)**~~ — f71a217c: Slow=half-speed(_slow_skip alt), Fear=block-toward-monster, Charm=no-attack, Blind=FOV→2+EV-5, Corona=stealth→0, Daze=33%scatter+EV-2, Poison 3-level(apply_poison helper, rPois check, stacking). MonsterAI: blind/corona/daze/slow/fear/charm spells wired. Remaining: Frozen, Weakness, Silenced expansion, Enthralled.
-5. **Dungeon tile behaviour** — Lava/Water blocking, Teleport trap, Shaft, glass walls.
-6. **Unarmed Combat skill** — new skill id, XP on unarmed swings, damage scaling.
-7. **Identification system** — randomize appearances per run, appearance_id + identified flag.
-5. **Status effect breadth** (🟡) — poison 3-level stacking, Frozen,
-   Petrifying→Petrified transition, Blind, Corona, Enthralled,
-   Silenced expansion, Exhausted, Mesmerised, Weakness, Daze. Each
-   is a small duration meta + tick in Player._tick_duration_metas
-   + interaction site (hit / move / cast).
+5. **Status effect breadth (remaining)** — Frozen, Weakness, Silenced
+   expansion, Enthralled, Petrifying→Petrified transition, Exhausted,
+   Mesmerised, Liquefaction. Same pattern as session 5 core: duration
+   meta + tick in Player._tick_duration_metas + interaction site.
 6. **Dungeon tile behaviour** — Lava / Water blocking, Teleport trap
    targeting, Shaft (drop to layer below), Golubria pair-portal,
    glass/translucent walls for FieldOfView opacity nuance.
 7. **Unarmed Combat skill** (🟡) — new skill id "unarmed_combat",
    add to SkillSystem.SKILL_IDS, wire XP grant from unarmed swings
-   (weapon_skill_id == ""), and CombatSystem.melee_attack reads the
-   level for base damage + mindelay.
+   (weapon_skill_id == ""), CombatSystem.melee_attack reads level
+   for base damage + mindelay.
 8. **Identification system** (🟡) — randomize potion/scroll/ring/amulet
    appearances per run; items carry `appearance_id` + `identified` flag;
    status popup / bag shows "blue potion" until identified; scrolls

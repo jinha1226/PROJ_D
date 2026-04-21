@@ -149,3 +149,62 @@ Session 5 queue (recorded in dcss_port_backlog.md "Active picks"):
 
 Gods deferred until user explicitly asks — do NOT pick those items
 from the top of stack even if they seem like a natural next step.
+
+## Session 5 update (2026-04-21, cross-machine) — jewellery + WL + status core
+
+Worked on a second machine, pulled back via the `.claude-memory` symlink.
+Session 4 queue items 1-4 all landed; 5-7 still open.
+
+Content ports:
+- **Amulet roster (5c2c6d18)** — `AmuletRegistry.gd` with 9 DCSS amulets:
+  Faith, Magic Mastery, Regeneration, Acrobat, Reflection, Stasis,
+  Guardian Spirit, Gourmand, Nothing. `Player.equip_amulet` slot added.
+  Spirit Shield routes incoming damage through MP (HP→MP split until MP=0).
+  Stasis blocks teleport/blink attempts. Acrobat grants +5 EV on turns
+  with no attack. Faith multiplies piety gain 1.5×. Floor-gen drops 2%.
+  Bag UI + TileRenderer tiles wired.
+- **Ring multi-stat + randart (2e17d103)** — `RandartGenerator.gd`:
+  17-property weighted pool (stats / resists / see_invis / stealth /
+  slaying / spirit_shield / rage etc.); depth-scaled 1-4 props; "the
+  Adj Noun" name pool. Rings only for now (amulet randart TBD). Floor
+  drops 15% randart at depth ≥ 4. Equip folds into _recompute_gear_stats;
+  tooltip lists every rolled prop.
+- **Player willpower stat + 7-level resist (b842a303)** — `Stats.WL`
+  seeded from `_race_base_wl` (formicid=270 effectively immune, mummy
+  /vine=80, humans ~30). `_recompute_gear_stats` computes WL = base +
+  XL*3 + willpower_ego*40. `willpower_check(hd)` = random(0..hd*5+30) < WL
+  mirroring mon-cast.cc:check_willpower. MonsterAI hex branch rolls WL
+  before landing confuse/paralyse/slow/fear/charm. 7-level resist display:
+  rF+ shows "+", rF++ shows "++", rF- shows "-" (was broken: all "+"s).
+  `_apply_elem_resist`: rl≥3 immune, rl=-1 ×1.5, rl=-2 ×2, rl≤-3 ×3.
+  `get_resist()` unified read: racial intrinsic + gear ego + mutation.
+  Status panel: 5-elemental row + WL/rCorr/rMut row.
+- **Status effects core (f71a217c)** — gameplay wiring for 6 statuses:
+  * Slow — `_slow_skip` alternates, giving 50% action rate.
+  * Fear — movement toward the fear source blocked; routing picks lateral/away.
+  * Charm — player/monster can't attack the charmer; expires on damage.
+  * Blind — FOV radius capped at 2; EV -5 while active.
+  * Corona — stealth forced to 0; monsters auto-spot.
+  * Daze — 33% chance each turn to scatter action to a random legal dir; EV-2.
+  * Poison 3-level (apply_poison helper) — stacks potency, ticks damage
+    per level, rPois reduces stacks on apply.
+  MonsterAI now uses blind/corona/daze/slow/fear/charm spells properly.
+  Remaining: Frozen, Weakness, Silenced expansion, Enthralled, Petrifying,
+  Mesmerised, Liquefaction.
+
+UX / polish commits this session:
+- `f2c48aad` — window 540→720 px wide; potion/scroll use writes log line
+  that reveals item name post-quaff.
+- `022c5425` — bag stays open while info popup overlays; tap-outside-close;
+  bigger fonts.
+- `dee293b3` — Skill dialog gains an "ACTIVE" tab listing only trained/
+  leveled skills at a glance.
+
+Top-of-stack (session 6):
+1. Dungeon tile behaviour (lava/water/shaft/golubria/glass)
+2. Unarmed Combat skill
+3. Identification system
+Followed by status-breadth tail (Frozen/Weakness/…), monster AI
+intelligence, portal vaults, branch theming, unrandart roster.
+
+Gods still deferred until user explicitly asks.
