@@ -3,6 +3,14 @@ extends CanvasLayer
 
 signal closed
 
+## Default fraction of the viewport the dialog window occupies. Bigger
+## looks better on phones (more tap area). 0.92 gives an 8% margin
+## on each side so the Close button stays clear of the OS gesture bar.
+const DEFAULT_RATIO: Vector2 = Vector2(0.92, 0.92)
+
+## Per-dialog ratio override, used when `create_ratio(...)` is called
+## with explicit width/height fractions.
+var _ratio: Vector2 = DEFAULT_RATIO
 var _on_close_cb: Callable = Callable()
 var _closed: bool = false
 
@@ -13,11 +21,28 @@ var _closed: bool = false
 @onready var _close_button: Button = $Dim/Window/Margin/VBox/CloseButton
 
 
-static func create(title: String, size: Vector2i) -> GameDialog:
+## Primary factory — accepts a legacy Vector2i pixel size for backward
+## compat with the 20+ existing call sites, but the actual window is
+## sized from the viewport using DEFAULT_RATIO. Pixel size is ignored.
+## Prefer create_ratio() for new call sites.
+static func create(title: String, _size: Vector2i = Vector2i(960, 1800)) -> GameDialog:
 	var scene: PackedScene = load("res://scenes/ui/GameDialog.tscn")
 	var dlg: GameDialog = scene.instantiate()
 	dlg.set_meta("_pending_title", title)
-	dlg.set_meta("_pending_size", size)
+	return dlg
+
+
+## Explicit-ratio factory. Pass (0.8, 0.8) for an 80%-of-screen dialog.
+## Ratios are clamped to [0.2, 1.0]. Use this for popups that should
+## look smaller (info tooltips etc.) or larger than the default.
+static func create_ratio(title: String, width_ratio: float = 0.92,
+		height_ratio: float = 0.92) -> GameDialog:
+	var scene: PackedScene = load("res://scenes/ui/GameDialog.tscn")
+	var dlg: GameDialog = scene.instantiate()
+	dlg.set_meta("_pending_title", title)
+	dlg.set_meta("_pending_ratio", Vector2(
+			clampf(width_ratio, 0.2, 1.0),
+			clampf(height_ratio, 0.2, 1.0)))
 	return dlg
 
 
@@ -28,10 +53,14 @@ func _ready() -> void:
 	if has_meta("_pending_title"):
 		_title_label.text = String(get_meta("_pending_title"))
 		remove_meta("_pending_title")
-	if has_meta("_pending_size"):
-		var sz: Vector2i = get_meta("_pending_size")
-		_resize_window(sz)
-		remove_meta("_pending_size")
+	if has_meta("_pending_ratio"):
+		_ratio = get_meta("_pending_ratio")
+		remove_meta("_pending_ratio")
+	_resize_from_viewport()
+	# Re-fit on viewport changes (orientation flip, resize on desktop).
+	var vp: Viewport = get_viewport()
+	if vp != null and not vp.size_changed.is_connected(_resize_from_viewport):
+		vp.size_changed.connect(_resize_from_viewport)
 
 
 func body() -> VBoxContainer:
@@ -80,9 +109,22 @@ func _on_dim_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
-func _resize_window(size: Vector2i) -> void:
-	_window.custom_minimum_size = Vector2(size.x, size.y)
-	_window.offset_left = -size.x / 2.0
-	_window.offset_top = -size.y / 2.0
-	_window.offset_right = size.x / 2.0
-	_window.offset_bottom = size.y / 2.0
+## Recompute window size from the current viewport. Fires once on
+## _ready and again on every viewport size_changed signal, so rotating
+## a phone or resizing the desktop window keeps the dialog centred
+## and scaled to DEFAULT_RATIO (or the per-dialog override set via
+## create_ratio).
+func _resize_from_viewport() -> void:
+	if _window == null:
+		return
+	var vp: Viewport = get_viewport()
+	if vp == null:
+		return
+	var vps: Vector2 = vp.get_visible_rect().size
+	var w: float = vps.x * _ratio.x
+	var h: float = vps.y * _ratio.y
+	_window.custom_minimum_size = Vector2(w, h)
+	_window.offset_left = -w / 2.0
+	_window.offset_top = -h / 2.0
+	_window.offset_right = w / 2.0
+	_window.offset_bottom = h / 2.0
