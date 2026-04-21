@@ -77,7 +77,7 @@ var _skills_swipe_start_y: float = -1.0
 var _skills_dlg: GameDialog = null
 var _status_dlg: GameDialog = null
 var _map_dlg: AcceptDialog = null
-var _magic_dlg: AcceptDialog = null
+var _magic_dlg: GameDialog = null
 var _combat_log_label: Label = null
 var _targeting_spell: String = ""
 # Camera follow tween so the view doesn't snap.
@@ -2864,75 +2864,66 @@ func _count_trained_skills() -> int:
 ## ---- MAGIC DIALOG (separate from Skills) ---------------------------------
 
 func _open_magic_dialog() -> void:
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null or player == null:
+	if player == null:
 		return
-	var dlg := AcceptDialog.new()
-	dlg.exclusive = false
-	dlg.title = "Magic"
-	dlg.ok_button_text = "Close"
+	var dlg := GameDialog.create("Magic", Vector2i(960, 1500))
+	add_child(dlg)
+	_magic_dlg = dlg
+	dlg.set_on_close(func():
+		if _magic_dlg == dlg: _magic_dlg = null)
+	var vb: VBoxContainer = dlg.body()
 
-	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 8)
-	dlg.add_child(vb)
-
-	var header := HBoxContainer.new()
-	header.add_theme_constant_override("separation", 8)
-	var mp_lab := Label.new()
+	# MP readout sits as the first body row so it's visible over the
+	# scrollable spell list.
 	var cur_mp: int = player.stats.MP if player.stats != null else 0
 	var max_mp: int = player.stats.mp_max if player.stats != null else 0
+	var mp_lab := Label.new()
 	mp_lab.text = "MP  %d / %d" % [cur_mp, max_mp]
 	mp_lab.add_theme_font_size_override("font_size", 48)
 	mp_lab.modulate = Color(0.45, 0.7, 1.0)
-	mp_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	header.add_child(mp_lab)
-	var close_btn := Button.new()
-	close_btn.text = "X"
-	close_btn.custom_minimum_size = Vector2(120, 120)
-	close_btn.add_theme_font_size_override("font_size", 48)
-	close_btn.pressed.connect(dlg.queue_free)
-	header.add_child(close_btn)
-	vb.add_child(header)
-	vb.add_child(HSeparator.new())
+	vb.add_child(mp_lab)
 
-	var scroll := ScrollContainer.new(); scroll.scroll_deadzone = 20
-	scroll.custom_minimum_size = Vector2(0, 1400)
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	vb.add_child(scroll)
+	vb.add_child(UICards.section_header("Known Spells"))
 
 	var rows := VBoxContainer.new()
 	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rows.add_theme_constant_override("separation", 6)
-	scroll.add_child(rows)
+	vb.add_child(rows)
 
 	var known: Array[String] = SpellRegistry.get_known_for_player(player, skill_system)
 	if known.is_empty():
-		var hint := Label.new()
-		hint.text = "No spells known.\nRead spellbooks or pick a magic job to learn spells."
-		hint.add_theme_font_size_override("font_size", 48)
-		hint.modulate = Color(0.7, 0.7, 0.8)
+		var hint := UICards.dim_hint("No spells known.\nRead spellbooks or pick a magic job to learn spells.")
 		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		rows.add_child(hint)
 	else:
 		for spell_id in known:
 			rows.add_child(_build_magic_row(spell_id, dlg))
 
-	popup_mgr.add_child(dlg)
-	_magic_dlg = dlg
-	dlg.tree_exited.connect(func():
-		if _magic_dlg == dlg: _magic_dlg = null)
-	dlg.confirmed.connect(dlg.queue_free)
-	dlg.canceled.connect(dlg.queue_free)
-	dlg.close_requested.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(960, 1500))
 
-
-func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
+func _build_magic_row(spell_id: String, dlg: GameDialog) -> Control:
 	var info: Dictionary = SpellRegistry.get_spell(spell_id)
 	if info.is_empty():
 		return Control.new()
 
+	# Outer vbox stacks (schools-pill-row, main-info-row) so pills sit
+	# above the name/cost text without cramping the cast-button column.
+	var outer := VBoxContainer.new()
+	outer.add_theme_constant_override("separation", 4)
+
+	# Row 1 — school pills. Each school gets a compact 3-letter pill
+	# coloured to match UICards.SCHOOL_COLOURS.
+	var pill_row := HBoxContainer.new()
+	pill_row.add_theme_constant_override("separation", 4)
+	for school in SpellRegistry.get_schools(spell_id):
+		var tag: String = String(school).substr(0, 3).to_upper()
+		pill_row.add_child(UICards.pill(tag, UICards.school_colour(String(school))))
+	# Trailing spacer so pills hug the left edge even on short rows.
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	pill_row.add_child(spacer)
+	outer.add_child(pill_row)
+
+	# Row 2 — name/cost on the left, Pow/Fail accent + Cast/QSlot on the right.
 	var row := HBoxContainer.new()
 	row.custom_minimum_size = Vector2(0, 120)
 	row.add_theme_constant_override("separation", 8)
@@ -2942,16 +2933,27 @@ func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
 	name_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	name_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var spell_name: String = String(info.get("name", spell_id))
-	var fail_p: int = SpellRegistry.failure_rate(spell_id, player)
-	var fail_txt: String = " (%d%%)" % fail_p if fail_p > 0 else ""
 	var range_txt: String = ""
 	if int(info.get("range", 0)) > 0:
 		range_txt = "  range %d" % int(info.get("range", 0))
-	name_btn.text = "%s  [%d MP]%s%s" % [spell_name, int(info.get("mp", 0)), fail_txt, range_txt]
+	name_btn.text = "%s  [%d MP]%s" % [spell_name, int(info.get("mp", 0)), range_txt]
 	name_btn.add_theme_font_size_override("font_size", 48)
 	name_btn.add_theme_color_override("font_color", info.get("color", Color.WHITE))
 	name_btn.pressed.connect(_show_spell_info.bind(spell_id))
 	row.add_child(name_btn)
+
+	# Power + Failure accented in gold so they stand out against the
+	# spell-name colour. Only render failure when it's non-zero to keep
+	# low-risk rows quieter.
+	var spell_pow: int = SpellRegistry.calc_spell_power(spell_id, player)
+	var fail_p: int = SpellRegistry.failure_rate(spell_id, player)
+	var stats_col := VBoxContainer.new()
+	stats_col.add_theme_constant_override("separation", 2)
+	stats_col.custom_minimum_size = Vector2(180, 0)
+	stats_col.add_child(UICards.accent_value("Pow %d" % spell_pow, 36))
+	if fail_p > 0:
+		stats_col.add_child(UICards.accent_value("Fail %d%%" % fail_p, 36))
+	row.add_child(stats_col)
 
 	var btns := VBoxContainer.new()
 	btns.add_theme_constant_override("separation", 4)
@@ -2976,7 +2978,8 @@ func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
 	btns.add_child(qs_btn)
 
 	row.add_child(btns)
-	return row
+	outer.add_child(row)
+	return outer
 
 
 func _show_spell_info(spell_id: String) -> void:
@@ -3040,8 +3043,8 @@ func _show_spell_info(spell_id: String) -> void:
 	dlg.popup_centered(Vector2i(920, 900))
 
 
-func _on_cast_with_targeting(spell_id: String, dlg: AcceptDialog) -> void:
-	dlg.queue_free()
+func _on_cast_with_targeting(spell_id: String, dlg: GameDialog) -> void:
+	dlg.close()
 	_targeting_spell = spell_id
 	if touch_input != null:
 		touch_input.targeting_mode = true
@@ -3258,21 +3261,21 @@ func _apply_spell_piety_penalty(spell_level: int) -> void:
 			[String(god.get("title", player.current_god)), loss])
 
 
-func _assign_spell_quickslot(spell_id: String, dlg: AcceptDialog) -> void:
+func _assign_spell_quickslot(spell_id: String, dlg: GameDialog) -> void:
 	if player == null:
 		return
 	for i in player.quickslot_ids.size():
 		if player.quickslot_ids[i] == "":
 			player.quickslot_ids[i] = "spell:" + spell_id
 			player.quickslots_changed.emit()
-			dlg.queue_free()
+			dlg.close()
 			_on_magic_pressed()
 			return
 	for i in player.quickslot_ids.size():
 		if player.quickslot_ids[i].begins_with("spell:"):
 			player.quickslot_ids[i] = "spell:" + spell_id
 			player.quickslots_changed.emit()
-			dlg.queue_free()
+			dlg.close()
 			_on_magic_pressed()
 			return
 	print("No empty quickslot.")
@@ -3339,8 +3342,8 @@ func _build_spell_panel(container: VBoxContainer, dlg: AcceptDialog) -> void:
 		container.add_child(HSeparator.new())
 
 
-func _on_cast_pressed(spell_id: String, dlg: AcceptDialog) -> void:
-	dlg.queue_free()
+func _on_cast_pressed(spell_id: String, dlg: GameDialog) -> void:
+	dlg.close()
 	var result: Dictionary = _execute_cast(spell_id)
 	if result.get("message", "") != "":
 		CombatLog.add(result.get("message", ""))
