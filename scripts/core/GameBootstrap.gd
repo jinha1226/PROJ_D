@@ -76,7 +76,7 @@ var _skills_swipe_start_x: float = -1.0
 var _skills_swipe_start_y: float = -1.0
 var _skills_dlg: GameDialog = null
 var _status_dlg: GameDialog = null
-var _map_dlg: AcceptDialog = null
+var _map_dlg: GameDialog = null
 var _magic_dlg: GameDialog = null
 var _combat_log_label: Label = null
 var _targeting_spell: String = ""
@@ -5164,45 +5164,76 @@ const _MM_SCALE: int = 12  # pixels per tile in the minimap texture
 
 func _on_minimap_pressed() -> void:
 	if _map_dlg != null and is_instance_valid(_map_dlg):
-		_map_dlg.queue_free()
-		_map_dlg = null
-		return
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null:
+		_map_dlg.close()
 		return
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	if dmap == null or generator == null:
 		return
-	var dlg := AcceptDialog.new()
-	dlg.exclusive = false
-	var depth: int = GameManager.current_depth if GameManager != null else 1
-	dlg.title = "Map — B%dF (tap to travel)" % depth
-	dlg.ok_button_text = "Close"
 
-	var vb := VBoxContainer.new()
-	dlg.add_child(vb)
+	var mm_w: int = DungeonGenerator.MAP_WIDTH * _MM_SCALE
+	var mm_h: int = DungeonGenerator.MAP_HEIGHT * _MM_SCALE
+	var dlg := GameDialog.create("Map", Vector2i(max(mm_w + 80, 960), mm_h + 520))
+	add_child(dlg)
+	_map_dlg = dlg
+	dlg.set_on_close(func():
+		if _map_dlg == dlg: _map_dlg = null)
+	var vb: VBoxContainer = dlg.body()
+
+	# Current-floor card — branch display name + depth.
+	vb.add_child(UICards.section_header("Current Floor"))
+	var depth_card: PanelContainer = UICards.card(Color(1.0, 0.85, 0.40))
+	var depth_col := VBoxContainer.new()
+	depth_card.add_child(depth_col)
+	var branch_id: String = GameManager.current_branch if GameManager else "dungeon"
+	var branch_name: String = BranchRegistry.display_name(branch_id) if branch_id != "" else "Dungeon"
+	var depth_n: int = GameManager.current_depth if GameManager != null else 1
+	depth_col.add_child(UICards.accent_value(
+			"%s  B%dF" % [branch_name, depth_n], 48))
+	var hint_lbl := UICards.dim_hint("Tap a tile to auto-travel.")
+	depth_col.add_child(hint_lbl)
+	vb.add_child(depth_card)
+
+	# Minimap texture — wrapped in a CenterContainer so it sits in the
+	# middle of the dialog on wide phones.
+	var center := CenterContainer.new()
+	vb.add_child(center)
 	var tex_rect := TextureRect.new()
 	tex_rect.texture = _build_minimap_texture(dmap, player.grid_pos if player else Vector2i.ZERO)
 	tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	var mm_w: int = DungeonGenerator.MAP_WIDTH * _MM_SCALE
-	var mm_h: int = DungeonGenerator.MAP_HEIGHT * _MM_SCALE
 	tex_rect.custom_minimum_size = Vector2(mm_w, mm_h)
 	tex_rect.mouse_filter = Control.MOUSE_FILTER_STOP
 	tex_rect.gui_input.connect(_on_minimap_tapped.bind(tex_rect, dlg))
-	vb.add_child(tex_rect)
+	center.add_child(tex_rect)
 
-	popup_mgr.add_child(dlg)
-	_map_dlg = dlg
-	dlg.tree_exited.connect(func():
-		if _map_dlg == dlg: _map_dlg = null)
-	dlg.confirmed.connect(dlg.queue_free)
-	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(mm_w + 80, mm_h + 240))
+	# Legend — 2-column grid of glyph + description. Glyphs mirror the
+	# tile renderer (stairs up/down, altar, shop, trap, unseen fog).
+	vb.add_child(UICards.section_header("Legend"))
+	var legend := GridContainer.new()
+	legend.columns = 2
+	legend.add_theme_constant_override("h_separation", 24)
+	legend.add_theme_constant_override("v_separation", 6)
+	for pair in [
+		["▲", "Stairs up"],
+		["▼", "Stairs down"],
+		["☥", "Altar"],
+		["$", "Shop"],
+		["^", "Trap"],
+		["?", "Unseen / fog"],
+	]:
+		var glyph: Label = UICards.accent_value(String(pair[0]), 44)
+		glyph.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		glyph.custom_minimum_size = Vector2(72, 0)
+		legend.add_child(glyph)
+		var desc := Label.new()
+		desc.text = String(pair[1])
+		desc.add_theme_font_size_override("font_size", 36)
+		legend.add_child(desc)
+	vb.add_child(legend)
 
 
 ## Tapping on the minimap converts local pixel → grid tile and kicks off
 ## auto-move toward it. Closes the popup on success.
-func _on_minimap_tapped(event: InputEvent, tex_rect: TextureRect, dlg: AcceptDialog) -> void:
+func _on_minimap_tapped(event: InputEvent, tex_rect: TextureRect, dlg: GameDialog) -> void:
 	var is_tap: bool = false
 	var pos: Vector2 = Vector2.ZERO
 	if event is InputEventMouseButton and event.pressed:
@@ -5234,7 +5265,7 @@ func _on_minimap_tapped(event: InputEvent, tex_rect: TextureRect, dlg: AcceptDia
 	if not $DungeonLayer/DungeonMap.is_explored(target):
 		return  # Can't travel to fog.
 	# Close map and start auto-move.
-	dlg.queue_free()
+	dlg.close()
 	touch_input.begin_auto_move_to(target)
 
 
