@@ -3113,16 +3113,38 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 		SpellFX.cast_area(fx_layer, player.position, target.position, hit_positions, spell_color, float(radius) * float(TILE_SIZE) + float(TILE_SIZE) / 2.0, school)
 		CombatLog.add("%s: %d hit(s), %d total dmg" % [String(info.get("name", spell_id)), hits, total_dmg])
 	else:
-		var dmg: int = _spell_roll_dmg(spell_id, info, power)
 		var effect_type: String = String(info.get("effect", "damage"))
 		if effect_type == "slow":
 			target.slowed_turns = 4
 			SpellFX.cast_status(fx_layer, target.position, spell_color, school, "SLOW")
 			CombatLog.add("%s is slowed!" % String(target.data.display_name if target.data else "enemy"))
 		else:
-			target.take_damage(dmg, SpellRegistry.element_for(spell_id))
-			SpellFX.cast_single(fx_layer, player.position, target, dmg, spell_color, school)
-			CombatLog.add("%s → %d dmg" % [String(info.get("name", spell_id)), dmg])
+			# DCSS beam.cc::do_fire — trace the ray to stop at walls
+			# and deal damage to every monster along the path (for
+			# piercing bolts) or the first one (for darts/shots).
+			var beam_range: int = int(info.get("range", 6))
+			var beam_real_target: Monster = _beam_resolve_target(target, spell_id, beam_range)
+			if beam_real_target == null:
+				SpellFX.cast_fizzle(fx_layer, player.position, school, spell_color)
+				CombatLog.add("%s splashes against the wall." % String(info.get("name", spell_id)))
+			else:
+				var dmg: int = _spell_roll_dmg(spell_id, info, power)
+				var total_dmg: int = 0
+				if Beam.should_pierce(spell_id):
+					# Roll once per victim, like DCSS beams that damage
+					# each cell. The beam hits every monster on the path.
+					for vmon in _beam_path_hits(target, spell_id, beam_range):
+						if vmon == null or not is_instance_valid(vmon):
+							continue
+						var vdmg: int = _spell_roll_dmg(spell_id, info, power)
+						vmon.take_damage(vdmg, SpellRegistry.element_for(spell_id))
+						total_dmg += vdmg
+					SpellFX.cast_single(fx_layer, player.position, beam_real_target, dmg, spell_color, school)
+					CombatLog.add("%s pierces for %d dmg total" % [String(info.get("name", spell_id)), total_dmg])
+				else:
+					beam_real_target.take_damage(dmg, SpellRegistry.element_for(spell_id))
+					SpellFX.cast_single(fx_layer, player.position, beam_real_target, dmg, spell_color, school)
+					CombatLog.add("%s → %d dmg" % [String(info.get("name", spell_id)), dmg])
 	if skill_system != null:
 		var tags: Array = SpellRegistry.get_schools(spell_id).duplicate()
 		tags.append("spellcasting")
@@ -3292,6 +3314,21 @@ func _cast_single_target(spell_id: String, info: Dictionary, power: int, target:
 	if target == null:
 		SpellCast.refund(player, int(info.get("mp", 1)))
 		return {"success": false, "message": "No visible target in range."}
+	# DCSS beam.cc::do_fire — walk the beam from caster to target so
+	# walls block and monsters in the line eat the hit. Damage spells
+	# get the full beam pipeline; status spells (slow/confuse) still
+	# teleport-apply since DCSS treats those as single-creature hexes
+	# not beams of damage.
+	var effect_type_check: String = String(info.get("effect", "damage"))
+	if effect_type_check == "damage" or effect_type_check == "":
+		target = _beam_resolve_target(target, spell_id, int(info.get("range", 6)))
+		if target == null:
+			# Beam hit a wall before reaching any foe — nothing to damage.
+			var fx_layer_f: Node2D = $EntityLayer
+			SpellFX.cast_fizzle(fx_layer_f, player.position,
+					String(info.get("school", "")), info.get("color", Color.WHITE))
+			return {"success": true, "message": "%s splashes against the wall." \
+					% String(info.get("name", spell_id))}
 
 	var tname: String = ""
 	if target.data != null and "display_name" in target.data:
@@ -3419,6 +3456,63 @@ func _cast_self_spell(spell_id: String, _info: Dictionary, _power: int) -> Dicti
 			return {"success": true, "message": "You blink to a new location."}
 		return {"success": true, "message": "Blink fizzles — nowhere safe nearby."}
 	return {"success": true, "message": ""}
+
+
+## Walk the beam from player to the pre-resolved target. If the beam
+## is blocked by a wall before reaching the target, or hits another
+## monster first (on a non-pierce spell), redirect to whatever the
+## beam actually lands on. Returns null iff the beam wall-splashed
+## with no valid victim.
+func _beam_resolve_target(picked: Monster, spell_id: String, range_tiles: int) -> Monster:
+	if picked == null or player == null:
+		return picked
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	var opaque_cb: Callable = func(cell: Vector2i) -> int:
+		if dmap == null or dmap.generator == null:
+			return 0
+		return dmap._opaque_at(cell)
+	var mon_cb: Callable = func(cell: Vector2i):
+		for m in get_tree().get_nodes_in_group("monsters"):
+			if is_instance_valid(m) and m is Monster and m.is_alive \
+					and m.grid_pos == cell:
+				return m
+		return null
+	var pierce: bool = Beam.should_pierce(spell_id)
+	var trace: Dictionary = Beam.trace(player.grid_pos, picked.grid_pos,
+			range_tiles, pierce, opaque_cb, mon_cb)
+	var hits: Array = trace.get("hits", [])
+	if hits.is_empty():
+		return null
+	# Non-pierce: the first monster on the line IS the real target,
+	# not whatever the user tapped.
+	if not pierce:
+		return hits[0]
+	# Pierce: keep the original pick (caller handles splash damage to
+	# the hit list via _beam_apply_pierce_damage below if desired).
+	return picked
+
+
+## Return every monster struck by the beam from player to `picked`.
+## Used by pierce-type spells (bolt_of_fire etc.) to enumerate victims.
+## For non-pierce, callers should use _beam_resolve_target and hit a
+## single monster.
+func _beam_path_hits(picked: Monster, spell_id: String, range_tiles: int) -> Array:
+	if picked == null or player == null:
+		return []
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	var opaque_cb: Callable = func(cell: Vector2i) -> int:
+		if dmap == null or dmap.generator == null:
+			return 0
+		return dmap._opaque_at(cell)
+	var mon_cb: Callable = func(cell: Vector2i):
+		for m in get_tree().get_nodes_in_group("monsters"):
+			if is_instance_valid(m) and m is Monster and m.is_alive \
+					and m.grid_pos == cell:
+				return m
+		return null
+	var trace: Dictionary = Beam.trace(player.grid_pos, picked.grid_pos,
+			range_tiles, true, opaque_cb, mon_cb)
+	return trace.get("hits", [])
 
 
 func _find_nearest_visible_monster(range_tiles: int = 99) -> Monster:
