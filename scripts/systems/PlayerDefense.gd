@@ -47,13 +47,16 @@ static func _player_evasion_raw(player: Node, skill_system, scale: int) -> int:
 			- _aux_evasion_penalty(player, scale) \
 			+ _form_ev_bonus(player) \
 			+ _base_evasion_modifiers(player) * scale
-	# Transient effects: petrifying/caught halve EV. Agility/Acrobat/
-	# Heavenly Storm aren't wired yet — leaving the hook for when we add
-	# the duration metas.
+	# Transient effects.
 	if player.has_meta("_petrifying") and bool(player.get_meta("_petrifying", false)):
 		natural /= 2
 	if player.has_meta("_caught") and bool(player.get_meta("_caught", false)):
 		natural /= 2
+	# Amulet of the Acrobat: +5 EV when the player did not melee-attack or
+	# cast a spell this turn. The flag "_acrobat_active" is set by Player at
+	# the start of each turn and cleared on any melee or spell action.
+	if player.has_meta("_amulet_acrobat") and player.has_meta("_acrobat_active"):
+		natural += 5 * scale
 	return natural
 
 

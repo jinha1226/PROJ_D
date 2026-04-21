@@ -66,7 +66,7 @@ var _bag_category: String = "all"
 # Swipe-tracking state for the current bag dialog.
 var _bag_swipe_start_x: float = -1.0
 var _bag_swipe_start_y: float = -1.0
-const _BAG_CATEGORIES: Array = ["all", "weapon", "armor", "cloak", "ring", "potion", "scroll", "book"]
+const _BAG_CATEGORIES: Array = ["all", "weapon", "armor", "cloak", "ring", "amulet", "potion", "scroll", "book"]
 # Swipe state for the skill dialog's category tabs — same pattern as
 # _bag_swipe_* but keyed per-dialog so closing one doesn't bleed into
 # the other.
@@ -1041,14 +1041,18 @@ func _place_random_floor_item(pos: Vector2i, depth: int, parent: Node) -> bool:
 				 "ego": ego_id,
 				 "cursed": is_cursed})
 	elif drop_roll < 0.73:
-		# Rings were dropping too frequently on Lv1 per user feedback.
-		# DCSS rings are rare picks — this trims the ring band from 8%
-		# down to 3% of drops. Monster-kill loot has its own flow.
+		# Rings — 3% of drops (DCSS rings are rare picks).
 		var rid: String = _RING_POOL[randi() % _RING_POOL.size()]
 		var ring_info: Dictionary = RingRegistry.get_info(rid)
 		fi.setup(pos, rid, String(ring_info.get("name", rid)), "ring",
 				ring_info.get("color", Color(0.85, 0.85, 0.90)))
-	elif drop_roll < 0.78:
+	elif drop_roll < 0.75:
+		# Amulets — 2% of drops, same rarity tier as rings.
+		var amid: String = AmuletRegistry.random_id()
+		var amu_info: Dictionary = AmuletRegistry.get_info(amid)
+		fi.setup(pos, amid, String(amu_info.get("name", amid)), "amulet",
+				amu_info.get("color", Color(1.00, 0.90, 0.30)))
+	elif drop_roll < 0.80:
 		# Wand drop: pick one of the 12 DCSS wands, roll its starting
 		# charges, stash both in `extra` so the FloorItem/inventory can
 		# track remaining charges through pickup and evocation.
@@ -1118,6 +1122,9 @@ func _on_monster_died(monster: Monster) -> void:
 		var gain: int = int(god.get("kill_piety", 0))
 		if gain > 0:
 			var cap: int = int(god.get("piety_cap", 200))
+			# Amulet of Faith: +50% piety from all sources (DCSS amulet.cc).
+			if player.has_meta("_amulet_piety_boost"):
+				gain = (gain * 3) / 2
 			player.piety = min(cap, player.piety + gain)
 	if player != null and player.trait_res != null and player.trait_res.special == "holy_light":
 		if player.stats != null and player.is_alive:
@@ -1744,7 +1751,8 @@ func _dispatch_invocation(effect: String) -> void:
 				CombatLog.add("Divine wrath smites the %s!" % _mon_name(sm_t))
 		# ---- Jiyva ----
 		"jelly_prayer":
-			player.piety = min(200, player.piety + 10)
+			var jp_gain: int = 15 if player.has_meta("_amulet_piety_boost") else 10
+			player.piety = min(200, player.piety + jp_gain)
 			CombatLog.add("The slimes commune with their god.")
 		"cure_bad_mutation":
 			_cure_one_bad_mutation()
@@ -3717,7 +3725,7 @@ func _on_bag_pressed() -> void:
 			info_btn.add_theme_font_size_override("font_size", 40)
 			info_btn.pressed.connect(_on_bag_info.bind(it))
 			row.add_child(info_btn)
-			if kind == "weapon" or kind == "armor" or kind == "ring":
+			if kind == "weapon" or kind == "armor" or kind == "ring" or kind == "amulet":
 				var eq_btn := Button.new()
 				eq_btn.text = "Equip"
 				eq_btn.add_theme_font_size_override("font_size", 40)
@@ -4332,6 +4340,22 @@ func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
 				if not prev_ring.is_empty():
 					prev_ring["kind"] = "ring"
 					items.append(prev_ring)
+			elif kind == "amulet":
+				var amid: String = String(it.get("id", ""))
+				var amu_info: Dictionary = AmuletRegistry.get_info(amid)
+				if amu_info.is_empty():
+					amu_info = {
+						"id": amid,
+						"name": String(it.get("name", amid)),
+						"slot": "amulet",
+						"kind": "amulet",
+						"color": it.get("color", Color(1.00, 0.90, 0.30)),
+					}
+				var prev_amu: Dictionary = player.equip_amulet(amu_info)
+				CombatLog.add("You put on the %s." % String(amu_info.get("name", amid)))
+				if not prev_amu.is_empty():
+					prev_amu["kind"] = "amulet"
+					items.append(prev_amu)
 			player.inventory_changed.emit()
 	_bag_dlg = null
 	dlg.queue_free()

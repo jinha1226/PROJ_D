@@ -57,6 +57,9 @@ static func cast(player: Node, spell_id: String, target, ctx: Dictionary) -> Dic
 	if player.has_meta("_silenced_turns"):
 		return _abort("You are surrounded by silence — no casting.")
 
+	# Acrobat bonus expires when a spell is cast.
+	if player.has_meta("_acrobat_active"):
+		player.remove_meta("_acrobat_active")
 	var cost: int = int(info.get("mp", 1))
 	if player.stats.MP < cost:
 		return _abort("Not enough MP (%d/%d)" % [player.stats.MP, cost])

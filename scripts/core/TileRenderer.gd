@@ -307,6 +307,16 @@ const ITEMS: Dictionary = {
 	"ring_stealth":       "item/ring/glass.png",
 	"ring_fire":          "item/ring/copper.png",
 	"ring_ice":           "item/ring/diamond.png",
+	# Amulets — reuse existing jewellery tiles where possible
+	"amulet_faith":           "item/ring/gold.png",
+	"amulet_magic_mastery":   "item/ring/agate.png",
+	"amulet_regeneration":    "item/ring/clay.png",
+	"amulet_acrobat":         "item/ring/emerald.png",
+	"amulet_reflection":      "item/ring/diamond.png",
+	"amulet_stasis":          "item/ring/glass.png",
+	"amulet_guardian_spirit": "item/ring/brass.png",
+	"amulet_gourmand":        "item/ring/bronze.png",
+	"amulet_nothing":         "item/ring/coral.png",
 	# Spellbooks — cover colour picked per school for flavour
 	"book_conjurations":   "item/book/dark_blue.png",
 	"book_flames":         "item/book/red.png",

@@ -86,6 +86,8 @@ var equipped_armor: Dictionary = {}
 # Array of ring info dicts (from RingRegistry.get_info). Max size is race-
 # dependent — octopodes wear eight, everyone else two.
 var equipped_rings: Array = []
+# Single amulet slot — dict from AmuletRegistry.get_info, or {} if empty.
+var equipped_amulet: Dictionary = {}
 # Enchant level on the currently-equipped weapon (DCSS "pluses"). Travels
 # with the specific item dict in inventory; we mirror it here so combat
 # doesn't have to crack open equipped_weapon each tick.
@@ -342,6 +344,9 @@ func _on_player_turn_started() -> void:
 	last_action_ticks = 10
 	if race_res != null:
 		last_action_ticks += int(race_res.move_speed_mod)
+	# Acrobat: assume active until a melee/cast action clears the flag.
+	if has_meta("_amulet_acrobat"):
+		set_meta("_acrobat_active", true)
 	_tick_duration_metas()
 
 
@@ -661,6 +666,12 @@ func get_resist(element: String) -> int:
 		var res_map: Dictionary = ArmorRegistry.ego_info(ego_id).get("resists", {})
 		if res_map.has(element):
 			total += int(res_map[element])
+	# Amulet resists (currently only future-proofing; no DCSS amulet grants
+	# a raw element resist, but the path is open for custom entries).
+	if not equipped_amulet.is_empty():
+		var amu_res: Dictionary = equipped_amulet.get("resists", {})
+		if amu_res.has(element):
+			total += int(amu_res[element])
 	return total
 
 
@@ -997,6 +1008,23 @@ func unequip_ring(slot_index: int) -> Dictionary:
 	return prev
 
 
+## Equip an amulet. Returns the displaced amulet dict (or empty if slot was
+## vacant) so the caller can place it back in inventory.
+func equip_amulet(amulet: Dictionary) -> Dictionary:
+	var prev: Dictionary = equipped_amulet.duplicate()
+	equipped_amulet = amulet
+	_recompute_gear_stats()
+	return prev
+
+
+## Remove the equipped amulet. Returns the removed dict (empty if none).
+func unequip_amulet() -> Dictionary:
+	var prev: Dictionary = equipped_amulet.duplicate()
+	equipped_amulet = {}
+	_recompute_gear_stats()
+	return prev
+
+
 ## Full stat recompute. Base stats are captured on character setup
 ## (`base_stats`) and never mutated; equipment effects are layered fresh
 ## on every equip/unequip so swapping rings is always reversible.
@@ -1017,6 +1045,10 @@ func _recompute_gear_stats() -> void:
 			"reflect", "spirit_shield", "flying", "jump", "mayhem", "command"]:
 		if has_meta("_ego_" + ego_flag):
 			remove_meta("_ego_" + ego_flag)
+	for amulet_flag in ["piety_boost", "acrobat", "reflect", "stasis",
+			"spirit_shield", "gourmand"]:
+		if has_meta("_amulet_" + amulet_flag):
+			remove_meta("_amulet_" + amulet_flag)
 	var base_ev: int = base_stats.EV
 	# AC starts at racial intrinsic (gargoyle stone, etc) + trait AC bonus.
 	var ac: int = 0
@@ -1064,6 +1096,18 @@ func _recompute_gear_stats() -> void:
 		ac += int(ring.get("ac", 0))
 		ev += int(ring.get("ev", 0))
 		stats.mp_max += int(ring.get("mp_max", 0))
+	# Apply amulet bonuses (single slot).
+	if not equipped_amulet.is_empty():
+		var sb: Dictionary = equipped_amulet.get("stat_bonus", {})
+		stats.STR    += int(sb.get("str", 0))
+		stats.DEX    += int(sb.get("dex", 0))
+		stats.INT    += int(sb.get("int_", 0))
+		ac           += int(sb.get("ac", 0))
+		ev           += int(sb.get("ev", 0))
+		stats.mp_max += int(sb.get("mp_max", 0))
+		var flag_s: String = String(equipped_amulet.get("flag", ""))
+		if flag_s != "":
+			set_meta("_amulet_" + flag_s, true)
 	# DCSS player_evasion (player.cc:2167). The old ad-hoc formula was
 	# replaced with the faithful PlayerDefense port: it now accounts for
 	# size factor, armour-STR reduction, shield penalty, aux slots, form
@@ -1418,6 +1462,34 @@ func use_item(index: int) -> void:
 	if String(it.get("kind", "")) == "evocable":
 		if _evoke_misc(index):
 			TurnManager.end_player_turn()
+		return
+	# Rings: equip into the next free slot (or swap slot 0 if full).
+	# The displaced ring, if any, goes back into the inventory in place of
+	# the one just worn.
+	if String(it.get("kind", "")) == "ring" or RingRegistry.is_ring(item_id):
+		var ring_info: Dictionary = it.duplicate()
+		if not ring_info.has("slot"):
+			ring_info = RingRegistry.get_info(item_id)
+		var displaced: Dictionary = equip_ring(ring_info)
+		items.remove_at(index)
+		if not displaced.is_empty():
+			items.insert(index, displaced)
+		CombatLog.add("You put on the %s." % String(ring_info.get("name", item_id)))
+		inventory_changed.emit()
+		TurnManager.end_player_turn()
+		return
+	# Amulets: equip into the single amulet slot.
+	if String(it.get("kind", "")) == "amulet" or AmuletRegistry.is_amulet(item_id):
+		var amu_info: Dictionary = it.duplicate()
+		if not amu_info.has("flag") and not amu_info.has("stat_bonus"):
+			amu_info = AmuletRegistry.get_info(item_id)
+		var displaced: Dictionary = equip_amulet(amu_info)
+		items.remove_at(index)
+		if not displaced.is_empty():
+			items.insert(index, displaced)
+		CombatLog.add("You put on the %s." % String(amu_info.get("name", item_id)))
+		inventory_changed.emit()
+		TurnManager.end_player_turn()
 		return
 	var info: Dictionary = ConsumableRegistry.get_info(item_id)
 	var consumed: bool = false
@@ -2168,10 +2240,11 @@ func _teleport_blink(radius: int) -> bool:
 	return true
 
 
-## Formicids are permanent-stasis — every teleport/blink path checks this
-## so scrolls, blink spells, and trait triggers all bounce off.
+## Returns true when the player is under stasis — blocks all teleports,
+## blinks, hasting, and slowing. Covers Formicid racial trait and the
+## Amulet of Stasis.
 func _is_formicid_stasis() -> bool:
-	return _racial_trait_id() == "formicid_stasis"
+	return _racial_trait_id() == "formicid_stasis" or has_meta("_amulet_stasis")
 
 
 ## Race-aware walkability. Extends DungeonGenerator.is_walkable with:
@@ -2387,6 +2460,9 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 				"speed": delay_10 = maxi(3, delay_10 * 2 / 3)
 				"heavy": delay_10 = delay_10 * 3 / 2
 	last_action_ticks = delay_10
+	# Acrobat bonus expires on any melee swing.
+	if has_meta("_acrobat_active"):
+		remove_meta("_acrobat_active")
 	CombatSystem.melee_attack(self, monster, skill_sys)
 	attacked.emit(monster)
 	# DCSS fight.cc cleave_targets — axes hit the two tiles flanking
@@ -2467,6 +2543,13 @@ func take_damage(amount: int, element: String = "") -> void:
 	var reduction: int = gear_damage_reduction()
 	if reduction > 0:
 		amount = max(1, amount - reduction)
+	# DCSS SPARM_SPIRIT_SHIELD / Amulet of Guardian Spirit — split incoming
+	# HP damage equally with MP. Only the HP half is taken if MP is depleted.
+	if (has_meta("_ego_spirit_shield") or has_meta("_amulet_spirit_shield")) and stats != null:
+		var mp_share: int = amount / 2
+		var mp_drain: int = mini(mp_share, stats.MP)
+		stats.MP -= mp_drain
+		amount -= mp_drain
 	stats.HP -= amount
 	damaged.emit(amount)
 	if stats.HP <= 0:
