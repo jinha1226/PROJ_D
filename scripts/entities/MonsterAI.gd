@@ -1,10 +1,16 @@
 class_name MonsterAI
 
 ## Greedy 8-directional AI for M1. No A*.
+##
+## Returns the energy cost of the action taken (DCSS mon-data.h
+## mon_energy_usage). Monster.take_turn decrements _action_energy by
+## this value instead of a flat 10, so slow monsters (naga move=14)
+## genuinely take longer per step while fast ones (bat move=5) get
+## extra swings.
 
-static func act(m: Monster) -> void:
+static func act(m: Monster) -> int:
 	if not m.is_alive:
-		return
+		return 10
 	# Poison DoT — ticked at the start of the monster's turn so the damage
 	# hits before it gets to swing. Scroll of Poison / Alchemist spells
 	# stash `_poison_turns` + `_poison_dmg` on the target.
@@ -16,8 +22,10 @@ static func act(m: Monster) -> void:
 			if pt <= 1:
 				m.remove_meta("_poison_turns")
 				m.remove_meta("_poison_dmg")
+				if m.has_meta("_poison_level"):
+					m.remove_meta("_poison_level")
 			if not m.is_alive:
-				return
+				return 10
 	# DCSS BEH_SLEEP handling. A sleeping monster first checks whether the
 	# player (or a companion) is in its sight line; if so it wakes and
 	# skips its first turn (DCSS charges a full-turn wake-up latency).
@@ -25,7 +33,7 @@ static func act(m: Monster) -> void:
 	if m.is_sleeping:
 		if _should_wake(m):
 			wake(m)
-		return
+		return 10
 	# Paralysis (wand of paralysis, spells) — skip every turn and count
 	# down until the hex wears off. Paralysed monsters can't even flee.
 	if m.has_meta("_paralysis_turns"):
@@ -34,7 +42,7 @@ static func act(m: Monster) -> void:
 			m.set_meta("_paralysis_turns", pt - 1)
 			if pt <= 1:
 				m.remove_meta("_paralysis_turns")
-			return
+			return 10
 	# Rooted — same frame as paralysis for action economy, but the monster
 	# can still strike adjacent targets (rooted ≠ helpless).
 	var rooted: bool = false
@@ -48,7 +56,7 @@ static func act(m: Monster) -> void:
 	# Slow hex: skip this turn and count down.
 	if m.slowed_turns > 0:
 		m.slowed_turns -= 1
-		return
+		return 10
 	# Fear: flee from the nearest hostile.
 	if m.has_meta("_flee_turns"):
 		var ft: int = int(m.get_meta("_flee_turns", 0))
@@ -59,7 +67,7 @@ static func act(m: Monster) -> void:
 			var flee_from: Node = _nearest_hostile(m)
 			if flee_from != null:
 				_step_away_from(m, flee_from.grid_pos)
-			return
+			return _move_cost(m)
 		else:
 			m.remove_meta("_flee_turns")
 	# Vulnerability countdown.
@@ -75,11 +83,12 @@ static func act(m: Monster) -> void:
 	# counter expires.
 	if _should_flee_from_low_hp(m) and not m.has_meta("_flee_turns"):
 		m.set_meta("_flee_turns", 6)
+		m.set_meta("_has_fled", true)
 		CombatLog.add("The %s turns to flee!" % (m.data.display_name if m.data else "monster"))
 		var flee_from: Node = _nearest_hostile(m)
 		if flee_from != null:
 			_step_away_from(m, flee_from.grid_pos)
-		return
+		return _move_cost(m)
 	# Choose the nearest hostile (player OR companion). Companions count as
 	# enemies to monsters, so a monster next to a summoned skeleton will
 	# whack the skeleton instead of running past it toward the player.
@@ -87,24 +96,34 @@ static func act(m: Monster) -> void:
 	if target == null:
 		if not rooted:
 			_maybe_wander(m)
-		return
+		return _move_cost(m)
 	if "is_alive" in target and not target.is_alive:
-		return
+		return 10
 	var ppos: Vector2i = target.grid_pos
 	var dist: int = _cheb(m.grid_pos, ppos)
 	# Keep the local `player` reference for the melee path below.
 	var player: Node = target
 
 	if dist <= 1:
+		# DCSS caster monsters prefer spell range over biting: if this
+		# monster has a spellbook, try to cast first even when adjacent
+		# (most zaps hit at any range and out-damage a single melee).
+		# If casting didn't fire, kite one step away from the target so
+		# the next turn opens back up — failed kiting falls through to
+		# the melee swing.
+		if _is_caster(m) and _try_cast_at(m, target):
+			return _spell_cost(m)
+		if not rooted and _is_caster(m) and _try_kite_away(m, ppos):
+			return _move_cost(m)
 		m.attack_animation_toward(ppos)
 		# Companions use the same damage shape (take_damage + ac) as monsters,
 		# so melee_attack_from_monster works for either target.
 		CombatSystem.melee_attack_from_monster(m, player)
-		return
+		return _attack_cost(m)
 
 	# Rooted: can't walk toward the target this turn. Just idle.
 	if rooted:
-		return
+		return 10
 
 	if dist <= m.sight_range:
 		# DCSS caster monsters may throw a spell instead of closing. Roll
@@ -112,29 +131,97 @@ static func act(m: Monster) -> void:
 		# at `freq` / 200 chance per turn (freq 15 ≈ 7.5%/turn), matching
 		# the look of DCSS mon-cast.cc handle_mon_spell pacing.
 		if _try_cast_at(m, target):
-			return
+			return _spell_cost(m)
 		_step_toward(m, ppos)
-		return
+		return _move_cost(m)
 
 	_maybe_wander(m)
+	return _move_cost(m)
 
 
 static func _cheb(a: Vector2i, b: Vector2i) -> int:
 	return max(abs(a.x - b.x), abs(a.y - b.y))
 
 
-## DCSS cowardice check: intelligent monsters below 25% HP flee once.
-## Animals, plants, and mindless undead fight to the death. Bosses too.
+## DCSS cowardice check. In actual DCSS most monsters fight to the death;
+## flee is an explicit flag set by fear spells, not an automatic low-HP
+## reaction. Our previous "anyone smart below 25% runs" caused packs to
+## scatter constantly. Tightened to match DCSS intent:
+##   - only monsters with HUMAN intel (excludes animal/plant/brainless)
+##   - they must have NO ranged pressure (no spellbook, no ranged attacks)
+##   - HP must be under 10% of max (was 25%)
+##   - one flee window per monster per encounter; re-engage if healed back
+##     past 40% (tracked via _has_fled meta)
+## Casters, bosses, and packs of animals stand their ground — the user
+## doesn't see a wave of retreats mid-fight anymore.
 static func _should_flee_from_low_hp(m: Monster) -> bool:
 	if m == null or m.data == null:
 		return false
 	if m.data.is_boss:
 		return false
 	var intel: String = String(m.data.intelligence)
-	if intel == "animal" or intel == "plant" or intel == "brainless":
+	if intel != "human":
 		return false
+	# Casters (have a spellbook) and rangers (spear_thrower etc.) can kite;
+	# they don't need to flee. Only front-liners with nothing to do at
+	# range break off.
+	var book_id: String = String(m.data.spells_book) if "spells_book" in m.data else ""
+	if book_id != "":
+		return false
+	if "flags" in m.data:
+		var flags_s: String = String(m.data.flags)
+		if "ARCHER" in flags_s or "THROWER" in flags_s or "SPELLCASTER" in flags_s:
+			return false
 	var max_hp: int = int(m.data.hp) if m.data.hp > 0 else 10
-	return m.hp * 4 <= max_hp  # below 25%
+	# Already fled once? Require a full heal past 40% to re-trigger.
+	if m.has_meta("_has_fled"):
+		if m.hp * 100 >= max_hp * 40:
+			m.remove_meta("_has_fled")
+		return false
+	return m.hp * 10 <= max_hp  # below 10%
+
+
+## DCSS mon_energy_usage readers. Each defaults to 10 if the monster
+## data doesn't override — matches the DEFAULT_ENERGY macro in
+## mon-data.h. Used by MonsterAI.act to return a per-action cost that
+## Monster.take_turn drains from _action_energy.
+static func _move_cost(m: Monster) -> int:
+	if m == null or m.data == null:
+		return 10
+	return maxi(1, int(m.data.move_energy if "move_energy" in m.data else 10))
+
+
+static func _attack_cost(m: Monster) -> int:
+	if m == null or m.data == null:
+		return 10
+	return maxi(1, int(m.data.attack_energy if "attack_energy" in m.data else 10))
+
+
+static func _spell_cost(m: Monster) -> int:
+	if m == null or m.data == null:
+		return 10
+	return maxi(1, int(m.data.spell_energy if "spell_energy" in m.data else 10))
+
+
+## Is this monster a caster? A spellbook id means `_try_cast_at` may
+## fire, so the AI treats the monster as preferring range over melee.
+static func _is_caster(m: Monster) -> bool:
+	if m == null or m.data == null:
+		return false
+	var book: String = String(m.data.spells_book) if "spells_book" in m.data else ""
+	return book != ""
+
+
+## DCSS caster kiting: step one tile away from `threat` only if the move
+## actually increases the distance. Returns true if the monster moved.
+## Used from the dist==1 branch so a gnoll shaman backs off instead of
+## whacking with its staff.
+static func _try_kite_away(m: Monster, threat: Vector2i) -> bool:
+	if m == null:
+		return false
+	var before: Vector2i = m.grid_pos
+	_step_away_from(m, threat)
+	return m.grid_pos != before
 
 
 const _MONSTER_SPELLBOOKS_JSON: String = "res://assets/dcss_mons/spellbooks.json"

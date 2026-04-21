@@ -63,3 +63,15 @@ extends Resource
 ## MonsterAI resolves this against `assets/dcss_mons/spellbooks.json` to pick
 ## and cast a spell on hostile sight.
 @export var spells_book: String = ""
+
+# --- DCSS mon_energy_usage (mon-data.h) ------------------------------------
+## Per-action energy cost. Default 10 is standard; nagas use move=14 so
+## they move slowly, bats use move=5 so they swarm, dragons use
+## attack=15 because a bite takes a while. Monster.take_turn decrements
+## _action_energy by the value returned by MonsterAI.act instead of a
+## flat 10.
+@export var move_energy: int = 10
+@export var attack_energy: int = 10
+@export var spell_energy: int = 10
+@export var missile_energy: int = 10
+@export var swim_energy: int = 6

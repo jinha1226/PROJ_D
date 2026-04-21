@@ -181,6 +181,31 @@ func _load_sprite() -> void:
 	_sprite.play_anim("idle", true)
 
 
+## DCSS-parity poison. Mirrors Player.apply_poison so venom weapons,
+## naga spit, alchemist spells and scroll of poison all route through
+## the same 3-level stack for player and monster alike.
+## Level 1=light (2dmg/t, 7t), 2=moderate (4dmg/t, 9t), 3=severe (6dmg/t, 11t).
+## Higher level replaces lower; equal extends duration; rPois scales
+## the level down and gates out when fully resistant.
+func apply_poison(level: int = 1, _source: String = "poison") -> void:
+	if data == null or not is_alive:
+		return
+	var rpois: int = _mon_resist_level("poison")
+	if rpois >= 3:
+		return  # Fully poison-immune (undead/demons/jellies typically).
+	if rpois >= 1:
+		level = maxi(0, level - 1)  # rPois+ one-shots a level down.
+	if level <= 0:
+		return
+	var cur_level: int = int(get_meta("_poison_level", 0))
+	var new_level: int = clampi(maxi(cur_level, level), 1, 3)
+	var dmg_per_turn: int = new_level * 2
+	var turns: int = 5 + new_level * 2
+	set_meta("_poison_level", new_level)
+	set_meta("_poison_turns", turns)
+	set_meta("_poison_dmg", dmg_per_turn)
+
+
 func take_damage(amount: int, element: String = "") -> void:
 	if not is_alive:
 		return
@@ -239,14 +264,18 @@ func take_turn() -> void:
 	_action_energy += monster_speed * player_ticks / 10
 	while is_alive and _action_energy >= 10:
 		var prev_pos: Vector2i = grid_pos
+		var action_cost: int = 10
 		if boss_ai != null:
 			var p: Node = get_tree().get_first_node_in_group("player")
 			boss_ai.act(self, p)
 		else:
-			MonsterAI.act(self)
+			# MonsterAI.act now returns the DCSS mon_energy_usage cost for
+			# the action it took (move=10 default, naga move=14, bat
+			# move=5, spell=10, etc.) — slow monsters actually lag.
+			action_cost = MonsterAI.act(self)
 		if _sprite and grid_pos != prev_pos:
 			_sprite.face_toward(grid_pos - prev_pos)
-		_action_energy -= 10
+		_action_energy -= maxi(1, action_cost)
 		_sprite.play_anim("walk", true)
 		# Reuse a single SceneTreeTimer reference per monster — each turn
 		# overwrites the previous one. Connecting only when not already

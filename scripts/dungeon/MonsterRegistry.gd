@@ -81,6 +81,13 @@ static func _merge_dcss_extended(target: MonsterData, entry: Dictionary) -> void
 		target.habitat = String(entry.get("habitat", "land"))
 	if target.shout == "silent":
 		target.shout = String(entry.get("shout", "silent"))
+	# Energy overrides only fold in when the .tres left them at default
+	# (10 for the four land axes, 6 for swim). That way a hand-tuned
+	# boss's custom energy stays intact but a plain naga.tres picks up
+	# move_energy=14 from the DCSS table.
+	if target.move_energy == 10 and target.attack_energy == 10 \
+			and target.spell_energy == 10 and target.missile_energy == 10:
+		_apply_energy_overrides(target, target.id)
 
 
 ## List every monster id we know about — union of `.tres` files and DCSS JSON
@@ -166,6 +173,7 @@ static func _build_from_dcss(id: String, entry: Dictionary) -> MonsterData:
 	d.attacks = entry.get("attacks", []) if typeof(entry.get("attacks")) == TYPE_ARRAY else []
 	d.resists = _to_string_array(entry.get("resists", []))
 	d.spells_book = String(entry.get("spells", ""))
+	_apply_energy_overrides(d, id)
 	# Tier is a rough difficulty band we use for UI sorting. Map to DCSS HD.
 	if d.hd >= 20:
 		d.tier = 5
@@ -188,6 +196,61 @@ static func _size_dex_mod(size: String) -> int:
 		"large":  return -1
 		"giant":  return -2
 	return 0
+
+
+## DCSS mon-data.h mon_energy_usage overrides for species that deviate
+## from DEFAULT_ENERGY{10,10,10,10,10,10,10,10}. Keyed by id prefix so
+## e.g. "naga", "naga_warrior", "naga_sharpshooter" all get the slow
+## coils. Only the nonstandard axes are written; the rest keep the
+## MonsterData field defaults.
+const _ENERGY_OVERRIDES: Dictionary = {
+	# Slow coils — nagas + naja-shape snakes.
+	"naga":        {"move": 14},
+	"salamander":  {"move": 14},
+	# Fast movers — bats, rats, centaurs, spriggans.
+	"bat":         {"move": 5},
+	"vampire_bat": {"move": 5},
+	"centaur":     {"move": 6, "missile": 7},
+	"yaktaur":     {"missile": 7},
+	"spriggan":    {"move": 6},
+	# Slow biters — dragons, giants, jelly.
+	"jelly":       {"move": 14, "attack": 14},
+	"azure_jelly": {"move": 14, "attack": 14},
+	"acid_blob":   {"move": 14, "attack": 14},
+	"fire_dragon": {"attack": 15},
+	"ice_dragon":  {"attack": 15},
+	"steam_dragon":{"attack": 15},
+	"hill_giant":  {"attack": 12},
+	"stone_giant": {"attack": 12},
+	# Quick stinger — adders, scorpions.
+	"adder":       {"attack": 8},
+	"scorpion":    {"attack": 9},
+	"wasp":        {"move": 9, "attack": 9},
+}
+
+
+static func _apply_energy_overrides(d: MonsterData, id: String) -> void:
+	var o: Variant = _ENERGY_OVERRIDES.get(id, null)
+	if o == null:
+		# Try stem match — "orc_wizard" → "orc_", "troll_dragon" → "troll_", etc.
+		# Only fires when the exact key isn't present so family traits
+		# stay limited to the ported species names.
+		for key in _ENERGY_OVERRIDES.keys():
+			if id == key or id.begins_with(String(key) + "_"):
+				o = _ENERGY_OVERRIDES[key]
+				break
+	if typeof(o) != TYPE_DICTIONARY:
+		return
+	if o.has("move"):
+		d.move_energy = int(o["move"])
+	if o.has("attack"):
+		d.attack_energy = int(o["attack"])
+	if o.has("spell"):
+		d.spell_energy = int(o["spell"])
+	if o.has("missile"):
+		d.missile_energy = int(o["missile"])
+	if o.has("swim"):
+		d.swim_energy = int(o["swim"])
 
 
 static func _to_string_array(v: Variant) -> Array[String]:
