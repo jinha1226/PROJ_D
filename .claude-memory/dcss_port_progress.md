@@ -208,3 +208,57 @@ Followed by status-breadth tail (Frozen/Weakness/…), monster AI
 intelligence, portal vaults, branch theming, unrandart roster.
 
 Gods still deferred until user explicitly asks.
+
+## Session 6 update (2026-04-21, evening) — UI upgrade infra + Status migration
+
+Spec + plan written to `docs/superpowers/specs/2026-04-21-ui-upgrade-design.md`
+and `docs/superpowers/plans/2026-04-21-ui-upgrade.md`. Three user asks
+drove this:
+1. Skills ACTIVE tab is sticky on uncheck (skill stays after disable)
+2. Cardify Bag / Skills / Magic / Map like the Status window
+3. Standardise close button — every dialog gets a single full-width
+   bottom Close (no top X)
+
+Decision: hybrid (c) for ACTIVE tab — split into Training and Learned
+sub-sections. Big-4 cardified. Small info popups get unified chrome
+only. All AcceptDialog usages → new GameDialog.
+
+### Shipped this session (commits 6224ea21..024d0e08)
+
+- **GameDialog scaffold (6224ea21)** — `scripts/ui/GameDialog.gd` +
+  `scenes/ui/GameDialog.tscn`. CanvasLayer popup with full-rect Dim,
+  centered PanelContainer Window (gold border, rounded), ScrollContainer
+  Body, full-width bottom Close. API: `GameDialog.create(title, size)`,
+  `body()` returns the populating VBox, `set_on_close(cb)`, `close()`.
+  Handles ESC / outside-tap / Close button uniformly. Layer 100.
+- **UICards helpers (5b598698)** — `scripts/ui/UICards.gd`. Static
+  helpers: `section_header` (52pt gold), `card(tint)` (PanelContainer
+  with tint-15% bg + tint border + radius 6), `accent_value`,
+  `dim_hint`, `pill`. SCHOOL_COLOURS dict for Magic pills (fire/cold/
+  earth/air/necro/hex/conj/trans/sum/charms/poison).
+- **Status migration (0a11d985)** — `_on_status_pressed` rebuilt via
+  GameDialog.create("Status", 960×1800). `_status_section_header` /
+  `_status_attr_card` delegate to UICards. Manual bottom Close removed
+  (GameDialog supplies it). `_build_essence_row` + cast/swap helpers
+  retyped from AcceptDialog → GameDialog.
+- **CanvasLayer nesting fix (024d0e08)** — root-cause debug: nested
+  CanvasLayers don't render their descendants in Godot 4, so
+  `popup_mgr.add_child(GameDialog)` produced an invisible dialog
+  (button highlight worked, but the panel never drew, no console
+  error). Fix: attach GameDialog via `self.add_child(dlg)`
+  (GameBootstrap is Node2D), matching the existing pattern of
+  ResultScreen and SkillLevelUpToast. New feedback memory captures
+  this gotcha for future sessions.
+
+### Remaining (plan tasks 4-8 — next session)
+
+4. Skills migration + ACTIVE split (Training / Learned sub-sections)
+5. Bag migration + Equipped card grid (Weapon/Body/Ring/Amulet)
+6. Magic migration + school pills + accent Pow/Fail
+7. Map migration + Current Floor card + Legend grid
+8. Remaining popups (Shop/Altar/Essence invoke/Identify/Quickslot/
+   ItemInfo/SkillInfo/GodGuide) chrome migration only
+
+Each migrated dialog MUST attach via `self.add_child(dlg)`, not
+`popup_mgr.add_child(dlg)`. The plan document still says popup_mgr —
+update inline as each task is executed.

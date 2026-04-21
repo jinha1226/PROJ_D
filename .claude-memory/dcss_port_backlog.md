@@ -64,7 +64,16 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 
 When a backlog item lands, replace its `[ ]` with `[x] (<commit-hash>)` and note which parts are left (if partial). Do NOT delete — the history matters for later retrospectives.
 
-## Active picks (top-of-stack — updated 2026-04-21 session 2)
+## Active picks (top-of-stack — updated 2026-04-21 session 6)
+
+**UI upgrade in flight** — plan at `docs/superpowers/plans/2026-04-21-ui-upgrade.md`,
+spec at `docs/superpowers/specs/2026-04-21-ui-upgrade-design.md`. Tasks
+1-3 shipped (GameDialog + UICards + Status migration with CanvasLayer
+nesting fix). Resume at task 4 (Skills + ACTIVE Training/Learned split),
+then 5 Bag, 6 Magic, 7 Map, 8 remaining popups. Every dialog attaches
+via `self.add_child(dlg)` per the canvaslayer-nesting feedback memory.
+
+After UI upgrade lands, return to the DCSS-port queue below.
 
 Gods deferred per user direction — don't start god invocation parity
 unless explicitly asked. User's queued order:
