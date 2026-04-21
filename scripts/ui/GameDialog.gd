@@ -63,7 +63,7 @@ func close() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		close()
-		accept_event()
+		get_viewport().set_input_as_handled()
 
 
 func _on_dim_input(event: InputEvent) -> void:
@@ -77,7 +77,7 @@ func _on_dim_input(event: InputEvent) -> void:
 	var pos: Vector2 = event.position if "position" in event else Vector2.ZERO
 	if not _window.get_global_rect().has_point(pos):
 		close()
-		accept_event()
+		get_viewport().set_input_as_handled()
 
 
 func _resize_window(size: Vector2i) -> void:
