@@ -363,26 +363,45 @@ static func melee_attack_from_monster(m, defender) -> int:
 				if defender.has_method("_apply_elem_resist"):
 					bonus_after = int(defender._apply_elem_resist(flav_bonus, flav_element))
 				total += bonus_after
+				if bonus_after > 0:
+					dealt_any = true
 
+	# DCSS attack.cc: every connecting swing deals at least 1 HP when some
+	# hit landed (the "glancing hit" floor). If every connecting hit was
+	# fully AC-soaked, take 1. If every swing missed entirely, take 0.
+	if total > 0:
+		dealt_any = true
 	if not dealt_any:
 		if missed_any:
 			var atk_name_m: String = m.data.display_name if m.data else "monster"
 			CombatLog.add("The %s misses you!" % atk_name_m)
 			return 0
-		total = 1  # glancing hit fallback
+		total = 1  # glancing hit fallback (all connected but soaked)
 
 	var def_trait: String = ""
 	if "trait_res" in defender and defender.trait_res != null:
 		def_trait = defender.trait_res.special
 	if def_trait == "iron_will" and randf() < 0.3:
 		total = max(1, total / 2)
+	var hp_before: int = 0
+	if "stats" in defender and defender.stats != null:
+		hp_before = int(defender.stats.HP)
 	if defender.has_method("take_damage"):
 		defender.take_damage(total)
+	var hp_after: int = 0
+	if "stats" in defender and defender.stats != null:
+		hp_after = int(defender.stats.HP)
 	var atk_name: String = ""
 	if "data" in m and m.data != null and "display_name" in m.data:
 		atk_name = String(m.data.display_name)
 	if atk_name != "":
-		CombatLog.add("The %s hits you for %d!" % [atk_name, total])
+		var real_dealt: int = hp_before - hp_after
+		CombatLog.add("The %s hits you for %d! (%d→%d)" % [atk_name, total, hp_before, hp_after])
+		# Diag: if the log damage doesn't match HP delta we know whether it's
+		# the compute or the apply that's eating the hit.
+		if real_dealt != total:
+			print("[monster-melee] %s: rolled=%d applied=%d (hp %d→%d)" % \
+					[atk_name, total, real_dealt, hp_before, hp_after])
 	_show_hit_feedback(defender, total, Color(1.0, 0.3, 0.3))
 	_show_slash_fx(defender)
 	return total
