@@ -1499,7 +1499,32 @@ func _spell_deal_dmg(target: Node, dmg: int, spell_id: String) -> void:
 	if target == null or not target.has_method("take_damage"):
 		return
 	var element: String = SpellRegistry.element_for(spell_id)
+	# DCSS reflection — a target wearing SPARM_REFLECTION / Amulet of
+	# Reflection has a 20% chance to bounce the spell back. We attenuate
+	# by 25% on reflect to reward building into it without making the
+	# player themselves get full-damage bolted on a miss-roll.
+	if target.has_method("has_meta") and \
+			(target.has_meta("_ego_reflect") or target.has_meta("_amulet_reflect")) \
+			and randi() % 100 < 20:
+		CombatLog.add("The %s reflects the spell!" % \
+				(String(target.data.display_name) if "data" in target and target.data else "target"))
+		var back_dmg: int = maxi(1, dmg * 3 / 4)
+		if player != null and player.has_method("take_damage"):
+			player.take_damage(back_dmg, element)
+		return
 	target.take_damage(dmg, element)
+	# DCSS burn_wall_effect — fire / flame spells char adjacent trees
+	# (TILE_TREE → TILE_FLOOR) over a small radius. Light-side QoL:
+	# clears the foliage so you can path through later.
+	if (element == "fire" or spell_id.begins_with("bolt_of_fire") \
+			or spell_id == "fireball") and target is Monster \
+			and target.generator != null:
+		var r: int = 1 if spell_id != "fireball" else 2
+		for dx in range(-r, r + 1):
+			for dy in range(-r, r + 1):
+				var c: Vector2i = target.grid_pos + Vector2i(dx, dy)
+				if target.generator.get_tile(c) == DungeonGenerator.TileType.TREE:
+					target.generator.map[c.x][c.y] = DungeonGenerator.TileType.FLOOR
 
 
 ## Global XP multiplier sourced from the player's racial trait. Applied to
