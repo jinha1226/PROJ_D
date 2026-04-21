@@ -84,8 +84,11 @@ func _opaque_at(cell: Vector2i) -> int:
 		return FieldOfView.OPC_OPAQUE
 	var t: int = generator.map[cell.x][cell.y]
 	if t == DungeonGenerator.TileType.WALL \
-			or t == DungeonGenerator.TileType.DOOR_CLOSED:
+			or t == DungeonGenerator.TileType.DOOR_CLOSED \
+			or t == DungeonGenerator.TileType.CRYSTAL_WALL:
 		return FieldOfView.OPC_OPAQUE
+	# Glass walls block movement but not sight — return CLEAR so FOV
+	# rays sail through the translucent pane.
 	return FieldOfView.OPC_CLEAR
 
 
@@ -304,6 +307,17 @@ func _draw_dcss() -> void:
 					# paint a vivid yellow-green square so it's visually
 					# distinct from LAVA (orange) and WATER (blue).
 					draw_rect(rect, Color(0.55, 0.95, 0.25) * modulate, true)
+					continue
+				DungeonGenerator.TileType.CRYSTAL_WALL:
+					# Zot's crystal halls — bright magenta-pink facets.
+					# Distinct from regular rock walls so the player can
+					# tell the "endgame feel" at a glance.
+					draw_rect(rect, Color(0.95, 0.55, 0.95) * modulate, true)
+					continue
+				DungeonGenerator.TileType.GLASS_WALL:
+					# Translucent stone — faint blue tint, lets the player
+					# see through for FOV but still blocks movement.
+					draw_rect(rect, Color(0.55, 0.75, 0.95, 0.6) * modulate, true)
 					continue
 				DungeonGenerator.TileType.DOOR_OPEN:
 					if floor_tex != null:

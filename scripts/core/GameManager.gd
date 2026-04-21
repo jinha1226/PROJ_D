@@ -211,7 +211,10 @@ func tileset_branch() -> String:
 			"crypt": return "crypt"
 			"tomb": return "crypt"
 			"zot": return "crystal"
-			"abyss", "pan": return "abyss"
+			"abyss": return "abyss"
+			"pan": return "pan"
+			"dis", "gehenna", "cocytus", "tartarus", "vestibule":
+				return "hell"
 			"depths": return "sandstone"
 			# Portal vaults each reuse an existing floor-gen theme that
 			# matches their flavour. Sewer = forest (caves + water).

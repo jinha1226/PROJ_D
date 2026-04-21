@@ -19,7 +19,7 @@ const CAVE_INITIAL_FILL: float = 0.45   # starting wall probability
 const CAVE_SMOOTH_STEPS: int = 5
 const CAVE_MIN_FLOOR_TILES: int = 600   # fallback threshold
 
-enum TileType { WALL, FLOOR, DOOR_OPEN, DOOR_CLOSED, STAIRS_DOWN, STAIRS_UP, WATER, LAVA, TRAP, BRANCH_ENTRANCE, SHOP, ALTAR, TREE, ACID }
+enum TileType { WALL, FLOOR, DOOR_OPEN, DOOR_CLOSED, STAIRS_DOWN, STAIRS_UP, WATER, LAVA, TRAP, BRANCH_ENTRANCE, SHOP, ALTAR, TREE, ACID, CRYSTAL_WALL, GLASS_WALL }
 
 var map: Array = []
 var rooms: Array[Rect2i] = []
@@ -87,9 +87,36 @@ func generate(depth: int, run_seed: int = -1) -> void:
 		# Vaults — DCSS Vaults branch is dense vault-stamp territory. Reuse
 		# main gen but fire extra vault placements below.
 		"vaults":  _build_dcss_overlapping_boxes(depth)
-		# Zot — wide open "arena" floors with crystal walls and lots of
-		# altars. Closest match: caves with no trees, extra debris.
-		"crystal": _build_caves(); _decorate_rock_debris(18)
+		# Zot — wide open "arena" floors with crystal walls. After cave
+		# generation, recolour the regular stone WALLs in the outer ring
+		# to CRYSTAL_WALL so the floor reads as Zot's signature pink
+		# glass halls.
+		"crystal":
+			_build_caves()
+			_decorate_rock_debris(18)
+			for x in MAP_WIDTH:
+				for y in MAP_HEIGHT:
+					if map[x][y] == TileType.WALL and (_rng.randf() < 0.6):
+						map[x][y] = TileType.CRYSTAL_WALL
+		# Abyss — chaotic: sparse caves + lava pockets + void gaps.
+		# DCSS Abyss regenerates each turn; we don't model that yet,
+		# so the floor is a static chaotic layout.
+		"abyss":
+			_build_caves()
+			_place_pools(TileType.LAVA, 3, 2, 5)
+			_decorate_rock_debris(10)
+		# Pandemonium — demon-infested chaos. Overlapping boxes layout
+		# with heavy lava contamination.
+		"pan":
+			_build_dcss_overlapping_boxes(depth)
+			_place_pools(TileType.LAVA, 4, 3, 7)
+		# Hell sub-branches (Dis/Gehenna/Cocytus/Tartarus) — each has
+		# its own flavor but share cave + hazard layout. We route by
+		# tileset name; theme-specific hazards fold in below.
+		"hell":
+			_build_caves()
+			_place_pools(TileType.LAVA, 5, 3, 8)  # Gehenna-like default
+			_decorate_rock_debris(10)
 		# Sewer portal — damp caves + more water than Lair, no trees.
 		# DCSS Sewer is a swimming-hazard test.
 		"sewer":   _build_caves(); _place_pools(TileType.WATER, 5, 3, 7)
