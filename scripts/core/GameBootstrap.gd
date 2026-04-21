@@ -4428,7 +4428,10 @@ func _on_status_pressed() -> void:
 		return
 
 	var dlg := GameDialog.create("Status", Vector2i(960, 1800))
-	popup_mgr.add_child(dlg)
+	# Attach to self (Node2D) not popup_mgr (CanvasLayer) — nested
+	# CanvasLayers don't render their descendants in Godot 4. Same
+	# pattern as ResultScreen / SkillLevelUpToast.
+	add_child(dlg)
 	_status_dlg = dlg
 	dlg.set_on_close(func():
 		if _status_dlg == dlg: _status_dlg = null)
