@@ -7,12 +7,26 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 ## 🔴 High-impact (big feel / big content)
 
 - [x] **Beam travel (beam.cc)** — d6dfdab7: Beam.gd walks Bresenham supercover ray, stops at walls, records monster hits, pierces for bolt_of_* spells. Still partial: no tile-set-on-fire (burn_wall_effect), no reflection shields, no beam bouncing.
-- [ ] **God invocation full-parity** (5 popular gods first — Trog / Makhleb / Okawaru / Sif Muna / Ashenzari):
-  - Trog: gift weapons at piety milestones
-  - Makhleb: Major Destruction should roll from the random DCSS pool (Fireball/Iron Shot/…) not fixed dmg
-  - Okawaru: Duel teleport-to-arena, weapon/armour gifts
-  - Sif Muna: Divine Exegesis (cast any known spell at +power), spellbook gifts
-  - Ashenzari: curse-proportional skill boost passive; Scry/Transfer Knowledge
+- [~] **God invocation full-parity** — PARTIAL (8d64f889 + 7056ad5f):
+  - [x] Makhleb Minor/Major Destruction — rolls from DCSS pool
+    (throw_flame/iron_shot/bolt_of_fire/lehudibs/...) via
+    _makhleb_random_zap.
+  - [x] Okawaru Duel — teleports player adjacent + flees nearby
+    monsters (arena approximation).
+  - [x] Sif Muna Divine Exegesis — full MP refill + _exegesis_turns
+    meta forcing fail_pct=0 for 3 casts.
+  - [x] Ashenzari Transfer Knowledge — 1500 XP split across currently-
+    trained skills. Passive: cursed slots → +5% XP/slot on kill.
+  - [x] Vehumet Gift Spell — piety-tiered pool, respects memorisation
+    cap.
+  - [x] Fedhas Sunlight/PlantRing/Rain — damage undead, summon plant
+    allies, convert FLOOR→WATER nearby.
+  - [x] Lugonu Corrupt Level — banish top-5 HD + confuse remainder.
+  - [x] Hepliaklqana Idealise/Transference — ally heal+haste, swap
+    positions with nearest ally.
+  - [ ] Trog gift weapons at piety milestones — TBD
+  - [ ] Okawaru weapon/armour gifts — TBD
+  - [ ] Sif spellbook gifts — TBD
 - [ ] **God passives unrelated to invocations**: Vehumet MP discount on destructive spells, Cheibriados speed-proportional bonus, Gozag gold-only economy, Ru sacrifice system.
 - [x] **Weapon brands — full DCSS roster** — 32dd5259: added drain/distortion/antimagic/protection/pain/vorpal/reaping/chaos. Remaining gaps: penetration (needs ranged attack flow), reaching (already covered by polearm reach).
 - [x] **Body-armour egos — full roster** — 32dd5259 + 4ec67fdd:
@@ -23,8 +37,15 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
   enemies (radius 3) on a killing blow, SPIRIT_SHIELD was already
   splitting HP→MP via Player.take_damage.
 - [x] **Amulet roster** — 5c2c6d18: AmuletRegistry.gd with 9 entries (Faith/Magic Mastery/Regen/Acrobat/Reflection/Stasis/Guardian Spirit/Gourmand/Nothing). equip_amulet slot on Player; spirit_shield splits HP→MP; stasis blocks tele/blink; acrobat +5 EV on non-combat turns; faith +50% piety; floor drops 2%; bag UI + TileRenderer tiles.
-- [ ] **Portal vaults** (timed mini-branches) — not implemented at all: Sewers, Ossuary, Bailey, Volcano, Icecave, Wizlab, Trove, Labyrinth, Desolation, Gauntlet. Mid-game interest driver in DCSS.
-- [~] **Branch theming** — PARTIAL (89229a3f):
+- [~] **Portal vaults** (timed mini-branches) — 5/10 shipped (fa337e7f):
+  Sewer / Ossuary / Bailey / Volcano / Icecave. New `is_portal` flag
+  in branches.json + `duration` / `monster_pool` / `entry_msg` fields;
+  BranchRegistry exposes helpers; GameManager seeds `portal_turns_left`
+  on enter; `_on_turn_tick_portal` ticks + collapses at 0 via
+  `leave_branch` + `_regenerate_dungeon(going_up=true)`. Arrival
+  announce logs "A portal to X shimmers somewhere on this floor".
+  Still missing: Wizlab, Trove, Labyrinth, Desolation, Gauntlet.
+- [x] **Branch theming** — DONE (89229a3f + 38fbe82b + d7bf79e3):
   - [x] Orcish Mines: Beogh orc conversion wired (CombatSystem.
     _maybe_beogh_convert on melee hit, piety-scaled 10-20% chance,
     swaps Monster → Companion reusing the same MonsterData + hp).
@@ -33,14 +54,23 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
     Wolf/warg/yak/bear/elephant/hippogriff pack bands added.
     Snake/Spider sub-branch bands (black_mamba, anaconda, spider,
     redback) land simultaneously.
-  - [ ] Elven Halls: elf faction packs (deep_elf_fighter band exists
-    but no elf-specific flavor rules)
-  - [ ] Slime Pits: acidic walls (needs new tile behaviour + wall-
-    touch damage)
-  - [ ] Vaults / Zot: vault-entry lockouts (needs timer mechanic)
-  - [ ] Crypt / Tomb: undead-heavy spawn weights (population pools
-    already route there; tuning TBD)
-  - [ ] Hell 7-floor, Pan 7-floor, Abyss — data only, no special gen
+  - [x] Elven Halls: deep_elf faction packs (archer/knight/priest/
+    mage/sorcerer/demonologist) + overlapping-boxes gen + extra
+    vault stamps (38fbe82b).
+  - [x] Slime Pits: dedicated TileType.ACID (9c650c41) — distinct
+    from LAVA, blocks movement unless rCorr ≥ 1, teleport-landing
+    damages. Slime gen places ACID pools.
+  - [x] Vaults / Zot: Vaults gets 6 vault stamps vs 3 elsewhere
+    (38fbe82b); Zot gets CRYSTAL_WALL recoloring of 60% stone walls
+    (d7bf79e3) for the signature pink crystal halls.
+  - [x] Crypt / Tomb: overlapping-boxes gen + undead-heavy spawn
+    bands (skeletal_warrior/mummy/wraith leading zombie/wight
+    followers, 38fbe82b).
+  - [x] Hell / Pan / Abyss specialised gen (d7bf79e3):
+    abyss = cave + small lava pools + debris;
+    pan = overlapping_boxes + 4 lava pools;
+    hell = caves + 5 lava pools + debris (Dis/Gehenna/Cocytus/
+    Tartarus/Vestibule all route to this via tileset_branch).
 
 ## 🟡 Medium (partial implementations)
 
@@ -84,14 +114,13 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 - [ ] **Invocations skill power scaling** — god abilities don't scale with invocation level.
 - [x] **Walking noise** — 2b243722: Player.try_move emits a body-armour-EVP-scaled DCSSNoise pulse (plate=loud, robe=silent). Stealth still trims.
 - [x] **Monster shout** — 32dd5259: MonsterAI.wake emits HD-scaled DCSSNoise (hiss 4 → roar 12). Silent-shape jellies and silent-flag mobs muzzled. Wave propagates through walls via the noise grid.
-- [~] **Unrandarts** — 12/~200 (29629b76). UnrandartRegistry holds
-  entries; WeaponRegistry / ArmorRegistry synthesize rows on demand
-  for `unrand_` ids. Shipped: Singing Sword, Bow of Krishna, Plutonium
-  Sword, Mace of Variability, Wucad Mu's Staff, Skullcrusher, Storm
-  Bow, Robe of Augmentation, Cloak of the Thief, Hat of the Alchemist,
-  Ring of Shaolin, Amulet of Bloodlust. Effects reuse existing brands/
-  egos/ring props — no per-artefact special code. Drops at 1.5% per
-  item roll from depth ≥ 5. Expansion = just append entries.
+- [~] **Unrandarts** — 50/~200 (29629b76 + 25dc8da7 + 555e1105 +
+  3394dbc3). UnrandartRegistry holds entries; WeaponRegistry /
+  ArmorRegistry synthesize rows on demand for `unrand_` ids.
+  Effects reuse existing brands / egos / ring props — no per-artefact
+  special code. Drops at 1.5% per item roll from depth ≥ 5.
+  Expansion = just append entries. 22 weapons, 10 armor, 3 aux,
+  4 rings, 4 amulets shipped.
 - [x] **Randart generation** — 2e17d103: RandartGenerator.gd with 17-prop weighted pool, depth-scaled 1-4 properties, "the Adj Noun" names. Rings only (amulets TBD). Floor drops 15% randart at depth≥4. Equip + tooltip wired.
 - [ ] **Identification system** — all items pre-identified; DCSS hides potion/scroll/ring/armour appearances until identified.
 - [x] **Player willpower stat** — b842a303: Stats.WL seeded from _race_base_wl (formicid=270 immune, mummy/vine=80, …). _recompute_gear_stats: WL=base+XL*3+willpower_ego*40. willpower_check(hd): random(0..hd*5+30)<WL. Wired in MonsterAI hex branch: confuse/paralyse/slow/fear/charm check WL first. 7-level resist display fixed (rF+ shows "+", not "++"). _apply_elem_resist: rl≥3=immune, -1=×1.5, -2=×2, ≤-3=×3. get_resist() unified source for all racial intrinsics + gear + mutations. Status panel: 5 elemental + WL/rCorr/rMut row.
