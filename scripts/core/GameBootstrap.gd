@@ -3498,16 +3498,13 @@ func _on_skill_button_input(event: InputEvent, btn: Button, skill_id: String) ->
 		btn.set_meta("_press_start_ms", Time.get_ticks_msec())
 		btn.set_meta("_long_press_fired", false)
 		# Defer a long-press check — if the user is still holding after
-		# _SKILL_LONG_PRESS_MS, trigger the description popup.
+		# _SKILL_LONG_PRESS_MS, trigger the description popup. Using a
+		# named method via Callable.bind instead of an inline multi-line
+		# lambda so the parser can't choke on the closing paren position.
 		var press_id: int = Time.get_ticks_msec()
 		btn.set_meta("_press_id", press_id)
-		get_tree().create_timer(_SKILL_LONG_PRESS_MS / 1000.0).timeout.connect(
-				func():
-					if is_instance_valid(btn) \
-							and int(btn.get_meta("_press_id", -1)) == press_id \
-							and int(btn.get_meta("_press_start_ms", -1)) > 0:
-						btn.set_meta("_long_press_fired", true)
-						_show_skill_desc_popup(skill_id))
+		var timer: SceneTreeTimer = get_tree().create_timer(_SKILL_LONG_PRESS_MS / 1000.0)
+		timer.timeout.connect(_skill_long_press_check.bind(btn, press_id, skill_id))
 	elif is_up:
 		var start_ms: int = int(btn.get_meta("_press_start_ms", -1))
 		var long_fired: bool = bool(btn.get_meta("_long_press_fired", false))
@@ -3524,6 +3521,22 @@ func _on_skill_button_input(event: InputEvent, btn: Button, skill_id: String) ->
 					var st: Dictionary = player.skill_state.get(skill_id, {})
 					currently = bool(st.get("training", false))
 				_on_skill_training_toggled(not currently, skill_id)
+
+
+## Deferred long-press check. Fires after _SKILL_LONG_PRESS_MS if the
+## finger is still on the skill button (matches the press_id the
+## button-down captured + the _press_start_ms flag hasn't been cleared
+## by button-up). Named function so the gui_input handler doesn't need
+## a multi-line inline lambda.
+func _skill_long_press_check(btn: Button, press_id: int, skill_id: String) -> void:
+	if not is_instance_valid(btn):
+		return
+	if int(btn.get_meta("_press_id", -1)) != press_id:
+		return
+	if int(btn.get_meta("_press_start_ms", -1)) <= 0:
+		return
+	btn.set_meta("_long_press_fired", true)
+	_show_skill_desc_popup(skill_id)
 
 
 ## Description popup for a single skill. Opens on long-press of the
