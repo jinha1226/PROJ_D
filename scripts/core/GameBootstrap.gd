@@ -2715,6 +2715,23 @@ func _end_run(victory: bool, killer: String) -> void:
 	run_over = true
 	var depth_reached: int = GameManager.current_depth
 	var shards_gained: int = meta.record_run_end(depth_reached, victory)
+	# Persist the richer run summary for the high-score board. record_run_end
+	# only tracked best_depth + total_runs; this gives us the roster the
+	# main menu can display.
+	if meta != null and meta.has_method("record_run_history"):
+		meta.record_run_history({
+			"race": player.race_res.display_name if player and player.race_res else "",
+			"job":  player.job_res.display_name if player and player.job_res else "",
+			"god":  player.current_god if player else "",
+			"level": player.level if player else 0,
+			"depth": depth_reached,
+			"branch": GameManager.current_branch,
+			"turns": TurnManager.turn_number,
+			"kills": kill_count,
+			"victory": victory,
+			"killer": killer,
+			"timestamp": Time.get_unix_time_from_system(),
+		})
 	GameManager.end_run(victory)
 	# DCSS morgue dump — write a text record of the run to user:// so the
 	# player can review what happened after the result screen closes.

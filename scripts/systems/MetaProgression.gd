@@ -223,3 +223,33 @@ func record_run_end(depth_reached: int, victory: bool) -> int:
 	add_rune_shards(gain)
 	save_to_disk()
 	return gain
+
+
+## Append a completed run to the persistent history list (capped at 50).
+## Called from GameBootstrap._end_run so the full context (race / job /
+## god / kills / turns) is available rather than just depth. The history
+## feeds the high score UI on the main menu.
+func record_run_history(entry: Dictionary) -> void:
+	var history: Array = stats_record.get("runs_history", [])
+	if typeof(history) != TYPE_ARRAY:
+		history = []
+	history.append(entry)
+	# Keep only the 50 most recent so the save file doesn't grow unbounded.
+	if history.size() > 50:
+		history = history.slice(history.size() - 50)
+	stats_record["runs_history"] = history
+	save_to_disk()
+
+
+## Return the N best historical runs sorted by depth desc, then turns asc.
+## Used by the high-score UI.
+func get_top_runs(n: int = 10) -> Array:
+	var history: Array = stats_record.get("runs_history", [])
+	if typeof(history) != TYPE_ARRAY:
+		return []
+	var sorted: Array = history.duplicate()
+	sorted.sort_custom(func(a, b):
+		if int(a.get("depth", 0)) != int(b.get("depth", 0)):
+			return int(a.get("depth", 0)) > int(b.get("depth", 0))
+		return int(a.get("turns", 0)) < int(b.get("turns", 0)))
+	return sorted.slice(0, n)
