@@ -177,6 +177,19 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 ## we don't have data for (common — DCSS has 667 monsters), retry a few
 ## times before falling back to the hand-curated per-branch list.
 static func _pick_monster(branch: String, depth: int, rng: RandomNumberGenerator) -> MonsterData:
+	# Portal-vault branches carry an explicit monster_pool on their
+	# branches.json row — bypass the DCSS population tables entirely so
+	# a Sewer reliably spawns its rats/toads instead of weighted picks
+	# drifting into mainline Dungeon fare.
+	if BranchRegistry.is_portal(GameManager.current_branch) \
+			and branch == GameManager.current_branch:
+		var pool: Array = BranchRegistry.monster_pool(branch)
+		if not pool.is_empty():
+			for _i in 10:
+				var pid: String = String(pool[rng.randi() % pool.size()])
+				var d0: MonsterData = MonsterRegistry.fetch(pid)
+				if d0 != null:
+					return d0
 	# DCSS pop tables are branch-local (Lair runs 1..6, Dungeon 1..27). Our
 	# 5-per-branch layout maps depth 11 to forest:1, depth 12 to forest:2, etc.
 	var local_depth: int = MonsterPopulation.branch_local_depth(depth)

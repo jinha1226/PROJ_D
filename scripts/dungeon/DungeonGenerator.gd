@@ -90,6 +90,9 @@ func generate(depth: int, run_seed: int = -1) -> void:
 		# Zot — wide open "arena" floors with crystal walls and lots of
 		# altars. Closest match: caves with no trees, extra debris.
 		"crystal": _build_caves(); _decorate_rock_debris(18)
+		# Sewer portal — damp caves + more water than Lair, no trees.
+		# DCSS Sewer is a swimming-hazard test.
+		"sewer":   _build_caves(); _place_pools(TileType.WATER, 5, 3, 7)
 		_:         _build_dcss_overlapping_boxes(depth)
 	# Up to 3 vault placements per floor so DCSS's ~100-vault pool actually
 	# shows up visibly. Each call only stamps one vault (or none) — repeated

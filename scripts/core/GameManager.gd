@@ -26,6 +26,13 @@ var current_branch: String = "dungeon"
 ## branch's floor 1.
 var branch_return_stack: Array = []
 
+## Portal-vault turn counter. Non-zero only while the player is inside
+## a portal branch (Sewer / Ossuary / Bailey / Volcano / Icecave).
+## Ticks down every player turn via GameBootstrap._on_player_turn_started;
+## when it hits zero the portal collapses and force-returns the player
+## to the parent branch.
+var portal_turns_left: int = 0
+
 # --- Item identification (per-run) ---
 # identified[id] == true once the player has drunk/read/identified a consumable.
 var identified: Dictionary = {}
@@ -206,6 +213,13 @@ func tileset_branch() -> String:
 			"zot": return "crystal"
 			"abyss", "pan": return "abyss"
 			"depths": return "sandstone"
+			# Portal vaults each reuse an existing floor-gen theme that
+			# matches their flavour. Sewer = forest (caves + water).
+			"sewer": return "sewer"
+			"ossuary": return "crypt"
+			"bailey": return "mine"
+			"volcano": return "volcano"
+			"icecave": return "crystal"
 			_: return current_branch
 	# Main trunk thematic rotation.
 	if current_depth <= 5:
@@ -237,10 +251,16 @@ func branch_for_depth(d: int) -> String:
 
 ## Push the current {branch, depth} and switch to the top of a new
 ## branch. GameBootstrap handles the floor regen afterward.
+## For portal vaults, also starts the per-portal turn counter so the
+## timed-branch expiry logic kicks in.
 func enter_branch(branch_id: String) -> void:
 	branch_return_stack.push_back({"branch": current_branch, "depth": current_depth})
 	current_branch = branch_id
 	current_depth = 1
+	if BranchRegistry.is_portal(branch_id):
+		portal_turns_left = BranchRegistry.portal_duration(branch_id)
+	else:
+		portal_turns_left = 0
 
 
 ## Pop the last parent floor off the stack (if any) and return to it.
@@ -252,4 +272,5 @@ func leave_branch() -> bool:
 	var ret: Dictionary = branch_return_stack.pop_back()
 	current_branch = String(ret.get("branch", "dungeon"))
 	current_depth = int(ret.get("depth", 1))
+	portal_turns_left = 0
 	return true

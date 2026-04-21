@@ -317,6 +317,8 @@ func _ready() -> void:
 
 	if not TurnManager.player_turn_started.is_connected(_on_turn_refresh_visibility):
 		TurnManager.player_turn_started.connect(_on_turn_refresh_visibility)
+	if not TurnManager.player_turn_started.is_connected(_on_turn_tick_portal):
+		TurnManager.player_turn_started.connect(_on_turn_tick_portal)
 
 	_setup_combat_log(ui)
 	TurnManager.start_player_turn()
@@ -369,6 +371,45 @@ func _on_turn_refresh_visibility() -> void:
 		essence_system.on_turn_tick()
 	if _resting:
 		_rest_tick()
+
+
+## DCSS floor-arrival portal detection. If the freshly-generated
+## floor has any portal-vault entrances (sewer/ossuary/bailey/volcano/
+## icecave), drop a CombatLog line per entrance so the player knows
+## a timed side-detour is available without having to stumble onto
+## the tile. Only fires on dungeon floors — child branches don't nest
+## portals in our port.
+func _announce_portals_on_floor() -> void:
+	if generator == null or generator.branch_entrances.is_empty():
+		return
+	for pos in generator.branch_entrances.keys():
+		var bid: String = String(generator.branch_entrances[pos])
+		if not BranchRegistry.is_portal(bid):
+			continue
+		var name_s: String = BranchRegistry.display_name(bid)
+		var dur: int = BranchRegistry.portal_duration(bid)
+		CombatLog.add("A portal to %s shimmers somewhere on this floor (%d turns inside)." % \
+				[name_s, dur])
+
+
+## DCSS portal-vault expiry. Ticks the per-portal turn counter each
+## player turn. Warns at the 10-turn and 5-turn marks, then force-
+## collapses the portal when it hits zero (returns the player to the
+## parent branch via GameManager.leave_branch + _regenerate_dungeon).
+func _on_turn_tick_portal() -> void:
+	if GameManager == null or GameManager.portal_turns_left <= 0:
+		return
+	GameManager.portal_turns_left -= 1
+	var left: int = GameManager.portal_turns_left
+	if left == 10:
+		CombatLog.add("The portal begins to fade... (10 turns)")
+	elif left == 5:
+		CombatLog.add("The portal wavers wildly! (5 turns)")
+	elif left <= 0:
+		CombatLog.add("The portal collapses — you are flung back!")
+		_save_current_floor()
+		if GameManager.leave_branch():
+			_regenerate_dungeon(true, false)
 
 
 func _refresh_danger_tiles(dmap: DungeonMap) -> void:
@@ -2295,7 +2336,16 @@ func _on_branch_entrance_tapped(pos: Vector2i) -> void:
 		return
 	_save_current_floor()
 	GameManager.enter_branch(branch_id)
-	CombatLog.add("You enter %s." % BranchRegistry.display_name(branch_id))
+	var is_portal: bool = BranchRegistry.is_portal(branch_id)
+	if is_portal:
+		CombatLog.add("You step into %s. (%d turns before it collapses)" % [
+				BranchRegistry.display_name(branch_id),
+				BranchRegistry.portal_duration(branch_id)])
+		var msg: String = BranchRegistry.entry_message(branch_id)
+		if msg != "":
+			CombatLog.add(msg)
+	else:
+		CombatLog.add("You enter %s." % BranchRegistry.display_name(branch_id))
 	_regenerate_dungeon(false, false)
 
 
@@ -2359,6 +2409,10 @@ func _regenerate_dungeon(going_up: bool, secondary: bool = false) -> void:
 	# from an empty explored set on every revisit.
 	_refresh_minimap_preview(dmap, entry_pos)
 	_refresh_actor_visibility(dmap)
+	# DCSS arrival announce: if the new floor carries any portal-vault
+	# entrances, tell the player so they know a timed detour is waiting.
+	# The player sense what's on their floor even before they discover it.
+	_announce_portals_on_floor()
 
 
 func _save_current_floor() -> void:

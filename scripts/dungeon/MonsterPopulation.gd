@@ -53,6 +53,15 @@ const _BRANCH_MAP: Dictionary = {
 	"abyss":   ["Abyss"],
 	"pan":     ["Pandemonium"],
 	"hell":    ["Hell"],
+	# Portal vaults — themed pool keyed by the portal id. Each entry
+	# also ships its `monster_pool` on the branches.json row so the
+	# spawner can bypass DCSS branch tables entirely when a portal
+	# carries an explicit pool. See MonsterSpawner.spawn_for_depth.
+	"sewer":   ["Dungeon"],
+	"ossuary": ["Crypt"],
+	"bailey":  ["Orcish Mines"],
+	"volcano": ["Volcano", "Gehenna"],
+	"icecave": ["Cocytus"],
 }
 
 static var _table: Dictionary = {}

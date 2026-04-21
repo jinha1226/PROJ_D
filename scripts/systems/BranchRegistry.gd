@@ -57,6 +57,56 @@ static func parent_of(id: String) -> String:
 	return "" if p == null else String(p)
 
 
+## Portal-vault helpers. Portal vaults are timed one-floor branches
+## (Sewer, Ossuary, Bailey, Volcano, Icecave, …) distinguished by
+## `is_portal: true` in branches.json. GameManager ticks a per-portal
+## turn counter on entry and force-exits when it hits zero.
+static func is_portal(id: String) -> bool:
+	_ensure_loaded()
+	return bool(_by_id.get(id, {}).get("is_portal", false))
+
+
+static func portal_duration(id: String) -> int:
+	_ensure_loaded()
+	return int(_by_id.get(id, {}).get("duration", 80))
+
+
+static func monster_pool(id: String) -> Array:
+	_ensure_loaded()
+	var pool = _by_id.get(id, {}).get("monster_pool", [])
+	return pool if typeof(pool) == TYPE_ARRAY else []
+
+
+static func loot_bump(id: String) -> float:
+	_ensure_loaded()
+	return float(_by_id.get(id, {}).get("loot_bump", 1.0))
+
+
+static func entry_message(id: String) -> String:
+	_ensure_loaded()
+	var msg = _by_id.get(id, {}).get("entry_msg")
+	return String(msg) if msg != null else ""
+
+
+## All portal-vault ids eligible for placement at a given main-dungeon
+## depth. Used by DungeonGenerator._place_branch_entrances to decide
+## which portal to spawn.
+static func portals_at_depth(parent_branch: String, depth: int) -> Array:
+	_ensure_loaded()
+	var out: Array = []
+	for bid in _by_id.keys():
+		var info: Dictionary = _by_id[bid]
+		if not bool(info.get("is_portal", false)):
+			continue
+		if String(info.get("parent", "")) != parent_branch:
+			continue
+		var lo: int = int(info.get("min_depth", 0))
+		var hi: int = int(info.get("max_depth", 0))
+		if lo <= depth and depth <= hi:
+			out.append(bid)
+	return out
+
+
 ## Branches that enter from `parent_branch:depth`. Used by
 ## DungeonGenerator to place entrance tiles on the right floors.
 ## Excludes self-referential / deprecated entries; keys the result by
