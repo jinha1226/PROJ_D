@@ -12,7 +12,7 @@ const MIN_ZOOM: float = 0.25
 const MAX_ZOOM: float = 8.0
 const WHEEL_STEP_IN: float = 1.20
 const WHEEL_STEP_OUT: float = 0.83
-const DEFAULT_ZOOM: float = 5.0
+const DEFAULT_ZOOM: float = 6.5
 
 @export var camera: Camera2D
 

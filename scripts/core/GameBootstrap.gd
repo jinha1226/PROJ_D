@@ -946,6 +946,23 @@ func _maybe_drop_gold(monster: Monster) -> void:
 func _maybe_drop_loot(monster: Monster) -> void:
 	if monster == null or not ("grid_pos" in monster):
 		return
+	# DCSS species-specific drops: trolls exclusively drop their own hide
+	# armour (troll_leather_armour is never floor-generated). Gate this
+	# before the generic roll so the yield is independent of the 30%
+	# generic loot chance.
+	if monster.data != null and String(monster.data.id).begins_with("troll"):
+		if randf() < 0.25:
+			var fi: FloorItem = FloorItem.new()
+			$EntityLayer.add_child(fi)
+			var ainfo: Dictionary = ArmorRegistry.get_info("troll_leather_armour")
+			fi.setup(monster.grid_pos, "troll_leather_armour",
+					String(ainfo.get("name", "troll leather armour")),
+					"armor",
+					ainfo.get("color", Color(0.45, 0.55, 0.30)),
+					{"ac": int(ainfo.get("ac", 4)),
+					 "slot": String(ainfo.get("slot", "chest")),
+					 "cursed": false})
+			return
 	if randf() > _LOOT_DROP_CHANCE:
 		return
 	# Reuse the same distribution as floor-gen so kill drops and loose
@@ -960,8 +977,13 @@ func _maybe_drop_loot(monster: Monster) -> void:
 ## match the feel of DCSS's OBJ_RANDOM distribution.
 func _spawn_dummy_items(_count: int) -> void:
 	var depth: int = GameManager.current_depth
-	var d_roll: int = randi_range(1, 9) + randi_range(1, 9) + randi_range(1, 9)
-	var item_count: int = 3 + d_roll
+	# DCSS dungeon.cc:_num_items_wanted uses 3 + 3d9 (avg 18) but that's
+	# calibrated for full 80x70 floors. Our mobile maps are smaller and
+	# that density felt cluttered in playtesting ("1층부터 반지도 트롤갑도
+	# 너무 많아"). Scaled to 1 + 2d5 (avg 7) so each floor has a handful
+	# of picks without a yard sale on every corner.
+	var d_roll: int = randi_range(1, 5) + randi_range(1, 5)
+	var item_count: int = 1 + d_roll
 	var entity_layer: Node = $EntityLayer
 	var placed: int = 0
 	var attempts: int = 0
@@ -1009,12 +1031,15 @@ func _place_random_floor_item(pos: Vector2i, depth: int, parent: Node) -> bool:
 				{"ac": int(info.get("ac", 0)),
 				 "slot": String(info.get("slot", "chest")),
 				 "cursed": is_cursed})
-	elif drop_roll < 0.78:
+	elif drop_roll < 0.73:
+		# Rings were dropping too frequently on Lv1 per user feedback.
+		# DCSS rings are rare picks — this trims the ring band from 8%
+		# down to 3% of drops. Monster-kill loot has its own flow.
 		var rid: String = _RING_POOL[randi() % _RING_POOL.size()]
 		var ring_info: Dictionary = RingRegistry.get_info(rid)
 		fi.setup(pos, rid, String(ring_info.get("name", rid)), "ring",
 				ring_info.get("color", Color(0.85, 0.85, 0.90)))
-	elif drop_roll < 0.83:
+	elif drop_roll < 0.78:
 		# Wand drop: pick one of the 12 DCSS wands, roll its starting
 		# charges, stash both in `extra` so the FloorItem/inventory can
 		# track remaining charges through pickup and evocation.
@@ -4235,6 +4260,17 @@ func _status_build_vitals(vb: VBoxContainer) -> void:
 			Color(0.85, 0.15, 0.15), Color(0.30, 0.05, 0.05)))
 	vb.add_child(_status_vital_bar("MP", s.MP, s.mp_max,
 			Color(0.25, 0.45, 0.95), Color(0.05, 0.10, 0.30)))
+	# Per-turn regen readout. DCSS accumulator: `rate` points per turn,
+	# 100 points = +1 HP/MP. Display as the fractional HP/MP per turn so
+	# the user can see the exact flow rate.
+	var hp_rate: int = 20 + s.hp_max / 6
+	var mp_rate: int = 7 + s.mp_max / 2
+	var regen_lbl := Label.new()
+	regen_lbl.text = "Regen  HP %.2f/turn   MP %.2f/turn" \
+			% [float(hp_rate) / 100.0, float(mp_rate) / 100.0]
+	regen_lbl.add_theme_font_size_override("font_size", 32)
+	regen_lbl.modulate = Color(0.78, 0.78, 0.85)
+	vb.add_child(regen_lbl)
 
 
 func _status_vital_bar(label: String, cur: int, maxv: int,

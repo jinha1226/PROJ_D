@@ -547,8 +547,7 @@
     },
     "good": {
       "plate_armour": 2,
-      "chain_mail": 1,
-      "troll_leather_armour": 1
+      "chain_mail": 1
     },
     "rare": {
       "crystal_plate_armour": 2,
