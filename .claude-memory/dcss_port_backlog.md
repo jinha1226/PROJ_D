@@ -90,13 +90,25 @@ unless explicitly asked. User's queued order:
 2. ~~**Ring multi-stat coverage + randart generation**~~ — DONE 2e17d103
 3. ~~**Player willpower stat + hex resist + 7-level resist**~~ — DONE b842a303
 4. ~~**Status effect breadth (core)**~~ — f71a217c: Slow=half-speed(_slow_skip alt), Fear=block-toward-monster, Charm=no-attack, Blind=FOV→2+EV-5, Corona=stealth→0, Daze=33%scatter+EV-2, Poison 3-level(apply_poison helper, rPois check, stacking). MonsterAI: blind/corona/daze/slow/fear/charm spells wired. Remaining: Frozen, Weakness, Silenced expansion, Enthralled.
-5. **Status effect breadth (remaining)** — Frozen, Weakness, Silenced
-   expansion, Enthralled, Petrifying→Petrified transition, Exhausted,
-   Mesmerised, Liquefaction. Same pattern as session 5 core: duration
-   meta + tick in Player._tick_duration_metas + interaction site.
-6. **Dungeon tile behaviour** — Lava / Water blocking, Teleport trap
-   targeting, Shaft (drop to layer below), Golubria pair-portal,
-   glass/translucent walls for FieldOfView opacity nuance.
+5. ~~**Status effect breadth (remaining)**~~ — PARTIAL, session 8 (32c64621):
+   Frozen (new, cold-dmg rider), Weakness (new, -33% melee), Petrifying
+   slowdown (was already transitioning, now also slows), Exhausted
+   gameplay (was ticking only, now blocks re-berserk + slows). Paralysis/
+   Petrified/Frozen all block SpellCast.cast too. Mesmerised: already
+   shipped in session 5 (_mesmerised_turns + try_move block).
+   **Still deferred (content-gated)**: Silenced expansion needs
+   silence-aura monsters (DCSS silent spectre et al. — not ported);
+   Enthralled needs friendly-monster state (tangled with Companion
+   system); Liquefaction needs the Liquefy Earth spell + a LIQUEFIED
+   tile type. Pick these up when the trigger content lands.
+6. ~~**Dungeon tile behaviour**~~ — PARTIAL, session 8:
+   Shaft trap (new — drops victim 1-3 floors via `_regenerate_dungeon`),
+   Teleport trap DCSS-targeting (retry up to 20× until ≥6 tiles away).
+   **Already shipped pre-session**: Water/Lava traversal by race via
+   Player._player_can_walk_on (merfolk swim, tengu fly water, djinni
+   fly water+lava). **Deferred (no trigger content)**: Golubria pair
+   portal (needs the spell), glass/translucent walls (needs a vault/
+   branch that places them — DCSS-style `o`/`n` wall variants).
 7. **Unarmed Combat skill** (🟡) — new skill id "unarmed_combat",
    add to SkillSystem.SKILL_IDS, wire XP grant from unarmed swings
    (weapon_skill_id == ""), CombatSystem.melee_attack reads level

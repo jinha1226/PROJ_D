@@ -655,6 +655,12 @@ func _place_traps(depth: int) -> void:
 		types.append("net")
 	if depth >= 8:
 		types.append("bolt")
+	# Shaft: DCSS shaft drops the victim 1-3 floors down. Only place on
+	# non-terminal floors so the drop has somewhere to land. `MAX_DEPTH`
+	# lives in GameBootstrap; we defensively cap at depth 24 which is
+	# one below the usual 25-floor endgame floor.
+	if depth >= 3 and depth <= 24:
+		types.append("shaft")
 	for _i in want:
 		var spot: Vector2i = _pick_branch_entrance_tile()
 		if spot == Vector2i(-1, -1):

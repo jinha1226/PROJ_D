@@ -1310,9 +1310,36 @@ func _trigger_trap(pos: Vector2i) -> void:
 			player.take_damage(b, "physical")
 			CombatLog.add("A crossbow bolt fires into you! (%d dmg)" % b)
 		"teleport":
+			# DCSS teleport trap drops you at least 6 tiles away (trap.cc
+			# trap_effect). Random destinations close to the trap don't
+			# count — retry up to 20 times before falling back to plain
+			# random teleport.
 			CombatLog.add("Space wobbles — you are teleported!")
-			if player.has_method("_teleport_random"):
+			var old_pos: Vector2i = player.grid_pos
+			var landed: bool = false
+			for _attempt in 20:
+				if player.has_method("_teleport_random"):
+					player._teleport_random()
+				var dx_t: int = abs(player.grid_pos.x - old_pos.x)
+				var dy_t: int = abs(player.grid_pos.y - old_pos.y)
+				if maxi(dx_t, dy_t) >= 6:
+					landed = true
+					break
+			if not landed and player.has_method("_teleport_random"):
 				player._teleport_random()
+		"shaft":
+			# DCSS shaft drops the victim 1-3 floors down. Uses the same
+			# level-descent pipeline as stairs so floor state persistence
+			# (kills-stay-dead, items stay gone) still works.
+			var depth_drop: int = 1 + randi() % 3
+			var target_depth: int = mini(MAX_DEPTH, GameManager.current_depth + depth_drop)
+			if target_depth <= GameManager.current_depth:
+				CombatLog.add("The floor gives way, but you catch yourself!")
+			else:
+				CombatLog.add("The floor collapses — you plunge %d floors!" % \
+						(target_depth - GameManager.current_depth))
+				GameManager.current_depth = target_depth
+				_regenerate_dungeon(false, false)
 		"alarm":
 			CombatLog.add("An alarm blares!")
 			MonsterAI.broadcast_noise(get_tree(), pos, 30, 0)
