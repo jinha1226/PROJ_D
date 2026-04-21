@@ -48,6 +48,50 @@ const FEATURES: Dictionary = {
 	"tree":        "dngn/trees/tree1.png",
 }
 
+
+## Per-god altar tile lookup. Each value is the base frame from
+## `dngn/altars/` (DCSS ships animated frames; we pick the first so
+## the tile stays static). `feature_altar_tex(god_id)` returns this
+## texture with the altar folder prefix baked in.
+const ALTAR_TILES: Dictionary = {
+	"trog":            "trog.png",
+	"okawaru":         "okawaru.png",
+	"makhleb":         "makhleb_flame1.png",
+	"uskayaw":         "uskayaw.png",
+	"zin":             "zin1.png",
+	"the_shining_one": "shining_one.png",
+	"elyvilon":        "elyvilon.png",
+	"vehumet":         "vehumet1.png",
+	"sif_muna":        "sif_muna1.png",
+	"kikubaaqudgha":   "kikubaaqudgha.png",
+	"nemelex_xobeh":   "nemelex1.png",
+	"xom":             "xom0.png",
+	"yredelemnul":     "yredelemnul.png",
+	"beogh":           "beogh.png",
+	"jiyva":           "jiyva01.png",
+	"fedhas":          "fedhas.png",
+	"cheibriados":     "cheibriados.png",
+	"lugonu":          "lugonu.png",
+	"ashenzari":       "ashenzari.png",
+	"dithmenos":       "dithmenos1.png",
+	"gozag":           "gozag0.png",
+	"qazlal":          "qazlal0.png",
+	"ru":              "ru.png",
+	"wu_jian":         "wu_jian.png",
+	"hepliaklqana":    "hep0.png",
+	"ignis":           "ignis.png",
+}
+
+const _ALTAR_DIR: String = "res://assets/dcss_tiles/individual/dngn/altars/"
+
+
+## DCSS per-god altar texture. Falls back to `ecumenical.png` (the
+## generic unaligned altar tile) when the god isn't mapped — keeps
+## the map readable even for gods we haven't wired yet.
+static func altar_tex(god_id: String) -> Texture2D:
+	var fname: String = String(ALTAR_TILES.get(god_id, "ecumenical.png"))
+	return load(_ALTAR_DIR + fname) as Texture2D
+
 ## Per-branch overrides. DungeonMap picks the right floor/wall/etc. by
 ## passing the current branch id; missing keys fall back to FEATURES.
 const BRANCH_TILESETS: Dictionary = {
