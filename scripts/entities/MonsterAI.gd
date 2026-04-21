@@ -104,6 +104,14 @@ static func act(m: Monster) -> int:
 	# Keep the local `player` reference for the melee path below.
 	var player: Node = target
 
+	# DCSS `cautious` flag — these monsters won't willingly step into
+	# adjacency with a foe they can't cast at. Practical effect: a
+	# cautious non-caster with no ranged attack just holds position
+	# and waits (like the player hugging a doorway). We only honour
+	# it from dist > 1 — once we're adjacent, melee's the only option.
+	if dist > 1 and _is_cautious(m) and not _is_caster(m) \
+			and int(m.data.ranged_damage) <= 0:
+		return 10
 	if dist <= 1:
 		# DCSS caster monsters prefer spell range over biting: if this
 		# monster has a spellbook, try to cast first even when adjacent
@@ -255,8 +263,20 @@ static func _try_ranged_at(m: Monster, target: Node, dist: int) -> bool:
 	if hit_roll <= target_ev + range_penalty:
 		CombatLog.add("The %s fires at you but misses." % mname)
 		return true
-	# Damage: 1..rdmg + HD/5 flat bonus. Physical element (no resist path).
+	# DCSS SPARM_REFLECTION (shield) / Amulet of Reflection. Shields tagged
+	# with the reflect flag bounce missiles 25% of the time. On a reflect
+	# the attacker eats their own shot.
+	var reflected: bool = false
+	if target.has_method("has_meta") \
+			and (target.has_meta("_ego_reflect") or target.has_meta("_amulet_reflect")) \
+			and randi() % 100 < 25:
+		reflected = true
 	var dmg: int = 1 + randi() % rdmg + hd / 5
+	if reflected:
+		if m.has_method("take_damage"):
+			m.take_damage(dmg, "physical")
+		CombatLog.add("Your shield reflects the %s's shot!" % mname)
+		return true
 	if target.has_method("take_damage"):
 		target.take_damage(dmg, "physical")
 		CombatLog.add("The %s shoots you for %d damage!" % [mname, dmg])
@@ -300,6 +320,18 @@ static func _path_has_ally(m: Monster, target: Node) -> bool:
 		if cell == to:
 			break
 		if occupants.has(cell):
+			return true
+	return false
+
+
+## DCSS M_CAUTIOUS flag — these monsters refuse to close to melee when
+## they have no reliable way to hurt the target. Read off the string
+## flags list (our monsters.json carries flags as uppercase strings).
+static func _is_cautious(m: Monster) -> bool:
+	if m == null or m.data == null or m.data.flags == null:
+		return false
+	for f in m.data.flags:
+		if String(f).to_lower() == "cautious":
 			return true
 	return false
 

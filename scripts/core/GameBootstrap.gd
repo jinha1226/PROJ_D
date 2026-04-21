@@ -1105,12 +1105,23 @@ func _on_monster_died(monster: Monster) -> void:
 	if player != null and player.current_god != "":
 		var god: Dictionary = GodRegistry.get_info(player.current_god)
 		var gain: int = int(god.get("kill_piety", 0))
-		if gain > 0:
+		# DCSS god conducts — per-kill piety modifiers keyed to the
+		# victim's holiness / shape / genus. Each branch overrides
+		# `gain` with bonuses or outright penalties (negative = piety
+		# loss + log line). Only the most-distinctive deity conducts
+		# are wired for now; quiet gods pass through at base rate.
+		gain = _apply_god_conduct(player.current_god, monster, gain)
+		if gain != 0:
 			var cap: int = int(god.get("piety_cap", 200))
 			# Amulet of Faith: +50% piety from all sources (DCSS amulet.cc).
-			if player.has_meta("_amulet_piety_boost"):
+			if player.has_meta("_amulet_piety_boost") and gain > 0:
 				gain = (gain * 3) / 2
-			player.piety = min(cap, player.piety + gain)
+			if gain >= 0:
+				player.piety = min(cap, player.piety + gain)
+			else:
+				player.piety = max(0, player.piety + gain)
+				CombatLog.add("%s frowns at you." % \
+						String(god.get("title", player.current_god)))
 	if player != null and player.trait_res != null and player.trait_res.special == "holy_light":
 		if player.stats != null and player.is_alive:
 			var heal: int = max(1, int(player.stats.hp_max * 0.2))
@@ -1144,6 +1155,76 @@ func _on_monster_died(monster: Monster) -> void:
 		# Player-level XP: same magnitude as skill grant. Player.grant_xp handles
 		# rollover and emits leveled_up for the popup flow.
 		player.grant_xp(xp_gain)
+
+
+## DCSS per-god kill conducts. Returns the adjusted piety gain for this
+## kill (negative = piety loss). Bonuses fire on favoured victims
+## (TSO evil-kill, Yred holy-kill), penalties on disliked victims
+## (Elyvilon neutral, Beogh orc, Fedhas plant). Gods not listed here
+## return `base_gain` unchanged.
+func _apply_god_conduct(god_id: String, monster: Monster, base_gain: int) -> int:
+	if monster == null or monster.data == null:
+		return base_gain
+	var holiness: String = ""
+	# Holiness derived the same way CombatSystem / Monster does — read
+	# shape + flags. "undead"/"demonic"/"holy"/"plant" are the four
+	# conduct-bearing classes.
+	if String(monster.data.shape) == "undead":
+		holiness = "undead"
+	elif monster.data.flags != null:
+		for f in monster.data.flags:
+			var lf: String = String(f).to_lower()
+			if lf in ["undead", "demonic", "holy", "plant", "natural"]:
+				holiness = lf
+				break
+	var mid: String = String(monster.data.id) if "id" in monster.data else ""
+	match god_id:
+		"the_shining_one":
+			# TSO +50% from evil kills (undead + demonic); penalty for
+			# slaughtering the natural-aligned.
+			if holiness == "undead" or holiness == "demonic":
+				return base_gain + maxi(1, base_gain / 2)
+		"yredelemnul":
+			# Yred loves necrotic prey flipped: bonus for holy kills,
+			# outright penalty for slaughtering the undead (they're allies
+			# in spirit).
+			if holiness == "holy":
+				return base_gain + 2
+			if holiness == "undead":
+				return -1
+		"zin":
+			# Zin forbids mutation + chaos. Chaos demons / shapeshifters
+			# anger Zin even on kill (player should be cleansing, not
+			# slaying chaos). Small penalty.
+			if "chaos" in mid or "shapeshifter" in mid:
+				return -1
+			if holiness == "demonic":
+				return base_gain + 1
+		"elyvilon":
+			# Elyvilon — the pacifist. Kills of neutral/natural creatures
+			# cost piety; only undead and demonic kills are rewarded.
+			if holiness == "undead" or holiness == "demonic":
+				return base_gain
+			return -1
+		"cheibriados":
+			# Cheibriados cares more about speed than kills — no per-kill
+			# conduct, but passes base through. The haste-ban is enforced
+			# elsewhere (caster/buff sites).
+			return base_gain
+		"beogh":
+			# Beogh — orc god. Killing non-orc non-pets gains piety; orc
+			# kills are a hard penalty ("Beogh frowns").
+			if mid.begins_with("orc") or "orc_" in mid or mid == "orc":
+				return -3
+		"fedhas":
+			# Fedhas — plant god. Any plant kill is a -2 penalty.
+			if holiness == "plant":
+				return -2
+		"okawaru":
+			# Okawaru — lone warrior. No penalty on kills, but the summon/
+			# ally ban lives in the invocation/essence paths.
+			return base_gain
+	return base_gain
 
 
 ## Oni (and any future magical-might race) get a 20% spell power bump so

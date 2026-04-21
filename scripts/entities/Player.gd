@@ -44,6 +44,27 @@ const _HP_PER_LEVEL: int = 5  # fallback if race_res missing
 const _MP_PER_LEVEL: int = 3
 
 
+## True when the next step `delta` brings the player closer to any
+## hostile monster they can currently see. Used by the SPARM_RAMPAGING
+## ego gate so rampage only fires when the player is closing on a foe.
+func _move_is_toward_hostile(delta: Vector2i) -> bool:
+	if generator == null or delta == Vector2i.ZERO:
+		return false
+	var target_cell: Vector2i = grid_pos + delta
+	var closest: int = 999999
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+			continue
+		var cur: int = maxi(abs(m.grid_pos.x - grid_pos.x),
+				abs(m.grid_pos.y - grid_pos.y))
+		var nxt: int = maxi(abs(m.grid_pos.x - target_cell.x),
+				abs(m.grid_pos.y - target_cell.y))
+		if nxt < cur:
+			return true
+		closest = mini(closest, cur)
+	return false
+
+
 ## DCSS player_spell_levels(xl, spellcasting). Max total difficulty
 ## of memorised spells. Per player.cc: sl = min(xl, 27)/2 + spellcasting/3.
 ## Each spell's `difficulty` field (SpellRegistry) eats into this pool.
@@ -1213,6 +1234,20 @@ func apply_kill_bonuses(_monster: Node) -> void:
 			var mp: int = 2
 			stats.MP = min(stats.mp_max, stats.MP + mp)
 			stats_changed.emit()
+	# DCSS SPARM_MAYHEM (cloak of mayhem). On a killing blow, nearby
+	# hostiles panic — fear them for 3 turns via `_flee_turns` so the
+	# existing MonsterAI fear path drives the retreat. Radius 3 matches
+	# the DCSS aura.
+	if has_meta("_ego_mayhem"):
+		for m in get_tree().get_nodes_in_group("monsters"):
+			if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+				continue
+			var d: int = maxi(abs(m.grid_pos.x - grid_pos.x),
+					abs(m.grid_pos.y - grid_pos.y))
+			if d == 0 or d > 3:
+				continue
+			if not m.has_meta("_flee_turns"):
+				m.set_meta("_flee_turns", 3)
 
 
 ## Auto-enable the skill that `weapon_id` trains so the next kill's XP flows
@@ -1409,6 +1444,11 @@ func _recompute_gear_stats() -> void:
 			var flag_s: String = String(ego.get("flag", ""))
 			if flag_s != "":
 				set_meta("_ego_" + flag_s, true)
+				# SPARM_FLYING (boots of flying) plumbs into the same
+				# `_flying` meta that forms / djinni use, so the terrain
+				# + ranged paths only check one flag.
+				if flag_s == "flying":
+					set_meta("_flying", true)
 	# Apply ring bonuses.
 	for ring in equipped_rings:
 		if typeof(ring) != TYPE_DICTIONARY or ring.is_empty():
@@ -1744,6 +1784,13 @@ func try_move(delta: Vector2i) -> bool:
 	# human in bat form still moves at bat pace, not swift pace.
 	if has_meta("_form_move_bonus"):
 		speed_mod = maxi(speed_mod, int(get_meta("_form_move_bonus", 0)))
+	# DCSS SPARM_RAMPAGING: stepping toward a visible hostile covers two
+	# tiles in one action, so we grant +1 speed_mod exactly on those
+	# moves (stacks with swift / bat-form in the max() above). Requires
+	# a visible foe in the move direction so random wander doesn't
+	# rampage.
+	if has_meta("_ego_rampage") and _move_is_toward_hostile(delta):
+		speed_mod = maxi(speed_mod, 1)
 	if speed_mod > 0:
 		_free_move_counter += 1
 		if _free_move_counter < speed_mod:
