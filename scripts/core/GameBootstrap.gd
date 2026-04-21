@@ -373,6 +373,88 @@ func _on_turn_refresh_visibility() -> void:
 		_rest_tick()
 
 
+## DCSS rune + Orb placement. Called from _regenerate_dungeon once
+## per floor generation. Drops the branch-specific rune on its final
+## floor (the deepest floor of a runed branch) and places the Orb of
+## Zot on Zot:5. Both guard against re-placement on floor-revisit
+## via GameManager.runes_placed / orb_placed sets.
+func _maybe_place_rune_and_orb() -> void:
+	if generator == null or player == null:
+		return
+	var branch: String = GameManager.current_branch
+	var depth: int = GameManager.current_depth
+	# Rune drop: only on the deepest floor of a runed branch.
+	var rune_id: String = RuneRegistry.rune_for_branch(branch)
+	if rune_id != "" and not player.runes.has(rune_id):
+		var branch_floors: int = BranchRegistry.floors_in(branch)
+		# Final floor of the branch. DCSS places rune at the bottom.
+		if depth >= branch_floors:
+			var placed_key: String = "%s:%d" % [branch, depth]
+			if not GameManager.runes_placed.has(placed_key):
+				_spawn_rune_item(rune_id)
+				GameManager.runes_placed[placed_key] = true
+	# Orb of Zot: exclusively on Zot:5.
+	if branch == "zot" and depth == 5 and not GameManager.orb_placed and not player.has_orb:
+		_spawn_orb_of_zot()
+		GameManager.orb_placed = true
+
+
+## Spawn a rune pickup on a random floor tile. The item uses the
+## FloorItem pathway so the existing pickup flow recognises it — a
+## new kind "rune" feeds Player.runes.append on step-on.
+func _spawn_rune_item(rune_id: String) -> void:
+	var info: Dictionary = RuneRegistry.get_info(rune_id)
+	if info.is_empty():
+		return
+	var entity_layer: Node = get_node_or_null("EntityLayer")
+	if entity_layer == null:
+		return
+	var pos: Vector2i = _pick_random_floor_tile_away_from_player(5)
+	if pos == Vector2i(-1, -1):
+		return
+	var fi: FloorItem = FloorItem.new()
+	entity_layer.add_child(fi)
+	fi.setup(pos, rune_id, String(info.get("name", rune_id)), "rune",
+			info.get("color", Color.WHITE), {"rune_id": rune_id})
+	CombatLog.add("A %s radiates power somewhere on this floor." % \
+			String(info.get("name", rune_id)))
+
+
+## Spawn the Orb of Zot on Zot:5.
+func _spawn_orb_of_zot() -> void:
+	var entity_layer: Node = get_node_or_null("EntityLayer")
+	if entity_layer == null:
+		return
+	var pos: Vector2i = _pick_random_floor_tile_away_from_player(8)
+	if pos == Vector2i(-1, -1):
+		return
+	var fi: FloorItem = FloorItem.new()
+	entity_layer.add_child(fi)
+	fi.setup(pos, "orb_of_zot", "the Orb of Zot", "orb",
+			Color(1.00, 0.85, 0.15), {"orb": true})
+	CombatLog.add("The Orb of Zot blazes at the heart of this floor!")
+
+
+## Random walkable tile at least `min_dist` tiles from the player's
+## spawn. Used for rune / Orb placement so the loot isn't sitting on
+## the stairs the player just arrived on.
+func _pick_random_floor_tile_away_from_player(min_dist: int) -> Vector2i:
+	if generator == null or player == null:
+		return Vector2i(-1, -1)
+	var tiles: Array = []
+	for x in DungeonGenerator.MAP_WIDTH:
+		for y in DungeonGenerator.MAP_HEIGHT:
+			var p: Vector2i = Vector2i(x, y)
+			if not generator.is_walkable(p):
+				continue
+			var d: int = maxi(abs(p.x - player.grid_pos.x), abs(p.y - player.grid_pos.y))
+			if d >= min_dist:
+				tiles.append(p)
+	if tiles.is_empty():
+		return Vector2i(-1, -1)
+	return tiles[randi() % tiles.size()]
+
+
 ## DCSS floor-arrival portal detection. If the freshly-generated
 ## floor has any portal-vault entrances (sewer/ossuary/bailey/volcano/
 ## icecave), drop a CombatLog line per entrance so the player knows
@@ -1629,6 +1711,13 @@ func _on_stairs_up_tapped(_pos: Vector2i) -> void:
 		if GameManager.leave_branch():
 			_regenerate_dungeon(false, false)
 		return
+	# DCSS victory: stairs-up off D:1 of the Dungeon with the Orb of
+	# Zot in hand ends the run in triumph. Classic endgame gate.
+	if GameManager.current_branch == "dungeon" and GameManager.current_depth == 1 \
+			and player != null and player.has_orb:
+		CombatLog.add("You escape the dungeon with the Orb of Zot!")
+		_end_run(true, "")
+		return
 	if GameManager.current_depth <= 1:
 		return
 	var used_secondary: bool = (player.grid_pos == generator.spawn_pos2)
@@ -2584,6 +2673,15 @@ func _on_branch_entrance_tapped(pos: Vector2i) -> void:
 	var branch_id: String = String(generator.branch_entrances.get(pos, ""))
 	if branch_id == "":
 		return
+	# DCSS Zot gate — the Zot entrance demands at least N runes of Zot.
+	# Turn the player back at the portal if they're under the threshold.
+	if branch_id == "zot":
+		var have: int = player.runes.size() if player != null else 0
+		var need: int = RuneRegistry.ZOT_GATE_REQUIREMENT
+		if have < need:
+			CombatLog.add("The gates of Zot refuse you — %d / %d runes." % [have, need])
+			return
+		CombatLog.add("The Zot gates recognise your %d runes and part." % have)
 	_save_current_floor()
 	GameManager.enter_branch(branch_id)
 	var is_portal: bool = BranchRegistry.is_portal(branch_id)
@@ -2663,6 +2761,10 @@ func _regenerate_dungeon(going_up: bool, secondary: bool = false) -> void:
 	# entrances, tell the player so they know a timed detour is waiting.
 	# The player sense what's on their floor even before they discover it.
 	_announce_portals_on_floor()
+	# End-game placement: drop the branch's rune on its final floor, and
+	# the Orb of Zot on Zot:5. Both only appear once per run (guarded by
+	# GameManager.runes_placed / orb_placed).
+	_maybe_place_rune_and_orb()
 
 
 func _save_current_floor() -> void:
@@ -5351,6 +5453,7 @@ func _on_status_pressed() -> void:
 	_status_build_rings(vb)
 	_status_build_resistances(vb)
 	_status_build_trait(vb)
+	_status_build_runes(vb)
 
 	# Essence slots retained — each row handles its own cast/swap buttons.
 	if essence_system != null and essence_system.slots.size() > 0:
@@ -5868,6 +5971,33 @@ func _status_build_trait(vb: VBoxContainer) -> void:
 	lbl.add_theme_font_size_override("font_size", 38)
 	panel.add_child(lbl)
 	vb.add_child(panel)
+
+
+## Rune collection display. Header shows the count vs Zot gate
+## requirement; each collected rune gets a colored name line. Orb of
+## Zot, once picked up, flashes a victory reminder at the top.
+func _status_build_runes(vb: VBoxContainer) -> void:
+	if player == null:
+		return
+	var have: int = player.runes.size()
+	if have == 0 and not player.has_orb:
+		return  # no sense in a header for an empty collection
+	var need: int = RuneRegistry.ZOT_GATE_REQUIREMENT
+	vb.add_child(_status_section_header("Runes (%d / %d for Zot)" % [have, need]))
+	for rid in player.runes:
+		var info: Dictionary = RuneRegistry.get_info(String(rid))
+		var row := Label.new()
+		row.text = "• %s" % String(info.get("name", rid))
+		row.add_theme_font_size_override("font_size", 36)
+		row.add_theme_color_override("font_color",
+				info.get("color", Color(0.85, 0.80, 0.70)))
+		vb.add_child(row)
+	if player.has_orb:
+		var orb_lbl := Label.new()
+		orb_lbl.text = "✦ the Orb of Zot — flee to the surface!"
+		orb_lbl.add_theme_font_size_override("font_size", 42)
+		orb_lbl.add_theme_color_override("font_color", Color(1.00, 0.85, 0.15))
+		vb.add_child(orb_lbl)
 
 
 ## One row in the Status popup per essence slot. Shows the slotted essence's

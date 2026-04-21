@@ -155,6 +155,15 @@ var mutations: Dictionary = {}
 var current_god: String = ""
 var piety: int = 0
 
+## DCSS rune collection — each picked-up rune id is stored here.
+## RuneRegistry.ZOT_GATE_REQUIREMENT (= 3) is the minimum to pass
+## the Zot entrance. Also drives the "you won!" flow once the Orb
+## of Zot is in inventory and the player climbs back to D:1.
+var runes: Array[String] = []
+## Orb of Zot flag — set when the Orb pickup fires. Triggers the
+## "Orb run" end-game pace (monster spawn boost, victory on D:1↑).
+var has_orb: bool = false
+
 ## Gold currency. Gained from monster drops, floor piles, and Gozag's
 ## potion_petition gambling. Spent at shops and on Gozag's bribes.
 var gold: int = 0
@@ -1937,6 +1946,27 @@ func _pickup_items_here() -> void:
 				if amount > 0:
 					gold += amount
 					CombatLog.add("Picked up %d gold." % amount)
+				it.queue_free()
+				continue
+			# Rune pickup: add to rune collection rather than inventory.
+			# Dramatic log line matches DCSS's "You pick up the foo rune of Zot!"
+			if it.kind == "rune":
+				var rid: String = String(it.extra.get("rune_id", it.item_id))
+				if rid != "" and not runes.has(rid):
+					runes.append(rid)
+				CombatLog.add("You pick up the %s!" % it.display_name)
+				CombatLog.add("[%d rune%s collected]" % \
+						[runes.size(), "s" if runes.size() != 1 else ""])
+				it.queue_free()
+				continue
+			# Orb of Zot: sets the has_orb flag and triggers the Orb run.
+			# Doesn't go into regular inventory; monster aggression and
+			# the "reach D:1 up-stairs" victory condition read has_orb.
+			if it.kind == "orb":
+				has_orb = true
+				CombatLog.add("You pick up the Orb of Zot!")
+				CombatLog.add("The dungeon convulses — monsters rush you!")
+				CombatLog.add("Flee to the surface with the Orb to win!")
 				it.queue_free()
 				continue
 			items.append(it.as_dict())

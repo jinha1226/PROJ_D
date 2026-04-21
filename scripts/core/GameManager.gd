@@ -33,6 +33,12 @@ var branch_return_stack: Array = []
 ## to the parent branch.
 var portal_turns_left: int = 0
 
+## Rune / Orb placement guards. Keys are "branch:depth" strings; each
+## entry records that the rune or Orb has already been dropped on
+## that floor this run, so revisits don't double-place.
+var runes_placed: Dictionary = {}
+var orb_placed: bool = false
+
 # --- Item identification (per-run) ---
 # identified[id] == true once the player has drunk/read/identified a consumable.
 var identified: Dictionary = {}
@@ -90,6 +96,9 @@ func start_new_run(job_id: String = "fighter", race_id: String = "human", run_se
 	_pseudonyms.clear()
 	_consumable_bases.clear()
 	_pseudonyms_assigned = false
+	runes_placed.clear()
+	orb_placed = false
+	portal_turns_left = 0
 	# Persist the combo so QuickStart can resurface it on the next boot.
 	var meta: Node = get_tree().root.get_node_or_null("MetaProgression") if get_tree() != null else null
 	if meta != null and meta.has_method("record_last_combo"):
