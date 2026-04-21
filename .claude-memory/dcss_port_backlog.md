@@ -109,14 +109,21 @@ unless explicitly asked. User's queued order:
    fly water+lava). **Deferred (no trigger content)**: Golubria pair
    portal (needs the spell), glass/translucent walls (needs a vault/
    branch that places them — DCSS-style `o`/`n` wall variants).
-7. **Unarmed Combat skill** (🟡) — new skill id "unarmed_combat",
-   add to SkillSystem.SKILL_IDS, wire XP grant from unarmed swings
-   (weapon_skill_id == ""), CombatSystem.melee_attack reads level
-   for base damage + mindelay.
-8. **Identification system** (🟡) — randomize potion/scroll/ring/amulet
-   appearances per run; items carry `appearance_id` + `identified` flag;
-   status popup / bag shows "blue potion" until identified; scrolls
-   of identify flip the flag.
+7. ~~**Unarmed Combat skill**~~ — DONE session 8 (e66e3b96):
+   "unarmed_combat" in SkillSystem.SKILL_IDS (weapon category); aptitude
+   alias → JSON "unarmed"; Player.get_current_weapon_skill returns
+   "unarmed_combat" when unarmed so XP tags correctly; CombatSystem
+   adds +1 flat damage per 3 skill levels on top of the weapon-skill
+   multiplier; attack_delay mindelay reduction uses unarmed_combat
+   when fistfighting. SkillRow + _SKILL_DESCS entries for display.
+8. ~~**Identification system**~~ — DONE session 8 (d49ac290) + pre-existing:
+   Potions/scrolls already had per-run pseudonyms. This session added
+   rings ("Silver Ring", "Ruby Ring", …) and amulets ("Brass Amulet",
+   "Cameo Amulet"). display_name_for_item routes ring/amulet kinds
+   through the pseudonym table; randarts (`randart_*` id prefix) are
+   excluded — they keep their rolled artefact name. DCSS put-on
+   identification: Player.equip_ring / equip_amulet now auto-identify
+   non-randart base items on equip (item-use.cc parity).
 
 After those: monster AI intelligence, per-monster energy types,
 portal vaults (Sewers/Ossuary), transformation form expansion,
