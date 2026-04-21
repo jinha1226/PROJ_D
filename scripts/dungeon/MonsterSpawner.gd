@@ -91,6 +91,34 @@ const _FALLBACK_REGULARS: Dictionary = {
 	"forest":  ["jackal", "adder", "ball_python", "boggart"],
 	"swamp":   ["adder", "boggart", "bog_body", "alligator"],
 	"volcano": ["hell_hound", "fire_sprite", "ghoul", "orc_warrior"],
+	# Real branch ids (picked up directly when inside a branch).
+	"dungeon": ["rat", "bat", "goblin", "kobold", "jackal", "hobgoblin"],
+	"lair":    ["jackal", "adder", "bear", "wolf", "yak", "giant_toad"],
+	"orc":     ["orc", "orc_warrior", "orc_priest", "gnoll"],
+	"elf":     ["deep_elf_fighter", "deep_elf_archer", "deep_elf_mage"],
+	"crypt":   ["skeleton", "zombie", "wight", "skeletal_warrior"],
+	"vaults":  ["vault_guard", "deep_elf_knight", "centaur"],
+	"slime":   ["jelly", "acid_blob", "ooze"],
+	"snake":   ["adder", "black_mamba", "anaconda"],
+	"spider":  ["spider", "redback", "orb_spider"],
+	"shoals":  ["merfolk", "cyclops", "kraken"],
+	"zot":     ["tentacled_monstrosity", "draconian", "orb_guardian"],
+	"depths":  ["draconian", "deep_troll", "stone_giant"],
+	# Portal vaults.
+	"sewer":   ["rat", "giant_cockroach", "bat", "giant_toad", "adder"],
+	"ossuary": ["skeleton", "zombie", "wight", "mummy"],
+	"bailey":  ["orc", "orc_warrior", "orc_knight", "gnoll"],
+	"icecave": ["ice_beast", "polar_bear"],
+	# Hell sub-branches.
+	"hell":       ["hell_hound", "hell_knight", "red_devil"],
+	"dis":        ["iron_devil", "fire_giant"],
+	"gehenna":    ["fire_giant", "hell_hound", "red_devil"],
+	"cocytus":    ["ice_beast", "frost_giant"],
+	"tartarus":   ["shadow_wraith", "wraith", "spectral_thing"],
+	"vestibule":  ["hell_hound", "red_devil"],
+	# Abyss / Pan.
+	"abyss": ["abyssal_wretch", "red_devil", "shadow_demon"],
+	"pan":   ["red_devil", "green_death", "blue_devil"],
 }
 
 ## Boss-floor (depth % 5 == 0) → boss id. One named monster per segment.
@@ -180,9 +208,14 @@ static func _pick_monster(branch: String, depth: int, rng: RandomNumberGenerator
 	# Portal-vault branches carry an explicit monster_pool on their
 	# branches.json row — bypass the DCSS population tables entirely so
 	# a Sewer reliably spawns its rats/toads instead of weighted picks
-	# drifting into mainline Dungeon fare.
-	if BranchRegistry.is_portal(GameManager.current_branch) \
-			and branch == GameManager.current_branch:
+	# drifting into mainline Dungeon fare. Null-guarded: if the branch
+	# registry or game manager isn't wired up yet (early boot), skip
+	# the portal check rather than tripping an autoload lookup error.
+	var cur_branch: String = ""
+	if GameManager != null and "current_branch" in GameManager:
+		cur_branch = String(GameManager.current_branch)
+	if cur_branch != "" and BranchRegistry.is_portal(cur_branch) \
+			and branch == cur_branch:
 		var pool: Array = BranchRegistry.monster_pool(branch)
 		if not pool.is_empty():
 			for _i in 10:
@@ -207,6 +240,13 @@ static func _pick_monster(branch: String, depth: int, rng: RandomNumberGenerator
 		var d2: MonsterData = MonsterRegistry.fetch(id2)
 		if d2 != null:
 			return d2
+	# Absolute last resort — the branch fallback pool can miss when a
+	# portal / new branch id lands without an entry. "rat" is universal
+	# and always present in monsters.json.
+	var d3: MonsterData = MonsterRegistry.fetch("rat")
+	if d3 != null:
+		return d3
+	push_warning("[MonsterSpawner] could not fetch ANY monster for branch=" + branch)
 	return null
 
 
