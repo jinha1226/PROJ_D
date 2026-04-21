@@ -1492,28 +1492,40 @@ func use_item(index: int) -> void:
 		TurnManager.end_player_turn()
 		return
 	var info: Dictionary = ConsumableRegistry.get_info(item_id)
+	# Log "You drink/read..." BEFORE the effect so the cause appears first.
+	# Use the display name (pseudonym if unidentified, real name if identified).
+	var item_kind: String = String(info.get("kind", it.get("kind", "")))
+	var display_n: String = String(it.get("name", item_id))
+	if GameManager != null:
+		display_n = GameManager.display_name_for_item(item_id, display_n, item_kind)
+	match item_kind:
+		"potion":
+			CombatLog.add("You drink the %s." % display_n)
+		"scroll":
+			CombatLog.add("You read the %s." % display_n)
 	var consumed: bool = false
 	if info.is_empty():
 		# Unknown id — fall back to legacy kind heuristic.
-		match String(it.get("kind", "")):
+		match item_kind:
 			"potion":
 				if stats != null:
 					stats.HP = min(stats.hp_max, stats.HP + 20)
 					stats_changed.emit()
 				consumed = true
 			"scroll":
-				print("Read scroll: %s" % it.get("name", ""))
 				consumed = true
 			_:
-				print("Used: %s" % it.get("name", ""))
 				consumed = true
 	else:
 		consumed = _apply_consumable_effect(info)
 	if consumed:
-		# Auto-identify on use so the player learns what each unknown
-		# potion/scroll was.
+		# Auto-identify on use; re-fetch the real name for the reveal message.
 		if GameManager != null:
+			var was_known: bool = GameManager.identified.has(item_id)
 			GameManager.identify(item_id)
+			if not was_known and (item_kind == "potion" or item_kind == "scroll"):
+				var real_name: String = String(info.get("name", display_n))
+				CombatLog.add("(%s was the %s)" % [display_n, real_name])
 		items.remove_at(index)
 		inventory_changed.emit()
 		# Using an item costs a turn.
@@ -1791,8 +1803,10 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 		"restore_mp":
 			if stats == null:
 				return false
-			stats.MP = min(stats.mp_max, stats.MP + int(info.get("amount", 20)))
+			var restored: int = min(stats.mp_max - stats.MP, int(info.get("amount", 20)))
+			stats.MP += restored
 			stats_changed.emit()
+			CombatLog.add("Your magic surges! (+%d MP)" % restored)
 			return true
 		"teleport_random":
 			return _teleport_random()
@@ -1802,6 +1816,7 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 			var dmap: Node = get_tree().root.get_node_or_null("Game/DungeonLayer/DungeonMap")
 			if dmap != null and dmap.has_method("reveal_all"):
 				dmap.reveal_all()
+				CombatLog.add("An image of the level floods your mind.")
 				return true
 			return false
 		"identify_one":
@@ -1812,11 +1827,15 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 			if stats == null:
 				return false
 			var amt: int = int(info.get("amount", 2))
-			match String(info.get("stat", "")):
+			var stat_n: String = String(info.get("stat", ""))
+			match stat_n:
 				"STR": stats.STR += amt
 				"DEX": stats.DEX += amt
 				"INT": stats.INT += amt
 			stats_changed.emit()
+			CombatLog.add("You feel %s! (+%d %s)" % [
+				{"STR": "stronger", "DEX": "nimbler", "INT": "smarter"}.get(stat_n, "different"),
+				amt, stat_n])
 			return true
 		"harm":
 			if stats == null:
