@@ -921,6 +921,9 @@ const _RING_POOL: Array = [
 	"ring_magical_power", "ring_wizardry",
 	"ring_regeneration", "ring_stealth",
 	"ring_fire", "ring_ice",
+	"ring_the_mage", "ring_sustenance",
+	"ring_life_protection", "ring_poison_resistance",
+	"ring_lightning", "ring_see_invisible", "ring_flight",
 ]
 
 
@@ -1041,11 +1044,15 @@ func _place_random_floor_item(pos: Vector2i, depth: int, parent: Node) -> bool:
 				 "ego": ego_id,
 				 "cursed": is_cursed})
 	elif drop_roll < 0.73:
-		# Rings — 3% of drops (DCSS rings are rare picks).
-		var rid: String = _RING_POOL[randi() % _RING_POOL.size()]
-		var ring_info: Dictionary = RingRegistry.get_info(rid)
-		fi.setup(pos, rid, String(ring_info.get("name", rid)), "ring",
-				ring_info.get("color", Color(0.85, 0.85, 0.90)))
+		# Rings — 3% of drops. At depth≥4, ~15% chance to be a randart.
+		if depth >= 4 and randf() < 0.15:
+			var rart: Dictionary = RandartGenerator.generate_ring(depth)
+			fi.setup(pos, rart["id"], rart["name"], "ring", rart["color"], rart)
+		else:
+			var rid: String = _RING_POOL[randi() % _RING_POOL.size()]
+			var ring_info: Dictionary = RingRegistry.get_info(rid)
+			fi.setup(pos, rid, String(ring_info.get("name", rid)), "ring",
+					ring_info.get("color", Color(0.85, 0.85, 0.90)))
 	elif drop_roll < 0.75:
 		# Amulets — 2% of drops, same rarity tier as rings.
 		var amid: String = AmuletRegistry.random_id()
@@ -4058,10 +4065,18 @@ func _tooltip_armor(id: String, name_s: String, it: Dictionary) -> String:
 
 
 func _tooltip_ring(id: String, name_s: String, it: Dictionary) -> String:
+	var lines: Array = [name_s, "Slot: ring"]
+	# Randarts: use the compact describe string.
+	if it.get("randart", false):
+		lines.append(RandartGenerator.describe(it))
+		if player != null:
+			var worn: int = player.equipped_rings.size() if "equipped_rings" in player else 0
+			var cap: int = 8 if player.race_res and player.race_res.racial_trait == "octopode_rings" else 2
+			lines.append("Worn: %d / %d rings" % [worn, cap])
+		return "\n".join(PackedStringArray(lines))
 	var info: Dictionary = RingRegistry.get_info(id)
 	if info.is_empty():
 		return "%s\nA small band of unknown metal." % name_s
-	var lines: Array = [name_s, "Slot: ring"]
 	# Pretty-print every effect field present.
 	var pairs: Array = [
 		["str",         "STR +%d"],
@@ -4082,6 +4097,17 @@ func _tooltip_ring(id: String, name_s: String, it: Dictionary) -> String:
 		var fmt: String = p[1]
 		if info.has(key) and int(info[key]) != 0:
 			lines.append(fmt % int(info[key]))
+	# Resist lines from ring's resists dict.
+	var ring_resists: Dictionary = info.get("resists", {})
+	for elem in ring_resists.keys():
+		var lv: int = int(ring_resists[elem])
+		if lv != 0:
+			lines.append("r%s %s" % [elem.capitalize(), "+" if lv > 0 else "-"])
+	# Flag lines.
+	for flag in info.get("flags", []):
+		match String(flag):
+			"see_invis": lines.append("See invisible")
+			"flying":    lines.append("Flight")
 	# Stacking hint: shows how many rings we already wear.
 	if player != null:
 		var worn: int = player.equipped_rings.size() if "equipped_rings" in player else 0
@@ -4343,7 +4369,11 @@ func _on_bag_equip(idx: int, dlg: AcceptDialog) -> void:
 					})
 			elif kind == "ring":
 				var rid: String = String(it.get("id", ""))
-				var ring_info: Dictionary = RingRegistry.get_info(rid)
+				var ring_info: Dictionary
+				if it.get("randart", false):
+					ring_info = it.duplicate(true)
+				else:
+					ring_info = RingRegistry.get_info(rid)
 				if ring_info.is_empty():
 					ring_info = {
 						"id": rid,
@@ -4850,35 +4880,21 @@ func _ring_effect_summary(ring: Dictionary) -> String:
 func _status_resistances() -> Dictionary:
 	var r: Dictionary = {
 		"fire": 0, "cold": 0, "poison": 0, "negative": 0,
-		"electric": 0, "magic": 0,
+		"electric": 0, "magic": 0, "corr": 0, "mut": 0,
 	}
-	var trait_id: String = ""
-	if player != null and player.race_res != null:
-		trait_id = String(player.race_res.racial_trait)
-	match trait_id:
-		"djinni_flight":      r["fire"] += 1; r["cold"] -= 1
-		"vampire_bloodfeast": r["cold"] += 1; r["negative"] += 1
-		"mummy_undead":       r["cold"] += 1; r["negative"] += 1; r["poison"] += 1; r["fire"] -= 1
-		"ghoul_claws":        r["cold"] += 1; r["negative"] += 2; r["poison"] += 1
-		"gargoyle_stone":     r["poison"] += 1; r["negative"] += 1; r["electric"] += 1
-		"naga_poison_spit":   r["poison"] += 2
-		"formicid_stasis":    r["magic"] += 1
-		"deep_dwarf_dr":      r["negative"] += 1
-		"trollregen":         r["poison"] += 1
-		"demonspawn_mutations": r["fire"] += 1
-		"tengu_flight":       r["electric"] += 1
-		"draconian_resist":   r["magic"] += 1
-		"vine_stalker_mpregen": r["negative"] += 1; r["poison"] += 1
-	# Ring-sourced contributions (current ring effects: fire_apt → fire+,
-	# cold_apt → cold+, not true resistances but readable signal).
-	if player != null and player.equipped_rings is Array:
-		for ring in player.equipped_rings:
-			if typeof(ring) != TYPE_DICTIONARY:
-				continue
-			if int(ring.get("fire_apt", 0)) > 0:
-				r["fire"] += 1
-			if int(ring.get("cold_apt", 0)) > 0:
-				r["cold"] += 1
+	if player == null:
+		return r
+	# Read all resistances directly from Player.get_resist() so rings,
+	# armour egos, mutations, and racial intrinsics are all captured in
+	# one canonical place rather than duplicated here.
+	r["fire"]     = player.get_resist("fire")
+	r["cold"]     = player.get_resist("cold")
+	r["poison"]   = player.get_resist("poison")
+	r["negative"] = player.get_resist("neg")
+	r["electric"] = player.get_resist("elec")
+	r["magic"]    = player.get_resist("magic")
+	r["corr"]     = player.get_resist("corr")
+	r["mut"]      = player.get_resist("mut")
 	return r
 
 
@@ -4886,14 +4902,19 @@ func _status_build_resistances(vb: VBoxContainer) -> void:
 	var r: Dictionary = _status_resistances()
 	vb.add_child(_status_section_header("Resistances"))
 	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 12)
+	h.add_theme_constant_override("separation", 8)
 	h.add_child(_status_resist_card("rF",  r["fire"],     Color(1.0, 0.50, 0.30)))
 	h.add_child(_status_resist_card("rC",  r["cold"],     Color(0.50, 0.85, 1.0)))
 	h.add_child(_status_resist_card("rP",  r["poison"],   Color(0.45, 0.95, 0.45)))
 	h.add_child(_status_resist_card("rN",  r["negative"], Color(0.65, 0.40, 0.90)))
 	h.add_child(_status_resist_card("rE",  r["electric"], Color(1.0, 0.95, 0.35)))
-	h.add_child(_status_resist_card("MR",  r["magic"],    Color(0.90, 0.50, 0.90)))
 	vb.add_child(h)
+	var h2 := HBoxContainer.new()
+	h2.add_theme_constant_override("separation", 8)
+	h2.add_child(_status_resist_card("WL",    r["magic"],  Color(0.90, 0.50, 0.90)))
+	h2.add_child(_status_resist_card("rCorr", r["corr"],   Color(0.75, 0.50, 0.25)))
+	h2.add_child(_status_resist_card("rMut",  r["mut"],    Color(0.55, 0.85, 0.55)))
+	vb.add_child(h2)
 
 
 ## Compact "rF +1" / "rC --" card.
@@ -4929,8 +4950,10 @@ func _status_resist_card(label: String, value: int, tint: Color) -> Control:
 	if value == 0:
 		val_lbl.text = "--"
 		val_lbl.modulate = Color(0.55, 0.55, 0.60)
+	elif value > 0:
+		val_lbl.text = "+".repeat(clampi(value, 1, 3))
 	else:
-		val_lbl.text = "+" + "+".repeat(max(1, value)) if value > 0 else "-" + "-".repeat(max(1, -value))
+		val_lbl.text = "-".repeat(clampi(-value, 1, 3))
 	val_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	val_lbl.add_theme_font_size_override("font_size", 44)
 	col.add_child(val_lbl)

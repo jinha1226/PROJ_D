@@ -216,26 +216,57 @@ static func _apply_mon_spell(m: Monster, target: Node, spell_id: String) -> bool
 		if target.has_method("take_damage"):
 			var elem: String = SpellRegistry.element_for(spell_id)
 			target.take_damage(dmg, elem)
-			var mname: String = m.data.display_name if m.data else "monster"
+			var dmg_mname: String = m.data.display_name if m.data else "monster"
 			CombatLog.add("The %s casts %s for %d damage!" % [
-					mname, spell_id.replace("_", " "), dmg])
+					dmg_mname, spell_id.replace("_", " "), dmg])
 		return true
 	# Non-damage spells: hex / heal-other / summon / invisibility. Minimum
 	# viable coverage so priests and wizards feel like DCSS rather than
 	# standing silent. Anything not matched here silently fails — caller
 	# still returns true so the monster spends a turn on the attempt.
+	var mname: String = m.data.display_name if (m.data != null) else "caster"
 	match spell_id:
 		"confuse":
+			if target.has_method("willpower_check") and target.willpower_check(hd):
+				CombatLog.add("You resist the %s's confusion!" % mname)
+				return true
 			if target.has_method("set_meta"):
 				target.set_meta("_confused", true)
 				var ct: int = 4 + int(hd / 4)
 				target.set_meta("_confusion_turns", ct)
-			CombatLog.add("The %s confuses you!" % (m.data.display_name if m.data else "caster"))
+			CombatLog.add("The %s confuses you!" % mname)
 			return true
 		"paralyse":
+			if target.has_method("willpower_check") and target.willpower_check(hd):
+				CombatLog.add("You resist the %s's paralysis!" % mname)
+				return true
 			if target.has_method("set_meta"):
 				target.set_meta("_paralysis_turns", 2 + int(hd / 6))
-			CombatLog.add("The %s paralyses you!" % (m.data.display_name if m.data else "caster"))
+			CombatLog.add("The %s paralyses you!" % mname)
+			return true
+		"slow":
+			if target.has_method("willpower_check") and target.willpower_check(hd):
+				CombatLog.add("You resist the %s's slow!" % mname)
+				return true
+			if target.has_method("set_meta"):
+				target.set_meta("_slowed_turns", 4 + int(hd / 4))
+			CombatLog.add("The %s slows you!" % mname)
+			return true
+		"fear":
+			if target.has_method("willpower_check") and target.willpower_check(hd):
+				CombatLog.add("You resist the %s's fear!" % mname)
+				return true
+			if target.has_method("set_meta"):
+				target.set_meta("_afraid_turns", 3 + int(hd / 5))
+			CombatLog.add("The %s fills you with dread!" % mname)
+			return true
+		"charm":
+			if target.has_method("willpower_check") and target.willpower_check(hd):
+				CombatLog.add("You resist the %s's charm!" % mname)
+				return true
+			if target.has_method("set_meta"):
+				target.set_meta("_charmed_turns", 3 + int(hd / 5))
+			CombatLog.add("The %s charms you!" % mname)
 			return true
 		"invisibility":
 			if m.has_method("set_meta"):

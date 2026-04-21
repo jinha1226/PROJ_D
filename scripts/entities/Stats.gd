@@ -10,6 +10,9 @@ extends Resource
 @export var EV: int = 0
 @export var hp_max: int = 20
 @export var mp_max: int = 10
+## DCSS Willpower (MR). Each 40 points = one pip (★). Formicid = 270 (immune).
+## Hex spells check random(0, hd*5) < WL to resist.
+@export var WL: int = 40
 
 
 func get_attack() -> int:
@@ -27,4 +30,5 @@ func clone() -> Stats:
 	s.EV = EV
 	s.hp_max = hp_max
 	s.mp_max = mp_max
+	s.WL = WL
 	return s

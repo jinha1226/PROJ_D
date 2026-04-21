@@ -374,6 +374,35 @@ func _tick_duration_metas() -> void:
 	_tick_simple_meta("_exhausted_turns")
 	_tick_simple_meta("_mesmerised_turns")
 	_tick_simple_meta("_sanctuary_turns")
+	# Paralysis, slow, fear, charm — monster hex durations.
+	if has_meta("_paralysis_turns"):
+		var pv: int = int(get_meta("_paralysis_turns", 0)) - 1
+		if pv <= 0:
+			remove_meta("_paralysis_turns")
+			CombatLog.add("You can move again.")
+		else:
+			set_meta("_paralysis_turns", pv)
+	if has_meta("_slowed_turns"):
+		var sv: int = int(get_meta("_slowed_turns", 0)) - 1
+		if sv <= 0:
+			remove_meta("_slowed_turns")
+			CombatLog.add("You feel yourself speed up.")
+		else:
+			set_meta("_slowed_turns", sv)
+	if has_meta("_afraid_turns"):
+		var av: int = int(get_meta("_afraid_turns", 0)) - 1
+		if av <= 0:
+			remove_meta("_afraid_turns")
+			CombatLog.add("Your fear subsides.")
+		else:
+			set_meta("_afraid_turns", av)
+	if has_meta("_charmed_turns"):
+		var cv: int = int(get_meta("_charmed_turns", 0)) - 1
+		if cv <= 0:
+			remove_meta("_charmed_turns")
+			CombatLog.add("The charm wears off.")
+		else:
+			set_meta("_charmed_turns", cv)
 	_tick_simple_meta("_divine_shield_turns")
 	_tick_simple_meta("_shadow_form_turns")
 	_tick_simple_meta("_fiery_armour_turns")
@@ -629,32 +658,61 @@ func clear_form() -> void:
 ## Returns an int; positive = resist, negative = vulnerability.
 func get_resist(element: String) -> int:
 	var total: int = 0
+	var rt: String = _racial_trait_id()
 	match element:
 		"fire":
 			total += int(get_meta("_mut_rF", 0))
 			total += int(get_meta("_form_rfire", 0))
+			# Djinni fire-born, demonspawn — +1 rF. Mummy -1 rF.
+			if rt in ["djinni_flight", "demonspawn_mutations"]:
+				total += 1
+			elif rt == "mummy_undead":
+				total -= 1
 		"cold":
 			total += int(get_meta("_mut_rC", 0))
 			total += int(get_meta("_form_rcold", 0))
+			# Vampire / mummy / ghoul cold-immune intrinsic.
+			if rt in ["vampire_bloodfeast", "mummy_undead", "ghoul_claws"]:
+				total += 1
+			# Djinni -1 rC (fire body, no cold protection).
+			elif rt == "djinni_flight":
+				total -= 1
 		"elec":
 			total += int(get_meta("_mut_rElec", 0))
 			total += int(get_meta("_form_relec", 0))
+			# Gargoyle / tengu intrinsic rElec.
+			if rt in ["gargoyle_stone", "tengu_flight"]:
+				total += 1
 		"poison":
 			total += int(get_meta("_mut_rPois", 0))
 			total += int(get_meta("_form_rpoison", 0))
-			# Vine stalker / mummy / kobold built-in poison resistance.
-			var trait_id: String = _racial_trait_id()
-			if trait_id in ["vine_stalker_poison", "mummy_undead", "kobold_sneak"]:
+			# Vine stalker / mummy / kobold / naga / gargoyle / ghoul / troll.
+			if rt in ["vine_stalker_poison", "mummy_undead", "kobold_sneak",
+					"naga_poison_spit", "gargoyle_stone", "ghoul_claws", "trollregen"]:
+				total += 1
+			# Naga +2 rP total.
+			if rt == "naga_poison_spit":
 				total += 1
 		"acid":
 			total += int(get_meta("_form_racid", 0))
 		"holy":
 			pass  # DCSS has rHoly only via mutations; we don't model yet
 		"drain", "neg":
-			# Gargoyle / mummy / demonspawn get drain resist.
-			var tt: String = _racial_trait_id()
-			if tt == "gargoyle_stone" or tt == "mummy_undead":
+			# Gargoyle / mummy / ghoul / deep dwarf / vine stalker drain resist.
+			if rt in ["gargoyle_stone", "mummy_undead", "deep_dwarf_dr",
+					"vine_stalker_mpregen"]:
 				total += 1
+			if rt == "ghoul_claws":
+				total += 2
+		"magic":
+			# Willpower pips: WL / 40 rounded down (max displayed 3 for +++).
+			if stats != null:
+				total = mini(3, stats.WL / 40)
+				return total  # skip armour ego loop — WL is self-contained
+		"corr":
+			total += int(get_meta("_mut_rCorr", 0))
+		"mut":
+			total += int(get_meta("_mut_rMut", 0))
 	# DCSS SPARM_* ego resists — each equipped armour with a matching
 	# ego adds 1 to the corresponding element. Resistance / willpower
 	# ego grants both fire and cold by reading the ego table.
@@ -666,8 +724,14 @@ func get_resist(element: String) -> int:
 		var res_map: Dictionary = ArmorRegistry.ego_info(ego_id).get("resists", {})
 		if res_map.has(element):
 			total += int(res_map[element])
-	# Amulet resists (currently only future-proofing; no DCSS amulet grants
-	# a raw element resist, but the path is open for custom entries).
+	# Ring resists (ring of fire, ice, lightning, life protection, etc.).
+	for ring in equipped_rings:
+		if typeof(ring) != TYPE_DICTIONARY or ring.is_empty():
+			continue
+		var ring_res: Dictionary = ring.get("resists", {})
+		if ring_res.has(element):
+			total += int(ring_res[element])
+	# Amulet resists.
 	if not equipped_amulet.is_empty():
 		var amu_res: Dictionary = equipped_amulet.get("resists", {})
 		if amu_res.has(element):
@@ -682,19 +746,22 @@ func get_resist(element: String) -> int:
 ##                          bonus_res = 1 for "boolean" resists (pois, neg)
 ##   elif res == -1:        resistible *= 1.5
 ##   elif res <= -2:        resistible *= 2
-## BEAM_NEG (drain) on player uses a different divisor (res*2) — we
-## treat that element-by-element below.
+## Resist levels: --- (-3) ×3, -- (-2) ×2, - (-1) ×1.5, 0 full,
+## + (1) /2, ++ (2) /3, +++ (3) immune (0). Clamps at ±3.
 func _apply_elem_resist(amount: int, element: String) -> int:
 	var rl: int = get_resist(element)
-	if rl > 3:
-		return 0  # immune at rF++++ etc.
+	if rl >= 3:
+		return 0  # immune at rF+++ and above
 	if rl == 0:
 		return amount
 	if rl < 0:
+		# Vulnerability: -1 = ×1.5, -2 = ×2, -3 = ×3 (triple vulnerability)
 		if rl == -1:
 			return amount * 3 / 2
-		return amount * 2  # rF-- and worse
-	# Positive resist path.
+		if rl == -2:
+			return amount * 2
+		return amount * 3  # rF--- and worse
+	# Positive resist path (rl 1 or 2).
 	var bonus_res: int = 0
 	if element == "poison" or element == "neg":
 		bonus_res = 1  # boolean resists
@@ -703,6 +770,47 @@ func _apply_elem_resist(amount: int, element: String) -> int:
 		return maxi(1, amount / (rl * 2))
 	var denom: int = (3 * rl + 1) / 2 + bonus_res
 	return maxi(1, amount / maxi(1, denom))
+
+
+## DCSS willpower_check. Returns true if the player resists the hex.
+## Formula: if randi(0..spell_hd*5) < stats.WL → resisted.
+## Formicid (WL=270) is immune to all hexes.
+func willpower_check(spell_hd: int) -> bool:
+	if stats == null:
+		return false
+	if stats.WL >= 270:
+		return true  # immune
+	var roll: int = randi() % maxi(1, spell_hd * 5 + 30)
+	return roll < stats.WL
+
+
+## DCSS species MR (willpower) base values from species-data.h.
+static func _race_base_wl(rid: String) -> int:
+	match rid:
+		"formicid":  return 270  # MR_IMMUNE
+		"mummy":     return 80
+		"vine_stalker": return 80
+		"deep_elf":  return 80
+		"vampire":   return 60
+		"halfling":  return 60
+		"merfolk":   return 60
+		"elf":       return 60
+		"octopode":  return 50
+		"gargoyle":  return 40
+		"ghoul":     return 40
+		"naga":      return 40
+		"centaur":   return 40
+		"demonspawn":return 40
+		"draconian": return 40
+		"tengu":     return 40
+		"djinni":    return 40
+		"deep_dwarf":return 40
+		"minotaur":  return 40
+		"kobold":    return 40
+		"human":     return 40
+		"troll":     return 20
+		"gnoll":     return 25
+		_:           return 40
 
 
 ## Generic `_<name>_turns` meta countdown. Removes the meta at 0.
@@ -775,6 +883,8 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 	var race_trait: String = race.racial_trait if race != null else ""
 	if race_trait == "djinni_flight" or race_trait == "tengu_flight":
 		s.EV += 2
+	# DCSS species MR (willpower) base. Formicid = immune (270), Mummy = high.
+	s.WL = _race_base_wl(race_id)
 	stats = s
 	base_stats = s.clone()
 
@@ -1049,6 +1159,9 @@ func _recompute_gear_stats() -> void:
 			"spirit_shield", "gourmand"]:
 		if has_meta("_amulet_" + amulet_flag):
 			remove_meta("_amulet_" + amulet_flag)
+	for ring_flag in ["see_invis", "flying"]:
+		if has_meta("_ring_" + ring_flag):
+			remove_meta("_ring_" + ring_flag)
 	var base_ev: int = base_stats.EV
 	# AC starts at racial intrinsic (gargoyle stone, etc) + trait AC bonus.
 	var ac: int = 0
@@ -1096,6 +1209,9 @@ func _recompute_gear_stats() -> void:
 		ac += int(ring.get("ac", 0))
 		ev += int(ring.get("ev", 0))
 		stats.mp_max += int(ring.get("mp_max", 0))
+		# Flags: set player meta so other systems can check without re-reading ring dict.
+		for flag_s in ring.get("flags", []):
+			set_meta("_ring_" + String(flag_s), true)
 	# Apply amulet bonuses (single slot).
 	if not equipped_amulet.is_empty():
 		var sb: Dictionary = equipped_amulet.get("stat_bonus", {})
@@ -1123,6 +1239,18 @@ func _recompute_gear_stats() -> void:
 	# Clamp MP if cap dropped below current reading.
 	if stats.MP > stats.mp_max:
 		stats.MP = stats.mp_max
+	# Recompute WL: base from race + XL scaling (DCSS: ~XL*3 for humans).
+	# Willpower ego on armour adds +40 per piece. Formicid stays immune.
+	var wl_base: int = _race_base_wl(race_id)
+	if wl_base < 270:
+		stats.WL = wl_base + level * 3
+		for slot_key in equipped_armor.keys():
+			var slot_dict: Dictionary = equipped_armor[slot_key]
+			var ego_id: String = String(slot_dict.get("ego", ""))
+			if ego_id == "willpower":
+				stats.WL += 40
+	else:
+		stats.WL = 270  # formicid immune
 	stats_changed.emit()
 
 
@@ -1280,9 +1408,12 @@ func try_move(delta: Vector2i) -> bool:
 		return false
 	if generator == null:
 		return false
-	# Petrified: no movement or attacks whatsoever.
+	# Petrified or paralysed: no movement or attacks.
 	if has_meta("_petrified_turns"):
 		CombatLog.add("You cannot move — you are stone.")
+		return false
+	if has_meta("_paralysis_turns"):
+		CombatLog.add("You cannot move — you are paralysed!")
 		return false
 	# DCSS confusion: each move has ~50% chance to stagger into a
 	# random cardinal direction instead. Doesn't stop the action.
