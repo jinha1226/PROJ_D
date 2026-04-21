@@ -2642,8 +2642,8 @@ func _open_skills_dialog(category: String) -> void:
 	skill_header.add_child(skill_title)
 	var skill_close := Button.new()
 	skill_close.text = "X"
-	skill_close.custom_minimum_size = Vector2(72, 72)
-	skill_close.add_theme_font_size_override("font_size", 40)
+	skill_close.custom_minimum_size = Vector2(120, 120)
+	skill_close.add_theme_font_size_override("font_size", 48)
 	skill_close.pressed.connect(dlg.queue_free)
 	skill_header.add_child(skill_close)
 	vb.add_child(skill_header)
@@ -2653,11 +2653,11 @@ func _open_skills_dialog(category: String) -> void:
 	for cat in _SKILL_CATEGORIES:
 		var tb := Button.new()
 		tb.text = _SKILL_CATEGORY_LABELS.get(cat, cat)
-		tb.custom_minimum_size = Vector2(0, 64)
+		tb.custom_minimum_size = Vector2(0, 80)
 		tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		tb.toggle_mode = true
 		tb.button_pressed = (cat == category)
-		tb.add_theme_font_size_override("font_size", 40)
+		tb.add_theme_font_size_override("font_size", 44)
 		tb.pressed.connect(_on_skills_tab.bind(cat, dlg))
 		tabs_hbox.add_child(tb)
 	vb.add_child(tabs_hbox)
@@ -2696,6 +2696,7 @@ func _open_skills_dialog(category: String) -> void:
 		if _skills_dlg == dlg: _skills_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
+	dlg.close_requested.connect(dlg.queue_free)
 	dlg.popup_centered(Vector2i(960, 1500))
 
 
@@ -2745,19 +2746,19 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 	outer.add_theme_constant_override("separation", 2)
 
 	var row := HBoxContainer.new()
-	row.custom_minimum_size = Vector2(0, 72)
+	row.custom_minimum_size = Vector2(0, 88)
 	row.add_theme_constant_override("separation", 8)
 
 	var chk := CheckBox.new()
 	chk.button_pressed = bool(entry.get("training", false))
-	chk.custom_minimum_size = Vector2(56, 56)
+	chk.custom_minimum_size = Vector2(64, 64)
 	chk.toggled.connect(_on_skill_training_toggled.bind(skill_id))
 	row.add_child(chk)
 
 	var name_lab := Label.new()
 	name_lab.text = String(SkillRow.SKILL_NAMES.get(skill_id, skill_id))
 	name_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_lab.add_theme_font_size_override("font_size", 46)
+	name_lab.add_theme_font_size_override("font_size", 48)
 	row.add_child(name_lab)
 
 	var level: int = int(entry.get("level", 0))
@@ -2768,17 +2769,14 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 		lv_lab.text = "MAX"
 	else:
 		lv_lab.text = "Lv.%d" % level
-	lv_lab.add_theme_font_size_override("font_size", 46)
+	lv_lab.add_theme_font_size_override("font_size", 48)
 	lv_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	row.add_child(lv_lab)
 
-	# Racial aptitude label (+2 / 0 / -3) — green for positive, red for
-	# negative. Gives the player an instant read on why a given skill
-	# trains fast or slow for this race.
 	var apt_lab := Label.new()
 	apt_lab.text = _format_aptitude(skill_id)
-	apt_lab.add_theme_font_size_override("font_size", 46)
-	apt_lab.custom_minimum_size = Vector2(100, 0)
+	apt_lab.add_theme_font_size_override("font_size", 48)
+	apt_lab.custom_minimum_size = Vector2(110, 0)
 	apt_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	var apt_val: int = _player_aptitude(skill_id)
 	if apt_val > 0:
@@ -2804,7 +2802,7 @@ func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> 
 		if trained_count > 0:
 			parts.append("%d%% XP" % int(100.0 / trained_count))
 	info_line.text = "  |  ".join(PackedStringArray(parts))
-	info_line.add_theme_font_size_override("font_size", 38)
+	info_line.add_theme_font_size_override("font_size", 42)
 	info_line.modulate = Color(0.6, 0.75, 0.6)
 	outer.add_child(info_line)
 
@@ -2861,14 +2859,14 @@ func _open_magic_dialog() -> void:
 	var cur_mp: int = player.stats.MP if player.stats != null else 0
 	var max_mp: int = player.stats.mp_max if player.stats != null else 0
 	mp_lab.text = "MP  %d / %d" % [cur_mp, max_mp]
-	mp_lab.add_theme_font_size_override("font_size", 40)
+	mp_lab.add_theme_font_size_override("font_size", 48)
 	mp_lab.modulate = Color(0.45, 0.7, 1.0)
 	mp_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(mp_lab)
 	var close_btn := Button.new()
 	close_btn.text = "X"
-	close_btn.custom_minimum_size = Vector2(72, 72)
-	close_btn.add_theme_font_size_override("font_size", 40)
+	close_btn.custom_minimum_size = Vector2(120, 120)
+	close_btn.add_theme_font_size_override("font_size", 48)
 	close_btn.pressed.connect(dlg.queue_free)
 	header.add_child(close_btn)
 	vb.add_child(header)
@@ -2889,7 +2887,7 @@ func _open_magic_dialog() -> void:
 	if known.is_empty():
 		var hint := Label.new()
 		hint.text = "No spells known.\nRead spellbooks or pick a magic job to learn spells."
-		hint.add_theme_font_size_override("font_size", 40)
+		hint.add_theme_font_size_override("font_size", 48)
 		hint.modulate = Color(0.7, 0.7, 0.8)
 		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		rows.add_child(hint)
@@ -2903,6 +2901,7 @@ func _open_magic_dialog() -> void:
 		if _magic_dlg == dlg: _magic_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
+	dlg.close_requested.connect(dlg.queue_free)
 	dlg.popup_centered(Vector2i(960, 1500))
 
 
@@ -2912,7 +2911,7 @@ func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
 		return Control.new()
 
 	var row := HBoxContainer.new()
-	row.custom_minimum_size = Vector2(0, 110)
+	row.custom_minimum_size = Vector2(0, 120)
 	row.add_theme_constant_override("separation", 8)
 
 	var name_btn := Button.new()
@@ -2926,7 +2925,7 @@ func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
 	if int(info.get("range", 0)) > 0:
 		range_txt = "  range %d" % int(info.get("range", 0))
 	name_btn.text = "%s  [%d MP]%s%s" % [spell_name, int(info.get("mp", 0)), fail_txt, range_txt]
-	name_btn.add_theme_font_size_override("font_size", 40)
+	name_btn.add_theme_font_size_override("font_size", 48)
 	name_btn.add_theme_color_override("font_color", info.get("color", Color.WHITE))
 	name_btn.pressed.connect(_show_spell_info.bind(spell_id))
 	row.add_child(name_btn)
@@ -2936,8 +2935,8 @@ func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
 
 	var cast_btn := Button.new()
 	cast_btn.text = "Cast"
-	cast_btn.custom_minimum_size = Vector2(140, 56)
-	cast_btn.add_theme_font_size_override("font_size", 40)
+	cast_btn.custom_minimum_size = Vector2(160, 72)
+	cast_btn.add_theme_font_size_override("font_size", 44)
 	cast_btn.disabled = (player.stats == null or player.stats.MP < int(info.get("mp", 1)))
 	var targeting_type: String = String(info.get("targeting", "single"))
 	if targeting_type == "self":
@@ -2947,9 +2946,9 @@ func _build_magic_row(spell_id: String, dlg: AcceptDialog) -> Control:
 	btns.add_child(cast_btn)
 
 	var qs_btn := Button.new()
-	qs_btn.text = "Quickslot"
-	qs_btn.custom_minimum_size = Vector2(140, 48)
-	qs_btn.add_theme_font_size_override("font_size", 40)
+	qs_btn.text = "QSlot"
+	qs_btn.custom_minimum_size = Vector2(160, 60)
+	qs_btn.add_theme_font_size_override("font_size", 44)
 	qs_btn.pressed.connect(_assign_spell_quickslot.bind(spell_id, dlg))
 	btns.add_child(qs_btn)
 
@@ -3007,13 +3006,14 @@ func _show_spell_info(spell_id: String) -> void:
 	scroll.add_child(lab)
 	var close_btn := Button.new()
 	close_btn.text = "Close"
-	close_btn.add_theme_font_size_override("font_size", 44)
-	close_btn.custom_minimum_size = Vector2(0, 96)
+	close_btn.add_theme_font_size_override("font_size", 48)
+	close_btn.custom_minimum_size = Vector2(0, 120)
 	close_btn.pressed.connect(dlg.queue_free)
 	vb.add_child(close_btn)
 	popup_mgr.add_child(dlg)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
+	dlg.close_requested.connect(dlg.queue_free)
 	dlg.popup_centered(Vector2i(920, 900))
 
 
@@ -3619,8 +3619,8 @@ func _on_bag_pressed() -> void:
 	header.add_child(bag_title)
 	var bag_close := Button.new()
 	bag_close.text = "X"
-	bag_close.custom_minimum_size = Vector2(72, 72)
-	bag_close.add_theme_font_size_override("font_size", 40)
+	bag_close.custom_minimum_size = Vector2(120, 120)
+	bag_close.add_theme_font_size_override("font_size", 48)
 	bag_close.pressed.connect(dlg.queue_free)
 	header.add_child(bag_close)
 	vb.add_child(header)
@@ -3630,9 +3630,9 @@ func _on_bag_pressed() -> void:
 	for cat in _BAG_CATEGORIES:
 		var tab_btn := Button.new()
 		tab_btn.text = cat.to_upper()
-		tab_btn.custom_minimum_size = Vector2(0, 48)
+		tab_btn.custom_minimum_size = Vector2(0, 64)
 		tab_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		tab_btn.add_theme_font_size_override("font_size", 40)
+		tab_btn.add_theme_font_size_override("font_size", 44)
 		if cat == _bag_category:
 			# Active tab — brighter so the user sees the current filter.
 			tab_btn.modulate = Color(1.0, 1.0, 0.75)
@@ -3704,7 +3704,7 @@ func _on_bag_pressed() -> void:
 			var count: int = int(g["count"])
 			var kind: String = String(it.get("kind", ""))
 			var row := HBoxContainer.new()
-			row.custom_minimum_size = Vector2(0, 80)
+			row.custom_minimum_size = Vector2(0, 96)
 			row.add_theme_constant_override("separation", 8)
 			var iid_row: String = String(it.get("id", ""))
 			var icon_node: Control = _build_bag_item_thumbnail(iid_row, kind)
@@ -3722,27 +3722,27 @@ func _on_bag_pressed() -> void:
 			info_btn.flat = true
 			info_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			info_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			info_btn.add_theme_font_size_override("font_size", 40)
+			info_btn.add_theme_font_size_override("font_size", 48)
 			info_btn.pressed.connect(_on_bag_info.bind(it))
 			row.add_child(info_btn)
 			if kind == "weapon" or kind == "armor" or kind == "ring" or kind == "amulet":
 				var eq_btn := Button.new()
 				eq_btn.text = "Equip"
-				eq_btn.add_theme_font_size_override("font_size", 40)
-				eq_btn.custom_minimum_size = Vector2(130, 64)
+				eq_btn.add_theme_font_size_override("font_size", 44)
+				eq_btn.custom_minimum_size = Vector2(150, 80)
 				eq_btn.pressed.connect(_on_bag_equip.bind(i, dlg))
 				row.add_child(eq_btn)
 			else:
 				var use_btn := Button.new()
 				use_btn.text = "Use"
-				use_btn.add_theme_font_size_override("font_size", 40)
-				use_btn.custom_minimum_size = Vector2(100, 64)
+				use_btn.add_theme_font_size_override("font_size", 44)
+				use_btn.custom_minimum_size = Vector2(110, 80)
 				use_btn.pressed.connect(_on_bag_use.bind(i, dlg))
 				row.add_child(use_btn)
 			var drop_btn := Button.new()
 			drop_btn.text = "Drop"
-			drop_btn.add_theme_font_size_override("font_size", 40)
-			drop_btn.custom_minimum_size = Vector2(100, 64)
+			drop_btn.add_theme_font_size_override("font_size", 44)
+			drop_btn.custom_minimum_size = Vector2(110, 80)
 			drop_btn.pressed.connect(_on_bag_drop.bind(i, dlg))
 			row.add_child(drop_btn)
 			rows.add_child(row)
@@ -3752,6 +3752,7 @@ func _on_bag_pressed() -> void:
 		if _bag_dlg == dlg: _bag_dlg = null)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
+	dlg.close_requested.connect(dlg.queue_free)
 	dlg.popup_centered(Vector2i(960, 1700))
 
 
@@ -3867,7 +3868,7 @@ func _build_equipped_section(vb: VBoxContainer) -> void:
 
 	var header := Label.new()
 	header.text = "Equipped"
-	header.add_theme_font_size_override("font_size", 32)
+	header.add_theme_font_size_override("font_size", 44)
 	header.modulate = Color(0.85, 0.85, 0.7)
 	vb.add_child(header)
 
@@ -3916,6 +3917,16 @@ func _build_equipped_section(vb: VBoxContainer) -> void:
 			rinfo["kind"] = "ring"
 			_append_equipped_row(vb, "ring %d" % (i + 1), rname, TileRenderer.item(rid), rinfo)
 
+	# Amulet row.
+	if "equipped_amulet" in player and not player.equipped_amulet.is_empty():
+		var amid: String = String(player.equipped_amulet.get("id", ""))
+		var amname: String = String(player.equipped_amulet.get("name", amid))
+		var aminfo: Dictionary = player.equipped_amulet.duplicate()
+		aminfo["id"] = amid
+		aminfo["name"] = amname
+		aminfo["kind"] = "amulet"
+		_append_equipped_row(vb, "amulet", amname, TileRenderer.item(amid), aminfo)
+
 	var sep := HSeparator.new()
 	vb.add_child(sep)
 
@@ -3923,29 +3934,27 @@ func _build_equipped_section(vb: VBoxContainer) -> void:
 func _append_equipped_row(vb: VBoxContainer, slot: String, display: String,
 		tex: Texture2D, item_dict: Dictionary = {}) -> void:
 	var row := HBoxContainer.new()
-	row.custom_minimum_size = Vector2(0, 56)
+	row.custom_minimum_size = Vector2(0, 88)
 	row.add_theme_constant_override("separation", 8)
 	if tex != null:
 		var icon := TextureRect.new()
 		icon.texture = tex
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.custom_minimum_size = Vector2(40, 40)
+		icon.custom_minimum_size = Vector2(56, 56)
 		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(icon)
 	var slot_label := Label.new()
 	slot_label.text = slot.capitalize() + ":"
-	slot_label.add_theme_font_size_override("font_size", 28)
-	slot_label.custom_minimum_size = Vector2(160, 0)
+	slot_label.add_theme_font_size_override("font_size", 42)
+	slot_label.custom_minimum_size = Vector2(190, 0)
 	slot_label.modulate = Color(0.7, 0.7, 0.7)
 	row.add_child(slot_label)
-	# Name is now a flat button so a tap opens the standard item info
-	# popup — same flow as tapping an unequipped item in the list.
 	var name_btn := Button.new()
 	name_btn.text = display
 	name_btn.flat = true
 	name_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	name_btn.add_theme_font_size_override("font_size", 32)
+	name_btn.add_theme_font_size_override("font_size", 44)
 	name_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if not item_dict.is_empty():
 		name_btn.pressed.connect(_on_bag_info.bind(item_dict))
@@ -4212,20 +4221,15 @@ func _on_bag_info(it: Dictionary) -> void:
 	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
 	if popup_mgr == null:
 		return
-	_close_all_dialogs()
+	# Do NOT close the bag — info opens on top and bag stays alive.
 	var dlg := AcceptDialog.new()
 	dlg.exclusive = false
 	dlg.title = String(it.get("name", "Item"))
-	# Hide AcceptDialog's built-in OK footer — we ship our own Close
-	# button that's easier to hit on a tall mobile screen.
 	dlg.ok_button_text = ""
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 12)
 	vb.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	dlg.add_child(vb)
-	# Scroll the tooltip so a long description doesn't balloon the
-	# dialog out to the full viewport height (which was pushing the
-	# text to the top of the screen).
 	var scroll := ScrollContainer.new()
 	scroll.scroll_deadzone = 20
 	scroll.custom_minimum_size = Vector2(860, 700)
@@ -4240,16 +4244,14 @@ func _on_bag_info(it: Dictionary) -> void:
 	scroll.add_child(lab)
 	var close_btn := Button.new()
 	close_btn.text = "Close"
-	close_btn.add_theme_font_size_override("font_size", 44)
-	close_btn.custom_minimum_size = Vector2(0, 96)
+	close_btn.add_theme_font_size_override("font_size", 48)
+	close_btn.custom_minimum_size = Vector2(0, 120)
 	close_btn.pressed.connect(dlg.queue_free)
 	vb.add_child(close_btn)
 	popup_mgr.add_child(dlg)
 	dlg.confirmed.connect(dlg.queue_free)
 	dlg.canceled.connect(dlg.queue_free)
-	# Fixed compact size, centred. popup_centered sets the window size
-	# exactly to this Vector2i so the dialog sits in the middle of the
-	# viewport regardless of content length.
+	dlg.close_requested.connect(dlg.queue_free)
 	dlg.popup_centered(Vector2i(920, 900))
 
 
