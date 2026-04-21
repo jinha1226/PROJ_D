@@ -3308,9 +3308,9 @@ func _open_skills_dialog(category: String = "active") -> void:
 			rows.add_child(_build_skill_row(skill_id, cat_id, state.get(skill_id, {})))
 			any_shown = true
 		if not any_shown:
-			var hint := UICards.dim_hint("No skills in this category.")
-			hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			rows.add_child(hint)
+			var empty_hint := UICards.dim_hint("No skills in this category.")
+			empty_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			rows.add_child(empty_hint)
 
 
 ## Build the ACTIVE tab body: split into "Training" (currently enabled)
