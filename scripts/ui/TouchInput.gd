@@ -133,6 +133,8 @@ func _handle_key(k: InputEventKey) -> void:
 			key_action.emit("abilities")
 		KEY_X:                           # "x" = examine
 			key_action.emit("examine")
+		KEY_F:                           # "f" = fire ranged weapon
+			key_action.emit("fire")
 		KEY_ESCAPE:
 			key_action.emit("cancel")
 

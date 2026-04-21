@@ -2834,6 +2834,48 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 	return monster
 
 
+## Player ranged attack. Pre-checks equipped weapon, routes through
+## CombatSystem.ranged_attack which rolls to-hit with range penalty,
+## applies damage, and trains bow + fighting via the standard XP pipe.
+## Returns true if the shot actually fired (spent the turn).
+func try_ranged_attack(target_pos: Vector2i) -> bool:
+	if not is_alive or generator == null:
+		return false
+	# Bow/sling/crossbow required — WeaponRegistry maps all three to
+	# the "bow" skill.
+	if WeaponRegistry.weapon_skill_for(equipped_weapon_id) != "bow":
+		CombatLog.add("You need a bow, sling, or crossbow to fire.")
+		return false
+	# Find a target at the position. Shots without a victim just fly
+	# off; DCSS actually allows empty-tile fire but our UX keeps it
+	# target-locked to stop accidental turn-wastes.
+	var target: Node = _monster_at(target_pos)
+	if target == null:
+		CombatLog.add("No target there.")
+		return false
+	var skill_sys: Node = get_tree().root.get_node_or_null("Game/SkillSystem")
+	var dist: int = maxi(abs(target_pos.x - grid_pos.x),
+			abs(target_pos.y - grid_pos.y))
+	# Clamp to the weapon's conservative range band. DCSS longbow caps at
+	# 7 without Portal Projectile; we use a flat 7 for all bows.
+	if dist > 7:
+		CombatLog.add("Too far.")
+		return false
+	# Facing animation for feedback.
+	if _sprite:
+		_sprite.face_toward(target_pos - grid_pos)
+	var delay_10: int = int(round(WeaponRegistry.weapon_delay_for(equipped_weapon_id) * 10))
+	# Bow skill reduces delay the same way as melee mindelay.
+	var bow_lv: int = skill_sys.get_level(self, "bow") if skill_sys != null else 0
+	delay_10 = maxi(3, delay_10 - mini(bow_lv, 10) * 10 / 20)
+	last_action_ticks = delay_10
+	CombatSystem.ranged_attack(self, target, target_pos, skill_sys)
+	attacked.emit(target)
+	MonsterAI.broadcast_noise(get_tree(), grid_pos, 8, _skill_level("stealth"))
+	TurnManager.end_player_turn()
+	return true
+
+
 func take_damage(amount: int, element: String = "") -> void:
 	if not is_alive:
 		return

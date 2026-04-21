@@ -132,6 +132,12 @@ static func act(m: Monster) -> int:
 		# the look of DCSS mon-cast.cc handle_mon_spell pacing.
 		if _try_cast_at(m, target):
 			return _spell_cost(m)
+		# Archer / thrower monsters (data.ranged_damage > 0) lead with a
+		# projectile when the target is in the weapon's range band. Melee
+		# path still gets a crack next turn if the arrow missed or the
+		# target closed the distance.
+		if _try_ranged_at(m, target, dist):
+			return _missile_cost(m)
 		_step_toward(m, ppos)
 		return _move_cost(m)
 
@@ -201,6 +207,101 @@ static func _spell_cost(m: Monster) -> int:
 	if m == null or m.data == null:
 		return 10
 	return maxi(1, int(m.data.spell_energy if "spell_energy" in m.data else 10))
+
+
+static func _missile_cost(m: Monster) -> int:
+	if m == null or m.data == null:
+		return 10
+	return maxi(1, int(m.data.missile_energy if "missile_energy" in m.data else 10))
+
+
+## DCSS archer path (mon-cast.cc + ranged_attack). Fires a bresenham
+## arrow from the monster toward `target` if:
+##   - data.ranged_damage > 0 (the monster is actually an archer)
+##   - dist is ≤ data.ranged_range (weapon's useful band)
+##   - no hostile-side monster blocks the lane (friendly-fire check)
+## Damage rolls 1..ranged_damage with an HD/5 base bonus, then routes
+## through the target's take_damage(physical). Returns true on launch.
+static func _try_ranged_at(m: Monster, target: Node, dist: int) -> bool:
+	if m == null or m.data == null or target == null:
+		return false
+	var rdmg: int = int(m.data.ranged_damage)
+	if rdmg <= 0:
+		return false
+	var rrange: int = int(m.data.ranged_range)
+	if rrange <= 0 or dist > rrange:
+		return false
+	# Very close — the melee branch above handles dist==1. Between 2 and
+	# rrange inclusive is the archer's comfortable band.
+	if dist < 2:
+		return false
+	# Friendly-fire: no sense clipping another orc between us and the
+	# player. Reuse the beam tracer with a synthetic spell id so the
+	# element-based gate treats this as a physical projectile.
+	if _path_has_ally(m, target):
+		return false
+	# DCSS to-hit for ranged: mhit = HD*3 + 10; roll < EV miss.
+	var hd: int = int(m.data.hd) if m.data.hd > 0 else 1
+	var to_hit: int = 10 + hd * 3
+	var target_ev: int = 0
+	if "stats" in target and target.stats != null:
+		target_ev = int(target.stats.EV)
+	elif "data" in target and target.data != null:
+		target_ev = int(target.data.ev)
+	# DCSS range penalty: accuracy drops as distance grows past 2 tiles.
+	var range_penalty: int = maxi(0, (dist - 2) * 3)
+	var hit_roll: int = randi() % (to_hit + 1)
+	var mname: String = m.data.display_name if m.data else "archer"
+	if hit_roll <= target_ev + range_penalty:
+		CombatLog.add("The %s fires at you but misses." % mname)
+		return true
+	# Damage: 1..rdmg + HD/5 flat bonus. Physical element (no resist path).
+	var dmg: int = 1 + randi() % rdmg + hd / 5
+	if target.has_method("take_damage"):
+		target.take_damage(dmg, "physical")
+		CombatLog.add("The %s shoots you for %d damage!" % [mname, dmg])
+	return true
+
+
+## Lightweight friendly-fire gate for physical projectiles. Same shape
+## as _beam_friendly_fire but doesn't require a spell id.
+static func _path_has_ally(m: Monster, target: Node) -> bool:
+	if m == null or target == null:
+		return false
+	var from: Vector2i = m.grid_pos
+	var to: Vector2i = target.grid_pos
+	if from == to:
+		return false
+	var occupants: Dictionary = {}
+	for other in m.get_tree().get_nodes_in_group("monsters"):
+		if other == m or not is_instance_valid(other):
+			continue
+		if not (other is Monster) or not other.is_alive:
+			continue
+		occupants[other.grid_pos] = true
+	var dx: int = to.x - from.x
+	var dy: int = to.y - from.y
+	var sx: int = 1 if dx > 0 else (-1 if dx < 0 else 0)
+	var sy: int = 1 if dy > 0 else (-1 if dy < 0 else 0)
+	var adx: int = absi(dx)
+	var ady: int = absi(dy)
+	var x: int = from.x
+	var y: int = from.y
+	var err: int = adx - ady
+	while Vector2i(x, y) != to:
+		var e2: int = 2 * err
+		if e2 > -ady:
+			err -= ady
+			x += sx
+		if e2 < adx:
+			err += adx
+			y += sy
+		var cell: Vector2i = Vector2i(x, y)
+		if cell == to:
+			break
+		if occupants.has(cell):
+			return true
+	return false
 
 
 ## Is this monster a caster? A spellbook id means `_try_cast_at` may

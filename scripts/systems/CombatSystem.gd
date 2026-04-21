@@ -383,6 +383,99 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	return dmg
 
 
+## Player ranged attack. Walks a beam from attacker to target_pos,
+## applies skill+dex-driven to-hit against the first monster in the
+## path, and rolls damage through the same weapon-skill multiplier as
+## melee (so training Bows past 10 halves the to-hit roll gap between
+## miss and hit, just like any other weapon school).
+##
+## `weapon_id` must be a bow/sling/crossbow (skill == "bow"). Callers
+## guard on that before entering targeting mode. `dist` is pre-computed
+## Chebyshev so the range check is cheap.
+##
+## Range penalty (DCSS): -3 to-hit per tile past 2. Damage itself
+## doesn't fall off — DCSS only penalises accuracy.
+static func ranged_attack(attacker, target, target_pos: Vector2i, skill_sys = null) -> int:
+	if attacker == null or target == null:
+		return 0
+	var weapon_id: String = ""
+	if "equipped_weapon_id" in attacker:
+		weapon_id = String(attacker.equipped_weapon_id)
+	var weapon_skill_id: String = WeaponRegistry.weapon_skill_for(weapon_id)
+	if weapon_skill_id != "bow":
+		return 0
+	var weapon_dmg: int = WeaponRegistry.weapon_damage_for(weapon_id)
+	if "weapon_bonus_dmg" in attacker:
+		weapon_dmg += int(attacker.weapon_bonus_dmg)
+	var skill_lv: int = 0
+	var fighting_lv: int = 0
+	if skill_sys != null:
+		skill_lv = skill_sys.get_level(attacker, "bow")
+		fighting_lv = skill_sys.get_level(attacker, "fighting")
+	# DCSS uses DEX for bow to-hit. Our Stats has DEX.
+	var dex: int = 10
+	if "stats" in attacker and attacker.stats != null:
+		dex = attacker.stats.DEX
+	var dist: int = maxi(abs(target_pos.x - attacker.grid_pos.x),
+			abs(target_pos.y - attacker.grid_pos.y))
+	var range_pen: int = maxi(0, (dist - 2) * 3)
+	var to_hit: int = 15 + dex / 2
+	to_hit += (randi() % (fighting_lv * 100 + 1)) / 100
+	to_hit += (randi() % (skill_lv * 100 + 1)) / 100
+	if "equipped_weapon_plus" in attacker:
+		to_hit += int(attacker.equipped_weapon_plus)
+	to_hit -= range_pen
+	var ev: int = 0
+	if "stats" in target and target.stats != null:
+		ev = int(target.stats.EV)
+	elif "data" in target and target.data != null:
+		ev = int(target.data.ev)
+	var roll: int = randi() % maxi(1, to_hit + 1)
+	if roll < ev:
+		var mname_miss: String = "target"
+		if "data" in target and target.data != null:
+			mname_miss = String(target.data.display_name)
+		CombatLog.add("You miss the %s." % mname_miss)
+		_show_hit_feedback(target, 0, Color(0.8, 0.8, 0.8))
+		return 0
+	# Damage: same pipeline as melee but using DEX as the stat input
+	# (DCSS bow/thrown/sling reads DEX). Skill multiplier matches melee.
+	var attr: int = dex
+	var stat_mult: int = max(1, 75 + (25 * attr) / 10)
+	var potential: int = max(weapon_dmg, 1) * stat_mult
+	var base_damage: int = (randi() % (potential + 1)) / 100
+	var w_skill_scaled: int = skill_lv * 100
+	base_damage = base_damage * (2500 + (randi() % (w_skill_scaled + 1))) / 2500
+	var f_skill_scaled: int = fighting_lv * 100
+	base_damage = base_damage * (3000 + (randi() % (f_skill_scaled + 1))) / 3000
+	var slaying: int = 0
+	if "equipped_weapon_plus" in attacker:
+		slaying += int(attacker.equipped_weapon_plus)
+	if attacker.has_method("gear_damage_bonus"):
+		slaying += int(attacker.gear_damage_bonus())
+	if slaying >= 0:
+		base_damage += randi() % (1 + slaying)
+	else:
+		base_damage -= randi() % (1 - slaying)
+	var atk: int = max(1, base_damage)
+	# AC soak identical to melee (random2(1+ac) + GDR).
+	var def_ac: int = 0
+	if "ac" in target:
+		def_ac = target.ac
+	elif "stats" in target and target.stats != null:
+		def_ac = target.stats.AC
+	var soak: int = (randi() % (def_ac + 1)) if def_ac > 0 else 0
+	var dmg: int = max(1, atk - soak)
+	if target.has_method("take_damage"):
+		target.take_damage(dmg, "physical")
+	var tname: String = "target"
+	if "data" in target and target.data != null:
+		tname = String(target.data.display_name)
+	CombatLog.add("You shoot the %s for %d." % [tname, dmg])
+	_show_hit_feedback(target, dmg, Color(1.0, 0.9, 0.4))
+	return dmg
+
+
 ## Monster → player melee. Monsters don't have skills in M1, so this path
 ## keeps the legacy formula.
 static func melee_attack_from_monster(m, defender) -> int:

@@ -75,3 +75,10 @@ extends Resource
 @export var spell_energy: int = 10
 @export var missile_energy: int = 10
 @export var swim_energy: int = 6
+
+# --- Ranged attack (DCSS centaur bow / yaktaur crossbow / kobold throw) ----
+## When > 0 the monster has a built-in missile attack. MonsterAI fires a
+## beam at distant targets via Beam.trace before closing to melee. Damage
+## rolls 1..ranged_damage; range_range caps the max distance.
+@export var ranged_damage: int = 0
+@export var ranged_range: int = 7

@@ -80,6 +80,11 @@ var _map_dlg: GameDialog = null
 var _magic_dlg: GameDialog = null
 var _combat_log_label: Label = null
 var _targeting_spell: String = ""
+# Ranged-attack targeting mode — set when the player presses "f" / the
+# Fire HUD button with a bow-skill weapon equipped. Mutually exclusive
+# with _targeting_spell; _on_target_selected branches on whichever is
+# active.
+var _ranged_targeting: bool = false
 # Camera follow tween so the view doesn't snap.
 var _cam_tween: Tween = null
 const _CAM_FOLLOW_DUR: float = 0.14
@@ -1400,9 +1405,21 @@ func _on_key_action(action: String) -> void:
 				CombatLog.add("You have no abilities to invoke.")
 		"examine":
 			CombatLog.add("Examine mode: tap a tile to inspect. (stub)")
+		"fire":
+			# Ranged fire: a bow/sling/crossbow must be equipped. Enters
+			# the same targeting mode spells use, then resolves to
+			# Player.try_ranged_attack when the user taps a target.
+			if WeaponRegistry.weapon_skill_for(player.equipped_weapon_id) != "bow":
+				CombatLog.add("You have no ranged weapon equipped.")
+			elif touch_input != null:
+				_ranged_targeting = true
+				_targeting_spell = ""
+				touch_input.targeting_mode = true
+				CombatLog.add("Fire at which tile? Tap to aim, Esc to cancel.")
 		"cancel":
 			# Close any active popup. GameDialog auto-closes on Esc,
 			# but the path here also ensures targeting mode releases.
+			_ranged_targeting = false
 			if touch_input != null and "targeting_mode" in touch_input:
 				touch_input.targeting_mode = false
 
@@ -2992,6 +3009,16 @@ func _on_target_selected(pos: Vector2i) -> void:
 		dmap.aoe_preview_tiles.clear()
 		dmap.beam_preview_tiles.clear()
 		dmap.queue_redraw()
+	# Ranged-fire branch — when the player triggered "fire", the tap
+	# resolves a bow shot instead of a spell. Early-out so the spell
+	# targeting path below doesn't also run.
+	if _ranged_targeting:
+		_ranged_targeting = false
+		if touch_input != null:
+			touch_input.targeting_mode = false
+		if player != null:
+			player.try_ranged_attack(pos)
+		return
 	if _targeting_spell == "":
 		return
 	var target_monster: Monster = null

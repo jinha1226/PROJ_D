@@ -88,6 +88,10 @@ static func _merge_dcss_extended(target: MonsterData, entry: Dictionary) -> void
 	if target.move_energy == 10 and target.attack_energy == 10 \
 			and target.spell_energy == 10 and target.missile_energy == 10:
 		_apply_energy_overrides(target, target.id)
+	# Ranged overrides apply on top of .tres, since no .tres currently
+	# sets ranged_damage and the field default is 0 (which is also "no
+	# ranged"). Safe to call unconditionally.
+	_apply_ranged_overrides(target, target.id)
 
 
 ## List every monster id we know about — union of `.tres` files and DCSS JSON
@@ -174,6 +178,7 @@ static func _build_from_dcss(id: String, entry: Dictionary) -> MonsterData:
 	d.resists = _to_string_array(entry.get("resists", []))
 	d.spells_book = String(entry.get("spells", ""))
 	_apply_energy_overrides(d, id)
+	_apply_ranged_overrides(d, id)
 	# Tier is a rough difficulty band we use for UI sorting. Map to DCSS HD.
 	if d.hd >= 20:
 		d.tier = 5
@@ -227,6 +232,33 @@ const _ENERGY_OVERRIDES: Dictionary = {
 	"scorpion":    {"attack": 9},
 	"wasp":        {"move": 9, "attack": 9},
 }
+
+
+## DCSS ranged-attack overrides. Monsters with built-in bows / crossbows /
+## throwers fire projectiles at distance instead of closing to melee.
+## Numbers loosely match the DCSS shortbow/crossbow damage bands scaled
+## by the monster's HD.
+const _RANGED_OVERRIDES: Dictionary = {
+	"centaur":           {"damage": 10, "range": 7},
+	"centaur_warrior":   {"damage": 18, "range": 7},
+	"yaktaur":           {"damage": 20, "range": 7},
+	"yaktaur_captain":   {"damage": 26, "range": 8},
+	"deep_elf_archer":   {"damage": 14, "range": 7},
+	"faun":              {"damage": 8,  "range": 6},
+	"satyr":             {"damage": 12, "range": 6},
+	"kobold_brigand":    {"damage": 6,  "range": 5},
+	"orc_warrior":       {"damage": 8,  "range": 6},   # some carry bows in DCSS
+	"merfolk_javelineer":{"damage": 22, "range": 8},
+	"minotaur":          {"damage": 0,  "range": 0},   # explicit no-ranged override
+}
+
+
+static func _apply_ranged_overrides(d: MonsterData, id: String) -> void:
+	if not _RANGED_OVERRIDES.has(id):
+		return
+	var o: Dictionary = _RANGED_OVERRIDES[id]
+	d.ranged_damage = int(o.get("damage", 0))
+	d.ranged_range = int(o.get("range", 7))
 
 
 static func _apply_energy_overrides(d: MonsterData, id: String) -> void:
