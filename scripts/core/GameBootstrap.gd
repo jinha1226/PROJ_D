@@ -3804,12 +3804,15 @@ func _build_magic_row(spell_id: String, dlg: GameDialog) -> Control:
 	name_btn.flat = true
 	name_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	name_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# Clip the name button so long spell names ("Lehudib's Crystal
+	# Spear [8 MP] range 8") don't demand width beyond the dialog cap.
+	name_btn.clip_contents = true
 	var spell_name: String = String(info.get("name", spell_id))
 	var range_txt: String = ""
 	if int(info.get("range", 0)) > 0:
-		range_txt = "  range %d" % int(info.get("range", 0))
+		range_txt = "  r%d" % int(info.get("range", 0))
 	name_btn.text = "%s  [%d MP]%s" % [spell_name, int(info.get("mp", 0)), range_txt]
-	name_btn.add_theme_font_size_override("font_size", 48)
+	name_btn.add_theme_font_size_override("font_size", 36)
 	name_btn.add_theme_color_override("font_color", info.get("color", Color.WHITE))
 	name_btn.pressed.connect(_show_spell_info.bind(spell_id))
 	row.add_child(name_btn)
@@ -3821,10 +3824,10 @@ func _build_magic_row(spell_id: String, dlg: GameDialog) -> Control:
 	var fail_p: int = SpellRegistry.failure_rate(spell_id, player)
 	var stats_col := VBoxContainer.new()
 	stats_col.add_theme_constant_override("separation", 2)
-	stats_col.custom_minimum_size = Vector2(180, 0)
-	stats_col.add_child(UICards.accent_value("Pow %d" % spell_pow, 36))
+	stats_col.custom_minimum_size = Vector2(110, 0)
+	stats_col.add_child(UICards.accent_value("Pow %d" % spell_pow, 28))
 	if fail_p > 0:
-		stats_col.add_child(UICards.accent_value("Fail %d%%" % fail_p, 36))
+		stats_col.add_child(UICards.accent_value("Fail %d%%" % fail_p, 28))
 	row.add_child(stats_col)
 
 	var btns := VBoxContainer.new()
@@ -3832,8 +3835,8 @@ func _build_magic_row(spell_id: String, dlg: GameDialog) -> Control:
 
 	var cast_btn := Button.new()
 	cast_btn.text = "Cast"
-	cast_btn.custom_minimum_size = Vector2(160, 72)
-	cast_btn.add_theme_font_size_override("font_size", 44)
+	cast_btn.custom_minimum_size = Vector2(110, 58)
+	cast_btn.add_theme_font_size_override("font_size", 32)
 	cast_btn.disabled = (player.stats == null or player.stats.MP < int(info.get("mp", 1)))
 	var targeting_type: String = String(info.get("targeting", "single"))
 	if targeting_type == "self":
@@ -3844,8 +3847,8 @@ func _build_magic_row(spell_id: String, dlg: GameDialog) -> Control:
 
 	var qs_btn := Button.new()
 	qs_btn.text = "QSlot"
-	qs_btn.custom_minimum_size = Vector2(160, 60)
-	qs_btn.add_theme_font_size_override("font_size", 44)
+	qs_btn.custom_minimum_size = Vector2(110, 48)
+	qs_btn.add_theme_font_size_override("font_size", 30)
 	qs_btn.pressed.connect(_assign_spell_quickslot.bind(spell_id, dlg))
 	btns.add_child(qs_btn)
 
@@ -5520,6 +5523,7 @@ func _status_build_attributes(vb: VBoxContainer) -> void:
 		return
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 12)
+	h.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(_status_attr_card("STR", s.STR, Color(1.00, 0.55, 0.35)))
 	h.add_child(_status_attr_card("DEX", s.DEX, Color(0.40, 1.00, 0.55)))
 	h.add_child(_status_attr_card("INT", s.INT, Color(0.55, 0.70, 1.00)))
@@ -5528,6 +5532,8 @@ func _status_build_attributes(vb: VBoxContainer) -> void:
 
 func _status_attr_card(label: String, value: int, tint: Color) -> Control:
 	var panel: PanelContainer = UICards.card(tint)
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.clip_contents = true
 	var col := VBoxContainer.new()
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
 	panel.add_child(col)
@@ -5560,15 +5566,15 @@ func _status_build_combat(vb: VBoxContainer) -> void:
 	var total_ev: int = dex_ev + ev_bonus
 
 	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 12)
+	h.add_theme_constant_override("separation", 8)
+	h.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(_status_stat_card("AC", s.AC,
 			"race %+d · armor %+d" % [
 				player.race_res.base_ac if player.race_res else 0,
 				s.AC - (player.race_res.base_ac if player.race_res else 0)]))
 	h.add_child(_status_stat_card("EV", total_ev,
 			"DEX/2 %+d · gear %+d" % [dex_ev, ev_bonus]))
-	h.add_child(_status_stat_card("SH", s.SH,
-			"shield block score"))
+	h.add_child(_status_stat_card("SH", s.SH, "shield block"))
 	h.add_child(_status_stat_card("ATK", total_atk,
 			"wpn %d · STR %+d · gear %+d" % [w_dmg, str_bonus, gear_dmg + player.weapon_bonus_dmg]))
 	vb.add_child(h)
@@ -5577,6 +5583,11 @@ func _status_build_combat(vb: VBoxContainer) -> void:
 func _status_stat_card(label: String, value: int, sub: String) -> Control:
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# Sub-text ("race +3 · armor +8") is the widest element and tends
+	# to push the whole Combat row past the dialog's viewport-ratio
+	# cap. Clipping here keeps the card fixed-width even if the sub
+	# text overflows.
+	panel.clip_contents = true
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.10, 0.10, 0.14, 0.85)
 	sb.border_color = Color(0.45, 0.45, 0.55)
@@ -5612,8 +5623,10 @@ func _status_stat_card(label: String, value: int, sub: String) -> Control:
 	var sub_lbl := Label.new()
 	sub_lbl.text = sub
 	sub_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sub_lbl.add_theme_font_size_override("font_size", 28)
+	sub_lbl.add_theme_font_size_override("font_size", 24)
 	sub_lbl.modulate = Color(0.65, 0.65, 0.70)
+	sub_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	sub_lbl.custom_minimum_size = Vector2(0, 0)
 	col.add_child(sub_lbl)
 	return panel
 
