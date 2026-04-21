@@ -57,10 +57,12 @@ const _BRANCH_MAP: Dictionary = {
 	# also ships its `monster_pool` on the branches.json row so the
 	# spawner can bypass DCSS branch tables entirely when a portal
 	# carries an explicit pool. See MonsterSpawner.spawn_for_depth.
+	# Note: "volcano" is already keyed above (as a legacy trunk bucket)
+	# and serves both the trunk rotation and the portal — same
+	# lava-fiery pool either way. "icecave" and the others are new.
 	"sewer":   ["Dungeon"],
 	"ossuary": ["Crypt"],
 	"bailey":  ["Orcish Mines"],
-	"volcano": ["Volcano", "Gehenna"],
 	"icecave": ["Cocytus"],
 }
 
