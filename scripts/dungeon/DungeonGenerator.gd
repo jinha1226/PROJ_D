@@ -72,6 +72,25 @@ func generate(depth: int, run_seed: int = -1) -> void:
 				_place_pools(TileType.WATER, 2, 2, 5)
 		"swamp":   _build_caves(); _decorate_trees(10); _place_pools(TileType.WATER, 4, 4, 9)
 		"volcano": _build_caves(); _place_pools(TileType.LAVA, 3, 3, 7)
+		# Elven Halls — DCSS uses ornate room-heavy layouts. We reuse the
+		# main overlapping-boxes gen but with extra vault stamps for the
+		# decorative feel. Shops bumped too — elves trade heavily.
+		"elf":     _build_dcss_overlapping_boxes(depth)
+		# Slime Pits — DCSS splatters acidic pools that hurt non-acid-
+		# resistant actors (we model them as lava tiles, re-purposing
+		# the "lava" damage path since we don't have a separate acid
+		# floor). Caves feel wet and cramped.
+		"slime":   _build_caves(); _place_pools(TileType.LAVA, 4, 3, 8)
+		# Crypt / Tomb — tight rooms-and-corridors with cramped halls.
+		# Tomb goes even tighter. Population pool already weights heavy
+		# toward undead.
+		"crypt":   _build_dcss_overlapping_boxes(depth)
+		# Vaults — DCSS Vaults branch is dense vault-stamp territory. Reuse
+		# main gen but fire extra vault placements below.
+		"vaults":  _build_dcss_overlapping_boxes(depth)
+		# Zot — wide open "arena" floors with crystal walls and lots of
+		# altars. Closest match: caves with no trees, extra debris.
+		"crystal": _build_caves(); _decorate_rock_debris(18)
 		_:         _build_dcss_overlapping_boxes(depth)
 	# Up to 3 vault placements per floor so DCSS's ~100-vault pool actually
 	# shows up visibly. Each call only stamps one vault (or none) — repeated
@@ -79,6 +98,16 @@ func generate(depth: int, run_seed: int = -1) -> void:
 	_place_vault(branch, depth)
 	_place_vault(branch, depth)
 	_place_vault(branch, depth)
+	# Vault-branch floors stamp extra vaults (DCSS Vaults branch is
+	# literally vaults-stacked-on-vaults). Elf gets a bit more too for
+	# the ornate feel.
+	if branch == "vaults":
+		_place_vault(branch, depth)
+		_place_vault(branch, depth)
+		_place_vault(branch, depth)
+	elif branch == "elf":
+		_place_vault(branch, depth)
+		_place_vault(branch, depth)
 	if branch == "main":
 		_decorate_rock_debris(6)
 	_ensure_reachability()

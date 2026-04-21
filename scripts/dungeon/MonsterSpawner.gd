@@ -46,6 +46,23 @@ const _BANDS: Dictionary = {
 	"anaconda":        {"follower": "black_mamba",    "min": 1, "max": 2},
 	"spider":          {"follower": "spider",         "min": 1, "max": 3},
 	"redback":         {"follower": "redback",        "min": 1, "max": 2},
+	# --- Elven Halls faction packs (DCSS Elf spawns knights + mages) ---
+	"deep_elf_archer":    {"follower": "deep_elf_fighter", "min": 2, "max": 4},
+	"deep_elf_knight":    {"follower": "deep_elf_fighter", "min": 2, "max": 4},
+	"deep_elf_priest":    {"follower": "deep_elf_fighter", "min": 2, "max": 4},
+	"deep_elf_mage":      {"follower": "deep_elf_knight",  "min": 1, "max": 3},
+	"deep_elf_sorcerer":  {"follower": "deep_elf_mage",    "min": 2, "max": 4},
+	"deep_elf_demonologist": {"follower": "deep_elf_mage", "min": 2, "max": 4},
+	# --- Vaults guards + Crypt undead packs ---
+	"vault_guard":      {"follower": "vault_guard",    "min": 1, "max": 3},
+	"vault_warden":     {"follower": "vault_guard",    "min": 2, "max": 4},
+	"vault_sentinel":   {"follower": "vault_guard",    "min": 1, "max": 2},
+	"skeletal_warrior": {"follower": "skeleton",       "min": 1, "max": 3},
+	"mummy":            {"follower": "zombie",         "min": 1, "max": 3},
+	"wraith":           {"follower": "wight",          "min": 1, "max": 2},
+	# --- Slime Pits jelly sprawls ---
+	"jelly":            {"follower": "jelly",          "min": 1, "max": 3},
+	"acid_blob":        {"follower": "jelly",          "min": 1, "max": 2},
 }
 
 
