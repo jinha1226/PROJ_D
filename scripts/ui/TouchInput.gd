@@ -136,7 +136,10 @@ func _handle_key(k: InputEventKey) -> void:
 		KEY_F:                           # "f" = fire ranged weapon
 			key_action.emit("fire")
 		KEY_QUESTION, KEY_SLASH:         # "?" = help dialog
-			key_action.emit("help")
+			if k.shift_pressed:
+				key_action.emit("search")   # "?" with shift → search
+			else:
+				key_action.emit("help")
 		KEY_ESCAPE:
 			key_action.emit("cancel")
 

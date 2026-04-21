@@ -1215,6 +1215,106 @@ Poison stacks in 3 levels; rPois+ one-shots a level."""],
 		vb.add_child(body)
 
 
+## DCSS `?/` lookup — search monster / spell / item names across our
+## registries. Case-insensitive substring match; results list id →
+## short summary in a scroll. Primary use: "I got hit by a bolt —
+## what's a yaktaur again?" without leaving the dungeon.
+func _show_search_dialog() -> void:
+	var dlg := GameDialog.create("Search (?/)", Vector2i(960, 1800))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
+	vb.add_theme_constant_override("separation", 10)
+
+	var input := LineEdit.new()
+	input.placeholder_text = "type part of a name (monster / spell / item)..."
+	input.add_theme_font_size_override("font_size", 40)
+	input.custom_minimum_size = Vector2(0, 80)
+	vb.add_child(input)
+
+	vb.add_child(UICards.section_header("Results"))
+	var results := VBoxContainer.new()
+	results.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	results.add_theme_constant_override("separation", 4)
+	vb.add_child(results)
+
+	var on_query = func(text: String) -> void:
+		for c in results.get_children():
+			c.queue_free()
+		if text.length() < 2:
+			var hint := UICards.dim_hint("Type at least 2 characters.")
+			results.add_child(hint)
+			return
+		var needle: String = text.to_lower()
+		var total: int = 0
+		# Monsters — scan MonsterRegistry ids.
+		for mid in MonsterRegistry.all_ids():
+			if total >= 30:
+				break
+			var mid_s: String = String(mid)
+			if mid_s.to_lower().find(needle) < 0:
+				continue
+			var md: MonsterData = MonsterRegistry.fetch(mid_s)
+			if md == null:
+				continue
+			results.add_child(_search_row(
+					String(md.display_name),
+					"Monster · HD %d · HP ~%d · %s" % [
+						md.hd, md.hp, String(md.shape)]))
+			total += 1
+		# Spells — iterate SpellRegistry's built-in catalog.
+		for sid in SpellRegistry.SPELLS.keys():
+			if total >= 60:
+				break
+			var sid_s: String = String(sid)
+			var info: Dictionary = SpellRegistry.get_spell(sid_s)
+			var sname: String = String(info.get("name", sid_s))
+			if sname.to_lower().find(needle) < 0 \
+					and sid_s.to_lower().find(needle) < 0:
+				continue
+			results.add_child(_search_row(sname,
+					"Spell · %d MP · %s" % [
+						int(info.get("mp", 0)),
+						", ".join(PackedStringArray(SpellRegistry.get_schools(sid_s)))]))
+			total += 1
+		# Items — consumables + wands (weapons/armor names would clutter).
+		for cid in ConsumableRegistry.all_ids():
+			if total >= 90:
+				break
+			var cid_s: String = String(cid)
+			var cinfo: Dictionary = ConsumableRegistry.get_info(cid_s)
+			var cname: String = String(cinfo.get("name", cid_s))
+			if cname.to_lower().find(needle) < 0 \
+					and cid_s.to_lower().find(needle) < 0:
+				continue
+			results.add_child(_search_row(cname,
+					"%s · %s" % [String(cinfo.get("kind", "item")).capitalize(),
+						String(cinfo.get("desc", ""))]))
+			total += 1
+		if total == 0:
+			results.add_child(UICards.dim_hint("No matches."))
+
+	input.text_changed.connect(on_query)
+	input.call_deferred("grab_focus")
+
+
+## Single row inside the `?/` search results. Kept tiny so the scroll
+## fits lots of hits.
+func _search_row(title: String, subtitle: String) -> Control:
+	var col := VBoxContainer.new()
+	var name_lbl := Label.new()
+	name_lbl.text = title
+	name_lbl.add_theme_font_size_override("font_size", 36)
+	name_lbl.add_theme_color_override("font_color", Color(1.0, 0.90, 0.55))
+	col.add_child(name_lbl)
+	var sub := Label.new()
+	sub.text = subtitle
+	sub.add_theme_font_size_override("font_size", 28)
+	sub.modulate = Color(0.80, 0.80, 0.92)
+	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	col.add_child(sub)
+	return col
+
+
 ## DCSS per-god kill conducts. Returns the adjusted piety gain for this
 ## kill (negative = piety loss). Bonuses fire on favoured victims
 ## (TSO evil-kill, Yred holy-kill), penalties on disliked victims
@@ -1578,6 +1678,8 @@ func _on_key_action(action: String) -> void:
 				CombatLog.add("Fire at which tile? Tap to aim, Esc to cancel.")
 		"help":
 			_show_help_dialog()
+		"search":
+			_show_search_dialog()
 		"cancel":
 			# Close any active popup. GameDialog auto-closes on Esc,
 			# but the path here also ensures targeting mode releases.

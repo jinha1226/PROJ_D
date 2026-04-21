@@ -147,6 +147,114 @@ const _UNRANDS: Dictionary = {
 		"desc": "Worn on the neck, it whispers of endless battle.",
 		"props": {"str": 2, "slaying": 3},
 	},
+
+	# ---------------- WAVE 2 (+10, session 15) ----------------
+	# Weapons
+	"unrand_finisher": {
+		"kind": "weapon",
+		"base": "scimitar",
+		"name": "Finisher",
+		"dmg": 12, "skill": "long_blade", "delay": 1.2,
+		"plus": 5, "brand": "speed",
+		"color": Color(0.95, 0.95, 0.30),
+		"min_depth": 9,
+		"desc": "A slender blade whose strikes arrive before the swing.",
+	},
+	"unrand_sword_of_cerebov": {
+		"kind": "weapon",
+		"base": "great_sword",
+		"name": "the Sword of Cerebov",
+		"dmg": 22, "skill": "long_blade", "delay": 1.8,
+		"plus": 6, "brand": "flaming",
+		"color": Color(1.00, 0.35, 0.10),
+		"min_depth": 18,
+		"desc": "Cerebov's twisted blade drips with infernal flame.",
+	},
+	"unrand_obsidian_axe": {
+		"kind": "weapon",
+		"base": "waraxe",
+		"name": "the Obsidian Axe",
+		"dmg": 15, "skill": "axe", "delay": 1.5,
+		"plus": 6, "brand": "pain",
+		"color": Color(0.10, 0.05, 0.20),
+		"min_depth": 14,
+		"desc": "A black glass axe that feeds on suffering.",
+	},
+	"unrand_spriggans_rapier": {
+		"kind": "weapon",
+		"base": "rapier",
+		"name": "Spriggan's Rapier",
+		"dmg": 7, "skill": "short_blade", "delay": 1.0,
+		"plus": 4, "brand": "venom",
+		"color": Color(0.70, 1.00, 0.45),
+		"min_depth": 7,
+		"desc": "A wee envenomed rapier — light enough to flick between heartbeats.",
+	},
+	"unrand_vampire_tooth": {
+		"kind": "weapon",
+		"base": "dagger",
+		"name": "the Vampire's Tooth",
+		"dmg": 5, "skill": "short_blade", "delay": 0.9,
+		"plus": 5, "brand": "pain",
+		"color": Color(0.85, 0.15, 0.40),
+		"min_depth": 8,
+		"desc": "A dagger carved from a vampire's fang — drinks vitality on every cut.",
+	},
+
+	# Armor
+	"unrand_crystal_plate": {
+		"kind": "armor",
+		"base": "crystal_plate_armour",
+		"name": "the Crystal Plate of the Starlit Seer",
+		"slot": "chest",
+		"ac": 14, "plus": 4, "ego": "archmagi",
+		"color": Color(0.75, 0.85, 1.00),
+		"min_depth": 16,
+		"desc": "Heavy plate shot through with mana-conducting crystals.",
+	},
+	"unrand_troll_skin_of_the_north": {
+		"kind": "armor",
+		"base": "troll_leather_armour",
+		"name": "the Troll Skin of the North",
+		"slot": "chest",
+		"ac": 4, "plus": 5, "ego": "cold_resistance",
+		"color": Color(0.55, 0.70, 0.95),
+		"min_depth": 10,
+		"desc": "Bitterly cold troll hide that regenerates the wearer.",
+	},
+
+	# Boots / Gloves
+	"unrand_boots_of_the_assassin": {
+		"kind": "armor",
+		"base": "boots",
+		"name": "the Boots of the Assassin",
+		"slot": "boots",
+		"ac": 1, "plus": 3, "ego": "stealth",
+		"color": Color(0.20, 0.20, 0.30),
+		"min_depth": 7,
+		"desc": "Silent as grave-dust. The wearer barely registers on prey.",
+	},
+	"unrand_gauntlets_of_war": {
+		"kind": "armor",
+		"base": "gloves",
+		"name": "the Gauntlets of War",
+		"slot": "gloves",
+		"ac": 2, "plus": 3, "ego": "strength",
+		"color": Color(0.85, 0.50, 0.20),
+		"min_depth": 9,
+		"desc": "Iron gauntlets that flood the wearer with raw strength.",
+	},
+
+	# Ring
+	"unrand_ring_of_the_octopus_king": {
+		"kind": "ring",
+		"name": "the Ring of the Octopus King",
+		"color": Color(0.55, 0.25, 0.85),
+		"min_depth": 11,
+		"slot": "ring",
+		"desc": "One of the legendary rings of the Octopus King — a touch of all magics.",
+		"props": {"str": 1, "dex": 1, "int": 1, "ac": 2, "ev": 2, "slaying": 2},
+	},
 }
 
 
