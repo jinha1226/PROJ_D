@@ -276,7 +276,12 @@ func take_turn() -> void:
 		if _sprite and grid_pos != prev_pos:
 			_sprite.face_toward(grid_pos - prev_pos)
 		_action_energy -= maxi(1, action_cost)
-		_sprite.play_anim("walk", true)
+		# DCSS / ASCII render modes skip LPC sprite loading entirely
+		# (Monster._load_sprite returns early when TileRenderer.is_dcss()
+		# or .is_ascii()). Guard the anim call so a no-sprite monster
+		# doesn't crash its own turn.
+		if _sprite:
+			_sprite.play_anim("walk", true)
 		# Reuse a single SceneTreeTimer reference per monster — each turn
 		# overwrites the previous one. Connecting only when not already
 		# connected avoids piling up lambdas (was a per-turn allocation that

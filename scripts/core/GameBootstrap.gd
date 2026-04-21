@@ -3269,14 +3269,20 @@ func _open_skills_dialog(category: String = "active") -> void:
 
 	var tabs_hbox := HBoxContainer.new()
 	tabs_hbox.add_theme_constant_override("separation", 4)
+	tabs_hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for cat in _SKILL_CATEGORIES:
 		var tb := Button.new()
 		tb.text = _SKILL_CATEGORY_LABELS.get(cat, cat)
 		tb.custom_minimum_size = Vector2(0, 80)
 		tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		# Tab buttons are narrow columns — clip text + smaller font so
+		# the widest label ("DEFENSE") doesn't push the HBox wider than
+		# the dialog's viewport-derived width, which would drag the
+		# whole Window out past the 92% cap.
+		tb.clip_contents = true
 		tb.toggle_mode = true
 		tb.button_pressed = (cat == category)
-		tb.add_theme_font_size_override("font_size", 44)
+		tb.add_theme_font_size_override("font_size", 32)
 		tb.pressed.connect(_on_skills_tab.bind(cat, dlg))
 		tabs_hbox.add_child(tb)
 	vb.add_child(tabs_hbox)
@@ -4377,12 +4383,17 @@ func _on_bag_pressed() -> void:
 
 	var cat_tabs := HBoxContainer.new()
 	cat_tabs.add_theme_constant_override("separation", 4)
+	cat_tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for cat in _BAG_CATEGORIES:
 		var tab_btn := Button.new()
 		tab_btn.text = cat.to_upper()
 		tab_btn.custom_minimum_size = Vector2(0, 64)
 		tab_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		tab_btn.add_theme_font_size_override("font_size", 44)
+		# 9 bag tabs need to share ~660px usable width; clip + smaller
+		# font so long labels ("POTION", "AMULET", "SCROLL") don't push
+		# the dialog past its viewport-ratio cap.
+		tab_btn.clip_contents = true
+		tab_btn.add_theme_font_size_override("font_size", 28)
 		if cat == _bag_category:
 			tab_btn.modulate = Color(1.0, 1.0, 0.75)
 			tab_btn.disabled = true
