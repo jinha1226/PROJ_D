@@ -1,0 +1,3867 @@
+{
+  "_comment": "DCSS unrandart data from art-data.txt (0.32). 143 unique items.",
+  "items": [
+    {
+      "id": "singing_sword",
+      "name": "Singing Sword",
+      "category": "weapon",
+      "base": "double_sword",
+      "plus": 11,
+      "value": 1000,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "wrath_of_trog",
+      "name": "Wrath of Trog",
+      "category": "weapon",
+      "base": "battleaxe",
+      "plus": 8,
+      "value": 800,
+      "brand": "antimagic",
+      "props": [],
+      "bools": [
+        "rampage"
+      ],
+      "desc": "It causes slowness and exhaustion when equipped."
+    },
+    {
+      "id": "mace_of_variability",
+      "name": "mace of Variability",
+      "category": "weapon",
+      "base": "morningstar",
+      "plus": 7,
+      "value": 600,
+      "brand": "chaos",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "partisan_of_prune",
+      "name": "partisan of Prune",
+      "category": "weapon",
+      "base": "glaive",
+      "plus": 12,
+      "value": 0,
+      "brand": "freezing",
+      "props": [],
+      "bools": [
+        "chaotic"
+      ],
+      "desc": "Prune:     It halves damage taken while paralysed, petrified or unconscious."
+    },
+    {
+      "id": "sword_of_power",
+      "name": "sword of Power",
+      "category": "weapon",
+      "base": "great_sword",
+      "plus": 9,
+      "value": 800,
+      "brand": "spwpn_valour",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "staff_of_olgreb",
+      "name": "staff of Olgreb",
+      "category": "weapon",
+      "base": "staff",
+      "plus": 9,
+      "value": 1000,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Radiate: It can be activated via the 'a'bility menu to radiate toxic energy, with effectiveness depending on Evocations skill."
+    },
+    {
+      "id": "crystal_ball_of_wucad_mu",
+      "name": "crystal ball of Wucad Mu",
+      "category": "armour",
+      "base": "orb",
+      "plus": 0,
+      "value": 1000,
+      "brand": "sparm_energy",
+      "props": [],
+      "bools": [],
+      "desc": "Mindtap:  Whenever a successful spell causes magic to be channelled         from it, it may also drain additional magic from other enemies in         sight, with a chance increasing with spell level."
+    },
+    {
+      "id": "vampire_s_tooth",
+      "name": "Vampire's Tooth",
+      "category": "weapon",
+      "base": "quick_blade",
+      "plus": 8,
+      "value": 600,
+      "brand": "vampirism",
+      "props": [],
+      "bools": [
+        "skip_ego"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "scythe_of_curses",
+      "name": "scythe of Curses",
+      "category": "weapon",
+      "base": "halberd",
+      "plus": 13,
+      "value": 800,
+      "brand": "draining",
+      "props": [],
+      "bools": [
+        "drain"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "sceptre_of_torment",
+      "name": "sceptre of Torment",
+      "category": "weapon",
+      "base": "eveningstar",
+      "plus": 7,
+      "value": 1200,
+      "brand": "pain",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "sword_of_zonguldrok",
+      "name": "sword of Zonguldrok",
+      "category": "weapon",
+      "base": "double_sword",
+      "plus": 9,
+      "value": 800,
+      "brand": "reaping",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "sword_of_cerebov",
+      "name": "sword of Cerebov",
+      "category": "weapon",
+      "base": "great_sword",
+      "plus": 6,
+      "value": 0,
+      "brand": "flaming",
+      "props": [],
+      "bools": [
+        "evil",
+        "nogen"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "orb_of_dispater",
+      "name": "orb of Dispater",
+      "category": "armour",
+      "base": "orb",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "evil",
+        "nogen",
+        "corrode"
+      ],
+      "desc": "+Damnation: It grants the ability to hurl damnation at the cost of health and magic, with strength depending on Evocations skill."
+    },
+    {
+      "id": "sceptre_of_asmodeus",
+      "name": "sceptre of Asmodeus",
+      "category": "weapon",
+      "base": "eveningstar",
+      "plus": 13,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "evil",
+        "nogen"
+      ],
+      "desc": "Hellfire Court: It may summon demons of flame and damnation when striking foes."
+    },
+    {
+      "id": "faerie_dragon_scales",
+      "name": "faerie dragon scales",
+      "category": "armour",
+      "base": "acid_dragon_armour",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "nogen",
+        "no_upgrade"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "demon_blade_bloodbane",
+      "name": "demon blade \"Bloodbane\"",
+      "category": "weapon",
+      "base": "demon_blade",
+      "plus": 8,
+      "value": 0,
+      "brand": "draining",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "scimitar_of_flaming_death",
+      "name": "scimitar of Flaming Death",
+      "category": "weapon",
+      "base": "scimitar",
+      "plus": 6,
+      "value": 0,
+      "brand": "flaming",
+      "props": [],
+      "bools": [
+        "poison",
+        "skip_ego",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "eveningstar_brilliance",
+      "name": "eveningstar \"Brilliance\"",
+      "category": "weapon",
+      "base": "eveningstar",
+      "plus": 1,
+      "value": 0,
+      "brand": "spwpn_foul_flame",
+      "props": [],
+      "bools": [],
+      "desc": "Umbra:     It surrounds you with an aura of shadow, increasing your stealth and reducing the accuracy of all others within it."
+    },
+    {
+      "id": "demon_blade_leech",
+      "name": "demon blade \"Leech\"",
+      "category": "weapon",
+      "base": "demon_blade",
+      "plus": 8,
+      "value": 0,
+      "brand": "vampirism",
+      "props": [],
+      "bools": [
+        "drain",
+        "harm",
+        "skip_ego"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "dagger_of_chilly_death",
+      "name": "dagger of Chilly Death",
+      "category": "weapon",
+      "base": "dagger",
+      "plus": 9,
+      "value": 0,
+      "brand": "freezing",
+      "props": [],
+      "bools": [
+        "poison",
+        "skip_ego",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "dagger_morg",
+      "name": "dagger \"Morg\"",
+      "category": "weapon",
+      "base": "dagger",
+      "plus": 4,
+      "value": 0,
+      "brand": "pain",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "scythe_finisher",
+      "name": "scythe \"Finisher\"",
+      "category": "weapon",
+      "base": "halberd",
+      "plus": 5,
+      "value": 0,
+      "brand": "speed",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "greatsling_punk",
+      "name": "greatsling \"Punk\"",
+      "category": "weapon",
+      "base": "sling",
+      "plus": 3,
+      "value": 0,
+      "brand": "spwpn_acid",
+      "props": [],
+      "bools": [
+        "rCorr"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "longbow_zephyr",
+      "name": "longbow \"Zephyr\"",
+      "category": "weapon",
+      "base": "longbow",
+      "plus": 12,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "fly"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "giant_club_skullcrusher",
+      "name": "giant club \"Skullcrusher\"",
+      "category": "weapon",
+      "base": "giant_club",
+      "plus": 3,
+      "value": 0,
+      "brand": "speed",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "glaive_of_the_guard",
+      "name": "glaive of the Guard",
+      "category": "weapon",
+      "base": "glaive",
+      "plus": 5,
+      "value": 0,
+      "brand": "electrocution",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "zealot_s_sword",
+      "name": "zealot's sword",
+      "category": "weapon",
+      "base": "eudemon_blade",
+      "plus": 10,
+      "value": 0,
+      "brand": "holy_wrath",
+      "props": [],
+      "bools": [],
+      "desc": "Zealotry:  Whenever the wielder enters a berserk rage, their allies are berserked alongside them."
+    },
+    {
+      "id": "arbalest_damnation",
+      "name": "arbalest \"Damnation\"",
+      "category": "weapon",
+      "base": "arbalest",
+      "plus": 6,
+      "value": 800,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "evil"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "sword_of_the_dread_knight",
+      "name": "sword of the Dread Knight",
+      "category": "weapon",
+      "base": "great_sword",
+      "plus": 13,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "silence",
+        "evil",
+        "drain"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "morningstar_eos",
+      "name": "morningstar \"Eos\"",
+      "category": "weapon",
+      "base": "morningstar",
+      "plus": 10,
+      "value": 0,
+      "brand": "electrocution",
+      "props": [],
+      "bools": [
+        "elec"
+      ],
+      "desc": "Halo:      It grants its wielder a halo, revealing invisible creatures and increasing accuracy against all within it other than the wielder."
+    },
+    {
+      "id": "spear_of_the_botono",
+      "name": "spear of the Botono",
+      "category": "weapon",
+      "base": "spear",
+      "plus": 6,
+      "value": 0,
+      "brand": "reaping",
+      "props": [],
+      "bools": [
+        "poison",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "trident_of_the_octopus_king",
+      "name": "trident of the Octopus King",
+      "category": "weapon",
+      "base": "trident",
+      "plus": 8,
+      "value": 0,
+      "brand": "venom",
+      "props": [],
+      "bools": [
+        "elec",
+        "poison",
+        "no_upgrade"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "mithril_axe_arga",
+      "name": "mithril axe \"Arga\"",
+      "category": "weapon",
+      "base": "broad_axe",
+      "plus": 8,
+      "value": 0,
+      "brand": "speed",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "elemental_staff",
+      "name": "Elemental Staff",
+      "category": "weapon",
+      "base": "staff",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "heavy_crossbow_sniper",
+      "name": "heavy crossbow \"Sniper\"",
+      "category": "weapon",
+      "base": "triple_crossbow",
+      "plus": 27,
+      "value": 800,
+      "brand": "heavy",
+      "props": [],
+      "bools": [
+        "seeinv"
+      ],
+      "desc": "Acc+∞:     It never misses its target."
+    },
+    {
+      "id": "longbow_piercer",
+      "name": "longbow \"Piercer\"",
+      "category": "weapon",
+      "base": "longbow",
+      "plus": 7,
+      "value": 0,
+      "brand": "penetration",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "blowgun_of_the_assassin",
+      "name": "blowgun of the Assassin",
+      "category": "weapon",
+      "base": "blowgun",
+      "plus": 6,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "inv",
+        "tilerim",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "lance_wyrmbane",
+      "name": "lance \"Wyrmbane\"",
+      "category": "weapon",
+      "base": "spear",
+      "plus": 8,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "poison",
+        "no_upgrade"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "spriggan_s_knife",
+      "name": "Spriggan's Knife",
+      "category": "weapon",
+      "base": "dagger",
+      "plus": 7,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Stab:      It is more effective when stabbing unaware enemies, sometimes treating them as though they were completely helpless."
+    },
+    {
+      "id": "plutonium_sword",
+      "name": "plutonium sword",
+      "category": "weapon",
+      "base": "triple_sword",
+      "plus": 11,
+      "value": 1000,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "mutate",
+        "chaotic"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "great_mace_undeadhunter",
+      "name": "great mace \"Undeadhunter\"",
+      "category": "weapon",
+      "base": "morningstar",
+      "plus": 7,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "whip_snakebite",
+      "name": "whip \"Snakebite\"",
+      "category": "weapon",
+      "base": "whip",
+      "plus": 8,
+      "value": 0,
+      "brand": "venom",
+      "props": [],
+      "bools": [
+        "poison"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "knife_of_accuracy",
+      "name": "knife of Accuracy",
+      "category": "weapon",
+      "base": "dagger",
+      "plus": 27,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "tilerim",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "lehudib_s_crystal_spear",
+      "name": "Lehudib's crystal spear",
+      "category": "weapon",
+      "base": "spear",
+      "plus": 6,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "captain_s_cutlass",
+      "name": "captain's cutlass",
+      "category": "weapon",
+      "base": "rapier",
+      "plus": 7,
+      "value": 0,
+      "brand": "speed",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "storm_bow",
+      "name": "storm bow",
+      "category": "weapon",
+      "base": "longbow",
+      "plus": 8,
+      "value": 0,
+      "brand": "electrocution",
+      "props": [],
+      "bools": [
+        "tilerim"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "tower_shield_of_ignorance",
+      "name": "tower shield of Ignorance",
+      "category": "armour",
+      "base": "tower_shield",
+      "plus": 10,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "robe_of_augmentation",
+      "name": "robe of Augmentation",
+      "category": "armour",
+      "base": "robe",
+      "plus": 4,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "cloak_of_the_thief",
+      "name": "cloak of the Thief",
+      "category": "armour",
+      "base": "cloak",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "seeinv"
+      ],
+      "desc": "Quiet:      All noise in your surroundings is dampened."
+    },
+    {
+      "id": "tower_shield_bullseye",
+      "name": "tower shield \"Bullseye\"",
+      "category": "armour",
+      "base": "tower_shield",
+      "plus": 15,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "crown_of_dyrovepreva",
+      "name": "crown of Dyrovepreva",
+      "category": "armour",
+      "base": "hat",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec",
+        "seeinv"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "hat_of_the_bear_spirit",
+      "name": "hat of the Bear Spirit",
+      "category": "armour",
+      "base": "hat",
+      "plus": 2,
+      "value": 0,
+      "brand": "sparm_spirit_shield",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "robe_of_misfortune",
+      "name": "robe of Misfortune",
+      "category": "armour",
+      "base": "robe",
+      "plus": 5,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "harm",
+        "slow",
+        "corrode"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "cloak_of_flash",
+      "name": "cloak of Flash",
+      "category": "armour",
+      "base": "cloak",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "fly",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "hood_of_the_assassin",
+      "name": "hood of the Assassin",
+      "category": "armour",
+      "base": "hat",
+      "plus": 2,
+      "value": 600,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Detect:    It allows the wearer to sense nearby creatures."
+    },
+    {
+      "id": "lear_s_hauberk",
+      "name": "Lear's hauberk",
+      "category": "armour",
+      "base": "chain_mail",
+      "plus": 18,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "special"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "skin_of_zhor",
+      "name": "skin of Zhor",
+      "category": "armour",
+      "base": "animal_skin",
+      "plus": 4,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "seeinv"
+      ],
+      "desc": "*Englaciate: It radiates cold, occasionally slowing all nearby creatures who are not resistant to cold."
+    },
+    {
+      "id": "salamander_hide_armour",
+      "name": "salamander hide armour",
+      "category": "armour",
+      "base": "leather_armour",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "enh_fire",
+        "special"
+      ],
+      "desc": "Flames:    It surrounds you with flame clouds."
+    },
+    {
+      "id": "gauntlets_of_war",
+      "name": "gauntlets of War",
+      "category": "armour",
+      "base": "gloves",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "shield_of_resistance",
+      "name": "shield of Resistance",
+      "category": "armour",
+      "base": "kite_shield",
+      "plus": 2,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "robe_of_folly",
+      "name": "robe of Folly",
+      "category": "armour",
+      "base": "robe",
+      "plus": 4,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Brill:     It increases the power of your magical spells and halves their MP cost (rounding up)."
+    },
+    {
+      "id": "maxwell_s_patent_armour",
+      "name": "Maxwell's patent armour",
+      "category": "armour",
+      "base": "plate_armour",
+      "plus": 15,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "silence",
+        "notelep",
+        "elec",
+        "rCorr"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "mask_of_the_dragon",
+      "name": "mask of the Dragon",
+      "category": "armour",
+      "base": "hat",
+      "plus": 2,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "seeinv"
+      ],
+      "desc": "Dragonpray: It occasionally summons a dragon when using Invocations with hostile monsters in sight. Chance is 10% + twice the piety cost of the ability used."
+    },
+    {
+      "id": "robe_of_night",
+      "name": "robe of Night",
+      "category": "armour",
+      "base": "robe",
+      "plus": 5,
+      "value": 600,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "seeinv"
+      ],
+      "desc": "Dark:      It shrouds the wearer in darkness, reducing the range at which they can see and be seen by others."
+    },
+    {
+      "id": "scales_of_the_dragon_king",
+      "name": "scales of the Dragon King",
+      "category": "armour",
+      "base": "golden_dragon_armour",
+      "plus": 9,
+      "value": 0,
+      "brand": "sparm_command",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "hat_of_the_alchemist",
+      "name": "hat of the Alchemist",
+      "category": "armour",
+      "base": "hat",
+      "plus": -2,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec",
+        "poison",
+        "rMut",
+        "rCorr"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "fencer_s_gloves",
+      "name": "fencer's gloves",
+      "category": "armour",
+      "base": "gloves",
+      "plus": 0,
+      "value": 400,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Riposte:   It allows the wearer to riposte with melee weapons, swiftly retaliating against missed or blocked melee attacks."
+    },
+    {
+      "id": "cloak_of_starlight",
+      "name": "cloak of Starlight",
+      "category": "armour",
+      "base": "cloak",
+      "plus": 1,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "*Dazzle:   It may blind adjacent enemies who miss an attack against the wearer in melee combat."
+    },
+    {
+      "id": "ratskin_cloak",
+      "name": "ratskin cloak",
+      "category": "armour",
+      "base": "cloak",
+      "plus": 2,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "poison"
+      ],
+      "desc": "*Rats:     When the wearer is hurt, rats may emerge from it to assist them."
+    },
+    {
+      "id": "shield_of_the_gong",
+      "name": "shield of the Gong",
+      "category": "armour",
+      "base": "kite_shield",
+      "plus": 18,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "rcorr"
+      ],
+      "desc": "Loud:      It is deafeningly noisy when blocking attacks."
+    },
+    {
+      "id": "amulet_of_the_air",
+      "name": "amulet of the Air",
+      "category": "jewellery",
+      "base": "amulet_nothing",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "enh_air",
+        "elec",
+        "fly",
+        "rmsl"
+      ],
+      "desc": "Inacc:     It reduces the accuracy of your attacks and spells."
+    },
+    {
+      "id": "ring_of_shadows",
+      "name": "ring of Shadows",
+      "category": "jewellery",
+      "base": "ring_stealth",
+      "plus": 0,
+      "value": 400,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "inv"
+      ],
+      "desc": "Umbra:     It surrounds you with an aura of shadow, increasing your stealth and reducing the accuracy of all others within it."
+    },
+    {
+      "id": "amulet_of_cekugob",
+      "name": "amulet of Cekugob",
+      "category": "jewellery",
+      "base": "amulet_acrobat",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec",
+        "poison",
+        "notelep",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "amulet_of_tranquility",
+      "name": "amulet of Tranquility",
+      "category": "jewellery",
+      "base": "amulet_nothing",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "clarity"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "necklace_of_bloodlust",
+      "name": "necklace of Bloodlust",
+      "category": "jewellery",
+      "base": "amulet_nothing",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Fury:      It extends the wearer's berserk rage when killing foes."
+    },
+    {
+      "id": "ring_of_the_hare",
+      "name": "ring of the Hare",
+      "category": "jewellery",
+      "base": "ring_evasion",
+      "plus": 10,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "ring_of_the_tortoise",
+      "name": "ring of the Tortoise",
+      "category": "jewellery",
+      "base": "ring_protection",
+      "plus": 8,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "ring_of_the_mage",
+      "name": "ring of the Mage",
+      "category": "jewellery",
+      "base": "ring_wizardry",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "archmagi"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "brooch_of_shielding",
+      "name": "brooch of Shielding",
+      "category": "jewellery",
+      "base": "amulet_guardian_spirit",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "robe_of_clouds",
+      "name": "robe of Clouds",
+      "category": "armour",
+      "base": "robe",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec"
+      ],
+      "desc": "*Thunder:  It occasionally creates storm clouds above nearby enemies."
+    },
+    {
+      "id": "hat_of_pondering",
+      "name": "hat of Pondering",
+      "category": "armour",
+      "base": "hat",
+      "plus": 3,
+      "value": 0,
+      "brand": "sparm_ponderousness",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "obsidian_axe",
+      "name": "obsidian axe",
+      "category": "weapon",
+      "base": "broad_axe",
+      "plus": 16,
+      "value": 0,
+      "brand": "draining",
+      "props": [],
+      "bools": [
+        "seeinv",
+        "fly",
+        "drain"
+      ],
+      "desc": "Mesm:      Its wielder is mesmerised by any visible foes, and it cannot be unequipped while any foes are visible."
+    },
+    {
+      "id": "lightning_scales",
+      "name": "lightning scales",
+      "category": "armour",
+      "base": "barding",
+      "plus": 6,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec"
+      ],
+      "desc": "Swift:     It allows the wearer to cover ground more swiftly."
+    },
+    {
+      "id": "black_knight_s_barding",
+      "name": "Black Knight's barding",
+      "category": "armour",
+      "base": "barding",
+      "plus": 10,
+      "value": 0,
+      "brand": "sparm_ponderousness",
+      "props": [],
+      "bools": [
+        "poison",
+        "evil"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "amulet_of_vitality",
+      "name": "amulet of Vitality",
+      "category": "jewellery",
+      "base": "amulet_nothing",
+      "plus": 0,
+      "value": 1000,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "skip_ego"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "autumn_katana",
+      "name": "autumn katana",
+      "category": "weapon",
+      "base": "long_sword",
+      "plus": 8,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "shillelagh_devastator",
+      "name": "shillelagh \"Devastator\"",
+      "category": "weapon",
+      "base": "club",
+      "plus": 6,
+      "value": 600,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "special"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "dragonskin_cloak",
+      "name": "dragonskin cloak",
+      "category": "armour",
+      "base": "cloak",
+      "plus": 4,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "nogen"
+      ],
+      "desc": "Avatar's Aegis: It grants the wearer a chance to resist fire, cold, poison, electricity, acid, and negative energy."
+    },
+    {
+      "id": "ring_of_the_octopus_king",
+      "name": "ring of the Octopus King",
+      "category": "jewellery",
+      "base": "ring_first_ring",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "unided",
+        "no_upgrade"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "axe_of_woe",
+      "name": "Axe of Woe",
+      "category": "weapon",
+      "base": "executioners_axe",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "nogen",
+        "no_upgrade"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "moon_troll_leather_armour",
+      "name": "moon troll leather armour",
+      "category": "armour",
+      "base": "troll_leather_armour",
+      "plus": 5,
+      "value": 0,
+      "brand": "sparm_spirit_shield",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "macabre_finger_necklace",
+      "name": "macabre finger necklace",
+      "category": "jewellery",
+      "base": "amulet_nothing",
+      "plus": 0,
+      "value": 400,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "evil"
+      ],
+      "desc": "Ring+:   It enables you to equip an extra ring."
+    },
+    {
+      "id": "boots_of_the_spider",
+      "name": "boots of the spider",
+      "category": "armour",
+      "base": "boots",
+      "plus": 3,
+      "value": 0,
+      "brand": "sparm_jumping",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "dark_maul",
+      "name": "dark maul",
+      "category": "weapon",
+      "base": "morningstar",
+      "plus": 10,
+      "value": 0,
+      "brand": "heavy",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "hat_of_the_high_council",
+      "name": "hat of the High Council",
+      "category": "armour",
+      "base": "hat",
+      "plus": 2,
+      "value": 0,
+      "brand": "sparm_archmagi",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "arc_blade",
+      "name": "arc blade",
+      "category": "weapon",
+      "base": "rapier",
+      "plus": 8,
+      "value": 600,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "demon_whip_spellbinder",
+      "name": "demon whip \"Spellbinder\"",
+      "category": "weapon",
+      "base": "demon_whip",
+      "plus": 5,
+      "value": 0,
+      "brand": "antimagic",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "lajatang_of_order",
+      "name": "lajatang of Order",
+      "category": "weapon",
+      "base": "lajatang",
+      "plus": 7,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "rMut"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "great_mace_firestarter",
+      "name": "great mace \"Firestarter\"",
+      "category": "weapon",
+      "base": "morningstar",
+      "plus": 7,
+      "value": 0,
+      "brand": "flaming",
+      "props": [],
+      "bools": [],
+      "desc": "rFlCloud:  It grants immunity to clouds of flame."
+    },
+    {
+      "id": "orange_crystal_plate_armour",
+      "name": "orange crystal plate armour",
+      "category": "armour",
+      "base": "crystal_plate_armour",
+      "plus": 8,
+      "value": 0,
+      "brand": "sparm_archmagi",
+      "props": [],
+      "bools": [
+        "clarity"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "majin_bo",
+      "name": "Majin-Bo",
+      "category": "weapon",
+      "base": "staff",
+      "plus": 6,
+      "value": 0,
+      "brand": "vampirism",
+      "props": [],
+      "bools": [
+        "skip_ego"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "pair_of_quick_blades_gyre_and_gimble",
+      "name": "pair of quick blades \"Gyre\" and \"Gimble\"",
+      "category": "weapon",
+      "base": "quick_blade",
+      "plus": 8,
+      "value": 0,
+      "brand": "protection",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "maxwell_s_etheric_cage",
+      "name": "Maxwell's etheric cage",
+      "category": "armour",
+      "base": "helmet",
+      "plus": 0,
+      "value": 400,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "mutate",
+        "elec",
+        "chaotic",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "crown_of_eternal_torment",
+      "name": "crown of Eternal Torment",
+      "category": "armour",
+      "base": "hat",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "evil",
+        "seeinv",
+        "drain",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "robe_of_vines",
+      "name": "robe of Vines",
+      "category": "armour",
+      "base": "robe",
+      "plus": 1,
+      "value": 800,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "NoPotionHeal: Its wearer cannot be healed by potions."
+    },
+    {
+      "id": "kryia_s_mail_coat",
+      "name": "Kryia's mail coat",
+      "category": "armour",
+      "base": "scale_mail",
+      "plus": 7,
+      "value": 600,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "PotionHeal*2: Potions heal its wearer twice as much."
+    },
+    {
+      "id": "frozen_axe_frostbite",
+      "name": "frozen axe \"Frostbite\"",
+      "category": "weapon",
+      "base": "executioners_axe",
+      "plus": 8,
+      "value": 0,
+      "brand": "freezing",
+      "props": [],
+      "bools": [
+        "fly",
+        "noises"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "armour_of_talos",
+      "name": "armour of Talos",
+      "category": "armour",
+      "base": "plate_armour",
+      "plus": 12,
+      "value": 0,
+      "brand": "sparm_ponderousness",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "warlock_s_mirror",
+      "name": "warlock's mirror",
+      "category": "armour",
+      "base": "buckler",
+      "plus": 3,
+      "value": 400,
+      "brand": "sparm_reflection",
+      "props": [],
+      "bools": [
+        "skip_ego"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "amulet_of_invisibility",
+      "name": "amulet of invisibility",
+      "category": "jewellery",
+      "base": "amulet_nothing",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "inv",
+        "nogen"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "maxwell_s_thermic_engine",
+      "name": "Maxwell's thermic engine",
+      "category": "weapon",
+      "base": "double_sword",
+      "plus": 2,
+      "value": 0,
+      "brand": "flaming",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "demon_trident_rift",
+      "name": "demon trident \"Rift\"",
+      "category": "weapon",
+      "base": "demon_trident",
+      "plus": 8,
+      "value": 0,
+      "brand": "distortion",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "sphere_of_battle",
+      "name": "sphere of Battle",
+      "category": "armour",
+      "base": "orb",
+      "plus": 0,
+      "value": 800,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Battle: It summons a battlesphere in combat, with strength depending on Conjurations skill."
+    },
+    {
+      "id": "cigotuvi_s_embrace",
+      "name": "Cigotuvi's embrace",
+      "category": "armour",
+      "base": "leather_armour",
+      "plus": 4,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "drain",
+        "evil",
+        "special",
+        "no_upgrade"
+      ],
+      "desc": "Corpsefed: It gathers nearby corpses to temporarily increase the armour it provides."
+    },
+    {
+      "id": "seven_league_boots",
+      "name": "seven-league boots",
+      "category": "armour",
+      "base": "boots",
+      "plus": 3,
+      "value": 400,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Rampage+∞: When moving toward enemies, its wearer moves as far as possible, alerting their target en route."
+    },
+    {
+      "id": "mad_mage_s_maulers",
+      "name": "Mad Mage's Maulers",
+      "category": "armour",
+      "base": "gloves",
+      "plus": 3,
+      "value": 400,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "nospell"
+      ],
+      "desc": "Infuse+∞:  It empowers its wearer's blows with all of their magic."
+    },
+    {
+      "id": "dreamshard_necklace",
+      "name": "dreamshard necklace",
+      "category": "jewellery",
+      "base": "amulet_acrobat",
+      "plus": 0,
+      "value": 2000,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "special"
+      ],
+      "desc": "*Dream:    It absorbs a single lethal wound into itself, holding its wearer just short of death and releasing dream-creatures to guard them."
+    },
+    {
+      "id": "delatra_s_gloves",
+      "name": "Delatra's gloves",
+      "category": "armour",
+      "base": "gloves",
+      "plus": 1,
+      "value": 100,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "ID++:      It heals its wearer when they drink unknown potions, and restores their MP when they read unknown scrolls."
+    },
+    {
+      "id": "woodcutter_s_axe",
+      "name": "woodcutter's axe",
+      "category": "weapon",
+      "base": "battleaxe",
+      "plus": 5,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "throatcutter",
+      "name": "Throatcutter",
+      "category": "weapon",
+      "base": "long_sword",
+      "plus": 7,
+      "value": 0,
+      "brand": "draining",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "staff_of_the_meek",
+      "name": "staff of the Meek",
+      "category": "weapon",
+      "base": "quarterstaff",
+      "plus": 7,
+      "value": 0,
+      "brand": "protection",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "trishula_condemnation",
+      "name": "trishula \"Condemnation\"",
+      "category": "weapon",
+      "base": "trishula",
+      "plus": 8,
+      "value": 0,
+      "brand": "holy_wrath",
+      "props": [],
+      "bools": [
+        "fly",
+        "noises"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "amulet_of_elemental_vulnerability",
+      "name": "amulet of Elemental Vulnerability",
+      "category": "jewellery",
+      "base": "amulet_nothing",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "poison"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "mountain_boots",
+      "name": "mountain boots",
+      "category": "armour",
+      "base": "boots",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "special"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "lochaber_axe",
+      "name": "Lochaber axe",
+      "category": "weapon",
+      "base": "bardiche",
+      "plus": 5,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "drain"
+      ],
+      "desc": "Poleaxe:   It uses either Axes or Polearms skill, whichever is higher."
+    },
+    {
+      "id": "hermit_s_pendant",
+      "name": "Hermit's Pendant",
+      "category": "jewellery",
+      "base": "amulet_faith",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "slick_slippers",
+      "name": "slick slippers",
+      "category": "armour",
+      "base": "boots",
+      "plus": 2,
+      "value": 270,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "force_lance",
+      "name": "Force Lance",
+      "category": "weapon",
+      "base": "spear",
+      "plus": 5,
+      "value": 0,
+      "brand": "heavy",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "consecrated_labrys",
+      "name": "consecrated labrys",
+      "category": "weapon",
+      "base": "broad_axe",
+      "plus": 4,
+      "value": 0,
+      "brand": "holy_wrath",
+      "props": [],
+      "bools": [
+        "no_upgrade",
+        "fly",
+        "seeinv",
+        "fragile"
+      ],
+      "desc": "Valiant:   It becomes more powerful as more dangerous foes come into view."
+    },
+    {
+      "id": "toga_victory",
+      "name": "toga \"Victory\"",
+      "category": "armour",
+      "base": "robe",
+      "plus": 0,
+      "value": 600,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "clarity",
+        "no_upgrade"
+      ],
+      "desc": "*Victory:  When the wearer kills a threatening monster, it has a chance to gain +1 AC, +1 Slay, and +1 Int, capping at +7. When the wearer uses a scroll or a potion with a hostile monster in sight, its bonuses reset to +0. Unequipping it also resets its bonuses to +0."
+    },
+    {
+      "id": "storm_queen_s_shield",
+      "name": "Storm Queen's Shield",
+      "category": "armour",
+      "base": "kite_shield",
+      "plus": 5,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec",
+        "fly"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "dreamdust_necklace",
+      "name": "dreamdust necklace",
+      "category": "jewellery",
+      "base": "amulet_acrobat",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "special",
+        "nogen"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "hand_cannon_mule",
+      "name": "hand cannon \"Mule\"",
+      "category": "weapon",
+      "base": "hand_cannon",
+      "plus": 7,
+      "value": 0,
+      "brand": "flaming",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "gloves_of_the_gadgeteer",
+      "name": "gloves of the gadgeteer",
+      "category": "armour",
+      "base": "gloves",
+      "plus": 0,
+      "value": 400,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "fragile"
+      ],
+      "desc": "Gadgeteer:   Your evocable items recharge 30% faster and wands have a 30% chance to not spend a charge."
+    },
+    {
+      "id": "charlatan_s_orb",
+      "name": "Charlatan's Orb",
+      "category": "armour",
+      "base": "orb",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    {
+      "id": "justicar_s_regalia",
+      "name": "justicar's regalia",
+      "category": "armour",
+      "base": "scale_mail",
+      "plus": 5,
+      "value": 900,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Inspire:   When you summon or create an ally, it gains Regeneration."
+    },
+    {
+      "id": "skull_of_zonguldrok",
+      "name": "skull of Zonguldrok",
+      "category": "armour",
+      "base": "orb",
+      "plus": 0,
+      "value": 600,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "evil"
+      ],
+      "desc": "Reaping:   When you kill an enemy with your weapon, its spirit may be forced to fight for you."
+    },
+    {
+      "id": "fungal_fisticloak",
+      "name": "fungal fisticloak",
+      "category": "armour",
+      "base": "cloak",
+      "plus": 3,
+      "value": 550,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Shroompunch:   The cloak sometimes lashes out at its wearer's enemies, inflicting confusion with its spores."
+    },
+    {
+      "id": "crown_of_vainglory",
+      "name": "crown of vainglory",
+      "category": "armour",
+      "base": "hat",
+      "plus": 3,
+      "value": 550,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "fragile"
+      ],
+      "desc": "Majesty:   You are bathed in light that prevents you from turning invisible. Whenever you enter a new floor, you announce yourself to nearby enemies and refuse to leave the floor again for some time."
+    },
+    {
+      "id": "scarf_of_invisibility",
+      "name": "scarf of invisibility",
+      "category": "armour",
+      "base": "scarf",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "inv",
+        "nogen"
+      ],
+      "desc": ""
+    },
+    {
+      "id": "swamp_witch_s_dragon_scales",
+      "name": "swamp witch's dragon scales",
+      "category": "armour",
+      "base": "swamp_dragon_armour",
+      "plus": 5,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "TrickPois: Whenever you inflict a negative status on an enemy, you also fully poison it. Those with rPois+ will only be lightly poisoned, and those with rPois∞ won't be poisoned at all."
+    }
+  ],
+  "by_id": {
+    "singing_sword": {
+      "id": "singing_sword",
+      "name": "Singing Sword",
+      "category": "weapon",
+      "base": "double_sword",
+      "plus": 11,
+      "value": 1000,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "wrath_of_trog": {
+      "id": "wrath_of_trog",
+      "name": "Wrath of Trog",
+      "category": "weapon",
+      "base": "battleaxe",
+      "plus": 8,
+      "value": 800,
+      "brand": "antimagic",
+      "props": [],
+      "bools": [
+        "rampage"
+      ],
+      "desc": "It causes slowness and exhaustion when equipped."
+    },
+    "mace_of_variability": {
+      "id": "mace_of_variability",
+      "name": "mace of Variability",
+      "category": "weapon",
+      "base": "morningstar",
+      "plus": 7,
+      "value": 600,
+      "brand": "chaos",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "partisan_of_prune": {
+      "id": "partisan_of_prune",
+      "name": "partisan of Prune",
+      "category": "weapon",
+      "base": "glaive",
+      "plus": 12,
+      "value": 0,
+      "brand": "freezing",
+      "props": [],
+      "bools": [
+        "chaotic"
+      ],
+      "desc": "Prune:     It halves damage taken while paralysed, petrified or unconscious."
+    },
+    "sword_of_power": {
+      "id": "sword_of_power",
+      "name": "sword of Power",
+      "category": "weapon",
+      "base": "great_sword",
+      "plus": 9,
+      "value": 800,
+      "brand": "spwpn_valour",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "staff_of_olgreb": {
+      "id": "staff_of_olgreb",
+      "name": "staff of Olgreb",
+      "category": "weapon",
+      "base": "staff",
+      "plus": 9,
+      "value": 1000,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Radiate: It can be activated via the 'a'bility menu to radiate toxic energy, with effectiveness depending on Evocations skill."
+    },
+    "crystal_ball_of_wucad_mu": {
+      "id": "crystal_ball_of_wucad_mu",
+      "name": "crystal ball of Wucad Mu",
+      "category": "armour",
+      "base": "orb",
+      "plus": 0,
+      "value": 1000,
+      "brand": "sparm_energy",
+      "props": [],
+      "bools": [],
+      "desc": "Mindtap:  Whenever a successful spell causes magic to be channelled         from it, it may also drain additional magic from other enemies in         sight, with a chance increasing with spell level."
+    },
+    "vampire_s_tooth": {
+      "id": "vampire_s_tooth",
+      "name": "Vampire's Tooth",
+      "category": "weapon",
+      "base": "quick_blade",
+      "plus": 8,
+      "value": 600,
+      "brand": "vampirism",
+      "props": [],
+      "bools": [
+        "skip_ego"
+      ],
+      "desc": ""
+    },
+    "scythe_of_curses": {
+      "id": "scythe_of_curses",
+      "name": "scythe of Curses",
+      "category": "weapon",
+      "base": "halberd",
+      "plus": 13,
+      "value": 800,
+      "brand": "draining",
+      "props": [],
+      "bools": [
+        "drain"
+      ],
+      "desc": ""
+    },
+    "sceptre_of_torment": {
+      "id": "sceptre_of_torment",
+      "name": "sceptre of Torment",
+      "category": "weapon",
+      "base": "eveningstar",
+      "plus": 7,
+      "value": 1200,
+      "brand": "pain",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "sword_of_zonguldrok": {
+      "id": "sword_of_zonguldrok",
+      "name": "sword of Zonguldrok",
+      "category": "weapon",
+      "base": "double_sword",
+      "plus": 9,
+      "value": 800,
+      "brand": "reaping",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "sword_of_cerebov": {
+      "id": "sword_of_cerebov",
+      "name": "sword of Cerebov",
+      "category": "weapon",
+      "base": "great_sword",
+      "plus": 6,
+      "value": 0,
+      "brand": "flaming",
+      "props": [],
+      "bools": [
+        "evil",
+        "nogen"
+      ],
+      "desc": ""
+    },
+    "orb_of_dispater": {
+      "id": "orb_of_dispater",
+      "name": "orb of Dispater",
+      "category": "armour",
+      "base": "orb",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "evil",
+        "nogen",
+        "corrode"
+      ],
+      "desc": "+Damnation: It grants the ability to hurl damnation at the cost of health and magic, with strength depending on Evocations skill."
+    },
+    "sceptre_of_asmodeus": {
+      "id": "sceptre_of_asmodeus",
+      "name": "sceptre of Asmodeus",
+      "category": "weapon",
+      "base": "eveningstar",
+      "plus": 13,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "evil",
+        "nogen"
+      ],
+      "desc": "Hellfire Court: It may summon demons of flame and damnation when striking foes."
+    },
+    "faerie_dragon_scales": {
+      "id": "faerie_dragon_scales",
+      "name": "faerie dragon scales",
+      "category": "armour",
+      "base": "acid_dragon_armour",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "nogen",
+        "no_upgrade"
+      ],
+      "desc": ""
+    },
+    "demon_blade_bloodbane": {
+      "id": "demon_blade_bloodbane",
+      "name": "demon blade \"Bloodbane\"",
+      "category": "weapon",
+      "base": "demon_blade",
+      "plus": 8,
+      "value": 0,
+      "brand": "draining",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "scimitar_of_flaming_death": {
+      "id": "scimitar_of_flaming_death",
+      "name": "scimitar of Flaming Death",
+      "category": "weapon",
+      "base": "scimitar",
+      "plus": 6,
+      "value": 0,
+      "brand": "flaming",
+      "props": [],
+      "bools": [
+        "poison",
+        "skip_ego",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "eveningstar_brilliance": {
+      "id": "eveningstar_brilliance",
+      "name": "eveningstar \"Brilliance\"",
+      "category": "weapon",
+      "base": "eveningstar",
+      "plus": 1,
+      "value": 0,
+      "brand": "spwpn_foul_flame",
+      "props": [],
+      "bools": [],
+      "desc": "Umbra:     It surrounds you with an aura of shadow, increasing your stealth and reducing the accuracy of all others within it."
+    },
+    "demon_blade_leech": {
+      "id": "demon_blade_leech",
+      "name": "demon blade \"Leech\"",
+      "category": "weapon",
+      "base": "demon_blade",
+      "plus": 8,
+      "value": 0,
+      "brand": "vampirism",
+      "props": [],
+      "bools": [
+        "drain",
+        "harm",
+        "skip_ego"
+      ],
+      "desc": ""
+    },
+    "dagger_of_chilly_death": {
+      "id": "dagger_of_chilly_death",
+      "name": "dagger of Chilly Death",
+      "category": "weapon",
+      "base": "dagger",
+      "plus": 9,
+      "value": 0,
+      "brand": "freezing",
+      "props": [],
+      "bools": [
+        "poison",
+        "skip_ego",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "dagger_morg": {
+      "id": "dagger_morg",
+      "name": "dagger \"Morg\"",
+      "category": "weapon",
+      "base": "dagger",
+      "plus": 4,
+      "value": 0,
+      "brand": "pain",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "scythe_finisher": {
+      "id": "scythe_finisher",
+      "name": "scythe \"Finisher\"",
+      "category": "weapon",
+      "base": "halberd",
+      "plus": 5,
+      "value": 0,
+      "brand": "speed",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "greatsling_punk": {
+      "id": "greatsling_punk",
+      "name": "greatsling \"Punk\"",
+      "category": "weapon",
+      "base": "sling",
+      "plus": 3,
+      "value": 0,
+      "brand": "spwpn_acid",
+      "props": [],
+      "bools": [
+        "rCorr"
+      ],
+      "desc": ""
+    },
+    "longbow_zephyr": {
+      "id": "longbow_zephyr",
+      "name": "longbow \"Zephyr\"",
+      "category": "weapon",
+      "base": "longbow",
+      "plus": 12,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "fly"
+      ],
+      "desc": ""
+    },
+    "giant_club_skullcrusher": {
+      "id": "giant_club_skullcrusher",
+      "name": "giant club \"Skullcrusher\"",
+      "category": "weapon",
+      "base": "giant_club",
+      "plus": 3,
+      "value": 0,
+      "brand": "speed",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "glaive_of_the_guard": {
+      "id": "glaive_of_the_guard",
+      "name": "glaive of the Guard",
+      "category": "weapon",
+      "base": "glaive",
+      "plus": 5,
+      "value": 0,
+      "brand": "electrocution",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "zealot_s_sword": {
+      "id": "zealot_s_sword",
+      "name": "zealot's sword",
+      "category": "weapon",
+      "base": "eudemon_blade",
+      "plus": 10,
+      "value": 0,
+      "brand": "holy_wrath",
+      "props": [],
+      "bools": [],
+      "desc": "Zealotry:  Whenever the wielder enters a berserk rage, their allies are berserked alongside them."
+    },
+    "arbalest_damnation": {
+      "id": "arbalest_damnation",
+      "name": "arbalest \"Damnation\"",
+      "category": "weapon",
+      "base": "arbalest",
+      "plus": 6,
+      "value": 800,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "evil"
+      ],
+      "desc": ""
+    },
+    "sword_of_the_dread_knight": {
+      "id": "sword_of_the_dread_knight",
+      "name": "sword of the Dread Knight",
+      "category": "weapon",
+      "base": "great_sword",
+      "plus": 13,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "silence",
+        "evil",
+        "drain"
+      ],
+      "desc": ""
+    },
+    "morningstar_eos": {
+      "id": "morningstar_eos",
+      "name": "morningstar \"Eos\"",
+      "category": "weapon",
+      "base": "morningstar",
+      "plus": 10,
+      "value": 0,
+      "brand": "electrocution",
+      "props": [],
+      "bools": [
+        "elec"
+      ],
+      "desc": "Halo:      It grants its wielder a halo, revealing invisible creatures and increasing accuracy against all within it other than the wielder."
+    },
+    "spear_of_the_botono": {
+      "id": "spear_of_the_botono",
+      "name": "spear of the Botono",
+      "category": "weapon",
+      "base": "spear",
+      "plus": 6,
+      "value": 0,
+      "brand": "reaping",
+      "props": [],
+      "bools": [
+        "poison",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "trident_of_the_octopus_king": {
+      "id": "trident_of_the_octopus_king",
+      "name": "trident of the Octopus King",
+      "category": "weapon",
+      "base": "trident",
+      "plus": 8,
+      "value": 0,
+      "brand": "venom",
+      "props": [],
+      "bools": [
+        "elec",
+        "poison",
+        "no_upgrade"
+      ],
+      "desc": ""
+    },
+    "mithril_axe_arga": {
+      "id": "mithril_axe_arga",
+      "name": "mithril axe \"Arga\"",
+      "category": "weapon",
+      "base": "broad_axe",
+      "plus": 8,
+      "value": 0,
+      "brand": "speed",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "elemental_staff": {
+      "id": "elemental_staff",
+      "name": "Elemental Staff",
+      "category": "weapon",
+      "base": "staff",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec"
+      ],
+      "desc": ""
+    },
+    "heavy_crossbow_sniper": {
+      "id": "heavy_crossbow_sniper",
+      "name": "heavy crossbow \"Sniper\"",
+      "category": "weapon",
+      "base": "triple_crossbow",
+      "plus": 27,
+      "value": 800,
+      "brand": "heavy",
+      "props": [],
+      "bools": [
+        "seeinv"
+      ],
+      "desc": "Acc+∞:     It never misses its target."
+    },
+    "longbow_piercer": {
+      "id": "longbow_piercer",
+      "name": "longbow \"Piercer\"",
+      "category": "weapon",
+      "base": "longbow",
+      "plus": 7,
+      "value": 0,
+      "brand": "penetration",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "blowgun_of_the_assassin": {
+      "id": "blowgun_of_the_assassin",
+      "name": "blowgun of the Assassin",
+      "category": "weapon",
+      "base": "blowgun",
+      "plus": 6,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "inv",
+        "tilerim",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "lance_wyrmbane": {
+      "id": "lance_wyrmbane",
+      "name": "lance \"Wyrmbane\"",
+      "category": "weapon",
+      "base": "spear",
+      "plus": 8,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "poison",
+        "no_upgrade"
+      ],
+      "desc": ""
+    },
+    "spriggan_s_knife": {
+      "id": "spriggan_s_knife",
+      "name": "Spriggan's Knife",
+      "category": "weapon",
+      "base": "dagger",
+      "plus": 7,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Stab:      It is more effective when stabbing unaware enemies, sometimes treating them as though they were completely helpless."
+    },
+    "plutonium_sword": {
+      "id": "plutonium_sword",
+      "name": "plutonium sword",
+      "category": "weapon",
+      "base": "triple_sword",
+      "plus": 11,
+      "value": 1000,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "mutate",
+        "chaotic"
+      ],
+      "desc": ""
+    },
+    "great_mace_undeadhunter": {
+      "id": "great_mace_undeadhunter",
+      "name": "great mace \"Undeadhunter\"",
+      "category": "weapon",
+      "base": "morningstar",
+      "plus": 7,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "whip_snakebite": {
+      "id": "whip_snakebite",
+      "name": "whip \"Snakebite\"",
+      "category": "weapon",
+      "base": "whip",
+      "plus": 8,
+      "value": 0,
+      "brand": "venom",
+      "props": [],
+      "bools": [
+        "poison"
+      ],
+      "desc": ""
+    },
+    "knife_of_accuracy": {
+      "id": "knife_of_accuracy",
+      "name": "knife of Accuracy",
+      "category": "weapon",
+      "base": "dagger",
+      "plus": 27,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "tilerim",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "lehudib_s_crystal_spear": {
+      "id": "lehudib_s_crystal_spear",
+      "name": "Lehudib's crystal spear",
+      "category": "weapon",
+      "base": "spear",
+      "plus": 6,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "captain_s_cutlass": {
+      "id": "captain_s_cutlass",
+      "name": "captain's cutlass",
+      "category": "weapon",
+      "base": "rapier",
+      "plus": 7,
+      "value": 0,
+      "brand": "speed",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "storm_bow": {
+      "id": "storm_bow",
+      "name": "storm bow",
+      "category": "weapon",
+      "base": "longbow",
+      "plus": 8,
+      "value": 0,
+      "brand": "electrocution",
+      "props": [],
+      "bools": [
+        "tilerim"
+      ],
+      "desc": ""
+    },
+    "tower_shield_of_ignorance": {
+      "id": "tower_shield_of_ignorance",
+      "name": "tower shield of Ignorance",
+      "category": "armour",
+      "base": "tower_shield",
+      "plus": 10,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "robe_of_augmentation": {
+      "id": "robe_of_augmentation",
+      "name": "robe of Augmentation",
+      "category": "armour",
+      "base": "robe",
+      "plus": 4,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "cloak_of_the_thief": {
+      "id": "cloak_of_the_thief",
+      "name": "cloak of the Thief",
+      "category": "armour",
+      "base": "cloak",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "seeinv"
+      ],
+      "desc": "Quiet:      All noise in your surroundings is dampened."
+    },
+    "tower_shield_bullseye": {
+      "id": "tower_shield_bullseye",
+      "name": "tower shield \"Bullseye\"",
+      "category": "armour",
+      "base": "tower_shield",
+      "plus": 15,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "crown_of_dyrovepreva": {
+      "id": "crown_of_dyrovepreva",
+      "name": "crown of Dyrovepreva",
+      "category": "armour",
+      "base": "hat",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec",
+        "seeinv"
+      ],
+      "desc": ""
+    },
+    "hat_of_the_bear_spirit": {
+      "id": "hat_of_the_bear_spirit",
+      "name": "hat of the Bear Spirit",
+      "category": "armour",
+      "base": "hat",
+      "plus": 2,
+      "value": 0,
+      "brand": "sparm_spirit_shield",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "robe_of_misfortune": {
+      "id": "robe_of_misfortune",
+      "name": "robe of Misfortune",
+      "category": "armour",
+      "base": "robe",
+      "plus": 5,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "harm",
+        "slow",
+        "corrode"
+      ],
+      "desc": ""
+    },
+    "cloak_of_flash": {
+      "id": "cloak_of_flash",
+      "name": "cloak of Flash",
+      "category": "armour",
+      "base": "cloak",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "fly",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "hood_of_the_assassin": {
+      "id": "hood_of_the_assassin",
+      "name": "hood of the Assassin",
+      "category": "armour",
+      "base": "hat",
+      "plus": 2,
+      "value": 600,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Detect:    It allows the wearer to sense nearby creatures."
+    },
+    "lear_s_hauberk": {
+      "id": "lear_s_hauberk",
+      "name": "Lear's hauberk",
+      "category": "armour",
+      "base": "chain_mail",
+      "plus": 18,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "special"
+      ],
+      "desc": ""
+    },
+    "skin_of_zhor": {
+      "id": "skin_of_zhor",
+      "name": "skin of Zhor",
+      "category": "armour",
+      "base": "animal_skin",
+      "plus": 4,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "seeinv"
+      ],
+      "desc": "*Englaciate: It radiates cold, occasionally slowing all nearby creatures who are not resistant to cold."
+    },
+    "salamander_hide_armour": {
+      "id": "salamander_hide_armour",
+      "name": "salamander hide armour",
+      "category": "armour",
+      "base": "leather_armour",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "enh_fire",
+        "special"
+      ],
+      "desc": "Flames:    It surrounds you with flame clouds."
+    },
+    "gauntlets_of_war": {
+      "id": "gauntlets_of_war",
+      "name": "gauntlets of War",
+      "category": "armour",
+      "base": "gloves",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "shield_of_resistance": {
+      "id": "shield_of_resistance",
+      "name": "shield of Resistance",
+      "category": "armour",
+      "base": "kite_shield",
+      "plus": 2,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "robe_of_folly": {
+      "id": "robe_of_folly",
+      "name": "robe of Folly",
+      "category": "armour",
+      "base": "robe",
+      "plus": 4,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Brill:     It increases the power of your magical spells and halves their MP cost (rounding up)."
+    },
+    "maxwell_s_patent_armour": {
+      "id": "maxwell_s_patent_armour",
+      "name": "Maxwell's patent armour",
+      "category": "armour",
+      "base": "plate_armour",
+      "plus": 15,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "silence",
+        "notelep",
+        "elec",
+        "rCorr"
+      ],
+      "desc": ""
+    },
+    "mask_of_the_dragon": {
+      "id": "mask_of_the_dragon",
+      "name": "mask of the Dragon",
+      "category": "armour",
+      "base": "hat",
+      "plus": 2,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "seeinv"
+      ],
+      "desc": "Dragonpray: It occasionally summons a dragon when using Invocations with hostile monsters in sight. Chance is 10% + twice the piety cost of the ability used."
+    },
+    "robe_of_night": {
+      "id": "robe_of_night",
+      "name": "robe of Night",
+      "category": "armour",
+      "base": "robe",
+      "plus": 5,
+      "value": 600,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "seeinv"
+      ],
+      "desc": "Dark:      It shrouds the wearer in darkness, reducing the range at which they can see and be seen by others."
+    },
+    "scales_of_the_dragon_king": {
+      "id": "scales_of_the_dragon_king",
+      "name": "scales of the Dragon King",
+      "category": "armour",
+      "base": "golden_dragon_armour",
+      "plus": 9,
+      "value": 0,
+      "brand": "sparm_command",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "hat_of_the_alchemist": {
+      "id": "hat_of_the_alchemist",
+      "name": "hat of the Alchemist",
+      "category": "armour",
+      "base": "hat",
+      "plus": -2,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec",
+        "poison",
+        "rMut",
+        "rCorr"
+      ],
+      "desc": ""
+    },
+    "fencer_s_gloves": {
+      "id": "fencer_s_gloves",
+      "name": "fencer's gloves",
+      "category": "armour",
+      "base": "gloves",
+      "plus": 0,
+      "value": 400,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Riposte:   It allows the wearer to riposte with melee weapons, swiftly retaliating against missed or blocked melee attacks."
+    },
+    "cloak_of_starlight": {
+      "id": "cloak_of_starlight",
+      "name": "cloak of Starlight",
+      "category": "armour",
+      "base": "cloak",
+      "plus": 1,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "*Dazzle:   It may blind adjacent enemies who miss an attack against the wearer in melee combat."
+    },
+    "ratskin_cloak": {
+      "id": "ratskin_cloak",
+      "name": "ratskin cloak",
+      "category": "armour",
+      "base": "cloak",
+      "plus": 2,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "poison"
+      ],
+      "desc": "*Rats:     When the wearer is hurt, rats may emerge from it to assist them."
+    },
+    "shield_of_the_gong": {
+      "id": "shield_of_the_gong",
+      "name": "shield of the Gong",
+      "category": "armour",
+      "base": "kite_shield",
+      "plus": 18,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "rcorr"
+      ],
+      "desc": "Loud:      It is deafeningly noisy when blocking attacks."
+    },
+    "amulet_of_the_air": {
+      "id": "amulet_of_the_air",
+      "name": "amulet of the Air",
+      "category": "jewellery",
+      "base": "amulet_nothing",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "enh_air",
+        "elec",
+        "fly",
+        "rmsl"
+      ],
+      "desc": "Inacc:     It reduces the accuracy of your attacks and spells."
+    },
+    "ring_of_shadows": {
+      "id": "ring_of_shadows",
+      "name": "ring of Shadows",
+      "category": "jewellery",
+      "base": "ring_stealth",
+      "plus": 0,
+      "value": 400,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "inv"
+      ],
+      "desc": "Umbra:     It surrounds you with an aura of shadow, increasing your stealth and reducing the accuracy of all others within it."
+    },
+    "amulet_of_cekugob": {
+      "id": "amulet_of_cekugob",
+      "name": "amulet of Cekugob",
+      "category": "jewellery",
+      "base": "amulet_acrobat",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec",
+        "poison",
+        "notelep",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "amulet_of_tranquility": {
+      "id": "amulet_of_tranquility",
+      "name": "amulet of Tranquility",
+      "category": "jewellery",
+      "base": "amulet_nothing",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "clarity"
+      ],
+      "desc": ""
+    },
+    "necklace_of_bloodlust": {
+      "id": "necklace_of_bloodlust",
+      "name": "necklace of Bloodlust",
+      "category": "jewellery",
+      "base": "amulet_nothing",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Fury:      It extends the wearer's berserk rage when killing foes."
+    },
+    "ring_of_the_hare": {
+      "id": "ring_of_the_hare",
+      "name": "ring of the Hare",
+      "category": "jewellery",
+      "base": "ring_evasion",
+      "plus": 10,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "ring_of_the_tortoise": {
+      "id": "ring_of_the_tortoise",
+      "name": "ring of the Tortoise",
+      "category": "jewellery",
+      "base": "ring_protection",
+      "plus": 8,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "ring_of_the_mage": {
+      "id": "ring_of_the_mage",
+      "name": "ring of the Mage",
+      "category": "jewellery",
+      "base": "ring_wizardry",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "archmagi"
+      ],
+      "desc": ""
+    },
+    "brooch_of_shielding": {
+      "id": "brooch_of_shielding",
+      "name": "brooch of Shielding",
+      "category": "jewellery",
+      "base": "amulet_guardian_spirit",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "robe_of_clouds": {
+      "id": "robe_of_clouds",
+      "name": "robe of Clouds",
+      "category": "armour",
+      "base": "robe",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec"
+      ],
+      "desc": "*Thunder:  It occasionally creates storm clouds above nearby enemies."
+    },
+    "hat_of_pondering": {
+      "id": "hat_of_pondering",
+      "name": "hat of Pondering",
+      "category": "armour",
+      "base": "hat",
+      "plus": 3,
+      "value": 0,
+      "brand": "sparm_ponderousness",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "obsidian_axe": {
+      "id": "obsidian_axe",
+      "name": "obsidian axe",
+      "category": "weapon",
+      "base": "broad_axe",
+      "plus": 16,
+      "value": 0,
+      "brand": "draining",
+      "props": [],
+      "bools": [
+        "seeinv",
+        "fly",
+        "drain"
+      ],
+      "desc": "Mesm:      Its wielder is mesmerised by any visible foes, and it cannot be unequipped while any foes are visible."
+    },
+    "lightning_scales": {
+      "id": "lightning_scales",
+      "name": "lightning scales",
+      "category": "armour",
+      "base": "barding",
+      "plus": 6,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec"
+      ],
+      "desc": "Swift:     It allows the wearer to cover ground more swiftly."
+    },
+    "black_knight_s_barding": {
+      "id": "black_knight_s_barding",
+      "name": "Black Knight's barding",
+      "category": "armour",
+      "base": "barding",
+      "plus": 10,
+      "value": 0,
+      "brand": "sparm_ponderousness",
+      "props": [],
+      "bools": [
+        "poison",
+        "evil"
+      ],
+      "desc": ""
+    },
+    "amulet_of_vitality": {
+      "id": "amulet_of_vitality",
+      "name": "amulet of Vitality",
+      "category": "jewellery",
+      "base": "amulet_nothing",
+      "plus": 0,
+      "value": 1000,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "skip_ego"
+      ],
+      "desc": ""
+    },
+    "autumn_katana": {
+      "id": "autumn_katana",
+      "name": "autumn katana",
+      "category": "weapon",
+      "base": "long_sword",
+      "plus": 8,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "shillelagh_devastator": {
+      "id": "shillelagh_devastator",
+      "name": "shillelagh \"Devastator\"",
+      "category": "weapon",
+      "base": "club",
+      "plus": 6,
+      "value": 600,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "special"
+      ],
+      "desc": ""
+    },
+    "dragonskin_cloak": {
+      "id": "dragonskin_cloak",
+      "name": "dragonskin cloak",
+      "category": "armour",
+      "base": "cloak",
+      "plus": 4,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "nogen"
+      ],
+      "desc": "Avatar's Aegis: It grants the wearer a chance to resist fire, cold, poison, electricity, acid, and negative energy."
+    },
+    "ring_of_the_octopus_king": {
+      "id": "ring_of_the_octopus_king",
+      "name": "ring of the Octopus King",
+      "category": "jewellery",
+      "base": "ring_first_ring",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "unided",
+        "no_upgrade"
+      ],
+      "desc": ""
+    },
+    "axe_of_woe": {
+      "id": "axe_of_woe",
+      "name": "Axe of Woe",
+      "category": "weapon",
+      "base": "executioners_axe",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "nogen",
+        "no_upgrade"
+      ],
+      "desc": ""
+    },
+    "moon_troll_leather_armour": {
+      "id": "moon_troll_leather_armour",
+      "name": "moon troll leather armour",
+      "category": "armour",
+      "base": "troll_leather_armour",
+      "plus": 5,
+      "value": 0,
+      "brand": "sparm_spirit_shield",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "macabre_finger_necklace": {
+      "id": "macabre_finger_necklace",
+      "name": "macabre finger necklace",
+      "category": "jewellery",
+      "base": "amulet_nothing",
+      "plus": 0,
+      "value": 400,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "evil"
+      ],
+      "desc": "Ring+:   It enables you to equip an extra ring."
+    },
+    "boots_of_the_spider": {
+      "id": "boots_of_the_spider",
+      "name": "boots of the spider",
+      "category": "armour",
+      "base": "boots",
+      "plus": 3,
+      "value": 0,
+      "brand": "sparm_jumping",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "dark_maul": {
+      "id": "dark_maul",
+      "name": "dark maul",
+      "category": "weapon",
+      "base": "morningstar",
+      "plus": 10,
+      "value": 0,
+      "brand": "heavy",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "hat_of_the_high_council": {
+      "id": "hat_of_the_high_council",
+      "name": "hat of the High Council",
+      "category": "armour",
+      "base": "hat",
+      "plus": 2,
+      "value": 0,
+      "brand": "sparm_archmagi",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "arc_blade": {
+      "id": "arc_blade",
+      "name": "arc blade",
+      "category": "weapon",
+      "base": "rapier",
+      "plus": 8,
+      "value": 600,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec"
+      ],
+      "desc": ""
+    },
+    "demon_whip_spellbinder": {
+      "id": "demon_whip_spellbinder",
+      "name": "demon whip \"Spellbinder\"",
+      "category": "weapon",
+      "base": "demon_whip",
+      "plus": 5,
+      "value": 0,
+      "brand": "antimagic",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "lajatang_of_order": {
+      "id": "lajatang_of_order",
+      "name": "lajatang of Order",
+      "category": "weapon",
+      "base": "lajatang",
+      "plus": 7,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "rMut"
+      ],
+      "desc": ""
+    },
+    "great_mace_firestarter": {
+      "id": "great_mace_firestarter",
+      "name": "great mace \"Firestarter\"",
+      "category": "weapon",
+      "base": "morningstar",
+      "plus": 7,
+      "value": 0,
+      "brand": "flaming",
+      "props": [],
+      "bools": [],
+      "desc": "rFlCloud:  It grants immunity to clouds of flame."
+    },
+    "orange_crystal_plate_armour": {
+      "id": "orange_crystal_plate_armour",
+      "name": "orange crystal plate armour",
+      "category": "armour",
+      "base": "crystal_plate_armour",
+      "plus": 8,
+      "value": 0,
+      "brand": "sparm_archmagi",
+      "props": [],
+      "bools": [
+        "clarity"
+      ],
+      "desc": ""
+    },
+    "majin_bo": {
+      "id": "majin_bo",
+      "name": "Majin-Bo",
+      "category": "weapon",
+      "base": "staff",
+      "plus": 6,
+      "value": 0,
+      "brand": "vampirism",
+      "props": [],
+      "bools": [
+        "skip_ego"
+      ],
+      "desc": ""
+    },
+    "pair_of_quick_blades_gyre_and_gimble": {
+      "id": "pair_of_quick_blades_gyre_and_gimble",
+      "name": "pair of quick blades \"Gyre\" and \"Gimble\"",
+      "category": "weapon",
+      "base": "quick_blade",
+      "plus": 8,
+      "value": 0,
+      "brand": "protection",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "maxwell_s_etheric_cage": {
+      "id": "maxwell_s_etheric_cage",
+      "name": "Maxwell's etheric cage",
+      "category": "armour",
+      "base": "helmet",
+      "plus": 0,
+      "value": 400,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "mutate",
+        "elec",
+        "chaotic",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "crown_of_eternal_torment": {
+      "id": "crown_of_eternal_torment",
+      "name": "crown of Eternal Torment",
+      "category": "armour",
+      "base": "hat",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "evil",
+        "seeinv",
+        "drain",
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "robe_of_vines": {
+      "id": "robe_of_vines",
+      "name": "robe of Vines",
+      "category": "armour",
+      "base": "robe",
+      "plus": 1,
+      "value": 800,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "NoPotionHeal: Its wearer cannot be healed by potions."
+    },
+    "kryia_s_mail_coat": {
+      "id": "kryia_s_mail_coat",
+      "name": "Kryia's mail coat",
+      "category": "armour",
+      "base": "scale_mail",
+      "plus": 7,
+      "value": 600,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "PotionHeal*2: Potions heal its wearer twice as much."
+    },
+    "frozen_axe_frostbite": {
+      "id": "frozen_axe_frostbite",
+      "name": "frozen axe \"Frostbite\"",
+      "category": "weapon",
+      "base": "executioners_axe",
+      "plus": 8,
+      "value": 0,
+      "brand": "freezing",
+      "props": [],
+      "bools": [
+        "fly",
+        "noises"
+      ],
+      "desc": ""
+    },
+    "armour_of_talos": {
+      "id": "armour_of_talos",
+      "name": "armour of Talos",
+      "category": "armour",
+      "base": "plate_armour",
+      "plus": 12,
+      "value": 0,
+      "brand": "sparm_ponderousness",
+      "props": [],
+      "bools": [
+        "deleted"
+      ],
+      "desc": ""
+    },
+    "warlock_s_mirror": {
+      "id": "warlock_s_mirror",
+      "name": "warlock's mirror",
+      "category": "armour",
+      "base": "buckler",
+      "plus": 3,
+      "value": 400,
+      "brand": "sparm_reflection",
+      "props": [],
+      "bools": [
+        "skip_ego"
+      ],
+      "desc": ""
+    },
+    "amulet_of_invisibility": {
+      "id": "amulet_of_invisibility",
+      "name": "amulet of invisibility",
+      "category": "jewellery",
+      "base": "amulet_nothing",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "inv",
+        "nogen"
+      ],
+      "desc": ""
+    },
+    "maxwell_s_thermic_engine": {
+      "id": "maxwell_s_thermic_engine",
+      "name": "Maxwell's thermic engine",
+      "category": "weapon",
+      "base": "double_sword",
+      "plus": 2,
+      "value": 0,
+      "brand": "flaming",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "demon_trident_rift": {
+      "id": "demon_trident_rift",
+      "name": "demon trident \"Rift\"",
+      "category": "weapon",
+      "base": "demon_trident",
+      "plus": 8,
+      "value": 0,
+      "brand": "distortion",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "sphere_of_battle": {
+      "id": "sphere_of_battle",
+      "name": "sphere of Battle",
+      "category": "armour",
+      "base": "orb",
+      "plus": 0,
+      "value": 800,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Battle: It summons a battlesphere in combat, with strength depending on Conjurations skill."
+    },
+    "cigotuvi_s_embrace": {
+      "id": "cigotuvi_s_embrace",
+      "name": "Cigotuvi's embrace",
+      "category": "armour",
+      "base": "leather_armour",
+      "plus": 4,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "drain",
+        "evil",
+        "special",
+        "no_upgrade"
+      ],
+      "desc": "Corpsefed: It gathers nearby corpses to temporarily increase the armour it provides."
+    },
+    "seven_league_boots": {
+      "id": "seven_league_boots",
+      "name": "seven-league boots",
+      "category": "armour",
+      "base": "boots",
+      "plus": 3,
+      "value": 400,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Rampage+∞: When moving toward enemies, its wearer moves as far as possible, alerting their target en route."
+    },
+    "mad_mage_s_maulers": {
+      "id": "mad_mage_s_maulers",
+      "name": "Mad Mage's Maulers",
+      "category": "armour",
+      "base": "gloves",
+      "plus": 3,
+      "value": 400,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "nospell"
+      ],
+      "desc": "Infuse+∞:  It empowers its wearer's blows with all of their magic."
+    },
+    "dreamshard_necklace": {
+      "id": "dreamshard_necklace",
+      "name": "dreamshard necklace",
+      "category": "jewellery",
+      "base": "amulet_acrobat",
+      "plus": 0,
+      "value": 2000,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "special"
+      ],
+      "desc": "*Dream:    It absorbs a single lethal wound into itself, holding its wearer just short of death and releasing dream-creatures to guard them."
+    },
+    "delatra_s_gloves": {
+      "id": "delatra_s_gloves",
+      "name": "Delatra's gloves",
+      "category": "armour",
+      "base": "gloves",
+      "plus": 1,
+      "value": 100,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "ID++:      It heals its wearer when they drink unknown potions, and restores their MP when they read unknown scrolls."
+    },
+    "woodcutter_s_axe": {
+      "id": "woodcutter_s_axe",
+      "name": "woodcutter's axe",
+      "category": "weapon",
+      "base": "battleaxe",
+      "plus": 5,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "throatcutter": {
+      "id": "throatcutter",
+      "name": "Throatcutter",
+      "category": "weapon",
+      "base": "long_sword",
+      "plus": 7,
+      "value": 0,
+      "brand": "draining",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "staff_of_the_meek": {
+      "id": "staff_of_the_meek",
+      "name": "staff of the Meek",
+      "category": "weapon",
+      "base": "quarterstaff",
+      "plus": 7,
+      "value": 0,
+      "brand": "protection",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "trishula_condemnation": {
+      "id": "trishula_condemnation",
+      "name": "trishula \"Condemnation\"",
+      "category": "weapon",
+      "base": "trishula",
+      "plus": 8,
+      "value": 0,
+      "brand": "holy_wrath",
+      "props": [],
+      "bools": [
+        "fly",
+        "noises"
+      ],
+      "desc": ""
+    },
+    "amulet_of_elemental_vulnerability": {
+      "id": "amulet_of_elemental_vulnerability",
+      "name": "amulet of Elemental Vulnerability",
+      "category": "jewellery",
+      "base": "amulet_nothing",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "poison"
+      ],
+      "desc": ""
+    },
+    "mountain_boots": {
+      "id": "mountain_boots",
+      "name": "mountain boots",
+      "category": "armour",
+      "base": "boots",
+      "plus": 3,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "special"
+      ],
+      "desc": ""
+    },
+    "lochaber_axe": {
+      "id": "lochaber_axe",
+      "name": "Lochaber axe",
+      "category": "weapon",
+      "base": "bardiche",
+      "plus": 5,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "drain"
+      ],
+      "desc": "Poleaxe:   It uses either Axes or Polearms skill, whichever is higher."
+    },
+    "hermit_s_pendant": {
+      "id": "hermit_s_pendant",
+      "name": "Hermit's Pendant",
+      "category": "jewellery",
+      "base": "amulet_faith",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "slick_slippers": {
+      "id": "slick_slippers",
+      "name": "slick slippers",
+      "category": "armour",
+      "base": "boots",
+      "plus": 2,
+      "value": 270,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "force_lance": {
+      "id": "force_lance",
+      "name": "Force Lance",
+      "category": "weapon",
+      "base": "spear",
+      "plus": 5,
+      "value": 0,
+      "brand": "heavy",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "consecrated_labrys": {
+      "id": "consecrated_labrys",
+      "name": "consecrated labrys",
+      "category": "weapon",
+      "base": "broad_axe",
+      "plus": 4,
+      "value": 0,
+      "brand": "holy_wrath",
+      "props": [],
+      "bools": [
+        "no_upgrade",
+        "fly",
+        "seeinv",
+        "fragile"
+      ],
+      "desc": "Valiant:   It becomes more powerful as more dangerous foes come into view."
+    },
+    "toga_victory": {
+      "id": "toga_victory",
+      "name": "toga \"Victory\"",
+      "category": "armour",
+      "base": "robe",
+      "plus": 0,
+      "value": 600,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "clarity",
+        "no_upgrade"
+      ],
+      "desc": "*Victory:  When the wearer kills a threatening monster, it has a chance to gain +1 AC, +1 Slay, and +1 Int, capping at +7. When the wearer uses a scroll or a potion with a hostile monster in sight, its bonuses reset to +0. Unequipping it also resets its bonuses to +0."
+    },
+    "storm_queen_s_shield": {
+      "id": "storm_queen_s_shield",
+      "name": "Storm Queen's Shield",
+      "category": "armour",
+      "base": "kite_shield",
+      "plus": 5,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "elec",
+        "fly"
+      ],
+      "desc": ""
+    },
+    "dreamdust_necklace": {
+      "id": "dreamdust_necklace",
+      "name": "dreamdust necklace",
+      "category": "jewellery",
+      "base": "amulet_acrobat",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "special",
+        "nogen"
+      ],
+      "desc": ""
+    },
+    "hand_cannon_mule": {
+      "id": "hand_cannon_mule",
+      "name": "hand cannon \"Mule\"",
+      "category": "weapon",
+      "base": "hand_cannon",
+      "plus": 7,
+      "value": 0,
+      "brand": "flaming",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "gloves_of_the_gadgeteer": {
+      "id": "gloves_of_the_gadgeteer",
+      "name": "gloves of the gadgeteer",
+      "category": "armour",
+      "base": "gloves",
+      "plus": 0,
+      "value": 400,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "fragile"
+      ],
+      "desc": "Gadgeteer:   Your evocable items recharge 30% faster and wands have a 30% chance to not spend a charge."
+    },
+    "charlatan_s_orb": {
+      "id": "charlatan_s_orb",
+      "name": "Charlatan's Orb",
+      "category": "armour",
+      "base": "orb",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": ""
+    },
+    "justicar_s_regalia": {
+      "id": "justicar_s_regalia",
+      "name": "justicar's regalia",
+      "category": "armour",
+      "base": "scale_mail",
+      "plus": 5,
+      "value": 900,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Inspire:   When you summon or create an ally, it gains Regeneration."
+    },
+    "skull_of_zonguldrok": {
+      "id": "skull_of_zonguldrok",
+      "name": "skull of Zonguldrok",
+      "category": "armour",
+      "base": "orb",
+      "plus": 0,
+      "value": 600,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "evil"
+      ],
+      "desc": "Reaping:   When you kill an enemy with your weapon, its spirit may be forced to fight for you."
+    },
+    "fungal_fisticloak": {
+      "id": "fungal_fisticloak",
+      "name": "fungal fisticloak",
+      "category": "armour",
+      "base": "cloak",
+      "plus": 3,
+      "value": 550,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "Shroompunch:   The cloak sometimes lashes out at its wearer's enemies, inflicting confusion with its spores."
+    },
+    "crown_of_vainglory": {
+      "id": "crown_of_vainglory",
+      "name": "crown of vainglory",
+      "category": "armour",
+      "base": "hat",
+      "plus": 3,
+      "value": 550,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "fragile"
+      ],
+      "desc": "Majesty:   You are bathed in light that prevents you from turning invisible. Whenever you enter a new floor, you announce yourself to nearby enemies and refuse to leave the floor again for some time."
+    },
+    "scarf_of_invisibility": {
+      "id": "scarf_of_invisibility",
+      "name": "scarf of invisibility",
+      "category": "armour",
+      "base": "scarf",
+      "plus": 0,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [
+        "inv",
+        "nogen"
+      ],
+      "desc": ""
+    },
+    "swamp_witch_s_dragon_scales": {
+      "id": "swamp_witch_s_dragon_scales",
+      "name": "swamp witch's dragon scales",
+      "category": "armour",
+      "base": "swamp_dragon_armour",
+      "plus": 5,
+      "value": 0,
+      "brand": "",
+      "props": [],
+      "bools": [],
+      "desc": "TrickPois: Whenever you inflict a negative status on an enemy, you also fully poison it. Those with rPois+ will only be lightly poisoned, and those with rPois∞ won't be poisoned at all."
+    }
+  }
+}

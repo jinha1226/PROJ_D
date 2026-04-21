@@ -16,7 +16,7 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 - [ ] **God passives unrelated to invocations**: Vehumet MP discount on destructive spells, Cheibriados speed-proportional bonus, Gozag gold-only economy, Ru sacrifice system.
 - [x] **Weapon brands — full DCSS roster** — 32dd5259: added drain/distortion/antimagic/protection/pain/vorpal/reaping/chaos. Remaining gaps: penetration (needs ranged attack flow), reaching (already covered by polearm reach).
 - [x] **Body-armour egos — full roster** — 32dd5259: ArmorRegistry.EGOS with 27 entries; roll_ego rolls 6-25% by depth; Player._recompute_gear_stats folds stat/resist/flag effects. Harm ego wired to take_damage & melee_attack. Remaining partial: RAMPAGING/REFLECTION/SPIRIT_SHIELD/FLYING/MAYHEM need per-system handlers beyond just the flag.
-- [ ] **Amulet roster** — essentially none implemented. Need: Faith, Magic Mastery, Regeneration, Acrobat, Reflection, Stasis, Guardian Spirit, Gourmand, Nothing.
+- [x] **Amulet roster** — 5c2c6d18: AmuletRegistry.gd with 9 entries (Faith/Magic Mastery/Regen/Acrobat/Reflection/Stasis/Guardian Spirit/Gourmand/Nothing). equip_amulet slot on Player; spirit_shield splits HP→MP; stasis blocks tele/blink; acrobat +5 EV on non-combat turns; faith +50% piety; floor drops 2%; bag UI + TileRenderer tiles.
 - [ ] **Portal vaults** (timed mini-branches) — not implemented at all: Sewers, Ossuary, Bailey, Volcano, Icecave, Wizlab, Trove, Labyrinth, Desolation, Gauntlet. Mid-game interest driver in DCSS.
 - [ ] **Branch theming**:
   - Orcish Mines: Beogh worship converts orcs to allies
@@ -69,11 +69,7 @@ When a backlog item lands, replace its `[ ]` with `[x] (<commit-hash>)` and note
 Gods deferred per user direction — don't start god invocation parity
 unless explicitly asked. User's queued order from the last session:
 
-1. **Amulet roster** (🔴) — Faith / Magic Mastery / Regeneration / Acrobat /
-   Reflection / Stasis / Guardian Spirit / Gourmand / Nothing. Mirror the
-   ArmorRegistry.EGOS pattern: data table + drop-generation hook +
-   Player._recompute_gear_stats integration + get_resist integration.
-   Likely need a new `AmuletRegistry.gd` + amulet slot on Player.
+1. ~~**Amulet roster**~~ — DONE 5c2c6d18
 2. **Ring multi-stat coverage + randart generation** — current ring pool
    is single-stat (ring_str etc.). Add multi-property rolls; feeds
    the same code path that serves amulets.
