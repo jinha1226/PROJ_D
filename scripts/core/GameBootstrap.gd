@@ -4843,7 +4843,11 @@ func _status_resistances() -> Dictionary:
 	# one canonical place rather than duplicated here.
 	r["fire"]     = player.get_resist("fire")
 	r["cold"]     = player.get_resist("cold")
-	r["poison"]   = player.get_resist("poison")
+	# rPois is binary in DCSS: any positive level = full poison immunity,
+	# so display as +++ (not a partial "+"). Negative values still render
+	# as "-" for vulnerability.
+	var pois: int = player.get_resist("poison")
+	r["poison"]   = 3 if pois > 0 else pois
 	r["negative"] = player.get_resist("neg")
 	r["electric"] = player.get_resist("elec")
 	r["magic"]    = player.get_resist("magic")
