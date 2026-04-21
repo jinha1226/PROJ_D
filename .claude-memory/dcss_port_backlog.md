@@ -29,11 +29,26 @@ originSessionId: a6787a73-c32f-4d97-bf7b-67620bf7e827
 
 ## 🟡 Medium (partial implementations)
 
-- [ ] **Monster AI intelligence** — spell selection is simple freq-weighted; port DCSS `_should_cast_spell` tracer beam / friendly-fire check / emergency slot / cautious flag / antimagic resist.
-- [ ] **Monster energy types** — flat 10 per action; DCSS has per-monster `mon_energy_usage` (move/attack/spell/missile/swim costs).
-- [ ] **Monster pack/tactical behaviour** — leader follow, tactical retreat, ranged support. Currently packs scatter.
+- [x] **Monster AI intelligence** — PARTIAL (d7edc8ea). Flee tightened
+  (25%→10%, human-only, non-caster, one-shot `_has_fled` flag reset at
+  40% HP). Caster kiting wired: adjacent casters try cast first, else
+  step-back-to-regain-range, else melee. Still missing: `_should_cast_spell`
+  tracer beam, friendly-fire check, emergency-slot priority, cautious flag.
+- [x] **Monster energy types** — DONE (d7edc8ea). MonsterData exports
+  move/attack/spell/missile/swim energy (default 10/6). MonsterRegistry
+  applies mon-data.h overrides for naga (move=14), bat (move=5), centaur
+  (move=6, missile=7), fire_dragon (attack=15), jelly (move=14,attack=14),
+  adder (attack=8), wasp, spriggan, etc. MonsterAI.act returns the
+  action cost; Monster.take_turn drains _action_energy by that cost.
+- [ ] **Monster pack/tactical behaviour** — leader follow, tactical
+  retreat, ranged support. Still scatters. (Caster kiting shipped under
+  AI-intelligence above, but pack formation/cover/flanking unstarted.)
 - [ ] **Transformation forms** — FormRegistry has 5-6; DCSS has Dragon, Statue, Tree, Hydra, Lich, Bat Swarm, Fungus, Pig, Spider, Flux and form-specific stats/abilities.
-- [ ] **Poison levels** — single DoT scalar; DCSS has 3 levels + per-level resist scaling.
+- [x] **Poison levels** — DONE (d7edc8ea + earlier). Player had 3-level
+  stack from session 5; this session added Monster.apply_poison mirroring
+  it. Venom brands / naga tail slap / AF_POISON monster flavour / scroll
+  of poison all route through it. rPois+ drops incoming level by 1,
+  full immunity (undead/demons/jellies) rejects entirely.
 - [x] **Status effects (core)** — f71a217c: Slow/Fear/Charm/Blind/Corona/Daze gameplay wired. Poison 3-level stacking. Remaining: Frozen, Weakness, Silenced expansion, Enthralled, Liquefaction.
 - [ ] **Dungeon-feature tile behaviour** — lava/water blocking certain monsters, Teleport trap destination targeting, Zot/Shaft/Golubria traps, glass walls, translucent stone.
 - [ ] **Unarmed Combat skill** — skill doesn't exist; monk/brawler unarmed damage is flat.
