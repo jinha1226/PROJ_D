@@ -1024,12 +1024,21 @@ func _place_random_floor_item(pos: Vector2i, depth: int, parent: Node) -> bool:
 			aid = "leather_armour"
 		var info: Dictionary = ArmorRegistry.get_info(aid)
 		var aname: String = String(info.get("name", aid))
+		# DCSS item-prop.cc rolls an ego (SPARM_*) with a base rate
+		# scaled by depth — deeper floors have richer loot. Null ego
+		# keeps the item plain.
+		var ego_chance: float = clampf(0.06 + float(depth) * 0.008, 0.06, 0.25)
+		var ego_id: String = ArmorRegistry.roll_ego(
+				String(info.get("slot", "chest")), ego_chance)
+		if ego_id != "":
+			aname += " " + ArmorRegistry.ego_label(ego_id)
 		if is_cursed:
 			aname = "Cursed " + aname
 		fi.setup(pos, aid, aname, "armor",
 				info.get("color", Color(0.6, 0.6, 0.7)),
 				{"ac": int(info.get("ac", 0)),
 				 "slot": String(info.get("slot", "chest")),
+				 "ego": ego_id,
 				 "cursed": is_cursed})
 	elif drop_roll < 0.73:
 		# Rings were dropping too frequently on Lv1 per user feedback.

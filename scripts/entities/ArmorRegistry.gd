@@ -103,3 +103,82 @@ static func ev_penalty_for(id: String) -> int:
 
 static func display_name_for(id: String) -> String:
 	return String(_lookup(id).get("name", id.replace("_", " ").capitalize()))
+
+
+## DCSS SPARM_* armour egos. Each entry records:
+##   label       — prefix for display names ("of fire resistance" etc.)
+##   slots       — which slots accept the ego ("chest", "cloak", "all"…)
+##   stat_bonus  — Dict{str,dex,int,ac,ev,stealth,spellpower,mp_regen,mr}
+##   resists     — Dict{fire, cold, poison, neg, elec} resist levels (+1/+2)
+##   flag        — engine flag the player reads (see_invis, invisible, …)
+## Most SPARM_* entries without unique per-turn logic live here. Egos
+## that need special per-hit or per-turn handling (RAMPAGING, HARM,
+## SPIRIT_SHIELD, REFLECTION) are tagged via `flag` and handled in the
+## relevant system (take_damage / try_move / etc.).
+const EGOS: Dictionary = {
+	# --- Resistance egos ---
+	"fire_resistance":    {"label": "of fire resistance",    "slots": ["chest","cloak","shield"], "resists": {"fire": 1}},
+	"cold_resistance":    {"label": "of cold resistance",    "slots": ["chest","cloak","shield"], "resists": {"cold": 1}},
+	"poison_resistance":  {"label": "of poison resistance",  "slots": ["chest","cloak","shield"], "resists": {"poison": 1}},
+	"positive_energy":    {"label": "of positive energy",    "slots": ["chest","cloak","shield"], "resists": {"neg": 1}},
+	"resistance":         {"label": "of resistance",         "slots": ["chest","cloak","shield"], "resists": {"fire": 1, "cold": 1}},
+	"willpower":          {"label": "of willpower",          "slots": ["chest","cloak","shield","helm"], "stat_bonus": {"mr": 30}},
+	# --- Stat egos ---
+	"strength":           {"label": "of strength",           "slots": ["gloves","boots","chest"], "stat_bonus": {"str": 3}},
+	"dexterity":          {"label": "of dexterity",          "slots": ["gloves","boots","chest"], "stat_bonus": {"dex": 3}},
+	"intelligence":       {"label": "of intelligence",       "slots": ["helm","chest"], "stat_bonus": {"int": 3}},
+	# --- AC / defence ---
+	"protection":         {"label": "of protection",         "slots": ["chest","cloak","helm","gloves","boots","shield"], "stat_bonus": {"ac": 3}},
+	"ponderousness":      {"label": "of ponderousness",      "slots": ["chest"], "stat_bonus": {"ac": 2}, "flag": "slow"},  # DCSS bad ego
+	# --- Senses / utility ---
+	"see_invisible":      {"label": "of see invisible",      "slots": ["helm","cloak"], "flag": "see_invis"},
+	"stealth":            {"label": "of stealth",            "slots": ["boots","cloak","chest"], "stat_bonus": {"stealth": 2}},
+	"shadows":            {"label": "of shadows",            "slots": ["cloak"], "stat_bonus": {"stealth": 3}, "flag": "hate_light"},
+	"light":              {"label": "of light",              "slots": ["chest","cloak"], "flag": "shed_light"},
+	# --- Magic ---
+	"archmagi":           {"label": "of the archmagi",       "slots": ["chest"], "stat_bonus": {"spellpower": 3}},
+	"energy":             {"label": "of energy",             "slots": ["chest","cloak"], "stat_bonus": {"mp_regen": 1}},
+	"infusion":           {"label": "of infusion",           "slots": ["gloves"], "flag": "mp_for_damage"},
+	"guile":              {"label": "of guile",              "slots": ["gloves"], "flag": "foes_fail_spells"},
+	# --- Combat riders ---
+	"harm":               {"label": "of harm",               "slots": ["cloak","chest"], "flag": "harm"},  # +30% dmg both ways
+	"rampaging":          {"label": "of rampaging",          "slots": ["boots"], "flag": "rampage"},
+	"repulsion":          {"label": "of repulsion",          "slots": ["cloak"], "flag": "missile_dodge"},
+	"reflection":         {"label": "of reflection",         "slots": ["shield"], "flag": "reflect"},
+	"spirit_shield":      {"label": "of the spirit shield",  "slots": ["helm"], "flag": "spirit_shield"},
+	"archery":            {"label": "of archery",            "slots": ["gloves","cloak"], "stat_bonus": {"ranged_dmg": 4}},
+	"hurling":            {"label": "of hurling",            "slots": ["cloak","gloves"], "stat_bonus": {"throw_dmg": 3}},
+	# --- Misc ---
+	"flying":             {"label": "of flying",             "slots": ["boots"], "flag": "flying"},
+	"jumping":            {"label": "of jumping",            "slots": ["boots"], "flag": "jump"},
+	"mayhem":             {"label": "of mayhem",             "slots": ["cloak"], "flag": "mayhem"},
+	"resonance":          {"label": "of resonance",          "slots": ["chest"], "resists": {"acid": 1}, "stat_bonus": {"spellpower": 2}},
+	"command":            {"label": "of command",            "slots": ["helm"], "flag": "command"},
+}
+
+
+## Roll a random ego compatible with the given slot. Returns "" if no
+## ego should be applied. Call-site `p_chance` is the base drop rate
+## (DCSS rolls ego ~15% on a fresh armour); we default to 0.12 so
+## early-floor items aren't a constant festival of magic.
+static func roll_ego(slot: String, p_chance: float = 0.12) -> String:
+	if randf() > p_chance:
+		return ""
+	var pool: Array = []
+	for eid in EGOS.keys():
+		var slots: Array = EGOS[eid].get("slots", [])
+		if slots.has(slot) or slots.has("all"):
+			pool.append(eid)
+	if pool.is_empty():
+		return ""
+	return String(pool[randi() % pool.size()])
+
+
+static func ego_info(ego_id: String) -> Dictionary:
+	if EGOS.has(ego_id):
+		return EGOS[ego_id].duplicate()
+	return {}
+
+
+static func ego_label(ego_id: String) -> String:
+	return String(EGOS.get(ego_id, {}).get("label", ""))

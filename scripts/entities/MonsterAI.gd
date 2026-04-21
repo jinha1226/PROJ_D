@@ -311,20 +311,44 @@ static func wake(m: Monster) -> void:
 		return
 	m.is_sleeping = false
 	m.queue_redraw()
-	# Alarm adjacent sleepers (DCSS: noise propagates, we approximate with a
-	# 1-tile chain so a square of sleeping kobolds wakes together when one
-	# spots the player). Only one ring — avoids map-wide instant wake chains.
 	var tree: SceneTree = m.get_tree()
 	if tree == null:
 		return
-	for n in tree.get_nodes_in_group("monsters"):
-		if n == m or not (n is Monster) or not n.is_alive:
-			continue
-		if not n.is_sleeping:
-			continue
-		if _cheb(n.grid_pos, m.grid_pos) <= 1:
-			n.is_sleeping = false
-			n.queue_redraw()
+	# DCSS shout.cc port — a monster that just spotted an enemy emits
+	# a shout whose loudness is derived from the DCSS shout table
+	# (silent=0, hiss=4, soft=6, default=8, loud=10, roar=12). We don't
+	# carry an explicit per-monster shout type yet so we approximate
+	# from HD: tiny bugs stay quiet, drakes+ roar loud. DCSSNoise runs
+	# the wave through the grid so walls actually muffle the alarm
+	# instead of instantly waking the whole floor.
+	var hd: int = 1
+	if m.data != null and "hd" in m.data:
+		hd = int(m.data.hd)
+	var loudness: int
+	if hd <= 1:
+		loudness = 4      # hiss / skitter equivalent
+	elif hd <= 3:
+		loudness = 6      # soft
+	elif hd <= 7:
+		loudness = 8      # default shout
+	elif hd <= 12:
+		loudness = 10     # loud
+	else:
+		loudness = 12     # roar
+	# Some monsters are tagged silent in DCSS (mimics, jellies) — we
+	# skip the shout for those so an ambush doesn't auto-alert the
+	# room. Default path: the `silent` shape or `silent` flag muzzles.
+	var silent: bool = false
+	if m.data != null:
+		if "shape" in m.data and String(m.data.shape) == "jelly":
+			silent = true
+		if "flags" in m.data:
+			for f in m.data.flags:
+				if String(f).to_lower() == "silent":
+					silent = true
+					break
+	if not silent and loudness > 0:
+		broadcast_noise(tree, m.grid_pos, loudness, 0)
 
 
 static func _should_wake(m: Monster) -> bool:

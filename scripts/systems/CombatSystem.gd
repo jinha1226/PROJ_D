@@ -222,6 +222,11 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 			attacker.set_meta("_backstab_used", true)
 		else:
 			dmg = int(dmg * 1.15)
+	# DCSS SPARM_HARM ego — when the attacker (player or monster) wears
+	# a harm armour ego, they deal +30% damage. The defender half is
+	# applied in Player.take_damage.
+	if attacker.has_method("has_meta") and attacker.has_meta("_ego_harm"):
+		dmg = (dmg * 130) / 100
 	# DCSS stab (attack.cc:1426 player_stab_weapon_bonus +
 	# fight.cc:639 find_player_stab_type + 706 stab_bonus_denom):
 	#   stab_bonus = 1 for sleeping/paralysed/petrified  → full bonus
@@ -263,19 +268,99 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 	# DCSS weapon brand: Scroll of Brand Weapon stamps a permanent brand
 	# onto the wielded weapon; each brand adds a flat elemental proc on top
 	# of the base physical damage.
+	# DCSS weapon brands (item-prop-enum.h SPWPN_*). Numeric damage adds
+	# pull from attack.cc::apply_damage_brand; status riders dispatch
+	# via defender metas so Monster.take_damage routes them correctly.
 	var brand_key: String = "_weapon_brand_" + weapon_id
+	var brand_element: String = ""
 	if weapon_id != "" and attacker.has_method("has_meta") and attacker.has_meta(brand_key):
 		var brand: String = String(attacker.get_meta(brand_key))
 		var brand_dmg: int = 0
 		match brand:
-			"flaming":        brand_dmg = randi_range(1, 6)
-			"freezing":       brand_dmg = randi_range(1, 6)
-			"electrocution":  brand_dmg = randi_range(1, 4) * (2 if randi() % 4 == 0 else 1)
-			"venom":          brand_dmg = randi_range(1, 4)
-			"holy_wrath":     brand_dmg = randi_range(2, 5) if _is_undead_or_demon(defender) else 0
+			"flaming":
+				brand_dmg = randi_range(1, 6)
+				brand_element = "fire"
+			"freezing":
+				brand_dmg = randi_range(1, 6)
+				brand_element = "cold"
+			"electrocution":
+				# DCSS: 1/4 chance of 8-20 dmg burst, else 1..4.
+				if randi() % 4 == 0:
+					brand_dmg = randi_range(8, 20)
+				else:
+					brand_dmg = randi_range(1, 4)
+				brand_element = "elec"
+			"venom":
+				brand_dmg = randi_range(1, 4)
+				if defender.has_method("set_meta"):
+					defender.set_meta("_poison_turns", 5)
+					defender.set_meta("_poison_dmg", max(1, brand_dmg / 2))
+			"holy_wrath":
+				brand_dmg = randi_range(2, 5) if _is_undead_or_demon(defender) else 0
+				brand_element = "holy"
+			"draining":
+				# DCSS: 2d4 dmg + drain status on the target.
+				brand_dmg = randi_range(2, 8)
+				brand_element = "neg"
+				if defender.has_method("set_meta"):
+					defender.set_meta("_drained_turns", 15)
+			"pain":
+				# DCSS: +necromancy skill as damage (capped).
+				var necro: int = 0
+				if skill_sys != null:
+					necro = skill_sys.get_level(attacker, "necromancy")
+				brand_dmg = (randi() % maxi(1, necro + 1))
+				brand_element = "neg"
+			"distortion":
+				# DCSS: random chance to blink defender / teleport / banish.
+				var roll: int = randi() % 100
+				if roll < 5 and defender.has_method("set_meta"):
+					defender.set_meta("_banish_queued", true)  # deferred to Monster.take_damage
+				elif roll < 25:
+					# Random blink of the target 1-3 tiles.
+					_blink_random(defender, 3)
+			"protection":
+				# Passive +5 AC; no per-hit bonus damage but track so the
+				# status/equip screens can show the ego.
+				pass
+			"antimagic":
+				# Burn 2 MP per hit if defender has any. Helpful vs caster
+				# monsters; no effect on melee-only foes.
+				if "stats" in defender and defender.stats != null \
+						and "MP" in defender.stats and defender.stats.MP > 0:
+					defender.stats.MP = maxi(0, defender.stats.MP - 2)
+			"vorpal":
+				# DCSS SPWPN_VORPAL: +25% damage on ~1/3 swings (DCSS uses
+				# a weapon-type-specific roll). Good against fleshy foes.
+				if randi() % 3 == 0:
+					brand_dmg = dmg / 4
+			"reaping":
+				# DCSS: if the hit kills, 50% chance to raise a zombie.
+				# Queue the intent; Monster.take_damage honours it.
+				if defender.has_method("set_meta"):
+					defender.set_meta("_reaping_pending", true)
+			"chaos":
+				# Random weapon brand each hit — pick a die-roll element
+				# from the DCSS chaos pool. We don't recurse the match;
+				# instead we just slap a small element-tagged bonus.
+				var chaos_picks: Array = [
+					{"e": "fire",  "d": 4},
+					{"e": "cold",  "d": 4},
+					{"e": "elec",  "d": 3},
+					{"e": "poison","d": 3},
+					{"e": "neg",   "d": 3},
+					{"e": "holy",  "d": 3},
+					{"e": "",      "d": 5},
+				]
+				var pick: Dictionary = chaos_picks[randi() % chaos_picks.size()]
+				brand_dmg = 1 + (randi() % int(pick["d"]))
+				brand_element = String(pick["e"])
 		dmg += brand_dmg
 	if defender.has_method("take_damage"):
-		defender.take_damage(dmg)
+		if brand_element != "":
+			defender.take_damage(dmg, brand_element)
+		else:
+			defender.take_damage(dmg)
 	var def_name: String = ""
 	if "data" in defender and defender.data != null and "display_name" in defender.data:
 		def_name = String(defender.data.display_name)
@@ -538,6 +623,29 @@ static func _stab_stepdown(value: int, stepping: int, first_step: int, ceiling: 
 	if ceiling > 0 and out > ceiling:
 		out = ceiling
 	return out
+
+
+## Blink a defender to a random walkable tile within `radius` Chebyshev.
+## Used by the DCSS distortion brand — on a roll the target flashes
+## somewhere safe nearby. Silent no-op if no free tile is found.
+static func _blink_random(defender, radius: int) -> void:
+	if defender == null or not ("grid_pos" in defender) \
+			or not ("generator" in defender) or defender.generator == null:
+		return
+	var candidates: Array[Vector2i] = []
+	for dy in range(-radius, radius + 1):
+		for dx in range(-radius, radius + 1):
+			if dx == 0 and dy == 0:
+				continue
+			var cell: Vector2i = defender.grid_pos + Vector2i(dx, dy)
+			if defender.generator.is_walkable(cell):
+				candidates.append(cell)
+	if candidates.is_empty():
+		return
+	var dest: Vector2i = candidates[randi() % candidates.size()]
+	defender.grid_pos = dest
+	if "position" in defender:
+		defender.position = Vector2(dest.x * 32 + 16, dest.y * 32 + 16)
 
 
 ## DCSS player::gdr_perc (player.cc:6620): `16 * sqrt(sqrt(ac))`.

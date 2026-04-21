@@ -645,11 +645,22 @@ func get_resist(element: String) -> int:
 			total += int(get_meta("_form_racid", 0))
 		"holy":
 			pass  # DCSS has rHoly only via mutations; we don't model yet
-		"drain":
+		"drain", "neg":
 			# Gargoyle / mummy / demonspawn get drain resist.
 			var tt: String = _racial_trait_id()
 			if tt == "gargoyle_stone" or tt == "mummy_undead":
 				total += 1
+	# DCSS SPARM_* ego resists — each equipped armour with a matching
+	# ego adds 1 to the corresponding element. Resistance / willpower
+	# ego grants both fire and cold by reading the ego table.
+	for slot_key in equipped_armor.keys():
+		var slot_dict: Dictionary = equipped_armor[slot_key]
+		var ego_id: String = String(slot_dict.get("ego", ""))
+		if ego_id == "":
+			continue
+		var res_map: Dictionary = ArmorRegistry.ego_info(ego_id).get("resists", {})
+		if res_map.has(element):
+			total += int(res_map[element])
 	return total
 
 
@@ -999,6 +1010,13 @@ func _recompute_gear_stats() -> void:
 	stats.DEX = base_stats.DEX
 	stats.INT = base_stats.INT
 	stats.mp_max = base_stats.mp_max
+	# Clear stale ego metas so swapping an ego off actually removes
+	# its effect. Each ego re-sets its meta below if still equipped.
+	for ego_flag in ["harm", "slow", "see_invis", "hate_light", "shed_light",
+			"mp_for_damage", "foes_fail_spells", "rampage", "missile_dodge",
+			"reflect", "spirit_shield", "flying", "jump", "mayhem", "command"]:
+		if has_meta("_ego_" + ego_flag):
+			remove_meta("_ego_" + ego_flag)
 	var base_ev: int = base_stats.EV
 	# AC starts at racial intrinsic (gargoyle stone, etc) + trait AC bonus.
 	var ac: int = 0
@@ -1010,7 +1028,10 @@ func _recompute_gear_stats() -> void:
 	# Sum up body armour EV-penalty (negative PARM_EVASION). DCSS reduces
 	# EV by evp/10 from body armour only (other slots don't apply).
 	var body_evp_raw: int = 0
-	# Apply armor bonuses (base AC + enchant "plus").
+	# Apply armor bonuses (base AC + enchant "plus") and DCSS SPARM_*
+	# egos. Each equipped armour may carry an "ego" string resolved
+	# against ArmorRegistry.EGOS; its stat_bonus / resists / flag
+	# contributions fold into the player here.
 	for slot_key in equipped_armor.keys():
 		var slot_dict: Dictionary = equipped_armor[slot_key]
 		ac += int(slot_dict.get("ac", 0))
@@ -1018,6 +1039,21 @@ func _recompute_gear_stats() -> void:
 		ev += int(slot_dict.get("ev_bonus", 0))
 		if slot_key == "chest":
 			body_evp_raw = int(slot_dict.get("ev_penalty", 0))
+		var ego_id: String = String(slot_dict.get("ego", ""))
+		if ego_id != "":
+			var ego: Dictionary = ArmorRegistry.ego_info(ego_id)
+			var sb: Dictionary = ego.get("stat_bonus", {})
+			stats.STR += int(sb.get("str", 0))
+			stats.DEX += int(sb.get("dex", 0))
+			stats.INT += int(sb.get("int", 0))
+			ac += int(sb.get("ac", 0))
+			ev += int(sb.get("ev", 0))
+			# Flags written as player metas so other systems (take_damage,
+			# try_move, cast pipeline) can check them without pulling the
+			# ArmorRegistry directly.
+			var flag_s: String = String(ego.get("flag", ""))
+			if flag_s != "":
+				set_meta("_ego_" + flag_s, true)
 	# Apply ring bonuses.
 	for ring in equipped_rings:
 		if typeof(ring) != TYPE_DICTIONARY or ring.is_empty():
@@ -2393,6 +2429,11 @@ func take_damage(amount: int, element: String = "") -> void:
 	# resist level for that element before any generic mitigation.
 	if element != "":
 		amount = _apply_elem_resist(amount, element)
+	# DCSS SPARM_HARM ego — scarf/robe of harm increases dmg both ways
+	# by 30%. Here we handle the "dmg taken" half; the "dmg dealt" half
+	# is applied in CombatSystem.melee_attack via the same meta.
+	if has_meta("_ego_harm"):
+		amount = (amount * 130) / 100
 	# Shadow form halves all incoming damage.
 	if has_meta("_shadow_form_turns"):
 		amount = max(1, amount / 2)
