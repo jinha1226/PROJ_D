@@ -70,11 +70,11 @@ const _BAG_CATEGORIES: Array = ["all", "weapon", "armor", "cloak", "ring", "amul
 # Swipe state for the skill dialog's category tabs — same pattern as
 # _bag_swipe_* but keyed per-dialog so closing one doesn't bleed into
 # the other.
-var _skills_swipe_dlg: AcceptDialog = null
+var _skills_swipe_dlg: GameDialog = null
 var _skills_swipe_category: String = ""
 var _skills_swipe_start_x: float = -1.0
 var _skills_swipe_start_y: float = -1.0
-var _skills_dlg: AcceptDialog = null
+var _skills_dlg: GameDialog = null
 var _status_dlg: GameDialog = null
 var _map_dlg: AcceptDialog = null
 var _magic_dlg: AcceptDialog = null
@@ -2628,32 +2628,17 @@ func _on_skills_button_pressed() -> void:
 	_open_skills_dialog("active")
 
 
-func _open_skills_dialog(category: String) -> void:
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null or player == null:
+func _open_skills_dialog(category: String = "active") -> void:
+	if player == null:
 		return
-	var dlg := AcceptDialog.new()
-	dlg.exclusive = false
-	dlg.title = "Skills"
-	dlg.ok_button_text = "Close"
-	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 8)
-	dlg.add_child(vb)
 
-	var skill_header := HBoxContainer.new()
-	skill_header.add_theme_constant_override("separation", 8)
-	var skill_title := Label.new()
-	skill_title.text = "Skills"
-	skill_title.add_theme_font_size_override("font_size", 40)
-	skill_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	skill_header.add_child(skill_title)
-	var skill_close := Button.new()
-	skill_close.text = "X"
-	skill_close.custom_minimum_size = Vector2(120, 120)
-	skill_close.add_theme_font_size_override("font_size", 48)
-	skill_close.pressed.connect(dlg.queue_free)
-	skill_header.add_child(skill_close)
-	vb.add_child(skill_header)
+	var dlg := GameDialog.create("Skills", Vector2i(960, 1500))
+	add_child(dlg)
+	_skills_dlg = dlg
+	dlg.set_on_close(func():
+		if _skills_dlg == dlg: _skills_dlg = null)
+
+	var vb: VBoxContainer = dlg.body()
 
 	var tabs_hbox := HBoxContainer.new()
 	tabs_hbox.add_theme_constant_override("separation", 4)
@@ -2676,55 +2661,64 @@ func _open_skills_dialog(category: String) -> void:
 	vb.mouse_filter = Control.MOUSE_FILTER_PASS
 	vb.gui_input.connect(_on_skills_swipe_input)
 
-	var scroll := ScrollContainer.new(); scroll.scroll_deadzone = 20
-	scroll.custom_minimum_size = Vector2(0, 1200)
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.scroll_deadzone = 20
-	vb.add_child(scroll)
-
 	var rows := VBoxContainer.new()
 	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rows.add_theme_constant_override("separation", 4)
-	scroll.add_child(rows)
+	vb.add_child(rows)
 
 	var state: Dictionary = {}
 	if "skill_state" in player and player.skill_state is Dictionary:
 		state = player.skill_state
-	var any_shown: bool = false
-	for skill_id in SkillSystem.SKILL_IDS:
-		var cat_id: String = String(SkillSystem.SKILL_CATEGORY.get(skill_id, ""))
-		var entry: Dictionary = state.get(skill_id, {})
-		if category == "active":
-			# Show only skills that are being trained OR have a level > 0.
-			var training: bool = bool(entry.get("training", false))
-			var level: int = int(entry.get("level", 0))
-			if not training and level == 0:
+
+	if category == "active":
+		_build_active_tab(rows, state)
+	else:
+		var any_shown: bool = false
+		for skill_id in SkillSystem.SKILL_IDS:
+			var cat_id: String = String(SkillSystem.SKILL_CATEGORY.get(skill_id, ""))
+			if cat_id != category:
 				continue
-		elif category != "" and cat_id != category:
-			continue
-		rows.add_child(_build_skill_row(skill_id, cat_id, entry))
-		any_shown = true
-	if not any_shown and category == "active":
-		var hint := Label.new()
-		hint.text = "No skills trained yet.\nEnable skills in the other tabs."
-		hint.add_theme_font_size_override("font_size", 48)
-		hint.modulate = Color(0.7, 0.7, 0.8)
+			rows.add_child(_build_skill_row(skill_id, cat_id, state.get(skill_id, {})))
+			any_shown = true
+		if not any_shown:
+			var hint := UICards.dim_hint("No skills in this category.")
+			hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			rows.add_child(hint)
+
+
+## Build the ACTIVE tab body: split into "Training" (currently enabled)
+## and "Learned" (level>0 but not trained) sub-sections so toggling a
+## skill reshuffles it between the two lists.
+func _build_active_tab(rows: VBoxContainer, state: Dictionary) -> void:
+	var training_ids: Array = []
+	var learned_ids: Array = []
+	for skill_id in SkillSystem.SKILL_IDS:
+		var entry: Dictionary = state.get(skill_id, {})
+		var is_training: bool = bool(entry.get("training", false))
+		var lv: int = int(entry.get("level", 0))
+		if is_training:
+			training_ids.append(skill_id)
+		elif lv > 0:
+			learned_ids.append(skill_id)
+	if training_ids.is_empty() and learned_ids.is_empty():
+		var hint := UICards.dim_hint("No skills trained yet.\nEnable skills in the other tabs.")
 		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		rows.add_child(hint)
+		return
+	if not training_ids.is_empty():
+		rows.add_child(UICards.section_header("Training"))
+		for skill_id in training_ids:
+			var cat_id: String = String(SkillSystem.SKILL_CATEGORY.get(skill_id, ""))
+			rows.add_child(_build_skill_row(skill_id, cat_id, state.get(skill_id, {})))
+	if not learned_ids.is_empty():
+		rows.add_child(UICards.section_header("Learned"))
+		for skill_id in learned_ids:
+			var cat_id: String = String(SkillSystem.SKILL_CATEGORY.get(skill_id, ""))
+			rows.add_child(_build_skill_row(skill_id, cat_id, state.get(skill_id, {})))
 
-	popup_mgr.add_child(dlg)
-	_skills_dlg = dlg
-	dlg.tree_exited.connect(func():
-		if _skills_dlg == dlg: _skills_dlg = null)
-	dlg.confirmed.connect(dlg.queue_free)
-	dlg.canceled.connect(dlg.queue_free)
-	dlg.close_requested.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(960, 1500))
 
-
-func _on_skills_tab(cat: String, dlg: AcceptDialog) -> void:
-	dlg.queue_free()
+func _on_skills_tab(cat: String, dlg: GameDialog) -> void:
+	dlg.close()
 	_open_skills_dialog(cat)
 
 
@@ -2732,6 +2726,12 @@ func _on_skill_training_toggled(pressed: bool, skill_id: String) -> void:
 	if skill_system == null or player == null:
 		return
 	skill_system.set_training(player, skill_id, pressed)
+	# When the ACTIVE tab is currently open, toggling a skill moves it
+	# between Training/Learned sub-sections — rebuild the dialog so the
+	# row reshuffles in place.
+	if _skills_swipe_category == "active" and _skills_dlg != null and is_instance_valid(_skills_dlg):
+		_skills_dlg.close()
+		_open_skills_dialog("active")
 
 
 const _SKILL_DESCS: Dictionary = {
@@ -3867,10 +3867,10 @@ func _try_skills_swipe(end_pos: Vector2) -> void:
 	if idx < 0:
 		idx = 0
 	var next_idx: int = (idx + step + _SKILL_CATEGORIES.size()) % _SKILL_CATEGORIES.size()
-	var dlg: AcceptDialog = _skills_swipe_dlg
+	var dlg: GameDialog = _skills_swipe_dlg
 	if dlg == null or not is_instance_valid(dlg):
 		return
-	dlg.queue_free()
+	dlg.close()
 	_skills_dlg = null
 	_open_skills_dialog(String(_SKILL_CATEGORIES[next_idx]))
 
