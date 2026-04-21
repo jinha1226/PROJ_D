@@ -299,6 +299,12 @@ func _draw_dcss() -> void:
 					tex = water_tex
 				DungeonGenerator.TileType.LAVA:
 					tex = lava_tex
+				DungeonGenerator.TileType.ACID:
+					# Slime Pits acidic floor — no dedicated tile sprite yet,
+					# paint a vivid yellow-green square so it's visually
+					# distinct from LAVA (orange) and WATER (blue).
+					draw_rect(rect, Color(0.55, 0.95, 0.25) * modulate, true)
+					continue
 				DungeonGenerator.TileType.DOOR_OPEN:
 					if floor_tex != null:
 						draw_texture_rect(floor_tex, rect, false, modulate)
@@ -337,7 +343,8 @@ func _wall_borders_floor(tile: Vector2i) -> bool:
 					or nt == DungeonGenerator.TileType.STAIRS_UP \
 					or nt == DungeonGenerator.TileType.STAIRS_DOWN \
 					or nt == DungeonGenerator.TileType.WATER \
-					or nt == DungeonGenerator.TileType.LAVA:
+					or nt == DungeonGenerator.TileType.LAVA \
+					or nt == DungeonGenerator.TileType.ACID:
 				return true
 	return false
 

@@ -2743,13 +2743,20 @@ func _player_can_walk_on(target: Vector2i) -> bool:
 	if trait_id == "merfolk_swim" and tile == DungeonGenerator.TileType.WATER:
 		return true
 	if trait_id == "tengu_flight":
-		# Winged races cross water but never walk through lava.
+		# Winged races cross water but never walk through lava or acid.
 		if tile == DungeonGenerator.TileType.WATER:
 			return true
 	if trait_id == "djinni_flight":
-		# Flame-spirits glide over both hazards.
+		# Flame-spirits glide over water + lava (fire-kin immune).
+		# Acid still eats them unless they have rCorr, handled below.
 		if tile == DungeonGenerator.TileType.WATER \
 				or tile == DungeonGenerator.TileType.LAVA:
+			return true
+	# Acid pools: impassable unless the player has rCorr (corrosion
+	# resistance). DCSS equivalent — gargoyle stone, Shining One
+	# followers, SPARM_RESONANCE-ego armour.
+	if tile == DungeonGenerator.TileType.ACID:
+		if get_resist("corr") >= 1:
 			return true
 	return false
 
@@ -2760,6 +2767,19 @@ func _teleport_to(target: Vector2i) -> void:
 	if _move_tween != null and _move_tween.is_valid():
 		_move_tween.kill()
 	moved.emit(grid_pos)
+	# DCSS teleport-onto-hazard: landing on lava / acid without the
+	# relevant resist hurts. Walls never trigger this path because
+	# _teleport_random only picks walkable candidates.
+	if generator != null:
+		var t: int = generator.get_tile(grid_pos)
+		if t == DungeonGenerator.TileType.LAVA and get_resist("fire") < 3:
+			var burn: int = randi_range(15, 30)
+			take_damage(burn, "fire")
+			CombatLog.add("You land in lava! (%d dmg)" % burn)
+		elif t == DungeonGenerator.TileType.ACID and get_resist("corr") < 1:
+			var corr: int = randi_range(10, 20)
+			take_damage(corr, "acid")
+			CombatLog.add("You land in acid! (%d dmg)" % corr)
 
 
 func drop_item(index: int) -> void:

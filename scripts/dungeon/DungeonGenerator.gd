@@ -19,7 +19,7 @@ const CAVE_INITIAL_FILL: float = 0.45   # starting wall probability
 const CAVE_SMOOTH_STEPS: int = 5
 const CAVE_MIN_FLOOR_TILES: int = 600   # fallback threshold
 
-enum TileType { WALL, FLOOR, DOOR_OPEN, DOOR_CLOSED, STAIRS_DOWN, STAIRS_UP, WATER, LAVA, TRAP, BRANCH_ENTRANCE, SHOP, ALTAR, TREE }
+enum TileType { WALL, FLOOR, DOOR_OPEN, DOOR_CLOSED, STAIRS_DOWN, STAIRS_UP, WATER, LAVA, TRAP, BRANCH_ENTRANCE, SHOP, ALTAR, TREE, ACID }
 
 var map: Array = []
 var rooms: Array[Rect2i] = []
@@ -76,11 +76,10 @@ func generate(depth: int, run_seed: int = -1) -> void:
 		# main overlapping-boxes gen but with extra vault stamps for the
 		# decorative feel. Shops bumped too — elves trade heavily.
 		"elf":     _build_dcss_overlapping_boxes(depth)
-		# Slime Pits — DCSS splatters acidic pools that hurt non-acid-
-		# resistant actors (we model them as lava tiles, re-purposing
-		# the "lava" damage path since we don't have a separate acid
-		# floor). Caves feel wet and cramped.
-		"slime":   _build_caves(); _place_pools(TileType.LAVA, 4, 3, 8)
+		# Slime Pits — DCSS splatters acidic pools. TileType.ACID is
+		# the dedicated floor variant (distinct from LAVA so the UI /
+		# damage paths can differentiate). Caves feel wet and cramped.
+		"slime":   _build_caves(); _place_pools(TileType.ACID, 4, 3, 8)
 		# Crypt / Tomb — tight rooms-and-corridors with cramped halls.
 		# Tomb goes even tighter. Population pool already weights heavy
 		# toward undead.

@@ -31,6 +31,25 @@ village+companions is now deprioritized. Village + companions still
 live as a long-run differentiator, but they come AFTER faithful port
 completion.
 
+### Essence system — defer removal until port completion
+
+Brief flirtation (this session) with removing the Essence system to
+keep main "pure DCSS" was walked back. Rationale for keeping it:
+  - Working content; removing it deletes real value for no near-term
+    gain.
+  - Backup branch would rot over 25-50 sessions of divergent main
+    work, making re-integration a merge hell.
+  - "Faithful port" means DCSS mechanics are ported accurately —
+    it does NOT require excluding custom additions.
+  - User got cold feet on deletion; listen.
+
+**Current stance**: leave Essence untouched in main. Backup branch
+`essence-preserved` + tag `essence-snapshot-v1` remain as a safety
+net. Re-evaluate at port-completion milestone — options at that point:
+(A) keep as-is, (B) gate behind a setting toggle for the faithful-DCSS
+mode, or (C) remove entirely. Decision gated on how essence feels in
+a fully-populated DCSS port, not on abstract purity.
+
 ### Order for port completion (rough, based on gaps as of 2026-04-22)
 
 1. **Gods — 26-deity full parity** (the single biggest gap)

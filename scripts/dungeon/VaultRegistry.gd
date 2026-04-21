@@ -285,6 +285,7 @@ static func char_to_tile(ch: String) -> int:
 		".": return DungeonGenerator.TileType.FLOOR
 		"w": return DungeonGenerator.TileType.WATER
 		"l": return DungeonGenerator.TileType.LAVA
+		"a": return DungeonGenerator.TileType.ACID
 		"T": return DungeonGenerator.TileType.TREE
 		" ": return -1
 		_:   return DungeonGenerator.TileType.FLOOR
