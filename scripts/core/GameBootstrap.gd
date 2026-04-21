@@ -12,9 +12,9 @@ const RESULT_SCREEN_SCENE: PackedScene = preload("res://scenes/ui/ResultScreen.t
 # [skill-ui-agent] level-up toast prefab.
 const SKILL_TOAST_SCENE: PackedScene = preload("res://scenes/ui/SkillLevelUpToast.tscn")
 
-const _SKILL_CATEGORIES: Array = ["weapon", "defense", "magic", "misc"]
+const _SKILL_CATEGORIES: Array = ["active", "weapon", "defense", "magic", "misc"]
 const _SKILL_CATEGORY_LABELS: Dictionary = {
-	"weapon": "WEAPON", "defense": "DEFENSE",
+	"active": "ACTIVE", "weapon": "WEAPON", "defense": "DEFENSE",
 	"magic": "MAGIC", "misc": "MISC",
 }
 
@@ -2618,7 +2618,7 @@ func _on_skills_button_pressed() -> void:
 		_close_all_dialogs()
 		return
 	_close_all_dialogs()
-	_open_skills_dialog("weapon")
+	_open_skills_dialog("active")
 
 
 func _open_skills_dialog(category: String) -> void:
@@ -2684,11 +2684,27 @@ func _open_skills_dialog(category: String) -> void:
 	var state: Dictionary = {}
 	if "skill_state" in player and player.skill_state is Dictionary:
 		state = player.skill_state
+	var any_shown: bool = false
 	for skill_id in SkillSystem.SKILL_IDS:
 		var cat_id: String = String(SkillSystem.SKILL_CATEGORY.get(skill_id, ""))
-		if category != "" and cat_id != category:
+		var entry: Dictionary = state.get(skill_id, {})
+		if category == "active":
+			# Show only skills that are being trained OR have a level > 0.
+			var training: bool = bool(entry.get("training", false))
+			var level: int = int(entry.get("level", 0))
+			if not training and level == 0:
+				continue
+		elif category != "" and cat_id != category:
 			continue
-		rows.add_child(_build_skill_row(skill_id, cat_id, state.get(skill_id, {})))
+		rows.add_child(_build_skill_row(skill_id, cat_id, entry))
+		any_shown = true
+	if not any_shown and category == "active":
+		var hint := Label.new()
+		hint.text = "No skills trained yet.\nEnable skills in the other tabs."
+		hint.add_theme_font_size_override("font_size", 48)
+		hint.modulate = Color(0.7, 0.7, 0.8)
+		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		rows.add_child(hint)
 
 	popup_mgr.add_child(dlg)
 	_skills_dlg = dlg
