@@ -104,6 +104,16 @@ static func cast(player: Node, spell_id: String, target, ctx: Dictionary) -> Dic
 
 	# Failure roll (spl-cast.cc ~2160 — your_spells rolls before effect).
 	var fail_pct: int = SpellRegistry.failure_rate(spell_id, player)
+	# Sif Muna's Divine Exegesis: for 3 turns after invoking, spells
+	# cannot fail. Decrement the counter and force fail=0 on the roll.
+	if player.has_meta("_exegesis_turns") \
+			and int(player.get_meta("_exegesis_turns", 0)) > 0:
+		fail_pct = 0
+		var left: int = int(player.get_meta("_exegesis_turns", 0)) - 1
+		if left <= 0:
+			player.remove_meta("_exegesis_turns")
+		else:
+			player.set_meta("_exegesis_turns", left)
 	if randi() % 100 < fail_pct:
 		return {
 			"spret": SPRET_FAIL,

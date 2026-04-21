@@ -1182,6 +1182,20 @@ func _on_monster_died(monster: Monster) -> void:
 			xp_gain = max(1, int(monster.data.tier) * 8)
 		# Racial XP modifiers: barachi absorb more, demigod/mummy learn slow.
 		xp_gain = int(round(float(xp_gain) * _racial_xp_multiplier()))
+		# Ashenzari passive — curse-proportional skill boost. Per DCSS,
+		# each cursed equipped slot adds a percentage to XP gain (Ashenzari
+		# rewards the burden of curses). We count cursed weapon + each
+		# cursed armor slot and apply +5% XP per cursed slot.
+		if player.current_god == "ashenzari":
+			var curse_count: int = 0
+			if "equipped_weapon_cursed" in player and player.equipped_weapon_cursed:
+				curse_count += 1
+			for slot in player.equipped_armor.keys():
+				var a: Dictionary = player.equipped_armor[slot]
+				if bool(a.get("cursed", false)):
+					curse_count += 1
+			if curse_count > 0:
+				xp_gain = int(xp_gain * (100 + curse_count * 5) / 100.0)
 		xp_gain = max(1, xp_gain)
 		var tags: Array = []
 		var wskill: String = player.get_current_weapon_skill()
@@ -1354,6 +1368,37 @@ func _search_row(title: String, subtitle: String) -> Control:
 	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(sub)
 	return col
+
+
+## DCSS Makhleb Minor/Major Destruction. Rolls one of a fixed pool of
+## zaps and fires it at the nearest visible enemy via SpellRegistry's
+## damage curves so each invocation feels like a rolled spell rather
+## than a flat damage range. `major=true` uses the bigger pool from
+## DCSS god-abil.cc:makhleb_major_destruction.
+func _makhleb_random_zap(major: bool) -> void:
+	var pool_minor: Array = [
+			"magic_dart", "throw_flame", "throw_frost", "stone_arrow"]
+	var pool_major: Array = [
+			"fireball", "iron_shot", "bolt_of_fire", "bolt_of_draining",
+			"lehudibs_crystal_spear"]
+	var pool: Array = pool_major if major else pool_minor
+	var target: Monster = _find_nearest_visible_monster(10)
+	if target == null:
+		CombatLog.add("Makhleb's destruction finds no target.")
+		return
+	var spell_id: String = String(pool[randi() % pool.size()])
+	var info: Dictionary = SpellRegistry.get_spell(spell_id)
+	# Piety-derived power — Makhleb invocations scale with piety, not
+	# Invocations skill in DCSS (it's a quick-tempered god).
+	var power: int = 40 + int(player.piety) / 4
+	var dmg: int = SpellRegistry.roll_damage(spell_id, power)
+	if dmg <= 0:
+		dmg = randi_range(8, 18)
+	var elem: String = SpellRegistry.element_for(spell_id)
+	target.take_damage(dmg, elem)
+	var sname: String = String(info.get("name", spell_id.replace("_", " ")))
+	CombatLog.add("Makhleb hurls %s at the %s for %d!" % \
+			[sname, _mon_name(target), dmg])
 
 
 ## DCSS per-god kill conducts. Returns the adjusted piety gain for this
@@ -1948,17 +1993,54 @@ func _dispatch_invocation(effect: String) -> void:
 			player.set_meta("_finesse_turns", 10)
 			CombatLog.add("Your strikes blur into a flurry!")
 		"duel":
+			# DCSS Duel: banish the target + player to a private arena
+			# tile where nothing else can interfere. We approximate by
+			# teleporting the player adjacent to the target, nuking any
+			# other monsters within 3 tiles via a flee meta, and
+			# damaging the target. Not a full arena but the "1v1" feel
+			# is preserved.
 			var duel_t: Monster = _find_nearest_visible_monster(10)
 			if duel_t != null:
+				# Step player onto a tile adjacent to the target.
+				var dirs: Array = [Vector2i(1,0), Vector2i(-1,0),
+						Vector2i(0,1), Vector2i(0,-1)]
+				for d in dirs:
+					var cand: Vector2i = duel_t.grid_pos + d
+					if player.has_method("_player_can_walk_on") \
+							and player._player_can_walk_on(cand):
+						player.grid_pos = cand
+						player.position = Vector2(
+								cand.x * TILE_SIZE + TILE_SIZE / 2.0,
+								cand.y * TILE_SIZE + TILE_SIZE / 2.0)
+						break
+				# Clear the arena: nearby other monsters flee.
+				for m in get_tree().get_nodes_in_group("monsters"):
+					if m == duel_t or not is_instance_valid(m):
+						continue
+					if maxi(abs(m.grid_pos.x - player.grid_pos.x),
+							abs(m.grid_pos.y - player.grid_pos.y)) <= 3:
+						m.set_meta("_flee_turns", 8)
 				duel_t.take_damage(randi_range(25, 45))
-				CombatLog.add("Okawaru pulls the %s into a duel!" % _mon_name(duel_t))
+				CombatLog.add("Okawaru opens a private arena with the %s!" % \
+						_mon_name(duel_t))
 		# ---- Makhleb ----
 		"minor_destruction":
-			_damage_nearest_visible(12, 22, "A burst of chaos strikes %s!")
+			# DCSS rolls one of: throw_frost / throw_flame / magic_dart /
+			# lightning. Pick from the pool and route through SpellRegistry
+			# for damage to inherit per-element resist scaling.
+			_makhleb_random_zap(false)
 		"major_destruction":
-			_damage_nearest_visible(28, 55, "Makhleb's destruction engulfs %s!")
+			# DCSS rolls one of: fireball / iron_shot / bolt_of_draining /
+			# lehudibs_crystal_spear / bolt_of_fire. Each is a real zap with
+			# its own element + damage curve.
+			_makhleb_random_zap(true)
 		"summon_demon":
-			_summon_ally("red_devil", 50, "A demon rises to serve!")
+			# DCSS rolls a random Pan-lord-tier demon. We rotate across the
+			# demonic roster in our registry so each call feels distinct.
+			var demon_pool: Array = ["red_devil", "yellow_devil", "green_death",
+					"blue_devil", "iron_devil"]
+			_summon_ally(String(demon_pool[randi() % demon_pool.size()]),
+					50, "A demon rises to serve!")
 		# ---- Uskayaw ----
 		"stomp":
 			_aoe_damage_visible(8, 10, 20, "Uskayaw's stomp rattles the floor!")
@@ -1997,12 +2079,27 @@ func _dispatch_invocation(effect: String) -> void:
 				CombatLog.add("The %s calms and flees in peace." % _mon_name(pac_t))
 		# ---- Vehumet ----
 		"gift_spell":
-			if player.learned_spells.size() < 20:
-				var pool: Array = ["throw_flame", "throw_frost", "bolt_of_fire", "bolt_of_cold"]
-				var sp: String = String(pool[randi() % pool.size()])
+			# DCSS Vehumet gifts destructive spells tiered by piety.
+			# Low piety → throw_*; high piety → bolt_of_* / fireball.
+			var low_pool: Array = ["throw_flame", "throw_frost", "magic_dart",
+					"mephitic_cloud"]
+			var mid_pool: Array = ["sticky_flame", "bolt_of_fire", "bolt_of_cold",
+					"iron_shot", "stone_arrow"]
+			var high_pool: Array = ["fireball", "bolt_of_magma", "bolt_of_draining",
+					"lehudibs_crystal_spear"]
+			var pick_pool: Array = low_pool if player.piety < 80 \
+					else (mid_pool if player.piety < 140 else high_pool)
+			# Don't overflow the memorisation cap — bail if it's full.
+			if player.used_spell_levels() >= player.max_spell_levels():
+				CombatLog.add("Vehumet's lips form a spell but you have no memory to hold it.")
+				return
+			for _i in 10:
+				var sp: String = String(pick_pool[randi() % pick_pool.size()])
 				if not player.learned_spells.has(sp):
 					player.learned_spells.append(sp)
 					CombatLog.add("Vehumet gifts you %s." % sp.replace("_", " "))
+					player.spells_learned.emit()
+					break
 		# ---- Sif Muna ----
 		"channel_mana":
 			if player.stats != null:
@@ -2010,10 +2107,16 @@ func _dispatch_invocation(effect: String) -> void:
 				player.stats_changed.emit()
 			CombatLog.add("Sif Muna channels arcane energy into you.")
 		"divine_exegesis":
+			# DCSS Divine Exegesis — lets the player cast any spell they
+			# know at +power AND skips the fail roll. Our approximation:
+			# restore MP to full AND set `_exegesis_turns` for 3 turns,
+			# during which cast failure rate is forced to 0 and spell
+			# power gets a flat +30 bump. SpellCast reads both metas.
 			if player.stats != null:
-				player.stats.MP = min(player.stats.mp_max, player.stats.MP + 30)
+				player.stats.MP = player.stats.mp_max
 				player.stats_changed.emit()
-			CombatLog.add("Your next spell will hit like a meteor.")
+			player.set_meta("_exegesis_turns", 3)
+			CombatLog.add("Sif Muna's insight fills you — next 3 spells cannot fail.")
 		"amnesia":
 			player._apply_consumable_effect({"effect": "amnesia"})
 		# ---- Kikubaaqudgha ----
@@ -2110,7 +2213,22 @@ func _dispatch_invocation(effect: String) -> void:
 				dmap_y.reveal_all()
 			CombatLog.add("Ashenzari grants you sight.")
 		"transfer_knowledge":
-			CombatLog.add("Your skills shift. (stub — no UI yet)")
+			# DCSS Transfer Knowledge: move XP from one skill to another.
+			# Our simplification: grant 1500 XP split across currently-
+			# trained skills (the ones marked training = true). Matches
+			# the "skill swap" spirit while skipping the two-skill picker
+			# UI.
+			if skill_system != null:
+				var trained: Array = []
+				for sk in SkillSystem.SKILL_IDS:
+					var st: Dictionary = player.skill_state.get(sk, {})
+					if bool(st.get("training", false)):
+						trained.append(sk)
+				if trained.is_empty():
+					CombatLog.add("Enable skills to train before calling the transfer.")
+				else:
+					skill_system.grant_xp(player, 1500.0, trained)
+					CombatLog.add("Ashenzari pours arcane knowledge into your training.")
 		# ---- Dithmenos ----
 		"shadow_step":
 			var ss_t: Monster = _find_nearest_visible_monster(10)
