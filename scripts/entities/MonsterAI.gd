@@ -268,6 +268,31 @@ static func _apply_mon_spell(m: Monster, target: Node, spell_id: String) -> bool
 				target.set_meta("_charmed_turns", 3 + int(hd / 5))
 			CombatLog.add("The %s charms you!" % mname)
 			return true
+		"blind":
+			if target.has_method("willpower_check") and target.willpower_check(hd):
+				CombatLog.add("You resist the %s's blinding!" % mname)
+				return true
+			if target.has_method("set_meta"):
+				target.set_meta("_blind_turns", 3 + int(hd / 6))
+				if target.has_method("_recompute_gear_stats"):
+					target._recompute_gear_stats()
+			CombatLog.add("The %s blinds you!" % mname)
+			return true
+		"corona":
+			if target.has_method("set_meta"):
+				target.set_meta("_corona_turns", 5 + int(hd / 4))
+			CombatLog.add("The %s surrounds you with a glowing corona!" % mname)
+			return true
+		"daze", "vertigo":
+			if target.has_method("willpower_check") and target.willpower_check(hd):
+				CombatLog.add("You resist the %s's daze!" % mname)
+				return true
+			if target.has_method("set_meta"):
+				target.set_meta("_dazed_turns", 4 + int(hd / 5))
+				if target.has_method("_recompute_gear_stats"):
+					target._recompute_gear_stats()
+			CombatLog.add("The %s dazes you!" % mname)
+			return true
 		"invisibility":
 			if m.has_method("set_meta"):
 				m.set_meta("_invisible_turns", 20)
@@ -456,6 +481,9 @@ static func _player_stealth_scaled(player: Node) -> int:
 	# Confusion shreds stealth (DCSS divides it by 3).
 	if player.has_method("has_meta") and player.has_meta("_confused"):
 		stealth /= 3
+	# Corona: glowing aura makes the player visible — stealth = 0.
+	if player.has_method("has_meta") and player.has_meta("_corona_turns"):
+		stealth = 0
 	return maxi(0, stealth)
 
 

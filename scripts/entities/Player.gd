@@ -386,6 +386,8 @@ func _tick_duration_metas() -> void:
 		var sv: int = int(get_meta("_slowed_turns", 0)) - 1
 		if sv <= 0:
 			remove_meta("_slowed_turns")
+			if has_meta("_slow_skip"):
+				remove_meta("_slow_skip")
 			CombatLog.add("You feel yourself speed up.")
 		else:
 			set_meta("_slowed_turns", sv)
@@ -403,6 +405,29 @@ func _tick_duration_metas() -> void:
 			CombatLog.add("The charm wears off.")
 		else:
 			set_meta("_charmed_turns", cv)
+	if has_meta("_blind_turns"):
+		var bv: int = int(get_meta("_blind_turns", 0)) - 1
+		if bv <= 0:
+			remove_meta("_blind_turns")
+			_recompute_gear_stats()
+			CombatLog.add("Your vision returns.")
+		else:
+			set_meta("_blind_turns", bv)
+	if has_meta("_corona_turns"):
+		var kov: int = int(get_meta("_corona_turns", 0)) - 1
+		if kov <= 0:
+			remove_meta("_corona_turns")
+			CombatLog.add("Your corona fades.")
+		else:
+			set_meta("_corona_turns", kov)
+	if has_meta("_dazed_turns"):
+		var dv: int = int(get_meta("_dazed_turns", 0)) - 1
+		if dv <= 0:
+			remove_meta("_dazed_turns")
+			_recompute_gear_stats()
+			CombatLog.add("You feel less dazed.")
+		else:
+			set_meta("_dazed_turns", dv)
 	_tick_simple_meta("_divine_shield_turns")
 	_tick_simple_meta("_shadow_form_turns")
 	_tick_simple_meta("_fiery_armour_turns")
@@ -418,6 +443,8 @@ func _tick_duration_metas() -> void:
 			if pt <= 1:
 				remove_meta("_poison_turns")
 				remove_meta("_poison_dmg")
+				if has_meta("_poison_level"):
+					remove_meta("_poison_level")
 			else:
 				set_meta("_poison_turns", pt - 1)
 	# Petrifying → petrified. Petrifying counts down; when it expires,
@@ -770,6 +797,30 @@ func _apply_elem_resist(amount: int, element: String) -> int:
 		return maxi(1, amount / (rl * 2))
 	var denom: int = (3 * rl + 1) / 2 + bonus_res
 	return maxi(1, amount / maxi(1, denom))
+
+
+## FOV radius to use when computing line-of-sight. Blind = 2 tiles.
+func get_fov_radius() -> int:
+	if has_meta("_blind_turns"):
+		return 2
+	return FieldOfView.LOS_DEFAULT_RANGE
+
+
+## Apply poison to the player. level 1/2/3 = increasing DoT.
+## Stacks: re-poisoning at equal or higher level upgrades the DoT.
+func apply_poison(level: int = 1, source: String = "something") -> void:
+	if get_resist("poison") >= 1:
+		CombatLog.add("You resist the poison.")
+		return
+	var cur_level: int = int(get_meta("_poison_level", 0))
+	var new_level: int = clampi(maxi(cur_level, level), 1, 3)
+	var dmg_per_turn: int = new_level * 2
+	var turns: int = 5 + new_level * 2
+	set_meta("_poison_level", new_level)
+	set_meta("_poison_turns", turns)
+	set_meta("_poison_dmg", dmg_per_turn)
+	var labels: Array = ["", "lightly", "moderately", "severely"]
+	CombatLog.add("You are %s poisoned by %s!" % [labels[new_level], source])
 
 
 ## DCSS willpower_check. Returns true if the player resists the hex.
@@ -1236,6 +1287,11 @@ func _recompute_gear_stats() -> void:
 	# `ev` at this point is the sum of legacy slot-bonus + ring-EV reads
 	# above; PlayerDefense now owns both of those so drop the double-count.
 	stats.EV = maxi(0, dcss_ev_total)
+	# Blind: -5 EV (can't dodge what you can't see). Daze: -2 EV.
+	if has_meta("_blind_turns"):
+		stats.EV = maxi(0, stats.EV - 5)
+	if has_meta("_dazed_turns"):
+		stats.EV = maxi(0, stats.EV - 2)
 	# Clamp MP if cap dropped below current reading.
 	if stats.MP > stats.mp_max:
 		stats.MP = stats.mp_max
@@ -1415,6 +1471,15 @@ func try_move(delta: Vector2i) -> bool:
 	if has_meta("_paralysis_turns"):
 		CombatLog.add("You cannot move — you are paralysed!")
 		return false
+	# Slow: every other action is wasted — player moves at half speed.
+	if has_meta("_slowed_turns"):
+		if has_meta("_slow_skip"):
+			remove_meta("_slow_skip")
+			CombatLog.add("You slowly struggle to move...")
+			TurnManager.end_player_turn()
+			return false
+		else:
+			set_meta("_slow_skip", true)
 	# DCSS confusion: each move has ~50% chance to stagger into a
 	# random cardinal direction instead. Doesn't stop the action.
 	if has_meta("_confused") and bool(get_meta("_confused", false)):
@@ -1423,6 +1488,12 @@ func try_move(delta: Vector2i) -> bool:
 					Vector2i(1,1), Vector2i(-1,-1), Vector2i(1,-1), Vector2i(-1,1)]
 			delta = dirs[randi() % dirs.size()]
 			CombatLog.add("You stagger confusedly!")
+	# Daze: lighter confusion — 33% direction scatter.
+	elif has_meta("_dazed_turns"):
+		if randf() < 0.33:
+			var dirs: Array = [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1)]
+			delta = dirs[randi() % dirs.size()]
+			CombatLog.add("You stumble dazedly!")
 	# Mesmerised: can't walk away from the caster (simplification —
 	# DCSS checks direction; we just block movement outright for
 	# `_mesmerised_turns`).
@@ -1430,6 +1501,21 @@ func try_move(delta: Vector2i) -> bool:
 			and _monster_at(grid_pos + delta) == null:
 		CombatLog.add("You are transfixed.")
 		return false
+	# Fear: cannot step toward any visible monster.
+	if has_meta("_afraid_turns"):
+		var target_cell: Vector2i = grid_pos + delta
+		var too_close: bool = false
+		for m in get_tree().get_nodes_in_group("monsters"):
+			if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+				continue
+			var md: int = maxi(abs(m.grid_pos.x - grid_pos.x), abs(m.grid_pos.y - grid_pos.y))
+			var new_md: int = maxi(abs(m.grid_pos.x - target_cell.x), abs(m.grid_pos.y - target_cell.y))
+			if new_md < md:
+				too_close = true
+				break
+		if too_close:
+			CombatLog.add("You are too afraid to move closer!")
+			return false
 	# Tree form (potion of lignification) — root in place; you can still
 	# swing at adjacent monsters, but you can't walk.
 	if has_meta("_tree_turns"):
@@ -2554,6 +2640,10 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 		return null
 	var monster: Node = _monster_at(target_pos)
 	if monster == null:
+		return null
+	# Charm: cannot bring yourself to attack while under the effect.
+	if has_meta("_charmed_turns"):
+		CombatLog.add("You are charmed and cannot attack!")
 		return null
 	# DCSS reach check (item-prop.cc:2323). Polearms hit at distance 2;
 	# everything else is plain Chebyshev adjacent. The 2-tile reach

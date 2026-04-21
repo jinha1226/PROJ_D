@@ -1233,7 +1233,8 @@ func _on_player_moved(new_pos: Vector2i) -> void:
 	_cam_tween.tween_property(cam, "position", cam_target, _CAM_FOLLOW_DUR)
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	if dmap != null:
-		dmap.update_fov(new_pos)
+		var fov_r: int = player.get_fov_radius() if player != null and player.has_method("get_fov_radius") else DungeonMap.EXPLORE_RADIUS
+		dmap.update_fov(new_pos, fov_r)
 		_refresh_actor_visibility(dmap)
 		_refresh_minimap_preview(dmap, new_pos)
 
@@ -1333,8 +1334,7 @@ func _trigger_trap(pos: Vector2i) -> void:
 		"dart":
 			var d: int = 1 + randi() % max(3 + depth / 3, 3)
 			player.take_damage(d, "physical")
-			player.set_meta("_poison_turns", 5)
-			player.set_meta("_poison_dmg", 2)
+			player.apply_poison(1, "a dart")
 			CombatLog.add("A poisoned dart hits you for %d!" % d)
 		"arrow":
 			var a: int = 1 + randi() % max(4 + depth / 3, 4)

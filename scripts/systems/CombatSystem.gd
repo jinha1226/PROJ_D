@@ -190,9 +190,8 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 			if randf() < 0.33:
 				var ts: int = 3 + (randi() % maxi(1, xl))
 				dmg += ts
-				if defender.has_method("set_meta"):
-					defender.set_meta("_poison_turns", 3)
-					defender.set_meta("_poison_dmg", 1)
+				if defender.has_method("apply_poison"):
+					defender.apply_poison(1, "tail slap")
 				CombatLog.add("Your tail slap envenoms!")
 		"tengu_kick":
 			if randf() < 0.33:
@@ -292,9 +291,8 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 				brand_element = "elec"
 			"venom":
 				brand_dmg = randi_range(1, 4)
-				if defender.has_method("set_meta"):
-					defender.set_meta("_poison_turns", 5)
-					defender.set_meta("_poison_dmg", max(1, brand_dmg / 2))
+				if defender.has_method("apply_poison"):
+					defender.apply_poison(1, "venomous weapon")
 			"holy_wrath":
 				brand_dmg = randi_range(2, 5) if _is_undead_or_demon(defender) else 0
 				brand_element = "holy"
@@ -443,9 +441,9 @@ static func melee_attack_from_monster(m, defender) -> int:
 			var flav_element: String = ""
 			match flav:
 				"poison":
-					if defender.has_method("set_meta"):
-						defender.set_meta("_poison_turns", 5)
-						defender.set_meta("_poison_dmg", max(1, base / 4))
+					if defender.has_method("apply_poison"):
+						var aname: String = m.data.display_name if m.data else "the monster"
+						defender.apply_poison(1, aname)
 				"drain", "drain_xp":
 					if defender.has_method("set_meta"):
 						defender.set_meta("_drained_turns", 20)
