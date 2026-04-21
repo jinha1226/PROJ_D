@@ -501,35 +501,17 @@ func _on_quickslot_pressed(index: int) -> void:
 
 
 func _open_quickslot_picker(slot_index: int) -> void:
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null or player == null:
+	if player == null:
 		return
-	var dlg := AcceptDialog.new()
-	dlg.exclusive = false
-	dlg.title = "Assign Quickslot %d" % (slot_index + 1)
-	dlg.ok_button_text = "Cancel"
-
-	var vb := VBoxContainer.new()
+	var dlg := GameDialog.create("Assign Quickslot %d" % (slot_index + 1), Vector2i(800, 1400))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 6)
-	dlg.add_child(vb)
 
-	var scroll := ScrollContainer.new(); scroll.scroll_deadzone = 20
-	scroll.custom_minimum_size = Vector2(0, 1200)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	vb.add_child(scroll)
-
-	var rows := VBoxContainer.new()
-	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	rows.add_theme_constant_override("separation", 6)
-	scroll.add_child(rows)
-
-	var items_header := Label.new()
-	items_header.text = "--- Items ---"
-	items_header.add_theme_font_size_override("font_size", 40)
-	items_header.modulate = Color(0.8, 0.8, 0.6)
-	rows.add_child(items_header)
+	vb.add_child(UICards.section_header("Items"))
 
 	var seen_ids: Dictionary = {}
+	var any_items: bool = false
 	for it in player.get_items():
 		var iid: String = String(it.get("id", ""))
 		var kind: String = String(it.get("kind", ""))
@@ -538,21 +520,20 @@ func _open_quickslot_picker(slot_index: int) -> void:
 		if seen_ids.has(iid):
 			continue
 		seen_ids[iid] = true
+		any_items = true
 		var btn := Button.new()
 		var disp: String = GameManager.display_name_for_item(iid, String(it.get("name", iid)), kind)
 		btn.text = "%s [%s]" % [disp, kind]
 		btn.custom_minimum_size = Vector2(0, 72)
 		btn.add_theme_font_size_override("font_size", 40)
 		btn.pressed.connect(_assign_quickslot_item.bind(slot_index, iid, dlg))
-		rows.add_child(btn)
+		vb.add_child(btn)
+	if not any_items:
+		vb.add_child(UICards.dim_hint("No usable items."))
 
 	var known: Array[String] = SpellRegistry.get_known_for_player(player, skill_system)
 	if not known.is_empty():
-		var spell_header := Label.new()
-		spell_header.text = "--- Spells ---"
-		spell_header.add_theme_font_size_override("font_size", 40)
-		spell_header.modulate = Color(0.6, 0.7, 1.0)
-		rows.add_child(spell_header)
+		vb.add_child(UICards.section_header("Spells"))
 		for spell_id in known:
 			var info: Dictionary = SpellRegistry.get_spell(spell_id)
 			var btn := Button.new()
@@ -561,7 +542,7 @@ func _open_quickslot_picker(slot_index: int) -> void:
 			btn.add_theme_font_size_override("font_size", 40)
 			btn.add_theme_color_override("font_color", info.get("color", Color.WHITE))
 			btn.pressed.connect(_assign_quickslot_item.bind(slot_index, "spell:" + spell_id, dlg))
-			rows.add_child(btn)
+			vb.add_child(btn)
 
 	var clear_btn := Button.new()
 	clear_btn.text = "Clear Slot"
@@ -571,17 +552,12 @@ func _open_quickslot_picker(slot_index: int) -> void:
 	clear_btn.pressed.connect(_assign_quickslot_item.bind(slot_index, "", dlg))
 	vb.add_child(clear_btn)
 
-	popup_mgr.add_child(dlg)
-	dlg.confirmed.connect(dlg.queue_free)
-	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(800, 1400))
 
-
-func _assign_quickslot_item(slot_index: int, id: String, dlg: AcceptDialog) -> void:
+func _assign_quickslot_item(slot_index: int, id: String, dlg: GameDialog) -> void:
 	if player != null and slot_index < player.quickslot_ids.size():
 		player.quickslot_ids[slot_index] = id
 		player.quickslots_changed.emit()
-	dlg.queue_free()
+	dlg.close()
 
 
 ## Rebuild the BottomHUD quickslot labels/colours from player.quickslot_ids +
@@ -618,9 +594,6 @@ func _refresh_quickslots(bottom_hud: Node) -> void:
 
 
 func _on_inspect_requested(pos: Vector2i) -> void:
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null:
-		return
 	var lines: Array = []
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	# Tile info
@@ -658,15 +631,14 @@ func _on_inspect_requested(pos: Vector2i) -> void:
 		lines.append("Turn: %d" % TurnManager.turn_number)
 	if lines.is_empty():
 		return
-	var dlg := AcceptDialog.new()
-	dlg.exclusive = false
-	dlg.title = "Inspect"
-	dlg.ok_button_text = "Close"
-	dlg.dialog_text = "\n".join(PackedStringArray(lines))
-	popup_mgr.add_child(dlg)
-	dlg.confirmed.connect(dlg.queue_free)
-	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(700, 600))
+	var dlg := GameDialog.create("Inspect", Vector2i(700, 600))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
+	var lbl := Label.new()
+	lbl.text = "\n".join(PackedStringArray(lines))
+	lbl.add_theme_font_size_override("font_size", 36)
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vb.add_child(lbl)
 
 
 func _get_trait_skills(trait_id: String) -> Dictionary:
@@ -739,16 +711,10 @@ func _on_auto_attack_pressed() -> void:
 
 
 func _on_menu_pressed() -> void:
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null:
-		return
-	var dlg := AcceptDialog.new()
-	dlg.exclusive = false
-	dlg.title = "Menu"
-	dlg.ok_button_text = "Close"
-	var vb := VBoxContainer.new()
+	var dlg := GameDialog.create("Menu", Vector2i(720, 700))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 16)
-	dlg.add_child(vb)
 
 	var save_btn := Button.new()
 	save_btn.text = "Save & Continue"
@@ -758,7 +724,7 @@ func _on_menu_pressed() -> void:
 		if meta != null:
 			meta.save_to_disk()
 		print("Game saved.")
-		dlg.queue_free())
+		dlg.close())
 	vb.add_child(save_btn)
 
 	var restart_btn := Button.new()
@@ -766,7 +732,7 @@ func _on_menu_pressed() -> void:
 	restart_btn.custom_minimum_size = Vector2(0, 96)
 	restart_btn.add_theme_font_size_override("font_size", 40)
 	restart_btn.pressed.connect(func():
-		dlg.queue_free()
+		dlg.close()
 		GameManager.current_depth = 1
 		get_tree().change_scene_to_file("res://scenes/main/Game.tscn"))
 	vb.add_child(restart_btn)
@@ -778,14 +744,9 @@ func _on_menu_pressed() -> void:
 	quit_btn.pressed.connect(func():
 		if meta != null:
 			meta.save_to_disk()
-		dlg.queue_free()
+		dlg.close()
 		get_tree().change_scene_to_file("res://scenes/menu/MainMenu.tscn"))
 	vb.add_child(quit_btn)
-
-	popup_mgr.add_child(dlg)
-	dlg.confirmed.connect(dlg.queue_free)
-	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(700, 700))
 
 
 func _on_rest_pressed() -> void:
@@ -1413,8 +1374,8 @@ func _on_key_action(action: String) -> void:
 		"examine":
 			CombatLog.add("Examine mode: tap a tile to inspect. (stub)")
 		"cancel":
-			# Close any active popup. Godot's AcceptDialog auto-closes on
-			# Esc, but the path here also ensures targeting mode releases.
+			# Close any active popup. GameDialog auto-closes on Esc,
+			# but the path here also ensures targeting mode releases.
 			if touch_input != null and "targeting_mode" in touch_input:
 				touch_input.targeting_mode = false
 
@@ -1434,20 +1395,16 @@ func _on_shop_tapped(pos: Vector2i) -> void:
 
 
 func _open_shop_dialog(pos: Vector2i, shop: Dictionary) -> void:
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null:
-		return
-	var dlg := AcceptDialog.new()
 	var kind: String = String(shop.get("kind", "general"))
-	dlg.title = "Shop — %s (you have %d gold)" % [kind.capitalize(), player.gold]
-	dlg.exclusive = false
-	dlg.ok_button_text = "Leave"
-	var vb := VBoxContainer.new()
-	dlg.add_child(vb)
+	var title: String = "Shop — %s (you have %d gold)" % [kind.capitalize(), player.gold]
+	var dlg := GameDialog.create(title, Vector2i(800, 900))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
 	var inventory: Array = shop.get("inventory", [])
 	if inventory.is_empty():
 		var lbl := Label.new()
 		lbl.text = "Shop is empty."
+		lbl.add_theme_font_size_override("font_size", 40)
 		vb.add_child(lbl)
 	else:
 		for entry in inventory:
@@ -1459,14 +1416,14 @@ func _open_shop_dialog(pos: Vector2i, shop: Dictionary) -> void:
 				name_s = String(info_row.get("name", name_s))
 			var btn := Button.new()
 			btn.text = "%s — %d gold" % [name_s, price]
+			btn.custom_minimum_size = Vector2(0, 80)
+			btn.add_theme_font_size_override("font_size", 40)
 			btn.disabled = player.gold < price
 			btn.pressed.connect(_buy_from_shop.bind(pos, entry, dlg))
 			vb.add_child(btn)
-	popup_mgr.add_child(dlg)
-	dlg.popup_centered(Vector2i(760, 640))
 
 
-func _buy_from_shop(pos: Vector2i, entry: Dictionary, dlg: AcceptDialog) -> void:
+func _buy_from_shop(pos: Vector2i, entry: Dictionary, dlg: GameDialog) -> void:
 	if player == null or generator == null:
 		return
 	var shop: Dictionary = generator.shops.get(pos, {})
@@ -1501,7 +1458,7 @@ func _buy_from_shop(pos: Vector2i, entry: Dictionary, dlg: AcceptDialog) -> void
 	generator.shops[pos] = shop
 	# Refresh the dialog so the bought row disappears.
 	if dlg != null:
-		dlg.queue_free()
+		dlg.close()
 		_open_shop_dialog(pos, shop)
 
 
@@ -1534,17 +1491,10 @@ func _on_altar_tapped(pos: Vector2i) -> void:
 ## pair. First-time players can read the actual contract before
 ## committing to a permanent pledge.
 func _show_altar_guide(god_id: String, info: Dictionary) -> void:
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null:
-		return
-	var dlg := AcceptDialog.new()
-	dlg.exclusive = false
-	dlg.title = String(info.get("title", god_id))
-	dlg.ok_button_text = "Cancel"
-
-	var vb := VBoxContainer.new()
+	var dlg := GameDialog.create(String(info.get("title", god_id)), Vector2i(900, 1300))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 20)
-	dlg.add_child(vb)
 
 	var name_lbl := Label.new()
 	name_lbl.text = String(info.get("title", god_id))
@@ -1557,7 +1507,6 @@ func _show_altar_guide(god_id: String, info: Dictionary) -> void:
 	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc_lbl.add_theme_font_size_override("font_size", 40)
 	desc_lbl.modulate = Color(0.85, 0.85, 0.95)
-	desc_lbl.custom_minimum_size = Vector2(820, 0)
 	vb.add_child(desc_lbl)
 
 	vb.add_child(HSeparator.new())
@@ -1566,7 +1515,6 @@ func _show_altar_guide(god_id: String, info: Dictionary) -> void:
 	guide_lbl.text = GodRegistry.get_guide(god_id)
 	guide_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	guide_lbl.add_theme_font_size_override("font_size", 34)
-	guide_lbl.custom_minimum_size = Vector2(820, 0)
 	vb.add_child(guide_lbl)
 
 	vb.add_child(HSeparator.new())
@@ -1579,11 +1527,8 @@ func _show_altar_guide(god_id: String, info: Dictionary) -> void:
 		player.current_god = god_id
 		player.piety = 10
 		CombatLog.add("You pledge yourself to %s." % String(info.get("title", god_id)))
-		dlg.queue_free())
+		dlg.close())
 	vb.add_child(pledge_btn)
-
-	popup_mgr.add_child(dlg)
-	dlg.popup_centered(Vector2i(900, 1100))
 
 
 ## Open a popup listing the current god's invocations. Greyed rows are
@@ -1592,29 +1537,25 @@ func _show_invocations_menu() -> void:
 	if player == null or player.current_god == "":
 		return
 	var god: Dictionary = GodRegistry.get_info(player.current_god)
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null:
-		return
-	var dlg := AcceptDialog.new()
-	dlg.title = "%s — Piety %d/%d" % [String(god.get("title", "")), player.piety,
+	var title: String = "%s — Piety %d/%d" % [String(god.get("title", "")), player.piety,
 			int(god.get("piety_cap", 200))]
-	dlg.exclusive = false
-	var vb := VBoxContainer.new()
-	dlg.add_child(vb)
+	var dlg := GameDialog.create(title, Vector2i(720, 900))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
 	for inv_id in god.get("invocations", []):
 		var inv: Dictionary = GodRegistry.invocation(String(inv_id))
 		var btn := Button.new()
 		var locked: bool = player.piety < int(inv.get("min_piety", 999))
 		btn.text = "%s  — %d piety  [%s]" % [String(inv.get("name", inv_id)),
 				int(inv.get("cost", 0)), ("LOCKED" if locked else "READY")]
+		btn.custom_minimum_size = Vector2(0, 80)
+		btn.add_theme_font_size_override("font_size", 40)
 		btn.disabled = locked or player.piety < int(inv.get("cost", 0))
 		btn.pressed.connect(_invoke.bind(String(inv_id), dlg))
 		vb.add_child(btn)
-	popup_mgr.add_child(dlg)
-	dlg.popup_centered(Vector2i(720, 560))
 
 
-func _invoke(inv_id: String, dlg: AcceptDialog) -> void:
+func _invoke(inv_id: String, dlg: GameDialog) -> void:
 	var inv: Dictionary = GodRegistry.invocation(inv_id)
 	if inv.is_empty() or player == null:
 		return
@@ -1623,7 +1564,7 @@ func _invoke(inv_id: String, dlg: AcceptDialog) -> void:
 		return
 	player.piety -= int(inv.get("cost", 0))
 	if dlg != null:
-		dlg.queue_free()
+		dlg.close()
 	_dispatch_invocation(String(inv.get("effect", "")))
 
 
@@ -2274,8 +2215,7 @@ func _tile_occupied_any(pos: Vector2i) -> bool:
 
 
 func _on_identify_one_requested() -> void:
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null or player == null:
+	if player == null:
 		return
 	_suppress_bag_reopen = true
 	# Close the bag / any other open dialog first so the identify picker
@@ -2293,13 +2233,10 @@ func _on_identify_one_requested() -> void:
 		if ConsumableRegistry.has(iid) and not GameManager.is_identified(iid):
 			seen_ids[iid] = true
 			unidentified.append(it)
-	var dlg := AcceptDialog.new()
-	dlg.exclusive = false
-	dlg.title = "Identify Which?"
-	dlg.ok_button_text = "Cancel"
-	var vb := VBoxContainer.new()
+	var dlg := GameDialog.create("Identify Which?", Vector2i(800, 1000))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 8)
-	dlg.add_child(vb)
 	if unidentified.is_empty():
 		var l := Label.new()
 		l.text = "You have nothing left to identify."
@@ -2320,37 +2257,30 @@ func _on_identify_one_requested() -> void:
 			btn.add_theme_font_size_override("font_size", 40)
 			btn.pressed.connect(_on_identify_pick.bind(iid, dlg))
 			vb.add_child(btn)
-	popup_mgr.add_child(dlg)
-	dlg.confirmed.connect(dlg.queue_free)
-	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(800, 1000))
 
 
-func _on_identify_pick(id: String, dlg: AcceptDialog) -> void:
+func _on_identify_pick(id: String, dlg: GameDialog) -> void:
 	GameManager.identify(id)
-	dlg.queue_free()
+	dlg.close()
 
 
 ## Scroll of Enchant Weapon / Armour — pops a picker listing every
 ## weapon (or every armor piece) the player has, equipped or in the
 ## bag. Tapping one bumps its enchant `plus` by 1.
 func _on_enchant_one_requested(kind: String) -> void:
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null or player == null:
+	if player == null:
 		return
 	_close_all_dialogs()
-	var dlg := AcceptDialog.new()
-	dlg.exclusive = false
-	dlg.ok_button_text = "Cancel"
-	var vb := VBoxContainer.new()
+	var title: String = "Enchant Which Weapon?" if kind == "weapon" else "Enchant Which Armour?"
+	var dlg := GameDialog.create(title, Vector2i(900, 1200))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 8)
-	dlg.add_child(vb)
 	var prompt := Label.new()
 	prompt.add_theme_font_size_override("font_size", 40)
 	vb.add_child(prompt)
 
 	if kind == "weapon":
-		dlg.title = "Enchant Which Weapon?"
 		prompt.text = "Choose a weapon to enchant (+1 damage):"
 		# Equipped weapon first
 		if player.equipped_weapon_id != "":
@@ -2371,7 +2301,6 @@ func _on_enchant_one_requested(kind: String) -> void:
 					func(): _apply_enchant_inventory_item(idx, 1))
 			vb.add_child(btn2)
 	else:
-		dlg.title = "Enchant Which Armour?"
 		prompt.text = "Choose an armour piece to enchant (+1 AC):"
 		# Equipped armor slots
 		for slot in ["chest", "cloak", "legs", "helm", "gloves", "boots"]:
@@ -2397,13 +2326,8 @@ func _on_enchant_one_requested(kind: String) -> void:
 					func(): _apply_enchant_inventory_item(idx, 1))
 			vb.add_child(btn2)
 
-	popup_mgr.add_child(dlg)
-	dlg.confirmed.connect(dlg.queue_free)
-	dlg.canceled.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(900, 1200))
 
-
-func _make_enchant_btn(text: String, dlg: AcceptDialog,
+func _make_enchant_btn(text: String, dlg: GameDialog,
 		on_pick: Callable) -> Button:
 	var btn := Button.new()
 	btn.text = text
@@ -2411,7 +2335,7 @@ func _make_enchant_btn(text: String, dlg: AcceptDialog,
 	btn.add_theme_font_size_override("font_size", 38)
 	btn.pressed.connect(func():
 		on_pick.call()
-		dlg.queue_free())
+		dlg.close())
 	return btn
 
 
@@ -2983,16 +2907,13 @@ func _build_magic_row(spell_id: String, dlg: GameDialog) -> Control:
 
 
 func _show_spell_info(spell_id: String) -> void:
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null:
-		return
 	var info: Dictionary = SpellRegistry.get_spell(spell_id)
 	if info.is_empty():
 		return
-	var dlg := AcceptDialog.new()
-	dlg.exclusive = false
-	dlg.title = String(info.get("name", spell_id))
-	dlg.ok_button_text = ""
+	var dlg := GameDialog.create(String(info.get("name", spell_id)), Vector2i(920, 900))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
+	vb.add_theme_constant_override("separation", 12)
 	# Show all schools (multi-school spells like iron_shot list both).
 	var schools_list: Array = SpellRegistry.get_schools(spell_id)
 	var schools_txt: String = ""
@@ -3015,32 +2936,12 @@ func _show_spell_info(spell_id: String) -> void:
 	]
 	if info.has("min_dmg") and int(info.get("min_dmg", 0)) > 0:
 		text += "\nDamage: %d-%d + power" % [int(info.get("min_dmg", 0)), int(info.get("max_dmg", 0))]
-	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 12)
-	dlg.add_child(vb)
-	var scroll := ScrollContainer.new()
-	scroll.scroll_deadzone = 20
-	scroll.custom_minimum_size = Vector2(860, 700)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	vb.add_child(scroll)
 	var lab := Label.new()
 	lab.text = text
 	lab.add_theme_font_size_override("font_size", 48)
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(lab)
-	var close_btn := Button.new()
-	close_btn.text = "Close"
-	close_btn.add_theme_font_size_override("font_size", 48)
-	close_btn.custom_minimum_size = Vector2(0, 120)
-	close_btn.pressed.connect(dlg.queue_free)
-	vb.add_child(close_btn)
-	popup_mgr.add_child(dlg)
-	dlg.confirmed.connect(dlg.queue_free)
-	dlg.canceled.connect(dlg.queue_free)
-	dlg.close_requested.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(920, 900))
+	vb.add_child(lab)
 
 
 func _on_cast_with_targeting(spell_id: String, dlg: GameDialog) -> void:
@@ -3284,7 +3185,7 @@ func _assign_spell_quickslot(spell_id: String, dlg: GameDialog) -> void:
 ## ---- SPELL CASTING -------------------------------------------------------
 
 ## Builds the spell panel for the CAST tab of the skills dialog.
-func _build_spell_panel(container: VBoxContainer, dlg: AcceptDialog) -> void:
+func _build_spell_panel(container: VBoxContainer, dlg: GameDialog) -> void:
 	# MP header.
 	var mp_lab := Label.new()
 	var cur_mp: int = player.stats.MP if player.stats != null else 0
@@ -4297,41 +4198,17 @@ func _build_bag_item_thumbnail(iid: String, kind: String) -> Control:
 
 
 func _on_bag_info(it: Dictionary) -> void:
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null:
-		return
 	# Do NOT close the bag — info opens on top and bag stays alive.
-	var dlg := AcceptDialog.new()
-	dlg.exclusive = false
-	dlg.title = String(it.get("name", "Item"))
-	dlg.ok_button_text = ""
-	var vb := VBoxContainer.new()
+	var dlg := GameDialog.create(String(it.get("name", "Item")), Vector2i(920, 900))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 12)
-	vb.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	dlg.add_child(vb)
-	var scroll := ScrollContainer.new()
-	scroll.scroll_deadzone = 20
-	scroll.custom_minimum_size = Vector2(860, 700)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	vb.add_child(scroll)
 	var lab := Label.new()
 	lab.text = _build_item_tooltip(it)
 	lab.add_theme_font_size_override("font_size", 48)
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(lab)
-	var close_btn := Button.new()
-	close_btn.text = "Close"
-	close_btn.add_theme_font_size_override("font_size", 48)
-	close_btn.custom_minimum_size = Vector2(0, 120)
-	close_btn.pressed.connect(dlg.queue_free)
-	vb.add_child(close_btn)
-	popup_mgr.add_child(dlg)
-	dlg.confirmed.connect(dlg.queue_free)
-	dlg.canceled.connect(dlg.queue_free)
-	dlg.close_requested.connect(dlg.queue_free)
-	dlg.popup_centered(Vector2i(920, 900))
+	vb.add_child(lab)
 
 
 func _on_bag_use(idx: int, dlg: GameDialog) -> void:
@@ -4460,8 +4337,7 @@ func _on_status_pressed() -> void:
 		_close_all_dialogs()
 		return
 	_close_all_dialogs()
-	var popup_mgr: Node = get_node_or_null("UILayer/UI/PopupManager")
-	if popup_mgr == null or player == null:
+	if player == null:
 		return
 
 	var dlg := GameDialog.create("Status", Vector2i(960, 1800))
