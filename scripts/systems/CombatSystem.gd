@@ -138,6 +138,11 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 		base_damage += randi() % (1 + slaying)
 	else:
 		base_damage -= randi() % (1 - slaying)
+	# DCSS Weakness: weak attackers deal 2/3 damage (mostly for monster
+	# spell effects & the sickness aftermath). Uses floor div so very
+	# low rolls can still miss meaningfully.
+	if attacker.has_method("has_meta") and attacker.has_meta("_weak_turns"):
+		base_damage = base_damage * 2 / 3
 	var atk: int = max(1, base_damage)
 
 	var def_ac: int = 0

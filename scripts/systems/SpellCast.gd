@@ -53,9 +53,16 @@ static func cast(player: Node, spell_id: String, target, ctx: Dictionary) -> Dic
 		return _abort("No player")
 
 	# spl-cast.cc:1005 casting_uselessness_reason — silence blocks *every*
-	# cast (no MP cost), confusion burns MP then fizzles.
+	# cast (no MP cost), confusion burns MP then fizzles. Paralysis /
+	# petrification / freezing all prevent the verbal+somatic components
+	# of casting; we abort without burning MP (DCSS treats these as
+	# "can't even try").
 	if player.has_meta("_silenced_turns"):
 		return _abort("You are surrounded by silence — no casting.")
+	if player.has_meta("_paralysis_turns") or player.has_meta("_petrified_turns"):
+		return _abort("You cannot cast — you are immobilised.")
+	if player.has_meta("_frozen_turns"):
+		return _abort("You cannot cast — you are frozen.")
 
 	# Acrobat bonus expires when a spell is cast.
 	if player.has_meta("_acrobat_active"):

@@ -355,6 +355,12 @@ func _on_player_turn_started() -> void:
 ## means new potions just have to drop a meta in _apply_consumable_effect
 ## and the tick here takes care of the rest.
 func _tick_duration_metas() -> void:
+	# Slow / Petrifying / Exhausted share the _slow_skip alternating gate.
+	# When none are active, purge any stale skip flag so the next slow
+	# effect starts fresh on the "move" side of the alternation.
+	if has_meta("_slow_skip") and not (has_meta("_slowed_turns") \
+			or has_meta("_petrifying_turns") or has_meta("_exhausted_turns")):
+		remove_meta("_slow_skip")
 	_tick_simple_meta("_haste_turns")
 	_tick_simple_meta("_enlightened_turns")
 	_tick_simple_meta("_invisible_turns")
@@ -373,6 +379,22 @@ func _tick_duration_metas() -> void:
 			set_meta("_confusion_turns", ct)
 	_tick_simple_meta("_exhausted_turns")
 	_tick_simple_meta("_mesmerised_turns")
+	# Frozen — 1-2 turn full action block after heavy cold damage.
+	if has_meta("_frozen_turns"):
+		var fz: int = int(get_meta("_frozen_turns", 0)) - 1
+		if fz <= 0:
+			remove_meta("_frozen_turns")
+			CombatLog.add("You thaw out.")
+		else:
+			set_meta("_frozen_turns", fz)
+	# Weakness — melee damage reduced 33% while active.
+	if has_meta("_weak_turns"):
+		var wk: int = int(get_meta("_weak_turns", 0)) - 1
+		if wk <= 0:
+			remove_meta("_weak_turns")
+			CombatLog.add("You feel strong again.")
+		else:
+			set_meta("_weak_turns", wk)
 	_tick_simple_meta("_sanctuary_turns")
 	# Paralysis, slow, fear, charm — monster hex durations.
 	if has_meta("_paralysis_turns"):
@@ -777,26 +799,34 @@ func get_resist(element: String) -> int:
 ## + (1) /2, ++ (2) /3, +++ (3) immune (0). Clamps at ±3.
 func _apply_elem_resist(amount: int, element: String) -> int:
 	var rl: int = get_resist(element)
+	var final_amt: int = amount
 	if rl >= 3:
-		return 0  # immune at rF+++ and above
-	if rl == 0:
-		return amount
-	if rl < 0:
+		final_amt = 0  # immune at rF+++ and above
+	elif rl < 0:
 		# Vulnerability: -1 = ×1.5, -2 = ×2, -3 = ×3 (triple vulnerability)
 		if rl == -1:
-			return amount * 3 / 2
-		if rl == -2:
-			return amount * 2
-		return amount * 3  # rF--- and worse
-	# Positive resist path (rl 1 or 2).
-	var bonus_res: int = 0
-	if element == "poison" or element == "neg":
-		bonus_res = 1  # boolean resists
-	if element == "neg":
-		# DCSS special: rN divides by res*2 instead of the polynomial.
-		return maxi(1, amount / (rl * 2))
-	var denom: int = (3 * rl + 1) / 2 + bonus_res
-	return maxi(1, amount / maxi(1, denom))
+			final_amt = amount * 3 / 2
+		elif rl == -2:
+			final_amt = amount * 2
+		else:
+			final_amt = amount * 3  # rF--- and worse
+	elif rl > 0:
+		var bonus_res: int = 0
+		if element == "poison" or element == "neg":
+			bonus_res = 1  # boolean resists
+		if element == "neg":
+			# DCSS special: rN divides by res*2 instead of the polynomial.
+			final_amt = maxi(1, amount / (rl * 2))
+		else:
+			var denom: int = (3 * rl + 1) / 2 + bonus_res
+			final_amt = maxi(1, amount / maxi(1, denom))
+	# DCSS Frozen rider: heavy cold damage that isn't fully resisted has a
+	# small chance to freeze the player for a turn or two. No rC+ dodge
+	# (rC already cut the damage) but rl≥3 immunity zeroed final_amt, so
+	# the gate is "damage landed and was cold-flavoured".
+	if element == "cold" and final_amt >= 6 and randi() % 100 < 15:
+		apply_frozen(1 + randi() % 2, "the chill")
+	return final_amt
 
 
 ## FOV radius to use when computing line-of-sight. Blind = 2 tiles.
@@ -804,6 +834,32 @@ func get_fov_radius() -> int:
 	if has_meta("_blind_turns"):
 		return 2
 	return FieldOfView.LOS_DEFAULT_RANGE
+
+
+## DCSS Frozen: brief full-action block after heavy cold damage.
+## Duration stacks with whichever is longer rather than adding, matching
+## DCSS's mon-tentacle / bolt_of_cold "prefer fresh freeze" behaviour.
+func apply_frozen(turns: int = 2, source: String = "the cold") -> void:
+	if turns <= 0:
+		return
+	var cur: int = int(get_meta("_frozen_turns", 0))
+	if turns <= cur:
+		return
+	set_meta("_frozen_turns", turns)
+	CombatLog.add("You are frozen by %s!" % source)
+
+
+## DCSS Weakness: -33% melee damage for `turns` turns. Applied by a few
+## monster spells and the Potion of Sickness aftermath. Longer duration
+## wins on reapply (don't let old debuff block a fresh one).
+func apply_weakness(turns: int = 10, source: String = "an effect") -> void:
+	if turns <= 0:
+		return
+	var cur: int = int(get_meta("_weak_turns", 0))
+	if turns <= cur:
+		return
+	set_meta("_weak_turns", turns)
+	CombatLog.add("You feel weak (%s)." % source)
 
 
 ## Apply poison to the player. level 1/2/3 = increasing DoT.
@@ -1471,11 +1527,23 @@ func try_move(delta: Vector2i) -> bool:
 	if has_meta("_paralysis_turns"):
 		CombatLog.add("You cannot move — you are paralysed!")
 		return false
-	# Slow: every other action is wasted — player moves at half speed.
-	if has_meta("_slowed_turns"):
+	# Frozen: brief full-action block (cold-attack after-effect).
+	if has_meta("_frozen_turns"):
+		CombatLog.add("You are frozen stiff and can't move.")
+		return false
+	# Slow / Petrifying / Exhausted all reduce speed to 50% via the same
+	# alternating-skip gate so they stack sensibly (two of them active =
+	# still just half speed, not quarter; matches DCSS which caps slow).
+	if has_meta("_slowed_turns") or has_meta("_petrifying_turns") \
+			or has_meta("_exhausted_turns"):
 		if has_meta("_slow_skip"):
 			remove_meta("_slow_skip")
-			CombatLog.add("You slowly struggle to move...")
+			var msg: String = "You slowly struggle to move..."
+			if has_meta("_petrifying_turns"):
+				msg = "You lurch — petrification creeps in..."
+			elif has_meta("_exhausted_turns"):
+				msg = "You stagger — exhaustion drags at you..."
+			CombatLog.add(msg)
 			TurnManager.end_player_turn()
 			return false
 		else:
@@ -2209,6 +2277,11 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 				CombatLog.add("Your past learnings crystallise. (+%d XP)" % amt_xp)
 			return true
 		"berserk":
+			# DCSS you_exhausted(): exhausted players can't re-berserk
+			# until the fatigue wears off. Silently fails with a log line.
+			if has_meta("_exhausted_turns"):
+				CombatLog.add("You are too exhausted to berserk.")
+				return true
 			var dur_b: int = int(info.get("dur_base", 11)) + (randi() % max(int(info.get("dur_rand", 8)), 1))
 			set_meta("_berserk_turns", int(get_meta("_berserk_turns", 0)) + dur_b)
 			# DCSS berserk also hastes and grants bonus HP for the duration.
@@ -2644,6 +2717,13 @@ func try_attack_at(target_pos: Vector2i) -> Node:
 	# Charm: cannot bring yourself to attack while under the effect.
 	if has_meta("_charmed_turns"):
 		CombatLog.add("You are charmed and cannot attack!")
+		return null
+	# Frozen / Petrified / Paralysed: no motor control to swing a weapon.
+	if has_meta("_frozen_turns"):
+		CombatLog.add("You are frozen and can't attack!")
+		return null
+	if has_meta("_petrified_turns") or has_meta("_paralysis_turns"):
+		CombatLog.add("You cannot attack — you are immobilised!")
 		return null
 	# DCSS reach check (item-prop.cc:2323). Polearms hit at distance 2;
 	# everything else is plain Chebyshev adjacent. The 2-tile reach
