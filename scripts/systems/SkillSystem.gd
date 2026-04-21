@@ -21,7 +21,7 @@ const SKILL_IDS: Array = [
 	"spellcasting", "conjurations", "fire", "cold", "earth", "air",
 	"necromancy", "hexes", "translocations", "summonings",
 	# Misc
-	"stealth", "evocations", "essence_channeling",
+	"stealth", "evocations", "essence_channeling", "shapeshifting",
 ]
 
 const SKILL_CATEGORY: Dictionary = {
@@ -37,6 +37,7 @@ const SKILL_CATEGORY: Dictionary = {
 	"translocations": "magic", "summonings": "magic",
 
 	"stealth": "misc", "evocations": "misc", "essence_channeling": "misc",
+	"shapeshifting": "misc",
 }
 
 ## Weapon id → skill id. Used by combat to determine which skill a weapon trains.

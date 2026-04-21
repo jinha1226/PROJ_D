@@ -1585,6 +1585,14 @@ func _on_skill_leveled_up_for_stats(p: Node, skill_id: String, _new_level: int) 
 	if skill_id == "fighting" or skill_id == "spellcasting":
 		if player.has_method("_apply_level_up_growth"):
 			player._apply_level_up_growth()
+	# Shapeshifting levelling mid-form should retune the active form so
+	# the skill bump actually lands. Easiest: re-apply_form with the
+	# current id; apply_form clears the prior state and rebuilds with
+	# the new skill level folded in.
+	if skill_id == "shapeshifting" and player.current_form != "":
+		var cur_form: String = player.current_form
+		player.clear_form()
+		player.apply_form(cur_form)
 
 
 ## Trigger a trap the player just stepped on. Effect depends on the
@@ -3136,6 +3144,7 @@ const _SKILL_DESCS: Dictionary = {
 	"stealth": "Detect range -1/lv",
 	"evocations": "Wand power +2/lv",
 	"essence_channeling": "Essence power +2/lv",
+	"shapeshifting": "Form unarmed DMG + AC scale with lv (×0.1/lv on scaling forms)",
 }
 
 func _build_skill_row(skill_id: String, category: String, entry: Dictionary) -> Control:

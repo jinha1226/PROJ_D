@@ -32,6 +32,7 @@ const SKILL_NAMES: Dictionary = {
 	"stealth": "Stealth",
 	"evocations": "Evocations",
 	"essence_channeling": "Essence Channeling",
+	"shapeshifting": "Shapeshifting",
 }
 
 const CATEGORY_NAMES: Dictionary = {

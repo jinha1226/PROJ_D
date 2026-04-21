@@ -725,9 +725,26 @@ func apply_form(form_id: String) -> bool:
 	# _form_unarmed_base when the player is weaponless so dragon fists
 	# actually hit hard (base 8), tree fists are sturdy (base 9),
 	# storm form is devastating (base 24), etc.
+	# The DCSS formula is unarmed_base + unarmed_scaling × shapeshifting_skill / 10,
+	# capped at reasonable values. We precompute and store so the combat
+	# path only has to read a single meta.
 	var ubase: int = int(info.get("unarmed_base", 0))
-	if ubase > 0:
-		set_meta("_form_unarmed_base", ubase)
+	var uscale: int = int(info.get("unarmed_scaling", 0))
+	var shape_lv: int = _skill_level("shapeshifting")
+	var utotal: int = ubase + (uscale * shape_lv) / 10
+	if utotal > 0:
+		set_meta("_form_unarmed_base", utotal)
+	# DCSS form AC scaling — base + ac_scaling * shapeshifting / 10.
+	# ac_base was already applied via stats.AC delta in apply_form's top
+	# section; the scaling portion is folded in here now that we have
+	# the skill level. Store in a form-specific meta so clear_form can
+	# peel it off without rereading the registry.
+	var ac_scale: int = int(info.get("ac_scaling", 0))
+	if ac_scale > 0 and shape_lv > 0:
+		var ac_bonus: int = (ac_scale * shape_lv) / 10
+		if ac_bonus > 0:
+			stats.AC += ac_bonus
+			set_meta("_form_ac_bonus", ac_bonus)
 	# Form movement bonus. DCSS speed 10 is baseline; 5 means the form
 	# moves at 2× normal pace (bat/bat_swarm). Map to free-move bonus
 	# so the player skips the turn-end when moving in fast forms.
@@ -778,6 +795,10 @@ func clear_form() -> void:
 	remove_meta("_form_move_bonus")
 	remove_meta("_form_melds")
 	remove_meta("_form_size_factor")
+	# _form_ac_bonus was added directly to stats.AC in apply_form; the
+	# _form_baseline restore above already rolled AC back to pre-form,
+	# so we just clean up the tracking meta.
+	remove_meta("_form_ac_bonus")
 	_form_baseline.clear()
 	current_form = ""
 	stats_changed.emit()
