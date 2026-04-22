@@ -29,6 +29,16 @@ const COMBOS: Array = [
 	{"race": "demonspawn", "job": "fighter",           "tag": "DsFi — bulky fighter who gains mutations as you level.",        "tier": "hard"},
 ]
 
+## Simple-mode roster — four human archetypes mapping 1:1 to
+## Pixel Dungeon's Warrior / Mage / Rogue / Huntress. Human race
+## keeps race features out of the picture so Simple stays clean.
+const COMBOS_SIMPLE: Array = [
+	{"race": "human", "job": "fighter",      "tag": "Warrior — heavy melee, high HP, plate-friendly.",         "tier": "easy"},
+	{"race": "human", "job": "hedge_wizard", "tag": "Mage — early magic dart + any spellbook you find.",       "tier": "easy"},
+	{"race": "human", "job": "brigand",      "tag": "Rogue — daggers, stealth, backstab damage.",              "tier": "easy"},
+	{"race": "human", "job": "hunter",       "tag": "Hunter — short bow, ranged opener before the enemy closes.", "tier": "easy"},
+]
+
 const _ROW_HEIGHT: float = 220.0
 const _DOLL_WIDTH: float = 200.0
 
@@ -44,6 +54,16 @@ func _ready() -> void:
 func _build_list() -> void:
 	var list: VBoxContainer = $Scroll/List
 	var meta: MetaProgression = _ensure_meta()
+
+	# Simple mode narrows everything to a four-archetype human roster
+	# and hides the tier headers so the list reads like a Pixel
+	# Dungeon class pick.
+	if GameManager != null and GameManager.is_simple_mode():
+		list.add_child(_make_section_header("Pick a Class"))
+		for combo in COMBOS_SIMPLE:
+			list.add_child(_make_combo_row(String(combo["race"]),
+					String(combo["job"]), String(combo["tag"]), false))
+		return
 
 	# Last-played combo pinned at top when available.
 	if meta != null and meta.last_race != "" and meta.last_job != "":
