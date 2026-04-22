@@ -3030,6 +3030,31 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 				pcount += 1
 			CombatLog.add("A toxic cloud settles on every enemy you see. (%d poisoned)" % pcount)
 			return true
+		"upgrade":
+			# Pixel-Dungeon-style Scroll of Upgrade — adds +1 enchantment
+			# to the equipped weapon (if any), else the chest armour, else
+			# anything still enchantable. DCSS doesn't ship this exact
+			# item; it's the backbone of growth in Simple mode.
+			if equipped_weapon_id != "" \
+					and not equipped_weapon_cursed:
+				equipped_weapon_plus = int(equipped_weapon_plus) + 1
+				CombatLog.add("Your %s glows. (+%d)" % [
+						WeaponRegistry.display_name_for(equipped_weapon_id),
+						equipped_weapon_plus])
+				_recompute_gear_stats()
+				return true
+			if equipped_armor.has("chest"):
+				var body: Dictionary = equipped_armor["chest"]
+				if not bool(body.get("cursed", false)):
+					body["plus"] = int(body.get("plus", 0)) + 1
+					equipped_armor["chest"] = body
+					CombatLog.add("Your %s shimmers. (+%d)" % [
+							String(body.get("name", "armour")),
+							int(body["plus"])])
+					_recompute_gear_stats()
+					return true
+			CombatLog.add("Nothing here to enchant.")
+			return false
 		"butterflies":
 			# DCSS butterflies: noisy, harmless friendly summons. We use
 			# Monster.tscn with "butterfly" data, spawned as temp companions.

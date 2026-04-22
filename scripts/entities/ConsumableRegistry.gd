@@ -313,6 +313,16 @@ const DATA: Dictionary = {
 		"count": 5,
 		"desc": "A flutter of butterflies spawns around you — distractions, mostly.",
 	},
+	# Simple-mode growth currency — Pixel Dungeon style. Adds +1 to the
+	# equipped weapon's enchantment (or armour if no weapon equipped).
+	# Stat-light runs rely on stacking these to carry into deeper floors.
+	"scroll_upgrade": {
+		"name": "Scroll of Upgrade",
+		"kind": "scroll",
+		"color": Color(0.85, 0.95, 0.45),
+		"effect": "upgrade",
+		"desc": "Enchants your equipped weapon or armour (+1).",
+	},
 	# --- DCSS talismans (activate a transmutation form on use) ---
 	"talisman_dragon": {
 		"name": "Dragon Talisman", "kind": "talisman", "form": "dragon",
