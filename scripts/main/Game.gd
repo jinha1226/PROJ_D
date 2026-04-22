@@ -24,6 +24,8 @@ func _ready() -> void:
 	_spawn_items_layer()
 	_spawn_monsters_layer()
 	_spawn_player()
+	if GameManager.depth <= 1:
+		_apply_class_to_player(GameManager.selected_class_id)
 	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth))
 	_spawn_camera()
 	_spawn_ui()
@@ -31,6 +33,39 @@ func _ready() -> void:
 	_update_hud()
 	CombatLog.post("B%d — arrow/WASD to move, bump to attack, '>' descends." \
 			% GameManager.depth, Color(0.7, 0.9, 1.0))
+
+func _apply_class_to_player(class_id: String) -> void:
+	var data: ClassData = ClassRegistry.get_by_id(class_id)
+	if data == null:
+		return
+	player.hp_max = data.starting_hp
+	player.hp = data.starting_hp
+	player.mp_max = data.starting_mp
+	player.mp = data.starting_mp
+	player.strength = data.starting_str
+	player.dexterity = data.starting_dex
+	player.intelligence = data.starting_int
+	if data.starting_weapon != "":
+		player.items.append({"id": data.starting_weapon, "plus": 0})
+		player.equipped_weapon_id = data.starting_weapon
+	if data.starting_armor != "":
+		player.items.append({"id": data.starting_armor, "plus": 0})
+		player.equipped_armor_id = data.starting_armor
+	player.refresh_ac_from_equipment()
+	for id in _class_starter_items(class_id):
+		player.items.append({"id": id, "plus": 0})
+	CombatLog.post("You start as %s." % data.display_name,
+		Color(0.85, 0.9, 1.0))
+
+func _class_starter_items(class_id: String) -> Array:
+	match class_id:
+		"warrior":
+			return ["potion_healing", "potion_healing"]
+		"mage":
+			return ["scroll_blinking", "scroll_blinking", "potion_healing"]
+		"rogue":
+			return ["potion_healing", "scroll_blinking"]
+	return []
 
 func _spawn_map() -> void:
 	map = DungeonMapScene.new()
@@ -187,15 +222,9 @@ func _update_hud() -> void:
 		return
 	top_hud.set_hp(player.hp, player.hp_max)
 	top_hud.set_mp(player.mp, player.mp_max)
-	top_hud.set_xp(player.xp, _xp_to_next(player.xl), player.xl)
+	top_hud.set_xp(player.xp, player.xp_to_next(), player.xl)
 	top_hud.set_depth(GameManager.depth)
 	top_hud.set_gold(player.gold)
-
-func _xp_to_next(level: int) -> int:
-	var curve: Array = [0, 10, 30, 70, 140, 250, 420, 700, 1150, 1800]
-	if level < curve.size():
-		return curve[level]
-	return int(curve[curve.size() - 1] * pow(1.5, level - curve.size() + 1))
 
 func _on_player_moved(_new_pos: Vector2i) -> void:
 	_refresh_fov()
@@ -247,7 +276,7 @@ func _status_lines() -> Array:
 	var w_data: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
 	var a_data: ItemData = ItemRegistry.get_by_id(player.equipped_armor_id)
 	return [
-		"Level: %d  (XP %d / %d)" % [player.xl, player.xp, _xp_to_next(player.xl)],
+		"Level: %d  (XP %d / %d)" % [player.xl, player.xp, player.xp_to_next()],
 		"HP: %d / %d" % [player.hp, player.hp_max],
 		"MP: %d / %d" % [player.mp, player.mp_max],
 		"STR %d  DEX %d  INT %d" % [player.strength, player.dexterity, player.intelligence],

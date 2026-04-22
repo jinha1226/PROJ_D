@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bmonogre00001"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "ogre"
+display_name = "ogre"
+tier = 4
+hp = 52
+hd = 8
+ac = 5
+ev = 4
+speed = 9
+sight_range = 8
+attacks = [{"damage": 12, "flavour": "smash"}]
+resists = []
+min_depth = 7
+max_depth = 14
+weight = 10
+xp_value = 25
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/humanoids/ogre.png"
+glyph = "O"
+glyph_color = Color(0.85, 0.55, 0.35, 1)

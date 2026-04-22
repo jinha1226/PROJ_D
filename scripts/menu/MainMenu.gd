@@ -1,6 +1,7 @@
 extends Control
 
 const GAME_SCENE_PATH: String = "res://scenes/main/Game.tscn"
+const JOB_SELECT_PATH: String = "res://scenes/menu/JobSelect.tscn"
 
 @onready var _start_btn: Button = $VBox/StartButton
 @onready var _display_btn: Button = $VBox/DisplayButton
@@ -14,8 +15,7 @@ func _ready() -> void:
 	_refresh_display_label()
 
 func _on_start() -> void:
-	GameManager.start_new_run()
-	get_tree().change_scene_to_file(GAME_SCENE_PATH)
+	get_tree().change_scene_to_file(JOB_SELECT_PATH)
 
 func _on_toggle_display() -> void:
 	GameManager.toggle_tiles()

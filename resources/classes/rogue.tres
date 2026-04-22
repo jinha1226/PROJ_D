@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ClassData" load_steps=2 format=3 uid="uid://bclassrogue001"]
+
+[ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
+
+[resource]
+script = ExtResource("1_cdata")
+id = "rogue"
+display_name = "도적"
+description = "Agile. DEX-driven daggers, high dodge. Blink scrolls for escape."
+starting_hp = 24
+starting_mp = 4
+starting_str = 10
+starting_dex = 14
+starting_int = 10
+starting_weapon = "dagger"
+starting_armor = "leather_armor"
+starting_skills = {}
+starting_spells = []
+passive = ""

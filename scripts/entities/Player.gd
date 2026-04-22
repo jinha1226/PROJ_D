@@ -12,6 +12,9 @@ const SIGHT_RADIUS: int = 8
 const TEX_PLAYER: Texture2D = preload(
 	"res://assets/tiles/individual/player/base/human_m.png")
 
+const XP_CURVE: Array = [0, 10, 30, 70, 140, 250, 420, 700, 1150, 1800,
+	2800, 4200, 6000, 8400, 11500, 15500, 20500, 27000, 35500, 47000]
+
 var hp: int = 30
 var hp_max: int = 30
 var mp: int = 5
@@ -193,7 +196,45 @@ func heal(amount: int) -> void:
 
 func grant_xp(amount: int) -> void:
 	xp += amount
+	while xl < 27 and xp >= xp_to_next():
+		_level_up()
 	emit_signal("stats_changed")
+
+func xp_to_next() -> int:
+	if xl < XP_CURVE.size():
+		return XP_CURVE[xl]
+	var base: float = float(XP_CURVE[XP_CURVE.size() - 1])
+	return int(base * pow(1.35, xl - XP_CURVE.size() + 1))
+
+func _level_up() -> void:
+	xl += 1
+	var hp_gain: int = 5 + strength / 5
+	hp_max += hp_gain
+	hp = min(hp_max, hp + hp_gain)
+	var mp_gain: int = 2 + intelligence / 4
+	mp_max += mp_gain
+	mp = min(mp_max, mp + mp_gain)
+	CombatLog.post("Level up! You are now level %d." % xl,
+		Color(1.0, 0.9, 0.3))
+	if xl == 12 or xl == 15 or xl == 18:
+		_auto_stat_bump()
+
+func _auto_stat_bump() -> void:
+	# Pick the lowest stat and +1. Simplification of the classic
+	# player-choice bump; tie-breaks favour STR > DEX > INT.
+	var lowest_name: String = "strength"
+	var lowest_val: int = strength
+	if dexterity < lowest_val:
+		lowest_name = "dexterity"
+		lowest_val = dexterity
+	if intelligence < lowest_val:
+		lowest_name = "intelligence"
+		lowest_val = intelligence
+	match lowest_name:
+		"strength": strength += 1
+		"dexterity": dexterity += 1
+		"intelligence": intelligence += 1
+	CombatLog.post("(+1 %s)" % lowest_name.to_upper(), Color(0.75, 0.85, 1))
 
 func wait_turn() -> void:
 	# Light regen while waiting.

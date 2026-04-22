@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bmonadder0001"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "adder"
+display_name = "adder"
+tier = 2
+hp = 10
+hd = 3
+ac = 1
+ev = 10
+speed = 12
+sight_range = 6
+attacks = [{"damage": 4, "flavour": "bite"}]
+resists = []
+min_depth = 2
+max_depth = 6
+weight = 18
+xp_value = 4
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/adder.png"
+glyph = "s"
+glyph_color = Color(0.5, 0.75, 0.4, 1)

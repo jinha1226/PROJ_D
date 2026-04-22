@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bmonhobgoblin1"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "hobgoblin"
+display_name = "hobgoblin"
+tier = 2
+hp = 18
+hd = 4
+ac = 3
+ev = 7
+speed = 10
+sight_range = 8
+attacks = [{"damage": 5, "flavour": "hit"}]
+resists = []
+min_depth = 2
+max_depth = 7
+weight = 15
+xp_value = 6
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/humanoids/hobgoblin.png"
+glyph = "h"
+glyph_color = Color(0.55, 0.55, 0.3, 1)

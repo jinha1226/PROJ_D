@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ClassData" load_steps=2 format=3 uid="uid://bclasswarrior1"]
+
+[ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
+
+[resource]
+script = ExtResource("1_cdata")
+id = "warrior"
+display_name = "전사"
+description = "Heavy hitter. Starts with sword + armor. STR-driven melee."
+starting_hp = 35
+starting_mp = 2
+starting_str = 14
+starting_dex = 10
+starting_int = 6
+starting_weapon = "short_sword"
+starting_armor = "leather_armor"
+starting_skills = {}
+starting_spells = []
+passive = ""

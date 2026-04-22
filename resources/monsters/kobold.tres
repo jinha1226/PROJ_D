@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bmonkobold01"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "kobold"
+display_name = "kobold"
+tier = 1
+hp = 7
+hd = 2
+ac = 1
+ev = 6
+speed = 10
+sight_range = 8
+attacks = [{"damage": 3, "flavour": "hit"}]
+resists = []
+min_depth = 1
+max_depth = 4
+weight = 25
+xp_value = 2
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/humanoids/kobold.png"
+glyph = "K"
+glyph_color = Color(0.55, 0.7, 0.45, 1)

@@ -27,6 +27,7 @@ CombatLog="*res://scripts/core/CombatLog.gd"
 SaveManager="*res://scripts/core/SaveManager.gd"
 MonsterRegistry="*res://scripts/systems/MonsterRegistry.gd"
 ItemRegistry="*res://scripts/systems/ItemRegistry.gd"
+ClassRegistry="*res://scripts/systems/ClassRegistry.gd"
 
 [display]
 
