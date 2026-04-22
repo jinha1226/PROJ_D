@@ -85,6 +85,11 @@ var _targeting_spell: String = ""
 # with _targeting_spell; _on_target_selected branches on whichever is
 # active.
 var _ranged_targeting: bool = false
+## 2-tap confirm flow for area spells. First tap stores the intended
+## blast center here and paints the AoE radius around it; a second tap
+## on the same tile commits. Taps on a different tile move the preview
+## instead of firing. Vector2i(-1, -1) means "no pending selection".
+var _pending_area_target: Vector2i = Vector2i(-1, -1)
 # Camera follow tween so the view doesn't snap.
 var _cam_tween: Tween = null
 const _CAM_FOLLOW_DUR: float = 0.14
@@ -689,14 +694,91 @@ func _on_quickslot_long_pressed(index: int) -> void:
 	if id == "":
 		_open_quickslot_picker(index)
 		return
-	if id.begins_with("spell:"):
-		_show_spell_info(id.substr(6))
-		return
-	# Assume item id — show via the same info popup the bag uses.
-	var item_dict: Dictionary = _find_inventory_item_by_id(id)
-	if item_dict.is_empty():
-		item_dict = {"id": id, "name": id.capitalize().replace("_", " ")}
-	_on_bag_info(item_dict)
+	_open_quickslot_manage_dialog(index, id)
+
+
+## Long-press popup for an assigned quickslot. Shows the spell or item
+## info at the top, followed by Reassign / Clear Slot buttons so the
+## player can retire a slot without having to clear it from the
+## picker's tail. Replaces the info-only popup path that offered no
+## way to empty a slot once used.
+func _open_quickslot_manage_dialog(slot_index: int, assigned_id: String) -> void:
+	var is_spell: bool = assigned_id.begins_with("spell:")
+	var title: String
+	var body_text: String
+	if is_spell:
+		var spell_id: String = assigned_id.substr(6)
+		var info: Dictionary = SpellRegistry.get_spell(spell_id)
+		title = String(info.get("name", spell_id))
+		body_text = _spell_info_text(spell_id, info)
+	else:
+		var it: Dictionary = _find_inventory_item_by_id(assigned_id)
+		if it.is_empty():
+			it = {"id": assigned_id, "name": assigned_id.capitalize().replace("_", " ")}
+		title = String(it.get("name", "Item"))
+		body_text = _build_item_tooltip(it)
+	var dlg := GameDialog.create("Quickslot %d — %s" % [slot_index + 1, title],
+			Vector2i(960, 1200))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
+	vb.add_theme_constant_override("separation", 12)
+
+	var lab := Label.new()
+	lab.text = body_text
+	lab.add_theme_font_size_override("font_size", 42)
+	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vb.add_child(lab)
+
+	vb.add_child(HSeparator.new())
+
+	var reassign_btn := Button.new()
+	reassign_btn.text = "Reassign Slot"
+	reassign_btn.custom_minimum_size = Vector2(0, 96)
+	reassign_btn.add_theme_font_size_override("font_size", 44)
+	reassign_btn.pressed.connect(func():
+		dlg.close()
+		_open_quickslot_picker(slot_index))
+	vb.add_child(reassign_btn)
+
+	var clear_btn := Button.new()
+	clear_btn.text = "Clear Slot"
+	clear_btn.custom_minimum_size = Vector2(0, 96)
+	clear_btn.add_theme_font_size_override("font_size", 44)
+	clear_btn.modulate = Color(1.0, 0.55, 0.55)
+	clear_btn.pressed.connect(func():
+		if player != null and slot_index < player.quickslot_ids.size():
+			player.quickslot_ids[slot_index] = ""
+			player.quickslots_changed.emit()
+		dlg.close())
+	vb.add_child(clear_btn)
+
+
+## Extracted body of _show_spell_info so the Quickslot Manage popup
+## can reuse the exact stat block without popping a second dialog.
+func _spell_info_text(spell_id: String, info: Dictionary) -> String:
+	var schools_list: Array = SpellRegistry.get_schools(spell_id)
+	var schools_txt: String = ""
+	if schools_list.size() > 0:
+		var parts: Array = []
+		for sname in schools_list:
+			var lv: int = skill_system.get_level(player, String(sname)) if skill_system and player else 0
+			parts.append("%s Lv.%d" % [String(sname).capitalize(), lv])
+		schools_txt = ", ".join(PackedStringArray(parts))
+	var fail_pct: int = SpellRegistry.failure_rate(spell_id, player)
+	var spell_pow: int = SpellRegistry.calc_spell_power(spell_id, player)
+	var text: String = "%s\n\nMP Cost: %d\nSchools: %s\nDifficulty: %d\nPower: %d\nFailure: %d%%\nRange: %d" % [
+		String(info.get("desc", "")),
+		int(info.get("mp", 0)),
+		schools_txt,
+		int(info.get("difficulty", 1)),
+		spell_pow,
+		fail_pct,
+		int(info.get("range", 6)),
+	]
+	if info.has("min_dmg") and int(info.get("min_dmg", 0)) > 0:
+		text += "\nDamage: %d-%d + power" % [int(info.get("min_dmg", 0)), int(info.get("max_dmg", 0))]
+	return text
 
 
 func _find_inventory_item_by_id(iid: String) -> Dictionary:
@@ -733,6 +815,7 @@ func _on_quickslot_pressed(index: int) -> void:
 				TurnManager.end_player_turn()
 		else:
 			_targeting_spell = spell_id
+			_pending_area_target = Vector2i(-1, -1)
 			if touch_input != null:
 				touch_input.targeting_mode = true
 			_show_targeting_hint()
@@ -4117,6 +4200,7 @@ func _show_spell_info(spell_id: String) -> void:
 func _on_cast_with_targeting(spell_id: String, dlg: GameDialog) -> void:
 	dlg.close()
 	_targeting_spell = spell_id
+	_pending_area_target = Vector2i(-1, -1)
 	if touch_input != null:
 		touch_input.targeting_mode = true
 	_show_targeting_hint()
@@ -4124,15 +4208,15 @@ func _on_cast_with_targeting(spell_id: String, dlg: GameDialog) -> void:
 
 func _on_target_selected(pos: Vector2i) -> void:
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
-	if dmap != null:
-		dmap.danger_tiles.clear()
-		dmap.aoe_preview_tiles.clear()
-		dmap.beam_preview_tiles.clear()
-		dmap.queue_redraw()
 	# Ranged-fire branch — when the player triggered "fire", the tap
 	# resolves a bow shot instead of a spell. Early-out so the spell
 	# targeting path below doesn't also run.
 	if _ranged_targeting:
+		if dmap != null:
+			dmap.danger_tiles.clear()
+			dmap.aoe_preview_tiles.clear()
+			dmap.beam_preview_tiles.clear()
+			dmap.queue_redraw()
 		_ranged_targeting = false
 		if touch_input != null:
 			touch_input.targeting_mode = false
@@ -4140,33 +4224,59 @@ func _on_target_selected(pos: Vector2i) -> void:
 			player.try_ranged_attack(pos)
 		return
 	if _targeting_spell == "":
+		if dmap != null:
+			dmap.danger_tiles.clear()
+			dmap.aoe_preview_tiles.clear()
+			dmap.beam_preview_tiles.clear()
+			dmap.queue_redraw()
 		return
+	var info_for_range: Dictionary = SpellRegistry.get_spell(_targeting_spell)
+	var max_range: int = int(info_for_range.get("range", 99))
+	var d: int = max(abs(pos.x - player.grid_pos.x), abs(pos.y - player.grid_pos.y))
+	var targeting_kind: String = String(info_for_range.get("targeting", "single"))
+
+	# ----- 2-tap confirm flow for area spells ---------------------------
+	# First tap picks the blast center and paints the AoE radius; a
+	# second tap on the same tile commits. Different tile → move the
+	# preview. Out-of-range taps are silently rejected so the player
+	# can adjust without losing the pending state.
+	if targeting_kind == "area":
+		if d > max_range:
+			CombatLog.add("Out of range (%d > %d). Tap a closer tile." % [d, max_range])
+			return
+		if _pending_area_target == pos:
+			var spell_id_a: String = _targeting_spell
+			_targeting_spell = ""
+			_pending_area_target = Vector2i(-1, -1)
+			if dmap != null:
+				dmap.aoe_preview_tiles.clear()
+				dmap.danger_tiles.clear()
+				dmap.queue_redraw()
+			_execute_targeted_cast(spell_id_a, pos)
+			return
+		# Move the preview to the new tap location. Keep targeting mode
+		# active so the next tap in the same spot confirms.
+		_pending_area_target = pos
+		_repaint_area_preview(pos)
+		CombatLog.add("Tap again to cast %s." % String(info_for_range.get("name",
+				_targeting_spell)))
+		return
+
+	# ----- Single-target (1-tap fire, unchanged) ------------------------
+	if dmap != null:
+		dmap.danger_tiles.clear()
+		dmap.aoe_preview_tiles.clear()
+		dmap.beam_preview_tiles.clear()
+		dmap.queue_redraw()
 	var target_monster: Monster = null
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if is_instance_valid(m) and m is Monster and m.is_alive and m.grid_pos == pos:
 			target_monster = m
 			break
-	var info_for_range: Dictionary = SpellRegistry.get_spell(_targeting_spell)
-	var max_range: int = int(info_for_range.get("range", 99))
-	var d: int = max(abs(pos.x - player.grid_pos.x), abs(pos.y - player.grid_pos.y))
-	var targeting_kind: String = String(info_for_range.get("targeting", "single"))
-	# Area spells accept an empty tile as the blast center — useful for
-	# cloud-residue testing and DCSS-style "blow up a corridor" plays.
-	# Single-target zaps still need a creature under the tap.
 	if target_monster == null:
-		if targeting_kind != "area":
-			CombatLog.add("Targeting cancelled.")
-			_targeting_spell = ""
-			return
-		if d > max_range:
-			CombatLog.add("Target is out of range (%d > %d)." % [d, max_range])
-			_targeting_spell = ""
-			return
-		var spell_id_area: String = _targeting_spell
+		CombatLog.add("Targeting cancelled.")
 		_targeting_spell = ""
-		_execute_targeted_cast(spell_id_area, pos)
 		return
-	# Monster target — require LOS so wall-blocked taps don't eat MP.
 	if dmap != null and not dmap.is_tile_visible(target_monster.grid_pos):
 		CombatLog.add("Your line of sight is blocked.")
 		_targeting_spell = ""
@@ -4178,6 +4288,39 @@ func _on_target_selected(pos: Vector2i) -> void:
 	var spell_id: String = _targeting_spell
 	_targeting_spell = ""
 	_execute_targeted_cast(spell_id, target_monster)
+
+
+## Paint the AoE tiles around the pending blast center so the 2-tap
+## area-spell UX shows exactly which tiles will be hit before commit.
+## Keeps the usual enemy highlights so the player can see who's inside
+## the radius.
+func _repaint_area_preview(center: Vector2i) -> void:
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	if dmap == null or _targeting_spell == "":
+		return
+	var info: Dictionary = SpellRegistry.get_spell(_targeting_spell)
+	var aoe_radius: int = int(info.get("radius", 1))
+	var preview: Array[Vector2i] = []
+	for dy in range(-aoe_radius, aoe_radius + 1):
+		for dx in range(-aoe_radius, aoe_radius + 1):
+			if maxi(absi(dx), absi(dy)) > aoe_radius:
+				continue
+			preview.append(Vector2i(center.x + dx, center.y + dy))
+	dmap.aoe_preview_tiles = preview
+	dmap.beam_preview_tiles.clear()
+	# Keep enemy highlights so the player can see which foes sit in the
+	# radius about to be confirmed.
+	var spell_range: int = int(info.get("range", 6))
+	var enemies: Array[Vector2i] = []
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+			continue
+		if not dmap.is_tile_visible(m.grid_pos):
+			continue
+		if player.grid_pos.distance_to(m.grid_pos) <= float(spell_range):
+			enemies.append(m.grid_pos)
+	dmap.danger_tiles = enemies
+	dmap.queue_redraw()
 
 
 func _show_targeting_hint() -> void:
@@ -4237,7 +4380,14 @@ func _show_targeting_hint() -> void:
 	dmap.aoe_preview_tiles = aoe_preview
 	dmap.beam_preview_tiles = beam_preview
 	dmap.queue_redraw()
-	CombatLog.add("Target a tile to cast %s. Tap empty space to cancel." % String(info.get("name", _targeting_spell)))
+	var hint_msg: String
+	if targeting_type == "area":
+		hint_msg = "Tap a tile to aim %s. Tap again to confirm." \
+				% String(info.get("name", _targeting_spell))
+	else:
+		hint_msg = "Tap an enemy to cast %s. Tap empty space to cancel." \
+				% String(info.get("name", _targeting_spell))
+	CombatLog.add(hint_msg)
 
 
 func _execute_targeted_cast(spell_id: String, target) -> void:
