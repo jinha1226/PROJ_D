@@ -189,6 +189,11 @@ signal inventory_changed
 # remains. Drives BottomHUD's four quickslot buttons.
 var quickslot_ids: Array[String] = ["", "", "", "", "", "", "", ""]
 signal quickslots_changed
+## Emitted when the player triggers a wand that needs a tile target.
+## GameBootstrap catches this, enters targeting mode, and — on the
+## player's confirm tap — calls back into _fire_wand_at to resolve
+## damage / hex effects. Keeps all targeting-UI state in one place.
+signal wand_target_requested(item_index: int)
 
 # Temporary resistance: reduces damage for N more player turns.
 var resist_turns: int = 0
@@ -1402,6 +1407,11 @@ func equip_armor(armor: Dictionary) -> Dictionary:
 	var slot: String = String(armor.get("slot", "chest"))
 	var prev: Dictionary = equipped_armor.get(slot, {})
 	equipped_armor[slot] = armor
+	# DCSS auto-identify: wearing an ego armour reveals the ego class for
+	# the rest of the run, so subsequent drops of the same ego read true.
+	var ego: String = String(armor.get("ego", ""))
+	if ego != "" and GameManager != null:
+		GameManager.identify_armor_ego(ego)
 	_recompute_gear_stats()
 	_load_sprite_preset()
 	return prev
@@ -1991,8 +2001,9 @@ func _pickup_items_here() -> void:
 				it.queue_free()
 				continue
 			items.append(it.as_dict())
+			var pickup_ego: String = String(it.extra.get("ego", "")) if it.extra is Dictionary else ""
 			var shown: String = GameManager.display_name_for_item(
-					it.item_id, it.display_name, it.kind) if GameManager != null else it.display_name
+					it.item_id, it.display_name, it.kind, pickup_ego) if GameManager != null else it.display_name
 			CombatLog.add("Picked up: %s" % shown)
 			it.queue_free()
 	inventory_changed.emit()
@@ -2173,15 +2184,42 @@ func _evoke_wand(index: int) -> bool:
 		CombatLog.add("You carve at the rock. (wall-digging UX not yet wired)")
 		_spend_wand_charge(index, wand_id)
 		return true
-	var target: Node = _nearest_visible_hostile()
-	if target == null:
-		CombatLog.add("No visible target.")
+	# Hand off to GameBootstrap for the 2-tap targeting flow. GameBootstrap
+	# will call fire_wand_at once the player confirms a tile; charges and
+	# identification happen in that callback so a cancelled target spends
+	# nothing.
+	wand_target_requested.emit(index)
+	return true
+
+
+## Resolve a wand's effect at the chosen tile. Called back by
+## GameBootstrap after the 2-tap target flow commits. Returns true on a
+## successful fire so the caller can end the player's turn.
+func fire_wand_at(index: int, target: Node) -> bool:
+	if index < 0 or index >= items.size():
 		return false
-	# Damage / effect dispatch.
+	var it: Dictionary = items[index]
+	var wand_id: String = String(it.get("id", ""))
+	var info: Dictionary = WandRegistry.get_info(wand_id)
+	if info.is_empty():
+		return false
+	var charges: int = int(it.get("charges", 0))
+	if charges <= 0:
+		CombatLog.add("The %s is out of charges." % String(info.get("name", wand_id)))
+		return false
+	var evo: int = 0
+	if skill_state.has("evocations") and skill_state["evocations"] is Dictionary:
+		evo = int(skill_state["evocations"].get("level", 0))
+	var power: int = int(15 + evo * 7)
+	var spell_id: String = String(info.get("spell", ""))
+	var kind: String = String(info.get("kind", "direct"))
+	if target == null:
+		CombatLog.add("No target.")
+		return false
 	if kind == "direct":
 		var dmg: int = SpellRegistry.roll_damage(spell_id, power)
 		if dmg < 0:
-			dmg = randi_range(3, 8) + power / 4  # fallback
+			dmg = randi_range(3, 8) + power / 4
 		target.take_damage(dmg)
 		CombatLog.add("%s hits the %s for %d!" % [String(info.get("name", wand_id)),
 				target.data.display_name if target.data else "target", dmg])

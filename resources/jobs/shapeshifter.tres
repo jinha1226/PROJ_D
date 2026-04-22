@@ -11,6 +11,6 @@ str_bonus = 6
 dex_bonus = 4
 int_bonus = 2
 starting_equipment = Array[String](["dagger", "animal_skin", "potion_lignify", "talisman_quill", "talisman_protean"])
-starting_skills = {"dodging": 2, "fighting": 5}
+starting_skills = {"dodging": 2, "fighting": 5, "shapeshifting": 3}
 starting_spells = Array[String]([])
 unique_ability = ""

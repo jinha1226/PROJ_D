@@ -90,6 +90,11 @@ var _ranged_targeting: bool = false
 ## on the same tile commits. Taps on a different tile move the preview
 ## instead of firing. Vector2i(-1, -1) means "no pending selection".
 var _pending_area_target: Vector2i = Vector2i(-1, -1)
+## Wand targeting — set when Player emits wand_target_requested. We hold
+## the inventory index + resolved kind here so _on_target_selected can
+## call back into Player.fire_wand_at once the player confirms.
+var _targeting_wand_index: int = -1
+var _targeting_wand_id: String = ""
 # Camera follow tween so the view doesn't snap.
 var _cam_tween: Tween = null
 const _CAM_FOLLOW_DUR: float = 0.14
@@ -189,6 +194,8 @@ func _ready() -> void:
 		player.enchant_one_requested.connect(_on_enchant_one_requested)
 	if player.has_signal("summon_companion_requested"):
 		player.summon_companion_requested.connect(_on_summon_companion_requested)
+	if player.has_signal("wand_target_requested"):
+		player.wand_target_requested.connect(_on_wand_target_requested)
 
 	# UI lookup.
 	ui = get_node_or_null("UILayer/UI")
@@ -1371,11 +1378,18 @@ func _place_random_floor_item(pos: Vector2i, depth: int, parent: Node) -> bool:
 			fi.setup(pos, rid, String(ring_info.get("name", rid)), "ring",
 					ring_info.get("color", Color(0.85, 0.85, 0.90)))
 	elif drop_roll < 0.75:
-		# Amulets — 2% of drops, same rarity tier as rings.
-		var amid: String = AmuletRegistry.random_id()
-		var amu_info: Dictionary = AmuletRegistry.get_info(amid)
-		fi.setup(pos, amid, String(amu_info.get("name", amid)), "amulet",
-				amu_info.get("color", Color(1.00, 0.90, 0.30)))
+		# Amulets — 2% of drops, same rarity tier as rings. From depth ≥ 4
+		# a 15% slice rolls a randart amulet (unique name + 1-4 props)
+		# matching the ring path; otherwise pick from the base catalogue.
+		if depth >= 4 and randf() < 0.15:
+			var arart: Dictionary = RandartGenerator.generate_amulet(depth)
+			fi.setup(pos, arart["id"], arart["name"], "amulet",
+					arart["color"], arart)
+		else:
+			var amid: String = AmuletRegistry.random_id()
+			var amu_info: Dictionary = AmuletRegistry.get_info(amid)
+			fi.setup(pos, amid, String(amu_info.get("name", amid)), "amulet",
+					amu_info.get("color", Color(1.00, 0.90, 0.30)))
 	elif drop_roll < 0.80:
 		# Wand drop: pick one of the 12 DCSS wands, roll its starting
 		# charges, stash both in `extra` so the FloorItem/inventory can
@@ -3352,13 +3366,30 @@ func _on_identify_one_requested() -> void:
 	_close_all_dialogs()
 	# Dedupe by item id — carrying three of the same unknown potion should
 	# show one row in the picker, and identifying it reveals all three.
+	# Also surfaces unidentified rings / amulets and ego-bearing armour
+	# so Scroll of Identify works the DCSS way (any unknown magical item,
+	# not just consumables).
 	var unidentified: Array = []
 	var seen_ids: Dictionary = {}
 	for it in player.get_items():
 		var iid: String = String(it.get("id", ""))
 		if iid == "" or seen_ids.has(iid):
 			continue
+		if iid.begins_with("randart_") or iid.begins_with("unrand_"):
+			continue
+		var kind_it: String = String(it.get("kind", ""))
+		var is_candidate: bool = false
 		if ConsumableRegistry.has(iid) and not GameManager.is_identified(iid):
+			is_candidate = true
+		elif (kind_it == "ring" or kind_it == "amulet") \
+				and not GameManager.is_identified(iid):
+			is_candidate = true
+		elif kind_it == "armor":
+			var ego_it: String = String(it.get("ego", ""))
+			if ego_it != "" and not GameManager.is_identified(
+					GameManager.armor_ego_key(ego_it)):
+				is_candidate = true
+		if is_candidate:
 			seen_ids[iid] = true
 			unidentified.append(it)
 	var dlg := GameDialog.create("Identify Which?", Vector2i(960, 1200))
@@ -3388,7 +3419,18 @@ func _on_identify_one_requested() -> void:
 
 
 func _on_identify_pick(id: String, dlg: GameDialog) -> void:
+	# Armour egos are identified by the ego key, not the item id, so the
+	# picker resolves which path to use based on whether any inventory
+	# row under this id carries an ego.
 	GameManager.identify(id)
+	if player != null:
+		for it in player.get_items():
+			if String(it.get("id", "")) != id:
+				continue
+			var ego: String = String(it.get("ego", ""))
+			if ego != "":
+				GameManager.identify_armor_ego(ego)
+			break
 	dlg.close()
 
 
@@ -4420,6 +4462,22 @@ func _on_cast_with_targeting(spell_id: String, dlg: GameDialog) -> void:
 	_show_targeting_hint()
 
 
+## Player emitted wand_target_requested — kick the same 2-tap tile
+## targeting flow the spells use, but stash the inventory index so the
+## confirm tap can call Player.fire_wand_at with the chosen creature.
+func _on_wand_target_requested(item_index: int) -> void:
+	if player == null:
+		return
+	if item_index < 0 or item_index >= player.get_items().size():
+		return
+	_targeting_wand_index = item_index
+	_targeting_wand_id = String(player.get_items()[item_index].get("id", ""))
+	_pending_area_target = Vector2i(-1, -1)
+	if touch_input != null:
+		touch_input.targeting_mode = true
+	CombatLog.add("Tap an enemy to evoke, tap again to confirm.")
+
+
 func _on_target_selected(pos: Vector2i) -> void:
 	var dmap: DungeonMap = $DungeonLayer/DungeonMap
 	# Ranged-fire branch — when the player triggered "fire", the tap
@@ -4436,6 +4494,46 @@ func _on_target_selected(pos: Vector2i) -> void:
 			touch_input.targeting_mode = false
 		if player != null:
 			player.try_ranged_attack(pos)
+		return
+	# ----- Wand targeting (2-tap confirm against a monster) ------------
+	if _targeting_wand_index >= 0:
+		var wtm: Monster = null
+		for m in get_tree().get_nodes_in_group("monsters"):
+			if is_instance_valid(m) and m is Monster and m.is_alive and m.grid_pos == pos:
+				wtm = m
+				break
+		if wtm == null:
+			if dmap != null:
+				dmap.beam_preview_tiles.clear()
+				dmap.danger_tiles.clear()
+				dmap.queue_redraw()
+			CombatLog.add("Wand targeting cancelled.")
+			_targeting_wand_index = -1
+			_targeting_wand_id = ""
+			_pending_area_target = Vector2i(-1, -1)
+			if touch_input != null:
+				touch_input.targeting_mode = false
+			return
+		if dmap != null and not dmap.is_tile_visible(wtm.grid_pos):
+			CombatLog.add("Your line of sight is blocked.")
+			return
+		if _pending_area_target == pos:
+			var fire_idx: int = _targeting_wand_index
+			_targeting_wand_index = -1
+			_targeting_wand_id = ""
+			_pending_area_target = Vector2i(-1, -1)
+			if dmap != null:
+				dmap.beam_preview_tiles.clear()
+				dmap.danger_tiles.clear()
+				dmap.queue_redraw()
+			if touch_input != null:
+				touch_input.targeting_mode = false
+			if player.fire_wand_at(fire_idx, wtm):
+				TurnManager.end_player_turn()
+			return
+		_pending_area_target = pos
+		_repaint_beam_preview(wtm, 8)
+		CombatLog.add("Tap again to fire the wand.")
 		return
 	if _targeting_spell == "":
 		if dmap != null:
@@ -5328,7 +5426,8 @@ func _on_bag_pressed() -> void:
 				row.add_child(icon_node)
 			var info_btn := Button.new()
 			var disp_name: String = GameManager.display_name_for_item(
-					iid_row, String(it.get("name", "?")), kind)
+					iid_row, String(it.get("name", "?")), kind,
+					String(it.get("ego", "")))
 			var plus_amt: int = int(it.get("plus", 0))
 			if plus_amt > 0:
 				disp_name = "%s +%d" % [disp_name, plus_amt]

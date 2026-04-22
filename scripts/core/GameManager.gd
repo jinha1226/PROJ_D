@@ -129,8 +129,10 @@ func is_identified(id: String) -> bool:
 
 
 ## Returns true name if identified, or a stable pseudonym otherwise. Falls
-## through to `fallback` for non-consumable items.
-func display_name_for_item(id: String, fallback: String, kind: String) -> String:
+## through to `fallback` for non-consumable items. Optional `ego` routes
+## armour through the "runed" hide-until-known path.
+func display_name_for_item(id: String, fallback: String, kind: String,
+		ego: String = "") -> String:
 	if identified.has(id):
 		return fallback
 	# Randarts + unrandarts always render with their artefact name —
@@ -140,7 +142,54 @@ func display_name_for_item(id: String, fallback: String, kind: String) -> String
 	if kind == "potion" or kind == "scroll" or kind == "ring" or kind == "amulet":
 		_ensure_pseudonyms()
 		return String(_pseudonyms.get(id, fallback))
+	if kind == "armor" and ego != "":
+		if identified.has(armor_ego_key(ego)):
+			return fallback
+		var base_name: String = fallback
+		var of_idx: int = base_name.findn(" of ")
+		if of_idx >= 0:
+			base_name = base_name.substr(0, of_idx)
+		return "runed %s" % base_name
 	return fallback
+
+
+## DCSS armour-ego identification key. Egos are identified as a class
+## (once you've seen "cloak of stealth", every such cloak reveals), so
+## the key lives in `identified` under a stable "armor_ego_<id>" prefix
+## instead of against the individual item id.
+func armor_ego_key(ego_id: String) -> String:
+	return "armor_ego_%s" % ego_id
+
+
+## Returns the display string for an armour item dict, hiding its ego
+## label behind a "runed" prefix until the ego has been identified.
+## Items without an ego pass through unchanged — the visible flavour
+## gap is just for the magical pieces.
+func display_name_for_armor(item: Dictionary) -> String:
+	var fallback: String = String(item.get("name", ""))
+	var ego: String = String(item.get("ego", ""))
+	if ego == "":
+		return fallback
+	if identified.has(armor_ego_key(ego)):
+		return fallback
+	# Unidentified ego armour shows as "runed <base name>" — strip any
+	# "of <ego>" suffix that the caller may have composed. We can't know
+	# exactly how the caller built the string so a simple split on "of"
+	# covers the common "Leather Armour of Fire Resistance" shape.
+	var base_name: String = fallback
+	var of_idx: int = base_name.findn(" of ")
+	if of_idx >= 0:
+		base_name = base_name.substr(0, of_idx)
+	return "runed %s" % base_name
+
+
+## Reveal an armour ego (called on equip or when Scroll of Identify
+## picks the piece). Subsequent drops / equips of items with the same
+## ego render with their true label.
+func identify_armor_ego(ego_id: String) -> void:
+	if ego_id == "":
+		return
+	identified[armor_ego_key(ego_id)] = true
 
 
 func _ensure_pseudonyms() -> void:
