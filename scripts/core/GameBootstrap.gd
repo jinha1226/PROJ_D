@@ -319,6 +319,8 @@ func _ready() -> void:
 		TurnManager.player_turn_started.connect(_on_turn_refresh_visibility)
 	if not TurnManager.player_turn_started.is_connected(_on_turn_tick_portal):
 		TurnManager.player_turn_started.connect(_on_turn_tick_portal)
+	if not TurnManager.player_turn_started.is_connected(_on_turn_tick_clouds):
+		TurnManager.player_turn_started.connect(_on_turn_tick_clouds)
 
 	_setup_combat_log(ui)
 	TurnManager.start_player_turn()
@@ -492,6 +494,36 @@ func _on_turn_tick_portal() -> void:
 		_save_current_floor()
 		if GameManager.leave_branch():
 			_regenerate_dungeon(true, false)
+
+
+## Cloud tick — decrement every cloud's turns_left, remove expired ones,
+## and apply per-turn damage / status to any actor standing on a cloud
+## tile. Called each player turn. The FOV opaque callback already checks
+## smoke clouds via GameManager.clouds, so expired smoke naturally
+## stops blocking sight on the next redraw.
+func _on_turn_tick_clouds() -> void:
+	if GameManager == null or GameManager.clouds.is_empty():
+		return
+	# Apply damage first so an actor standing on a 1-turn cloud still
+	# takes the final tick before the cloud dissolves.
+	if player != null and player.is_alive:
+		var pc: Dictionary = GameManager.clouds.get(player.grid_pos, {})
+		if not pc.is_empty():
+			CloudSystem.apply_to_actor(pc, player)
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+			continue
+		var mc: Dictionary = GameManager.clouds.get(m.grid_pos, {})
+		if not mc.is_empty():
+			CloudSystem.apply_to_actor(mc, m)
+	var expired: Array = CloudSystem.tick(GameManager.clouds)
+	if not expired.is_empty():
+		var dmap: DungeonMap = $DungeonLayer/DungeonMap
+		if dmap != null:
+			# If any smoke cloud expired, recompute FOV since sight may
+			# have just opened up through that tile.
+			dmap.update_fov(player.grid_pos)
+			dmap.queue_redraw()
 
 
 func _refresh_danger_tiles(dmap: DungeonMap) -> void:
@@ -2724,6 +2756,11 @@ func _regenerate_dungeon(going_up: bool, secondary: bool = false) -> void:
 	# selection now goes through GameManager.tileset_branch() which
 	# derives the theme without mutating current_branch.
 	TileRenderer._cache.clear()
+	# Clouds are per-floor and don't persist across stairs. Clearing
+	# also prevents stale Vector2i keys from a prior map leaking onto
+	# a newly-generated one of different dimensions.
+	if GameManager != null:
+		GameManager.clouds.clear()
 	generator = DungeonGenerator.new()
 	add_child(generator)
 	generator.generate(GameManager.current_depth, _base_seed)
@@ -4467,9 +4504,33 @@ func _cast_area_spell(spell_id: String, info: Dictionary, power: int, center_m: 
 	SpellFX.float_text(fx_layer, center_px + Vector2(0, -24),
 			"%d dmg" % total_dmg, spell_color)
 
+	# DCSS cloud residue — some area spells leave behind a transient
+	# cloud patch. The spell_id → cloud_type map lives here so spells
+	# can opt in without knowing the CloudSystem exists.
+	var cloud_residue: String = _spell_cloud_residue(spell_id)
+	if cloud_residue != "" and GameManager != null:
+		var dmap2: DungeonMap = $DungeonLayer/DungeonMap
+		CloudSystem.place_patch(GameManager.clouds, center, cloud_residue, radius)
+		if dmap2 != null:
+			dmap2.update_fov(player.grid_pos)
+			dmap2.queue_redraw()
+
 	if hits == 0:
 		return {"success": true, "message": "%s hits nothing." % String(info.get("name", spell_id))}
 	return {"success": true, "message": "%s: %d hit(s), %d total dmg" % [String(info.get("name", spell_id)), hits, total_dmg]}
+
+
+## Spell → cloud type mapping. DCSS source: spl-zap.cc / spell data.
+## Fireball / Fire Storm leave fire clouds; Hailstorm leaves freezing
+## clouds. Extend here as cloud-placing spells are ported.
+func _spell_cloud_residue(spell_id: String) -> String:
+	match spell_id:
+		"fireball", "fire_storm":
+			return "fire"
+		"hailstorm":
+			return "freezing"
+		_:
+			return ""
 
 
 func _cast_self_spell(spell_id: String, _info: Dictionary, _power: int) -> Dictionary:

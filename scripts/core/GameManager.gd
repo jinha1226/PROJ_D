@@ -39,6 +39,11 @@ var portal_turns_left: int = 0
 var runes_placed: Dictionary = {}
 var orb_placed: bool = false
 
+## Active cloud tiles on the current floor. Keyed by Vector2i → dict
+## (see CloudSystem.place for shape). Cleared on floor regenerate;
+## CloudSystem.tick decrements per player turn via GameBootstrap.
+var clouds: Dictionary = {}
+
 # --- Item identification (per-run) ---
 # identified[id] == true once the player has drunk/read/identified a consumable.
 var identified: Dictionary = {}
@@ -99,6 +104,7 @@ func start_new_run(job_id: String = "fighter", race_id: String = "human", run_se
 	runes_placed.clear()
 	orb_placed = false
 	portal_turns_left = 0
+	clouds.clear()
 	# Persist the combo so QuickStart can resurface it on the next boot.
 	var meta: Node = get_tree().root.get_node_or_null("MetaProgression") if get_tree() != null else null
 	if meta != null and meta.has_method("record_last_combo"):

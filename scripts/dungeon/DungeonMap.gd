@@ -87,6 +87,12 @@ func _opaque_at(cell: Vector2i) -> int:
 			or t == DungeonGenerator.TileType.DOOR_CLOSED \
 			or t == DungeonGenerator.TileType.CRYSTAL_WALL:
 		return FieldOfView.OPC_OPAQUE
+	# Smoke clouds block line-of-sight like walls do — DCSS losparam.cc
+	# treats them as OPAQUE. Other cloud types stay transparent.
+	if GameManager != null and GameManager.clouds.has(cell):
+		var c: Dictionary = GameManager.clouds[cell]
+		if CloudSystem.blocks_fov(c):
+			return FieldOfView.OPC_OPAQUE
 	# Glass walls block movement but not sight — return CLEAR so FOV
 	# rays sail through the translucent pane.
 	return FieldOfView.OPC_CLEAR
@@ -154,6 +160,19 @@ func _draw() -> void:
 		_draw_dcss()
 	else:
 		_draw_lpc()
+	# Cloud overlay — translucent per-type tint drawn on top of the tile
+	# so terrain underneath still reads. Only drawn on currently-visible
+	# tiles (DCSS: clouds you don't see don't bleed into memory).
+	if GameManager != null and not GameManager.clouds.is_empty():
+		for pos in GameManager.clouds.keys():
+			if not is_tile_visible(pos):
+				continue
+			var c: Dictionary = GameManager.clouds[pos]
+			var type_id: String = String(c.get("type", ""))
+			var def: Dictionary = CloudSystem.CLOUD_DEFS.get(type_id, {})
+			var cc: Color = def.get("color", Color(0.7, 0.7, 0.7, 0.5))
+			var cr := Rect2(pos.x * TILE_SIZE, pos.y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+			draw_rect(cr, cc, true)
 	# Beam preview — cyan trail along the ray toward each visible enemy.
 	# Drawn first so AoE / danger overlays layer on top.
 	var beam_color: Color = Color(0.25, 0.75, 0.95, 0.30)
