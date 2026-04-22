@@ -19,6 +19,16 @@ const JOB_IDS: Array[String] = [
 	"earth_elementalist", "alchemist", "forgewright",
 ]
 
+## Simple-mode roster — four archetypes that map 1:1 to the Pixel
+## Dungeon classes: Warrior / Mage / Rogue / Hunter. Our closest
+## DCSS backgrounds stand in so character balance stays consistent.
+const JOB_IDS_SIMPLE: Array[String] = [
+	"fighter",      # Warrior
+	"hedge_wizard", # Mage
+	"brigand",      # Rogue
+	"hunter",       # Hunter
+]
+
 const _ROW_HEIGHT: float = 320.0
 const _DOLL_WIDTH: float = 260.0
 
@@ -37,7 +47,13 @@ func _ready() -> void:
 
 func _build_rows() -> void:
 	var list: VBoxContainer = $Scroll/List
-	for jid in JOB_IDS:
+	# Simple mode narrows the background pool to a four-archetype
+	# Pixel-Dungeon roster so character creation stays quick. Classic
+	# shows all 26 DCSS backgrounds.
+	var ids: Array[String] = JOB_IDS
+	if GameManager != null and GameManager.is_simple_mode():
+		ids = JOB_IDS_SIMPLE
+	for jid in ids:
 		var res: JobData = load("res://resources/jobs/%s.tres" % jid) as JobData
 		if res == null:
 			continue
