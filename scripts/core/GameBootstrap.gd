@@ -1432,7 +1432,30 @@ func _spawn_monsters_for_current_depth() -> void:
 	for m in monsters:
 		if m != null and not m.died.is_connected(_on_monster_died):
 			m.died.connect(_on_monster_died)
-	print("[spawn] depth=%d spawned=%d" % [GameManager.current_depth, monsters.size()])
+	# DCSS KMONS — vaults bind a glyph to a monster id via `KMONS: X = ...`.
+	# _stamp_vault recorded every such glyph's world position in
+	# generator.vault_monsters; spawn those creatures now so the vault
+	# reads the way its author intended (e.g. a boss room wired to its
+	# pet mob). Skipped on the Temple branch since it's a no-spawn
+	# sanctuary already.
+	var km_extra: int = 0
+	if GameManager != null and String(GameManager.current_branch) != "temple" \
+			and generator != null and not generator.vault_monsters.is_empty():
+		var scene: PackedScene = load("res://scenes/entities/Monster.tscn")
+		if scene != null:
+			for pos in generator.vault_monsters.keys():
+				var mid: String = String(generator.vault_monsters[pos])
+				var mdata: MonsterData = MonsterRegistry.fetch(mid)
+				if mdata == null:
+					continue
+				var m: Monster = scene.instantiate()
+				$EntityLayer.add_child(m)
+				m.setup(generator, pos, mdata)
+				if not m.died.is_connected(_on_monster_died):
+					m.died.connect(_on_monster_died)
+				km_extra += 1
+	print("[spawn] depth=%d spawned=%d (kmons=%d)" % [
+			GameManager.current_depth, monsters.size(), km_extra])
 
 
 const _LOOT_DROP_CHANCE: float = 0.30

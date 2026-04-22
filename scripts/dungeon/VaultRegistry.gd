@@ -254,13 +254,25 @@ static func for_branch(branch: String) -> Array:
 
 ## Depth-aware vault pool: combines hand-coded branch vaults with DCSS .des
 ## imports that match the given (branch, depth). Returns Array of map grids
-## (Array[String]) — compatible with `_stamp_vault`.
+## (Array[String]) — back-compat with `_stamp_vault` + tools/test_vault_pool.
 static func for_branch_at_depth(branch: String, depth: int) -> Array:
+	var out: Array = []
+	for v in for_branch_at_depth_full(branch, depth):
+		out.append(v.get("map", []))
+	return out
+
+
+## Depth-aware vault pool with full metadata (map + kmons). Used by the
+## DungeonGenerator placer so DCSS KMONS glyphs can trigger monster
+## spawns at placement time.
+static func for_branch_at_depth_full(branch: String, depth: int) -> Array:
 	ensure_dcss_loaded()
 	var out: Array = []
-	# Hand-coded vaults are always eligible for their branch.
+	# Hand-coded vaults are always eligible for their branch. Wrap them
+	# in the same shape the parsed DCSS vaults use so callers don't need
+	# to branch on source.
 	for tmpl in for_branch(branch):
-		out.append(tmpl)
+		out.append({"map": tmpl, "kmons": {}})
 	# DCSS vaults filter by depth spec. We also skip vaults whose footprint
 	# would swamp the map (>25x25 is effectively a full-level layout).
 	for v in _dcss_vaults:
@@ -273,7 +285,7 @@ static func for_branch_at_depth(branch: String, depth: int) -> Array:
 		var w: int = String(m[0]).length()
 		if h > 25 or w > 25:
 			continue
-		out.append(m)
+		out.append({"map": m, "kmons": v.get("kmons", {})})
 	return out
 
 

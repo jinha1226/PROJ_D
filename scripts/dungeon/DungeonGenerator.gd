@@ -35,6 +35,11 @@ var branch_entrances: Dictionary = {}
 ## Altar tile → god id. Temple floors get three (one per god); most
 ## dungeon floors get zero, ~12% get a single random altar.
 var altars: Dictionary = {}
+## Vault KMONS spawn requests — Vector2i → monster id. Populated by
+## `_stamp_vault` when the source vault's kmons dict maps a glyph that
+## lands on a specific tile. GameBootstrap reads this after regular
+## floor spawns so vault-anchored monsters land on their marked tiles.
+var vault_monsters: Dictionary = {}
 ## Shop tile → shop inventory dict. ~1-in-6 floors get a shop; the
 ## inventory is rolled at generation and serialised with the floor.
 var shops: Dictionary = {}
@@ -598,13 +603,14 @@ func _grow_pool(start: Vector2i, tile: int, target: int) -> void:
 # ---- Vault placement ------------------------------------------------------
 
 func _place_vault(branch: String, depth: int) -> void:
-	var pool: Array = VaultRegistry.for_branch_at_depth(branch, depth)
+	var pool: Array = VaultRegistry.for_branch_at_depth_full(branch, depth)
 	if pool.is_empty():
 		return
 	# Up to 3 vault attempts per floor so DCSS's large pool gets some coverage;
-	# each attempt picks a different template then tries 15 positions.
+	# each attempt picks a different vault then tries 15 positions.
 	for _attempt in 3:
-		var template: Array = pool[_rng.randi_range(0, pool.size() - 1)]
+		var vault: Dictionary = pool[_rng.randi_range(0, pool.size() - 1)]
+		var template: Array = vault.get("map", [])
 		if template.is_empty():
 			continue
 		var h: int = template.size()
@@ -615,7 +621,7 @@ func _place_vault(branch: String, depth: int) -> void:
 			var ox: int = _rng.randi_range(2, MAP_WIDTH - w - 2)
 			var oy: int = _rng.randi_range(2, MAP_HEIGHT - h - 2)
 			if _vault_fits(template, ox, oy):
-				_stamp_vault(template, ox, oy)
+				_stamp_vault(template, ox, oy, vault.get("kmons", {}))
 				return
 
 
@@ -648,11 +654,18 @@ func _vault_fits(template: Array, ox: int, oy: int) -> bool:
 	return floor_overlap > 0
 
 
-func _stamp_vault(template: Array, ox: int, oy: int) -> void:
+func _stamp_vault(template: Array, ox: int, oy: int, kmons: Dictionary = {}) -> void:
 	for ry in template.size():
 		var row: String = String(template[ry])
 		for rx in row.length():
 			var ch: String = row.substr(rx, 1)
+			# KMONS — DCSS binds a glyph to a monster id. Treat the glyph
+			# as floor for tile purposes and queue a spawn request at the
+			# stamped position so the spawner can land the creature.
+			if kmons.has(ch):
+				map[ox + rx][oy + ry] = TileType.FLOOR
+				vault_monsters[Vector2i(ox + rx, oy + ry)] = String(kmons[ch])
+				continue
 			var t: int = VaultRegistry.char_to_tile(ch)
 			if t == -1:
 				continue

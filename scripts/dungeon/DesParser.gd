@@ -140,6 +140,15 @@ static func _parse_vault_block(lines: PackedStringArray, start_idx: int,
 		"orient": "",
 		"map": [],
 		"source": source,
+		# SUBST: glyph → [ {ch, weight} ] weighted replacement pool.
+		# Applied at _finalize_vault so source glyphs never reach the
+		# supported-glyph gate.
+		"subst": {},
+		# KMONS: glyph → monster id (DCSS supports a single id or a
+		# weighted set; we take the first id as a safe simplification).
+		# During placement the glyph is treated as floor and a spawn
+		# request is queued against VaultRegistry.
+		"kmons": {},
 	}
 	var i: int = start_idx
 	var in_map: bool = false
@@ -187,9 +196,16 @@ static func _parse_vault_block(lines: PackedStringArray, start_idx: int,
 			vault["weight"] = _parse_int(stripped.substr("WEIGHT:".length()), 10)
 		elif stripped.begins_with("ORIENT:"):
 			vault["orient"] = stripped.substr("ORIENT:".length()).strip_edges()
-		elif stripped.begins_with("SUBST:") \
-				or stripped.begins_with("NSUBST:") \
-				or stripped.begins_with("KMONS:") \
+		elif stripped.begins_with("SUBST:"):
+			# SUBST: X = . / F    or    SUBST: X = .:5 x:3 w
+			# Parsed into a weighted replacement pool so finalize can
+			# roll once and emit a supported-glyph map.
+			_parse_subst_into(vault, stripped.substr("SUBST:".length()))
+		elif stripped.begins_with("KMONS:"):
+			# KMONS: X = orc   (we take the first token; weighted /
+			# alternate sets are simplified to the lead id).
+			_parse_kmons_into(vault, stripped.substr("KMONS:".length()))
+		elif stripped.begins_with("NSUBST:") \
 				or stripped.begins_with("KITEM:") \
 				or stripped.begins_with("KFEAT:") \
 				or stripped.begins_with("MONS:") \
@@ -209,11 +225,8 @@ static func _parse_vault_block(lines: PackedStringArray, start_idx: int,
 				or stripped.begins_with("EPILOGUE:") \
 				or stripped.begins_with("PROPERTIES:") \
 				or stripped.begins_with("NSLOT:"):
-			# These directives need engine support we don't have. We tolerate
-			# them (don't reject the vault) unless they're clearly doing work
-			# we can't ignore (KMONS/KITEM/KFEAT/MONS/ITEM substitute map
-			# glyphs for monsters or items — dropping them leaves the map
-			# emptier than DCSS intended but still playable).
+			# Remaining directives need engine support we don't have.
+			# Tolerate them (don't reject the vault).
 			pass
 		elif stripped == "MAP":
 			in_map = true
@@ -231,6 +244,24 @@ static func _finalize_vault(vault: Dictionary, has_lua: bool, has_unsupported: b
 		return {}
 	if has_unsupported:
 		return {}
+	# Apply SUBST substitutions before the supported-glyph check so
+	# vaults using `X = . / F` etc. don't get rejected for a source
+	# glyph they're going to replace anyway. One roll per source glyph
+	# per vault keeps the parsed template stable across runs — enough
+	# variety across the ~200 vault corpus without per-placement RNG.
+	var subst: Dictionary = vault.get("subst", {})
+	if not subst.is_empty():
+		var rolled: Dictionary = {}
+		for ch in subst.keys():
+			rolled[String(ch)] = _pick_weighted_glyph(subst[ch])
+		var out_rows: Array = []
+		for row in vault["map"]:
+			var s: String = String(row)
+			var rebuilt: String = ""
+			for c in s:
+				rebuilt += rolled.get(c, c) if rolled.has(c) else c
+			out_rows.append(rebuilt)
+		vault["map"] = out_rows
 	# Drop vaults containing map characters we can't render. Any glyph not in
 	# the supported set kills the vault — safer than placing a broken map.
 	for row in vault["map"]:
@@ -250,6 +281,103 @@ static func _finalize_vault(vault: Dictionary, has_lua: bool, has_unsupported: b
 		padded.append(s)
 	vault["map"] = padded
 	return vault
+
+
+## Parse a `SUBST:` tail into vault["subst"]. Accepts the DCSS forms:
+##   SUBST: X = .       (single replacement)
+##   SUBST: X = . / F   (uniform weights across /-separated glyphs)
+##   SUBST: X = .:5 x:3 w   (explicit weights — default 1)
+## One SUBST line may rebind multiple source glyphs via `;`-separated
+## clauses: `SUBST: X = . ; Y = w`.
+static func _parse_subst_into(vault: Dictionary, tail: String) -> void:
+	var subst: Dictionary = vault.get("subst", {})
+	for clause in tail.split(";", false):
+		var s: String = String(clause).strip_edges()
+		if s == "":
+			continue
+		var eq: int = s.find("=")
+		if eq < 0:
+			continue
+		var src_part: String = s.substr(0, eq).strip_edges()
+		if src_part.length() == 0:
+			continue
+		# DCSS allows `SUBST: X Y = ...` binding both to the same pool.
+		var sources: PackedStringArray = PackedStringArray()
+		for sc in src_part:
+			if sc != " " and sc != "\t":
+				sources.append(String(sc))
+		var pool_text: String = s.substr(eq + 1).strip_edges()
+		pool_text = pool_text.replace("/", " ")
+		var pool: Array = []
+		for tok in pool_text.split(" ", false):
+			var t: String = String(tok).strip_edges()
+			if t == "":
+				continue
+			var w: int = 1
+			var gch: String = t
+			var colon: int = t.find(":")
+			if colon >= 0:
+				gch = t.substr(0, colon)
+				w = _parse_int(t.substr(colon + 1), 1)
+			if gch.length() != 1:
+				continue
+			pool.append({"ch": gch, "w": maxi(1, w)})
+		if pool.is_empty():
+			continue
+		for sg in sources:
+			subst[String(sg)] = pool
+	vault["subst"] = subst
+
+
+## Parse a `KMONS:` tail into vault["kmons"]. Takes the first monster id
+## when the right-hand side enumerates a weighted set — good enough for
+## our placer which spawns a single creature per glyph slot.
+static func _parse_kmons_into(vault: Dictionary, tail: String) -> void:
+	var kmons: Dictionary = vault.get("kmons", {})
+	var s: String = tail.strip_edges()
+	var eq: int = s.find("=")
+	if eq < 0:
+		return
+	var src: String = s.substr(0, eq).strip_edges()
+	var rhs: String = s.substr(eq + 1).strip_edges()
+	if src.length() != 1:
+		return
+	# DCSS KMONS RHS forms:
+	#   orc
+	#   orc w:8 / kobold
+	#   orc / gnoll
+	# Split on `/` then pick the first non-weight token.
+	var first: String = ""
+	for chunk in rhs.split("/", false):
+		for tok in String(chunk).split(" ", false):
+			var t: String = String(tok).strip_edges()
+			if t == "" or t.contains(":"):
+				continue
+			first = t
+			break
+		if first != "":
+			break
+	if first != "":
+		kmons[src] = first
+	vault["kmons"] = kmons
+
+
+## Roll a glyph from a weighted pool. Pool entries are {"ch", "w"}.
+static func _pick_weighted_glyph(pool: Array) -> String:
+	if pool.is_empty():
+		return "."
+	var total: int = 0
+	for e in pool:
+		total += int(e.get("w", 1))
+	if total <= 0:
+		return String(pool[0].get("ch", "."))
+	var r: int = randi() % total
+	var acc: int = 0
+	for e in pool:
+		acc += int(e.get("w", 1))
+		if r < acc:
+			return String(e.get("ch", "."))
+	return String(pool[-1].get("ch", "."))
 
 
 static func _is_supported_glyph(ch: String) -> bool:
