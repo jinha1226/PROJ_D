@@ -59,6 +59,7 @@ func save_run(player, game_manager) -> bool:
 			"kills": player.kills,
 			"last_killer": player.last_killer,
 			"known_spells": player.known_spells,
+			"statuses": player.statuses,
 		},
 	}
 	return save(data)

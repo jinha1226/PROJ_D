@@ -51,3 +51,7 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	var final: int = max(1, raw - soak)
 	CombatLog.damage_taken("The %s hits you for %d." % [monster.data.display_name, final])
 	player.take_damage(final, monster.data.id)
+	var poison_turns: int = int(attack.get("poison_turns", 0))
+	if poison_turns > 0 and player.hp > 0:
+		player.apply_status("poison", poison_turns)
+		CombatLog.damage_taken("You are poisoned.")

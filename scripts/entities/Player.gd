@@ -32,6 +32,7 @@ var kills: int = 0
 var last_killer: String = ""
 var items: Array = []  # [{id: String, plus: int}]
 var known_spells: Array = []  # [String]
+var statuses: Dictionary = {}  # id -> turns_remaining
 var equipped_weapon_id: String = ""
 var equipped_armor_id: String = ""
 
@@ -269,6 +270,35 @@ func wait_turn() -> void:
 	if mp < mp_max:
 		mp = min(mp_max, mp + 1)
 	emit_signal("stats_changed")
+
+func apply_status(id: String, turns: int) -> void:
+	statuses[id] = max(int(statuses.get(id, 0)), turns)
+	emit_signal("stats_changed")
+
+func has_status(id: String) -> bool:
+	return int(statuses.get(id, 0)) > 0
+
+func tick_statuses() -> void:
+	if statuses.is_empty():
+		return
+	var ids: Array = statuses.keys().duplicate()
+	for id in ids:
+		_apply_status_tick(id)
+		var left: int = int(statuses.get(id, 0)) - 1
+		if left <= 0:
+			statuses.erase(id)
+			CombatLog.post("Your %s effect wears off." % id,
+				Color(0.75, 0.8, 0.9))
+		else:
+			statuses[id] = left
+	emit_signal("stats_changed")
+
+func _apply_status_tick(id: String) -> void:
+	match id:
+		"poison":
+			if hp > 1:
+				hp -= 1
+				CombatLog.damage_taken("Poison burns you. (-1 HP)")
 
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))

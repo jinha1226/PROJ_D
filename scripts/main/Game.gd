@@ -94,6 +94,7 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.kills = int(data.get("kills", 0))
 	player.last_killer = String(data.get("last_killer", ""))
 	player.known_spells = data.get("known_spells", [])
+	player.statuses = data.get("statuses", {})
 	CombatLog.post("Run resumed. Floor B%d." % GameManager.depth,
 		Color(0.7, 0.9, 1.0))
 
@@ -272,7 +273,8 @@ func _on_player_moved(_new_pos: Vector2i) -> void:
 	_center_camera_on_player()
 
 func _on_player_turn_started() -> void:
-	pass
+	if player != null and player.hp > 0:
+		player.tick_statuses()
 
 func _on_player_died() -> void:
 	CombatLog.post("You have died.", Color(1.0, 0.4, 0.4))
@@ -349,7 +351,7 @@ func _on_status_pressed() -> void:
 func _status_lines() -> Array:
 	var w_data: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
 	var a_data: ItemData = ItemRegistry.get_by_id(player.equipped_armor_id)
-	return [
+	var lines: Array = [
 		"Level: %d  (XP %d / %d)" % [player.xl, player.xp, player.xp_to_next()],
 		"HP: %d / %d" % [player.hp, player.hp_max],
 		"MP: %d / %d" % [player.mp, player.mp_max],
@@ -357,9 +359,15 @@ func _status_lines() -> Array:
 		"AC %d  EV %d  WL %d" % [player.ac, player.ev, player.wl],
 		"Weapon: %s" % (w_data.display_name if w_data != null else "(unarmed)"),
 		"Armor: %s" % (a_data.display_name if a_data != null else "(none)"),
-		"Gold: %d" % player.gold,
+		"Gold: %d   Kills: %d" % [player.gold, player.kills],
 		"Depth: B%d" % GameManager.depth,
 	]
+	if not player.statuses.is_empty():
+		var parts: Array = []
+		for id in player.statuses.keys():
+			parts.append("%s (%d)" % [id, int(player.statuses[id])])
+		lines.append("Status: " + ", ".join(parts))
+	return lines
 
 func _on_wait_pressed() -> void:
 	if player == null or not TurnManager.is_player_turn or player.hp <= 0:
