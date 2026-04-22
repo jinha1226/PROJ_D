@@ -11,7 +11,9 @@ const CREDITS_FONTS_PATH := "res://CREDITS_FONTS.md"
 # GameManager.render_mode: 0=LPC, 1=DCSS tiles, 2=ASCII. The toggle button
 # cycles DCSS↔ASCII only — LPC mode is unfinished and not user-facing.
 const _DISPLAY_LABELS: Array = ["DCSS Tiles", "DCSS Tiles", "ASCII"]
+const _MODE_LABELS: Array = ["Classic DCSS", "Simple (Pixel-style)"]
 var _display_btn: Button = null
+var _mode_btn: Button = null
 
 
 func _ready() -> void:
@@ -33,6 +35,15 @@ func _add_display_toggle() -> void:
 	_display_btn.pressed.connect(_on_cycle_display)
 	buttons.add_child(_display_btn)
 	_refresh_display_label()
+	# Ruleset toggle — mirrors the Display (DCSS ↔ ASCII) button. Lets
+	# the player pick the full DCSS port or the Pixel-Dungeon-style
+	# Simple mode. New runs pick up the current setting.
+	_mode_btn = Button.new()
+	_mode_btn.custom_minimum_size = Vector2(0, 120)
+	_mode_btn.add_theme_font_size_override("font_size", 48)
+	_mode_btn.pressed.connect(_on_cycle_mode)
+	buttons.add_child(_mode_btn)
+	_refresh_mode_label()
 	# Debug shortcut — boots straight into the game with an archmage
 	# test character (XL 27, every magic skill at 27, all spells learned,
 	# consumables pre-stocked). Meant for fireball / cloud iteration.
@@ -66,6 +77,21 @@ func _refresh_display_label() -> void:
 		return
 	var idx: int = clamp(int(GameManager.render_mode), 0, _DISPLAY_LABELS.size() - 1)
 	_display_btn.text = "Display: %s" % String(_DISPLAY_LABELS[idx])
+
+
+func _on_cycle_mode() -> void:
+	if GameManager.game_mode == GameManager.GameMode.CLASSIC:
+		GameManager.game_mode = GameManager.GameMode.SIMPLE
+	else:
+		GameManager.game_mode = GameManager.GameMode.CLASSIC
+	_refresh_mode_label()
+
+
+func _refresh_mode_label() -> void:
+	if _mode_btn == null:
+		return
+	var idx: int = clamp(int(GameManager.game_mode), 0, _MODE_LABELS.size() - 1)
+	_mode_btn.text = "Mode: %s" % String(_MODE_LABELS[idx])
 
 
 func _ensure_meta() -> MetaProgression:
