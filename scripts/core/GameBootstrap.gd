@@ -2211,6 +2211,28 @@ func _spell_deal_dmg(target: Node, dmg: int, spell_id: String) -> void:
 		CombatLog.add("The %s reflects the spell!" % \
 				(String(target.data.display_name) if "data" in target and target.data else "target"))
 		var back_dmg: int = maxi(1, dmg * 3 / 4)
+		# DCSS reflection re-traces the beam back toward the original
+		# caster (beam.cc::reflect). Any monster caught on the return
+		# path takes splash damage; the caster eats the remainder. We
+		# run the trace so a line of enemies between player + reflector
+		# gets hit on the way back, not just the reflector's tile.
+		if target is Monster and player != null:
+			var dmap_r: DungeonMap = $DungeonLayer/DungeonMap
+			var opaque_cb_r: Callable = func(c: Vector2i) -> int:
+				if dmap_r == null or dmap_r.generator == null:
+					return 0
+				return dmap_r._opaque_at(c)
+			var mon_cb_r: Callable = func(c: Vector2i):
+				for mm in get_tree().get_nodes_in_group("monsters"):
+					if is_instance_valid(mm) and mm is Monster and mm.is_alive \
+							and mm != target and mm.grid_pos == c:
+						return mm
+				return null
+			var rtrace: Dictionary = Beam.trace(target.grid_pos, player.grid_pos,
+					12, true, opaque_cb_r, mon_cb_r)
+			for rv in rtrace.get("hits", []):
+				if rv != null and rv.has_method("take_damage"):
+					rv.take_damage(maxi(1, back_dmg / 2), element)
 		if player != null and player.has_method("take_damage"):
 			player.take_damage(back_dmg, element)
 		return
@@ -5148,8 +5170,27 @@ func _beam_path_hits(picked: Monster, spell_id: String, range_tiles: int) -> Arr
 					and m.grid_pos == cell:
 				return m
 		return null
-	var trace: Dictionary = Beam.trace(player.grid_pos, picked.grid_pos,
-			range_tiles, true, opaque_cb, mon_cb)
+	# Bouncy spells (lightning bolt / chain lightning / quicksilver) use
+	# trace_with_bounce so a wall hit ricochets instead of fizzling. Up
+	# to 2 ricochets per cast — DCSS approximation.
+	var trace: Dictionary
+	if Beam.should_bounce(spell_id):
+		trace = Beam.trace_with_bounce(player.grid_pos, picked.grid_pos,
+				range_tiles, true, opaque_cb, mon_cb, 2)
+	else:
+		trace = Beam.trace(player.grid_pos, picked.grid_pos,
+				range_tiles, true, opaque_cb, mon_cb)
+	# DCSS burn_wall_effect — fire-element beams scorch TREE tiles along
+	# their whole path, not just the impact radius. Single sweep here
+	# centralises it so any bolt/ball/ray pathing through a forest
+	# leaves a trail.
+	var element: String = SpellRegistry.element_for(spell_id)
+	if element == "fire" and generator != null:
+		var burned: int = Beam.burn_tree_path(generator, trace.get("cells", []), element)
+		if burned > 0:
+			var dmap_b: DungeonMap = $DungeonLayer/DungeonMap
+			if dmap_b != null:
+				dmap_b.queue_redraw()
 	return trace.get("hits", [])
 
 

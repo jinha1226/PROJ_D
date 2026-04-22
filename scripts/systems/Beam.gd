@@ -53,6 +53,26 @@ static func should_pierce(spell_id: String) -> bool:
 	return bool(_PIERCING_SPELLS.get(spell_id, false))
 
 
+## Spells whose beam bounces off walls. DCSS `bolt.bounces = true` —
+## lightning bolts, quicksilver, chain lightning. Bouncing consumes
+## one wall deflection per hop; remaining range is split, direction
+## flips along the colliding axis.
+const _BOUNCY_SPELLS: Dictionary = {
+	"lightning_bolt": true,
+	"chain_lightning": true,
+	"quicksilver_bolt": true,
+}
+
+
+static func should_bounce(spell_id: String) -> bool:
+	return bool(_BOUNCY_SPELLS.get(spell_id, false))
+
+
+## Element kept on the beam's `cells` so tile-burn hooks (fire clouds,
+## tree ignition) can post-process a beam without inferring element
+## from spell_id. Caller fills it when invoking trace_with_bounce.
+
+
 ## Walk the beam from `origin` toward `target` until range runs out or
 ## something stops it. `opaque_fn(cell) -> int` is the same callable
 ## we feed FieldOfView (returns OPC_OPAQUE for walls / closed doors).
@@ -139,3 +159,73 @@ static func trace(origin: Vector2i, target: Vector2i, range_tiles: int, \
 	if out["stopped_by"] == "range" and not out["cells"].is_empty():
 		out["impact"] = out["cells"][-1]
 	return out
+
+
+## Trace a beam with up to `max_bounces` wall bounces. When a trace
+## stops on a wall, flip the direction component (x or y) that caused
+## the collision and restart from the last walkable cell with the
+## remaining range. Each bounce costs 1 range tile so infinite pinball
+## isn't possible. Cells + hits accumulate across all bounce segments.
+static func trace_with_bounce(origin: Vector2i, target: Vector2i,
+		range_tiles: int, pierce: bool, opaque_fn: Callable,
+		monster_fn: Callable, max_bounces: int = 2) -> Dictionary:
+	var combined: Dictionary = {
+		"cells": [], "hits": [], "impact": origin, "stopped_by": "range",
+		"bounces": 0,
+	}
+	var cur_origin: Vector2i = origin
+	var cur_target: Vector2i = target
+	var remaining: int = range_tiles
+	for _bounce in max_bounces + 1:
+		var seg: Dictionary = trace(cur_origin, cur_target, remaining,
+				pierce, opaque_fn, monster_fn)
+		for c in seg.get("cells", []):
+			combined["cells"].append(c)
+		for h in seg.get("hits", []):
+			if not combined["hits"].has(h):
+				combined["hits"].append(h)
+		combined["impact"] = seg.get("impact", cur_origin)
+		combined["stopped_by"] = seg.get("stopped_by", "range")
+		if seg.get("stopped_by", "") != "wall" or combined["bounces"] >= max_bounces:
+			break
+		# Flip direction: the axis that crossed into the wall is the one
+		# we invert. Approximation — the exact DCSS wall-normal check
+		# requires probing both flipped candidates; we pick whichever
+		# next step is walkable, else abort.
+		var cells: Array = seg.get("cells", [])
+		if cells.is_empty():
+			break
+		var last: Vector2i = cells[-1]
+		var dx: int = cur_target.x - cur_origin.x
+		var dy: int = cur_target.y - cur_origin.y
+		var cand_a: Vector2i = last + Vector2i(-1 if dx > 0 else (1 if dx < 0 else 0), 0) * 6
+		var cand_b: Vector2i = last + Vector2i(0, -1 if dy > 0 else (1 if dy < 0 else 0)) * 6
+		var chose: Vector2i = cand_a
+		if int(opaque_fn.call(last + Vector2i(sign(cand_a.x - last.x), 0))) >= 2:
+			chose = cand_b
+		cur_origin = last
+		cur_target = chose
+		remaining = maxi(0, remaining - cells.size() - 1)
+		if remaining <= 0:
+			break
+		combined["bounces"] += 1
+	return combined
+
+
+## DCSS `burn_wall_effect` — iterate a beam path and burn TREE tiles to
+## FLOOR when the element is fire/flame. Returns the count of tiles
+## cleared for log purposes. Safe to call with any element — non-fire
+## returns 0 without touching tiles.
+static func burn_tree_path(gen, cells: Array, element: String) -> int:
+	if gen == null or element != "fire":
+		return 0
+	var burned: int = 0
+	for cell in cells:
+		var c: Vector2i = cell
+		if gen.get_tile(c) == DungeonGenerator.TileType.TREE:
+			# 65% chance per cell so a single bolt doesn't clear-cut a
+			# forest, but a flame storm genuinely scars the board.
+			if randf() < 0.65:
+				gen.map[c.x][c.y] = DungeonGenerator.TileType.FLOOR
+				burned += 1
+	return burned
