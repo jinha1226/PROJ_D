@@ -1210,7 +1210,8 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 
 	# Pick first weapon from starting_equipment. Every armor piece slots
 	# itself by ArmorRegistry.slot_for so a job can start with chest+legs+
-	# boots (or more) and they all stack.
+	# boots (or more) and they all stack. Consumables / wands fall into
+	# the inventory with their DCSS kind so the Bag + quickslots see them.
 	equipped_weapon_id = ""
 	equipped_armor = {}
 	if job != null:
@@ -1223,6 +1224,26 @@ func setup(gen: DungeonGenerator, start_pos: Vector2i, job: JobData, race: RaceD
 				var slot: String = String(info.get("slot", "chest"))
 				if not equipped_armor.has(slot):
 					equipped_armor[slot] = info
+			elif WandRegistry.has(sid):
+				var winfo: Dictionary = WandRegistry.get_info(sid)
+				items.append({
+					"id": sid,
+					"name": String(winfo.get("name", sid)),
+					"kind": "wand",
+					"color": winfo.get("color", Color(0.75, 0.75, 0.85)),
+					"charges": WandRegistry.roll_charges(sid),
+				})
+				_try_assign_quickslot(sid, "wand")
+			elif ConsumableRegistry.has(sid):
+				var cinfo: Dictionary = ConsumableRegistry.get_info(sid)
+				var ckind: String = String(cinfo.get("kind", "potion"))
+				items.append({
+					"id": sid,
+					"name": String(cinfo.get("name", sid)),
+					"kind": ckind,
+					"color": cinfo.get("color", Color(0.75, 0.75, 0.85)),
+				})
+				_try_assign_quickslot(sid, ckind)
 	# Trait-based weapon/armor/item override
 	if p_trait != null:
 		var trait_equip: Dictionary = _get_trait_equipment(p_trait.id)

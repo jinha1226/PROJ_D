@@ -290,7 +290,11 @@ func _on_longpress(grid: Vector2i) -> void:
 
 
 func _farthest_floor_from(start: Vector2i) -> Vector2i:
-	# BFS over 4-connected walkable tiles.
+	# BFS over 8-connected walkable tiles so diagonal-only squeeze
+	# passages are reachable (matches Pathfinding.find_path, which also
+	# uses 8 directions). Before this, 4-dir BFS silently skipped any
+	# tile only accessible through a diagonal gap, and auto-explore
+	# declared "fully explored" while unseen rooms remained.
 	# Priority 1: nearest visible floor item the player hasn't grabbed yet.
 	# Priority 2: nearest unexplored tile (keep revealing map).
 	# Priority 3: farthest reachable explored tile (keep moving when
@@ -304,7 +308,10 @@ func _farthest_floor_from(start: Vector2i) -> Vector2i:
 	var nearest_unexplored_d: int = 999999
 	var farthest: Vector2i = start
 	var farthest_d: int = 0
-	var dirs: Array[Vector2i] = [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
+	var dirs: Array[Vector2i] = [
+		Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1),
+		Vector2i(1, 1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(-1, -1),
+	]
 	while not queue.is_empty():
 		var cur: Vector2i = queue.pop_front()
 		var d: int = visited[cur]
