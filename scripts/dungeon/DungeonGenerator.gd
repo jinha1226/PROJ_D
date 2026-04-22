@@ -8,8 +8,35 @@ class_name DungeonGenerator extends Node
 ##   volcano — caves + lava pools
 ## Every branch places one random minivault from VaultRegistry for flavour.
 
-const MAP_WIDTH: int = 50
-const MAP_HEIGHT: int = 72
+## Classic DCSS-scale floor footprint. Exposed as `static var` so the
+## generator can shrink it in Simple mode without breaking the dozens
+## of `DungeonGenerator.MAP_WIDTH` call sites scattered across the
+## codebase.
+static var MAP_WIDTH: int = 50
+static var MAP_HEIGHT: int = 72
+const _CLASSIC_MAP_WIDTH: int = 50
+const _CLASSIC_MAP_HEIGHT: int = 72
+const _SIMPLE_MAP_WIDTH: int = 35
+const _SIMPLE_MAP_HEIGHT: int = 50
+
+
+## Sync the class-level MAP_WIDTH / MAP_HEIGHT against the current
+## GameMode. Called from DungeonGenerator._init so each new floor
+## picks up a mode change the player toggled between runs.
+static func _refresh_map_size() -> void:
+	var mgr: Node = null
+	if Engine.get_main_loop() != null:
+		mgr = Engine.get_main_loop().root.get_node_or_null("GameManager")
+	if mgr != null and mgr.has_method("is_simple_mode") and mgr.is_simple_mode():
+		MAP_WIDTH = _SIMPLE_MAP_WIDTH
+		MAP_HEIGHT = _SIMPLE_MAP_HEIGHT
+	else:
+		MAP_WIDTH = _CLASSIC_MAP_WIDTH
+		MAP_HEIGHT = _CLASSIC_MAP_HEIGHT
+
+
+func _init() -> void:
+	_refresh_map_size()
 const MIN_ROOM_SIZE: int = 5
 const MAX_ROOM_SIZE: int = 16
 # BSP depth 4 → at most 16 leaf rooms; typically 8–12 after min-size culling.
