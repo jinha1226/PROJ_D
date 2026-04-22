@@ -606,8 +606,8 @@ static var _current_casting_player: Node = null
 
 ## DCSS calc_spell_power (spl-cast.cc:550). Runs the spell-power
 ## pipeline end-to-end: _skill_power → intel → enhancer ×1.5 →
-## Wild/Subdued → stepdown → cap. Post-stepdown multipliers (horror,
-## diminished, claustrophobia) remain TODO.
+## Wild/Subdued → stepdown → post-stepdown mutation multipliers
+## (horror, diminished, claustrophobia) → cap.
 static func calc_spell_power(spell_id: String, player: Node) -> int:
 	_ensure_loaded()
 	if player == null:
@@ -636,6 +636,44 @@ static func calc_spell_power(spell_id: String, player: Node) -> int:
 	if subdued > 0:
 		power = power * 10 / (10 + 3 * subdued)
 	power = _stepdown_value(power * 10, 50000, 50000, 200000) / 1000
+	# DCSS post-stepdown multipliers (spl-cast.cc:575 onward):
+	# - MUT_HORROR: adjacent hostiles → −10% power per level (max 3).
+	# - MUT_DIMINISHED_BRAIN: flat −50% power.
+	# - MUT_CLAUSTROPHOBIA: surrounded by walls → −33% power.
+	# All applied multiplicatively after stepdown so they eat into the
+	# stepped value rather than the raw skill roll.
+	if player.has_method("has_meta"):
+		var horror: int = int(player.get_meta("_mut_horror", 0))
+		if horror > 0:
+			# DCSS: count hostile monsters within LOS (radius 4 good
+			# enough) and scale penalty by how crowded the field is.
+			var nearby: int = 0
+			if player.has_method("get_tree"):
+				for mm in player.get_tree().get_nodes_in_group("monsters"):
+					if is_instance_valid(mm) and mm.is_alive:
+						var d: int = maxi(abs(mm.grid_pos.x - player.grid_pos.x),
+								abs(mm.grid_pos.y - player.grid_pos.y))
+						if d <= 4:
+							nearby += 1
+			if nearby > 0:
+				var pen: int = mini(horror, 3) * 10  # 10-30%
+				power = power * (100 - pen) / 100
+		if int(player.get_meta("_mut_diminished_brain", 0)) > 0:
+			power = power / 2
+		if int(player.get_meta("_mut_claustrophobia", 0)) > 0 \
+				and player.has_method("has_method"):
+			# Surrounded check: ≥6 of 8 adjacent tiles are non-walkable.
+			var solids: int = 0
+			if "generator" in player and player.generator != null:
+				for dy in [-1, 0, 1]:
+					for dx in [-1, 0, 1]:
+						if dx == 0 and dy == 0:
+							continue
+						var c: Vector2i = player.grid_pos + Vector2i(dx, dy)
+						if not player.generator.is_walkable(c):
+							solids += 1
+			if solids >= 6:
+				power = power * 2 / 3
 	# Apply DCSS spell_power_cap from our JSON when present.
 	var dc: Dictionary = _dcss.get(spell_id, {})
 	var cap: int = int(dc.get("power_cap", 0))
