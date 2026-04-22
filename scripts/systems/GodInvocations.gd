@@ -68,7 +68,7 @@ static func dispatch(host: Node, effect: String) -> void:
 					"dur_base": 15, "dur_rand": 10})
 		"trog_hand":
 			host._summon_ally("orc_warrior", 60, "Trog's Hand strikes your side!")
-		"brothers":
+		"brothers_in_arms":
 			for i in 3:
 				host._summon_ally("deep_troll", 40, "")
 			CombatLog.add("Trog sends his brothers in arms!")
@@ -152,14 +152,14 @@ static func dispatch(host: Node, effect: String) -> void:
 				player.stats_changed.emit()
 			player.set_meta("_exegesis_turns", 3)
 			CombatLog.add("Sif Muna's insight fills you — next 3 spells cannot fail.")
-		"amnesia":
+		"forget_spell":
 			player._apply_consumable_effect({"effect": "amnesia"})
 		# ---- Kikubaaqudgha ----
 		"receive_corpses":
 			for i in 3:
 				host._summon_ally("zombie", 30, "")
 			CombatLog.add("Corpses stir to your service.")
-		"god_torment":
+		"torment":
 			player._apply_consumable_effect({"effect": "torment"})
 		"unearthly_bond":
 			player.set_meta("_unearthly_bond", true)
@@ -172,7 +172,7 @@ static func dispatch(host: Node, effect: String) -> void:
 				host._nemelex_draw_card()
 			CombatLog.add("You stack the deck and draw three.")
 		# ---- Yredelemnul ----
-		"yred_animate":
+		"animate_dead":
 			for i in 2:
 				host._summon_ally("zombie", 50, "")
 			CombatLog.add("The dead answer your call.")
