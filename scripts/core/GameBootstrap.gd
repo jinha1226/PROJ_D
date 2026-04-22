@@ -446,10 +446,10 @@ func _apply_test_character_boost() -> void:
 		GameManager.identify(String(wid))
 	# One of each unrand slot at test-friendly depth so equip + tooltip
 	# + armour-ego identify paths can be exercised without farming drops.
-	for unrand_id in ["unrand_singing_sword", "unrand_plate_of_the_sunborne",
-			"unrand_ring_of_the_mage", "unrand_amulet_of_the_hearth",
-			"unrand_boots_of_the_skyborne", "unrand_helm_of_serafin",
-			"unrand_cloak_of_stormweaver", "unrand_gloves_of_vorpal_grip"]:
+	for unrand_id in ["unrand_singing_sword", "unrand_lears_hauberk",
+			"unrand_the_mage", "unrand_hermits_pendant",
+			"unrand_seven_league_boots", "unrand_dyrovepreva",
+			"unrand_the_thief", "unrand_mad_mages_maulers"]:
 		if UnrandartRegistry.has(unrand_id):
 			var ud: Dictionary = UnrandartRegistry.make_item(unrand_id)
 			if not ud.is_empty():

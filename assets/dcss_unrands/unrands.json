@@ -1,0 +1,1613 @@
+[
+  {
+    "id": "unrand_singing_sword",
+    "kind": "weapon",
+    "base": "great_sword",
+    "name": "Singing Sword",
+    "obj": "OBJ_WEAPONS/WPN_DOUBLE_SWORD",
+    "plus": 11,
+    "brand_enum": "",
+    "colour_enum": "ETC_GOLD",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Sonic Wave: It radiates damaging sonic waves as it strikes, especially in combat involving dangerous or numerous foes."
+  },
+  {
+    "id": "unrand_trog",
+    "kind": "weapon",
+    "base": "battleaxe",
+    "name": "Wrath of Trog",
+    "obj": "OBJ_WEAPONS/WPN_BATTLEAXE",
+    "plus": 8,
+    "brand_enum": "SPWPN_ANTIMAGIC",
+    "colour_enum": "ETC_BLOOD",
+    "bool": [
+      "rampage"
+    ],
+    "descrip": "It causes slowness and exhaustion when equipped. It extends the wielder's berserk rage when killing foes.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_variability",
+    "kind": "weapon",
+    "base": "great_mace",
+    "name": "mace of Variability",
+    "obj": "OBJ_WEAPONS/WPN_GREAT_MACE",
+    "plus": 7,
+    "brand_enum": "SPWPN_CHAOS",
+    "colour_enum": "ETC_RANDOM",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Chaos Arc: It occasionally unleashes arcs of chaos on nearby creatures upon striking a foe."
+  },
+  {
+    "id": "unrand_prune",
+    "kind": "weapon",
+    "base": "glaive",
+    "name": "glaive of Prune",
+    "obj": "OBJ_WEAPONS/WPN_GLAIVE",
+    "plus": 12,
+    "brand_enum": "SPWPN_FREEZING",
+    "colour_enum": "LIGHTMAGENTA",
+    "bool": [
+      "chaotic"
+    ],
+    "descrip": "Prune:     It halves damage taken while paralysed, petrified or unconscious.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_olgreb",
+    "kind": "weapon",
+    "base": "quarterstaff",
+    "name": "staff of Olgreb",
+    "obj": "OBJ_WEAPONS/WPN_STAFF",
+    "plus": 9,
+    "brand_enum": "",
+    "colour_enum": "ETC_POISON",
+    "bool": [],
+    "descrip": "Radiate: It can be activated via the 'a'bility menu to radiate toxic energy, with effectiveness depending on Evocations skill. Alch: It enhances your alchemy magic. rPois∞: It grants immunity to poison.",
+    "dbrand": "Envenom: If the wielder is skilled in Evocations, they can envenom those struck by it, dealing poison damage which bypasses armour."
+  },
+  {
+    "id": "unrand_wucad_mu",
+    "kind": "armor",
+    "base": "orb",
+    "name": "crystal ball of Wucad Mu",
+    "obj": "OBJ_ARMOUR/ARM_ORB",
+    "plus": 0,
+    "brand_enum": "SPARM_ENERGY",
+    "colour_enum": "ETC_MAGIC",
+    "bool": [],
+    "descrip": "Mindtap:  Whenever a successful spell causes magic to be channelled from it, it may also drain additional magic from other enemies in sight, with a chance increasing with spell level.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_vampires_tooth",
+    "kind": "weapon",
+    "base": "quick_blade",
+    "name": "Vampire's Tooth",
+    "obj": "OBJ_WEAPONS/WPN_QUICK_BLADE",
+    "plus": 8,
+    "brand_enum": "SPWPN_VAMPIRISM",
+    "colour_enum": "ETC_BONE",
+    "bool": [
+      "skip_ego"
+    ],
+    "descrip": "",
+    "dbrand": "Megavamp:  It occasionally heals its wielder for the full amount of damage dealt when it wounds a living foe."
+  },
+  {
+    "id": "unrand_curses",
+    "kind": "weapon",
+    "base": "halberd",
+    "name": "scythe of Curses",
+    "obj": "OBJ_WEAPONS/WPN_HALBERD",
+    "plus": 13,
+    "brand_enum": "SPWPN_DRAINING",
+    "colour_enum": "ETC_DEATH",
+    "bool": [
+      "drain"
+    ],
+    "descrip": "",
+    "dbrand": "Curses:    It inflicts powerful necromantic curses on any living foe it strikes."
+  },
+  {
+    "id": "unrand_torment",
+    "kind": "weapon",
+    "base": "morningstar",
+    "name": "sceptre of Torment",
+    "obj": "OBJ_WEAPONS/WPN_EVENINGSTAR",
+    "plus": 7,
+    "brand_enum": "SPWPN_PAIN",
+    "colour_enum": "ETC_GOLD",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Torment:   It occasionally torments all nearby living foes when it strikes in combat."
+  },
+  {
+    "id": "unrand_brilliance",
+    "kind": "weapon",
+    "base": "morningstar",
+    "name": "eveningstar \"Brilliance\"",
+    "obj": "OBJ_WEAPONS/WPN_EVENINGSTAR",
+    "plus": 1,
+    "brand_enum": "SPWPN_FOUL_FLAME",
+    "colour_enum": "ETC_FOUL_FLAME",
+    "bool": [],
+    "descrip": "Umbra:     It surrounds you with an aura of shadow, increasing your stealth and reducing the accuracy of all others within it.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_leech",
+    "kind": "weapon",
+    "base": "long_sword",
+    "name": "demon blade \"Leech\"",
+    "obj": "OBJ_WEAPONS/WPN_DEMON_BLADE",
+    "plus": 8,
+    "brand_enum": "SPWPN_VAMPIRISM",
+    "colour_enum": "ETC_DARK",
+    "bool": [
+      "drain",
+      "harm",
+      "skip_ego"
+    ],
+    "descrip": "",
+    "dbrand": "Evervamp:  It heals its wielder for a portion of the damage dealt every time it strikes a living foe."
+  },
+  {
+    "id": "unrand_finisher",
+    "kind": "weapon",
+    "base": "halberd",
+    "name": "scythe \"Finisher\"",
+    "obj": "OBJ_WEAPONS/WPN_HALBERD",
+    "plus": 5,
+    "brand_enum": "SPWPN_SPEED",
+    "colour_enum": "ETC_DARK",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Execute:   It may instantly slay those it strikes, especially weaker foes."
+  },
+  {
+    "id": "unrand_punk",
+    "kind": "weapon",
+    "base": "slingshot",
+    "name": "greatsling \"Punk\"",
+    "obj": "OBJ_WEAPONS/WPN_SLING",
+    "plus": 3,
+    "brand_enum": "SPWPN_ACID",
+    "colour_enum": "ETC_SLIME",
+    "bool": [
+      "rCorr"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_zephyr",
+    "kind": "weapon",
+    "base": "longbow",
+    "name": "longbow \"Zephyr\"",
+    "obj": "OBJ_WEAPONS/WPN_LONGBOW",
+    "plus": 8,
+    "brand_enum": "SPWPN_SPEED",
+    "colour_enum": "ETC_GOLD",
+    "bool": [
+      "seeinv"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_skullcrusher",
+    "kind": "weapon",
+    "base": "club",
+    "name": "giant club \"Skullcrusher\"",
+    "obj": "OBJ_WEAPONS/WPN_GIANT_CLUB",
+    "plus": 3,
+    "brand_enum": "SPWPN_SPEED",
+    "colour_enum": "BROWN",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_the_guard",
+    "kind": "weapon",
+    "base": "glaive",
+    "name": "glaive of the Guard",
+    "obj": "OBJ_WEAPONS/WPN_GLAIVE",
+    "plus": 5,
+    "brand_enum": "SPWPN_ELECTROCUTION",
+    "colour_enum": "ETC_ELECTRICITY",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Spectral:  When it strikes, its spirit leaps out and fights alongside the wielder."
+  },
+  {
+    "id": "unrand_zealots_sword",
+    "kind": "weapon",
+    "base": "long_sword",
+    "name": "zealot's sword",
+    "obj": "OBJ_WEAPONS/WPN_EUDEMON_BLADE",
+    "plus": 10,
+    "brand_enum": "SPWPN_HOLY_WRATH",
+    "colour_enum": "ETC_HOLY",
+    "bool": [],
+    "descrip": "Zealotry:  Whenever the wielder enters a berserk rage, their allies are berserked alongside them.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_damnation",
+    "kind": "weapon",
+    "base": "arbalest",
+    "name": "arbalest \"Damnation\"",
+    "obj": "OBJ_WEAPONS/WPN_ARBALEST",
+    "plus": 6,
+    "brand_enum": "",
+    "colour_enum": "ETC_FIRE",
+    "bool": [
+      "evil"
+    ],
+    "descrip": "",
+    "dbrand": "Damnation: Any ammunition fired from it explodes in a burst of damnation on striking a foe, dealing damage which bypasses armour."
+  },
+  {
+    "id": "unrand_the_dread_knight",
+    "kind": "weapon",
+    "base": "great_sword",
+    "name": "sword of the Dread Knight",
+    "obj": "OBJ_WEAPONS/WPN_GREAT_SWORD",
+    "plus": 13,
+    "brand_enum": "",
+    "colour_enum": "BLUE",
+    "bool": [
+      "drain",
+      "evil",
+      "silence"
+    ],
+    "descrip": "",
+    "dbrand": "Decimate: It inflicts additional damage proportional to its victim's maximum health."
+  },
+  {
+    "id": "unrand_eos",
+    "kind": "weapon",
+    "base": "morningstar",
+    "name": "morningstar \"Eos\"",
+    "obj": "OBJ_WEAPONS/WPN_MORNINGSTAR",
+    "plus": 10,
+    "brand_enum": "SPWPN_ELECTROCUTION",
+    "colour_enum": "ETC_JEWEL",
+    "bool": [
+      "elec"
+    ],
+    "descrip": "Halo:      It grants its wielder a halo, revealing invisible creatures and increasing accuracy against all within it other than the wielder.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_the_octopus_king",
+    "kind": "weapon",
+    "base": "trident",
+    "name": "trident of the Octopus King",
+    "obj": "OBJ_WEAPONS/WPN_TRIDENT",
+    "plus": 0,
+    "brand_enum": "SPWPN_VENOM",
+    "colour_enum": "ETC_WATER",
+    "bool": [
+      "elec",
+      "no_upgrade",
+      "poison"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_arga",
+    "kind": "weapon",
+    "base": "broad_axe",
+    "name": "mithril axe \"Arga\"",
+    "obj": "OBJ_WEAPONS/WPN_BROAD_AXE",
+    "plus": 8,
+    "brand_enum": "SPWPN_SPEED",
+    "colour_enum": "WHITE",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_elemental_staff",
+    "kind": "weapon",
+    "base": "quarterstaff",
+    "name": "Elemental Staff",
+    "obj": "OBJ_WEAPONS/WPN_STAFF",
+    "plus": 3,
+    "brand_enum": "",
+    "colour_enum": "DARKGREY",
+    "bool": [
+      "elec"
+    ],
+    "descrip": "",
+    "dbrand": "Ele:       It enhances your fire, ice, earth and air magic. If skilled in Evocations, you can discharge powerful blasts of elemental energy when striking with it."
+  },
+  {
+    "id": "unrand_sniper",
+    "kind": "weapon",
+    "base": "crossbow",
+    "name": "heavy crossbow \"Sniper\"",
+    "obj": "OBJ_WEAPONS/WPN_TRIPLE_CROSSBOW",
+    "plus": 27,
+    "brand_enum": "SPWPN_HEAVY",
+    "colour_enum": "ETC_DARK",
+    "bool": [
+      "seeinv"
+    ],
+    "descrip": "Acc+∞:     It never misses its target.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_wyrmbane",
+    "kind": "weapon",
+    "base": "spear",
+    "name": "lance \"Wyrmbane\"",
+    "obj": "OBJ_WEAPONS/WPN_SPEAR",
+    "plus": 8,
+    "brand_enum": "",
+    "colour_enum": "LIGHTGREEN",
+    "bool": [
+      "no_upgrade",
+      "poison"
+    ],
+    "descrip": "",
+    "dbrand": "Slay Drac: It inflicts extra damage against dragons and draconians."
+  },
+  {
+    "id": "unrand_spriggans_knife",
+    "kind": "weapon",
+    "base": "dagger",
+    "name": "Spriggan's Knife",
+    "obj": "OBJ_WEAPONS/WPN_DAGGER",
+    "plus": 7,
+    "brand_enum": "",
+    "colour_enum": "LIGHTCYAN",
+    "bool": [],
+    "descrip": "Stab:      It is more effective when stabbing unaware enemies, sometimes treating them as though they were completely helpless.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_plutonium_sword",
+    "kind": "weapon",
+    "base": "great_sword",
+    "name": "plutonium sword",
+    "obj": "OBJ_WEAPONS/WPN_TRIPLE_SWORD",
+    "plus": 11,
+    "brand_enum": "",
+    "colour_enum": "ETC_MUTAGENIC",
+    "bool": [
+      "chaotic",
+      "mutate"
+    ],
+    "descrip": "",
+    "dbrand": "Mutate:    It occasionally inflicts wild transmutation effects on those it strikes, inflicting malmutation or extra damage, or polymorphing them into a new form."
+  },
+  {
+    "id": "unrand_undeadhunter",
+    "kind": "weapon",
+    "base": "great_mace",
+    "name": "great mace \"Undeadhunter\"",
+    "obj": "OBJ_WEAPONS/WPN_GREAT_MACE",
+    "plus": 7,
+    "brand_enum": "",
+    "colour_enum": "LIGHTGREY",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Deathbane: It inflicts significantly more damage against the undead."
+  },
+  {
+    "id": "unrand_snakebite",
+    "kind": "weapon",
+    "base": "whip",
+    "name": "whip \"Snakebite\"",
+    "obj": "OBJ_WEAPONS/WPN_WHIP",
+    "plus": 8,
+    "brand_enum": "SPWPN_VENOM",
+    "colour_enum": "DARKGREY",
+    "bool": [
+      "poison"
+    ],
+    "descrip": "",
+    "dbrand": "Curare:    It occasionally inflicts asphyxiating poison on those it strikes, dealing poison damage and causing slowness."
+  },
+  {
+    "id": "unrand_captains_cutlass",
+    "kind": "weapon",
+    "base": "rapier",
+    "name": "captain's cutlass",
+    "obj": "OBJ_WEAPONS/WPN_RAPIER",
+    "plus": 7,
+    "brand_enum": "SPWPN_SPEED",
+    "colour_enum": "DARKGREY",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Disarm:    It may disarm weapon-wielding foes when striking them, dealing extra damage in the process."
+  },
+  {
+    "id": "unrand_storm_bow",
+    "kind": "weapon",
+    "base": "longbow",
+    "name": "storm bow",
+    "obj": "OBJ_WEAPONS/WPN_LONGBOW",
+    "plus": 8,
+    "brand_enum": "SPWPN_ELECTROCUTION",
+    "colour_enum": "BLUE",
+    "bool": [
+      "tilerim"
+    ],
+    "descrip": "",
+    "dbrand": "Penet:     Any ammunition fired by it passes through the targets it hits, potentially hitting all targets in its path until it reaches maximum range."
+  },
+  {
+    "id": "unrand_ignorance",
+    "kind": "armor",
+    "base": "tower_shield",
+    "name": "tower shield of Ignorance",
+    "obj": "OBJ_ARMOUR/ARM_TOWER_SHIELD",
+    "plus": 10,
+    "brand_enum": "",
+    "colour_enum": "BROWN",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_augmentation",
+    "kind": "armor",
+    "base": "robe",
+    "name": "robe of Augmentation",
+    "obj": "OBJ_ARMOUR/ARM_ROBE",
+    "plus": 4,
+    "brand_enum": "",
+    "colour_enum": "LIGHTRED",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_the_thief",
+    "kind": "armor",
+    "base": "cloak",
+    "name": "cloak of the Thief",
+    "obj": "OBJ_ARMOUR/ARM_CLOAK",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_DARK",
+    "bool": [
+      "seeinv"
+    ],
+    "descrip": "Quiet:      All noise in your surroundings is dampened.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_dyrovepreva",
+    "kind": "armor",
+    "base": "hat",
+    "name": "crown of Dyrovepreva",
+    "obj": "OBJ_ARMOUR/ARM_HAT",
+    "plus": 3,
+    "brand_enum": "",
+    "colour_enum": "ETC_JEWEL",
+    "bool": [
+      "elec",
+      "seeinv"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_the_bear_spirit",
+    "kind": "armor",
+    "base": "hat",
+    "name": "hat of the Bear Spirit",
+    "obj": "OBJ_ARMOUR/ARM_HAT",
+    "plus": 2,
+    "brand_enum": "SPARM_SPIRIT_SHIELD",
+    "colour_enum": "DARKGREY",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Bear:      Going berserk makes the wearer exceptionally tough, and they are slowed for a shorter time afterward."
+  },
+  {
+    "id": "unrand_misfortune",
+    "kind": "armor",
+    "base": "robe",
+    "name": "robe of Misfortune",
+    "obj": "OBJ_ARMOUR/ARM_ROBE",
+    "plus": 5,
+    "brand_enum": "",
+    "colour_enum": "LIGHTMAGENTA",
+    "bool": [
+      "corrode",
+      "harm",
+      "slow"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_the_assassin",
+    "kind": "armor",
+    "base": "hat",
+    "name": "hood of the Assassin",
+    "obj": "OBJ_ARMOUR/ARM_HAT",
+    "plus": 2,
+    "brand_enum": "",
+    "colour_enum": "BROWN",
+    "bool": [],
+    "descrip": "Detect:    It allows the wearer to sense nearby creatures. Stab+:     It allows the wearer to make particularly effective stabbing attacks against helpless or unaware enemies with any melee weapon.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_lears_hauberk",
+    "kind": "armor",
+    "base": "chain_mail",
+    "name": "Lear's hauberk",
+    "obj": "OBJ_ARMOUR/ARM_CHAIN_MAIL",
+    "plus": 18,
+    "brand_enum": "",
+    "colour_enum": "ETC_GOLD",
+    "bool": [
+      "special"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_zhor",
+    "kind": "armor",
+    "base": "animal_skin",
+    "name": "skin of Zhor",
+    "obj": "OBJ_ARMOUR/ARM_ANIMAL_SKIN",
+    "plus": 4,
+    "brand_enum": "",
+    "colour_enum": "BROWN",
+    "bool": [
+      "seeinv"
+    ],
+    "descrip": "*Englaciate: It radiates cold, occasionally slowing all nearby creatures who are not resistant to cold.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_salamander_hide_armour",
+    "kind": "armor",
+    "base": "leather_armour",
+    "name": "salamander hide armour",
+    "obj": "OBJ_ARMOUR/ARM_LEATHER_ARMOUR",
+    "plus": 3,
+    "brand_enum": "",
+    "colour_enum": "ETC_FIRE",
+    "bool": [
+      "enh_fire",
+      "special"
+    ],
+    "descrip": "Flames:    It surrounds you with flame clouds. rFlCloud:  It grants immunity to flame clouds.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_war",
+    "kind": "armor",
+    "base": "gloves",
+    "name": "gauntlets of War",
+    "obj": "OBJ_ARMOUR/ARM_GLOVES",
+    "plus": 3,
+    "brand_enum": "",
+    "colour_enum": "BROWN",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_resistance",
+    "kind": "armor",
+    "base": "kite_shield",
+    "name": "shield of Resistance",
+    "obj": "OBJ_ARMOUR/ARM_KITE_SHIELD",
+    "plus": 2,
+    "brand_enum": "",
+    "colour_enum": "LIGHTRED",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_folly",
+    "kind": "armor",
+    "base": "robe",
+    "name": "robe of Folly",
+    "obj": "OBJ_ARMOUR/ARM_ROBE",
+    "plus": 4,
+    "brand_enum": "",
+    "colour_enum": "LIGHTGREY",
+    "bool": [],
+    "descrip": "Brill:     It increases the power of your magical spells and halves their MP cost (rounding up). Will-∞:    It reduces your willpower to zero.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_maxwells_patent_armour",
+    "kind": "armor",
+    "base": "plate_armour",
+    "name": "Maxwell's patent armour",
+    "obj": "OBJ_ARMOUR/ARM_PLATE_ARMOUR",
+    "plus": 15,
+    "brand_enum": "",
+    "colour_enum": "LIGHTGREEN",
+    "bool": [
+      "elec",
+      "notelep",
+      "rCorr",
+      "silence"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_the_dragon",
+    "kind": "armor",
+    "base": "hat",
+    "name": "mask of the Dragon",
+    "obj": "OBJ_ARMOUR/ARM_HAT",
+    "plus": 2,
+    "brand_enum": "",
+    "colour_enum": "ETC_SHIMMER_BLUE",
+    "bool": [
+      "seeinv"
+    ],
+    "descrip": "Dragonpray: It occasionally summons a dragon when using Invocations with hostile monsters in sight. Chance is 10% + twice the piety cost of the ability used.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_night",
+    "kind": "armor",
+    "base": "robe",
+    "name": "robe of Night",
+    "obj": "OBJ_ARMOUR/ARM_ROBE",
+    "plus": 5,
+    "brand_enum": "",
+    "colour_enum": "ETC_DARK",
+    "bool": [
+      "seeinv"
+    ],
+    "descrip": "Dark:      It shrouds the wearer in darkness, reducing the range at which they can see and be seen by others.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_the_dragon_king",
+    "kind": "armor",
+    "base": "plate_armour",
+    "name": "scales of the Dragon King",
+    "obj": "OBJ_ARMOUR/ARM_GOLDEN_DRAGON_ARMOUR",
+    "plus": 9,
+    "brand_enum": "SPARM_COMMAND",
+    "colour_enum": "ETC_GOLD",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_the_alchemist",
+    "kind": "armor",
+    "base": "hat",
+    "name": "hat of the Alchemist",
+    "obj": "OBJ_ARMOUR/ARM_HAT",
+    "plus": -2,
+    "brand_enum": "",
+    "colour_enum": "LIGHTMAGENTA",
+    "bool": [
+      "elec",
+      "poison",
+      "rCorr",
+      "rMut"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_fencers_gloves",
+    "kind": "armor",
+    "base": "gloves",
+    "name": "fencer's gloves",
+    "obj": "OBJ_ARMOUR/ARM_GLOVES",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "WHITE",
+    "bool": [],
+    "descrip": "Riposte:   It allows the wearer to riposte with melee weapons, swiftly retaliating against missed or blocked melee attacks.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_starlight",
+    "kind": "armor",
+    "base": "cloak",
+    "name": "cloak of Starlight",
+    "obj": "OBJ_ARMOUR/ARM_CLOAK",
+    "plus": 1,
+    "brand_enum": "",
+    "colour_enum": "ETC_ICE",
+    "bool": [],
+    "descrip": "*Dazzle:   It may blind adjacent enemies who miss an attack against the wearer in melee combat.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_ratskin_cloak",
+    "kind": "armor",
+    "base": "cloak",
+    "name": "ratskin cloak",
+    "obj": "OBJ_ARMOUR/ARM_CLOAK",
+    "plus": 2,
+    "brand_enum": "",
+    "colour_enum": "ETC_BEOGH",
+    "bool": [
+      "poison"
+    ],
+    "descrip": "*Rats:     When the wearer is hurt, rats may emerge from it to assist them.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_the_gong",
+    "kind": "armor",
+    "base": "kite_shield",
+    "name": "shield of the Gong",
+    "obj": "OBJ_ARMOUR/ARM_KITE_SHIELD",
+    "plus": 18,
+    "brand_enum": "",
+    "colour_enum": "ETC_GOLD",
+    "bool": [
+      "rcorr"
+    ],
+    "descrip": "Loud:      It is deafeningly noisy when blocking attacks.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_the_air",
+    "kind": "amulet",
+    "base": "amulet",
+    "name": "amulet of the Air",
+    "obj": "OBJ_JEWELLERY/AMU_NOTHING",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_ELECTRICITY",
+    "bool": [
+      "elec",
+      "enh_air",
+      "fly",
+      "rmsl"
+    ],
+    "descrip": "Inacc:     It reduces the accuracy of your attacks and spells.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_shadows",
+    "kind": "ring",
+    "base": "ring",
+    "name": "ring of Shadows",
+    "obj": "OBJ_JEWELLERY/RING_STEALTH",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_DARK",
+    "bool": [
+      "inv"
+    ],
+    "descrip": "Umbra:     It surrounds you with an aura of shadow, increasing your stealth and reducing the accuracy of all others within it.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_the_four_winds",
+    "kind": "amulet",
+    "base": "amulet",
+    "name": "amulet of the Four Winds",
+    "obj": "OBJ_JEWELLERY/AMU_NOTHING",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_POISON",
+    "bool": [
+      "clarity"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_bloodlust",
+    "kind": "amulet",
+    "base": "amulet",
+    "name": "necklace of Bloodlust",
+    "obj": "OBJ_JEWELLERY/AMU_NOTHING",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_BLOOD",
+    "bool": [],
+    "descrip": "Fury:      It extends the wearer's berserk rage when killing foes.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_the_hare",
+    "kind": "ring",
+    "base": "ring",
+    "name": "ring of the Hare",
+    "obj": "OBJ_JEWELLERY/RING_EVASION",
+    "plus": 10,
+    "brand_enum": "",
+    "colour_enum": "ETC_POISON",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_the_tortoise",
+    "kind": "ring",
+    "base": "ring",
+    "name": "ring of the Tortoise",
+    "obj": "OBJ_JEWELLERY/RING_PROTECTION",
+    "plus": 8,
+    "brand_enum": "",
+    "colour_enum": "ETC_GOLD",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_the_mage",
+    "kind": "ring",
+    "base": "ring",
+    "name": "ring of the Mage",
+    "obj": "OBJ_JEWELLERY/RING_WIZARDRY",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_ENCHANT",
+    "bool": [
+      "archmagi"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_shielding",
+    "kind": "amulet",
+    "base": "amulet",
+    "name": "brooch of Shielding",
+    "obj": "OBJ_JEWELLERY/AMU_GUARDIAN_SPIRIT",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_MAGIC",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_clouds",
+    "kind": "armor",
+    "base": "robe",
+    "name": "robe of Clouds",
+    "obj": "OBJ_ARMOUR/ARM_ROBE",
+    "plus": 3,
+    "brand_enum": "",
+    "colour_enum": "ETC_MIST",
+    "bool": [
+      "elec"
+    ],
+    "descrip": "*Thunder:  It occasionally creates storm clouds above nearby enemies. rCloud:    It grants its wearer immunity to clouds.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_pondering",
+    "kind": "armor",
+    "base": "hat",
+    "name": "hat of Pondering",
+    "obj": "OBJ_ARMOUR/ARM_HAT",
+    "plus": 3,
+    "brand_enum": "SPARM_PONDEROUSNESS",
+    "colour_enum": "LIGHTRED",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_obsidian_axe",
+    "kind": "weapon",
+    "base": "broad_axe",
+    "name": "obsidian axe",
+    "obj": "OBJ_WEAPONS/WPN_BROAD_AXE",
+    "plus": 16,
+    "brand_enum": "SPWPN_DRAINING",
+    "colour_enum": "ETC_UNHOLY",
+    "bool": [
+      "drain",
+      "fly",
+      "seeinv"
+    ],
+    "descrip": "Mesm:      Its wielder is mesmerised by any visible foes, and it cannot be unequipped while any foes are visible.",
+    "dbrand": "Demonic:   It occasionally summons demons to assist the wielder when it strikes in combat."
+  },
+  {
+    "id": "unrand_lightning_scales",
+    "kind": "armor",
+    "base": "barding",
+    "name": "lightning scales",
+    "obj": "OBJ_ARMOUR/ARM_BARDING",
+    "plus": 6,
+    "brand_enum": "",
+    "colour_enum": "ETC_ELECTRICITY",
+    "bool": [
+      "elec"
+    ],
+    "descrip": "Swift:     It allows the wearer to cover ground more swiftly.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_black_knights_barding",
+    "kind": "armor",
+    "base": "barding",
+    "name": "Black Knight's barding",
+    "obj": "OBJ_ARMOUR/ARM_BARDING",
+    "plus": 10,
+    "brand_enum": "SPARM_PONDEROUSNESS",
+    "colour_enum": "ETC_UNHOLY",
+    "bool": [
+      "evil",
+      "poison"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_vitality",
+    "kind": "amulet",
+    "base": "amulet",
+    "name": "amulet of Vitality",
+    "obj": "OBJ_JEWELLERY/AMU_NOTHING",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_MUTAGENIC",
+    "bool": [
+      "skip_ego"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_autumn_katana",
+    "kind": "weapon",
+    "base": "long_sword",
+    "name": "autumn katana",
+    "obj": "OBJ_WEAPONS/WPN_LONG_SWORD",
+    "plus": 8,
+    "brand_enum": "",
+    "colour_enum": "LIGHTRED",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Manifold Assault: It sometimes launches melee attacks against multiple visible enemies."
+  },
+  {
+    "id": "unrand_devastator",
+    "kind": "weapon",
+    "base": "club",
+    "name": "shillelagh \"Devastator\"",
+    "obj": "OBJ_WEAPONS/WPN_CLUB",
+    "plus": 6,
+    "brand_enum": "",
+    "colour_enum": "WHITE",
+    "bool": [
+      "special"
+    ],
+    "descrip": "",
+    "dbrand": "Shatter:   It releases a powerful concussive burst when it strikes, dealing extra damage to the target and all other creatures adjacent to them."
+  },
+  {
+    "id": "unrand_ring_the_octopus_king",
+    "kind": "ring",
+    "base": "ring",
+    "name": "ring of the Octopus King",
+    "obj": "OBJ_JEWELLERY/RING_FIRST_RING",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_WATER",
+    "bool": [
+      "no_upgrade",
+      "unided"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_moon_troll_leather_armour",
+    "kind": "armor",
+    "base": "troll_leather_armour",
+    "name": "moon troll leather armour",
+    "obj": "OBJ_ARMOUR/ARM_TROLL_LEATHER_ARMOUR",
+    "plus": 5,
+    "brand_enum": "SPARM_SPIRIT_SHIELD",
+    "colour_enum": "ETC_SHIMMER_BLUE",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_macabre_finger_necklace",
+    "kind": "amulet",
+    "base": "amulet",
+    "name": "macabre finger necklace",
+    "obj": "OBJ_JEWELLERY/AMU_NOTHING",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_BONE",
+    "bool": [
+      "evil"
+    ],
+    "descrip": "Ring+:   It enables you to equip an extra ring.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_dark_maul",
+    "kind": "weapon",
+    "base": "great_mace",
+    "name": "dark maul",
+    "obj": "OBJ_WEAPONS/WPN_GREAT_MACE",
+    "plus": 10,
+    "brand_enum": "SPWPN_HEAVY",
+    "colour_enum": "LIGHTRED",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_arc_blade",
+    "kind": "weapon",
+    "base": "rapier",
+    "name": "arc blade",
+    "obj": "OBJ_WEAPONS/WPN_RAPIER",
+    "plus": 8,
+    "brand_enum": "",
+    "colour_enum": "ETC_ELECTRICITY",
+    "bool": [
+      "elec"
+    ],
+    "descrip": "",
+    "dbrand": "Discharge: It occasionally unleashes powerful arcs of lightning upon striking a foe. These may arc to other adjacent creatures (including the wielder, but dealing reduced damage to them) before grounding out."
+  },
+  {
+    "id": "unrand_spellbinder",
+    "kind": "weapon",
+    "base": "whip",
+    "name": "demon whip \"Spellbinder\"",
+    "obj": "OBJ_WEAPONS/WPN_DEMON_WHIP",
+    "plus": 5,
+    "brand_enum": "SPWPN_ANTIMAGIC",
+    "colour_enum": "ETC_ENCHANT",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Disrupt:   It unleashes wild and unpredictable magical effects upon striking a wizard or a creature with magical abilities."
+  },
+  {
+    "id": "unrand_order",
+    "kind": "weapon",
+    "base": "quarterstaff",
+    "name": "lajatang of Order",
+    "obj": "OBJ_WEAPONS/WPN_LAJATANG",
+    "plus": 7,
+    "brand_enum": "",
+    "colour_enum": "ETC_SILVER",
+    "bool": [
+      "rMut"
+    ],
+    "descrip": "",
+    "dbrand": "Silver:    It inflicts extra damage upon those it strikes, and deals substantially increased damage to chaotic, mutated and magically transformed beings."
+  },
+  {
+    "id": "unrand_firestarter",
+    "kind": "weapon",
+    "base": "great_mace",
+    "name": "great mace \"Firestarter\"",
+    "obj": "OBJ_WEAPONS/WPN_GREAT_MACE",
+    "plus": 7,
+    "brand_enum": "SPWPN_FLAMING",
+    "colour_enum": "RED",
+    "bool": [],
+    "descrip": "rFlCloud:  It grants immunity to clouds of flame.",
+    "dbrand": "Immolate:  It fills those it strikes with an explosive inner flame."
+  },
+  {
+    "id": "unrand_orange_crystal_plate_armour",
+    "kind": "armor",
+    "base": "crystal_plate_armour",
+    "name": "orange crystal plate armour",
+    "obj": "OBJ_ARMOUR/ARM_CRYSTAL_PLATE_ARMOUR",
+    "plus": 8,
+    "brand_enum": "SPARM_ARCHMAGI",
+    "colour_enum": "LIGHTRED",
+    "bool": [
+      "clarity"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_majin_bo",
+    "kind": "weapon",
+    "base": "quarterstaff",
+    "name": "Majin-Bo",
+    "obj": "OBJ_WEAPONS/WPN_STAFF",
+    "plus": 6,
+    "brand_enum": "SPWPN_VAMPIRISM",
+    "colour_enum": "ETC_UNHOLY",
+    "bool": [
+      "skip_ego"
+    ],
+    "descrip": "",
+    "dbrand": "Spellvamp: It heals its wielder for a portion of the damage dealt when they wound a living foe with it or with a spell, but its wielder's spells cost health as well as magical power."
+  },
+  {
+    "id": "unrand_gyre",
+    "kind": "weapon",
+    "base": "quick_blade",
+    "name": "pair of quick blades \"Gyre\" and \"Gimble\"",
+    "obj": "OBJ_WEAPONS/WPN_QUICK_BLADE",
+    "plus": 8,
+    "brand_enum": "SPWPN_PROTECTION",
+    "colour_enum": "ETC_ENCHANT",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_vines",
+    "kind": "armor",
+    "base": "robe",
+    "name": "robe of Vines",
+    "obj": "OBJ_ARMOUR/ARM_ROBE",
+    "plus": 1,
+    "brand_enum": "",
+    "colour_enum": "GREEN",
+    "bool": [],
+    "descrip": "NoPotionHeal: Its wearer cannot be healed by potions.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_kryias_mail_coat",
+    "kind": "armor",
+    "base": "scale_mail",
+    "name": "Kryia's mail coat",
+    "obj": "OBJ_ARMOUR/ARM_SCALE_MAIL",
+    "plus": 7,
+    "brand_enum": "",
+    "colour_enum": "LIGHTCYAN",
+    "bool": [],
+    "descrip": "PotionHeal*2: Potions heal its wearer twice as much.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_frostbite",
+    "kind": "weapon",
+    "base": "battleaxe",
+    "name": "frozen axe \"Frostbite\"",
+    "obj": "OBJ_WEAPONS/WPN_EXECUTIONERS_AXE",
+    "plus": 8,
+    "brand_enum": "SPWPN_FREEZING",
+    "colour_enum": "ETC_ICE",
+    "bool": [
+      "fly",
+      "noises"
+    ],
+    "descrip": "",
+    "dbrand": "Freezing Cloud: It occasionally leaves clouds of freezing vapour upon striking a foe, and grants immunity to clouds of freezing vapour."
+  },
+  {
+    "id": "unrand_warlocks_mirror",
+    "kind": "armor",
+    "base": "buckler",
+    "name": "warlock's mirror",
+    "obj": "OBJ_ARMOUR/ARM_BUCKLER",
+    "plus": 3,
+    "brand_enum": "SPARM_REFLECTION",
+    "colour_enum": "ETC_SILVER",
+    "bool": [
+      "skip_ego"
+    ],
+    "descrip": "",
+    "dbrand": "Omnireflect: It can block and reflect piercing ranged attacks and magical attacks against the wielder's willpower."
+  },
+  {
+    "id": "unrand_maxwells_thermic_engine",
+    "kind": "weapon",
+    "base": "great_sword",
+    "name": "Maxwell's thermic engine",
+    "obj": "OBJ_WEAPONS/WPN_DOUBLE_SWORD",
+    "plus": 2,
+    "brand_enum": "SPWPN_FLAMING",
+    "colour_enum": "ETC_VEHUMET",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Freeze:    It freezes victims, dealing an additional one-quarter of any damage that pierces defenders' armour. It may also slow down cold-blooded creatures. Rev:       It becomes more effective when it hits something. This effect fades over time."
+  },
+  {
+    "id": "unrand_rift",
+    "kind": "weapon",
+    "base": "trident",
+    "name": "demon trident \"Rift\"",
+    "obj": "OBJ_WEAPONS/WPN_DEMON_TRIDENT",
+    "plus": 8,
+    "brand_enum": "SPWPN_DISTORTION",
+    "colour_enum": "ETC_WARP",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Reach+:    It can reach especially far, and its reaching attacks ignore other creatures in the way."
+  },
+  {
+    "id": "unrand_battle",
+    "kind": "armor",
+    "base": "orb",
+    "name": "sphere of Battle",
+    "obj": "OBJ_ARMOUR/ARM_ORB",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_MAGIC",
+    "bool": [],
+    "descrip": "Battle: It summons a battlesphere in combat, with strength depending on Conjurations skill. Destructive: It enhances your destructive magic, and weakens non-destructive magic.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_cigotuvis_embrace",
+    "kind": "armor",
+    "base": "leather_armour",
+    "name": "Cigotuvi's embrace",
+    "obj": "OBJ_ARMOUR/ARM_LEATHER_ARMOUR",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_UNHOLY",
+    "bool": [
+      "drain",
+      "evil",
+      "no_upgrade",
+      "special"
+    ],
+    "descrip": "Corpsefed: It gathers nearby corpses to temporarily increase the armour it provides. rMiasma:   It protects you from foul pestilence.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_seven_league_boots",
+    "kind": "armor",
+    "base": "boots",
+    "name": "seven-league boots",
+    "obj": "OBJ_ARMOUR/ARM_BOOTS",
+    "plus": 3,
+    "brand_enum": "",
+    "colour_enum": "ETC_ENCHANT",
+    "bool": [],
+    "descrip": "Rampage+∞: When moving toward enemies, its wearer moves as far as possible, alerting their target en route.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_mad_mages_maulers",
+    "kind": "armor",
+    "base": "gloves",
+    "name": "Mad Mage's Maulers",
+    "obj": "OBJ_ARMOUR/ARM_GLOVES",
+    "plus": 3,
+    "brand_enum": "",
+    "colour_enum": "ETC_MAGIC",
+    "bool": [
+      "nospell"
+    ],
+    "descrip": "Infuse+∞:  It empowers its wearer's blows with all of their magic. VampMP:    Blows struck in melee replenish the wearer's magic.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_dreamshard_necklace",
+    "kind": "amulet",
+    "base": "amulet",
+    "name": "dreamshard necklace",
+    "obj": "OBJ_JEWELLERY/AMU_ACROBAT",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_SILVER",
+    "bool": [
+      "special"
+    ],
+    "descrip": "*Dream:    It absorbs a single lethal wound into itself, holding its wearer just short of death and releasing dream-creatures to guard them.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_delatras_gloves",
+    "kind": "armor",
+    "base": "gloves",
+    "name": "Delatra's gloves",
+    "obj": "OBJ_ARMOUR/ARM_GLOVES",
+    "plus": 1,
+    "brand_enum": "",
+    "colour_enum": "BLUE",
+    "bool": [],
+    "descrip": "ID++:      It heals its wearer when they drink unknown potions, and restores their MP when they read unknown scrolls.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_woodcutters_axe",
+    "kind": "weapon",
+    "base": "battleaxe",
+    "name": "woodcutter's axe",
+    "obj": "OBJ_WEAPONS/WPN_BATTLEAXE",
+    "plus": 5,
+    "brand_enum": "",
+    "colour_enum": "BROWN",
+    "bool": [],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_throatcutter",
+    "kind": "weapon",
+    "base": "long_sword",
+    "name": "Throatcutter",
+    "obj": "OBJ_WEAPONS/WPN_LONG_SWORD",
+    "plus": 7,
+    "brand_enum": "SPWPN_DRAINING",
+    "colour_enum": "LIGHTRED",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Coup de Grace: It may instantly kill foes which have little health."
+  },
+  {
+    "id": "unrand_the_meek",
+    "kind": "weapon",
+    "base": "quarterstaff",
+    "name": "staff of the Meek",
+    "obj": "OBJ_WEAPONS/WPN_QUARTERSTAFF",
+    "plus": 7,
+    "brand_enum": "SPWPN_PROTECTION",
+    "colour_enum": "WHITE",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Meekguard: It provides extra protection to wielders with little health."
+  },
+  {
+    "id": "unrand_condemnation",
+    "kind": "weapon",
+    "base": "trident",
+    "name": "trishula \"Condemnation\"",
+    "obj": "OBJ_WEAPONS/WPN_TRISHULA",
+    "plus": 8,
+    "brand_enum": "SPWPN_HOLY_WRATH",
+    "colour_enum": "ETC_HOLY",
+    "bool": [
+      "fly",
+      "noises"
+    ],
+    "descrip": "",
+    "dbrand": "Anguish:   It makes its victims' attacks reflect back on them."
+  },
+  {
+    "id": "unrand_elemental_vulnerability",
+    "kind": "amulet",
+    "base": "amulet",
+    "name": "amulet of Elemental Vulnerability",
+    "obj": "OBJ_JEWELLERY/AMU_NOTHING",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_VEHUMET",
+    "bool": [
+      "poison"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_mountain_boots",
+    "kind": "armor",
+    "base": "boots",
+    "name": "mountain boots",
+    "obj": "OBJ_ARMOUR/ARM_BOOTS",
+    "plus": 3,
+    "brand_enum": "",
+    "colour_enum": "ETC_MOUNTAIN",
+    "bool": [
+      "special"
+    ],
+    "descrip": "",
+    "dbrand": "Steadfast: It prevents involuntary movement, except for blinking, teleportation, or banishment."
+  },
+  {
+    "id": "unrand_lochaber_axe",
+    "kind": "weapon",
+    "base": "bardiche",
+    "name": "Lochaber axe",
+    "obj": "OBJ_WEAPONS/WPN_BARDICHE",
+    "plus": 5,
+    "brand_enum": "",
+    "colour_enum": "ETC_IRON",
+    "bool": [
+      "drain"
+    ],
+    "descrip": "Poleaxe:   It uses either Axes or Polearms skill, whichever is higher.",
+    "dbrand": "Reach-Cleave: It can be evoked to extend its reach, and strikes at all foes within reach, dealing less damage to those not targeted."
+  },
+  {
+    "id": "unrand_hermits_pendant",
+    "kind": "amulet",
+    "base": "amulet",
+    "name": "Hermit's Pendant",
+    "obj": "OBJ_JEWELLERY/AMU_FAITH",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "BROWN",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Invo=14:   It sets your Invocations skill to 14. Evo=0:    It sets your Evocations skill to 0."
+  },
+  {
+    "id": "unrand_slick_slippers",
+    "kind": "armor",
+    "base": "boots",
+    "name": "slick slippers",
+    "obj": "OBJ_ARMOUR/ARM_BOOTS",
+    "plus": 2,
+    "brand_enum": "",
+    "colour_enum": "ETC_DITHMENOS",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Slick:     Its wearer cannot be constricted, netted, webbed, or stopped by binding sigils. Slippery:  Its wearer slips away from damaging melee attacks, pulling the attacker onward."
+  },
+  {
+    "id": "unrand_force_lance",
+    "kind": "weapon",
+    "base": "spear",
+    "name": "Force Lance",
+    "obj": "OBJ_WEAPONS/WPN_SPEAR",
+    "plus": 5,
+    "brand_enum": "SPWPN_HEAVY",
+    "colour_enum": "ETC_DISJUNCTION",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Knockback: It sometimes drives back enemies it hits."
+  },
+  {
+    "id": "unrand_consecrated_labrys",
+    "kind": "weapon",
+    "base": "broad_axe",
+    "name": "consecrated labrys",
+    "obj": "OBJ_WEAPONS/WPN_BROAD_AXE",
+    "plus": 4,
+    "brand_enum": "SPWPN_HOLY_WRATH",
+    "colour_enum": "ETC_HOLY",
+    "bool": [
+      "fly",
+      "fragile",
+      "no_upgrade",
+      "seeinv"
+    ],
+    "descrip": "Valiant:   It becomes more powerful as more dangerous foes come into view.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_victory",
+    "kind": "armor",
+    "base": "robe",
+    "name": "toga \"Victory\"",
+    "obj": "OBJ_ARMOUR/ARM_ROBE",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "LIGHTCYAN",
+    "bool": [
+      "clarity",
+      "no_upgrade"
+    ],
+    "descrip": "*Victory:  When the wearer kills a threatening monster, it has a chance to gain +1 AC, +1 Slay, and +1 Int, capping at +7. When the wearer uses a scroll or a potion with a hostile monster in sight, its bonuses reset to +0. Unequipping it also resets its bonuses to +0.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_storm_queens_shield",
+    "kind": "armor",
+    "base": "kite_shield",
+    "name": "Storm Queen's Shield",
+    "obj": "OBJ_ARMOUR/ARM_KITE_SHIELD",
+    "plus": 5,
+    "brand_enum": "",
+    "colour_enum": "BLUE",
+    "bool": [
+      "elec",
+      "fly"
+    ],
+    "descrip": "",
+    "dbrand": "Shock:     When it blocks an attack, it may electrocute the attacker. This works even against foes who are a short distance away."
+  },
+  {
+    "id": "unrand_mule",
+    "kind": "weapon",
+    "base": "crossbow",
+    "name": "hand cannon \"Mule\"",
+    "obj": "OBJ_WEAPONS/WPN_HAND_CANNON",
+    "plus": 7,
+    "brand_enum": "SPWPN_FLAMING",
+    "colour_enum": "ETC_INCARNADINE",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "Backblast: When fired, it often launches its wielder backwards."
+  },
+  {
+    "id": "unrand_the_gadgeteer",
+    "kind": "armor",
+    "base": "gloves",
+    "name": "gloves of the gadgeteer",
+    "obj": "OBJ_ARMOUR/ARM_GLOVES",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "MAGENTA",
+    "bool": [
+      "fragile"
+    ],
+    "descrip": "Gadgeteer:   Your evocable items recharge 30% faster and wands have a 30% chance to not spend a charge. Wandboost:   Your wands are more powerful.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_charlatans_orb",
+    "kind": "armor",
+    "base": "orb",
+    "name": "Charlatan's Orb",
+    "obj": "OBJ_ARMOUR/ARM_ORB",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "MAGENTA",
+    "bool": [],
+    "descrip": "",
+    "dbrand": "It massively reduces your stealth. It interferes with translocations, delaying teleports. Charlatan: It boosts your other skills by 20% of your base Evocations skill."
+  },
+  {
+    "id": "unrand_justicars_regalia",
+    "kind": "armor",
+    "base": "scale_mail",
+    "name": "justicar's regalia",
+    "obj": "OBJ_ARMOUR/ARM_SCALE_MAIL",
+    "plus": 5,
+    "brand_enum": "",
+    "colour_enum": "WHITE",
+    "bool": [],
+    "descrip": "Inspire:   When you summon or create an ally, it gains Regeneration. Amulet+:   You can equip an additional amulet.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_zonguldrok",
+    "kind": "armor",
+    "base": "orb",
+    "name": "skull of Zonguldrok",
+    "obj": "OBJ_ARMOUR/ARM_ORB",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "BLUE",
+    "bool": [
+      "evil"
+    ],
+    "descrip": "Reaping:   When you kill an enemy with your weapon, its spirit may be forced to fight for you. Hat+:   You can equip an additional hat (on the skull).",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_fungal_fisticloak",
+    "kind": "armor",
+    "base": "cloak",
+    "name": "fungal fisticloak",
+    "obj": "OBJ_ARMOUR/ARM_CLOAK",
+    "plus": 3,
+    "brand_enum": "",
+    "colour_enum": "MAGENTA",
+    "bool": [],
+    "descrip": "Shroompunch:   The cloak sometimes lashes out at its wearer's enemies, inflicting confusion with its spores. Gloves+:   Your cloak can equip an additional pair of gloves.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_vainglory",
+    "kind": "armor",
+    "base": "hat",
+    "name": "crown of vainglory",
+    "obj": "OBJ_ARMOUR/ARM_HAT",
+    "plus": 3,
+    "brand_enum": "",
+    "colour_enum": "YELLOW",
+    "bool": [
+      "fragile"
+    ],
+    "descrip": "Majesty:   You are bathed in light that prevents you from turning invisible. Whenever you enter a new floor, you announce yourself to nearby enemies and refuse to leave the floor again for some time. Ring++:   You can equip two additional rings.",
+    "dbrand": ""
+  }
+]
