@@ -2289,6 +2289,23 @@ func _show_search_dialog() -> void:
 					"%s · %s" % [String(cinfo.get("kind", "item")).capitalize(),
 						String(cinfo.get("desc", ""))]))
 			total += 1
+		# Unrandarts — artefacts merit their own entries since our pool has
+		# 120+ hand-crafted items; listing them by DCSS name lets the
+		# player lookup tooltips before they ever drop.
+		for uid in UnrandartRegistry.all_ids():
+			if total >= 110:
+				break
+			var uid_s: String = String(uid)
+			var uinfo: Dictionary = UnrandartRegistry.get_info(uid_s)
+			var uname: String = String(uinfo.get("name", uid_s))
+			if uname.to_lower().find(needle) < 0 \
+					and uid_s.to_lower().find(needle) < 0:
+				continue
+			results.add_child(_search_row(uname,
+					"Unrand %s · %s" % [
+						String(uinfo.get("kind", "artefact")).capitalize(),
+						String(uinfo.get("desc", ""))]))
+			total += 1
 		if total == 0:
 			results.add_child(UICards.dim_hint("No matches."))
 
