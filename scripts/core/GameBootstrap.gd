@@ -349,6 +349,8 @@ func _ready() -> void:
 		TurnManager.player_turn_started.connect(_on_turn_tick_abyss)
 	if not TurnManager.player_turn_started.is_connected(_on_turn_tick_god_gifts):
 		TurnManager.player_turn_started.connect(_on_turn_tick_god_gifts)
+	if not TurnManager.player_turn_started.is_connected(_on_turn_tick_xom):
+		TurnManager.player_turn_started.connect(_on_turn_tick_xom)
 
 	_setup_combat_log(ui)
 	TurnManager.start_player_turn()
@@ -739,6 +741,98 @@ func _on_turn_tick_abyss() -> void:
 					player.moved.emit(dest)
 					CombatLog.add("The Abyss shifts around you.")
 					break
+
+
+## DCSS Xom passive (god-xom.cc). The chaos god acts on random turns
+## when bored — the player rolls a 1-in-120 chance each turn for a
+## random weal or woe event. Balance: roughly 50/50 good/bad so the
+## worshipper can't predict the payoff.
+func _on_turn_tick_xom() -> void:
+	if player == null or not player.is_alive or player.current_god != "xom":
+		return
+	# Bored + rolls an act. DCSS has a boredom meter; we approximate.
+	if randi() % 120 != 0:
+		return
+	if randf() < 0.5:
+		_xom_good_event()
+	else:
+		_xom_bad_event()
+
+
+func _xom_good_event() -> void:
+	var roll: int = randi() % 5
+	match roll:
+		0:
+			player.set_meta("_haste_turns", int(player.get_meta("_haste_turns", 0)) + 15)
+			CombatLog.add("Xom giggles. Time rushes past you.")
+		1:
+			if player.stats != null:
+				player.stats.HP = player.stats.hp_max
+				player.stats.MP = player.stats.mp_max
+				player.stats_changed.emit()
+			CombatLog.add("Xom restores you on a whim.")
+		2:
+			var pool: Array = ["red_devil", "blue_devil", "iron_devil",
+					"orc_knight", "hell_hound", "fire_elemental"]
+			_summon_ally(String(pool[randi() % pool.size()]), 40,
+					"Xom sends an ally to play with you.")
+		3:
+			var pots: Array = ["potion_curing", "potion_haste", "potion_might",
+					"potion_resistance", "potion_magic", "potion_invisibility"]
+			var pid: String = String(pots[randi() % pots.size()])
+			var pinfo: Dictionary = ConsumableRegistry.get_info(pid)
+			var entity_layer: Node = get_tree().get_first_node_in_group("entity_layer")
+			if entity_layer == null:
+				entity_layer = self
+			var fi := FloorItem.new()
+			entity_layer.add_child(fi)
+			fi.setup(player.grid_pos, pid, String(pinfo.get("name", pid)),
+					"potion", pinfo.get("color", Color(0.75, 0.75, 0.75)))
+			CombatLog.add("Xom drops a potion at your feet.")
+		_:
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if is_instance_valid(m) and m is Monster and m.is_alive:
+					m.set_meta("_confusion_turns", 8)
+			CombatLog.add("Xom chortles — every foe suddenly looks confused.")
+
+
+func _xom_bad_event() -> void:
+	var roll: int = randi() % 5
+	match roll:
+		0:
+			player.set_meta("_confusion_turns", int(player.get_meta("_confusion_turns", 0)) + 6)
+			player.set_meta("_confused", true)
+			CombatLog.add("Xom spins the world. You feel dizzy.")
+		1:
+			if player.stats != null:
+				player.take_damage(randi_range(3, 10))
+			CombatLog.add("Xom pokes you for amusement.")
+		2:
+			# Random cloud at player feet
+			if GameManager != null:
+				var cloud_types: Array = ["fire", "freezing", "mephitic", "smoke"]
+				CloudSystem.place(GameManager.clouds, player.grid_pos,
+						String(cloud_types[randi() % cloud_types.size()]))
+			CombatLog.add("Xom wraps you in mischief.")
+		3:
+			# Summon a hostile
+			var pool: Array = ["ogre", "hell_hound", "red_devil", "yak"]
+			var mid: String = String(pool[randi() % pool.size()])
+			var tile: Vector2i = _find_free_adjacent_tile(player.grid_pos)
+			if tile != player.grid_pos:
+				var scene: PackedScene = load("res://scenes/entities/Monster.tscn")
+				var md: MonsterData = MonsterRegistry.fetch(mid)
+				if scene != null and md != null:
+					var m: Monster = scene.instantiate()
+					$EntityLayer.add_child(m)
+					m.setup(generator, tile, md)
+					if not m.died.is_connected(_on_monster_died):
+						m.died.connect(_on_monster_died)
+					CombatLog.add("Xom drops a %s on your head." % mid.replace("_", " "))
+		_:
+			# Stat drain for a brief period
+			player.set_meta("_weak_turns", int(player.get_meta("_weak_turns", 0)) + 10)
+			CombatLog.add("Xom hamstrings you. You feel weak.")
 
 
 ## DCSS Trog / Okawaru / Sif Muna gift pipelines (god-gift.cc). These
