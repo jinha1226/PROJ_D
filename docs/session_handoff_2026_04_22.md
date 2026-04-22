@@ -35,11 +35,15 @@ GameBootstrap because they touch dialog re-open state.
 
 ## Active bug queue — user-reported
 
-Items `#1`, `#3`, `#4`, `#5`, `#6` resolved. Others pending.
+Items `#1`, `#2`, `#3`, `#4`, `#5`, `#6` resolved. Others pending.
 
 1. ✅ Second-tap area spell movement bug (fixed in `799411ad`).
-2. Status dialog — add move speed (Haste readout), mutation list,
-   piety progress.
+2. ✅ Status dialog expanded: **Active Effects** section lists every
+   `_<name>_turns` meta with tint + countdown (Haste, Invisible, Berserk,
+   Poisoned w/ dmg/turn, Corroded w/ AC penalty, pending-teleport, …);
+   **Mutations** section iterates `player.mutations` with level/max +
+   good/bad flag tint via `MutationRegistry.desc_for`; piety card now
+   also draws a 6-star rank line.
 3. ✅ Potion of Invisibility dims the player sprite — `Player._refresh_invisibility_visual`
    drops `modulate.a` to 0.45 while `_invisible_turns > 0` and restores on
    expire / cancellation. (Meta key was `_invisible_turns`, not the
