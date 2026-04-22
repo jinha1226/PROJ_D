@@ -30,3 +30,32 @@ func has_save() -> bool:
 func delete_save() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
+
+func save_run(player, game_manager) -> bool:
+	var data: Dictionary = {
+		"version": 1,
+		"depth": game_manager.depth,
+		"seed": game_manager.seed,
+		"gold": game_manager.gold,
+		"selected_class_id": game_manager.selected_class_id,
+		"identified": game_manager.identified,
+		"player": {
+			"hp": player.hp,
+			"hp_max": player.hp_max,
+			"mp": player.mp,
+			"mp_max": player.mp_max,
+			"ac": player.ac,
+			"ev": player.ev,
+			"wl": player.wl,
+			"str": player.strength,
+			"dex": player.dexterity,
+			"int": player.intelligence,
+			"xl": player.xl,
+			"xp": player.xp,
+			"gold": player.gold,
+			"items": player.items,
+			"weapon": player.equipped_weapon_id,
+			"armor": player.equipped_armor_id,
+		},
+	}
+	return save(data)

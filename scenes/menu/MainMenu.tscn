@@ -71,6 +71,13 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 28
 
+[node name="ContinueButton" type="Button" parent="VBox"]
+visible = false
+custom_minimum_size = Vector2(0, 120)
+theme_override_font_sizes/font_size = 44
+theme_override_colors/font_color = Color(0.85, 1.0, 0.7, 1)
+text = "이어하기"
+
 [node name="StartButton" type="Button" parent="VBox"]
 custom_minimum_size = Vector2(0, 120)
 theme_override_font_sizes/font_size = 52

@@ -24,7 +24,10 @@ func _ready() -> void:
 	_spawn_items_layer()
 	_spawn_monsters_layer()
 	_spawn_player()
-	if GameManager.depth <= 1:
+	if not GameManager.pending_player_state.is_empty():
+		_apply_loaded_player_state(GameManager.pending_player_state)
+		GameManager.pending_player_state = {}
+	elif GameManager.depth <= 1:
 		_apply_class_to_player(GameManager.selected_class_id)
 	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth))
 	_spawn_camera()
@@ -66,6 +69,26 @@ func _class_starter_items(class_id: String) -> Array:
 		"rogue":
 			return ["potion_healing", "scroll_blinking"]
 	return []
+
+func _apply_loaded_player_state(data: Dictionary) -> void:
+	player.hp = int(data.get("hp", 30))
+	player.hp_max = int(data.get("hp_max", 30))
+	player.mp = int(data.get("mp", 5))
+	player.mp_max = int(data.get("mp_max", 5))
+	player.ac = int(data.get("ac", 0))
+	player.ev = int(data.get("ev", 5))
+	player.wl = int(data.get("wl", 0))
+	player.strength = int(data.get("str", 10))
+	player.dexterity = int(data.get("dex", 10))
+	player.intelligence = int(data.get("int", 10))
+	player.xl = int(data.get("xl", 1))
+	player.xp = int(data.get("xp", 0))
+	player.gold = int(data.get("gold", 0))
+	player.items = data.get("items", [])
+	player.equipped_weapon_id = String(data.get("weapon", ""))
+	player.equipped_armor_id = String(data.get("armor", ""))
+	CombatLog.post("Run resumed. Floor B%d." % GameManager.depth,
+		Color(0.7, 0.9, 1.0))
 
 func _spawn_map() -> void:
 	map = DungeonMapScene.new()
@@ -246,6 +269,7 @@ func _on_stairs_down() -> void:
 	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth))
 	_center_camera_on_player(true)
 	_update_hud()
+	SaveManager.save_run(player, GameManager)
 	TurnManager.end_player_turn()
 
 func _on_item_dropped(item_id: String, at_pos: Vector2i, plus: int) -> void:
@@ -323,7 +347,10 @@ func _on_magic_pressed() -> void:
 	CombatLog.post("Magic not yet implemented.", Color(0.7, 0.7, 0.7))
 
 func _on_menu_pressed() -> void:
-	GameManager.end_run("quit")
+	# Save on quit so Continue can pick up the run.
+	if player != null and player.hp > 0:
+		SaveManager.save_run(player, GameManager)
+	GameManager.run_in_progress = false
 	get_tree().change_scene_to_file(MENU_SCENE_PATH)
 
 func _chebyshev(a: Vector2i, b: Vector2i) -> int:

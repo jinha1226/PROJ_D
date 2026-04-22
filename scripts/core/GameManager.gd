@@ -15,6 +15,10 @@ var run_in_progress: bool = false
 # Character selection — set by menus before start_new_run().
 var selected_class_id: String = ""
 
+# Staging slot for loaded player stats. Game.gd consumes this on scene
+# load and writes into the freshly-instantiated Player, then clears it.
+var pending_player_state: Dictionary = {}
+
 # Display / meta state (persisted).
 var use_tiles: bool = true
 var rune_shards: int = 0
@@ -39,7 +43,22 @@ func descend() -> void:
 
 func end_run(result: String) -> void:
 	run_in_progress = false
+	if result == "death":
+		SaveManager.delete_save()
 	emit_signal("run_ended", result)
+
+func load_run() -> bool:
+	var data: Dictionary = SaveManager.load_save()
+	if data.is_empty() or not data.has("player"):
+		return false
+	depth = int(data.get("depth", 1))
+	seed = int(data.get("seed", 0))
+	gold = int(data.get("gold", 0))
+	selected_class_id = String(data.get("selected_class_id", ""))
+	identified = data.get("identified", {})
+	pending_player_state = data.get("player", {})
+	run_in_progress = true
+	return true
 
 func is_identified(item_id: String) -> bool:
 	return identified.get(item_id, false)

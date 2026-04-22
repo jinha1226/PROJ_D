@@ -3,16 +3,24 @@ extends Control
 const GAME_SCENE_PATH: String = "res://scenes/main/Game.tscn"
 const JOB_SELECT_PATH: String = "res://scenes/menu/JobSelect.tscn"
 
+@onready var _continue_btn: Button = $VBox/ContinueButton
 @onready var _start_btn: Button = $VBox/StartButton
 @onready var _display_btn: Button = $VBox/DisplayButton
 @onready var _shards_btn: Button = $VBox/ShardsButton
 
 func _ready() -> void:
 	theme = GameTheme.create()
+	if _continue_btn != null:
+		_continue_btn.pressed.connect(_on_continue)
+		_continue_btn.visible = SaveManager.has_save()
 	_start_btn.pressed.connect(_on_start)
 	_display_btn.pressed.connect(_on_toggle_display)
 	_shards_btn.pressed.connect(_on_shards)
 	_refresh_display_label()
+
+func _on_continue() -> void:
+	if GameManager.load_run():
+		get_tree().change_scene_to_file(GAME_SCENE_PATH)
 
 func _on_start() -> void:
 	get_tree().change_scene_to_file(JOB_SELECT_PATH)
