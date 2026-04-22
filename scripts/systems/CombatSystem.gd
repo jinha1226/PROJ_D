@@ -42,6 +42,25 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		player.grant_xp(monster.data.xp_value)
 		player.register_kill()
 
+static func monster_ranged_attack_player(monster: Monster, player: Player,
+		ra: Dictionary) -> void:
+	if player.hp <= 0:
+		return
+	var dmg_base: int = int(ra.get("damage", 2))
+	var verb: String = String(ra.get("verb", "shoots"))
+	var to_hit_base: int = 15 + monster.data.hd
+	var to_hit_roll: int = randi_range(0, to_hit_base)
+	if to_hit_roll < player.ev:
+		CombatLog.miss("The %s %s at you and misses." \
+				% [monster.data.display_name, verb])
+		return
+	var raw: int = randi_range(1, max(1, dmg_base))
+	var soak: int = randi_range(0, player.ac + 1)
+	var final: int = max(1, raw - soak)
+	CombatLog.damage_taken("The %s %s you for %d." \
+			% [monster.data.display_name, verb, final])
+	player.take_damage(final, monster.data.id)
+
 static func monster_attack_player(monster: Monster, player: Player) -> void:
 	if monster.data == null or player.hp <= 0:
 		return

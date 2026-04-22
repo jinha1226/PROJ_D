@@ -13,9 +13,21 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 		CombatSystem.monster_attack_player(monster, player)
 		return
 	if _can_see(monster, map, player.grid_pos):
+		if _try_ranged(monster, player, dist):
+			return
 		_step_toward(monster, map, player.grid_pos)
 	else:
 		_random_step(monster, map)
+
+static func _try_ranged(monster: Monster, player: Player, dist: int) -> bool:
+	var ra: Dictionary = monster.data.ranged_attack
+	if ra.is_empty():
+		return false
+	var max_range: int = int(ra.get("range", 6))
+	if dist > max_range:
+		return false
+	CombatSystem.monster_ranged_attack_player(monster, player, ra)
+	return true
 
 static func _find_player() -> Player:
 	var tree := Engine.get_main_loop() as SceneTree

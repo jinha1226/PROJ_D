@@ -10,6 +10,7 @@ class_name MonsterData extends Resource
 @export var speed: int = 10
 @export var sight_range: int = 8
 @export var attacks: Array = []
+@export var ranged_attack: Dictionary = {}  # {damage, range, verb, flavour}
 @export var resists: Array = []
 @export var min_depth: int = 1
 @export var max_depth: int = 25
