@@ -34,6 +34,7 @@ func start_new_run(random_seed: int = -1) -> void:
 	depth = 1
 	gold = 0
 	identified.clear()
+	pending_player_state.clear()
 	run_in_progress = true
 	emit_signal("depth_changed", depth)
 
