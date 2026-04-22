@@ -5132,6 +5132,44 @@ func _cast_self_spell(spell_id: String, _info: Dictionary, _power: int) -> Dicti
 				scared += 1
 			return {"success": true,
 				"message": "%d foes turn to flee in terror." % scared}
+		"passage":
+			# DCSS Passage of Golubria places a pair of portals on the
+			# floor and walking into one emerges the other. Our map lacks
+			# a paired-portal construct, so approximate with a longer-
+			# ranged blink (radius 15 vs blink's 6) keyed off the same
+			# stasis gate.
+			if player != null and player.race_res != null \
+					and player.race_res.racial_trait == "formicid_stasis":
+				return {"success": true, "message": "Your stasis prevents the passage."}
+			for _i in 80:
+				var dx_p: int = randi_range(-15, 15)
+				var dy_p: int = randi_range(-15, 15)
+				if abs(dx_p) + abs(dy_p) < 6:
+					continue
+				var dest_p: Vector2i = player.grid_pos + Vector2i(dx_p, dy_p)
+				if generator == null or not generator.is_walkable(dest_p):
+					continue
+				var blocked_p: bool = false
+				for m in get_tree().get_nodes_in_group("monsters"):
+					if is_instance_valid(m) and m is Monster and m.grid_pos == dest_p:
+						blocked_p = true
+						break
+				if blocked_p:
+					continue
+				var old_px_p: Vector2 = player.position
+				player.grid_pos = dest_p
+				player.position = Vector2(dest_p.x * TILE_SIZE + TILE_SIZE / 2,
+						dest_p.y * TILE_SIZE + TILE_SIZE / 2)
+				var dmap_p: DungeonMap = $DungeonLayer/DungeonMap
+				if dmap_p != null:
+					dmap_p.update_fov(dest_p)
+				var cam_p: Camera2D = $Camera2D
+				cam_p.position = player.position
+				SpellFX.cast_blink($EntityLayer, old_px_p, player.position)
+				return {"success": true,
+					"message": "A shimmering portal opens and you step through."}
+			return {"success": true,
+				"message": "Passage of Golubria finds no safe tile."}
 		"passwall":
 			# Step through the nearest orthogonal wall run up to 3 cells.
 			if generator == null:
