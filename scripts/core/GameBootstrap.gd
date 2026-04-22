@@ -4843,6 +4843,8 @@ func _on_target_selected(pos: Vector2i) -> void:
 				dmap.aoe_preview_tiles.clear()
 				dmap.danger_tiles.clear()
 				dmap.queue_redraw()
+			if touch_input != null:
+				touch_input.targeting_mode = false
 			_execute_targeted_cast(spell_id_a, pos)
 			return
 		# Move the preview to the new tap location. Keep targeting mode
@@ -4874,6 +4876,8 @@ func _on_target_selected(pos: Vector2i) -> void:
 		CombatLog.add("Targeting cancelled.")
 		_targeting_spell = ""
 		_pending_area_target = Vector2i(-1, -1)
+		if touch_input != null:
+			touch_input.targeting_mode = false
 		return
 	if dmap != null and not dmap.is_tile_visible(target_monster.grid_pos):
 		CombatLog.add("Your line of sight is blocked.")
@@ -4891,6 +4895,8 @@ func _on_target_selected(pos: Vector2i) -> void:
 			dmap.aoe_preview_tiles.clear()
 			dmap.beam_preview_tiles.clear()
 			dmap.queue_redraw()
+		if touch_input != null:
+			touch_input.targeting_mode = false
 		_execute_targeted_cast(spell_id, target_monster)
 		return
 	_pending_area_target = pos
@@ -5517,6 +5523,126 @@ func _monster_death_cloud(monster_id: String) -> Dictionary:
 
 
 func _cast_self_spell(spell_id: String, _info: Dictionary, _power: int) -> Dictionary:
+	# New-roster self-targeted spells. Each one consumes the MP SpellCast
+	# already paid and reports its own status line.
+	match spell_id:
+		"excruciating_wounds":
+			if player != null:
+				player.set_meta("_temp_brand", "pain")
+				player.set_meta("_temp_brand_turns", 25)
+				return {"success": true,
+					"message": "Your weapon twists — each wound cries out."}
+		"frozen_ramparts":
+			# Freeze every adjacent wall's face for a few turns. We simulate
+			# by damaging adjacent monsters and flagging a cold-damage
+			# residue via clouds.
+			if player != null and generator != null:
+				for dx in range(-1, 2):
+					for dy in range(-1, 2):
+						if dx == 0 and dy == 0:
+							continue
+						var cell: Vector2i = player.grid_pos + Vector2i(dx, dy)
+						if not generator.is_walkable(cell):
+							# adjacent wall → freeze it
+							CloudSystem.place(GameManager.clouds, cell, "freezing")
+				return {"success": true,
+					"message": "Icy ramparts bloom on the walls around you."}
+		"summon_imp":
+			_summon_ally("imp", 40, "A little devil grins at your side.")
+			return {"success": true, "message": ""}
+		"call_canine_familiar":
+			_summon_ally("wolf", 60, "A wolf lopes up to heel.")
+			return {"success": true, "message": ""}
+		"summon_demon":
+			var demons: Array = ["red_devil", "blue_devil", "iron_devil",
+					"green_death"]
+			var picked: String = String(demons[randi() % demons.size()])
+			_summon_ally(picked, 50, "A greater demon answers the call.")
+			return {"success": true, "message": ""}
+		"polar_vortex":
+			var pv_r: Array = _inv_scale_range(15, 40)
+			_aoe_damage_visible(4, int(pv_r[0]), int(pv_r[1]),
+					"A polar vortex rages around you.")
+			return {"success": true, "message": ""}
+		"olgreb_toxic_radiance":
+			var dmap_ot: DungeonMap = $DungeonLayer/DungeonMap
+			var hit: int = 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+					continue
+				if dmap_ot != null and not dmap_ot.is_tile_visible(m.grid_pos):
+					continue
+				if m.has_method("apply_poison"):
+					m.apply_poison(2, "a toxic radiance")
+					hit += 1
+			return {"success": true,
+				"message": "A toxic green halo scorches %d foes." % hit}
+		"ignite_poison":
+			# Detonate every poisoned monster + every noxious cloud tile.
+			var det: int = 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+					continue
+				if m.has_meta("_poison_level") \
+						and int(m.get_meta("_poison_level", 0)) > 0:
+					var boom: int = randi_range(8, 18)
+					m.take_damage(boom, "fire")
+					det += 1
+			if GameManager != null:
+				for pos in GameManager.clouds.keys():
+					var c: Dictionary = GameManager.clouds[pos]
+					if String(c.get("type", "")) == "noxious":
+						GameManager.clouds[pos] = {
+							"type": "fire", "turns_left": 4,
+							"damage": 3, "element": "fire",
+							"status": "", "fov_block": false}
+						det += 1
+			return {"success": true,
+				"message": "Poison ignites into flame. (%d detonations)" % det}
+		"cause_fear":
+			var dmap_cf: DungeonMap = $DungeonLayer/DungeonMap
+			var scared: int = 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+					continue
+				if dmap_cf != null and not dmap_cf.is_tile_visible(m.grid_pos):
+					continue
+				if m.data != null and m.data.shape == "undead":
+					continue  # mindless, immune to fear
+				m.set_meta("_flee_turns", 8)
+				scared += 1
+			return {"success": true,
+				"message": "%d foes turn to flee in terror." % scared}
+		"passwall":
+			# Step through the nearest orthogonal wall run up to 3 cells.
+			if generator == null:
+				return {"success": false, "message": "You can't passwall here."}
+			var dirs_pw: Array = [Vector2i(1, 0), Vector2i(-1, 0),
+					Vector2i(0, 1), Vector2i(0, -1)]
+			for d in dirs_pw:
+				var next_cell: Vector2i = player.grid_pos + d
+				if generator.is_walkable(next_cell):
+					continue  # wall is the target, not open floor
+				# Walk through up to 3 wall tiles, land on first floor.
+				for step in range(1, 4):
+					var probe: Vector2i = player.grid_pos + d * step
+					if generator.is_walkable(probe):
+						player.grid_pos = probe
+						player.position = Vector2(
+								probe.x * TILE_SIZE + TILE_SIZE / 2,
+								probe.y * TILE_SIZE + TILE_SIZE / 2)
+						var dmap_pw: DungeonMap = $DungeonLayer/DungeonMap
+						if dmap_pw != null:
+							dmap_pw.update_fov(probe)
+						return {"success": true,
+							"message": "You slip through the stone."}
+					if probe.x <= 0 or probe.x >= DungeonGenerator.MAP_WIDTH - 1:
+						break
+					if probe.y <= 0 or probe.y >= DungeonGenerator.MAP_HEIGHT - 1:
+						break
+			return {"success": true,
+				"message": "No wall thin enough to pass through."}
+
 	if spell_id == "blink":
 		# Formicid stasis blocks every teleport path.
 		if player != null and player.race_res != null \

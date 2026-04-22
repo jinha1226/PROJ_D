@@ -198,8 +198,12 @@ func _on_tap(grid: Vector2i) -> void:
 	if not player.is_alive:
 		return
 	if targeting_mode:
+		# Don't auto-disable targeting here — the 2-tap confirm flow in
+		# GameBootstrap._on_target_selected wants to keep targeting alive
+		# across the first "preview" tap and only exit on the confirm,
+		# cancel, or out-of-range paths. Those branches explicitly set
+		# targeting_mode = false themselves when done.
 		target_selected.emit(grid)
-		targeting_mode = false
 		return
 	var delta: Vector2i = grid - player.grid_pos
 	var cheb: int = max(abs(delta.x), abs(delta.y))
