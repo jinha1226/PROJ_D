@@ -58,6 +58,9 @@ func _apply_class_to_player(class_id: String) -> void:
 		player.items.append({"id": data.starting_armor, "plus": 0})
 		player.equipped_armor_id = data.starting_armor
 	player.refresh_ac_from_equipment()
+	player.init_skills()
+	for skill_id in data.starting_skills.keys():
+		player.skills[skill_id]["level"] = int(data.starting_skills[skill_id])
 	player.known_spells = data.starting_spells.duplicate()
 	for id in _class_starter_items(class_id):
 		player.items.append({"id": id, "plus": 0})
@@ -95,6 +98,9 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.last_killer = String(data.get("last_killer", ""))
 	player.known_spells = data.get("known_spells", [])
 	player.statuses = data.get("statuses", {})
+	player.skills = data.get("skills", {})
+	if player.skills.is_empty():
+		player.init_skills()
 	CombatLog.post("Run resumed. Floor B%d." % GameManager.depth,
 		Color(0.7, 0.9, 1.0))
 

@@ -33,8 +33,14 @@ var last_killer: String = ""
 var items: Array = []  # [{id: String, plus: int}]
 var known_spells: Array = []  # [String]
 var statuses: Dictionary = {}  # id -> turns_remaining
+var skills: Dictionary = {}  # skill_id -> {"level": int, "xp": float}
 var equipped_weapon_id: String = ""
 var equipped_armor_id: String = ""
+
+const SKILL_IDS: Array = ["blade", "blunt", "dagger", "polearm", "ranged",
+	"armor", "magic", "stealth"]
+const SKILL_XP_DELTA: Array = [20, 30, 50, 80, 120, 170, 230, 300, 400,
+	500, 700, 1000, 1400, 2000, 2800, 4000, 5500, 7500, 10000, 13000]
 
 var _map: DungeonMap
 
@@ -220,6 +226,31 @@ func register_kill() -> void:
 func heal(amount: int) -> void:
 	hp = min(hp_max, hp + amount)
 	emit_signal("stats_changed")
+
+func init_skills() -> void:
+	for id in SKILL_IDS:
+		if not skills.has(id):
+			skills[id] = {"level": 0, "xp": 0.0}
+
+func get_skill_level(id: String) -> int:
+	var s: Dictionary = skills.get(id, {})
+	return int(s.get("level", 0))
+
+func grant_skill_xp(id: String, amount: float) -> void:
+	if not SKILL_IDS.has(id):
+		return
+	if not skills.has(id):
+		skills[id] = {"level": 0, "xp": 0.0}
+	var s: Dictionary = skills[id]
+	s["xp"] = float(s.get("xp", 0.0)) + amount
+	while int(s.get("level", 0)) < 20 \
+			and float(s.get("xp", 0.0)) >= SKILL_XP_DELTA[int(s.get("level", 0))]:
+		s["xp"] = float(s["xp"]) - SKILL_XP_DELTA[int(s["level"])]
+		s["level"] = int(s["level"]) + 1
+		CombatLog.post("%s skill reaches %d." \
+				% [id.capitalize(), int(s["level"])],
+			Color(0.7, 0.95, 0.5))
+	skills[id] = s
 
 func grant_xp(amount: int) -> void:
 	xp += amount

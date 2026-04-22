@@ -16,6 +16,7 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 	var power: int = _compute_power(player, spell)
 	var fizzle: bool = _roll_fizzle(player, spell)
 	player.mp = max(0, player.mp - spell.mp_cost)
+	player.grant_skill_xp("magic", float(spell.mp_cost))
 	player.emit_signal("stats_changed")
 	if fizzle:
 		CombatLog.post("Your %s fizzles." % spell.display_name,
@@ -36,14 +37,15 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 	return true
 
 static func _compute_power(player: Player, spell: SpellData) -> int:
-	# Placeholder for §4.7 "magic skill * INT / 10" curve. Until
-	# SkillSystem lands, approximate power from INT + player level.
-	return int(player.intelligence + player.xl * 0.5)
+	# §4.7 curve: magic_skill * INT / 10 + INT baseline.
+	var skill: int = player.get_skill_level("magic")
+	return int(player.intelligence + skill * player.intelligence / 10.0)
 
 static func _roll_fizzle(player: Player, spell: SpellData) -> bool:
 	# §4.7: failure = max(0, 25 + difficulty*5 - magic_skill*3 - INT/2).
-	# Skill 0 in MVP — so purely INT-gated.
-	var fail: int = max(0, 25 + spell.difficulty * 5 - player.intelligence / 2)
+	var skill: int = player.get_skill_level("magic")
+	var fail: int = max(0, 25 + spell.difficulty * 5 - skill * 3
+			- player.intelligence / 2)
 	return randi() % 100 < fail
 
 static func _damage_auto_target(spell: SpellData, player: Player,

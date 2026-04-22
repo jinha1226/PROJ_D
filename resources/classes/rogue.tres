@@ -14,6 +14,6 @@ starting_dex = 14
 starting_int = 10
 starting_weapon = "dagger"
 starting_armor = "leather_armor"
-starting_skills = {}
+starting_skills = {"dagger": 3, "stealth": 2}
 starting_spells = []
 passive = ""
