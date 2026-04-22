@@ -1,14 +1,17 @@
 extends Node
 
 const _HUMAN: Resource = preload("res://resources/races/human.tres")
+const _KOBOLD: Resource = preload("res://resources/races/kobold.tres")
+const _ORC: Resource = preload("res://resources/races/orc.tres")
+const _TROLL: Resource = preload("res://resources/races/troll.tres")
+const _MINOTAUR: Resource = preload("res://resources/races/minotaur.tres")
 const _ELF: Resource = preload("res://resources/races/elf.tres")
-const _DWARF: Resource = preload("res://resources/races/dwarf.tres")
 
 var by_id: Dictionary = {}
 var all: Array = []
 
 func _ready() -> void:
-	for res in [_HUMAN, _ELF, _DWARF]:
+	for res in [_HUMAN, _KOBOLD, _ORC, _TROLL, _MINOTAUR, _ELF]:
 		_register(res)
 	if all.is_empty():
 		push_warning("RaceRegistry: 0 races registered.")
@@ -27,7 +30,7 @@ func get_by_id(id: String) -> RaceData:
 	return by_id.get(id)
 
 func ids_in_order() -> Array:
-	var known: Array = ["human", "elf", "dwarf"]
+	var known: Array = ["human", "kobold", "orc", "elf", "troll", "minotaur"]
 	var result: Array = []
 	for id in known:
 		if by_id.has(id):
@@ -41,4 +44,6 @@ func is_unlocked(id: String) -> bool:
 	var r: RaceData = get_by_id(id)
 	if r == null:
 		return false
-	return r.unlocked
+	if r.unlocked:
+		return true
+	return GameManager.is_unlocked(id)

@@ -24,6 +24,11 @@ var pending_player_state: Dictionary = {}
 var use_tiles: bool = true
 var rune_shards: int = 0
 
+## Permanent unlock registry — race / class ids the player has earned
+## across runs. Keyed by plain id (e.g. "kobold", "berserker"). Written
+## to settings.json so deaths don't revoke progress.
+var unlocks: Dictionary = {}
+
 func _ready() -> void:
 	_load_settings()
 
@@ -78,6 +83,42 @@ func add_rune_shards(amount: int) -> void:
 	rune_shards = max(0, rune_shards + amount)
 	_save_settings()
 
+func unlock(id: String) -> bool:
+	if id == "":
+		return false
+	if bool(unlocks.get(id, false)):
+		return false
+	unlocks[id] = true
+	_save_settings()
+	return true
+
+func is_unlocked(id: String) -> bool:
+	return bool(unlocks.get(id, false))
+
+func try_kill_unlock(monster_id: String) -> void:
+	# Race unlock by kill.
+	for rid in RaceRegistry.by_id.keys():
+		var r: RaceData = RaceRegistry.get_by_id(rid)
+		if r == null:
+			continue
+		if String(r.unlock_kind) == "kill" \
+				and String(r.unlock_trigger_id) == monster_id \
+				and unlock(rid):
+			CombatLog.post("New race unlocked: %s!" % r.display_name,
+				Color(1.0, 0.9, 0.4))
+
+func try_use_unlock(item_id: String) -> void:
+	# Class unlock by item use.
+	for cid in ClassRegistry.by_id.keys():
+		var c: ClassData = ClassRegistry.get_by_id(cid)
+		if c == null:
+			continue
+		if String(c.unlock_kind) == "use_item" \
+				and String(c.unlock_trigger_id) == item_id \
+				and unlock(cid):
+			CombatLog.post("New class unlocked: %s!" % c.display_name,
+				Color(1.0, 0.85, 0.35))
+
 func _load_settings() -> void:
 	if not FileAccess.file_exists(SETTINGS_PATH):
 		return
@@ -91,9 +132,16 @@ func _load_settings() -> void:
 		return
 	use_tiles = bool(parsed.get("use_tiles", use_tiles))
 	rune_shards = int(parsed.get("rune_shards", rune_shards))
+	var saved_unlocks = parsed.get("unlocks", null)
+	if saved_unlocks is Dictionary:
+		unlocks = saved_unlocks
 
 func _save_settings() -> void:
-	var data := {"use_tiles": use_tiles, "rune_shards": rune_shards}
+	var data := {
+		"use_tiles": use_tiles,
+		"rune_shards": rune_shards,
+		"unlocks": unlocks,
+	}
 	var f := FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
 	if f == null:
 		return

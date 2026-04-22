@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3 uid="uid://braceorc000001"]
+
+[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+
+[resource]
+script = ExtResource("1_rdata")
+id = "orc"
+display_name = "Orc"
+description = "Brutal and resilient. +2 STR / +3 HP, -1 DEX, -1 INT."
+base_sprite_path = "res://assets/tiles/individual/player/base/orc_m.png"
+unlocked = false
+unlock_kind = "kill"
+unlock_trigger_id = "orc"
+str_mod = 2
+dex_mod = -1
+int_mod = -1
+hp_mod = 3
+mp_mod = 0

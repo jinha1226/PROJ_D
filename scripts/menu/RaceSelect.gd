@@ -72,14 +72,23 @@ func _make_card(data: RaceData) -> Control:
 	desc_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vb.add_child(desc_lab)
 
+	var unlocked: bool = RaceRegistry.is_unlocked(data.id)
+	if not unlocked:
+		var hint_lab := Label.new()
+		hint_lab.text = data.unlock_hint()
+		hint_lab.add_theme_font_size_override("font_size", 20)
+		hint_lab.add_theme_color_override("font_color", Color(1.0, 0.7, 0.45))
+		hint_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		vb.add_child(hint_lab)
+
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(0, 60)
 	btn.add_theme_font_size_override("font_size", 26)
-	if data.unlocked:
+	if unlocked:
 		btn.text = "Pick %s" % data.display_name
 		btn.pressed.connect(_on_pick.bind(data.id))
 	else:
-		btn.text = "Locked (%d shards)" % data.unlock_cost
+		btn.text = "Locked"
 		btn.disabled = true
 	vb.add_child(btn)
 

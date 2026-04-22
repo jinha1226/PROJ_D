@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3 uid="uid://bracetroll0001"]
+
+[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+
+[resource]
+script = ExtResource("1_rdata")
+id = "troll"
+display_name = "Troll"
+description = "Huge and regenerating. +3 STR / +8 HP, -2 DEX / -2 INT. Slow spellcaster."
+base_sprite_path = "res://assets/tiles/individual/player/base/troll_m.png"
+unlocked = false
+unlock_kind = "kill"
+unlock_trigger_id = "troll"
+str_mod = 3
+dex_mod = -2
+int_mod = -2
+hp_mod = 8
+mp_mod = -2

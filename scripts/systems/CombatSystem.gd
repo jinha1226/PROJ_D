@@ -44,6 +44,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		CombatLog.hit("You kill the %s." % monster.data.display_name)
 		player.grant_xp(monster.data.xp_value)
 		player.register_kill()
+		GameManager.try_kill_unlock(monster.data.id)
 
 static func monster_ranged_attack_player(monster: Monster, player: Player,
 		ra: Dictionary) -> void:

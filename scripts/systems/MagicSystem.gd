@@ -63,6 +63,7 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 		CombatLog.hit("You kill the %s." % target.data.display_name)
 		player.grant_xp(target.data.xp_value)
 		player.register_kill()
+		GameManager.try_kill_unlock(target.data.id)
 
 static func _find_nearest_visible(player: Player, game: Node,
 		max_range: int) -> Monster:

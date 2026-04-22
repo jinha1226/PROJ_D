@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3 uid="uid://braceminotaur1"]
+
+[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+
+[resource]
+script = ExtResource("1_rdata")
+id = "minotaur"
+display_name = "Minotaur"
+description = "Bullheaded warrior. +2 STR / +1 DEX / +4 HP, -3 INT."
+base_sprite_path = "res://assets/tiles/individual/player/base/minotaur_m.png"
+unlocked = false
+unlock_kind = "kill"
+unlock_trigger_id = "minotaur"
+str_mod = 2
+dex_mod = 1
+int_mod = -3
+hp_mod = 4
+mp_mod = -1

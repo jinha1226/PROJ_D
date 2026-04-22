@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bmonminotaur001"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "minotaur"
+display_name = "minotaur"
+tier = 4
+hp = 58
+hd = 10
+ac = 4
+ev = 7
+speed = 10
+sight_range = 8
+attacks = [{"damage": 12, "flavour": "gore"}]
+resists = []
+min_depth = 9
+max_depth = 16
+weight = 7
+xp_value = 34
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/demihumanoids/minotaur.png"
+glyph = "M"
+glyph_color = Color(0.65, 0.45, 0.3, 1)

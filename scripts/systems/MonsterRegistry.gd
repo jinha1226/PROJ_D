@@ -10,10 +10,14 @@ const _GNOLL: Resource = preload("res://resources/monsters/gnoll.tres")
 const _ORC: Resource = preload("res://resources/monsters/orc.tres")
 const _OGRE: Resource = preload("res://resources/monsters/ogre.tres")
 const _ORC_WIZARD: Resource = preload("res://resources/monsters/orc_wizard.tres")
+const _TROLL: Resource = preload("res://resources/monsters/troll.tres")
+const _MINOTAUR: Resource = preload("res://resources/monsters/minotaur.tres")
+const _DEEP_ELF_ARCHER: Resource = preload(
+	"res://resources/monsters/deep_elf_archer.tres")
 
 const _ALL_MONSTERS: Array = [
 	_RAT, _BAT, _KOBOLD, _GOBLIN, _HOBGOBLIN, _ADDER, _GNOLL,
-	_ORC, _OGRE, _ORC_WIZARD,
+	_ORC, _OGRE, _ORC_WIZARD, _TROLL, _MINOTAUR, _DEEP_ELF_ARCHER,
 ]
 
 var by_id: Dictionary = {}
