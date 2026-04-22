@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_cdata")
 id = "mage"
-display_name = "마법사"
+display_name = "Mage"
 description = "Spell-focused. Low HP, high MP. Starts with dagger + robe + scrolls."
 starting_hp = 22
 starting_mp = 8

@@ -9,12 +9,27 @@ const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 func _ready() -> void:
 	theme = GameTheme.create()
 	_back_btn.pressed.connect(_on_back)
+	# Defensive rescan: if autoload loaded before ClassData's script
+	# was resolved, by_id can be empty on first run after a pull.
+	if ClassRegistry.all.is_empty():
+		ClassRegistry._scan()
 	_build_cards()
 
 func _build_cards() -> void:
 	for child in _container.get_children():
 		child.queue_free()
-	for id in ClassRegistry.ids_in_order():
+	var ids: Array = ClassRegistry.ids_in_order()
+	if ids.is_empty():
+		var lab := Label.new()
+		lab.text = "No classes loaded.\n"\
+			+ "Try re-opening the project in the Godot editor so that "\
+			+ "resources/classes/*.tres gets imported, then run again."
+		lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		lab.add_theme_font_size_override("font_size", 26)
+		lab.add_theme_color_override("font_color", Color(1.0, 0.6, 0.5))
+		_container.add_child(lab)
+		return
+	for id in ids:
 		var data: ClassData = ClassRegistry.get_by_id(id)
 		if data == null:
 			continue

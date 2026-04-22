@@ -21,8 +21,9 @@ func _scan() -> void:
 		if not dir.current_is_dir() and fname.ends_with(".tres"):
 			var path: String = "%s/%s" % [SPELL_DIR, fname]
 			var res = load(path)
-			if res is SpellData and res.id != "":
-				by_id[res.id] = res
+			if res != null and "id" in res and "mp_cost" in res \
+					and String(res.id) != "":
+				by_id[String(res.id)] = res
 				all.append(res)
 		fname = dir.get_next()
 	dir.list_dir_end()

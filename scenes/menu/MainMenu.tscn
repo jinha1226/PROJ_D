@@ -35,7 +35,7 @@ theme_override_colors/font_color = Color(0.96, 0.87, 0.58, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 108
-text = "포켓크롤"
+text = "PocketCrawl"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -53,7 +53,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.65, 0.62, 0.72, 1)
 theme_override_font_sizes/font_size = 36
-text = "Pocket Crawl"
+text = "a tiny roguelike"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -76,12 +76,12 @@ visible = false
 custom_minimum_size = Vector2(0, 120)
 theme_override_font_sizes/font_size = 44
 theme_override_colors/font_color = Color(0.85, 1.0, 0.7, 1)
-text = "이어하기"
+text = "Continue"
 
 [node name="StartButton" type="Button" parent="VBox"]
 custom_minimum_size = Vector2(0, 120)
 theme_override_font_sizes/font_size = 52
-text = "시작"
+text = "New Run"
 
 [node name="DisplayButton" type="Button" parent="VBox"]
 custom_minimum_size = Vector2(0, 120)
@@ -91,9 +91,9 @@ text = "Display: Tiles"
 [node name="ShardsButton" type="Button" parent="VBox"]
 custom_minimum_size = Vector2(0, 120)
 theme_override_font_sizes/font_size = 44
-text = "룬샤드"
+text = "Rune Shards"
 
 [node name="HelpButton" type="Button" parent="VBox"]
 custom_minimum_size = Vector2(0, 100)
 theme_override_font_sizes/font_size = 36
-text = "도움말"
+text = "How to Play"

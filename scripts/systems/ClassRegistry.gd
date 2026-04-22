@@ -21,8 +21,12 @@ func _scan() -> void:
 		if not dir.current_is_dir() and fname.ends_with(".tres"):
 			var path: String = "%s/%s" % [CLASS_DIR, fname]
 			var res = load(path)
-			if res is ClassData and res.id != "":
-				by_id[res.id] = res
+			# Duck-typed check — `is ClassData` can fail when the
+			# global class registry isn't yet populated (e.g. first
+			# run after a git pull without a fresh editor import).
+			if res != null and "id" in res and "starting_hp" in res \
+					and String(res.id) != "":
+				by_id[String(res.id)] = res
 				all.append(res)
 		fname = dir.get_next()
 	dir.list_dir_end()

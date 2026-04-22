@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_cdata")
 id = "warrior"
-display_name = "전사"
+display_name = "Warrior"
 description = "Heavy hitter. Starts with sword + armor. STR-driven melee."
 starting_hp = 35
 starting_mp = 2
