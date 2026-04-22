@@ -5952,7 +5952,103 @@ func _on_equipped_card_input(event: InputEvent, item_dict: Dictionary) -> void:
 	elif event is InputEventScreenTouch:
 		is_click = event.pressed
 	if is_click:
-		_on_bag_info(item_dict)
+		_show_equipped_action_dialog(item_dict)
+
+
+## Equipped-card tap menu — info + unequip. Cursed items can't be
+## removed (DCSS parity); the button greys out and logs the reason.
+func _show_equipped_action_dialog(item_dict: Dictionary) -> void:
+	if player == null or item_dict.is_empty():
+		return
+	var name_s: String = String(item_dict.get("name", "Item"))
+	var kind: String = String(item_dict.get("kind", ""))
+	var cursed: bool = bool(item_dict.get("cursed", false))
+	var dlg := GameDialog.create(name_s, Vector2i(960, 900))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
+	vb.add_theme_constant_override("separation", 12)
+
+	var lab := Label.new()
+	lab.text = BagTooltips.build_item_tooltip(player, item_dict)
+	lab.add_theme_font_size_override("font_size", 40)
+	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vb.add_child(lab)
+
+	vb.add_child(HSeparator.new())
+
+	var unequip_btn := Button.new()
+	unequip_btn.text = "Unequip"
+	unequip_btn.custom_minimum_size = Vector2(0, 88)
+	unequip_btn.add_theme_font_size_override("font_size", 42)
+	if cursed:
+		unequip_btn.disabled = true
+		unequip_btn.text = "Unequip (cursed — can't remove)"
+	else:
+		unequip_btn.pressed.connect(_on_unequip.bind(item_dict, kind, dlg))
+	vb.add_child(unequip_btn)
+
+
+func _on_unequip(item_dict: Dictionary, kind: String, dlg: GameDialog) -> void:
+	if player == null:
+		dlg.close()
+		return
+	var iid: String = String(item_dict.get("id", ""))
+	var returned: Dictionary = {}
+	match kind:
+		"weapon":
+			# DCSS unequip: move the weapon into inventory, clear the
+			# slot + any per-weapon meta brand.
+			if player.equipped_weapon_id == iid and not player.equipped_weapon_cursed:
+				var w_back: Dictionary = {
+					"id": iid,
+					"name": WeaponRegistry.display_name_for(iid),
+					"kind": "weapon",
+					"plus": int(player.equipped_weapon_plus),
+					"color": Color(0.75, 0.75, 0.85),
+				}
+				player.items.append(w_back)
+				player.equipped_weapon_id = ""
+				player.equipped_weapon_plus = 0
+				returned = w_back
+		"armor":
+			var slot: String = String(item_dict.get("slot", ""))
+			if slot == "":
+				for k in player.equipped_armor.keys():
+					var a: Dictionary = player.equipped_armor[k]
+					if String(a.get("id", "")) == iid:
+						slot = String(k)
+						break
+			if slot != "" and not bool(item_dict.get("cursed", false)):
+				returned = player.unequip_armor_slot(slot)
+				if not returned.is_empty():
+					player.items.append(returned)
+		"ring":
+			for i in player.equipped_rings.size():
+				var r: Dictionary = player.equipped_rings[i] \
+						if typeof(player.equipped_rings[i]) == TYPE_DICTIONARY else {}
+				if not r.is_empty() and String(r.get("id", "")) == iid:
+					returned = player.unequip_ring(i)
+					if not returned.is_empty():
+						player.items.append(returned)
+					break
+		"amulet":
+			returned = player.unequip_amulet()
+			if not returned.is_empty():
+				player.items.append(returned)
+	if returned.is_empty():
+		CombatLog.add("You can't unequip that right now.")
+	else:
+		CombatLog.add("You unequip the %s." % String(returned.get("name", iid)))
+		if player.has_method("_recompute_gear_stats"):
+			player._recompute_gear_stats()
+		if player.has_signal("inventory_changed"):
+			player.inventory_changed.emit()
+	dlg.close()
+	# Refresh the bag view so the slot updates visibly.
+	if _bag_dlg != null and is_instance_valid(_bag_dlg):
+		_bag_dlg.close()
+		_on_bag_pressed()
 
 
 ## Bag info popup — thin forwarder. Tooltip text + thumbnail + dialog
@@ -6576,7 +6672,7 @@ func _status_build_rings(vb: VBoxContainer) -> void:
 	var cap: int = player.max_ring_slots() if player.has_method("max_ring_slots") else 2
 	if cap <= 0:
 		return
-	vb.add_child(_status_section_header("Rings (%d / %d slots)" % [
+	vb.add_child(_status_section_header("Jewellery (%d / %d rings)" % [
 			_count_equipped_rings(), cap]))
 	for i in cap:
 		var ring: Dictionary = {}
@@ -6592,6 +6688,20 @@ func _status_build_rings(vb: VBoxContainer) -> void:
 					_ring_effect_summary(ring),
 					TileRenderer.item(rid),
 					false))
+	# Amulet row — always visible so the player can see the slot even
+	# while empty, matching how ring slots render.
+	var am: Dictionary = {}
+	if "equipped_amulet" in player and player.equipped_amulet is Dictionary:
+		am = player.equipped_amulet
+	if am.is_empty():
+		vb.add_child(_status_gear_row("Amulet", "(empty)", "", null, false))
+	else:
+		var amid: String = String(am.get("id", ""))
+		vb.add_child(_status_gear_row("Amulet",
+				String(am.get("name", amid)),
+				_ring_effect_summary(am),
+				TileRenderer.item(amid),
+				bool(am.get("cursed", false))))
 
 
 func _count_equipped_rings() -> int:
