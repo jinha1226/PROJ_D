@@ -1670,10 +1670,17 @@ func _maybe_drop_gold(monster: Monster) -> void:
 	var intel: String = String(monster.data.intelligence)
 	if intel == "animal" or intel == "plant" or intel == "brainless":
 		return
-	if randf() >= 0.30:
+	# DCSS Gozag passive (god-abil.cc gozag_gold_bonus): every kill drops
+	# gold, and the amount is doubled. No piety is earned (kill_piety:0),
+	# so the loyal worshipper's only return on killing is more coin for
+	# the invocations (Potion Petition / Call Merchant / Bribe Branch).
+	var is_gozag: bool = player != null and player.current_god == "gozag"
+	if not is_gozag and randf() >= 0.30:
 		return
 	var hd: int = int(monster.data.hd)
 	var amount: int = max(1, hd + randi() % max(hd * 2, 3))
+	if is_gozag:
+		amount *= 2
 	var fi: FloorItem = FloorItem.new()
 	$EntityLayer.add_child(fi)
 	fi.setup(monster.grid_pos, "gold", "%d gold" % amount, "gold",
