@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3 uid="uid://bracedwarf0001"]
+
+[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+
+[resource]
+script = ExtResource("1_rdata")
+id = "dwarf"
+display_name = "Dwarf"
+description = "Hardy mountain folk. +1 STR / +4 HP, -1 DEX, -1 MP."
+base_sprite_path = "res://assets/tiles/individual/player/base/dwarf_m.png"
+unlocked = false
+unlock_cost = 120
+str_mod = 1
+dex_mod = -1
+int_mod = 0
+hp_mod = 4
+mp_mod = -1

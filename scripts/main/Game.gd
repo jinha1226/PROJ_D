@@ -8,7 +8,7 @@ const TopHUDScene = preload("res://scenes/ui/TopHUD.tscn")
 const BottomHUDScene = preload("res://scenes/ui/BottomHUD.tscn")
 const ResultScreenScene = preload("res://scenes/ui/ResultScreen.tscn")
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
-const JOB_SELECT_PATH: String = "res://scenes/menu/JobSelect.tscn"
+const RACE_SELECT_PATH: String = "res://scenes/menu/RaceSelect.tscn"
 
 var map: DungeonMap
 var player: Player
@@ -96,6 +96,8 @@ func _apply_class_to_player(class_id: String) -> void:
 	player.strength = data.starting_str
 	player.dexterity = data.starting_dex
 	player.intelligence = data.starting_int
+	_apply_race_mods(GameManager.selected_race_id)
+	player.set_race_from_id(GameManager.selected_race_id)
 	if data.starting_weapon != "":
 		player.items.append({"id": data.starting_weapon, "plus": 0})
 		player.equipped_weapon_id = data.starting_weapon
@@ -106,12 +108,27 @@ func _apply_class_to_player(class_id: String) -> void:
 	for skill_id in data.starting_skills.keys():
 		player.skills[skill_id]["level"] = int(data.starting_skills[skill_id])
 	player.refresh_ac_from_equipment()
+	player._refresh_paperdoll()
 	player.known_spells = data.starting_spells.duplicate()
 	for id in _class_starter_items(class_id):
 		player.items.append({"id": id, "plus": 0})
 		player.auto_bind_quickslot(id)
-	CombatLog.post("You start as %s." % data.display_name,
+	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
+	var race_name: String = race.display_name if race != null else "adventurer"
+	CombatLog.post("You start as %s %s." % [race_name, data.display_name],
 		Color(0.85, 0.9, 1.0))
+
+func _apply_race_mods(race_id: String) -> void:
+	var race: RaceData = RaceRegistry.get_by_id(race_id)
+	if race == null:
+		return
+	player.strength = max(1, player.strength + race.str_mod)
+	player.dexterity = max(1, player.dexterity + race.dex_mod)
+	player.intelligence = max(1, player.intelligence + race.int_mod)
+	player.hp_max = max(1, player.hp_max + race.hp_mod)
+	player.hp = player.hp_max
+	player.mp_max = max(0, player.mp_max + race.mp_mod)
+	player.mp = player.mp_max
 
 func _class_starter_items(class_id: String) -> Array:
 	match class_id:
@@ -150,6 +167,8 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	var saved_qs = data.get("quickslots", null)
 	if saved_qs is Array and saved_qs.size() == player.quickslots.size():
 		player.quickslots = saved_qs
+	player.set_race_from_id(GameManager.selected_race_id)
+	player._refresh_paperdoll()
 	CombatLog.post("Run resumed. Floor B%d." % GameManager.depth,
 		Color(0.7, 0.9, 1.0))
 
@@ -400,7 +419,8 @@ func _on_result_retry(res: Node) -> void:
 	if is_instance_valid(res):
 		res.queue_free()
 	GameManager.selected_class_id = ""
-	get_tree().change_scene_to_file(JOB_SELECT_PATH)
+	GameManager.selected_race_id = ""
+	get_tree().change_scene_to_file(RACE_SELECT_PATH)
 
 func _on_result_meta(res: Node) -> void:
 	if is_instance_valid(res):

@@ -127,8 +127,7 @@ static func _equip_weapon(index: int, player: Player, dlg: GameDialog) -> void:
 	if index < 0 or index >= player.items.size():
 		return
 	var entry: Dictionary = player.items[index]
-	player.equipped_weapon_id = String(entry.get("id", ""))
-	player.emit_signal("stats_changed")
+	player.set_equipped_weapon(String(entry.get("id", "")))
 	CombatLog.post("You equip %s." % _name_of(entry))
 	dlg.close()
 	TurnManager.end_player_turn()
@@ -137,8 +136,7 @@ static func _equip_armor(index: int, player: Player, dlg: GameDialog) -> void:
 	if index < 0 or index >= player.items.size():
 		return
 	var entry: Dictionary = player.items[index]
-	player.equipped_armor_id = String(entry.get("id", ""))
-	player.refresh_ac_from_equipment()
+	player.set_equipped_armor(String(entry.get("id", "")))
 	CombatLog.post("You don %s." % _name_of(entry))
 	dlg.close()
 	TurnManager.end_player_turn()

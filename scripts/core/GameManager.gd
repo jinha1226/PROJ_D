@@ -14,6 +14,7 @@ var run_in_progress: bool = false
 
 # Character selection — set by menus before start_new_run().
 var selected_class_id: String = ""
+var selected_race_id: String = "human"
 
 # Staging slot for loaded player stats. Game.gd consumes this on scene
 # load and writes into the freshly-instantiated Player, then clears it.
@@ -56,6 +57,7 @@ func load_run() -> bool:
 	seed = int(data.get("seed", 0))
 	gold = int(data.get("gold", 0))
 	selected_class_id = String(data.get("selected_class_id", ""))
+	selected_race_id = String(data.get("selected_race_id", "human"))
 	identified = data.get("identified", {})
 	pending_player_state = data.get("player", {})
 	run_in_progress = true

@@ -29,6 +29,7 @@ MonsterRegistry="*res://scripts/systems/MonsterRegistry.gd"
 ItemRegistry="*res://scripts/systems/ItemRegistry.gd"
 ClassRegistry="*res://scripts/systems/ClassRegistry.gd"
 SpellRegistry="*res://scripts/systems/SpellRegistry.gd"
+RaceRegistry="*res://scripts/systems/RaceRegistry.gd"
 
 [display]
 

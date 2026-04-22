@@ -9,11 +9,30 @@ signal item_dropped(item_id: String, at_pos: Vector2i, plus: int)
 @export var grid_pos: Vector2i = Vector2i(1, 1)
 
 const SIGHT_RADIUS: int = 8
-const TEX_PLAYER: Texture2D = preload(
+const DEFAULT_BASE_TEX: Texture2D = preload(
 	"res://assets/tiles/individual/player/base/human_m.png")
 
 const XP_CURVE: Array = [0, 10, 30, 70, 140, 250, 420, 700, 1150, 1800,
 	2800, 4200, 6000, 8400, 11500, 15500, 20500, 27000, 35500, 47000]
+
+## Paper-doll layer lookup tables. When equipped item id matches a key,
+## the corresponding sprite is drawn on top of the base race sprite.
+const DOLL_BODY_MAP: Dictionary = {
+	"leather_armor": "res://assets/tiles/individual/player/body/leather_armour.png",
+	"chain_mail": "res://assets/tiles/individual/player/body/chainmail.png",
+	"robe": "res://assets/tiles/individual/player/body/robe_blue.png",
+}
+
+const DOLL_HAND1_MAP: Dictionary = {
+	"short_sword": "res://assets/tiles/individual/player/hand1/short_sword.png",
+	"dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
+	"mace": "res://assets/tiles/individual/player/hand1/mace.png",
+	"long_sword": "res://assets/tiles/individual/player/hand1/long_sword_slant.png",
+}
+
+var _base_tex: Texture2D = DEFAULT_BASE_TEX
+var _body_doll_tex: Texture2D = null
+var _hand1_doll_tex: Texture2D = null
 
 var hp: int = 30
 var hp_max: int = 30
@@ -464,10 +483,47 @@ func _apply_status_tick(id: String) -> void:
 				hp -= 1
 				CombatLog.damage_taken("Poison burns you. (-1 HP)")
 
+func set_race_from_id(race_id: String) -> void:
+	var race: RaceData = RaceRegistry.get_by_id(race_id)
+	if race != null and race.base_sprite_path != "" \
+			and ResourceLoader.exists(race.base_sprite_path):
+		_base_tex = load(race.base_sprite_path) as Texture2D
+	else:
+		_base_tex = DEFAULT_BASE_TEX
+	queue_redraw()
+
+func set_equipped_weapon(id: String) -> void:
+	equipped_weapon_id = id
+	_refresh_paperdoll()
+	emit_signal("stats_changed")
+
+func set_equipped_armor(id: String) -> void:
+	equipped_armor_id = id
+	_refresh_paperdoll()
+	refresh_ac_from_equipment()  # emits stats_changed
+
+func _refresh_paperdoll() -> void:
+	_body_doll_tex = null
+	_hand1_doll_tex = null
+	if DOLL_BODY_MAP.has(equipped_armor_id):
+		var path: String = String(DOLL_BODY_MAP[equipped_armor_id])
+		if ResourceLoader.exists(path):
+			_body_doll_tex = load(path) as Texture2D
+	if DOLL_HAND1_MAP.has(equipped_weapon_id):
+		var path: String = String(DOLL_HAND1_MAP[equipped_weapon_id])
+		if ResourceLoader.exists(path):
+			_hand1_doll_tex = load(path) as Texture2D
+	queue_redraw()
+
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
 	if GameManager.use_tiles:
-		draw_texture_rect(TEX_PLAYER, rect, false)
+		if _base_tex != null:
+			draw_texture_rect(_base_tex, rect, false)
+		if _body_doll_tex != null:
+			draw_texture_rect(_body_doll_tex, rect, false)
+		if _hand1_doll_tex != null:
+			draw_texture_rect(_hand1_doll_tex, rect, false)
 	else:
 		draw_string(ThemeDB.fallback_font,
 			Vector2(6, DungeonMap.CELL_SIZE - 6),

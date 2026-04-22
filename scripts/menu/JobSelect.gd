@@ -1,6 +1,7 @@
 extends Control
 
 const GAME_SCENE_PATH: String = "res://scenes/main/Game.tscn"
+const RACE_SELECT_PATH: String = "res://scenes/menu/RaceSelect.tscn"
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 
 @onready var _container: VBoxContainer = $ScrollContainer/VBox
@@ -106,4 +107,4 @@ func _on_pick(class_id: String) -> void:
 	get_tree().change_scene_to_file(GAME_SCENE_PATH)
 
 func _on_back() -> void:
-	get_tree().change_scene_to_file(MENU_SCENE_PATH)
+	get_tree().change_scene_to_file(RACE_SELECT_PATH)
