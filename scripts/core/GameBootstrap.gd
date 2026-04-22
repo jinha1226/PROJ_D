@@ -2179,133 +2179,26 @@ func _on_skill_leveled_up_for_stats(p: Node, skill_id: String, _new_level: int) 
 		player.apply_form(cur_form)
 
 
-## Trigger a trap the player just stepped on. Effect depends on the
-## trap's `type` field; DCSS damage scales with depth. After firing,
-## most traps remain in place (visible reminder) but arrow/bolt/spear
-## mechanicals can wear out — we keep them for simplicity.
+## Thin dispatcher — reads trap type / depth from the generator and
+## delegates the actual effect to TrapEffects (static module). The
+## two cross-cutting side effects a static module can't own —
+## floor descent and hostile spawns — are passed in as callables.
 func _trigger_trap(pos: Vector2i) -> void:
 	if player == null or generator == null:
 		return
 	var info: Dictionary = generator.traps.get(pos, {})
-	var ttype: String = String(info.get("type", ""))
-	var depth: int = int(info.get("depth", 1))
-	match ttype:
-		"dart":
-			var d: int = 1 + randi() % max(3 + depth / 3, 3)
-			player.take_damage(d, "physical")
-			player.apply_poison(1, "a dart")
-			CombatLog.add("A poisoned dart hits you for %d!" % d)
-		"arrow":
-			var a: int = 1 + randi() % max(4 + depth / 3, 4)
-			player.take_damage(a, "physical")
-			CombatLog.add("An arrow thuds into you! (%d dmg)" % a)
-		"spear":
-			var s: int = 1 + randi() % max(6 + depth / 3, 6)
-			player.take_damage(s, "physical")
-			CombatLog.add("A spear stabs you! (%d dmg)" % s)
-		"bolt":
-			var b: int = 1 + randi() % max(5 + depth / 3, 5)
-			player.take_damage(b, "physical")
-			CombatLog.add("A crossbow bolt fires into you! (%d dmg)" % b)
-		"teleport":
-			# DCSS teleport trap drops you at least 6 tiles away (trap.cc
-			# trap_effect). Random destinations close to the trap don't
-			# count — retry up to 20 times before falling back to plain
-			# random teleport.
-			CombatLog.add("Space wobbles — you are teleported!")
-			var old_pos: Vector2i = player.grid_pos
-			var landed: bool = false
-			for _attempt in 20:
-				if player.has_method("_teleport_random"):
-					player._teleport_random()
-				var dx_t: int = abs(player.grid_pos.x - old_pos.x)
-				var dy_t: int = abs(player.grid_pos.y - old_pos.y)
-				if maxi(dx_t, dy_t) >= 6:
-					landed = true
-					break
-			if not landed and player.has_method("_teleport_random"):
-				player._teleport_random()
-		"shaft":
-			# DCSS shaft drops the victim 1-3 floors down. Uses the same
-			# level-descent pipeline as stairs so floor state persistence
-			# (kills-stay-dead, items stay gone) still works.
-			var depth_drop: int = 1 + randi() % 3
-			var target_depth: int = mini(MAX_DEPTH, GameManager.current_depth + depth_drop)
-			if target_depth <= GameManager.current_depth:
-				CombatLog.add("The floor gives way, but you catch yourself!")
-			else:
-				CombatLog.add("The floor collapses — you plunge %d floors!" % \
-						(target_depth - GameManager.current_depth))
-				GameManager.current_depth = target_depth
-				_regenerate_dungeon(false, false)
-		"alarm":
-			CombatLog.add("An alarm blares!")
-			MonsterAI.broadcast_noise(get_tree(), pos, 30, 0)
-		"net":
-			player.set_meta("_rooted_turns", 5)
-			CombatLog.add("A net falls on you! (rooted for 5 turns)")
-		"zot":
-			# DCSS Zot trap — cascade of nastiness. Rolls one of: heavy
-			# damage, random bad status, summon 1-3 dangerous mobs, or a
-			# teleport. Scales with depth so late-game Zot traps are
-			# catastrophic, early-game traps are merely bad.
-			CombatLog.add("A flash of evil energy — the Zot trap triggers!")
-			var zot_roll: int = randi() % 4
-			match zot_roll:
-				0:
-					var zd: int = 10 + randi() % max(10 + depth, 10)
-					player.take_damage(zd, "negative")
-					CombatLog.add("Baleful magic rakes you for %d damage!" % zd)
-				1:
-					var bad_statuses: Array = ["_confused", "_slowed_turns",
-							"_afraid_turns", "_paralysis_turns"]
-					var pick: String = String(bad_statuses[randi() % bad_statuses.size()])
-					if pick == "_confused":
-						player.set_meta("_confused", true)
-						player.set_meta("_confusion_turns", 6)
-					else:
-						player.set_meta(pick, 4 + randi() % 6)
-					CombatLog.add("A curse grips you! (%s)" % pick.replace("_turns", "").replace("_", ""))
-				2:
-					var zot_pool: Array = ["orange_demon", "hell_hound",
-							"iron_golem", "ynoxinul", "shadow_demon"]
-					for _i in 1 + randi() % 3:
-						var sid: String = String(zot_pool[randi() % zot_pool.size()])
-						_spawn_hostile(sid, player.grid_pos)
-					CombatLog.add("Shapes coalesce around you!")
-				3:
-					CombatLog.add("You are flung across the floor!")
-					if player.has_method("_teleport_random"):
-						player._teleport_random()
-		"golubria":
-			# DCSS Passage of Golubria trap — short-range controlled
-			# teleport to a visible walkable tile. No direct damage; the
-			# payoff is that monsters adjacent to the old position lose
-			# their tempo. Fires once per trigger.
-			CombatLog.add("A portal of Golubria opens — you step through!")
-			var dmap_g: DungeonMap = $DungeonLayer/DungeonMap
-			var candidates: Array[Vector2i] = []
-			if dmap_g != null:
-				for dx_g in range(-6, 7):
-					for dy_g in range(-6, 7):
-						var cand: Vector2i = player.grid_pos + Vector2i(dx_g, dy_g)
-						if not generator.is_walkable(cand):
-							continue
-						if not dmap_g.is_tile_visible(cand):
-							continue
-						if maxi(abs(dx_g), abs(dy_g)) < 3:
-							continue
-						candidates.append(cand)
-			if not candidates.is_empty():
-				var dest: Vector2i = candidates[randi() % candidates.size()]
-				player.grid_pos = dest
-				player.position = Vector2(dest.x * TILE_SIZE + TILE_SIZE / 2.0,
-						dest.y * TILE_SIZE + TILE_SIZE / 2.0)
-				player.moved.emit(dest)
-				if dmap_g != null:
-					dmap_g.update_fov(dest)
-		_:
-			CombatLog.add("A trap triggers, but nothing happens.")
+	TrapEffects.trigger({
+		"player": player,
+		"generator": generator,
+		"dmap": $DungeonLayer/DungeonMap,
+		"tree": get_tree(),
+		"pos": pos,
+		"ttype": String(info.get("type", "")),
+		"depth": int(info.get("depth", 1)),
+		"max_depth": MAX_DEPTH,
+		"regenerate_dungeon": Callable(self, "_regenerate_dungeon"),
+		"spawn_hostile": Callable(self, "_spawn_hostile"),
+	})
 
 
 ## Keyboard command dispatcher. Wires the vi-key / function-key
