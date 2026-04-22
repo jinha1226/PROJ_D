@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SpellData" load_steps=2 format=3 uid="uid://bspellmagmsl01"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "magic_missile"
+display_name = "Magic Missile"
+mp_cost = 3
+difficulty = 1
+base_damage = 4
+max_range = 7
+targeting = "nearest"
+element = ""
+effect = "multi_damage"
+description = "Three force darts each auto-find a visible enemy. Can't miss."

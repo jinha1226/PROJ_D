@@ -34,6 +34,10 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 				Color(0.7, 0.85, 1.0))
 		"damage":
 			_damage_auto_target(spell, player, power, game)
+		"multi_damage":
+			_multi_damage(spell, player, power, game, 3)
+		"aoe_damage":
+			_aoe_damage(spell, player, power, game)
 	return true
 
 static func _compute_power(player: Player, spell: SpellData) -> int:
@@ -64,6 +68,63 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 		player.grant_xp(target.data.xp_value)
 		player.register_kill()
 		GameManager.try_kill_unlock(target.data.id)
+
+static func _multi_damage(spell: SpellData, player: Player,
+		power: int, game: Node, darts: int) -> void:
+	# Magic Missile style: N independent auto-targeted bolts. Each dart
+	# re-finds the nearest visible enemy, so kills cascade onto the
+	# next survivor rather than overkilling one target.
+	var fired: int = 0
+	for _i in range(darts):
+		var target: Monster = _find_nearest_visible(player, game, spell.max_range)
+		if target == null:
+			break
+		var dmg: int = spell.base_damage + randi_range(0, 2) + power / 4
+		CombatLog.hit("A dart strikes the %s for %d." \
+				% [target.data.display_name, dmg])
+		var was_alive: bool = target.hp > 0
+		target.take_damage(dmg)
+		if was_alive and target.hp <= 0:
+			CombatLog.hit("You kill the %s." % target.data.display_name)
+			player.grant_xp(target.data.xp_value)
+			player.register_kill()
+			GameManager.try_kill_unlock(target.data.id)
+		fired += 1
+	if fired == 0:
+		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
+
+static func _aoe_damage(spell: SpellData, player: Player,
+		power: int, game: Node) -> void:
+	# Burning Hands style: all visible enemies within spell.max_range
+	# take damage. No LOS line check beyond the player's own FOV.
+	var tree := game.get_tree() if game != null else null
+	if tree == null:
+		return
+	var visible: Dictionary = player.compute_fov()
+	var hits: int = 0
+	for n in tree.get_nodes_in_group("monsters"):
+		if not (n is Monster):
+			continue
+		if not visible.has(n.grid_pos):
+			continue
+		var d: int = max(abs(n.grid_pos.x - player.grid_pos.x),
+				abs(n.grid_pos.y - player.grid_pos.y))
+		if d > spell.max_range:
+			continue
+		var dmg: int = spell.base_damage + randi_range(0, 3) + power / 3
+		CombatLog.hit("%s burns the %s for %d." \
+				% [spell.display_name, n.data.display_name, dmg])
+		var was_alive: bool = n.hp > 0
+		n.take_damage(dmg)
+		if was_alive and n.hp <= 0:
+			CombatLog.hit("You kill the %s." % n.data.display_name)
+			player.grant_xp(n.data.xp_value)
+			player.register_kill()
+			GameManager.try_kill_unlock(n.data.id)
+		hits += 1
+	if hits == 0:
+		CombatLog.post("The flames find no target.",
+			Color(0.75, 0.75, 0.75))
 
 static func _find_nearest_visible(player: Player, game: Node,
 		max_range: int) -> Monster:
