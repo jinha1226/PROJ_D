@@ -683,6 +683,10 @@ func _place_branch_entrances(depth: int, run_seed: int) -> void:
 	var mgr: Node = null
 	if Engine.get_main_loop() != null:
 		mgr = Engine.get_main_loop().root.get_node_or_null("GameManager")
+	# Simple mode is a single 25-floor trunk — no branches, no portal
+	# vaults. Skip the whole placement pass so the dungeon stays flat.
+	if mgr != null and mgr.has_method("is_simple_mode") and mgr.is_simple_mode():
+		return
 	var parent: String = "dungeon"
 	if mgr != null and "current_branch" in mgr:
 		var cb = mgr.current_branch
@@ -716,6 +720,9 @@ func _place_altars() -> void:
 	var mgr: Node = null
 	if Engine.get_main_loop() != null:
 		mgr = Engine.get_main_loop().root.get_node_or_null("GameManager")
+	# Simple mode has no gods — skip altar placement entirely.
+	if mgr != null and mgr.has_method("is_simple_mode") and mgr.is_simple_mode():
+		return
 	var branch: String = "dungeon"
 	if mgr != null and "current_branch" in mgr:
 		var cb = mgr.current_branch
