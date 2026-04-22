@@ -303,14 +303,24 @@ func _draw_dcss() -> void:
 								Color(0, 0, 0, 0.8) * modulate, 1.2)
 					continue
 				DungeonGenerator.TileType.TRAP:
-					# Trap = floor backdrop + a small X glyph in muted grey.
-					# Hidden traps are a DCSS stretch goal; ours stay visible.
+					# Floor backdrop + the DCSS trap icon for the stored
+					# type (bolt / spear / alarm / teleport / shaft / zot /
+					# net / golubria). Falls back to a red X when we
+					# somehow don't have a type on the tile.
 					if floor_tex != null:
 						draw_texture_rect(floor_tex, rect, false, modulate)
-					var tm: Vector2 = rect.position + rect.size * 0.5
-					var tc := Color(0.80, 0.35, 0.35) * modulate
-					draw_line(tm + Vector2(-5, -5), tm + Vector2(5, 5), tc, 1.6)
-					draw_line(tm + Vector2(-5, 5), tm + Vector2(5, -5), tc, 1.6)
+					var trap_info: Dictionary = generator.traps.get(tile, {}) \
+							if "traps" in generator else {}
+					var trap_type: String = String(trap_info.get("type", ""))
+					var ttex: Texture2D = TileRenderer.trap_tex(trap_type) \
+							if trap_type != "" else null
+					if ttex != null:
+						draw_texture_rect(ttex, rect, false, modulate)
+					else:
+						var tm: Vector2 = rect.position + rect.size * 0.5
+						var tc := Color(0.80, 0.35, 0.35) * modulate
+						draw_line(tm + Vector2(-5, -5), tm + Vector2(5, 5), tc, 1.6)
+						draw_line(tm + Vector2(-5, 5), tm + Vector2(5, -5), tc, 1.6)
 					continue
 				DungeonGenerator.TileType.SHOP:
 					# Shop tile: floor + a "$" sigil in amber. Simple and

@@ -92,6 +92,29 @@ static func altar_tex(god_id: String) -> Texture2D:
 	var fname: String = String(ALTAR_TILES.get(god_id, "ecumenical.png"))
 	return load(_ALTAR_DIR + fname) as Texture2D
 
+
+## DCSS trap tile lookup. Maps each DungeonGenerator trap type onto
+## its icon in rltiles/dngn/traps. Unknown types fall back to the
+## generic dart/bolt sprite so the player can still see something.
+const _TRAP_TILES: Dictionary = {
+	"dart":     "bolt.png",
+	"arrow":    "bolt.png",
+	"bolt":     "bolt.png",
+	"spear":    "spear.png",
+	"net":      "net.png",
+	"teleport": "teleport.png",
+	"alarm":    "alarm.png",
+	"shaft":    "shaft.png",
+	"golubria": "passage_of_golubria.png",
+	"zot":      "zot.png",
+}
+const _TRAP_DIR: String = "res://assets/dcss_tiles/individual/dngn/traps/"
+
+
+static func trap_tex(trap_type: String) -> Texture2D:
+	var fname: String = String(_TRAP_TILES.get(trap_type, "bolt.png"))
+	return load(_TRAP_DIR + fname) as Texture2D
+
 ## Per-branch overrides. DungeonMap picks the right floor/wall/etc. by
 ## passing the current branch id (mapped through GameManager.tileset_branch);
 ## missing keys fall back to FEATURES. Filenames mirror the canonical DCSS
