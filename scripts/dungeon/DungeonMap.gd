@@ -11,20 +11,26 @@ enum Tile {
 
 const GRID_W: int = 35
 const GRID_H: int = 50
-const CELL_SIZE: int = 24
+const CELL_SIZE: int = 32
+
+const TEX_WALL: Texture2D = preload(
+	"res://assets/tiles/individual/dngn/wall/catacombs0.png")
+const TEX_FLOOR: Texture2D = preload(
+	"res://assets/tiles/individual/dngn/floor/limestone0.png")
+const TEX_STAIRS_UP: Texture2D = preload(
+	"res://assets/tiles/individual/dngn/gateways/metal_stairs_up.png")
+const TEX_STAIRS_DOWN: Texture2D = preload(
+	"res://assets/tiles/individual/dngn/gateways/metal_stairs_down.png")
 
 var tiles: PackedByteArray = PackedByteArray()
 var visible_tiles: Dictionary = {}
 var explored: Dictionary = {}
-var reveal_all: bool = true  # Day 1: no FOV. Day 2 FieldOfView sets this false.
+var reveal_all: bool = false
 
-var _font: Font
-
-func _ready() -> void:
-	_font = ThemeDB.fallback_font
-	if tiles.is_empty():
-		generate_placeholder_room()
-	queue_redraw()
+var spawn_pos: Vector2i = Vector2i(1, 1)
+var stairs_down_pos: Vector2i = Vector2i(1, 1)
+var stairs_up_pos: Vector2i = Vector2i(1, 1)
+var rooms: Array[Rect2i] = []
 
 func in_bounds(p: Vector2i) -> bool:
 	return p.x >= 0 and p.y >= 0 and p.x < GRID_W and p.y < GRID_H
@@ -54,27 +60,38 @@ func grid_to_world(p: Vector2i) -> Vector2:
 func world_to_grid(w: Vector2) -> Vector2i:
 	return Vector2i(int(floor(w.x / CELL_SIZE)), int(floor(w.y / CELL_SIZE)))
 
-func generate_placeholder_room() -> void:
-	tiles.resize(GRID_W * GRID_H)
-	for y in range(GRID_H):
-		for x in range(GRID_W):
-			var edge := x == 0 or y == 0 or x == GRID_W - 1 or y == GRID_H - 1
-			tiles[y * GRID_W + x] = Tile.WALL if edge else Tile.FLOOR
-	# Scatter a few pillars so movement feels non-empty.
-	for p in [Vector2i(8, 6), Vector2i(20, 10), Vector2i(12, 18),
-			Vector2i(25, 22), Vector2i(6, 30), Vector2i(18, 35),
-			Vector2i(28, 42)]:
-		tiles[p.y * GRID_W + p.x] = Tile.WALL
-	# Stairs down bottom-right-ish for later.
-	tiles[45 * GRID_W + 30] = Tile.STAIRS_DOWN
+func generate(map_seed: int = -1) -> void:
+	var result: Dictionary = MapGen.generate(GRID_W, GRID_H, map_seed)
+	tiles = result["tiles"]
+	spawn_pos = result["spawn"]
+	stairs_down_pos = result["stairs_down"]
+	stairs_up_pos = result["stairs_up"]
+	rooms = result["rooms"]
+	visible_tiles.clear()
+	explored.clear()
+	queue_redraw()
 
 func find_spawn() -> Vector2i:
-	# Pick first walkable tile — fine for placeholder room.
-	for y in range(GRID_H):
-		for x in range(GRID_W):
-			if is_walkable(Vector2i(x, y)):
-				return Vector2i(x, y)
-	return Vector2i(1, 1)
+	return spawn_pos
+
+func random_floor_tile(rng: RandomNumberGenerator = null) -> Vector2i:
+	if rooms.is_empty():
+		return spawn_pos
+	var room_idx: int
+	if rng != null:
+		room_idx = rng.randi_range(0, rooms.size() - 1)
+	else:
+		room_idx = randi_range(0, rooms.size() - 1)
+	var room: Rect2i = rooms[room_idx]
+	var x: int
+	var y: int
+	if rng != null:
+		x = rng.randi_range(room.position.x, room.position.x + room.size.x - 1)
+		y = rng.randi_range(room.position.y, room.position.y + room.size.y - 1)
+	else:
+		x = randi_range(room.position.x, room.position.x + room.size.x - 1)
+		y = randi_range(room.position.y, room.position.y + room.size.y - 1)
+	return Vector2i(x, y)
 
 func set_fov(new_visible: Dictionary) -> void:
 	visible_tiles = new_visible
@@ -83,6 +100,8 @@ func set_fov(new_visible: Dictionary) -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	var dim: Color = Color(0.45, 0.45, 0.55, 1.0)
+	var bright: Color = Color.WHITE
 	for y in range(GRID_H):
 		for x in range(GRID_W):
 			var pos := Vector2i(x, y)
@@ -91,30 +110,35 @@ func _draw() -> void:
 			if not is_vis and not was_explored:
 				continue
 			var t: int = tiles[y * GRID_W + x]
-			var glyph: String = _glyph_for(t)
-			var color: Color = _color_for(t)
-			if not is_vis:
-				color = Color(color.r * 0.4, color.g * 0.4, color.b * 0.4, 1.0)
-			draw_string(_font,
-				Vector2(x * CELL_SIZE + 2, y * CELL_SIZE + CELL_SIZE - 4),
-				glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 2, color)
+			var tex: Texture2D = _texture_for(t)
+			var mod: Color = bright if is_vis else dim
+			var rect := Rect2(Vector2(x * CELL_SIZE, y * CELL_SIZE),
+					Vector2(CELL_SIZE, CELL_SIZE))
+			if tex != null:
+				draw_texture_rect(tex, rect, false, mod)
+			else:
+				draw_rect(rect, Color(0.15, 0.13, 0.1, 1.0))
+				var glyph: String = _glyph_for(t)
+				draw_string(ThemeDB.fallback_font,
+					Vector2(x * CELL_SIZE + 4, y * CELL_SIZE + CELL_SIZE - 6),
+					glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 4, mod)
+
+func _texture_for(t: int) -> Texture2D:
+	match t:
+		Tile.WALL:
+			return TEX_WALL
+		Tile.FLOOR:
+			return TEX_FLOOR
+		Tile.STAIRS_UP:
+			return TEX_STAIRS_UP
+		Tile.STAIRS_DOWN:
+			return TEX_STAIRS_DOWN
+	return null
 
 func _glyph_for(t: int) -> String:
 	match t:
-		Tile.WALL: return "#"
-		Tile.FLOOR: return "."
-		Tile.STAIRS_UP: return "<"
-		Tile.STAIRS_DOWN: return ">"
-		Tile.DOOR_CLOSED: return "+"
-		Tile.DOOR_OPEN: return "'"
+		Tile.DOOR_CLOSED:
+			return "+"
+		Tile.DOOR_OPEN:
+			return "'"
 	return "?"
-
-func _color_for(t: int) -> Color:
-	match t:
-		Tile.WALL: return Color(0.6, 0.5, 0.35)
-		Tile.FLOOR: return Color(0.4, 0.38, 0.32)
-		Tile.STAIRS_UP: return Color(1.0, 1.0, 0.6)
-		Tile.STAIRS_DOWN: return Color(0.6, 1.0, 1.0)
-		Tile.DOOR_CLOSED: return Color(0.7, 0.5, 0.3)
-		Tile.DOOR_OPEN: return Color(0.55, 0.4, 0.25)
-	return Color.WHITE

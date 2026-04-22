@@ -6,9 +6,10 @@ signal stats_changed
 var data: MonsterData
 var hp: int = 0
 var grid_pos: Vector2i = Vector2i.ZERO
-var status: Dictionary = {}  # status_id (String) -> turns_remaining (int)
+var status: Dictionary = {}
 
 var _map: DungeonMap
+var _tex: Texture2D = null
 var _font: Font
 
 func _ready() -> void:
@@ -21,6 +22,8 @@ func setup(monster_data: MonsterData, map: DungeonMap, pos: Vector2i) -> void:
 	_map = map
 	grid_pos = pos
 	position = map.grid_to_world(pos)
+	if data.tile_path != "":
+		_tex = load(data.tile_path) as Texture2D
 	queue_redraw()
 
 func take_turn() -> void:
@@ -51,6 +54,10 @@ func die() -> void:
 func _draw() -> void:
 	if data == null:
 		return
-	draw_string(_font, Vector2(2, DungeonMap.CELL_SIZE - 4),
-		data.glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, DungeonMap.CELL_SIZE - 2,
-		data.glyph_color)
+	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
+	if _tex != null:
+		draw_texture_rect(_tex, rect, false)
+	else:
+		draw_string(_font, Vector2(4, DungeonMap.CELL_SIZE - 6),
+			data.glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, DungeonMap.CELL_SIZE - 4,
+			data.glyph_color)
