@@ -3,12 +3,13 @@ extends Node
 const _DART: Resource = preload("res://resources/spells/magic_dart.tres")
 const _HEAL: Resource = preload("res://resources/spells/heal_wounds.tres")
 const _BLINK: Resource = preload("res://resources/spells/blink.tres")
+const _ICE_BOLT: Resource = preload("res://resources/spells/ice_bolt.tres")
 
 var by_id: Dictionary = {}
 var all: Array = []
 
 func _ready() -> void:
-	for res in [_DART, _HEAL, _BLINK]:
+	for res in [_DART, _HEAL, _BLINK, _ICE_BOLT]:
 		_register(res)
 	if all.is_empty():
 		push_warning("SpellRegistry: 0 spells registered.")

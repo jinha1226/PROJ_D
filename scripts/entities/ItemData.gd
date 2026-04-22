@@ -26,3 +26,9 @@ class_name ItemData extends Resource
 @export_group("Misc")
 @export var plus: int = 0
 @export var description: String = ""
+
+@export_group("Unlocks / Grants")
+## When this item is used, unlock the class with this id (if any).
+@export var unlocks_class_id: String = ""
+## When used, teach the spell with this id to the player (if not known).
+@export var grants_spell_id: String = ""

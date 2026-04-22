@@ -17,3 +17,6 @@ starting_armor = "leather_armor"
 starting_skills = {"dagger": 3, "stealth": 2}
 starting_spells = []
 passive = ""
+unlocked = true
+unlock_kind = ""
+unlock_trigger_id = ""

@@ -28,6 +28,7 @@ const DOLL_HAND1_MAP: Dictionary = {
 	"dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
 	"mace": "res://assets/tiles/individual/player/hand1/mace.png",
 	"long_sword": "res://assets/tiles/individual/player/hand1/long_sword_slant.png",
+	"battle_axe": "res://assets/tiles/individual/player/hand1/battle_axe1.png",
 }
 
 var _base_tex: Texture2D = DEFAULT_BASE_TEX
@@ -200,6 +201,7 @@ func use_item(index: int) -> void:
 	var data: ItemData = ItemRegistry.get_by_id(entry.get("id", ""))
 	if data == null:
 		return
+	var had_effect: bool = true
 	match data.effect:
 		"heal":
 			heal(data.effect_value)
@@ -230,8 +232,25 @@ func use_item(index: int) -> void:
 			_enchant_weapon(max(1, data.effect_value))
 		"enchant_armor":
 			_enchant_armor(max(1, data.effect_value))
+		"berserk":
+			apply_berserk(max(1, data.effect_value))
+		"study":
+			CombatLog.post("You study the tome.", Color(0.7, 0.85, 1.0))
 		_:
-			CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
+			had_effect = false
+	# Side grants — run regardless of match.
+	if String(data.grants_spell_id) != "" \
+			and not known_spells.has(data.grants_spell_id):
+		known_spells.append(data.grants_spell_id)
+		var s: SpellData = SpellRegistry.get_by_id(data.grants_spell_id)
+		var sname: String = s.display_name if s != null else data.grants_spell_id
+		CombatLog.post("You learn %s." % sname, Color(0.7, 0.95, 1.0))
+		had_effect = true
+	if String(data.unlocks_class_id) != "":
+		GameManager.try_use_unlock(data.id)
+		had_effect = true
+	if not had_effect:
+		CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
 	items.remove_at(index)
 	emit_signal("stats_changed")
 
@@ -469,6 +488,7 @@ func tick_statuses() -> void:
 		_apply_status_tick(id)
 		var left: int = int(statuses.get(id, 0)) - 1
 		if left <= 0:
+			_on_status_removed(id)
 			statuses.erase(id)
 			CombatLog.post("Your %s effect wears off." % id,
 				Color(0.75, 0.8, 0.9))
@@ -482,6 +502,21 @@ func _apply_status_tick(id: String) -> void:
 			if hp > 1:
 				hp -= 1
 				CombatLog.damage_taken("Poison burns you. (-1 HP)")
+		"berserk":
+			# Passive — STR bonus was granted on apply; nothing per tick.
+			pass
+
+func _on_status_removed(id: String) -> void:
+	match id:
+		"berserk":
+			strength = max(1, strength - 4)
+
+func apply_berserk(turns: int) -> void:
+	if not has_status("berserk"):
+		strength += 4
+	apply_status("berserk", turns)
+	CombatLog.post("You enter a berserk rage. (+4 STR)",
+		Color(1.0, 0.55, 0.35))
 
 func set_race_from_id(race_id: String) -> void:
 	var race: RaceData = RaceRegistry.get_by_id(race_id)

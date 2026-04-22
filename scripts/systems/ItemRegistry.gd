@@ -17,13 +17,18 @@ const _SCROLL_TELEPORT: Resource = preload("res://resources/items/scroll_telepor
 const _SCROLL_ENCHANT_WEAPON: Resource = preload("res://resources/items/scroll_enchant_weapon.tres")
 const _SCROLL_ENCHANT_ARMOR: Resource = preload("res://resources/items/scroll_enchant_armor.tres")
 const _GOLD_PILE: Resource = preload("res://resources/items/gold_pile.tres")
+const _BATTLE_AXE: Resource = preload("res://resources/items/battle_axe.tres")
+const _POTION_BERSERK: Resource = preload("res://resources/items/potion_berserk.tres")
+const _BOOK_ICE_MAGIC: Resource = preload("res://resources/items/book_ice_magic.tres")
 
 const _ALL_ITEMS: Array = [
-	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD,
+	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE,
 	_LEATHER_ARMOR, _ROBE, _CHAIN_MAIL,
 	_POTION_HEALING, _POTION_MIGHT, _POTION_CURE_POISON, _POTION_MAGIC,
+	_POTION_BERSERK,
 	_SCROLL_BLINKING, _SCROLL_MAGIC_MAPPING, _SCROLL_TELEPORT,
 	_SCROLL_ENCHANT_WEAPON, _SCROLL_ENCHANT_ARMOR,
+	_BOOK_ICE_MAGIC,
 	_GOLD_PILE,
 ]
 

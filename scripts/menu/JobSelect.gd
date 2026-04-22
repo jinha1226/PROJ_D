@@ -88,11 +88,24 @@ func _make_card(data: ClassData) -> Control:
 	desc_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	inner.add_child(desc_lab)
 
+	var unlocked: bool = ClassRegistry.is_unlocked(data.id)
+	if not unlocked:
+		var hint_lab := Label.new()
+		hint_lab.text = data.unlock_hint()
+		hint_lab.add_theme_font_size_override("font_size", 20)
+		hint_lab.add_theme_color_override("font_color", Color(1.0, 0.7, 0.45))
+		hint_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		inner.add_child(hint_lab)
+
 	var pick_btn := Button.new()
 	pick_btn.custom_minimum_size = Vector2(0, 72)
-	pick_btn.text = "Start as %s" % data.display_name
 	pick_btn.add_theme_font_size_override("font_size", 28)
-	pick_btn.pressed.connect(_on_pick.bind(data.id))
+	if unlocked:
+		pick_btn.text = "Start as %s" % data.display_name
+		pick_btn.pressed.connect(_on_pick.bind(data.id))
+	else:
+		pick_btn.text = "Locked"
+		pick_btn.disabled = true
 	inner.add_child(pick_btn)
 
 	return panel

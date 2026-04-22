@@ -13,3 +13,19 @@ class_name ClassData extends Resource
 @export var starting_skills: Dictionary = {}
 @export var starting_spells: Array = []
 @export var passive: String = ""
+
+## Unlock gating. See RaceData for field contract. Default-true for the
+## 3 core classes (warrior / mage / rogue) that ship unlocked.
+@export var unlocked: bool = true
+@export var unlock_kind: String = ""
+@export var unlock_trigger_id: String = ""
+
+func unlock_hint() -> String:
+	if unlocked:
+		return ""
+	match unlock_kind:
+		"kill":
+			return "Slay a %s to unlock." % unlock_trigger_id.capitalize()
+		"use_item":
+			return "Use a %s to unlock." % unlock_trigger_id.replace("_", " ")
+	return "Locked."

@@ -7,12 +7,14 @@ extends Node
 const _WARRIOR: Resource = preload("res://resources/classes/warrior.tres")
 const _MAGE: Resource = preload("res://resources/classes/mage.tres")
 const _ROGUE: Resource = preload("res://resources/classes/rogue.tres")
+const _BERSERKER: Resource = preload("res://resources/classes/berserker.tres")
+const _ICE_MAGE: Resource = preload("res://resources/classes/ice_mage.tres")
 
 var by_id: Dictionary = {}
 var all: Array = []
 
 func _ready() -> void:
-	for res in [_WARRIOR, _MAGE, _ROGUE]:
+	for res in [_WARRIOR, _MAGE, _ROGUE, _BERSERKER, _ICE_MAGE]:
 		_register(res)
 	if all.is_empty():
 		push_warning("ClassRegistry: 0 classes registered.")
@@ -33,7 +35,8 @@ func get_by_id(id: String) -> ClassData:
 	return by_id.get(id)
 
 func ids_in_order() -> Array:
-	var known_order: Array = ["warrior", "mage", "rogue"]
+	var known_order: Array = ["warrior", "mage", "rogue",
+		"berserker", "ice_mage"]
 	var result: Array = []
 	for id in known_order:
 		if by_id.has(id):
@@ -43,8 +46,16 @@ func ids_in_order() -> Array:
 			result.append(id)
 	return result
 
+func is_unlocked(id: String) -> bool:
+	var c: ClassData = get_by_id(id)
+	if c == null:
+		return false
+	if c.unlocked:
+		return true
+	return GameManager.is_unlocked(id)
+
 # Legacy rescan path kept for JobSelect defensive call.
 func _scan() -> void:
 	if all.is_empty():
-		for res in [_WARRIOR, _MAGE, _ROGUE]:
+		for res in [_WARRIOR, _MAGE, _ROGUE, _BERSERKER, _ICE_MAGE]:
 			_register(res)
