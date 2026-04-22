@@ -55,9 +55,9 @@ func _draw() -> void:
 	if data == null:
 		return
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
-	if _tex != null:
+	if GameManager.use_tiles and _tex != null:
 		draw_texture_rect(_tex, rect, false)
 	else:
-		draw_string(_font, Vector2(4, DungeonMap.CELL_SIZE - 6),
-			data.glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, DungeonMap.CELL_SIZE - 4,
+		draw_string(_font, Vector2(6, DungeonMap.CELL_SIZE - 6),
+			data.glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, DungeonMap.CELL_SIZE - 6,
 			data.glyph_color)

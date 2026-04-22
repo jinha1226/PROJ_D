@@ -104,4 +104,10 @@ func heal(amount: int) -> void:
 
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
-	draw_texture_rect(TEX_PLAYER, rect, false)
+	if GameManager.use_tiles:
+		draw_texture_rect(TEX_PLAYER, rect, false)
+	else:
+		draw_string(ThemeDB.fallback_font,
+			Vector2(6, DungeonMap.CELL_SIZE - 6),
+			"@", HORIZONTAL_ALIGNMENT_LEFT, -1, DungeonMap.CELL_SIZE - 6,
+			Color(1.0, 0.95, 0.5))

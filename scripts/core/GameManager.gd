@@ -2,6 +2,9 @@ extends Node
 
 signal depth_changed(new_depth: int)
 signal run_ended(result: String)
+signal settings_changed
+
+const SETTINGS_PATH: String = "user://settings.json"
 
 var depth: int = 1
 var seed: int = 0
@@ -11,6 +14,13 @@ var run_in_progress: bool = false
 
 # Character selection — set by menus before start_new_run().
 var selected_class_id: String = ""
+
+# Display / meta state (persisted).
+var use_tiles: bool = true
+var rune_shards: int = 0
+
+func _ready() -> void:
+	_load_settings()
 
 func start_new_run(random_seed: int = -1) -> void:
 	if random_seed < 0:
@@ -36,3 +46,34 @@ func is_identified(item_id: String) -> bool:
 
 func identify(item_id: String) -> void:
 	identified[item_id] = true
+
+func toggle_tiles() -> void:
+	use_tiles = not use_tiles
+	_save_settings()
+	emit_signal("settings_changed")
+
+func add_rune_shards(amount: int) -> void:
+	rune_shards = max(0, rune_shards + amount)
+	_save_settings()
+
+func _load_settings() -> void:
+	if not FileAccess.file_exists(SETTINGS_PATH):
+		return
+	var f := FileAccess.open(SETTINGS_PATH, FileAccess.READ)
+	if f == null:
+		return
+	var raw := f.get_as_text()
+	f.close()
+	var parsed = JSON.parse_string(raw)
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return
+	use_tiles = bool(parsed.get("use_tiles", use_tiles))
+	rune_shards = int(parsed.get("rune_shards", rune_shards))
+
+func _save_settings() -> void:
+	var data := {"use_tiles": use_tiles, "rune_shards": rune_shards}
+	var f := FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
+	if f == null:
+		return
+	f.store_string(JSON.stringify(data))
+	f.close()

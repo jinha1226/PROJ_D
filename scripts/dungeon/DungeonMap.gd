@@ -102,6 +102,8 @@ func set_fov(new_visible: Dictionary) -> void:
 func _draw() -> void:
 	var dim: Color = Color(0.45, 0.45, 0.55, 1.0)
 	var bright: Color = Color.WHITE
+	var use_tiles: bool = GameManager.use_tiles
+	var bg: Color = Color(0.06, 0.06, 0.08, 1.0)
 	for y in range(GRID_H):
 		for x in range(GRID_W):
 			var pos := Vector2i(x, y)
@@ -110,18 +112,22 @@ func _draw() -> void:
 			if not is_vis and not was_explored:
 				continue
 			var t: int = tiles[y * GRID_W + x]
-			var tex: Texture2D = _texture_for(t)
 			var mod: Color = bright if is_vis else dim
 			var rect := Rect2(Vector2(x * CELL_SIZE, y * CELL_SIZE),
 					Vector2(CELL_SIZE, CELL_SIZE))
-			if tex != null:
-				draw_texture_rect(tex, rect, false, mod)
-			else:
-				draw_rect(rect, Color(0.15, 0.13, 0.1, 1.0))
-				var glyph: String = _glyph_for(t)
-				draw_string(ThemeDB.fallback_font,
-					Vector2(x * CELL_SIZE + 4, y * CELL_SIZE + CELL_SIZE - 6),
-					glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 4, mod)
+			if use_tiles:
+				var tex: Texture2D = _texture_for(t)
+				if tex != null:
+					draw_texture_rect(tex, rect, false, mod)
+					continue
+				# Fall through to glyph render for tiles without a texture.
+			draw_rect(rect, bg)
+			var glyph: String = _glyph_for(t)
+			var glyph_color: Color = _glyph_color_for(t) * mod
+			glyph_color.a = 1.0
+			draw_string(ThemeDB.fallback_font,
+				Vector2(x * CELL_SIZE + 6, y * CELL_SIZE + CELL_SIZE - 6),
+				glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6, glyph_color)
 
 func _texture_for(t: int) -> Texture2D:
 	match t:
@@ -137,8 +143,32 @@ func _texture_for(t: int) -> Texture2D:
 
 func _glyph_for(t: int) -> String:
 	match t:
+		Tile.WALL:
+			return "#"
+		Tile.FLOOR:
+			return "."
+		Tile.STAIRS_UP:
+			return "<"
+		Tile.STAIRS_DOWN:
+			return ">"
 		Tile.DOOR_CLOSED:
 			return "+"
 		Tile.DOOR_OPEN:
 			return "'"
 	return "?"
+
+func _glyph_color_for(t: int) -> Color:
+	match t:
+		Tile.WALL:
+			return Color(0.65, 0.55, 0.38)
+		Tile.FLOOR:
+			return Color(0.45, 0.42, 0.35)
+		Tile.STAIRS_UP:
+			return Color(1.0, 1.0, 0.6)
+		Tile.STAIRS_DOWN:
+			return Color(0.6, 1.0, 1.0)
+		Tile.DOOR_CLOSED:
+			return Color(0.75, 0.55, 0.3)
+		Tile.DOOR_OPEN:
+			return Color(0.55, 0.4, 0.25)
+	return Color.WHITE
