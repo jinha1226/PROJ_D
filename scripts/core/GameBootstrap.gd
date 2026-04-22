@@ -432,7 +432,7 @@ func _open_combat_log_dialog() -> void:
 	for msg in msgs:
 		var lbl := Label.new()
 		lbl.text = msg
-		lbl.add_theme_font_size_override("font_size", 30)
+		lbl.add_theme_font_size_override("font_size", 42)
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		vb.add_child(lbl)
@@ -4551,12 +4551,19 @@ func _cast_single_target(spell_id: String, info: Dictionary, power: int, target:
 func _cast_area_spell(spell_id: String, info: Dictionary, power: int, center_m: Monster = null) -> Dictionary:
 	if center_m == null:
 		center_m = _find_nearest_visible_monster(int(info.get("range", 8)))
-	if center_m == null:
-		SpellCast.refund(player, int(info.get("mp", 1)))
-		return {"success": false, "message": "No visible target in range."}
-
-	var center: Vector2i = center_m.grid_pos
-	var center_px: Vector2 = center_m.position
+	# Resolve an explosion center. Prefer a monster so we auto-aim; fall
+	# back to a visible walkable tile a few steps out so the spell still
+	# fires (useful for cloud-residue / FX testing when no enemy is in
+	# sight). The area still hits any monsters that happen to be inside.
+	var center: Vector2i
+	var center_px: Vector2
+	if center_m != null:
+		center = center_m.grid_pos
+		center_px = center_m.position
+	else:
+		center = _fallback_area_center(int(info.get("range", 4)))
+		center_px = Vector2(center.x * TILE_SIZE + TILE_SIZE / 2.0,
+				center.y * TILE_SIZE + TILE_SIZE / 2.0)
 	var radius: int = int(info.get("radius", 2))
 	var spell_color: Color = info.get("color", Color.WHITE)
 	var school: String = String(info.get("school", ""))
@@ -4704,6 +4711,36 @@ func _beam_path_hits(picked: Monster, spell_id: String, range_tiles: int) -> Arr
 	var trace: Dictionary = Beam.trace(player.grid_pos, picked.grid_pos,
 			range_tiles, true, opaque_cb, mon_cb)
 	return trace.get("hits", [])
+
+
+## Pick a walkable tile to drop an area spell on when no monster is in
+## range. Scans Chebyshev rings outward from the player for the first
+## visible walkable tile, capped at `max_range` so the explosion stays
+## reachable. Falls back to the player's own tile when nothing nearby
+## is walkable — harmless, since area spells hit 0 monsters then and
+## we still play FX + cloud residue.
+func _fallback_area_center(max_range: int) -> Vector2i:
+	if player == null or generator == null:
+		return Vector2i.ZERO
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	var r: int = max(2, min(max_range, 4))
+	for dist in range(2, r + 1):
+		# Prefer cardinal directions at the target distance for a clean
+		# forward blast; diagonals are considered after to broaden reach.
+		var rings: Array = [
+			Vector2i(dist, 0), Vector2i(-dist, 0),
+			Vector2i(0, dist), Vector2i(0, -dist),
+			Vector2i(dist, dist), Vector2i(-dist, -dist),
+			Vector2i(dist, -dist), Vector2i(-dist, dist),
+		]
+		for d in rings:
+			var cand: Vector2i = player.grid_pos + d
+			if not generator.is_walkable(cand):
+				continue
+			if dmap != null and not dmap.is_tile_visible(cand):
+				continue
+			return cand
+	return player.grid_pos
 
 
 func _find_nearest_visible_monster(range_tiles: int = 99) -> Monster:

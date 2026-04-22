@@ -83,21 +83,24 @@ static func cast(player: Node, spell_id: String, target, ctx: Dictionary) -> Dic
 		}
 
 	# Range / target resolution. For "self" spells the caller must pass
-	# null; for single/area we auto-pick the nearest visible foe if the
+	# null. For "single" we auto-pick the nearest visible foe if the
 	# caller didn't supply one (matches DCSS book-cast auto-targeting
-	# for a monster in range).
+	# for a monster in range). "area" spells are allowed to fall through
+	# with a null target — the caller (_cast_area_spell) picks an empty
+	# tile in the player's sight when no monster is in range so the
+	# blast still fires for spell-effect testing.
 	var targeting: String = String(info.get("targeting", "single"))
 	var target_pos: Vector2i = Vector2i.ZERO
 	var target_node = target
-	if targeting != "self":
+	if targeting == "single":
 		if target_node == null:
 			target_node = _find_nearest_visible_target(player, int(info.get("range", 6)), ctx)
 			if target_node == null:
 				return _abort("No visible target in range.")
-		if target_node is Vector2i:
-			target_pos = target_node
-		elif target_node and "grid_pos" in target_node:
-			target_pos = target_node.grid_pos
+	if target_node is Vector2i:
+		target_pos = target_node
+	elif target_node and "grid_pos" in target_node:
+		target_pos = target_node.grid_pos
 
 	# --- Pay MP (spl-cast.cc:1046 pay_mp). ------------------------------
 	_pay_mp(player, cost)

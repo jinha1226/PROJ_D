@@ -32,6 +32,7 @@ func _ready() -> void:
 	$Footer/StartButton.pressed.connect(_on_start)
 	$Footer/StartButton.disabled = true
 	_build_rows()
+	TouchScrollHelper.install($Scroll)
 
 
 func _build_rows() -> void:

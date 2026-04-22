@@ -66,6 +66,12 @@ func _ready() -> void:
 	var vp: Viewport = get_viewport()
 	if vp != null and not vp.size_changed.is_connected(_resize_from_viewport):
 		vp.size_changed.connect(_resize_from_viewport)
+	# Touch-drag scroll inside the dialog Body. Works around Godot 4 mobile
+	# web swallowing drag events when child Buttons have MOUSE_FILTER_STOP.
+	var body_scroll: ScrollContainer = get_node_or_null(
+			"Dim/Window/Margin/VBox/Body") as ScrollContainer
+	if body_scroll != null:
+		TouchScrollHelper.install(body_scroll)
 
 
 func body() -> VBoxContainer:

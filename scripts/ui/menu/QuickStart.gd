@@ -38,6 +38,7 @@ func _ready() -> void:
 	$Footer/BackButton.pressed.connect(_on_back)
 	$Footer/CustomButton.pressed.connect(_on_custom)
 	_build_list()
+	TouchScrollHelper.install($Scroll)
 
 
 func _build_list() -> void:
