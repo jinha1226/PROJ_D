@@ -19,7 +19,8 @@ PROJ_D is GPL v2+ (DCSS derivative). The new project must NOT carry over:
   `SpellRegistry.gd`, `SkillSystem.gd`, `DungeonGenerator.gd`,
   `DesParser.gd`, and the 15+ `*Registry.gd` files.
 - **Data**: everything under `assets/dcss_*/`.
-- **Tiles**: everything under `assets/dcss_tiles/`.
+- **Tiles**: see §1g — DCSS tiles are **mostly CC0 and legally reusable**.
+  The earlier "avoid entirely" guidance was over-cautious.
 - **Resources** referencing DCSS: `resources/monsters/*.tres`,
   `resources/essences/*.tres`, `resources/jobs/*.tres`, `resources/races/*.tres`.
 - **Names**: "Dungeon Crawl", DCSS god names, DCSS unique monster names,
@@ -116,6 +117,41 @@ essence_drop_id / …), a strict reading could call it derivative. Safer:
 3. Rename anything that reads like "this was copy-pasted from DCSS's
    header" into something your-game-specific (e.g., `intel` →
    `ai_style` with your own enum values).
+
+### 1g. DCSS tile art — actually reusable
+
+DCSS LICENSE: *"The majority of Crawl's tiles and artwork are released
+under the CC0 license."* CC0 = public domain; no attribution required,
+commercial OK, can embed in a proprietary / MIT / any-license project.
+
+**Practical policy**:
+
+- **Tiles you can use freely** (~95%+ of DCSS's tile tree):
+  - `rltiles/dngn/` (terrain, walls, floors, stairs, altars, traps)
+  - `rltiles/mon/` (monsters)
+  - `rltiles/item/` (weapons, armor, potions, scrolls, wands, rings)
+  - `rltiles/player/` (paper-doll overlays)
+- **Per-tile verification**: if worried, check
+  https://github.com/crawl/tiles for individual tile licenses. Most
+  modern (last 10 yrs) submissions are CC0.
+- **Older tiles (pre-2015-ish)**: occasional individual-artist licenses.
+  If a specific tile is used heavily in your game, verify before ship.
+- **Attribution not required** under CC0, but a `CREDITS_TILES.md`
+  listing the RLTiles project + notable contributors is common courtesy.
+
+**Tradeoffs vs a uniform CC0 pack (Kenney/Oryx)**:
+
+| Criterion | DCSS tiles | Kenney pack |
+|---|---|---|
+| Volume | ~5000 pieces | few hundred |
+| Art-style consistency | Multi-artist, varies by era | Uniform |
+| Licensing audit cost | Small (few non-CC0) | Zero |
+| "Looks like DCSS" factor | High | Low |
+| Fit for new-IP branding | Neutral (if repainted) | Better |
+
+**Rule of thumb**: if you're building a DCSS-homage or want to ship fast,
+DCSS tiles are fine. If you're building a distinct new-IP product, a
+uniform pack sells the new identity better.
 
 ### 1f. Workflow for reusing data formats
 
