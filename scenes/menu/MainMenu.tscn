@@ -92,3 +92,8 @@ text = "Display: Tiles"
 custom_minimum_size = Vector2(0, 120)
 theme_override_font_sizes/font_size = 44
 text = "룬샤드"
+
+[node name="HelpButton" type="Button" parent="VBox"]
+custom_minimum_size = Vector2(0, 100)
+theme_override_font_sizes/font_size = 36
+text = "도움말"
