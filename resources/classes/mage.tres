@@ -15,5 +15,5 @@ starting_int = 14
 starting_weapon = "dagger"
 starting_armor = "robe"
 starting_skills = {}
-starting_spells = []
+starting_spells = ["magic_dart", "heal_wounds", "blink"]
 passive = ""

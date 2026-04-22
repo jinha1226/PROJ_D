@@ -31,6 +31,7 @@ var gold: int = 0
 var kills: int = 0
 var last_killer: String = ""
 var items: Array = []  # [{id: String, plus: int}]
+var known_spells: Array = []  # [String]
 var equipped_weapon_id: String = ""
 var equipped_armor_id: String = ""
 

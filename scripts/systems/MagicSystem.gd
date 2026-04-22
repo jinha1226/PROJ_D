@@ -1,0 +1,85 @@
+class_name MagicSystem extends RefCounted
+
+## Self-targeted / auto-target spells per guide §4.7. MVP roster: 3
+## spells covering the three canonical shapes (damage bolt / self heal
+## / self blink). Full targeting UI + area spells arrive with the
+## targeting system milestone.
+
+static func cast(spell_id: String, player: Player, game: Node) -> bool:
+	var spell: SpellData = SpellRegistry.get_by_id(spell_id)
+	if spell == null:
+		return false
+	if player.mp < spell.mp_cost:
+		CombatLog.post("Not enough MP for %s." % spell.display_name,
+			Color(1.0, 0.7, 0.5))
+		return false
+	var power: int = _compute_power(player, spell)
+	var fizzle: bool = _roll_fizzle(player, spell)
+	player.mp = max(0, player.mp - spell.mp_cost)
+	player.emit_signal("stats_changed")
+	if fizzle:
+		CombatLog.post("Your %s fizzles." % spell.display_name,
+			Color(0.7, 0.6, 0.9))
+		return true
+	match spell.effect:
+		"heal":
+			var amt: int = 12 + power / 2
+			player.heal(amt)
+			CombatLog.post("You cast %s. (+%d HP)" % [spell.display_name, amt],
+				Color(0.6, 1.0, 0.6))
+		"blink":
+			player._blink(max(2, spell.max_range))
+			CombatLog.post("You cast %s." % spell.display_name,
+				Color(0.7, 0.85, 1.0))
+		"damage":
+			_damage_auto_target(spell, player, power, game)
+	return true
+
+static func _compute_power(player: Player, spell: SpellData) -> int:
+	# Placeholder for §4.7 "magic skill * INT / 10" curve. Until
+	# SkillSystem lands, approximate power from INT + player level.
+	return int(player.intelligence + player.xl * 0.5)
+
+static func _roll_fizzle(player: Player, spell: SpellData) -> bool:
+	# §4.7: failure = max(0, 25 + difficulty*5 - magic_skill*3 - INT/2).
+	# Skill 0 in MVP — so purely INT-gated.
+	var fail: int = max(0, 25 + spell.difficulty * 5 - player.intelligence / 2)
+	return randi() % 100 < fail
+
+static func _damage_auto_target(spell: SpellData, player: Player,
+		power: int, game: Node) -> void:
+	var target: Monster = _find_nearest_visible(player, game, spell.max_range)
+	if target == null:
+		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
+		return
+	var dmg: int = spell.base_damage + randi_range(0, 2) + power / 3
+	CombatLog.hit("You hit the %s with %s for %d." \
+			% [target.data.display_name, spell.display_name, dmg])
+	var was_alive: bool = target.hp > 0
+	target.take_damage(dmg)
+	if was_alive and target.hp <= 0:
+		CombatLog.hit("You kill the %s." % target.data.display_name)
+		player.grant_xp(target.data.xp_value)
+		player.register_kill()
+
+static func _find_nearest_visible(player: Player, game: Node,
+		max_range: int) -> Monster:
+	var tree := game.get_tree() if game != null else null
+	if tree == null:
+		return null
+	var best: Monster = null
+	var best_d: int = max_range + 1
+	var visible: Dictionary = {}
+	if game != null and game.has_method("_refresh_fov"):
+		visible = player.compute_fov()
+	for n in tree.get_nodes_in_group("monsters"):
+		if not (n is Monster):
+			continue
+		if not visible.has(n.grid_pos):
+			continue
+		var d: int = max(abs(n.grid_pos.x - player.grid_pos.x),
+			abs(n.grid_pos.y - player.grid_pos.y))
+		if d <= max_range and d < best_d:
+			best = n
+			best_d = d
+	return best

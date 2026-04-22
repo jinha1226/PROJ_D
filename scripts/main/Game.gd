@@ -58,6 +58,7 @@ func _apply_class_to_player(class_id: String) -> void:
 		player.items.append({"id": data.starting_armor, "plus": 0})
 		player.equipped_armor_id = data.starting_armor
 	player.refresh_ac_from_equipment()
+	player.known_spells = data.starting_spells.duplicate()
 	for id in _class_starter_items(class_id):
 		player.items.append({"id": id, "plus": 0})
 	CombatLog.post("You start as %s." % data.display_name,
@@ -92,6 +93,7 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.equipped_armor_id = String(data.get("armor", ""))
 	player.kills = int(data.get("kills", 0))
 	player.last_killer = String(data.get("last_killer", ""))
+	player.known_spells = data.get("known_spells", [])
 	CombatLog.post("Run resumed. Floor B%d." % GameManager.depth,
 		Color(0.7, 0.9, 1.0))
 
@@ -392,7 +394,9 @@ func _on_skills_pressed() -> void:
 	CombatLog.post("Skills not yet implemented.", Color(0.7, 0.7, 0.7))
 
 func _on_magic_pressed() -> void:
-	CombatLog.post("Magic not yet implemented.", Color(0.7, 0.7, 0.7))
+	if player == null:
+		return
+	MagicDialog.open(player, self)
 
 func _on_menu_pressed() -> void:
 	# Save on quit so Continue can pick up the run.

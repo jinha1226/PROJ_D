@@ -28,6 +28,7 @@ SaveManager="*res://scripts/core/SaveManager.gd"
 MonsterRegistry="*res://scripts/systems/MonsterRegistry.gd"
 ItemRegistry="*res://scripts/systems/ItemRegistry.gd"
 ClassRegistry="*res://scripts/systems/ClassRegistry.gd"
+SpellRegistry="*res://scripts/systems/SpellRegistry.gd"
 
 [display]
 
