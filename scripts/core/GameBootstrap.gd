@@ -1595,8 +1595,23 @@ func _on_auto_attack_pressed() -> void:
 	if best == null:
 		return
 	var delta: Vector2i = best.grid_pos - player.grid_pos
+	# Polearm reach: `weapon_reach` returns 2 for polearms, 1 for the
+	# rest. When our wielded weapon can hit at distance 2 and the
+	# target is on the reach ring, strike instead of pathing a step
+	# closer — DCSS spears/glaives get full use of their tile-2 swing.
+	var reach: int = WeaponRegistry.weapon_reach(player.equipped_weapon_id) \
+			if player.equipped_weapon_id != "" else 1
 	if best_dist <= 1:
 		player.try_move(delta)
+	elif best_dist <= reach and player.has_method("try_attack_at"):
+		if player.try_attack_at(best.grid_pos) != null:
+			return
+		# Reach strike blocked (middle tile occupied by ally / wall) —
+		# fall through to pathing so the player still closes in.
+		var path_r: Array[Vector2i] = Pathfinding.find_path(generator,
+				player.grid_pos, best.grid_pos)
+		if not path_r.is_empty():
+			player.try_move(path_r[0] - player.grid_pos)
 	else:
 		var path: Array[Vector2i] = Pathfinding.find_path(generator, player.grid_pos, best.grid_pos)
 		if not path.is_empty():
