@@ -2475,7 +2475,7 @@ func _tile_has_actor(p: Vector2i) -> bool:
 ## the Companion scene so the tile-existing companion AI handles it; we
 ## pick a reasonable default id (`small_mammal`) when the caller didn't
 ## specify one.
-func _spawn_temp_ally_at(tile: Vector2i, monster_id: String = "small_mammal") -> Monster:
+func _spawn_temp_ally_at(tile: Vector2i, monster_id: String = "rat") -> Monster:
 	var path: String = "res://resources/monsters/%s.tres" % monster_id
 	var mdata: MonsterData = null
 	if ResourceLoader.exists(path):
@@ -2891,13 +2891,15 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 			CombatLog.add("The scroll shrieks! (%d monsters woken)" % woke)
 			return true
 		"summoning":
-			# DCSS: summons a small group of temporary allies. We spawn `count`
-			# companions on walkable tiles around the player.
+			# DCSS scroll-effects.cc cast_summon_small_mammals — spawns
+			# 2-4 temporary allies from the small-mammal pool (rat /
+			# quokka / bat) on walkable tiles around the player.
+			var small_mammals: Array = ["rat", "quokka", "bat"]
 			var want: int = int(info.get("count", 3))
 			var summoned: int = 0
-			var gb: Node = get_tree().root.get_node_or_null("Game")
 			for tile in _adjacent_free_tiles(want):
-				var ally: Monster = _spawn_temp_ally_at(tile)
+				var pick: String = String(small_mammals[randi() % small_mammals.size()])
+				var ally: Monster = _spawn_temp_ally_at(tile, pick)
 				if ally != null:
 					summoned += 1
 			CombatLog.add("The scroll summons allies. (%d appeared)" % summoned)
@@ -2980,20 +2982,36 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 		"acquirement":
 			if generator == null:
 				return false
+			# DCSS acquirement picks a kind, then drops an appropriately-
+			# powered item at the player's feet. We roll a weapon or armour
+			# and drop it via the same FloorItem pipeline as floor gen.
 			var _acq_weapons: Array = ["long_sword", "war_axe", "mace", "shortbow",
 					"halberd", "rapier", "quarterstaff", "crystal_staff"]
 			var _acq_armor: Array = ["chain_mail", "plate_armour", "leather_armour",
 					"helmet", "buckler", "boots"]
-			var pool: Array = _acq_weapons + _acq_armor
-			var chosen: String = pool[randi() % pool.size()]
-			# Emit a pickup-like event: drop item at player position for auto-pickup.
-			var fi_script = load("res://scripts/entities/FloorItem.gd")
-			if fi_script != null:
-				var fi: Node2D = Node2D.new()
-				fi.set_script(fi_script)
-				get_tree().get_first_node_in_group("entity_layer").add_child(fi)
-				fi.setup(generator, grid_pos, {"id": chosen, "cursed": false})
-				CombatLog.add("An item appears: %s!" % chosen.replace("_", " ").capitalize())
+			var is_weapon: bool = randf() < 0.5
+			var chosen: String = _acq_weapons[randi() % _acq_weapons.size()] if is_weapon \
+					else _acq_armor[randi() % _acq_armor.size()]
+			var entity_layer: Node = get_tree().get_first_node_in_group("entity_layer")
+			if entity_layer == null:
+				entity_layer = get_parent()
+			var fi := FloorItem.new()
+			entity_layer.add_child(fi)
+			var item_name: String = ""
+			var item_kind: String = ""
+			var tint: Color = Color(0.75, 0.75, 0.85)
+			var extra: Dictionary = {"cursed": false}
+			if is_weapon:
+				item_name = WeaponRegistry.display_name_for(chosen)
+				item_kind = "weapon"
+			else:
+				var a_info: Dictionary = ArmorRegistry.get_info(chosen)
+				item_name = String(a_info.get("name", chosen))
+				item_kind = "armor"
+				if a_info.has("slot"):
+					extra["slot"] = String(a_info["slot"])
+			fi.setup(grid_pos, chosen, item_name, item_kind, tint, extra)
+			CombatLog.add("An item materialises at your feet: %s!" % item_name)
 			return true
 		_:
 			print("Unknown consumable effect: %s" % info.get("effect"))

@@ -766,8 +766,33 @@ static func monster(id: String) -> Texture2D:
 	return null
 
 
+## Book covers used when an ID like `book_of_chaos` has no direct ITEMS
+## mapping — hashed index keeps the same book drawing the same cover
+## across the whole run.
+const _BOOK_COVER_POOL: Array = [
+	"item/book/bronze.png", "item/book/cloth.png", "item/book/copper.png",
+	"item/book/cyan.png", "item/book/dark_blue.png", "item/book/dark_brown.png",
+	"item/book/dark_gray.png", "item/book/dark_green.png", "item/book/gold.png",
+	"item/book/leather.png", "item/book/light_blue.png", "item/book/light_brown.png",
+	"item/book/light_gray.png", "item/book/light_green.png", "item/book/magenta.png",
+	"item/book/metal_blue.png", "item/book/metal_cyan.png", "item/book/metal_green.png",
+	"item/book/parchment.png", "item/book/pink.png", "item/book/plaid.png",
+	"item/book/purple.png", "item/book/red.png", "item/book/silver.png",
+	"item/book/tan.png", "item/book/turquoise.png", "item/book/white.png",
+]
+
+
 static func item(id: String) -> Texture2D:
-	return _load(String(ITEMS.get(id, "")))
+	var mapped: String = String(ITEMS.get(id, ""))
+	if mapped != "":
+		return _load(mapped)
+	# DCSS spellbooks loaded from JSON come in as `book_of_<school>` ids
+	# that may not all have bespoke entries. Pick a stable cover per id
+	# so the Bag UI renders a painted book instead of a fallback glyph.
+	if id.begins_with("book_"):
+		var idx: int = absi(id.hash()) % _BOOK_COVER_POOL.size()
+		return _load(String(_BOOK_COVER_POOL[idx]))
+	return null
 
 
 ## Base potion / scroll tile (the colour the player sees before identifying).

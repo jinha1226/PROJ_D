@@ -12,7 +12,7 @@ script = ExtResource("1_boot")
 
 [node name="DungeonMap" parent="DungeonLayer" instance=ExtResource("2_dmap")]
 
-[node name="EntityLayer" type="Node2D" parent="."]
+[node name="EntityLayer" type="Node2D" parent="." groups=["entity_layer"]]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(0.85, 0.85)
