@@ -412,7 +412,9 @@ func _monster_in_sight() -> bool:
 	return false
 
 func _on_skills_pressed() -> void:
-	CombatLog.post("Skills not yet implemented.", Color(0.7, 0.7, 0.7))
+	if player == null:
+		return
+	SkillsDialog.open(player, self)
 
 func _on_magic_pressed() -> void:
 	if player == null:
