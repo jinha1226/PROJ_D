@@ -291,15 +291,71 @@ static func _try_ranged_at(m: Monster, target: Node, dist: int) -> bool:
 			and randi() % 100 < 25:
 		reflected = true
 	var dmg: int = 1 + randi() % rdmg + hd / 5
+	# Fire the projectile FX so the shot is visible mid-flight. Colour
+	# maps off monster shape where we have one (acid blob → green spit,
+	# fire things → orange, cold things → cyan); everything else uses
+	# a neutral brown for a physical arrow / dart.
+	var fx_layer: Node = m.get_tree().get_first_node_in_group("entity_layer")
+	if fx_layer == null:
+		fx_layer = m.get_parent()
+	var shot_colour: Color = _mon_ranged_colour(m)
+	var shot_school: String = _mon_ranged_school(m)
 	if reflected:
+		if fx_layer != null and m is Node2D:
+			# Bounce the shot back at the shooter.
+			SpellFX.cast_single(fx_layer, target.position, m, dmg,
+					shot_colour, shot_school)
 		if m.has_method("take_damage"):
 			m.take_damage(dmg, "physical")
 		CombatLog.add("Your shield reflects the %s's shot!" % mname)
 		return true
 	if target.has_method("take_damage"):
+		if fx_layer != null and target is Node2D:
+			SpellFX.cast_single(fx_layer, m.position, target, dmg,
+					shot_colour, shot_school)
 		target.take_damage(dmg, "physical")
 		CombatLog.add("The %s shoots you for %d damage!" % [mname, dmg])
 	return true
+
+
+## Map a monster's identity to a ranged-shot colour so the FX reads at
+## a glance. Small table for the ranged attackers we ship; everything
+## else gets the neutral brown of a physical arrow.
+static func _mon_ranged_colour(m: Monster) -> Color:
+	if m == null or m.data == null:
+		return Color(0.75, 0.65, 0.45)
+	var mid: String = String(m.data.id)
+	match mid:
+		"acid_blob", "azure_jelly", "jelly":
+			return Color(0.55, 0.95, 0.35)  # acid spit — lurid green
+		"fire_elemental", "fire_sprite", "efreet":
+			return Color(1.00, 0.55, 0.20)
+		"ice_beast", "white_imp", "polar_bear":
+			return Color(0.55, 0.85, 1.00)
+		"electric_eel":
+			return Color(0.95, 0.95, 0.40)
+		"acid_dragon":
+			return Color(0.55, 0.95, 0.35)
+	return Color(0.75, 0.65, 0.45)  # physical default
+
+
+## Pick a SpellFX school hint so the projectile shape matches the
+## attacker (fire mobs get a fireball, cold mobs get an ice shard,
+## etc.). "" falls back to the generic conj dart.
+static func _mon_ranged_school(m: Monster) -> String:
+	if m == null or m.data == null:
+		return ""
+	var mid: String = String(m.data.id)
+	match mid:
+		"fire_elemental", "fire_sprite", "efreet", "fire_dragon":
+			return "fire"
+		"ice_beast", "white_imp", "polar_bear", "ice_dragon":
+			return "cold"
+		"electric_eel":
+			return "air"
+		"acid_blob", "azure_jelly", "jelly", "acid_dragon":
+			return "poison"
+	return ""
 
 
 ## Lightweight friendly-fire gate for physical projectiles. Same shape
