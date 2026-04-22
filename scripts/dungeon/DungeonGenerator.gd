@@ -57,6 +57,21 @@ func generate(depth: int, run_seed: int = -1) -> void:
 	_dcss_stairs_down.clear()
 	_dcss_stairs_up.clear()
 	_init_map()
+	# Labyrinth branch overrides the normal layout — tight maze corridors
+	# with a single prize chamber. Check the real branch id (not the
+	# tileset bucket) since only "labyrinth" should trigger this path.
+	var real_branch: String = ""
+	if Engine.get_main_loop() != null:
+		var mgr_r: Node = Engine.get_main_loop().root.get_node_or_null("GameManager")
+		if mgr_r != null and "current_branch" in mgr_r:
+			real_branch = String(mgr_r.current_branch)
+	if real_branch == "labyrinth":
+		_build_maze()
+		_ensure_reachability()
+		_place_stairs()
+		_place_branch_entrances(depth, run_seed)
+		_place_traps(depth)
+		return
 	var branch: String = _current_branch()
 	match branch:
 		"main":    _build_dcss_overlapping_boxes(depth)
@@ -213,6 +228,67 @@ func _init_map() -> void:
 		for y in MAP_HEIGHT:
 			col[y] = TileType.WALL
 		map[x] = col
+
+
+# ---- Builder: maze (Labyrinth branch) -------------------------------------
+
+## Recursive-backtracker maze on a 2-tile grid. Walks from (1,1) on odd
+## coordinates, carving a pair of tiles per step so the result is
+## corridor-width = 1 with full walls between runs. After the maze is
+## carved, stamp a small prize chamber at one random odd-grid cell
+## (3×3 opened) so loot placement has somewhere to live. Used only by
+## the Labyrinth portal vault.
+func _build_maze() -> void:
+	# Odd-coordinate grid — every (odd, odd) cell is a potential
+	# corridor node; even coordinates are walls between them.
+	var stack: Array = []
+	var start: Vector2i = Vector2i(1, 1)
+	map[start.x][start.y] = TileType.FLOOR
+	stack.push_back(start)
+	var dirs_maze: Array = [Vector2i(2, 0), Vector2i(-2, 0),
+			Vector2i(0, 2), Vector2i(0, -2)]
+	while not stack.is_empty():
+		var cur: Vector2i = stack[stack.size() - 1]
+		var choices: Array = dirs_maze.duplicate()
+		choices.shuffle()
+		var advanced: bool = false
+		for d in choices:
+			var nb: Vector2i = cur + d
+			if nb.x <= 0 or nb.x >= MAP_WIDTH - 1:
+				continue
+			if nb.y <= 0 or nb.y >= MAP_HEIGHT - 1:
+				continue
+			if map[nb.x][nb.y] == TileType.FLOOR:
+				continue
+			# Carve the wall between cur and nb, then nb itself.
+			var mid: Vector2i = cur + Vector2i(d.x / 2, d.y / 2)
+			map[mid.x][mid.y] = TileType.FLOOR
+			map[nb.x][nb.y] = TileType.FLOOR
+			stack.push_back(nb)
+			advanced = true
+			break
+		if not advanced:
+			stack.pop_back()
+	# Prize chamber — punch out a 3×3 room somewhere deep in the maze.
+	var prize_x: int = 2 * (3 + _rng.randi() % ((MAP_WIDTH - 8) / 2)) + 1
+	var prize_y: int = 2 * (3 + _rng.randi() % ((MAP_HEIGHT - 8) / 2)) + 1
+	for dx in range(-1, 2):
+		for dy in range(-1, 2):
+			var px: int = prize_x + dx
+			var py: int = prize_y + dy
+			if px <= 0 or px >= MAP_WIDTH - 1:
+				continue
+			if py <= 0 or py >= MAP_HEIGHT - 1:
+				continue
+			map[px][py] = TileType.FLOOR
+	spawn_pos = start
+	stairs_down_pos = Vector2i(prize_x, prize_y)
+	# Maze has no secondary stairs / spawns — duplicate the primary
+	# so _regenerate_dungeon's secondary path has something valid.
+	spawn_pos2 = start
+	stairs_down_pos2 = stairs_down_pos
+	rooms.clear()
+	rooms.append(Rect2i(prize_x - 1, prize_y - 1, 3, 3))
 
 
 # ---- Builder: rooms + corridors (classic BSP) -----------------------------

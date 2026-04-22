@@ -959,18 +959,41 @@ static func _nearest_hostile(m: Monster) -> Node:
 	var tree: SceneTree = m.get_tree()
 	if tree == null:
 		return null
+	var self_enthralled: bool = m.has_meta("_enthralled_turns") \
+			and int(m.get_meta("_enthralled_turns", 0)) > 0
 	var player: Node = tree.get_first_node_in_group("player")
-	if player != null and "grid_pos" in player and "is_alive" in player and player.is_alive:
+	# Enthralled monsters ignore the player and their original allies —
+	# they chase any un-enthralled hostile instead (matches DCSS hex
+	# "enthralled" semantics where the charmed mob's loyalty shifts).
+	if not self_enthralled \
+			and player != null and "grid_pos" in player \
+			and "is_alive" in player and player.is_alive:
 		var pd: int = _cheb(m.grid_pos, player.grid_pos)
 		if pd < best_d:
 			best_d = pd
 			best = player
 	for c in tree.get_nodes_in_group("companions"):
-		if c is Companion and c.is_alive and "grid_pos" in c:
+		if not self_enthralled and c is Companion and c.is_alive and "grid_pos" in c:
 			var cd: int = _cheb(m.grid_pos, c.grid_pos)
 			if cd < best_d:
 				best_d = cd
 				best = c
+	# Enthralled mobs: scan the other hostile monsters and pick the
+	# nearest non-enthralled one as a target. Un-enthralled mobs also
+	# target enthralled peers (a charmed orc reads as a traitor).
+	for other in tree.get_nodes_in_group("monsters"):
+		if other == m or not is_instance_valid(other):
+			continue
+		if not (other is Monster) or not other.is_alive:
+			continue
+		var other_enthralled: bool = other.has_meta("_enthralled_turns") \
+				and int(other.get_meta("_enthralled_turns", 0)) > 0
+		if self_enthralled == other_enthralled:
+			continue  # same faction, skip
+		var d: int = _cheb(m.grid_pos, other.grid_pos)
+		if d < best_d:
+			best_d = d
+			best = other
 	return best
 
 

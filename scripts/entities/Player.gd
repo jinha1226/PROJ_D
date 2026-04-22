@@ -2179,15 +2179,11 @@ func _evoke_wand(index: int) -> bool:
 	var spell_id: String = String(info.get("spell", ""))
 	# Find a target — MVP uses the nearest visible hostile. Targeting UI
 	# comes later; digging wands self-target (no effect for now).
-	var kind: String = String(info.get("kind", "direct"))
-	if kind == "utility_dig":
-		CombatLog.add("You carve at the rock. (wall-digging UX not yet wired)")
-		_spend_wand_charge(index, wand_id)
-		return true
-	# Hand off to GameBootstrap for the 2-tap targeting flow. GameBootstrap
-	# will call fire_wand_at once the player confirms a tile; charges and
-	# identification happen in that callback so a cancelled target spends
-	# nothing.
+	# All wands (including utility_dig) route through GameBootstrap's
+	# 2-tap targeting flow. GameBootstrap will call fire_wand_at once
+	# the player confirms a tile; charges and identification happen in
+	# that callback so a cancelled target spends nothing. Dig wands
+	# interpret the target as a direction hint rather than a creature.
 	wand_target_requested.emit(index)
 	return true
 
@@ -2330,9 +2326,61 @@ func _apply_wand_hex(kind: String, target: Node, power: int, info: Dictionary) -
 				target.set_meta("_flee_turns", 5)
 			CombatLog.add("The %s falters, confused." % tname)
 		"hex_poly":
-			CombatLog.add("The %s warps and twists — but nothing changes (polymorph not yet modelled)." % tname)
+			# DCSS polymorph: replace the monster with a different one of
+			# similar HD. Pool is every MonsterRegistry entry whose HD is
+			# within ±2 of the current target; we keep the grid_pos but
+			# swap data + rename. If no candidate fits, the target just
+			# "writhes" — matches the DCSS fallback for no-valid-poly.
+			_polymorph_monster(target)
 		_:
 			CombatLog.add("The %s writhes briefly." % tname)
+
+
+## DCSS polymorph — swap the monster's data for a random MonsterRegistry
+## entry whose HD sits within ±2 of the current target. The target's hp
+## is re-rolled from the new template's max. Logs the transformation so
+## the player sees the change. No-op when no eligible replacement.
+func _polymorph_monster(target: Node) -> void:
+	if target == null or not ("data" in target) or target.data == null:
+		return
+	var old_name: String = String(target.data.display_name)
+	var old_id: String = String(target.data.id)
+	var old_hd: int = int(target.data.hd)
+	var eligible: Array[String] = []
+	for mid in MonsterRegistry.all_ids():
+		if mid == old_id:
+			continue
+		var cand: MonsterData = MonsterRegistry.fetch(mid)
+		if cand == null:
+			continue
+		var diff: int = abs(int(cand.hd) - old_hd)
+		if diff > 2:
+			continue
+		# Never polymorph into a boss / unique / non-hostile placeholder.
+		if cand.flags != null:
+			var skip: bool = false
+			for f in cand.flags:
+				var lf: String = String(f).to_lower()
+				if lf == "unique" or lf == "no_poly" or lf == "friendly":
+					skip = true
+					break
+			if skip:
+				continue
+		eligible.append(mid)
+	if eligible.is_empty():
+		CombatLog.add("The %s shimmers, resisting the change." % old_name)
+		return
+	var picked: String = eligible[randi() % eligible.size()]
+	var new_data: MonsterData = MonsterRegistry.fetch(picked)
+	if new_data == null:
+		return
+	target.data = new_data
+	if "hp" in target and int(new_data.hp) > 0:
+		target.hp = int(new_data.hp)
+	if target.has_method("queue_redraw"):
+		target.queue_redraw()
+	CombatLog.add("The %s writhes and becomes %s!" % [
+			old_name, String(new_data.display_name)])
 
 
 ## Return up to `count` walkable, unoccupied 8-neighbour tiles around the

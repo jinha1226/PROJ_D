@@ -62,6 +62,19 @@ const CLOUD_DEFS: Dictionary = {
 		"duration_min": 6,
 		"duration_max": 10,
 	},
+	# Liquefied ground — not a cloud per se but shares the tile-overlay
+	# infrastructure. No damage, no FOV block; the "slow" status applies
+	# while the actor stands on it, via Player / Monster's _slow_skip
+	# gate. Long duration reflects the DCSS Liquefy Earth land shape.
+	"liquefied": {
+		"name": "liquefied ground",
+		"color": Color(0.55, 0.40, 0.20, 0.45),
+		"damage": 0,
+		"element": "",
+		"duration_min": 15,
+		"duration_max": 25,
+		"status": "slow",
+	},
 }
 
 
@@ -142,6 +155,13 @@ static func apply_to_actor(cloud: Dictionary, actor) -> void:
 		actor.set_meta("_confused", true)
 		actor.set_meta("_confusion_turns",
 				maxi(3, int(actor.get_meta("_confusion_turns", 0))))
+	# Liquefied ground — refresh the slowed meta so movement stays
+	# half-speed while the actor is on the tile. Reuses the existing
+	# _slowed_turns gate rather than adding a new status: Player /
+	# Monster try_move already alternate-skip while that meta is set.
+	if status == "slow" and actor.has_method("set_meta"):
+		actor.set_meta("_slowed_turns",
+				maxi(2, int(actor.get_meta("_slowed_turns", 0))))
 
 
 ## FOV opacity contribution from a cloud. Used by DungeonMap._opaque_at

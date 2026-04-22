@@ -343,6 +343,10 @@ func _ready() -> void:
 		TurnManager.player_turn_started.connect(_on_turn_tick_portal)
 	if not TurnManager.player_turn_started.is_connected(_on_turn_tick_clouds):
 		TurnManager.player_turn_started.connect(_on_turn_tick_clouds)
+	if not TurnManager.player_turn_started.is_connected(_on_turn_tick_silence):
+		TurnManager.player_turn_started.connect(_on_turn_tick_silence)
+	if not TurnManager.player_turn_started.is_connected(_on_turn_tick_abyss):
+		TurnManager.player_turn_started.connect(_on_turn_tick_abyss)
 
 	_setup_combat_log(ui)
 	TurnManager.start_player_turn()
@@ -598,6 +602,110 @@ func _on_turn_tick_portal() -> void:
 ## tile. Called each player turn. The FOV opaque callback already checks
 ## smoke clouds via GameManager.clouds, so expired smoke naturally
 ## stops blocking sight on the next redraw.
+## Silent Spectre and related mobs project a radius-2 silence zone.
+## Standing in the aura silences the player for the next turn (blocks
+## spellcasting via SpellCast's existing _silenced_turns check and
+## invocations via SpellCast.cast -> confusion/silence gate). Checked
+## every player turn so the status clears the moment you step out.
+const _SILENCE_AURA_SOURCES: Array = [
+	"silent_spectre", "silent_lich", "silence_mage",
+]
+const _SILENCE_AURA_RADIUS: int = 2
+
+
+## Abyss per-turn drift — while standing in the Abyss branch, every
+## few player turns we re-roll ~3% of the floor's interior tiles:
+## walls ↔ floor, with a rare spatial ripple that nudges the player
+## in a random direction. Keeps the DCSS "Abyss regenerates around
+## you" feel without rebuilding the whole map every turn (which
+## would also wipe the player's pathing). Cloud state, items, and
+## monsters are untouched — only the base tile grid twists.
+const _ABYSS_SHIFT_INTERVAL: int = 4
+const _ABYSS_SHIFT_RATIO: float = 0.03
+var _abyss_tick_counter: int = 0
+
+
+func _on_turn_tick_abyss() -> void:
+	if GameManager == null or String(GameManager.current_branch) != "abyss":
+		_abyss_tick_counter = 0
+		return
+	if generator == null or player == null:
+		return
+	_abyss_tick_counter += 1
+	if _abyss_tick_counter < _ABYSS_SHIFT_INTERVAL:
+		return
+	_abyss_tick_counter = 0
+	var target_shifts: int = int(float(DungeonGenerator.MAP_WIDTH) \
+			* float(DungeonGenerator.MAP_HEIGHT) * _ABYSS_SHIFT_RATIO)
+	var shifts: int = 0
+	for _i in 200:
+		if shifts >= target_shifts:
+			break
+		var rx: int = 1 + randi() % (DungeonGenerator.MAP_WIDTH - 2)
+		var ry: int = 1 + randi() % (DungeonGenerator.MAP_HEIGHT - 2)
+		var here: Vector2i = Vector2i(rx, ry)
+		# Never ripple the player's own tile or immediate neighbours
+		# (would trap them in a wall mid-turn).
+		if maxi(abs(rx - player.grid_pos.x), abs(ry - player.grid_pos.y)) <= 1:
+			continue
+		var t: int = generator.map[rx][ry]
+		if t == DungeonGenerator.TileType.WALL:
+			generator.map[rx][ry] = DungeonGenerator.TileType.FLOOR
+			shifts += 1
+		elif t == DungeonGenerator.TileType.FLOOR:
+			generator.map[rx][ry] = DungeonGenerator.TileType.WALL
+			shifts += 1
+	if shifts > 0:
+		var dmap: DungeonMap = $DungeonLayer/DungeonMap
+		if dmap != null:
+			dmap.update_fov(player.grid_pos)
+			dmap.queue_redraw()
+		# Occasionally nudge the player a step — DCSS Abyss will shove
+		# the wanderer toward a random direction when space ripples.
+		if randf() < 0.25:
+			var dirs_a: Array = [Vector2i(1,0), Vector2i(-1,0),
+					Vector2i(0,1), Vector2i(0,-1)]
+			dirs_a.shuffle()
+			for d in dirs_a:
+				var dest: Vector2i = player.grid_pos + d
+				if generator.is_walkable(dest):
+					player.grid_pos = dest
+					player.position = Vector2(
+							dest.x * TILE_SIZE + TILE_SIZE / 2.0,
+							dest.y * TILE_SIZE + TILE_SIZE / 2.0)
+					player.moved.emit(dest)
+					CombatLog.add("The Abyss shifts around you.")
+					break
+
+
+func _on_turn_tick_silence() -> void:
+	if player == null or not player.is_alive:
+		return
+	var any_aura: bool = false
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+			continue
+		if m.data == null:
+			continue
+		if not _SILENCE_AURA_SOURCES.has(String(m.data.id)):
+			continue
+		var d: int = max(abs(m.grid_pos.x - player.grid_pos.x),
+				abs(m.grid_pos.y - player.grid_pos.y))
+		if d <= _SILENCE_AURA_RADIUS:
+			any_aura = true
+			break
+	if any_aura:
+		var prev: int = int(player.get_meta("_silenced_turns", 0))
+		if prev < 2:
+			player.set_meta("_silenced_turns", 2)
+		if not player.has_meta("_silence_aura_in"):
+			player.set_meta("_silence_aura_in", true)
+			CombatLog.add("An unnatural silence presses against you.")
+	else:
+		if player.has_meta("_silence_aura_in"):
+			player.remove_meta("_silence_aura_in")
+
+
 func _on_turn_tick_clouds() -> void:
 	if GameManager == null or GameManager.clouds.is_empty():
 		return
@@ -3075,6 +3183,17 @@ func _on_branch_entrance_tapped(pos: Vector2i) -> void:
 func _confirm_enter_branch(branch_id: String) -> void:
 	if run_over:
 		return
+	# Trove gate — custodian demands gold before letting the player in.
+	# Price scales with current depth so late-game Troves cost more.
+	# Player with not enough gold is turned away; refusing bypass is
+	# always allowed (cancel popup).
+	if branch_id == "trove":
+		var price: int = 100 + GameManager.current_depth * 25
+		if player == null or player.gold < price:
+			CombatLog.add("The Trove custodian demands %d gold — you don't have it." % price)
+			return
+		_prompt_trove_payment(branch_id, price)
+		return
 	if branch_id == "zot":
 		CombatLog.add("The Zot gates recognise your runes and part.")
 	_save_current_floor()
@@ -3090,6 +3209,52 @@ func _confirm_enter_branch(branch_id: String) -> void:
 	else:
 		CombatLog.add("You enter %s." % BranchRegistry.display_name(branch_id))
 	_regenerate_dungeon(false, false)
+
+
+## Payment prompt for the Trove custodian. Accept deducts gold and
+## enters the branch; Decline leaves the portal alone so the player
+## can come back later with more funds (until the portal decays).
+func _prompt_trove_payment(branch_id: String, price: int) -> void:
+	var dlg := GameDialog.create("The Custodian", Vector2i(960, 900))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
+	vb.add_theme_constant_override("separation", 14)
+	var msg := Label.new()
+	msg.text = "A hooded figure bars the doorway. They hold out a hand, wordless."
+	msg.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	msg.add_theme_font_size_override("font_size", 38)
+	vb.add_child(msg)
+	var price_lbl := Label.new()
+	price_lbl.text = "Pay %d gold?   (You have %d)" % [price, player.gold]
+	price_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	price_lbl.add_theme_font_size_override("font_size", 46)
+	price_lbl.modulate = Color(1.0, 0.9, 0.4)
+	vb.add_child(price_lbl)
+	vb.add_child(HSeparator.new())
+	var pay := Button.new()
+	pay.text = "Pay %d" % price
+	pay.custom_minimum_size = Vector2(0, 120)
+	pay.add_theme_font_size_override("font_size", 52)
+	pay.modulate = Color(1.0, 0.95, 0.55)
+	pay.pressed.connect(func():
+		dlg.close()
+		player.gold -= price
+		player.inventory_changed.emit()
+		CombatLog.add("You drop %d gold into the Custodian's hand." % price)
+		_save_current_floor()
+		GameManager.enter_branch(branch_id)
+		CombatLog.add("You step into %s." % BranchRegistry.display_name(branch_id))
+		var entry_msg: String = BranchRegistry.entry_message(branch_id)
+		if entry_msg != "":
+			CombatLog.add(entry_msg)
+		_regenerate_dungeon(false, false))
+	vb.add_child(pay)
+	var decline := Button.new()
+	decline.text = "Walk away"
+	decline.custom_minimum_size = Vector2(0, 96)
+	decline.add_theme_font_size_override("font_size", 44)
+	decline.pressed.connect(dlg.close)
+	vb.add_child(decline)
 
 
 ## going_up=true places the player at the new floor's stairs_down (where they
@@ -4495,8 +4660,48 @@ func _on_target_selected(pos: Vector2i) -> void:
 		if player != null:
 			player.try_ranged_attack(pos)
 		return
-	# ----- Wand targeting (2-tap confirm against a monster) ------------
+	# ----- Wand targeting (2-tap confirm) ------------------------------
 	if _targeting_wand_index >= 0:
+		var wand_info: Dictionary = WandRegistry.get_info(_targeting_wand_id)
+		var wand_kind: String = String(wand_info.get("kind", "direct"))
+		# Dig wands: tapped tile is a DIRECTION hint. We carve a line of
+		# walls from the player toward that tile up to 4 cells deep.
+		# Two-tap same as damage wands — first tap paints the carve
+		# preview, second tap commits.
+		if wand_kind == "utility_dig":
+			var dig_cells: Array[Vector2i] = _wand_dig_line(pos)
+			if dig_cells.is_empty():
+				CombatLog.add("Nothing there to dig.")
+				_targeting_wand_index = -1
+				_targeting_wand_id = ""
+				_pending_area_target = Vector2i(-1, -1)
+				if dmap != null:
+					dmap.aoe_preview_tiles.clear()
+					dmap.queue_redraw()
+				if touch_input != null:
+					touch_input.targeting_mode = false
+				return
+			if _pending_area_target == pos:
+				var dig_idx: int = _targeting_wand_index
+				_targeting_wand_index = -1
+				_targeting_wand_id = ""
+				_pending_area_target = Vector2i(-1, -1)
+				if dmap != null:
+					dmap.aoe_preview_tiles.clear()
+					dmap.queue_redraw()
+				if touch_input != null:
+					touch_input.targeting_mode = false
+				_apply_wand_dig(dig_idx, dig_cells)
+				TurnManager.end_player_turn()
+				return
+			_pending_area_target = pos
+			if dmap != null:
+				dmap.aoe_preview_tiles = dig_cells
+				dmap.beam_preview_tiles.clear()
+				dmap.danger_tiles.clear()
+				dmap.queue_redraw()
+			CombatLog.add("Tap again to carve through the wall.")
+			return
 		var wtm: Monster = null
 		for m in get_tree().get_nodes_in_group("monsters"):
 			if is_instance_valid(m) and m is Monster and m.is_alive and m.grid_pos == pos:
@@ -4651,6 +4856,60 @@ func _repaint_area_preview(center: Vector2i) -> void:
 			enemies.append(m.grid_pos)
 	dmap.danger_tiles = enemies
 	dmap.queue_redraw()
+
+
+## Walk a line from the player toward the target tile and return the
+## up-to-4 cells that the Wand of Digging would carve. Stops at map
+## edge or at CRYSTAL_WALL (indestructible rock). An empty result means
+## the direction has no walls in reach — caller treats that as "nothing
+## to dig" and cancels the targeting cleanly.
+func _wand_dig_line(target_tile: Vector2i) -> Array[Vector2i]:
+	var out: Array[Vector2i] = []
+	if player == null or generator == null:
+		return out
+	var dx: int = target_tile.x - player.grid_pos.x
+	var dy: int = target_tile.y - player.grid_pos.y
+	if dx == 0 and dy == 0:
+		return out
+	var step: Vector2i = Vector2i(
+		0 if dx == 0 else (1 if dx > 0 else -1),
+		0 if dy == 0 else (1 if dy > 0 else -1))
+	var cur: Vector2i = player.grid_pos + step
+	for _i in 4:
+		if cur.x < 0 or cur.x >= DungeonGenerator.MAP_WIDTH:
+			break
+		if cur.y < 0 or cur.y >= DungeonGenerator.MAP_HEIGHT:
+			break
+		var t: int = generator.get_tile(cur)
+		if t == DungeonGenerator.TileType.CRYSTAL_WALL:
+			break
+		if t == DungeonGenerator.TileType.WALL:
+			out.append(cur)
+		# Continue into the next cell even past floor — dig keeps going
+		# until it hits the wall-chain limit (matches DCSS behaviour of
+		# tunnelling straight through until the charge budget runs out).
+		cur += step
+	return out
+
+
+## Convert the dig line to floor, spend the wand charge, identify it.
+## Separate from _wand_dig_line so the preview path can compute without
+## mutating anything.
+func _apply_wand_dig(item_index: int, cells: Array[Vector2i]) -> void:
+	if player == null or generator == null:
+		return
+	for c in cells:
+		generator.map[c.x][c.y] = DungeonGenerator.TileType.FLOOR
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	if dmap != null:
+		dmap.update_fov(player.grid_pos)
+		dmap.queue_redraw()
+	CombatLog.add("The wand tunnels through %d tiles of rock." % cells.size())
+	var it: Dictionary = player.get_items()[item_index]
+	var wand_id: String = String(it.get("id", ""))
+	player._spend_wand_charge(item_index, wand_id)
+	if GameManager != null:
+		GameManager.identify(wand_id)
 
 
 ## Paint the single-target beam path so the 2-tap confirm flow shows
