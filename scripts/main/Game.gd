@@ -249,6 +249,13 @@ func _refresh_fov() -> void:
 	if player == null or map == null:
 		return
 	map.set_fov(player.compute_fov())
+	_update_minimap()
+
+func _update_minimap() -> void:
+	if top_hud == null or map == null or player == null:
+		return
+	var tex: ImageTexture = MinimapRenderer.render(map, player, self)
+	top_hud.set_minimap_texture(tex)
 
 func _center_camera_on_player(snap: bool = false) -> void:
 	if player == null or camera == null:
