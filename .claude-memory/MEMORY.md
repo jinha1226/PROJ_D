@@ -1,7 +1,7 @@
 # PROJ_D Memory Index
 
 ## Current project (PocketCrawl, MIT, at repo root)
-- [PocketCrawl current state](pocketcrawl_state.md) — **READ FIRST** — what's built across Day 1-5 + Week 2 systems (29 commits 2026-04-22→23), roadmap, architecture, gotchas
+- [PocketCrawl current state](pocketcrawl_state.md) — **READ FIRST** — current systems (core loop / unlock flow / 5 races / 5 classes / 18 items / 18 monsters / 6 spells / skills / statuses / CI / paper-doll), pending roadmap, architecture decisions, gotchas
 - [Clean-room reboot decision](reboot_decision.md) — PROJ_D = old GPL DCSS port (archived in oldproject/); PocketCrawl = new MIT project at root. Legal firewall + what must NOT carry over
 
 ## Historical (pre-reboot, apply to oldproject/ only)
