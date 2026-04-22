@@ -57,10 +57,10 @@ func _apply_class_to_player(class_id: String) -> void:
 	if data.starting_armor != "":
 		player.items.append({"id": data.starting_armor, "plus": 0})
 		player.equipped_armor_id = data.starting_armor
-	player.refresh_ac_from_equipment()
 	player.init_skills()
 	for skill_id in data.starting_skills.keys():
 		player.skills[skill_id]["level"] = int(data.starting_skills[skill_id])
+	player.refresh_ac_from_equipment()
 	player.known_spells = data.starting_spells.duplicate()
 	for id in _class_starter_items(class_id):
 		player.items.append({"id": id, "plus": 0})

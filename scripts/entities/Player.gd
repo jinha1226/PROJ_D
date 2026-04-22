@@ -182,9 +182,14 @@ func drop_item(index: int) -> void:
 
 func refresh_ac_from_equipment() -> void:
 	ac = 0
+	ev = 5 + dexterity / 2
 	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id)
 	if armor != null:
 		ac += armor.ac_bonus
+		var armor_skill: int = get_skill_level("armor")
+		var penalty_mult: float = max(0.0, 1.0 - float(armor_skill) * 0.1)
+		ev -= int(round(float(armor.ev_penalty) * penalty_mult))
+	ev = max(0, ev)
 	emit_signal("stats_changed")
 
 func _teleport_far() -> void:
