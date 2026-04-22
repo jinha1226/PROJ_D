@@ -135,6 +135,14 @@ static func spawn_for_depth(depth: int, gen: DungeonGenerator, container: Node) 
 	var result: Array[Monster] = []
 	if gen == null or container == null:
 		return result
+	# DCSS Temple is a sanctuary — zero wandering monsters. Keep it
+	# peaceful so the player can pledge without combat pressure.
+	var mgr: Node = null
+	if Engine.get_main_loop() != null:
+		mgr = Engine.get_main_loop().root.get_node_or_null("GameManager")
+	if mgr != null and "current_branch" in mgr \
+			and String(mgr.current_branch) == "temple":
+		return result
 	var scene: PackedScene = load(MONSTER_SCENE_PATH)
 	if scene == null:
 		push_error("MonsterSpawner: failed to load Monster.tscn")

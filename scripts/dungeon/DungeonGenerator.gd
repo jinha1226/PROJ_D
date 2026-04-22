@@ -712,10 +712,30 @@ func _place_altars() -> void:
 	if god_ids.is_empty():
 		return
 	if branch == "temple":
-		# Temple: one altar per god.
+		# Temple — one altar per god. Track used positions so independent
+		# random picks can't collide and overwrite each other's altar
+		# entries (the old loop let two gods land on the same tile, so
+		# roughly 1-in-3 Temple floors were missing an altar or two).
+		var used_altar_tiles: Dictionary = {}
 		for gid in god_ids:
-			var pos: Vector2i = _pick_branch_entrance_tile()
+			var pos: Vector2i = Vector2i(-1, -1)
+			for _retry in 30:
+				var candidate: Vector2i = _pick_branch_entrance_tile()
+				if candidate == Vector2i(-1, -1):
+					break
+				# Keep altars at least 2 tiles apart so each has elbow
+				# room for its per-god tile to read cleanly.
+				var too_close: bool = false
+				for u in used_altar_tiles.keys():
+					if max(abs(u.x - candidate.x), abs(u.y - candidate.y)) < 2:
+						too_close = true
+						break
+				if too_close:
+					continue
+				pos = candidate
+				break
 			if pos != Vector2i(-1, -1):
+				used_altar_tiles[pos] = true
 				map[pos.x][pos.y] = TileType.ALTAR
 				altars[pos] = String(gid)
 		return
