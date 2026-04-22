@@ -388,6 +388,11 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 			defender.take_damage(dmg, brand_element)
 		else:
 			defender.take_damage(dmg)
+	# DCSS unrand on-hit effects (art-func.h). Asmodeus's sceptre
+	# summons flame demons on a successful strike; the handler lives
+	# in the Player because it needs generator/entity-layer access.
+	if weapon_id == "unrand_asmodeus" and attacker.has_method("_maybe_summon_flame_demon"):
+		attacker._maybe_summon_flame_demon(defender)
 	var def_name: String = ""
 	if "data" in defender and defender.data != null and "display_name" in defender.data:
 		def_name = String(defender.data.display_name)

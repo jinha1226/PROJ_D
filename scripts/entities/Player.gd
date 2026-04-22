@@ -2495,6 +2495,35 @@ func _tile_has_actor(p: Vector2i) -> bool:
 ## the Companion scene so the tile-existing companion AI handles it; we
 ## pick a reasonable default id (`small_mammal`) when the caller didn't
 ## specify one.
+## DCSS Sceptre of Asmodeus on-hit (art-func.h::asmodeus_strike). 10%
+## chance per connecting melee swing to summon a flame demon adjacent
+## to the defender. Called from `CombatSystem.melee_attack` when the
+## attacker's weapon is the sceptre.
+func _maybe_summon_flame_demon(defender: Node) -> void:
+	if defender == null or not ("grid_pos" in defender):
+		return
+	if randf() >= 0.10:
+		return
+	var tile: Vector2i = _find_free_adjacent_to(defender.grid_pos)
+	if tile == defender.grid_pos:
+		return
+	var pool: Array = ["red_devil", "blue_devil", "iron_devil", "green_death"]
+	_spawn_temp_ally_at(tile, String(pool[randi() % pool.size()]))
+	CombatLog.add("A flame demon answers Asmodeus's sceptre!")
+
+
+func _find_free_adjacent_to(center: Vector2i) -> Vector2i:
+	for dy in [-1, 0, 1]:
+		for dx in [-1, 0, 1]:
+			if dx == 0 and dy == 0:
+				continue
+			var p: Vector2i = center + Vector2i(dx, dy)
+			if generator != null and generator.is_walkable(p) \
+					and not _tile_has_actor(p) and p != grid_pos:
+				return p
+	return center
+
+
 func _spawn_temp_ally_at(tile: Vector2i, monster_id: String = "rat") -> Monster:
 	var path: String = "res://resources/monsters/%s.tres" % monster_id
 	var mdata: MonsterData = null

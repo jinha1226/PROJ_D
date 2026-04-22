@@ -149,6 +149,17 @@ static func cast(player: Node, spell_id: String, target, ctx: Dictionary) -> Dic
 		power += int(player.gear_spell_power_bonus())
 	if ctx.has("spellpower_fn"):
 		power = int(ctx["spellpower_fn"].call(power))
+	# DCSS Wucad Mu crystal ball (art-func.h::wucad_mu_channel): carrying
+	# the orb lets successful casts refund a small amount of MP
+	# proportional to the spell level. No evoke gesture required — the
+	# orb passively channels back as long as it's in your inventory.
+	# Orb of Dispater (art-func.h::dispater_damnation): carrying it
+	# amplifies raw spell power by +20% on destructive schools.
+	if _player_carries_unrand(player, "unrand_wucad_mu"):
+		var refund: int = mini(int(info.get("mp", 1)) / 2 + 1, cost)
+		player.stats.MP = mini(player.stats.mp_max, player.stats.MP + refund)
+	if _player_carries_unrand(player, "unrand_dispater"):
+		power = int(round(float(power) * 1.20))
 
 	# Execution is caller-owned: SpellCast owns MP & fail; the effect
 	# (damage rolls, status riders, area FX) lives in the caller because
@@ -190,6 +201,19 @@ static func _pay_mp(player: Node, cost: int) -> void:
 const _VEHUMET_SCHOOLS: Array = [
 	"conjurations", "fire", "cold", "earth", "air", "poison", "necromancy",
 ]
+
+
+## True when the player's inventory currently holds the given unrand
+## id. Bag carry triggers the passive half of art-func effects that
+## DCSS binds to evoke actions — since we don't have a dedicated
+## evoke UI, `carrying it` is the trigger.
+static func _player_carries_unrand(player: Node, unrand_id: String) -> bool:
+	if player == null or not player.has_method("get_items"):
+		return false
+	for it in player.get_items():
+		if String(it.get("id", "")) == unrand_id:
+			return true
+	return false
 
 
 static func _vehumet_supports_spell(spell_id: String) -> bool:
