@@ -2286,10 +2286,26 @@ func fire_wand_at(index: int, target: Node) -> bool:
 		var dmg: int = SpellRegistry.roll_damage(spell_id, power)
 		if dmg < 0:
 			dmg = randi_range(3, 8) + power / 4
+		# Fire the projectile + hit FX BEFORE damage so the tween can
+		# start while take_damage schedules its own hurt animation.
+		var spell_info: Dictionary = SpellRegistry.get_spell(spell_id)
+		var school: String = String(spell_info.get("school", ""))
+		var tint: Color = info.get("color", spell_info.get("color", Color.WHITE))
+		var fx_layer: Node = get_tree().get_first_node_in_group("entity_layer")
+		if fx_layer == null:
+			fx_layer = get_parent()
+		if fx_layer != null and target is Node2D:
+			SpellFX.cast_single(fx_layer, position, target, dmg, tint, school)
 		target.take_damage(dmg)
 		CombatLog.add("%s hits the %s for %d!" % [String(info.get("name", wand_id)),
 				target.data.display_name if target.data else "target", dmg])
 	else:
+		# Hex wands: flash the target in the wand's colour so it's clear
+		# the evocation hit. Actual status application still routes
+		# through _apply_wand_hex.
+		if target is Node2D:
+			var hex_tint: Color = info.get("color", Color(0.85, 0.55, 1.00))
+			SpellFX.flash(target, hex_tint, 0.35)
 		_apply_wand_hex(kind, target, power, info)
 	_spend_wand_charge(index, wand_id)
 	if GameManager != null:
