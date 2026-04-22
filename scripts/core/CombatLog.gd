@@ -28,5 +28,11 @@ func get_recent(n: int) -> Array[String]:
 	return out
 
 
+## Full rolling history (up to MAX_MESSAGES entries). Used by the
+## full-screen log dialog opened via tapping the combat log strip.
+func get_all() -> Array[String]:
+	return _messages.duplicate()
+
+
 func clear() -> void:
 	_messages.clear()

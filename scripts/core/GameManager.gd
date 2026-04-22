@@ -44,6 +44,11 @@ var orb_placed: bool = false
 ## CloudSystem.tick decrements per player turn via GameBootstrap.
 var clouds: Dictionary = {}
 
+## Debug flag — set by MainMenu's "Fireball Test" button. GameBootstrap
+## reads this after setup to bump the player to XL 27, max skills, learn
+## every spell, and stock consumables for rapid spell iteration.
+var test_character_mode: bool = false
+
 # --- Item identification (per-run) ---
 # identified[id] == true once the player has drunk/read/identified a consumable.
 var identified: Dictionary = {}
@@ -105,6 +110,9 @@ func start_new_run(job_id: String = "fighter", race_id: String = "human", run_se
 	orb_placed = false
 	portal_turns_left = 0
 	clouds.clear()
+	# test_character_mode is NOT cleared here — MainMenu sets it right
+	# before change_scene_to_file, and start_new_run runs after. The flag
+	# is cleared by GameBootstrap once the boost has been applied.
 	# Persist the combo so QuickStart can resurface it on the next boot.
 	var meta: Node = get_tree().root.get_node_or_null("MetaProgression") if get_tree() != null else null
 	if meta != null and meta.has_method("record_last_combo"):

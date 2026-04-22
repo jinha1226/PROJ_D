@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="JobData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/jobs/JobData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "archmage"
+display_name = "Archmage (TEST)"
+description = "Debug character — max magic skills, all spells learned, huge HP/MP. Use via the Main Menu test button to iterate on spell balance and effects."
+str_bonus = 8
+dex_bonus = 8
+int_bonus = 18
+starting_equipment = Array[String](["robe", "potion_magic", "potion_magic", "potion_magic", "potion_curing", "potion_curing", "potion_haste", "scroll_identify", "scroll_magic_map"])
+starting_skills = {"air": 27, "cold": 27, "conjurations": 27, "earth": 27, "evocations": 27, "fighting": 15, "fire": 27, "hexes": 27, "necromancy": 27, "spellcasting": 27, "summonings": 27, "translocations": 27, "dodging": 15, "armour": 10, "stealth": 10}
+starting_spells = Array[String](["magic_dart", "flame_tongue", "fireball", "fire_storm", "freeze", "hailstorm", "lightning_bolt", "chain_lightning", "stone_arrow", "iron_shot", "pain", "vampiric_drain", "agony", "slow", "confuse", "petrify", "blink", "passage", "static_discharge", "dazzling_flash", "sticky_flame", "airstrike", "scorch", "orb_of_destruction", "metabolic_englaciation"])
+unique_ability = ""

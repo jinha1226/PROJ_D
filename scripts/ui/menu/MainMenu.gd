@@ -4,6 +4,7 @@ extends Control
 
 const RACE_SELECT_PATH := "res://scenes/menu/RaceSelect.tscn"
 const QUICK_START_PATH := "res://scenes/menu/QuickStart.tscn"
+const GAME_SCENE_PATH := "res://scenes/main/Game.tscn"
 const CREDITS_LPC_PATH := "res://CREDITS_LPC.md"
 const CREDITS_FONTS_PATH := "res://CREDITS_FONTS.md"
 
@@ -32,6 +33,23 @@ func _add_display_toggle() -> void:
 	_display_btn.pressed.connect(_on_cycle_display)
 	buttons.add_child(_display_btn)
 	_refresh_display_label()
+	# Debug shortcut — boots straight into the game with an archmage
+	# test character (XL 27, every magic skill at 27, all spells learned,
+	# consumables pre-stocked). Meant for fireball / cloud iteration.
+	var test_btn := Button.new()
+	test_btn.custom_minimum_size = Vector2(0, 120)
+	test_btn.add_theme_font_size_override("font_size", 42)
+	test_btn.text = "Spell Test (Archmage)"
+	test_btn.pressed.connect(_on_spell_test)
+	buttons.add_child(test_btn)
+
+
+func _on_spell_test() -> void:
+	GameManager.selected_race_id = "human"
+	GameManager.selected_job_id = "archmage"
+	GameManager.selected_trait_id = ""
+	GameManager.test_character_mode = true
+	get_tree().change_scene_to_file(GAME_SCENE_PATH)
 
 
 func _on_cycle_display() -> void:

@@ -164,6 +164,11 @@ func _ready() -> void:
 	# system has populated skill_state.
 	if player.has_method("_recompute_defense"):
 		player._recompute_defense()
+	# Test-character boost — MainMenu's "Spell Test" button sets this
+	# flag. Bump to XL 27, fill HP/MP, learn every registered spell.
+	if GameManager != null and GameManager.test_character_mode:
+		_apply_test_character_boost()
+		GameManager.test_character_mode = false
 	# Re-run on every skill level-up so dodging gains translate into
 	# EV bumps immediately (instead of waiting for the next equip swap).
 	if not skill_system.skill_leveled_up.is_connected(_on_skill_leveled_up_for_stats):
@@ -337,7 +342,14 @@ func _setup_combat_log(ui_root: Node) -> void:
 	panel.anchor_bottom = 0.82
 	panel.offset_top = 0
 	panel.offset_bottom = 0
-	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Tappable strip — opens the full history dialog. Uses MOUSE_FILTER_STOP
+	# so the tap doesn't fall through to the DungeonMap underneath.
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	panel.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventMouseButton \
+				and event.pressed \
+				and event.button_index == MOUSE_BUTTON_LEFT:
+			_open_combat_log_dialog())
 	# Inner margin so text doesn't hug the screen edges — the left side
 	# was getting clipped against the viewport.
 	var margin := MarginContainer.new()
@@ -361,6 +373,74 @@ func _setup_combat_log(ui_root: Node) -> void:
 		if _combat_log_label != null and is_instance_valid(_combat_log_label):
 			var recent := CombatLog.get_recent(3)
 			_combat_log_label.text = "\n".join(PackedStringArray(recent)))
+
+
+## Debug-only — takes the freshly-seeded player and maxes them out so
+## the Spell Test launcher drops you straight into a usable kit for
+## iterating on fireball / hailstorm / cloud residue etc. Safe to call
+## more than once but meant to run once at setup. No-op if called
+## before Player.setup populates stats / skills.
+func _apply_test_character_boost() -> void:
+	if player == null or player.stats == null:
+		return
+	# Bump XL — _apply_level_up_growth recomputes hp_max / mp_max from
+	# scratch using the now-level-27 fighting / spellcasting skills.
+	player.level = 27
+	if player.has_method("_apply_level_up_growth"):
+		player._apply_level_up_growth()
+	player.stats.HP = player.stats.hp_max
+	player.stats.MP = player.stats.mp_max
+	# Learn every spell in SpellRegistry.SPELLS so the Magic dialog has
+	# the full catalogue available for testing. Duplicates are guarded
+	# by the has() check so repeated boost calls don't balloon the list.
+	if "learned_spells" in player:
+		for spell_id in SpellRegistry.SPELLS.keys():
+			if not player.learned_spells.has(spell_id):
+				player.learned_spells.append(String(spell_id))
+	# Stock a handful of utility consumables beyond the archmage kit so
+	# we can test scroll interactions without fishing for drops.
+	for extra_id in ["scroll_fog", "scroll_blink", "scroll_teleport",
+			"potion_might", "potion_resistance", "potion_berserk_rage"]:
+		if ConsumableRegistry.has(extra_id):
+			var cinfo: Dictionary = ConsumableRegistry.get_info(extra_id)
+			player.items.append({
+				"id": extra_id,
+				"name": String(cinfo.get("name", extra_id)),
+				"kind": String(cinfo.get("kind", "potion")),
+				"color": cinfo.get("color", Color(0.75, 0.75, 0.85)),
+			})
+			GameManager.identify(extra_id)
+	if player.has_signal("stats_changed"):
+		player.stats_changed.emit()
+	if player.has_signal("inventory_changed"):
+		player.inventory_changed.emit()
+	CombatLog.add("[Test character: XL 27, all spells learned.]")
+
+
+## Full combat-log history dialog — opened by tapping the 3-line strip
+## above BottomHUD. Shows every message still in CombatLog's rolling
+## buffer (MAX_MESSAGES = 60), newest at the bottom, auto-scrolled.
+func _open_combat_log_dialog() -> void:
+	var dlg := GameDialog.create("Combat Log", Vector2i(960, 1800))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
+	vb.add_theme_constant_override("separation", 4)
+	var msgs: Array[String] = CombatLog.get_all()
+	if msgs.is_empty():
+		vb.add_child(UICards.dim_hint("(no messages yet)"))
+		return
+	for msg in msgs:
+		var lbl := Label.new()
+		lbl.text = msg
+		lbl.add_theme_font_size_override("font_size", 30)
+		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		vb.add_child(lbl)
+	# Scroll to bottom so the most recent line is visible on open.
+	var scroll: ScrollContainer = vb.get_parent() as ScrollContainer
+	if scroll != null:
+		await get_tree().process_frame
+		scroll.scroll_vertical = int(scroll.get_v_scroll_bar().max_value)
 
 
 func _on_turn_refresh_visibility() -> void:
