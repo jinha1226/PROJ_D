@@ -2876,7 +2876,62 @@ func _on_branch_entrance_tapped(pos: Vector2i) -> void:
 		if have < need:
 			CombatLog.add("The gates of Zot refuse you — %d / %d runes." % [have, need])
 			return
-		CombatLog.add("The Zot gates recognise your %d runes and part." % have)
+	# Confirmation dialog — players walked onto branch entrances thinking
+	# they were stairs-down and got yanked to D:1 of a sub-branch. Now
+	# tapping pops a prompt; the branch is only entered on explicit
+	# confirm so the main-trunk descent stays predictable.
+	var dlg := GameDialog.create("Enter a new branch?", Vector2i(960, 900))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
+	vb.add_theme_constant_override("separation", 14)
+	var name_lbl := Label.new()
+	name_lbl.text = BranchRegistry.display_name(branch_id)
+	name_lbl.add_theme_font_size_override("font_size", 56)
+	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vb.add_child(name_lbl)
+	var is_portal: bool = BranchRegistry.is_portal(branch_id)
+	var detail := Label.new()
+	if is_portal:
+		detail.text = "A timed portal — %d turns inside before it collapses and flings you back to the parent floor." % \
+				BranchRegistry.portal_duration(branch_id)
+	else:
+		detail.text = "Persistent branch — you can walk back up the branch's stairs to return to this floor."
+	detail.add_theme_font_size_override("font_size", 38)
+	detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vb.add_child(detail)
+	var gate_msg: String = BranchRegistry.entry_message(branch_id)
+	if gate_msg != "":
+		var gate_lbl := Label.new()
+		gate_lbl.text = gate_msg
+		gate_lbl.add_theme_font_size_override("font_size", 34)
+		gate_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		gate_lbl.modulate = Color(0.85, 0.85, 1.0)
+		gate_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		vb.add_child(gate_lbl)
+	vb.add_child(HSeparator.new())
+	var enter_btn := Button.new()
+	enter_btn.text = "Enter"
+	enter_btn.custom_minimum_size = Vector2(0, 120)
+	enter_btn.add_theme_font_size_override("font_size", 52)
+	enter_btn.modulate = Color(1.0, 0.95, 0.55)
+	enter_btn.pressed.connect(func():
+		dlg.close()
+		_confirm_enter_branch(branch_id))
+	vb.add_child(enter_btn)
+	var stay_btn := Button.new()
+	stay_btn.text = "Stay"
+	stay_btn.custom_minimum_size = Vector2(0, 96)
+	stay_btn.add_theme_font_size_override("font_size", 44)
+	stay_btn.pressed.connect(dlg.close)
+	vb.add_child(stay_btn)
+
+
+func _confirm_enter_branch(branch_id: String) -> void:
+	if run_over:
+		return
+	if branch_id == "zot":
+		CombatLog.add("The Zot gates recognise your runes and part.")
 	_save_current_floor()
 	GameManager.enter_branch(branch_id)
 	var is_portal: bool = BranchRegistry.is_portal(branch_id)

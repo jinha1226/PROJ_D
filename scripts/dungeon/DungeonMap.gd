@@ -254,13 +254,25 @@ func _draw_dcss() -> void:
 						draw_texture_rect(floor_tex, rect, false, modulate)
 					tex = stairs_up_tex
 				DungeonGenerator.TileType.BRANCH_ENTRANCE:
-					# Draw a stairs-down under a colour-tinted overlay so the
-					# player can tell branch portals apart from normal stairs.
+					# Branch entries look enough like stairs-down that players
+					# walked onto them thinking they were descending the main
+					# trunk. Now: floor backdrop + stairs-down icon PLUS a
+					# bright ring in the branch colour around the tile so it
+					# reads at a glance. Confirmation dialog on tap prevents
+					# accidental branch entry.
 					if floor_tex != null:
 						draw_texture_rect(floor_tex, rect, false, modulate)
-					tex = stairs_dn_tex
-					# Tint the modulate downstream — we hack a draw_rect
-					# overlay after the tile draw for now.
+					if stairs_dn_tex != null:
+						draw_texture_rect(stairs_dn_tex, rect, false, modulate)
+					var bid: String = String(generator.branch_entrances.get(tile, "")) \
+							if "branch_entrances" in generator else ""
+					var ring_color: Color = _branch_ring_color(bid) * modulate
+					var ring_center: Vector2 = rect.position + rect.size * 0.5
+					draw_arc(ring_center, TILE_SIZE * 0.48, 0.0, TAU, 24,
+							ring_color, 3.0, true)
+					draw_arc(ring_center, TILE_SIZE * 0.38, 0.0, TAU, 24,
+							ring_color * Color(1, 1, 1, 0.4), 2.0, true)
+					continue
 				DungeonGenerator.TileType.ALTAR:
 					# Floor backdrop + DCSS per-god altar texture pulled from
 					# rltiles/dngn/altars (ported verbatim). `altar_tex`
@@ -351,6 +363,36 @@ func _draw_dcss() -> void:
 			else:
 				# Last-resort solid fill if the tile asset is missing.
 				draw_rect(rect, Color(0.4, 0.4, 0.4) * modulate, true)
+
+
+## Signature colour per branch entry — paints the ring drawn around a
+## BRANCH_ENTRANCE tile so the player reads it as a portal and not as a
+## regular stairs-down. Falls back to a neutral gold for unknown ids.
+func _branch_ring_color(branch_id: String) -> Color:
+	match branch_id:
+		"temple":    return Color(1.00, 0.95, 0.55)  # gold / ecumenical
+		"orc":       return Color(0.85, 0.55, 0.20)
+		"elf":       return Color(0.75, 0.90, 1.00)
+		"lair":      return Color(0.45, 0.85, 0.35)  # verdant
+		"swamp":     return Color(0.55, 0.80, 0.30)
+		"shoals":    return Color(0.25, 0.70, 1.00)
+		"snake":     return Color(0.35, 0.85, 0.55)
+		"spider":    return Color(0.85, 0.75, 0.20)
+		"slime":     return Color(0.55, 1.00, 0.30)
+		"vaults":    return Color(0.85, 0.85, 0.95)
+		"crypt":     return Color(0.60, 0.55, 0.80)
+		"tomb":      return Color(1.00, 0.85, 0.30)
+		"depths":    return Color(0.80, 0.70, 1.00)
+		"zot":       return Color(1.00, 0.40, 0.90)
+		"abyss":     return Color(0.70, 0.20, 0.95)
+		"pan":       return Color(0.95, 0.30, 0.95)
+		"sewer":     return Color(0.50, 0.80, 0.60)
+		"ossuary":   return Color(0.90, 0.85, 0.70)
+		"bailey":    return Color(0.85, 0.55, 0.35)
+		"volcano":   return Color(1.00, 0.45, 0.15)
+		"icecave":   return Color(0.70, 0.95, 1.00)
+		"vestibule": return Color(0.85, 0.25, 0.20)
+		_:           return Color(1.00, 0.85, 0.30)
 
 
 ## Classic roguelike console view — every tile gets a character glyph.
