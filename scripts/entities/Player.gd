@@ -2391,10 +2391,13 @@ func _apply_wand_hex(kind: String, target: Node, power: int, info: Dictionary) -
 				target.set_meta("_rooted_turns", turns2)
 			CombatLog.add("Roots entangle the %s! (%d turns)" % [tname, turns2])
 		"hex_charm":
-			# Simple fear proxy (we don't have friendly-monster support yet).
+			# DCSS wand of charming (item-use.cc: charming_wand_uses_enthral).
+			# Turns the target temporarily friendly — MonsterAI._nearest_hostile
+			# treats `_enthralled_turns > 0` as shifted loyalty and points
+			# the enthralled mob at its former peers.
 			if target.has_method("set_meta"):
-				target.set_meta("_flee_turns", 5)
-			CombatLog.add("The %s falters, confused." % tname)
+				target.set_meta("_enthralled_turns", 8)
+			CombatLog.add("The %s's mind bends to your will." % tname)
 		"hex_poly":
 			# DCSS polymorph: replace the monster with a different one of
 			# similar HD. Pool is every MonsterRegistry entry whose HD is

@@ -43,6 +43,15 @@ static func act(m: Monster) -> int:
 			if pt <= 1:
 				m.remove_meta("_paralysis_turns")
 			return 10
+	# Enthralled — tick down each turn. `_nearest_hostile` already uses
+	# the live value to flip target selection so the enthralled mob
+	# attacks its former peers until the counter expires.
+	if m.has_meta("_enthralled_turns"):
+		var et: int = int(m.get_meta("_enthralled_turns", 0)) - 1
+		if et <= 0:
+			m.remove_meta("_enthralled_turns")
+		else:
+			m.set_meta("_enthralled_turns", et)
 	# Rooted — same frame as paralysis for action economy, but the monster
 	# can still strike adjacent targets (rooted ≠ helpless).
 	var rooted: bool = false
