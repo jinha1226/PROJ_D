@@ -3959,6 +3959,12 @@ func _on_magic_pressed() -> void:
 
 
 func _on_skills_button_pressed() -> void:
+	# Simple mode hides the full skill tree — growth is through +N
+	# weapon / armour upgrades, not per-skill XP. Short-circuit the
+	# tap with a quick informative log so the button isn't a dead end.
+	if GameManager != null and GameManager.is_simple_mode():
+		CombatLog.add("Skills are disabled in Simple mode.")
+		return
 	if _skills_dlg != null and is_instance_valid(_skills_dlg):
 		_close_all_dialogs()
 		return

@@ -2834,6 +2834,16 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 			CombatLog.add("You go berserk! (%d turns)" % dur_b)
 			return true
 		"mutation":
+			# Simple mode strips the mutation system — the potion instead
+			# gives a small HP/MP buff so the item still does *something*
+			# when quaffed.
+			if GameManager != null and GameManager.is_simple_mode():
+				if stats != null:
+					stats.HP = mini(stats.hp_max, stats.HP + 20)
+					stats.MP = mini(stats.mp_max, stats.MP + 10)
+					stats_changed.emit()
+				CombatLog.add("You feel invigorated. (+HP, +MP)")
+				return true
 			# DCSS potion_mutation grants 2-4 random rolls, each a coin-flip
 			# between adding a good mutation or adding a bad one. Net effect
 			# is "you're probably a bit different now".
