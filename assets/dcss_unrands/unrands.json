@@ -125,6 +125,71 @@
     "dbrand": "Torment:   It occasionally torments all nearby living foes when it strikes in combat."
   },
   {
+    "id": "unrand_cerebov",
+    "kind": "weapon",
+    "base": "great_sword",
+    "name": "sword of Cerebov",
+    "obj": "OBJ_WEAPONS/WPN_GREAT_SWORD",
+    "plus": 6,
+    "brand_enum": "SPWPN_FLAMING",
+    "colour_enum": "ETC_FIRE",
+    "bool": [
+      "evil",
+      "nogen"
+    ],
+    "descrip": "",
+    "dbrand": "Hellfire:  It temporarily reduces the fire resistance of those it strikes."
+  },
+  {
+    "id": "unrand_dispater",
+    "kind": "armor",
+    "base": "orb",
+    "name": "orb of Dispater",
+    "obj": "OBJ_ARMOUR/ARM_ORB",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "LIGHTRED",
+    "bool": [
+      "corrode",
+      "evil",
+      "nogen"
+    ],
+    "descrip": "+Damnation: It grants the ability to hurl damnation at the cost of health and magic, with strength depending on Evocations skill.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_asmodeus",
+    "kind": "weapon",
+    "base": "morningstar",
+    "name": "sceptre of Asmodeus",
+    "obj": "OBJ_WEAPONS/WPN_EVENINGSTAR",
+    "plus": 13,
+    "brand_enum": "",
+    "colour_enum": "ETC_BLOOD",
+    "bool": [
+      "evil",
+      "nogen"
+    ],
+    "descrip": "Hellfire Court: It may summon demons of flame and damnation when striking foes.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_faerie_dragon_scales",
+    "kind": "armor",
+    "base": "leather_armour",
+    "name": "faerie dragon scales",
+    "obj": "OBJ_ARMOUR/ARM_ACID_DRAGON_ARMOUR",
+    "plus": 3,
+    "brand_enum": "",
+    "colour_enum": "ETC_JEWEL",
+    "bool": [
+      "no_upgrade",
+      "nogen"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
     "id": "unrand_brilliance",
     "kind": "weapon",
     "base": "morningstar",
@@ -999,6 +1064,21 @@
     "dbrand": "Shatter:   It releases a powerful concussive burst when it strikes, dealing extra damage to the target and all other creatures adjacent to them."
   },
   {
+    "id": "unrand_dragonskin_cloak",
+    "kind": "armor",
+    "base": "cloak",
+    "name": "dragonskin cloak",
+    "obj": "OBJ_ARMOUR/ARM_CLOAK",
+    "plus": 4,
+    "brand_enum": "",
+    "colour_enum": "ETC_HEAL",
+    "bool": [
+      "nogen"
+    ],
+    "descrip": "Avatar's Aegis: It grants the wearer a chance to resist fire, cold, poison, electricity, acid, and negative energy.",
+    "dbrand": ""
+  },
+  {
     "id": "unrand_ring_the_octopus_king",
     "kind": "ring",
     "base": "ring",
@@ -1010,6 +1090,22 @@
     "bool": [
       "no_upgrade",
       "unided"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_woe",
+    "kind": "weapon",
+    "base": "battleaxe",
+    "name": "Axe of Woe",
+    "obj": "OBJ_WEAPONS/WPN_EXECUTIONERS_AXE",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_BLOOD",
+    "bool": [
+      "no_upgrade",
+      "nogen"
     ],
     "descrip": "",
     "dbrand": ""
@@ -1210,6 +1306,22 @@
     ],
     "descrip": "",
     "dbrand": "Omnireflect: It can block and reflect piercing ranged attacks and magical attacks against the wielder's willpower."
+  },
+  {
+    "id": "unrand_invisibility",
+    "kind": "amulet",
+    "base": "amulet",
+    "name": "amulet of invisibility",
+    "obj": "OBJ_JEWELLERY/AMU_NOTHING",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "WHITE",
+    "bool": [
+      "inv",
+      "nogen"
+    ],
+    "descrip": "",
+    "dbrand": ""
   },
   {
     "id": "unrand_maxwells_thermic_engine",
@@ -1514,6 +1626,22 @@
     "dbrand": "Shock:     When it blocks an attack, it may electrocute the attacker. This works even against foes who are a short distance away."
   },
   {
+    "id": "unrand_dreamdust_necklace",
+    "kind": "amulet",
+    "base": "amulet",
+    "name": "dreamdust necklace",
+    "obj": "OBJ_JEWELLERY/AMU_ACROBAT",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "ETC_SILVER",
+    "bool": [
+      "nogen",
+      "special"
+    ],
+    "descrip": "",
+    "dbrand": ""
+  },
+  {
     "id": "unrand_mule",
     "kind": "weapon",
     "base": "crossbow",
@@ -1608,6 +1736,22 @@
       "fragile"
     ],
     "descrip": "Majesty:   You are bathed in light that prevents you from turning invisible. Whenever you enter a new floor, you announce yourself to nearby enemies and refuse to leave the floor again for some time. Ring++:   You can equip two additional rings.",
+    "dbrand": ""
+  },
+  {
+    "id": "unrand_armor_invisibility",
+    "kind": "armor",
+    "base": "scarf",
+    "name": "scarf of invisibility",
+    "obj": "OBJ_ARMOUR/ARM_SCARF",
+    "plus": 0,
+    "brand_enum": "",
+    "colour_enum": "WHITE",
+    "bool": [
+      "inv",
+      "nogen"
+    ],
+    "descrip": "",
     "dbrand": ""
   }
 ]

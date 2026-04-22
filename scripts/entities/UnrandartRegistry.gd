@@ -21,7 +21,6 @@ extends Object
 ## trivial.
 
 const _UNRANDS: Dictionary = {
-	# ---------------- GENERATED FROM art-data.txt ----------------
 	"unrand_singing_sword": {
 		"kind": "weapon",
 		"base": "great_sword",
@@ -112,6 +111,45 @@ const _UNRANDS: Dictionary = {
 		"color": Color(1.00, 0.85, 0.30),
 		"min_depth": 16,
 		"desc": "Torment: It occasionally torments all nearby living foes when it strikes in combat.",
+	},
+	"unrand_cerebov": {
+		"kind": "weapon",
+		"base": "great_sword",
+		"name": "the sword of Cerebov",
+		"dmg": 17, "skill": "long_blade", "delay": 1.7,
+		"plus": 6, "brand": "flaming",
+		"color": Color(1.00, 0.45, 0.20),
+		"min_depth": 18,
+		"desc": "Hellfire: It temporarily reduces the fire resistance of those it strikes.",
+	},
+	"unrand_dispater": {
+		"kind": "armor",
+		"base": "orb",
+		"name": "the orb of Dispater",
+		"slot": "offhand",
+		"ac": 5, "plus": 0,
+		"color": Color(1.00, 0.50, 0.45),
+		"min_depth": 18,
+		"desc": "+Damnation: It grants the ability to hurl damnation at the cost of health and magic, with strength depending on Evocations skill.",
+	},
+	"unrand_asmodeus": {
+		"kind": "weapon",
+		"base": "morningstar",
+		"name": "the sceptre of Asmodeus",
+		"dmg": 13, "skill": "mace", "delay": 1.5,
+		"plus": 13,
+		"color": Color(0.75, 0.12, 0.15),
+		"min_depth": 18,
+		"desc": "Hellfire Court: It may summon demons of flame and damnation when striking foes.",
+	},
+	"unrand_faerie_dragon_scales": {
+		"kind": "armor",
+		"base": "leather_armour",
+		"name": "the faerie dragon scales",
+		"slot": "chest",
+		"ac": 3, "plus": 3,
+		"color": Color(0.95, 0.55, 0.75),
+		"min_depth": 18,
 	},
 	"unrand_brilliance": {
 		"kind": "weapon",
@@ -681,12 +719,30 @@ const _UNRANDS: Dictionary = {
 		"min_depth": 4,
 		"desc": "Shatter: It releases a powerful concussive burst when it strikes, dealing extra damage to the target and all other creatures adjacent to them.",
 	},
+	"unrand_dragonskin_cloak": {
+		"kind": "armor",
+		"base": "cloak",
+		"name": "the dragonskin cloak",
+		"slot": "cloak",
+		"ac": 1, "plus": 4,
+		"color": Color(0.55, 1.00, 0.75),
+		"min_depth": 18,
+		"desc": "Avatar's Aegis: It grants the wearer a chance to resist fire, cold, poison, electricity, acid, and negative energy.",
+	},
 	"unrand_ring_the_octopus_king": {
 		"kind": "ring",
 		"name": "the ring of the Octopus King",
 		"props": {"ac": 2, "ev": 2, "hp_max": 2, "sh": 2},
 		"color": Color(0.25, 0.55, 0.90),
 		"min_depth": 5,
+	},
+	"unrand_woe": {
+		"kind": "weapon",
+		"base": "battleaxe",
+		"name": "the Axe of Woe",
+		"dmg": 15, "skill": "axe", "delay": 1.7,
+		"color": Color(0.75, 0.12, 0.15),
+		"min_depth": 18,
 	},
 	"unrand_moon_troll_leather_armour": {
 		"kind": "armor",
@@ -825,6 +881,14 @@ const _UNRANDS: Dictionary = {
 		"color": Color(0.90, 0.90, 0.95),
 		"min_depth": 5,
 		"desc": "Omnireflect: It can block and reflect piercing ranged attacks and magical attacks against the wielder's willpower.",
+	},
+	"unrand_invisibility": {
+		"kind": "amulet",
+		"name": "the amulet of invisibility",
+		"props": {},
+		"color": Color(1.00, 1.00, 1.00),
+		"min_depth": 18,
+		"base": "amulet_nothing",
 	},
 	"unrand_maxwells_thermic_engine": {
 		"kind": "weapon",
@@ -1031,6 +1095,14 @@ const _UNRANDS: Dictionary = {
 		"min_depth": 13,
 		"desc": "Shock: When it blocks an attack, it may electrocute the attacker. This works even against foes who are a short distance away.",
 	},
+	"unrand_dreamdust_necklace": {
+		"kind": "amulet",
+		"name": "the dreamdust necklace",
+		"props": {},
+		"color": Color(0.90, 0.90, 0.95),
+		"min_depth": 18,
+		"base": "amulet_acrobat",
+	},
 	"unrand_mule": {
 		"kind": "weapon",
 		"base": "crossbow",
@@ -1101,6 +1173,16 @@ const _UNRANDS: Dictionary = {
 		"min_depth": 4,
 		"desc": "Majesty: You are bathed in light that prevents you from turning invisible. Whenever you enter a new floor, you announce yourself to nearby enemies and refuse to leave the floor again for some time. Ring++: You can equip two additional rings.",
 	},
+	"unrand_armor_invisibility": {
+		"kind": "armor",
+		"base": "scarf",
+		"name": "the scarf of invisibility",
+		"slot": "cloak",
+		"ac": 0, "plus": 0,
+		"color": Color(1.00, 1.00, 1.00),
+		"min_depth": 18,
+	},
+
 }
 
 

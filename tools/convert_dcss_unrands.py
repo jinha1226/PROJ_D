@@ -318,14 +318,19 @@ LEGEND_DEPTH = {
 }
 
 
-def _min_depth_for(base_id: str, name: str, kind: str) -> int:
+def _min_depth_for(base_id: str, name: str, kind: str, bool_flags: set = None) -> int:
     """Derive a min_depth guess from base tier + name overrides.
 
     Rule:
-      1. If the (lowercased) name is in LEGEND_DEPTH, use that.
-      2. Else: look up base_id in WEAPON_DEPTH or ARMOUR_DEPTH.
-      3. Else: default 6 for weapons/armour, 5 for jewellery.
+      1. If the entry is `nogen` (boss drop in DCSS), clamp to 18 so
+         Cerebov / Asmodeus / Dispater style artefacts only appear on
+         the deepest trunk floors in our generic pool.
+      2. If the (lowercased) name is in LEGEND_DEPTH, use that.
+      3. Else: look up base_id in WEAPON_DEPTH or ARMOUR_DEPTH.
+      4. Else: default 6 for weapons/armour, 5 for jewellery.
     """
+    if bool_flags is not None and "nogen" in bool_flags:
+        return 18
     lname = name.lower()
     if lname in LEGEND_DEPTH:
         return LEGEND_DEPTH[lname]
@@ -572,7 +577,7 @@ def _emit_weapon(uid: str, ent: Entry, base_id: str) -> str:
     dmg, skill, delay = WPN_STATS.get(base_id, (8, "short_blade", 1.3))
     desc = _combine_desc(ent)
     colour = ent.fields.get("COLOUR", "WHITE")
-    depth = _min_depth_for(base_id, name, "weapon")
+    depth = _min_depth_for(base_id, name, "weapon", ent.bool_flags)
 
     lines: list[str] = []
     lines.append(f'\t{_quote(uid)}: {{')
@@ -607,7 +612,7 @@ def _emit_armor(uid: str, ent: Entry, base_id: str) -> str:
     ego = EGO_MAP.get(brand_enum, "")
     desc = _combine_desc(ent)
     colour = ent.fields.get("COLOUR", "WHITE")
-    depth = _min_depth_for(base_id, name, "armor")
+    depth = _min_depth_for(base_id, name, "armor", ent.bool_flags)
 
     # AC value: we report the PLUS (armour enchant) as `plus`; give a
     # rough ac baseline from the base-tier table for tooltips.
@@ -643,7 +648,7 @@ def _emit_jewel(uid: str, ent: Entry, kind: str) -> str:
     colour = ent.fields.get("COLOUR", "WHITE")
     props = _extract_props(ent)
     desc = _combine_desc(ent)
-    depth = _min_depth_for("", name, kind)
+    depth = _min_depth_for("", name, kind, ent.bool_flags)
     # Include the OBJ-base for amulets when a sensible base id exists,
     # so equip code can fall back to the generic amulet row.
     enum, _ = _obj_base(ent.fields["OBJ"])
@@ -705,12 +710,15 @@ def main() -> int:
         if name.startswith("DUMMY UNRANDART"):
             skipped.append(f"{name}: sentinel")
             continue
-        if "nogen" in ent.bool_flags:
-            skipped.append(f"{name}: nogen")
-            continue
         if "deleted" in ent.bool_flags:
             skipped.append(f"{name}: deleted")
             continue
+        # nogen items in DCSS are boss drops / unique spawns. Our port
+        # doesn't model every DCSS boss drop table yet, so we let them
+        # enter the generic late-game pool by forcing a high min_depth
+        # — Cerebov/Asmodeus/Dispater only show up on Zot floors, etc.
+        # The block still emits because they're real unrands with real
+        # stats worth preserving.
         obj = ent.fields.get("OBJ", "")
         kind = _kind_from_obj(obj)
         if not kind:
