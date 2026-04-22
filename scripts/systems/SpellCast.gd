@@ -68,6 +68,19 @@ static func cast(player: Node, spell_id: String, target, ctx: Dictionary) -> Dic
 	if player.has_meta("_acrobat_active"):
 		player.remove_meta("_acrobat_active")
 	var cost: int = int(info.get("mp", 1))
+	# DCSS Vehumet passive (god-abil.cc vehumet_supports_spell +
+	# pay_mp): destructive spells cost 1 MP less at piety ≥ 50 and 2
+	# less at piety ≥ 120. Schools Vehumet smiles upon: conjurations,
+	# fire, cold, earth, air, poison, necromancy (the destructive set).
+	if "current_god" in player and String(player.current_god) == "vehumet" \
+			and "piety" in player:
+		if _vehumet_supports_spell(spell_id):
+			var discount: int = 0
+			if int(player.piety) >= 120:
+				discount = 2
+			elif int(player.piety) >= 50:
+				discount = 1
+			cost = maxi(1, cost - discount)
 	if player.stats.MP < cost:
 		return _abort("Not enough MP (%d/%d)" % [player.stats.MP, cost])
 
@@ -169,6 +182,22 @@ static func refund(player: Node, mp_cost: int) -> void:
 static func _pay_mp(player: Node, cost: int) -> void:
 	player.stats.MP = maxi(0, player.stats.MP - cost)
 	player.stats_changed.emit()
+
+
+## DCSS Vehumet supports any spell whose school list intersects its
+## favoured set (conjurations, the four elements, poison, necromancy).
+## Hex / charm / summon / translocation / alchemy spells don't qualify.
+const _VEHUMET_SCHOOLS: Array = [
+	"conjurations", "fire", "cold", "earth", "air", "poison", "necromancy",
+]
+
+
+static func _vehumet_supports_spell(spell_id: String) -> bool:
+	var schools: Array = SpellRegistry.get_schools(spell_id)
+	for s in schools:
+		if _VEHUMET_SCHOOLS.has(String(s)):
+			return true
+	return false
 
 
 static func _abort(msg: String) -> Dictionary:

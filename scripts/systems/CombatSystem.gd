@@ -374,6 +374,15 @@ static func melee_attack(attacker, defender, skill_sys = null) -> int:
 				brand_dmg = 1 + (randi() % int(pick["d"]))
 				brand_element = String(pick["e"])
 		dmg += brand_dmg
+	# DCSS The Shining One passive (god-abil.cc the_shining_one_blood):
+	# +1/3 damage vs evil / demonic / undead foes when the attacker is
+	# a TSO worshipper. Mirrors the "holy fury" trope — mirror of the
+	# holy_wrath brand but applied to the whole swing, not just brand dmg.
+	if "current_god" in attacker and String(attacker.current_god) == "the_shining_one" \
+			and _is_undead_or_demon(defender):
+		dmg = int(round(float(dmg) * 1.333))
+		if brand_element == "":
+			brand_element = "holy"
 	if defender.has_method("take_damage"):
 		if brand_element != "":
 			defender.take_damage(dmg, brand_element)

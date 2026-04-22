@@ -1697,6 +1697,26 @@ func _recompute_gear_stats() -> void:
 				stats.WL += 40
 	else:
 		stats.WL = 270  # formicid immune
+	# DCSS Cheibriados passive (god-abil.cc chei_stat_boost): in return
+	# for moving slowly, the god of time grants scaling STR / INT / DEX
+	# / AC. Piety 30+ unlocks +2, 75+ unlocks +4, 120+ unlocks +6, 160+
+	# unlocks +8. No cap on direction — the heavier the armour, the
+	# more the god approves.
+	if current_god == "cheibriados" and piety > 0:
+		var chei_bonus: int = 0
+		if piety >= 160:
+			chei_bonus = 8
+		elif piety >= 120:
+			chei_bonus = 6
+		elif piety >= 75:
+			chei_bonus = 4
+		elif piety >= 30:
+			chei_bonus = 2
+		if chei_bonus > 0:
+			stats.STR += chei_bonus
+			stats.DEX += chei_bonus
+			stats.INT += chei_bonus
+			stats.AC += chei_bonus
 	stats_changed.emit()
 
 
@@ -3491,6 +3511,24 @@ func take_damage(amount: int, element: String = "") -> void:
 		var mp_drain: int = mini(mp_share, stats.MP)
 		stats.MP -= mp_drain
 		amount -= mp_drain
+	# DCSS Qazlal passive (god-abil.cc qazlal_cloud_immunity + elemental
+	# adaptation): taking a hit ≥ 5 dmg spawns an elemental cloud on every
+	# adjacent tile of attackers. Piety-scaled chance so early worshippers
+	# get the flavour without spamming clouds.
+	if current_god == "qazlal" and amount >= 5 and GameManager != null:
+		var q_piety: float = clampf(float(piety) / 200.0, 0.15, 1.0)
+		if randf() < 0.5 * q_piety:
+			var cloud_type: String = String(
+					["fire", "freezing", "mephitic"][randi() % 3])
+			for dy in [-1, 0, 1]:
+				for dx in [-1, 0, 1]:
+					if dx == 0 and dy == 0:
+						continue
+					var cp: Vector2i = grid_pos + Vector2i(dx, dy)
+					if _monster_at(cp) != null:
+						CloudSystem.place_patch(GameManager.clouds, cp,
+								cloud_type, 0)
+			CombatLog.add("Qazlal's fury lashes out — a %s cloud bursts around you!" % cloud_type)
 	stats.HP -= amount
 	damaged.emit(amount)
 	if stats.HP <= 0:

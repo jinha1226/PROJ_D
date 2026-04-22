@@ -1760,6 +1760,25 @@ func _on_monster_died(monster: Monster) -> void:
 				player.piety = max(0, player.piety + gain)
 				CombatLog.add("%s frowns at you." % \
 						String(god.get("title", player.current_god)))
+	# DCSS Makhleb passive (god-abil.cc makhleb_kill_bonus): every kill
+	# carries a piety-scaled chance to restore HP/MP proportional to the
+	# victim's HD. Anchors Makhleb's "aggressive sustain" fantasy — one
+	# kill can keep the conjurer fighting.
+	if player != null and player.current_god == "makhleb" \
+			and monster != null and monster.data != null \
+			and player.stats != null and player.is_alive:
+		var hd_m: int = int(monster.data.hd)
+		var piety_factor: float = clampf(float(player.piety) / 200.0, 0.2, 1.0)
+		if randf() < 0.5 * piety_factor:
+			var hp_restore: int = int(hd_m * 2 * piety_factor) + 1
+			player.stats.HP = min(player.stats.hp_max, player.stats.HP + hp_restore)
+			player.stats_changed.emit()
+			CombatLog.add("Makhleb restores you. (+%d HP)" % hp_restore)
+		if randf() < 0.3 * piety_factor:
+			var mp_restore: int = int(hd_m * piety_factor) + 1
+			player.stats.MP = min(player.stats.mp_max, player.stats.MP + mp_restore)
+			player.stats_changed.emit()
+			CombatLog.add("Makhleb restores your mana. (+%d MP)" % mp_restore)
 	if player != null and player.trait_res != null and player.trait_res.special == "holy_light":
 		if player.stats != null and player.is_alive:
 			var heal: int = max(1, int(player.stats.hp_max * 0.2))
