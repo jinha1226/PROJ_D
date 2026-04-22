@@ -16,6 +16,7 @@ var _pulsing: bool = false
 var _depth: int = 1
 var _level: int = 1
 var _gold: int = 0
+var _branch_label: String = "Dungeon"
 
 
 func _ready() -> void:
@@ -59,6 +60,22 @@ func set_depth(d: int) -> void:
 	_update_xp_label()
 
 
+## Set the short branch label alongside depth so the header reads
+## "Lv.N  Temple:1  X$" instead of a bare "BNF". Caller passes
+## BranchRegistry.short_name(...) for the current branch id.
+func set_branch(label: String) -> void:
+	if label == "":
+		label = "Dungeon"
+	_branch_label = label
+	_update_xp_label()
+
+
+func set_location(branch_label: String, d: int) -> void:
+	_branch_label = branch_label if branch_label != "" else "Dungeon"
+	_depth = d
+	_update_xp_label()
+
+
 func set_gold(g: int) -> void:
 	_gold = g
 	_update_xp_label()
@@ -66,7 +83,7 @@ func set_gold(g: int) -> void:
 
 func _update_xp_label() -> void:
 	if xp_label:
-		xp_label.text = "Lv.%d   B%dF   %d$" % [_level, _depth, _gold]
+		xp_label.text = "Lv.%d  %s:%d  %d$" % [_level, _branch_label, _depth, _gold]
 
 
 ## GameBootstrap feeds the rebuilt minimap ImageTexture in here whenever

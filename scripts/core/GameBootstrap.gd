@@ -220,7 +220,10 @@ func _ready() -> void:
 	# TopHUD keeps HP/MP/XP bars + minimap preview; all other buttons moved
 	# to BottomHUD. Wire depth, XP updates, minimap preview + click.
 	_top_hud_ref = top_hud
-	if top_hud != null and top_hud.has_method("set_depth"):
+	if top_hud != null and top_hud.has_method("set_location"):
+		top_hud.set_location(BranchRegistry.short_name(GameManager.current_branch),
+				GameManager.current_depth)
+	elif top_hud != null and top_hud.has_method("set_depth"):
 		top_hud.set_depth(GameManager.current_depth)
 	if top_hud != null and top_hud.has_method("set_xp"):
 		top_hud.set_xp(player.xp, player.xp_for_next_level(), player.level)
@@ -2999,7 +3002,10 @@ func _regenerate_dungeon(going_up: bool, secondary: bool = false) -> void:
 	cam.position = player.position
 	if touch_input:
 		touch_input.generator = generator
-	if _top_hud_ref != null and _top_hud_ref.has_method("set_depth"):
+	if _top_hud_ref != null and _top_hud_ref.has_method("set_location"):
+		_top_hud_ref.set_location(BranchRegistry.short_name(GameManager.current_branch),
+				GameManager.current_depth)
+	elif _top_hud_ref != null and _top_hud_ref.has_method("set_depth"):
 		_top_hud_ref.set_depth(GameManager.current_depth)
 	await get_tree().process_frame
 	if _floor_state.has(GameManager.floor_key()):
@@ -6660,6 +6666,101 @@ func _on_minimap_pressed() -> void:
 		desc.add_theme_font_size_override("font_size", 36)
 		legend.add_child(desc)
 	vb.add_child(legend)
+
+	# ---- Visited-floor fast travel ------------------------------------
+	# DCSS Shift+G (go to level) analog. Lists every floor already saved
+	# in _floor_state, tap one to jump. Current floor is shown but not
+	# clickable. Portal vaults are skipped — their state persists even
+	# after the timer collapses them, but the portal itself is gone.
+	vb.add_child(UICards.section_header("Travel"))
+	var visited: Array = _collect_visited_floors()
+	if visited.is_empty():
+		vb.add_child(UICards.dim_hint("No floors visited yet."))
+	else:
+		for entry in visited:
+			var fbid: String = String(entry.get("branch", "dungeon"))
+			var fdep: int = int(entry.get("depth", 1))
+			var is_current: bool = (fbid == GameManager.current_branch \
+					and fdep == GameManager.current_depth)
+			var row := Button.new()
+			var short: String = BranchRegistry.short_name(fbid)
+			var line: String = "%s : %d" % [short, fdep]
+			if is_current:
+				line += "   (here)"
+			row.text = line
+			row.custom_minimum_size = Vector2(0, 96)
+			row.add_theme_font_size_override("font_size", 40)
+			if is_current:
+				row.disabled = true
+				row.modulate = Color(0.7, 0.7, 0.7)
+			else:
+				row.pressed.connect(_on_fast_travel_pressed.bind(fbid, fdep, dlg))
+			vb.add_child(row)
+
+
+## Sorted list of visited floors for the Travel section. Each entry:
+## {branch, depth}. Sort is by branch id (dungeon first), then depth.
+func _collect_visited_floors() -> Array:
+	var out: Array = []
+	for key in _floor_state.keys():
+		var parts: PackedStringArray = String(key).split(":")
+		if parts.size() != 2:
+			continue
+		var bid: String = parts[0]
+		if BranchRegistry.is_portal(bid):
+			continue  # collapsed timed branches — not a valid travel target
+		out.append({"branch": bid, "depth": int(parts[1])})
+	# Include the current floor even if it hasn't been save-snapshotted
+	# yet (first visit, not yet descended from). Handy as a "you are
+	# here" anchor.
+	var here: Dictionary = {
+		"branch": GameManager.current_branch,
+		"depth": GameManager.current_depth,
+	}
+	var has_current: bool = false
+	for e in out:
+		if e.get("branch") == here.branch and e.get("depth") == here.depth:
+			has_current = true
+			break
+	if not has_current:
+		out.append(here)
+	out.sort_custom(_visited_floor_sort)
+	return out
+
+
+## Comparator for _collect_visited_floors. Dungeon trunk on top, then
+## other branches alphabetically, then ascending by depth inside each.
+func _visited_floor_sort(a: Dictionary, b: Dictionary) -> bool:
+	var ba: String = String(a.get("branch", ""))
+	var bb: String = String(b.get("branch", ""))
+	var rank_a: int = 0 if ba == "dungeon" else 1
+	var rank_b: int = 0 if bb == "dungeon" else 1
+	if rank_a != rank_b:
+		return rank_a < rank_b
+	if ba != bb:
+		return ba < bb
+	return int(a.get("depth", 0)) < int(b.get("depth", 0))
+
+
+func _on_fast_travel_pressed(target_branch: String, target_depth: int,
+		dlg: GameDialog) -> void:
+	if player == null or run_over:
+		return
+	dlg.close()
+	_save_current_floor()
+	# Fast travel bypasses the physical stairs path, so we overwrite
+	# current location outright. The branch_return_stack is left alone:
+	# if the target is a branch the player physically entered, the stack
+	# they built up remains valid. If they fast-travel into a branch
+	# they never entered before (shouldn't be possible — target has to
+	# be in _floor_state), it still falls through cleanly because
+	# leave_branch just fails on an empty stack.
+	GameManager.current_branch = target_branch
+	GameManager.current_depth = target_depth
+	GameManager.portal_turns_left = 0  # non-portal targets only reach this line
+	_regenerate_dungeon(false, false)
+	CombatLog.add("You travel to %s:%d." % [BranchRegistry.short_name(target_branch),
+			target_depth])
 
 
 ## Tapping on the minimap converts local pixel → grid tile and kicks off
