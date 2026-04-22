@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bgameroot0001"]
+
+[ext_resource type="Script" path="res://scripts/main/Game.gd" id="1_game"]
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_game")

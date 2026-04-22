@@ -1,0 +1,92 @@
+[gd_scene format=3 uid="uid://btophudroot1"]
+
+[ext_resource type="Script" path="res://scripts/ui/TopHUD.gd" id="1_tophud"]
+
+[sub_resource type="StyleBoxFlat" id="SB_HP"]
+bg_color = Color(0.752941, 0.188235, 0.188235, 1)
+
+[sub_resource type="StyleBoxFlat" id="SB_MP"]
+bg_color = Color(0.188235, 0.376471, 0.752941, 1)
+
+[sub_resource type="StyleBoxFlat" id="SB_XP"]
+bg_color = Color(0.870588, 0.690196, 0.133333, 1)
+
+[node name="TopHUD" type="Control"]
+anchor_right = 1.0
+offset_bottom = 250.0
+script = ExtResource("1_tophud")
+
+[node name="BG" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.08, 0.08, 0.1, 0.90)
+
+[node name="Margin" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="HBox" type="HBoxContainer" parent="Margin"]
+theme_override_constants/separation = 12
+
+[node name="MinimapButton" type="Button" parent="Margin/HBox"]
+custom_minimum_size = Vector2(220, 220)
+expand_icon = true
+
+[node name="Bars" type="VBoxContainer" parent="Margin/HBox"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="HPRow" type="HBoxContainer" parent="Margin/HBox/Bars"]
+theme_override_constants/separation = 8
+
+[node name="HPLabel" type="Label" parent="Margin/HBox/Bars/HPRow"]
+custom_minimum_size = Vector2(300, 70)
+text = "HP 0/0"
+theme_override_font_sizes/font_size = 36
+vertical_alignment = 1
+
+[node name="HPBar" type="ProgressBar" parent="Margin/HBox/Bars/HPRow"]
+custom_minimum_size = Vector2(0, 70)
+size_flags_horizontal = 3
+max_value = 100.0
+value = 100.0
+show_percentage = false
+theme_override_styles/fill = SubResource("SB_HP")
+
+[node name="MPRow" type="HBoxContainer" parent="Margin/HBox/Bars"]
+theme_override_constants/separation = 8
+
+[node name="MPLabel" type="Label" parent="Margin/HBox/Bars/MPRow"]
+custom_minimum_size = Vector2(300, 70)
+text = "MP 0/0"
+theme_override_font_sizes/font_size = 36
+vertical_alignment = 1
+
+[node name="MPBar" type="ProgressBar" parent="Margin/HBox/Bars/MPRow"]
+custom_minimum_size = Vector2(0, 70)
+size_flags_horizontal = 3
+max_value = 100.0
+value = 100.0
+show_percentage = false
+theme_override_styles/fill = SubResource("SB_MP")
+
+[node name="XPRow" type="HBoxContainer" parent="Margin/HBox/Bars"]
+theme_override_constants/separation = 8
+
+[node name="XPLabel" type="Label" parent="Margin/HBox/Bars/XPRow"]
+custom_minimum_size = Vector2(300, 70)
+text = "Lv.1  B1F"
+theme_override_font_sizes/font_size = 36
+vertical_alignment = 1
+
+[node name="XPBar" type="ProgressBar" parent="Margin/HBox/Bars/XPRow"]
+custom_minimum_size = Vector2(0, 70)
+size_flags_horizontal = 3
+max_value = 100.0
+value = 0.0
+show_percentage = false
+theme_override_styles/fill = SubResource("SB_XP")

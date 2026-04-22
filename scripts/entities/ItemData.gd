@@ -1,0 +1,28 @@
+class_name ItemData extends Resource
+
+@export var id: String = ""
+@export var display_name: String = ""
+@export var kind: String = ""
+@export var tier: int = 1
+@export var tile_path: String = ""
+@export var glyph: String = "?"
+@export var glyph_color: Color = Color.WHITE
+
+@export_group("Weapon")
+@export var damage: int = 0
+@export var delay: float = 1.0
+@export var category: String = ""
+@export var brand: String = ""
+
+@export_group("Armor")
+@export var ac_bonus: int = 0
+@export var ev_penalty: int = 0
+@export var slot: String = ""
+
+@export_group("Consumable")
+@export var effect: String = ""
+@export var effect_value: int = 0
+
+@export_group("Misc")
+@export var plus: int = 0
+@export var description: String = ""

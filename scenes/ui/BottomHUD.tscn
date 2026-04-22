@@ -1,0 +1,123 @@
+[gd_scene format=3 uid="uid://bbothudroot01"]
+
+[ext_resource type="Script" path="res://scripts/ui/BottomHUD.gd" id="1_bh"]
+[ext_resource type="PackedScene" uid="uid://bquickslot01" path="res://scenes/ui/QuickSlot.tscn" id="2_qs"]
+
+[node name="BottomHUD" type="Control"]
+position = Vector2(0, 2040)
+size = Vector2(1080, 300)
+script = ExtResource("1_bh")
+
+[node name="BG" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.08, 0.08, 0.1, 0.90)
+
+[node name="Margin" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="Row1" type="HBoxContainer" parent="Margin/VBox"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="QuickSlot0" type="Button" parent="Margin/VBox/Row1" instance=ExtResource("2_qs")]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="QuickSlot1" type="Button" parent="Margin/VBox/Row1" instance=ExtResource("2_qs")]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="QuickSlot2" type="Button" parent="Margin/VBox/Row1" instance=ExtResource("2_qs")]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="QuickSlot3" type="Button" parent="Margin/VBox/Row1" instance=ExtResource("2_qs")]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="QuickSlot4" type="Button" parent="Margin/VBox/Row1" instance=ExtResource("2_qs")]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="QuickSlot5" type="Button" parent="Margin/VBox/Row1" instance=ExtResource("2_qs")]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="QuickSlot6" type="Button" parent="Margin/VBox/Row1" instance=ExtResource("2_qs")]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="QuickSlot7" type="Button" parent="Margin/VBox/Row1" instance=ExtResource("2_qs")]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="RestButton" type="Button" parent="Margin/VBox/Row1"]
+custom_minimum_size = Vector2(180, 0)
+size_flags_vertical = 3
+text = "REST"
+theme_override_font_sizes/font_size = 43
+
+[node name="Row2" type="HBoxContainer" parent="Margin/VBox"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="BagButton" type="Button" parent="Margin/VBox/Row2"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "BAG"
+theme_override_font_sizes/font_size = 49
+
+[node name="SkillsButton" type="Button" parent="Margin/VBox/Row2"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "SKILLS"
+theme_override_font_sizes/font_size = 49
+
+[node name="MagicButton" type="Button" parent="Margin/VBox/Row2"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "MAGIC"
+theme_override_font_sizes/font_size = 49
+
+[node name="StatusButton" type="Button" parent="Margin/VBox/Row2"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "STATUS"
+theme_override_font_sizes/font_size = 49
+
+[node name="WaitButton" type="Button" parent="Margin/VBox/Row2"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "WAIT"
+theme_override_font_sizes/font_size = 49
+
+[node name="AutoMoveButton" type="Button" parent="Margin/VBox/Row2"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "AUTO"
+theme_override_font_sizes/font_size = 49
+
+[node name="AutoAttackButton" type="Button" parent="Margin/VBox/Row2"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "ATCK"
+theme_override_font_sizes/font_size = 49
+
+[node name="MenuButton" type="Button" parent="Margin/VBox/Row2"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "MENU"
+theme_override_font_sizes/font_size = 49

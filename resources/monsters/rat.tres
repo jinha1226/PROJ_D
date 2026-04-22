@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://brat000000001"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "rat"
+display_name = "rat"
+tier = 1
+hp = 6
+hd = 1
+ac = 0
+ev = 7
+speed = 10
+sight_range = 6
+attacks = [{"damage": 3, "flavour": "bite"}]
+resists = []
+min_depth = 1
+max_depth = 3
+weight = 30
+xp_value = 1
+is_boss = false
+tile_path = ""
+glyph = "r"
+glyph_color = Color(0.75, 0.65, 0.55, 1)
