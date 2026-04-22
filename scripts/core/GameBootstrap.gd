@@ -4146,20 +4146,31 @@ func _on_target_selected(pos: Vector2i) -> void:
 		if is_instance_valid(m) and m is Monster and m.is_alive and m.grid_pos == pos:
 			target_monster = m
 			break
+	var info_for_range: Dictionary = SpellRegistry.get_spell(_targeting_spell)
+	var max_range: int = int(info_for_range.get("range", 99))
+	var d: int = max(abs(pos.x - player.grid_pos.x), abs(pos.y - player.grid_pos.y))
+	var targeting_kind: String = String(info_for_range.get("targeting", "single"))
+	# Area spells accept an empty tile as the blast center — useful for
+	# cloud-residue testing and DCSS-style "blow up a corridor" plays.
+	# Single-target zaps still need a creature under the tap.
 	if target_monster == null:
-		CombatLog.add("Targeting cancelled.")
+		if targeting_kind != "area":
+			CombatLog.add("Targeting cancelled.")
+			_targeting_spell = ""
+			return
+		if d > max_range:
+			CombatLog.add("Target is out of range (%d > %d)." % [d, max_range])
+			_targeting_spell = ""
+			return
+		var spell_id_area: String = _targeting_spell
 		_targeting_spell = ""
+		_execute_targeted_cast(spell_id_area, pos)
 		return
-	# Refuse if target isn't visible — wall-blocked (no LOS) or outside
-	# FOV. Refund nothing; the spell didn't actually fire.
+	# Monster target — require LOS so wall-blocked taps don't eat MP.
 	if dmap != null and not dmap.is_tile_visible(target_monster.grid_pos):
 		CombatLog.add("Your line of sight is blocked.")
 		_targeting_spell = ""
 		return
-	# Range check: spell's max range from the registry.
-	var info_for_range: Dictionary = SpellRegistry.get_spell(_targeting_spell)
-	var max_range: int = int(info_for_range.get("range", 99))
-	var d: int = max(abs(pos.x - player.grid_pos.x), abs(pos.y - player.grid_pos.y))
 	if d > max_range:
 		CombatLog.add("Target is out of range (%d > %d)." % [d, max_range])
 		_targeting_spell = ""
@@ -4229,8 +4240,22 @@ func _show_targeting_hint() -> void:
 	CombatLog.add("Target a tile to cast %s. Tap empty space to cancel." % String(info.get("name", _targeting_spell)))
 
 
-func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
+func _execute_targeted_cast(spell_id: String, target) -> void:
 	if player == null:
+		return
+	# `target` accepts either a Monster (single + area) or a Vector2i
+	# (area-at-empty-tile path from _on_target_selected). Resolve both
+	# to a grid_pos / world_pos pair so the damage loop works the same.
+	var target_grid: Vector2i
+	var target_world: Vector2
+	if target is Vector2i:
+		target_grid = target
+		target_world = Vector2(target_grid.x * TILE_SIZE + TILE_SIZE / 2.0,
+				target_grid.y * TILE_SIZE + TILE_SIZE / 2.0)
+	elif target != null and "grid_pos" in target:
+		target_grid = target.grid_pos
+		target_world = target.position
+	else:
 		return
 	# Route every cast through SpellCast (DCSS spl-cast.cc port): it owns
 	# silence/confusion/MP validation, pays MP up front, rolls failure,
@@ -4267,7 +4292,7 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 		for m in get_tree().get_nodes_in_group("monsters"):
 			if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
 				continue
-			var dist: int = max(abs(m.grid_pos.x - target.grid_pos.x), abs(m.grid_pos.y - target.grid_pos.y))
+			var dist: int = max(abs(m.grid_pos.x - target_grid.x), abs(m.grid_pos.y - target_grid.y))
 			if dist > radius:
 				continue
 			var dmg: int = _spell_roll_dmg(spell_id, info, power)
@@ -4277,8 +4302,18 @@ func _execute_targeted_cast(spell_id: String, target: Monster) -> void:
 			m.take_damage(dmg, SpellRegistry.element_for(spell_id))
 			total_dmg += dmg
 			hits += 1
-		SpellFX.cast_area(fx_layer, player.position, target.position, hit_positions, spell_color, float(radius) * float(TILE_SIZE) + float(TILE_SIZE) / 2.0, school)
+		SpellFX.cast_area(fx_layer, player.position, target_world, hit_positions, spell_color, float(radius) * float(TILE_SIZE) + float(TILE_SIZE) / 2.0, school)
 		CombatLog.add("%s: %d hit(s), %d total dmg" % [String(info.get("name", spell_id)), hits, total_dmg])
+		# Cloud residue (fireball/fire_storm/hailstorm) — same hook
+		# that _cast_area_spell uses, so tapped-tile casts leave the
+		# expected clouds behind.
+		var cloud_residue: String = _spell_cloud_residue(spell_id)
+		if cloud_residue != "" and GameManager != null:
+			var dmap_c: DungeonMap = $DungeonLayer/DungeonMap
+			CloudSystem.place_patch(GameManager.clouds, target_grid, cloud_residue, radius)
+			if dmap_c != null:
+				dmap_c.update_fov(player.grid_pos)
+				dmap_c.queue_redraw()
 	else:
 		var effect_type: String = String(info.get("effect", "damage"))
 		if effect_type == "slow":

@@ -2999,6 +2999,12 @@ func xp_for_next_level() -> int:
 	#   cost *= apt_to_factor(exp_apt - 1)       (species scaling)
 	# apt_to_factor(apt) = 1 / 2^(apt/4). Higher apt → lower XP cost.
 	# Troll xp_mod -1 → factor 2^0.5 ≈ 1.414× slower. Demigod -2 → ~1.68×.
+	# XL is capped at 27 (DCSS experience_level max). At or past the cap,
+	# return a sentinel so grant_xp's while-loop exits immediately — the
+	# earlier bug was returning max(1, 0) = 1 once level >= 27, which
+	# turned a single kill into a runaway level-up cascade.
+	if level >= 27:
+		return 0x3FFFFFFF
 	var here: int = _DCSS_EXP_NEEDED[clampi(level - 1, 0, _DCSS_EXP_NEEDED.size() - 1)]
 	var next: int = _DCSS_EXP_NEEDED[clampi(level, 0, _DCSS_EXP_NEEDED.size() - 1)]
 	var base: int = max(1, next - here)
