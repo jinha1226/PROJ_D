@@ -2048,6 +2048,66 @@ func _trigger_trap(pos: Vector2i) -> void:
 		"net":
 			player.set_meta("_rooted_turns", 5)
 			CombatLog.add("A net falls on you! (rooted for 5 turns)")
+		"zot":
+			# DCSS Zot trap — cascade of nastiness. Rolls one of: heavy
+			# damage, random bad status, summon 1-3 dangerous mobs, or a
+			# teleport. Scales with depth so late-game Zot traps are
+			# catastrophic, early-game traps are merely bad.
+			CombatLog.add("A flash of evil energy — the Zot trap triggers!")
+			var zot_roll: int = randi() % 4
+			match zot_roll:
+				0:
+					var zd: int = 10 + randi() % max(10 + depth, 10)
+					player.take_damage(zd, "negative")
+					CombatLog.add("Baleful magic rakes you for %d damage!" % zd)
+				1:
+					var bad_statuses: Array = ["_confused", "_slowed_turns",
+							"_afraid_turns", "_paralysis_turns"]
+					var pick: String = String(bad_statuses[randi() % bad_statuses.size()])
+					if pick == "_confused":
+						player.set_meta("_confused", true)
+						player.set_meta("_confusion_turns", 6)
+					else:
+						player.set_meta(pick, 4 + randi() % 6)
+					CombatLog.add("A curse grips you! (%s)" % pick.replace("_turns", "").replace("_", ""))
+				2:
+					var zot_pool: Array = ["orange_demon", "hell_hound",
+							"iron_golem", "ynoxinul", "shadow_demon"]
+					for _i in 1 + randi() % 3:
+						var sid: String = String(zot_pool[randi() % zot_pool.size()])
+						_spawn_hostile(sid, player.grid_pos)
+					CombatLog.add("Shapes coalesce around you!")
+				3:
+					CombatLog.add("You are flung across the floor!")
+					if player.has_method("_teleport_random"):
+						player._teleport_random()
+		"golubria":
+			# DCSS Passage of Golubria trap — short-range controlled
+			# teleport to a visible walkable tile. No direct damage; the
+			# payoff is that monsters adjacent to the old position lose
+			# their tempo. Fires once per trigger.
+			CombatLog.add("A portal of Golubria opens — you step through!")
+			var dmap_g: DungeonMap = $DungeonLayer/DungeonMap
+			var candidates: Array[Vector2i] = []
+			if dmap_g != null:
+				for dx_g in range(-6, 7):
+					for dy_g in range(-6, 7):
+						var cand: Vector2i = player.grid_pos + Vector2i(dx_g, dy_g)
+						if not generator.is_walkable(cand):
+							continue
+						if not dmap_g.is_tile_visible(cand):
+							continue
+						if maxi(abs(dx_g), abs(dy_g)) < 3:
+							continue
+						candidates.append(cand)
+			if not candidates.is_empty():
+				var dest: Vector2i = candidates[randi() % candidates.size()]
+				player.grid_pos = dest
+				player.position = Vector2(dest.x * TILE_SIZE + TILE_SIZE / 2.0,
+						dest.y * TILE_SIZE + TILE_SIZE / 2.0)
+				player.moved.emit(dest)
+				if dmap_g != null:
+					dmap_g.update_fov(dest)
 		_:
 			CombatLog.add("A trap triggers, but nothing happens.")
 
@@ -2363,7 +2423,8 @@ func _dispatch_invocation(effect: String) -> void:
 					if maxi(abs(m.grid_pos.x - player.grid_pos.x),
 							abs(m.grid_pos.y - player.grid_pos.y)) <= 3:
 						m.set_meta("_flee_turns", 8)
-				duel_t.take_damage(randi_range(25, 45))
+				var duel_rng: Array = _inv_scale_range(25, 45)
+				duel_t.take_damage(randi_range(int(duel_rng[0]), int(duel_rng[1])))
 				CombatLog.add("Okawaru opens a private arena with the %s!" % \
 						_mon_name(duel_t))
 		# ---- Makhleb ----
@@ -2386,39 +2447,48 @@ func _dispatch_invocation(effect: String) -> void:
 					50, "A demon rises to serve!")
 		# ---- Uskayaw ----
 		"stomp":
-			_aoe_damage_visible(8, 10, 20, "Uskayaw's stomp rattles the floor!")
+			var stomp_r: Array = _inv_scale_range(10, 20)
+			_aoe_damage_visible(8, int(stomp_r[0]), int(stomp_r[1]),
+					"Uskayaw's stomp rattles the floor!")
 		"line_pass":
-			_aoe_damage_visible(12, 15, 30, "You dance through the enemy line!")
+			var lp_r: Array = _inv_scale_range(15, 30)
+			_aoe_damage_visible(12, int(lp_r[0]), int(lp_r[1]),
+					"You dance through the enemy line!")
 		# ---- Zin / TSO / Elyvilon ----
 		"vitalisation":
-			_heal_player(40, 20, "Zin's light fills you.")
+			_heal_player(_inv_scale_int(40), _inv_scale_int(20),
+					"Zin's light fills you.")
 		"imprison":
 			var imp_t: Monster = _find_nearest_visible_monster(8)
 			if imp_t != null:
-				imp_t.set_meta("_paralysis_turns", 10)
+				imp_t.set_meta("_paralysis_turns", _inv_scale_int(10))
 				CombatLog.add("Stone walls seal the %s in place." % _mon_name(imp_t))
 		"sanctuary":
-			player.set_meta("_sanctuary_turns", 12)
+			player.set_meta("_sanctuary_turns", _inv_scale_int(12))
 			CombatLog.add("A peaceful silence falls around you.")
 		"divine_shield":
 			if player.stats != null:
-				player.stats.AC += 6
-				player.set_meta("_divine_shield_turns", 15)
-				player.set_meta("_divine_shield_ac", 6)
+				var ds_ac: int = _inv_scale_int(6)
+				player.stats.AC += ds_ac
+				player.set_meta("_divine_shield_turns", _inv_scale_int(15))
+				player.set_meta("_divine_shield_ac", ds_ac)
 				player.stats_changed.emit()
 			CombatLog.add("A golden shield surrounds you.")
 		"cleansing_flame":
-			_aoe_damage_visible(12, 20, 40, "Cleansing flame burns every foe!")
+			var cf_r: Array = _inv_scale_range(20, 40)
+			_aoe_damage_visible(12, int(cf_r[0]), int(cf_r[1]),
+					"Cleansing flame burns every foe!")
 		"summon_angel":
-			_summon_ally("angel", 80, "An angel descends to your aid!")
+			_summon_ally("angel", _inv_scale_int(80),
+					"An angel descends to your aid!")
 		"lesser_healing":
-			_heal_player(15, 0, "Elyvilon mends your wounds.")
+			_heal_player(_inv_scale_int(15), 0, "Elyvilon mends your wounds.")
 		"greater_healing":
-			_heal_player(40, 0, "Elyvilon heals you deeply.")
+			_heal_player(_inv_scale_int(40), 0, "Elyvilon heals you deeply.")
 		"pacify":
 			var pac_t: Monster = _find_nearest_visible_monster(8)
 			if pac_t != null:
-				pac_t.set_meta("_flee_turns", 20)
+				pac_t.set_meta("_flee_turns", _inv_scale_int(20))
 				CombatLog.add("The %s calms and flees in peace." % _mon_name(pac_t))
 		# ---- Vehumet ----
 		"gift_spell":
@@ -2446,7 +2516,8 @@ func _dispatch_invocation(effect: String) -> void:
 		# ---- Sif Muna ----
 		"channel_mana":
 			if player.stats != null:
-				player.stats.MP = min(player.stats.mp_max, player.stats.MP + 15)
+				var mp_gain: int = _inv_scale_int(15)
+				player.stats.MP = min(player.stats.mp_max, player.stats.MP + mp_gain)
 				player.stats_changed.emit()
 			CombatLog.add("Sif Muna channels arcane energy into you.")
 		"divine_exegesis":
@@ -2485,7 +2556,9 @@ func _dispatch_invocation(effect: String) -> void:
 				_summon_ally("zombie", 50, "")
 			CombatLog.add("The dead answer your call.")
 		"drain_life":
-			var drained: int = _aoe_damage_visible(10, 5, 15, "Life flows out of the living!")
+			var dl_r: Array = _inv_scale_range(5, 15)
+			var drained: int = _aoe_damage_visible(10, int(dl_r[0]), int(dl_r[1]),
+					"Life flows out of the living!")
 			_heal_player(drained / 2, 0, "")
 		"enslave_soul":
 			var es_t: Monster = _find_nearest_visible_monster(8)
@@ -2498,7 +2571,8 @@ func _dispatch_invocation(effect: String) -> void:
 		"smite":
 			var sm_t: Monster = _find_nearest_visible_monster(10)
 			if sm_t != null:
-				sm_t.take_damage(randi_range(20, 40))
+				var sm_r: Array = _inv_scale_range(20, 40)
+				sm_t.take_damage(randi_range(int(sm_r[0]), int(sm_r[1])))
 				CombatLog.add("Divine wrath smites the %s!" % _mon_name(sm_t))
 		# ---- Jiyva ----
 		"jelly_prayer":
@@ -2575,15 +2649,17 @@ func _dispatch_invocation(effect: String) -> void:
 					m.slowed_turns = randi_range(3, 10)
 			CombatLog.add("Time fractures unpredictably.")
 		"slouch":
+			var sl_r: Array = _inv_scale_range(8, 20)
 			for m in get_tree().get_nodes_in_group("monsters"):
 				if is_instance_valid(m) and m.is_alive:
-					m.take_damage(randi_range(8, 20))
+					m.take_damage(randi_range(int(sl_r[0]), int(sl_r[1])))
 			CombatLog.add("Slouch hits the swift!")
 		# ---- Lugonu ----
 		"bend_space":
 			var bs_t: Monster = _find_nearest_visible_monster(8)
 			if bs_t != null:
-				bs_t.take_damage(randi_range(5, 12))
+				var bsr: Array = _inv_scale_range(5, 12)
+				bs_t.take_damage(randi_range(int(bsr[0]), int(bsr[1])))
 				CombatLog.add("Space warps around the %s." % _mon_name(bs_t))
 		"banishment":
 			var bn_t: Monster = _find_nearest_visible_monster(8)
@@ -2768,6 +2844,27 @@ func _mon_name(m: Node) -> String:
 	if m == null or not ("data" in m) or m.data == null:
 		return "foe"
 	return String(m.data.display_name)
+
+
+## Invocations-skill multiplier for god ability potency. Linear: skill
+## 0 → 1.0×, skill 27 → 2.0×. Applied to heal amount, AoE damage ranges,
+## paralysis / sanctuary / divine-shield durations, and summon lifetimes
+## so a newly-pledged acolyte's smite does meaningful-but-weaker work
+## and a 27-skill zealot's smite hits roughly DCSS full-strength values.
+func _inv_factor() -> float:
+	if skill_system == null or player == null:
+		return 1.0
+	var inv: int = int(skill_system.get_level(player, "invocations"))
+	return 1.0 + float(inv) / 27.0
+
+
+func _inv_scale_int(base: int) -> int:
+	return int(float(base) * _inv_factor())
+
+
+func _inv_scale_range(lo: int, hi: int) -> Array:
+	var f: float = _inv_factor()
+	return [int(lo * f), int(hi * f)]
 
 
 func _heal_player(hp: int, mp: int, msg: String) -> void:
@@ -3190,6 +3287,31 @@ func _on_summon_companion_requested(essence_id: String) -> void:
 	c.setup(generator, spawn_pos, mdata)
 	c.lifetime = 60  # ~60 turns before despawning
 	print("Summoned %s." % companion_id)
+
+
+## Spawn one hostile Monster of `monster_id` adjacent to `center` — used
+## by Zot traps and other hostile-summon sources. No-op when the template
+## resource is missing or every neighbour is blocked.
+func _spawn_hostile(monster_id: String, center: Vector2i) -> void:
+	if generator == null:
+		return
+	var tres_path: String = "res://resources/monsters/%s.tres" % monster_id
+	if not ResourceLoader.exists(tres_path):
+		return
+	var mdata: MonsterData = load(tres_path)
+	if mdata == null:
+		return
+	var sp: Vector2i = _find_free_adjacent_tile(center)
+	if sp == center:
+		return
+	var monster_scene: PackedScene = load("res://scenes/entities/Monster.tscn")
+	if monster_scene == null:
+		return
+	var m: Monster = monster_scene.instantiate()
+	$EntityLayer.add_child(m)
+	m.setup(generator, sp, mdata)
+	if not m.died.is_connected(_on_monster_died):
+		m.died.connect(_on_monster_died)
 
 
 ## First walkable, unoccupied 8-neighbour of `center`. Returns center itself

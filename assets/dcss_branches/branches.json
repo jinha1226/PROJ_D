@@ -428,6 +428,97 @@
     "ice_devil",
     "frost_dragon"
    ]
+  },
+  {
+   "id": "wizlab",
+   "parent": "dungeon",
+   "min_depth": 8,
+   "max_depth": 14,
+   "floors": 1,
+   "abs_depth": 11,
+   "short_name": "Wizlab",
+   "long_name": "a Wizard's Laboratory",
+   "abbrev": "WLab",
+   "runes": [],
+   "entry_msg": "Arcane residues linger in the air...",
+   "tileset": "crystal",
+   "is_portal": true,
+   "duration": 80,
+   "loot_bump": 2.5,
+   "monster_pool": [
+    "ugly_thing",
+    "boggart",
+    "crystal_guardian",
+    "deep_elf_sorcerer",
+    "iron_golem"
+   ]
+  },
+  {
+   "id": "trove",
+   "parent": "dungeon",
+   "min_depth": 8,
+   "max_depth": 14,
+   "floors": 1,
+   "abs_depth": 11,
+   "short_name": "Trove",
+   "long_name": "a Hidden Treasure Trove",
+   "abbrev": "Trv",
+   "runes": [],
+   "entry_msg": "Gold glints \u2014 a custodian demands payment.",
+   "tileset": "vaults",
+   "is_portal": true,
+   "duration": 40,
+   "loot_bump": 4.0,
+   "monster_pool": [
+    "guardian_mummy",
+    "iron_golem",
+    "orb_guardian"
+   ]
+  },
+  {
+   "id": "labyrinth",
+   "parent": "dungeon",
+   "min_depth": 11,
+   "max_depth": 15,
+   "floors": 1,
+   "abs_depth": 14,
+   "short_name": "Labyrinth",
+   "long_name": "a Labyrinth",
+   "abbrev": "Lab",
+   "runes": [],
+   "entry_msg": "The walls twist. You are not meant to leave easily.",
+   "tileset": "sandstone",
+   "is_portal": true,
+   "duration": 120,
+   "loot_bump": 3.0,
+   "monster_pool": [
+    "minotaur"
+   ]
+  },
+  {
+   "id": "gauntlet",
+   "parent": "dungeon",
+   "min_depth": 9,
+   "max_depth": 14,
+   "floors": 1,
+   "abs_depth": 12,
+   "short_name": "Gauntlet",
+   "long_name": "a Gauntlet",
+   "abbrev": "Gnt",
+   "runes": [],
+   "entry_msg": "A gauntlet of creatures bars your path.",
+   "tileset": "vaults",
+   "is_portal": true,
+   "duration": 100,
+   "loot_bump": 2.5,
+   "monster_pool": [
+    "minotaur",
+    "ogre_mage",
+    "hell_knight",
+    "war_gargoyle",
+    "redback",
+    "fire_crab"
+   ]
   }
  ],
  "by_id": {
@@ -734,6 +825,97 @@
    ],
    "entry_msg": "You feel the oppressive weight of Zot.",
    "tileset": "zot"
+  },
+  "wizlab": {
+   "id": "wizlab",
+   "parent": "dungeon",
+   "min_depth": 8,
+   "max_depth": 14,
+   "floors": 1,
+   "abs_depth": 11,
+   "short_name": "Wizlab",
+   "long_name": "a Wizard's Laboratory",
+   "abbrev": "WLab",
+   "runes": [],
+   "entry_msg": "Arcane residues linger in the air...",
+   "tileset": "crystal",
+   "is_portal": true,
+   "duration": 80,
+   "loot_bump": 2.5,
+   "monster_pool": [
+    "ugly_thing",
+    "boggart",
+    "crystal_guardian",
+    "deep_elf_sorcerer",
+    "iron_golem"
+   ]
+  },
+  "trove": {
+   "id": "trove",
+   "parent": "dungeon",
+   "min_depth": 8,
+   "max_depth": 14,
+   "floors": 1,
+   "abs_depth": 11,
+   "short_name": "Trove",
+   "long_name": "a Hidden Treasure Trove",
+   "abbrev": "Trv",
+   "runes": [],
+   "entry_msg": "Gold glints \u2014 a custodian demands payment.",
+   "tileset": "vaults",
+   "is_portal": true,
+   "duration": 40,
+   "loot_bump": 4.0,
+   "monster_pool": [
+    "guardian_mummy",
+    "iron_golem",
+    "orb_guardian"
+   ]
+  },
+  "labyrinth": {
+   "id": "labyrinth",
+   "parent": "dungeon",
+   "min_depth": 11,
+   "max_depth": 15,
+   "floors": 1,
+   "abs_depth": 14,
+   "short_name": "Labyrinth",
+   "long_name": "a Labyrinth",
+   "abbrev": "Lab",
+   "runes": [],
+   "entry_msg": "The walls twist. You are not meant to leave easily.",
+   "tileset": "sandstone",
+   "is_portal": true,
+   "duration": 120,
+   "loot_bump": 3.0,
+   "monster_pool": [
+    "minotaur"
+   ]
+  },
+  "gauntlet": {
+   "id": "gauntlet",
+   "parent": "dungeon",
+   "min_depth": 9,
+   "max_depth": 14,
+   "floors": 1,
+   "abs_depth": 12,
+   "short_name": "Gauntlet",
+   "long_name": "a Gauntlet",
+   "abbrev": "Gnt",
+   "runes": [],
+   "entry_msg": "A gauntlet of creatures bars your path.",
+   "tileset": "vaults",
+   "is_portal": true,
+   "duration": 100,
+   "loot_bump": 2.5,
+   "monster_pool": [
+    "minotaur",
+    "ogre_mage",
+    "hell_knight",
+    "war_gargoyle",
+    "redback",
+    "fire_crab"
+   ]
   }
  }
 }

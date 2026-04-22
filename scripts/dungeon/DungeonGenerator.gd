@@ -727,6 +727,15 @@ func _place_traps(depth: int) -> void:
 	# one below the usual 25-floor endgame floor.
 	if depth >= 3 and depth <= 24:
 		types.append("shaft")
+	# Passage of Golubria trap — short-range controlled teleport. Appears
+	# from mid-dungeon onward as a DCSS trans-school nuisance.
+	if depth >= 5:
+		types.append("golubria")
+	# Zot trap — late-game nasty cascade. DCSS places these only in Zot
+	# branch + Depths + Vaults tail. We gate on depth + current_branch
+	# so the trunk's lower floors feel the pressure before the endgame.
+	if depth >= 13:
+		types.append("zot")
 	for _i in want:
 		var spot: Vector2i = _pick_branch_entrance_tile()
 		if spot == Vector2i(-1, -1):
