@@ -1,97 +1,83 @@
-# Session Handoff — 2026-04-22 late
+# Session Handoff — 2026-04-22 late (updated 2026-04-23)
 
-Picked up by the next session. Everything listed below is **queued, not
-in progress** — current HEAD (`799411ad`) is clean and runnable.
+Next session pick-up. HEAD is clean and runnable.
 
-## Active bug queue (user-reported, unresolved)
+## Refactor pipeline — status
 
-Reported while testing the archmage Spell Test build on mobile web.
-Item `#1` is already fixed in `799411ad`; the rest are untouched.
+| Module | Lines out | Status | Commit |
+|---|---|---|---|
+| R1 TrapEffects | ~107 | ✅ done | `1eeae81f` |
+| R7 CloudHooks | ~62 | ✅ done | `3942cbe2` |
+| R6 GodConducts | ~80 | ✅ done | `3942cbe2` |
+| R3 IdentifyDialog | ~108 | ✅ done | `3942cbe2` |
+| R2 GodInvocations | ~497 | ✅ done | `c59f6829` |
+| R4 BagTooltips | ~281 | ✅ done (partial) | `d0edfb57` |
+| R5 MagicDialog | ~150 | ✅ done + bug #6 fix | (this session) |
 
-1. ~~Second tap on an area spell moves the player instead of firing.~~
-   **Fixed in `799411ad`** (TouchInput.gd no longer auto-disables
-   `targeting_mode` between the preview tap and the confirm tap; the
-   confirm / cancel branches inside
-   `GameBootstrap._on_target_selected` now turn it off themselves).
-2. Status dialog should show current move speed (see Haste effect),
-   mutation list, and piety progress. Currently shows stats + resists
-   + skills + gear but not speed / mut / piety.
-3. Potion of Invisibility should dim the player sprite while active —
-   set `player.modulate.a` around 0.45 while `_invis_turns > 0`, restore
-   on expiry. Status check already exists (`has_meta("_invis_turns")`).
-4. Scroll of Teleportation should defer the actual teleport by N turns
-   (DCSS: delayed tele counter). Currently fires immediately. Add a
-   `_pending_teleport_turns` meta + a per-turn tick that teleports
-   when it hits 0.
-5. `TileRenderer.ITEMS` dict is missing entries for some books and for
-   every wand. Books that do have entries render via
-   `item/book/*` paths; wands default to the fallback blob. Scan the
-   `assets/dcss_tiles/individual/item/book/` + `/wand/` directories
-   and fill the dict.
-6. Magic dialog lists every learned spell flat. Split into school
-   headers (Fire / Cold / Earth / Air / Necromancy / Alchemy / Hexes /
-   Translocations / Summonings / Conjurations) so it reads cleanly.
-   Also: when the player reads a spellbook at full memory capacity,
-   the book is consumed but no spell is learned — book should stay in
-   the bag on that failure path.
-7. Equipping the 8 test-character unrands from `_apply_test_character_
-   boost` leaves the paper-doll nude. The doll layer lookup
-   (`TileRenderer.doll_layer`) probably has no entry for those unrand
-   ids, so the composite falls back to the bare race body. Either add
-   a generic overlay per slot or wire each test unrand to a
-   representative base-item tile.
-8. Scroll of Silence: no visible aura drawn, player can still cast.
-   Effect is set correctly in `Player._apply_consumable_effect`
-   (line ~2875) but the SpellCast silence gate reads the *player's*
-   `_silenced_turns` meta — confirm that meta is actually being set,
-   that the counter ticks, and that SpellCast.cast reads it. Also add
-   a faint halo overlay in DungeonMap for the duration.
+**GameBootstrap size**: ~7700 → 6414 lines (≈17% smaller, 7 modules
+extracted, ~1285 lines moved out).
 
-## Deferred port items (not yet started)
+## Remaining refactor work
 
-Originally slated under L2-L5 but deleted from the task list to keep
-the refactor session clean. Re-add when the bug queue is empty.
+R4 was a partial extraction — it pulled the read-only bag helpers
+(tooltip builder, thumbnail, info popup) but left the live dialog
+state behind. Similarly R5 kept equip/use/drop callbacks in
+GameBootstrap because they touch dialog re-open state.
 
-- **L2 — Penetration brand (ranged).** Bow/crossbow/slingshot pieces
-  with this brand hit every monster on the beam line instead of the
-  first. Reuses `Beam.trace` + `_beam_path_hits`.
-- **L3 — Stair-up escape confirm.** Tapping stairs-up on D:1 of the
-  main trunk should pop a recap dialog before `_end_run` fires, so
-  Orb-less accidental exits don't blow the run.
-- **L4 — Translucent stone tile.** Variant of `GLASS_WALL` with a stone
-  palette instead of blue — same movement-blocked / sight-through
-  semantics, placed as a vault feature.
-- **L5 — Autofight smart target priority.** `_on_auto_attack_pressed`
-  picks Chebyshev-nearest; switch to a weighted pick that prefers
-  low-HP / high-HD targets when distance ties.
+- **R4.2** — Move `_on_bag_pressed`, `_open_bag_filtered`,
+  `_build_equipped_section`, `_bag_category` state into
+  `scripts/ui/BagDialog.gd`. Equip / use / drop stay as host
+  callbacks. **Medium risk** — requires moving `_bag_dlg` +
+  `_suppress_bag_reopen` state.
+- **R5.2** — Already in good shape; could still move `_on_cast_pressed`
+  + `_on_cast_with_targeting` + `_assign_spell_quickslot` into the
+  module but they touch `_targeting_spell` state.
 
-## Refactor pipeline
+## Active bug queue — user-reported
 
-Extraction candidates for GameBootstrap.gd (currently ~5000 lines),
-in recommended order. `R1` (TrapEffects) is in flight right now.
+Item `#1` and `#6` resolved. Others pending.
 
-| Module | Est. lines out | Risk |
-|---|---|---|
-| `R1` TrapEffects | ~180 | Low — self-contained |
-| `R2` GodInvocations | ~400 | Medium — reads player + monster state |
-| `R3` IdentifyDialog | ~100 | Low — standalone dialog builder |
-| `R4` BagDialog | ~300 | Medium — touches equip/unequip paths |
-| `R5` MagicDialog | ~300 | Medium — mirrors BagDialog scope |
-| `R6` GodConducts | ~80 | Low — pure helpers |
-| `R7` CloudHooks | ~60 | Low — pure helpers |
+1. ✅ Second-tap area spell movement bug (fixed in `799411ad`).
+2. Status dialog — add move speed (Haste readout), mutation list,
+   piety progress.
+3. Potion of Invisibility — dim the player sprite
+   (`player.modulate.a ≈ 0.45` while `_invis_turns > 0`).
+4. Scroll of Teleportation — defer teleport by N turns via a
+   `_pending_teleport_turns` meta + turn tick.
+5. `TileRenderer.ITEMS` dict — fill missing book + wand entries by
+   scanning `assets/dcss_tiles/individual/item/{book,wand}/`.
+6. ✅ Magic dialog — split by school header (MagicDialog now groups
+   Conjurations / Fire / Cold / … under accent headers).
+   ✅ Spellbook at full memory — Player._apply_consumable_effect
+   "learn_spells" now returns false when nothing was learned, so
+   the book stays in the bag.
+7. Paper-doll is nude when equipping test-character unrands —
+   `TileRenderer.doll_layer` has no entry for those ids. Add
+   generic slot overlays or wire each test unrand to a base-item
+   tile.
+8. Scroll of Silence — effect sets `_silenced_turns` correctly but
+   (a) no visible aura, (b) verify SpellCast reads it for the
+   player's own casts (the silence aura only blocks monsters in
+   the current implementation).
 
-Target: pull ~1400 lines, leaving GameBootstrap around 3600 — still
-big, but narrowly the scene-tree orchestrator.
+## Deferred port items (L-series, queued behind bugs)
 
-## Ground rules for the extraction
+- **L2 — Penetration brand (ranged).** Reuses `Beam.trace` +
+  `_beam_path_hits`.
+- **L3 — Stair-up escape confirm.** Recap dialog before `_end_run`
+  on D:1 trunk exit.
+- **L4 — Translucent stone tile.** Stone-palette variant of
+  `GLASS_WALL`.
+- **L5 — Autofight smart target priority.** Weight by low-HP /
+  high-HD instead of pure Chebyshev distance.
 
-- Static modules in `scripts/systems/` or `scripts/ui/`.
-- No `@onready` / `$path` inside extracted code — callers pass the
-  nodes / arrays they need as parameters.
+## Ground rules
+
+- Static modules live in `scripts/systems/` or `scripts/ui/`.
+- No `@onready` / `$path` inside extracted code. Callers pass
+  nodes / arrays / Callables as parameters.
 - Autoloads (`GameManager`, `CombatLog`, `TurnManager`,
-  `BranchRegistry`, etc.) are fair game from anywhere; they're
-  globally resolvable.
-- Each extraction is its own commit with a before/after line delta
-  in the message body.
-- Behaviour parity first, improvement second. Don't refactor logic
-  while moving it.
+  `BranchRegistry`, `GodRegistry`, …) are fair game from anywhere.
+- Each extraction is its own commit with a before/after line
+  delta in the message body.
+- Behaviour parity first. Don't refactor logic while moving it.

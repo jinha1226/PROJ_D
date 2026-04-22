@@ -2587,7 +2587,10 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 			if newly.is_empty() and rejected.is_empty():
 				CombatLog.add("You already know these spells.")
 			spells_learned.emit()
-			return true
+			# DCSS preserves spellbooks when no new spell was learned.
+			# Returning false keeps the book in inventory so the player
+			# can retry after gaining memory / level / spellcasting.
+			return not newly.is_empty()
 		"curing":
 			if stats == null:
 				return false
