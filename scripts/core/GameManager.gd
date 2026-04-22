@@ -16,6 +16,22 @@ var selected_trait_id: String = ""
 # Art mode — 0 = LPC (composed), 1 = DCSS tiles. Read via TileRenderer.mode().
 # DCSS is now the default since the tile mapping is complete.
 var render_mode: int = 1
+
+## Ruleset mode — `CLASSIC` preserves the full DCSS port (26 classes,
+## skills, gods, mutations, branches, portal vaults). `SIMPLE` is a
+## Pixel-Dungeon-like simplification: 4 classes, no skill tree, no
+## gods, 25-floor single trunk, growth via +N upgrade scrolls. Toggle
+## persists alongside `render_mode` so players can switch between runs.
+enum GameMode { CLASSIC, SIMPLE }
+var game_mode: int = GameMode.CLASSIC
+
+
+func is_simple_mode() -> bool:
+	return game_mode == GameMode.SIMPLE
+
+
+func is_classic_mode() -> bool:
+	return game_mode == GameMode.CLASSIC
 ## DCSS-style branch id that `current_depth` indexes into. "dungeon" on the
 ## main trunk; "lair" / "orc" / "vaults" / … once the player takes a
 ## branch entrance. Used as a key prefix in GameBootstrap._floor_state so
