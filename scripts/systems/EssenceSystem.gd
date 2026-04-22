@@ -60,11 +60,19 @@ var cooldowns: Array[int] = []
 
 func _ready() -> void:
 	if slots.is_empty():
-		slots.resize(SLOT_COUNT)
-		for i in SLOT_COUNT:
+		# DCSS-style slots cap, but gated by MetaProgression's
+		# Essence Affinity upgrade: start at 1 slot, 2 after ess_1,
+		# 3 after ess_2. Matches how the UPGRADES catalog is worded.
+		var slot_cap: int = SLOT_COUNT
+		var mp_node: Node = get_tree().root.get_node_or_null("MetaProgression") \
+				if get_tree() != null else null
+		if mp_node != null and mp_node.has_method("get_essence_slot_count"):
+			slot_cap = mini(SLOT_COUNT, maxi(1, int(mp_node.get_essence_slot_count())))
+		slots.resize(slot_cap)
+		for i in slot_cap:
 			slots[i] = null
-		cooldowns.resize(SLOT_COUNT)
-		for i in SLOT_COUNT:
+		cooldowns.resize(slot_cap)
+		for i in slot_cap:
 			cooldowns[i] = 0
 
 
@@ -130,7 +138,14 @@ func try_drop_from_monster(monster: Monster) -> void:
 	var essence: EssenceData = load(path) as EssenceData
 	if essence == null:
 		return
-	if randf() > essence.drop_chance:
+	# MetaProgression Essence Resonance upgrade multiplies the per-
+	# monster essence drop chance. Defaults to 1.0 without the unlock.
+	var drop_mult: float = 1.0
+	var mp_node: Node = get_tree().root.get_node_or_null("MetaProgression") \
+			if get_tree() != null else null
+	if mp_node != null and mp_node.has_method("get_essence_drop_mult"):
+		drop_mult = float(mp_node.get_essence_drop_mult())
+	if randf() > essence.drop_chance * drop_mult:
 		return
 	essence_acquired.emit(essence)
 	add_to_inventory(essence)

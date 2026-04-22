@@ -157,6 +157,40 @@ func _ready() -> void:
 	var race_res: RaceData = RaceRegistry.fetch(race_id)
 	player.setup(generator, generator.spawn_pos, job, race_res, null)
 
+	# MetaProgression run-start bonuses — rune-shard upgrades were
+	# defined but never consumed. Apply them now so purchasing an
+	# upgrade on the main menu actually helps the next run:
+	#   surv_1/2/3 → +10/20/30% max HP
+	#   combat_1/2 → +1/+2 to all three base stats
+	#   surv_pot   → start with a curing potion in the bag
+	if meta != null and player.stats != null:
+		var hp_mul: float = meta.get_start_hp_bonus()
+		if hp_mul != 1.0:
+			var new_hp_max: int = maxi(1, int(round(float(player.stats.hp_max) * hp_mul)))
+			player.stats.hp_max = new_hp_max
+			player.stats.HP = new_hp_max
+			if player.base_stats != null:
+				player.base_stats.hp_max = new_hp_max
+		var stat_bonus: int = meta.get_start_stat_bonus()
+		if stat_bonus > 0:
+			player.stats.STR += stat_bonus
+			player.stats.DEX += stat_bonus
+			player.stats.INT += stat_bonus
+			if player.base_stats != null:
+				player.base_stats.STR += stat_bonus
+				player.base_stats.DEX += stat_bonus
+				player.base_stats.INT += stat_bonus
+		if meta.gives_starting_potion():
+			var pot: Dictionary = ConsumableRegistry.get_info("potion_curing")
+			if not pot.is_empty():
+				player.items.append({
+					"id": "potion_curing",
+					"name": String(pot.get("name", "Potion of Curing")),
+					"kind": "potion",
+					"color": pot.get("color", Color(0.85, 0.35, 0.35)),
+				})
+		player.stats_changed.emit()
+
 	# [skill-agent] SkillSystem must exist before first attack; attach as child
 	# of Game root with node name "SkillSystem" so Player.try_attack_at can
 	# fetch it via get_node_or_null("Game/SkillSystem").
