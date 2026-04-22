@@ -14,10 +14,19 @@ const _TROLL: Resource = preload("res://resources/monsters/troll.tres")
 const _MINOTAUR: Resource = preload("res://resources/monsters/minotaur.tres")
 const _DEEP_ELF_ARCHER: Resource = preload(
 	"res://resources/monsters/deep_elf_archer.tres")
+const _GIANT_WOLF_SPIDER: Resource = preload(
+	"res://resources/monsters/giant_wolf_spider.tres")
+const _GNOLL_SHAMAN: Resource = preload(
+	"res://resources/monsters/gnoll_shaman.tres")
+const _WIGHT: Resource = preload("res://resources/monsters/wight.tres")
+const _MUMMY: Resource = preload("res://resources/monsters/mummy.tres")
+const _STONE_GIANT: Resource = preload(
+	"res://resources/monsters/stone_giant.tres")
 
 const _ALL_MONSTERS: Array = [
 	_RAT, _BAT, _KOBOLD, _GOBLIN, _HOBGOBLIN, _ADDER, _GNOLL,
 	_ORC, _OGRE, _ORC_WIZARD, _TROLL, _MINOTAUR, _DEEP_ELF_ARCHER,
+	_GIANT_WOLF_SPIDER, _GNOLL_SHAMAN, _WIGHT, _MUMMY, _STONE_GIANT,
 ]
 
 var by_id: Dictionary = {}
