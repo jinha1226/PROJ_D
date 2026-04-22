@@ -1210,26 +1210,46 @@ func _on_auto_move_pressed() -> void:
 func _on_auto_attack_pressed() -> void:
 	if player == null or not player.is_alive or run_over:
 		return
-	# Find nearest visible monster and move/attack toward it.
-	var nearest = null
-	var nearest_dist: int = 999
+	# Smart target priority (DCSS autofight.lua-inspired): among visible
+	# hostiles, pick the one with the best score of
+	#   hd_bonus + low_hp_bonus − distance_penalty
+	# so the bot finishes off weakened threats and closes on high-HD
+	# foes instead of blindly chasing whichever rat is closest.
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	var best = null
+	var best_score: float = -1e9
+	var best_dist: int = 999
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if not is_instance_valid(m) or not ("grid_pos" in m):
 			continue
 		if "is_alive" in m and not m.is_alive:
 			continue
-		var d: int = max(abs(m.grid_pos.x - player.grid_pos.x),
+		# Skip off-FOV monsters — autofight should only react to what
+		# the player can actually see right now.
+		if dmap != null and not dmap.is_tile_visible(m.grid_pos):
+			continue
+		var d: int = maxi(abs(m.grid_pos.x - player.grid_pos.x),
 				abs(m.grid_pos.y - player.grid_pos.y))
-		if d < nearest_dist:
-			nearest_dist = d
-			nearest = m
-	if nearest == null:
+		var hd: int = 1
+		var max_hp: int = 1
+		if "data" in m and m.data != null:
+			hd = maxi(1, int(m.data.hd))
+			max_hp = maxi(1, int(m.data.hp))
+		var hp_ratio: float = clampf(float(int(m.hp)) / float(max_hp), 0.0, 1.0)
+		var score: float = float(hd) * 3.0 \
+				+ (1.0 - hp_ratio) * 10.0 \
+				- float(d) * 4.0
+		if score > best_score:
+			best_score = score
+			best = m
+			best_dist = d
+	if best == null:
 		return
-	var delta: Vector2i = nearest.grid_pos - player.grid_pos
-	if nearest_dist <= 1:
+	var delta: Vector2i = best.grid_pos - player.grid_pos
+	if best_dist <= 1:
 		player.try_move(delta)
 	else:
-		var path: Array[Vector2i] = Pathfinding.find_path(generator, player.grid_pos, nearest.grid_pos)
+		var path: Array[Vector2i] = Pathfinding.find_path(generator, player.grid_pos, best.grid_pos)
 		if not path.is_empty():
 			player.try_move(path[0] - player.grid_pos)
 
@@ -2077,11 +2097,11 @@ func _on_stairs_up_tapped(_pos: Vector2i) -> void:
 			_regenerate_dungeon(false, false)
 		return
 	# DCSS victory: stairs-up off D:1 of the Dungeon with the Orb of
-	# Zot in hand ends the run in triumph. Classic endgame gate.
+	# Zot in hand ends the run in triumph. Gated by a recap dialog so an
+	# accidental tap doesn't instantly close the run.
 	if GameManager.current_branch == "dungeon" and GameManager.current_depth == 1 \
 			and player != null and player.has_orb:
-		CombatLog.add("You escape the dungeon with the Orb of Zot!")
-		_end_run(true, "")
+		_show_escape_confirm()
 		return
 	if GameManager.current_depth <= 1:
 		return
@@ -2089,6 +2109,64 @@ func _on_stairs_up_tapped(_pos: Vector2i) -> void:
 	_save_current_floor()
 	GameManager.current_depth -= 1
 	_regenerate_dungeon(true, used_secondary)
+
+
+## Escape confirm — DCSS ends the run when you carry the Orb of Zot up
+## from D:1, but a misclick on the ascend tile shouldn't instantly
+## close the save. Show a recap (XL / turn / kills / runes) with
+## Stay / Escape buttons so the player gets a beat of confirmation.
+func _show_escape_confirm() -> void:
+	if player == null:
+		_end_run(true, "")
+		return
+	var dlg := GameDialog.create("Escape the Dungeon?", Vector2i(960, 900))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
+	vb.add_theme_constant_override("separation", 16)
+
+	var lead := Label.new()
+	lead.text = "You stand on the ascent with the Orb of Zot.\nStep up now and the run ends in victory."
+	lead.add_theme_font_size_override("font_size", 42)
+	lead.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vb.add_child(lead)
+
+	var rune_names: Array = []
+	for rid in player.runes:
+		var rinfo: Dictionary = RuneRegistry.get_info(String(rid))
+		rune_names.append(String(rinfo.get("name", rid)))
+	var recap := Label.new()
+	recap.text = "XL %d   Turn %d   Kills %d   Runes %d" % [
+			player.level, TurnManager.turn_number, kill_count, player.runes.size()]
+	if not rune_names.is_empty():
+		recap.text += "\n" + ", ".join(PackedStringArray(rune_names))
+	recap.add_theme_font_size_override("font_size", 36)
+	recap.add_theme_color_override("font_color", Color(0.85, 0.85, 0.95))
+	recap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vb.add_child(recap)
+
+	var btns := HBoxContainer.new()
+	btns.add_theme_constant_override("separation", 16)
+
+	var stay := Button.new()
+	stay.text = "Stay"
+	stay.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	stay.custom_minimum_size = Vector2(0, 96)
+	stay.add_theme_font_size_override("font_size", 40)
+	stay.pressed.connect(dlg.close)
+	btns.add_child(stay)
+
+	var escape := Button.new()
+	escape.text = "Escape"
+	escape.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	escape.custom_minimum_size = Vector2(0, 96)
+	escape.add_theme_font_size_override("font_size", 40)
+	escape.modulate = Color(1.0, 0.85, 0.45)
+	escape.pressed.connect(func():
+		dlg.close()
+		CombatLog.add("You escape the dungeon with the Orb of Zot!")
+		_end_run(true, ""))
+	btns.add_child(escape)
+	vb.add_child(btns)
 
 
 ## Skill level-up callback that refreshes defense stats. Dodging /

@@ -68,16 +68,22 @@ Items `#1`, `#2`, `#3`, `#4`, `#5`, `#6`, `#7`, `#8` all resolved.
    `_silenced_turns > 0`. Self-cast check was already in place at
    `SpellCast.gd:60`.
 
-## Deferred port items (L-series, queued behind bugs)
+## Deferred port items — all landed
 
-- **L2 — Penetration brand (ranged).** Reuses `Beam.trace` +
-  `_beam_path_hits`.
-- **L3 — Stair-up escape confirm.** Recap dialog before `_end_run`
-  on D:1 trunk exit.
-- **L4 — Translucent stone tile.** Stone-palette variant of
-  `GLASS_WALL`.
-- **L5 — Autofight smart target priority.** Weight by low-HP /
-  high-HD instead of pure Chebyshev distance.
+- ✅ **L2 — Penetration brand (ranged).** `_weapon_brand_<id> == "penetration"`
+  on a bow triggers `Beam.trace(pierce=true)` in `Player.try_ranged_attack`
+  so one shot hits every monster in the line. Scroll of Brand Weapon rolls
+  it only when the equipped weapon is bow-skill.
+- ✅ **L3 — Stair-up escape confirm.** `_show_escape_confirm()` gates
+  `_end_run(true, "")` on D:1 Dungeon ascent with the Orb — recap shows
+  XL / turn / kills / runes and a Stay/Escape pair.
+- ✅ **L4 — Translucent stone tile.** `DungeonGenerator.TileType.TRANSLUCENT_STONE`
+  added (stone-palette render, FOV passes via `_opaque_at` default, not
+  in `is_walkable` whitelist). Vaults can now reference it.
+- ✅ **L5 — Autofight smart target priority.** `_on_auto_attack_pressed`
+  scores by `hd*3 + (1 - hp_ratio)*10 − dist*4` with FOV gating, so the
+  bot finishes weakened threats and closes on high-HD foes instead of
+  blindly chasing the nearest rat.
 
 ## Ground rules
 

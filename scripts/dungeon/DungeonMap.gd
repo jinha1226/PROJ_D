@@ -346,9 +346,15 @@ func _draw_dcss() -> void:
 					draw_rect(rect, Color(0.95, 0.55, 0.95) * modulate, true)
 					continue
 				DungeonGenerator.TileType.GLASS_WALL:
-					# Translucent stone — faint blue tint, lets the player
-					# see through for FOV but still blocks movement.
+					# Glass pane — faint blue tint, lets the player see
+					# through for FOV but still blocks movement.
 					draw_rect(rect, Color(0.55, 0.75, 0.95, 0.6) * modulate, true)
+					continue
+				DungeonGenerator.TileType.TRANSLUCENT_STONE:
+					# DCSS stone palette — desaturated grey. FOV passes
+					# through (handled in `_opaque_at`) so scouts can map
+					# rooms behind the veil, but the tile stays impassable.
+					draw_rect(rect, Color(0.55, 0.55, 0.58, 0.7) * modulate, true)
 					continue
 				DungeonGenerator.TileType.DOOR_OPEN:
 					if floor_tex != null:

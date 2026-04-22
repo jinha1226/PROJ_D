@@ -22,21 +22,102 @@ static func open(host: Node, player) -> GameDialog:
 	_build_header(vb, player)
 	vb.add_child(UICards.section_header("Known Spells"))
 
+	var skill_sys = host.skill_system if "skill_system" in host else null
+	var known: Array[String] = SpellRegistry.get_known_for_player(player, skill_sys)
+
 	var rows := VBoxContainer.new()
 	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rows.add_theme_constant_override("separation", 6)
+
+	var present_schools: Array = _collect_present_schools(known)
+	if known.size() > 0 and present_schools.size() >= 2:
+		vb.add_child(_build_school_tabs(host, player, known, rows, dlg, present_schools))
 	vb.add_child(rows)
 
-	var skill_sys = host.skill_system if "skill_system" in host else null
-	var known: Array[String] = SpellRegistry.get_known_for_player(player, skill_sys)
 	if known.is_empty():
 		var hint := UICards.dim_hint(
 				"No spells known.\nRead spellbooks or pick a magic job to learn spells.")
 		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		rows.add_child(hint)
 	else:
-		_build_school_grouped_rows(rows, host, player, known, dlg)
+		_populate_rows("all", rows, host, player, known, dlg)
 	return dlg
+
+
+## Returns the distinct set of primary schools present in `known`, in SpellRegistry.SCHOOL_SPELLS order with any extras appended.
+static func _collect_present_schools(known: Array[String]) -> Array:
+	var present: Dictionary = {}
+	for sp in known:
+		var schools: Array = SpellRegistry.get_schools(sp)
+		var primary: String = String(schools[0]) if not schools.is_empty() else "misc"
+		present[primary] = true
+	var ordered: Array = []
+	for s in SpellRegistry.SCHOOL_SPELLS.keys():
+		if present.has(String(s)):
+			ordered.append(String(s))
+	for s in present.keys():
+		if not ordered.has(String(s)):
+			ordered.append(String(s))
+	return ordered
+
+
+## Builds the horizontal tab strip ("All" + one button per present school) that swaps the rows VBox contents on press.
+static func _build_school_tabs(host: Node, player, known: Array[String],
+		rows: VBoxContainer, dlg: GameDialog, present_schools: Array) -> HBoxContainer:
+	var tabs_hbox := HBoxContainer.new()
+	tabs_hbox.add_theme_constant_override("separation", 4)
+	tabs_hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+	var selected: String = "all"
+	var all_btn := Button.new()
+	all_btn.text = "All"
+	all_btn.custom_minimum_size = Vector2(0, 80)
+	all_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	all_btn.clip_contents = true
+	all_btn.toggle_mode = true
+	all_btn.button_pressed = true
+	all_btn.add_theme_font_size_override("font_size", 32)
+	tabs_hbox.add_child(all_btn)
+
+	var buttons: Array = [all_btn]
+	var ids: Array = ["all"]
+	for school in present_schools:
+		var b := Button.new()
+		b.text = String(school).capitalize()
+		b.custom_minimum_size = Vector2(0, 80)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.clip_contents = true
+		b.toggle_mode = true
+		b.button_pressed = false
+		b.add_theme_font_size_override("font_size", 32)
+		b.modulate = UICards.school_colour(String(school))
+		tabs_hbox.add_child(b)
+		buttons.append(b)
+		ids.append(String(school))
+
+	for i in buttons.size():
+		var idx: int = i
+		buttons[i].pressed.connect(func():
+			for j in buttons.size():
+				buttons[j].button_pressed = (j == idx)
+			_populate_rows(String(ids[idx]), rows, host, player, known, dlg))
+	return tabs_hbox
+
+
+## Clears `rows` and rebuilds it for the selected school ("all" = full grouped view; else only that school's spells, no sub-header).
+static func _populate_rows(selected_school: String, rows: VBoxContainer,
+		host: Node, player, known: Array[String], dlg: GameDialog) -> void:
+	for child in rows.get_children():
+		rows.remove_child(child)
+		child.queue_free()
+	if selected_school == "all":
+		_build_school_grouped_rows(rows, host, player, known, dlg)
+		return
+	for sp in known:
+		var schools: Array = SpellRegistry.get_schools(sp)
+		var primary: String = String(schools[0]) if not schools.is_empty() else "misc"
+		if primary == selected_school:
+			rows.add_child(_build_row(host, player, String(sp), dlg))
 
 
 ## MP + memorisation readouts the player checks before every cast.

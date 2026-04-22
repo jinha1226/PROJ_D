@@ -2928,6 +2928,9 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 				CombatLog.add("You are wielding nothing to brand.")
 				return false
 			var brands: Array = ["flaming", "freezing", "electrocution", "venom", "holy_wrath"]
+			# DCSS SPWPN_PENETRATION is bow-exclusive.
+			if WeaponRegistry.weapon_skill_for(equipped_weapon_id) == "bow":
+				brands.append("penetration")
 			var picked: String = String(brands[randi() % brands.size()])
 			set_meta("_weapon_brand_" + equipped_weapon_id, picked)
 			CombatLog.add("Your %s glows with %s energy!" % [
@@ -3371,7 +3374,37 @@ func try_ranged_attack(target_pos: Vector2i) -> bool:
 	var bow_lv: int = skill_sys.get_level(self, "bow") if skill_sys != null else 0
 	delay_10 = maxi(3, delay_10 - mini(bow_lv, 10) * 10 / 20)
 	last_action_ticks = delay_10
-	CombatSystem.ranged_attack(self, target, target_pos, skill_sys)
+	# DCSS SPWPN_PENETRATION: the arrow pierces through and hits every
+	# monster in the line up to weapon range, not just the first. Reuses
+	# `Beam.trace(pierce=true)` to enumerate victims; we fire the same
+	# ranged_attack against each so skill training and noise-per-shot
+	# still make sense (one swing, multiple victims).
+	var brand_key: String = "_weapon_brand_" + equipped_weapon_id
+	var penetrates: bool = has_meta(brand_key) \
+			and String(get_meta(brand_key)) == "penetration"
+	if penetrates:
+		var gen: DungeonGenerator = generator
+		var opaque_cb: Callable = func(cell: Vector2i) -> int:
+			var t: int = gen.get_tile(cell)
+			if t == DungeonGenerator.TileType.WALL \
+					or t == DungeonGenerator.TileType.CRYSTAL_WALL \
+					or t == DungeonGenerator.TileType.DOOR_CLOSED:
+				return 2  # FieldOfView.OPC_OPAQUE
+			return 0
+		var mon_cb: Callable = func(cell: Vector2i):
+			return _monster_at(cell)
+		var trace: Dictionary = Beam.trace(grid_pos, target_pos, 7, true,
+				opaque_cb, mon_cb)
+		var hits: Array = trace.get("hits", [])
+		if hits.is_empty():
+			CombatSystem.ranged_attack(self, target, target_pos, skill_sys)
+		else:
+			for h in hits:
+				if h == null or not is_instance_valid(h):
+					continue
+				CombatSystem.ranged_attack(self, h, h.grid_pos, skill_sys)
+	else:
+		CombatSystem.ranged_attack(self, target, target_pos, skill_sys)
 	attacked.emit(target)
 	MonsterAI.broadcast_noise(get_tree(), grid_pos, 8, _skill_level("stealth"))
 	TurnManager.end_player_turn()
