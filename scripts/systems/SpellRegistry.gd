@@ -1,32 +1,27 @@
 extends Node
 
-const SPELL_DIR: String = "res://resources/spells"
+const _DART: Resource = preload("res://resources/spells/magic_dart.tres")
+const _HEAL: Resource = preload("res://resources/spells/heal_wounds.tres")
+const _BLINK: Resource = preload("res://resources/spells/blink.tres")
 
 var by_id: Dictionary = {}
 var all: Array = []
 
 func _ready() -> void:
-	_scan()
+	for res in [_DART, _HEAL, _BLINK]:
+		_register(res)
+	if all.is_empty():
+		push_warning("SpellRegistry: 0 spells registered.")
 
-func _scan() -> void:
-	by_id.clear()
-	all.clear()
-	var dir := DirAccess.open(SPELL_DIR)
-	if dir == null:
-		push_warning("SpellRegistry: %s not found." % SPELL_DIR)
+func _register(res) -> void:
+	if res == null:
 		return
-	dir.list_dir_begin()
-	var fname: String = dir.get_next()
-	while fname != "":
-		if not dir.current_is_dir() and fname.ends_with(".tres"):
-			var path: String = "%s/%s" % [SPELL_DIR, fname]
-			var res = load(path)
-			if res != null and "id" in res and "mp_cost" in res \
-					and String(res.id) != "":
-				by_id[String(res.id)] = res
-				all.append(res)
-		fname = dir.get_next()
-	dir.list_dir_end()
+	if not ("id" in res):
+		return
+	if String(res.id) == "":
+		return
+	by_id[String(res.id)] = res
+	all.append(res)
 
 func get_by_id(id: String) -> SpellData:
 	return by_id.get(id)

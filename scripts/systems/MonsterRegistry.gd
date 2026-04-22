@@ -1,32 +1,39 @@
 extends Node
 
-const MONSTER_DIR: String = "res://resources/monsters"
+const _RAT: Resource = preload("res://resources/monsters/rat.tres")
+const _BAT: Resource = preload("res://resources/monsters/bat.tres")
+const _KOBOLD: Resource = preload("res://resources/monsters/kobold.tres")
+const _GOBLIN: Resource = preload("res://resources/monsters/goblin.tres")
+const _HOBGOBLIN: Resource = preload("res://resources/monsters/hobgoblin.tres")
+const _ADDER: Resource = preload("res://resources/monsters/adder.tres")
+const _GNOLL: Resource = preload("res://resources/monsters/gnoll.tres")
+const _ORC: Resource = preload("res://resources/monsters/orc.tres")
+const _OGRE: Resource = preload("res://resources/monsters/ogre.tres")
+const _ORC_WIZARD: Resource = preload("res://resources/monsters/orc_wizard.tres")
+
+const _ALL_MONSTERS: Array = [
+	_RAT, _BAT, _KOBOLD, _GOBLIN, _HOBGOBLIN, _ADDER, _GNOLL,
+	_ORC, _OGRE, _ORC_WIZARD,
+]
 
 var by_id: Dictionary = {}
 var all: Array = []
 
 func _ready() -> void:
-	_scan()
+	for res in _ALL_MONSTERS:
+		_register(res)
+	if all.is_empty():
+		push_warning("MonsterRegistry: 0 monsters registered.")
 
-func _scan() -> void:
-	by_id.clear()
-	all.clear()
-	var dir := DirAccess.open(MONSTER_DIR)
-	if dir == null:
-		push_warning("MonsterRegistry: %s not found; run with empty roster." % MONSTER_DIR)
+func _register(res) -> void:
+	if res == null:
 		return
-	dir.list_dir_begin()
-	var fname: String = dir.get_next()
-	while fname != "":
-		if not dir.current_is_dir() and fname.ends_with(".tres"):
-			var path: String = "%s/%s" % [MONSTER_DIR, fname]
-			var res = load(path)
-			if res != null and "id" in res and "hp" in res \
-					and String(res.id) != "":
-				by_id[String(res.id)] = res
-				all.append(res)
-		fname = dir.get_next()
-	dir.list_dir_end()
+	if not ("id" in res):
+		return
+	if String(res.id) == "":
+		return
+	by_id[String(res.id)] = res
+	all.append(res)
 
 func get_by_id(id: String) -> MonsterData:
 	return by_id.get(id)

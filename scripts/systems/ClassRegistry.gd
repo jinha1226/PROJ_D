@@ -1,35 +1,33 @@
 extends Node
 
-const CLASS_DIR: String = "res://resources/classes"
+## Preload baked at script parse time — survives any filesystem / import
+## quirk Godot's autoload phase might have. Adding a new class means
+## adding a line here and a .tres file under resources/classes/.
+
+const _WARRIOR: Resource = preload("res://resources/classes/warrior.tres")
+const _MAGE: Resource = preload("res://resources/classes/mage.tres")
+const _ROGUE: Resource = preload("res://resources/classes/rogue.tres")
 
 var by_id: Dictionary = {}
 var all: Array = []
 
 func _ready() -> void:
-	_scan()
+	for res in [_WARRIOR, _MAGE, _ROGUE]:
+		_register(res)
+	if all.is_empty():
+		push_warning("ClassRegistry: 0 classes registered.")
 
-func _scan() -> void:
-	by_id.clear()
-	all.clear()
-	var dir := DirAccess.open(CLASS_DIR)
-	if dir == null:
-		push_warning("ClassRegistry: %s not found." % CLASS_DIR)
+func _register(res) -> void:
+	if res == null:
 		return
-	dir.list_dir_begin()
-	var fname: String = dir.get_next()
-	while fname != "":
-		if not dir.current_is_dir() and fname.ends_with(".tres"):
-			var path: String = "%s/%s" % [CLASS_DIR, fname]
-			var res = load(path)
-			# Duck-typed check — `is ClassData` can fail when the
-			# global class registry isn't yet populated (e.g. first
-			# run after a git pull without a fresh editor import).
-			if res != null and "id" in res and "starting_hp" in res \
-					and String(res.id) != "":
-				by_id[String(res.id)] = res
-				all.append(res)
-		fname = dir.get_next()
-	dir.list_dir_end()
+	var id_val = null
+	if "id" in res:
+		id_val = res.id
+	if id_val == null or String(id_val) == "":
+		push_warning("ClassRegistry: resource has no id (%s)." % str(res))
+		return
+	by_id[String(id_val)] = res
+	all.append(res)
 
 func get_by_id(id: String) -> ClassData:
 	return by_id.get(id)
@@ -44,3 +42,9 @@ func ids_in_order() -> Array:
 		if not result.has(id):
 			result.append(id)
 	return result
+
+# Legacy rescan path kept for JobSelect defensive call.
+func _scan() -> void:
+	if all.is_empty():
+		for res in [_WARRIOR, _MAGE, _ROGUE]:
+			_register(res)
