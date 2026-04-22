@@ -1015,6 +1015,20 @@ func _on_quickslot_pressed(index: int) -> void:
 					skill_system.grant_xp(player, float(info.get("mp", 1)) * 8.0, tags)
 				TurnManager.end_player_turn()
 		else:
+			# Double-tap the same quickslot → auto-fire at the nearest
+			# visible hostile (within spell range). First tap entered
+			# targeting mode; a second tap while still targeting the same
+			# spell commits to the closest valid victim without needing
+			# to aim on the map.
+			if _targeting_spell == spell_id \
+					and touch_input != null and touch_input.targeting_mode:
+				var spell_range: int = int(info.get("range", 6))
+				var auto: Monster = _find_nearest_visible_monster(spell_range)
+				if auto != null:
+					_on_target_selected(auto.grid_pos)
+				else:
+					CombatLog.add("No target in range.")
+				return
 			_targeting_spell = spell_id
 			_pending_area_target = Vector2i(-1, -1)
 			if touch_input != null:
@@ -1022,6 +1036,9 @@ func _on_quickslot_pressed(index: int) -> void:
 			_show_targeting_hint()
 		return
 	player.use_quickslot(index)
+
+
+const _QS_KINDS: Array = ["potion", "scroll", "wand", "book"]
 
 
 func _open_quickslot_picker(slot_index: int) -> void:
@@ -1032,41 +1049,14 @@ func _open_quickslot_picker(slot_index: int) -> void:
 	var vb: VBoxContainer = dlg.body()
 	vb.add_theme_constant_override("separation", 6)
 
-	vb.add_child(UICards.section_header("Items"))
+	var rows := VBoxContainer.new()
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rows.add_theme_constant_override("separation", 4)
 
-	var seen_ids: Dictionary = {}
-	var any_items: bool = false
-	for it in player.get_items():
-		var iid: String = String(it.get("id", ""))
-		var kind: String = String(it.get("kind", ""))
-		if kind != "potion" and kind != "scroll" and kind != "book":
-			continue
-		if seen_ids.has(iid):
-			continue
-		seen_ids[iid] = true
-		any_items = true
-		var btn := Button.new()
-		var disp: String = GameManager.display_name_for_item(iid, String(it.get("name", iid)), kind)
-		btn.text = "%s [%s]" % [disp, kind]
-		btn.custom_minimum_size = Vector2(0, 72)
-		btn.add_theme_font_size_override("font_size", 40)
-		btn.pressed.connect(_assign_quickslot_item.bind(slot_index, iid, dlg))
-		vb.add_child(btn)
-	if not any_items:
-		vb.add_child(UICards.dim_hint("No usable items."))
+	vb.add_child(_build_quickslot_tabs(slot_index, rows, dlg))
+	vb.add_child(rows)
 
-	var known: Array[String] = SpellRegistry.get_known_for_player(player, skill_system)
-	if not known.is_empty():
-		vb.add_child(UICards.section_header("Spells"))
-		for spell_id in known:
-			var info: Dictionary = SpellRegistry.get_spell(spell_id)
-			var btn := Button.new()
-			btn.text = "%s [%d MP]" % [String(info.get("name", spell_id)), int(info.get("mp", 0))]
-			btn.custom_minimum_size = Vector2(0, 72)
-			btn.add_theme_font_size_override("font_size", 40)
-			btn.add_theme_color_override("font_color", info.get("color", Color.WHITE))
-			btn.pressed.connect(_assign_quickslot_item.bind(slot_index, "spell:" + spell_id, dlg))
-			vb.add_child(btn)
+	_populate_quickslot_rows("all", slot_index, rows, dlg)
 
 	var clear_btn := Button.new()
 	clear_btn.text = "Clear Slot"
@@ -1075,6 +1065,95 @@ func _open_quickslot_picker(slot_index: int) -> void:
 	clear_btn.modulate = Color(1.0, 0.5, 0.5)
 	clear_btn.pressed.connect(_assign_quickslot_item.bind(slot_index, "", dlg))
 	vb.add_child(clear_btn)
+
+
+## Horizontal tab row: All / Potion / Scroll / Wand / Book / Spell.
+## Selected tab filters the rows VBox; swap happens in place without
+## reopening the dialog, matching the Magic dialog pattern.
+func _build_quickslot_tabs(slot_index: int, rows: VBoxContainer,
+		dlg: GameDialog) -> HBoxContainer:
+	var hbox := HBoxContainer.new()
+	hbox.add_theme_constant_override("separation", 4)
+	hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var labels: Array = ["All", "Potion", "Scroll", "Wand", "Book", "Spell"]
+	var ids: Array = ["all", "potion", "scroll", "wand", "book", "spell"]
+	var buttons: Array = []
+	for i in labels.size():
+		var b := Button.new()
+		b.text = String(labels[i])
+		b.toggle_mode = true
+		b.button_pressed = (i == 0)
+		b.custom_minimum_size = Vector2(0, 64)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.clip_contents = true
+		b.add_theme_font_size_override("font_size", 30)
+		hbox.add_child(b)
+		buttons.append(b)
+	for i in buttons.size():
+		var idx: int = i
+		buttons[i].pressed.connect(func():
+			for j in buttons.size():
+				buttons[j].button_pressed = (j == idx)
+			_populate_quickslot_rows(String(ids[idx]), slot_index, rows, dlg))
+	return hbox
+
+
+## Clear + rebuild the rows VBox for the selected filter. "all" mirrors
+## the legacy grouped view (Items header + all kinds + Spells header);
+## a specific kind shows only that kind's entries.
+func _populate_quickslot_rows(filter: String, slot_index: int,
+		rows: VBoxContainer, dlg: GameDialog) -> void:
+	for child in rows.get_children():
+		rows.remove_child(child)
+		child.queue_free()
+	if player == null:
+		return
+	var show_all: bool = (filter == "all")
+	var show_items: bool = show_all or _QS_KINDS.has(filter)
+	var show_spells: bool = show_all or filter == "spell"
+
+	if show_items:
+		if show_all:
+			rows.add_child(UICards.section_header("Items"))
+		var seen_ids: Dictionary = {}
+		var any_items: bool = false
+		for it in player.get_items():
+			var iid: String = String(it.get("id", ""))
+			var kind: String = String(it.get("kind", ""))
+			if not _QS_KINDS.has(kind):
+				continue
+			if not show_all and kind != filter:
+				continue
+			if seen_ids.has(iid):
+				continue
+			seen_ids[iid] = true
+			any_items = true
+			var btn := Button.new()
+			var disp: String = GameManager.display_name_for_item(iid, String(it.get("name", iid)), kind)
+			btn.text = "%s [%s]" % [disp, kind]
+			btn.custom_minimum_size = Vector2(0, 72)
+			btn.add_theme_font_size_override("font_size", 40)
+			btn.pressed.connect(_assign_quickslot_item.bind(slot_index, iid, dlg))
+			rows.add_child(btn)
+		if not any_items and not show_spells:
+			rows.add_child(UICards.dim_hint("No matching items."))
+
+	if show_spells:
+		var known: Array[String] = SpellRegistry.get_known_for_player(player, skill_system)
+		if not known.is_empty():
+			if show_all:
+				rows.add_child(UICards.section_header("Spells"))
+			for spell_id in known:
+				var info: Dictionary = SpellRegistry.get_spell(spell_id)
+				var btn := Button.new()
+				btn.text = "%s [%d MP]" % [String(info.get("name", spell_id)), int(info.get("mp", 0))]
+				btn.custom_minimum_size = Vector2(0, 72)
+				btn.add_theme_font_size_override("font_size", 40)
+				btn.add_theme_color_override("font_color", info.get("color", Color.WHITE))
+				btn.pressed.connect(_assign_quickslot_item.bind(slot_index, "spell:" + spell_id, dlg))
+				rows.add_child(btn)
+		elif filter == "spell":
+			rows.add_child(UICards.dim_hint("No spells learned."))
 
 
 func _assign_quickslot_item(slot_index: int, id: String, dlg: GameDialog) -> void:

@@ -61,37 +61,73 @@ static func _collect_present_schools(known: Array[String]) -> Array:
 	return ordered
 
 
-## Builds the horizontal tab strip ("All" + one button per present school) that swaps the rows VBox contents on press.
-static func _build_school_tabs(host: Node, player, known: Array[String],
-		rows: VBoxContainer, dlg: GameDialog, present_schools: Array) -> HBoxContainer:
-	var tabs_hbox := HBoxContainer.new()
-	tabs_hbox.add_theme_constant_override("separation", 4)
-	tabs_hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+## 3-letter abbreviations for the school sub-tabs — matches the pill
+## tag style already used on each spell row (`school.substr(0,3).upper`).
+const _SCHOOL_ABBR: Dictionary = {
+	"conjurations":    "CON",
+	"fire":            "FIR",
+	"cold":            "CLD",
+	"earth":           "ERT",
+	"air":             "AIR",
+	"necromancy":      "NEC",
+	"alchemy":         "ALC",
+	"hexes":           "HEX",
+	"translocations":  "TLC",
+	"summonings":      "SUM",
+	"charms":          "CHM",
+	"poison":          "PSN",
+}
 
-	var selected: String = "all"
+
+## Returns the 3-letter uppercase abbreviation for a school id, falling
+## back to the first three letters when the school isn't in the table.
+static func _school_abbr(school: String) -> String:
+	if _SCHOOL_ABBR.has(school):
+		return String(_SCHOOL_ABBR[school])
+	return school.substr(0, 3).to_upper()
+
+
+## Builds a two-row card grid — "All" on top (full width), then a 4-col
+## grid of 3-letter school buttons below — instead of one wide horizontal
+## strip that overflowed on 10+ schools. Swaps the rows VBox contents
+## on press.
+static func _build_school_tabs(host: Node, player, known: Array[String],
+		rows: VBoxContainer, dlg: GameDialog, present_schools: Array) -> Control:
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 4)
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
 	var all_btn := Button.new()
 	all_btn.text = "All"
-	all_btn.custom_minimum_size = Vector2(0, 80)
+	all_btn.custom_minimum_size = Vector2(0, 64)
 	all_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	all_btn.clip_contents = true
 	all_btn.toggle_mode = true
 	all_btn.button_pressed = true
-	all_btn.add_theme_font_size_override("font_size", 32)
-	tabs_hbox.add_child(all_btn)
+	all_btn.add_theme_font_size_override("font_size", 34)
+	col.add_child(all_btn)
+
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 4)
+	grid.add_theme_constant_override("v_separation", 4)
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.add_child(grid)
 
 	var buttons: Array = [all_btn]
 	var ids: Array = ["all"]
 	for school in present_schools:
 		var b := Button.new()
-		b.text = String(school).capitalize()
-		b.custom_minimum_size = Vector2(0, 80)
+		b.text = _school_abbr(String(school))
+		b.tooltip_text = String(school).capitalize()
+		b.custom_minimum_size = Vector2(0, 64)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.clip_contents = true
 		b.toggle_mode = true
 		b.button_pressed = false
-		b.add_theme_font_size_override("font_size", 32)
+		b.add_theme_font_size_override("font_size", 34)
 		b.modulate = UICards.school_colour(String(school))
-		tabs_hbox.add_child(b)
+		grid.add_child(b)
 		buttons.append(b)
 		ids.append(String(school))
 
@@ -101,7 +137,7 @@ static func _build_school_tabs(host: Node, player, known: Array[String],
 			for j in buttons.size():
 				buttons[j].button_pressed = (j == idx)
 			_populate_rows(String(ids[idx]), rows, host, player, known, dlg))
-	return tabs_hbox
+	return col
 
 
 ## Clears `rows` and rebuilds it for the selected school ("all" = full grouped view; else only that school's spells, no sub-header).
