@@ -2724,7 +2724,13 @@ func _regenerate_dungeon(going_up: bool, secondary: bool = false) -> void:
 	elif _top_hud_ref != null and _top_hud_ref.has_method("set_depth"):
 		_top_hud_ref.set_depth(GameManager.current_depth)
 	await get_tree().process_frame
-	if _floor_state.has(GameManager.floor_key()):
+	# _seed_test_travel_destinations stubs every reachable branch/depth
+	# with an empty snapshot so Travel lists them, but that same stub
+	# makes `has()` report a restore path where `_restore_floor` returns
+	# immediately on empty content. Treat empty snapshots as unvisited.
+	var fk: String = GameManager.floor_key()
+	var has_saved: bool = _floor_state.has(fk) and not _floor_state[fk].is_empty()
+	if has_saved:
 		_restore_floor(GameManager.current_depth)
 	else:
 		_spawn_monsters_for_current_depth()
@@ -3424,12 +3430,13 @@ func _on_skill_training_toggled(pressed: bool, skill_id: String) -> void:
 	if skill_system == null or player == null:
 		return
 	skill_system.set_training(player, skill_id, pressed)
-	# When the ACTIVE tab is currently open, toggling a skill moves it
-	# between Training/Learned sub-sections — rebuild the dialog so the
-	# row reshuffles in place.
-	if _skills_swipe_category == "active" and _skills_dlg != null and is_instance_valid(_skills_dlg):
+	# Rebuild the current tab so the row's training indicator (leading ▶
+	# bullet + green tint) updates immediately. On the ACTIVE tab the row
+	# also reshuffles between the Training / Learned sub-sections.
+	if _skills_dlg != null and is_instance_valid(_skills_dlg):
+		var cat: String = _skills_swipe_category
 		_skills_dlg.close()
-		_open_skills_dialog("active")
+		_open_skills_dialog(cat)
 
 
 const _SKILL_DESCS: Dictionary = {

@@ -787,12 +787,21 @@ static func player_race(id: String) -> Texture2D:
 
 
 ## Doll overlay texture for a slot/item. Returns null if no mapping exists
-## so callers can cleanly skip that layer.
+## so callers can cleanly skip that layer. Unrands fall back to their
+## base item's tile — `unrand_storm_bow` paints as the `shortbow` tile
+## rather than leaving the paper-doll nude.
 static func doll_layer(slot: String, item_id: String) -> Texture2D:
 	if item_id == "":
 		return null
 	var slot_map: Dictionary = PLAYER_DOLL.get(slot, {})
-	return _load(String(slot_map.get(item_id, "")))
+	var direct: String = String(slot_map.get(item_id, ""))
+	if direct != "":
+		return _load(direct)
+	if item_id.begins_with("unrand_") and UnrandartRegistry.has(item_id):
+		var base_id: String = String(UnrandartRegistry.get_info(item_id).get("base", ""))
+		if base_id != "":
+			return _load(String(slot_map.get(base_id, "")))
+	return null
 
 
 ## Compose a single texture from a race/job base + optional doll overlays,
