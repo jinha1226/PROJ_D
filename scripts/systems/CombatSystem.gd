@@ -31,6 +31,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	if was_alive and monster.hp <= 0:
 		CombatLog.hit("You kill the %s." % monster.data.display_name)
 		player.grant_xp(monster.data.xp_value)
+		player.register_kill()
 
 static func monster_attack_player(monster: Monster, player: Player) -> void:
 	if monster.data == null or player.hp <= 0:

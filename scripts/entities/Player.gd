@@ -28,6 +28,8 @@ var intelligence: int = 10
 var xl: int = 1
 var xp: int = 0
 var gold: int = 0
+var kills: int = 0
+var last_killer: String = ""
 var items: Array = []  # [{id: String, plus: int}]
 var equipped_weapon_id: String = ""
 var equipped_armor_id: String = ""
@@ -184,11 +186,16 @@ func compute_fov() -> Dictionary:
 	var is_opaque := func(p: Vector2i) -> bool: return _map.is_opaque(p)
 	return FieldOfView.compute(grid_pos, SIGHT_RADIUS, is_opaque)
 
-func take_damage(amount: int, _source: String = "") -> void:
+func take_damage(amount: int, source: String = "") -> void:
 	hp = max(0, hp - amount)
+	if source != "":
+		last_killer = source
 	emit_signal("stats_changed")
 	if hp <= 0:
 		emit_signal("died")
+
+func register_kill() -> void:
+	kills += 1
 
 func heal(amount: int) -> void:
 	hp = min(hp_max, hp + amount)

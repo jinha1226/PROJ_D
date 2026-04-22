@@ -6,7 +6,9 @@ const MonsterScene = preload("res://scripts/entities/Monster.gd")
 const FloorItemScene = preload("res://scripts/entities/FloorItem.gd")
 const TopHUDScene = preload("res://scenes/ui/TopHUD.tscn")
 const BottomHUDScene = preload("res://scenes/ui/BottomHUD.tscn")
+const ResultScreenScene = preload("res://scenes/ui/ResultScreen.tscn")
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
+const JOB_SELECT_PATH: String = "res://scenes/menu/JobSelect.tscn"
 
 var map: DungeonMap
 var player: Player
@@ -16,6 +18,7 @@ var camera: Camera2D
 var ui_layer: CanvasLayer
 var top_hud: TopHUD
 var bottom_hud: BottomHUD
+var log_strip: CombatLogStrip
 
 func _ready() -> void:
 	if not GameManager.run_in_progress:
@@ -87,6 +90,8 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.items = data.get("items", [])
 	player.equipped_weapon_id = String(data.get("weapon", ""))
 	player.equipped_armor_id = String(data.get("armor", ""))
+	player.kills = int(data.get("kills", 0))
+	player.last_killer = String(data.get("last_killer", ""))
 	CombatLog.post("Run resumed. Floor B%d." % GameManager.depth,
 		Color(0.7, 0.9, 1.0))
 
@@ -136,6 +141,17 @@ func _spawn_ui() -> void:
 	bottom_hud = BottomHUDScene.instantiate()
 	bottom_hud.name = "BottomHUD"
 	ui_layer.add_child(bottom_hud)
+	log_strip = CombatLogStrip.new()
+	log_strip.name = "CombatLogStrip"
+	log_strip.anchor_left = 0.0
+	log_strip.anchor_right = 1.0
+	log_strip.anchor_top = 1.0
+	log_strip.anchor_bottom = 1.0
+	log_strip.offset_top = -380.0
+	log_strip.offset_bottom = -240.0
+	log_strip.grow_horizontal = 2
+	log_strip.grow_vertical = 0
+	ui_layer.add_child(log_strip)
 	bottom_hud.bag_pressed.connect(_on_bag_pressed)
 	bottom_hud.status_pressed.connect(_on_status_pressed)
 	bottom_hud.wait_pressed.connect(_on_wait_pressed)
@@ -258,7 +274,39 @@ func _on_player_turn_started() -> void:
 
 func _on_player_died() -> void:
 	CombatLog.post("You have died.", Color(1.0, 0.4, 0.4))
+	var shards: int = max(1, GameManager.depth * 2 + player.xl * 3)
+	GameManager.add_rune_shards(shards)
 	GameManager.end_run("death")
+	_show_result_screen(false, shards)
+
+func _show_result_screen(victory: bool, shards: int) -> void:
+	var res = ResultScreenScene.instantiate()
+	ui_layer.add_child(res)
+	var data: Dictionary = {
+		"victory": victory,
+		"depth": GameManager.depth,
+		"kills": player.kills,
+		"turns": TurnManager.turn_number,
+		"shards_gained": shards,
+		"shards_total": GameManager.rune_shards,
+		"killer": player.last_killer,
+	}
+	res.show_result(data)
+	if res.has_signal("retry_pressed"):
+		res.retry_pressed.connect(_on_result_retry.bind(res))
+	if res.has_signal("meta_pressed"):
+		res.meta_pressed.connect(_on_result_meta.bind(res))
+
+func _on_result_retry(res: Node) -> void:
+	if is_instance_valid(res):
+		res.queue_free()
+	GameManager.selected_class_id = ""
+	get_tree().change_scene_to_file(JOB_SELECT_PATH)
+
+func _on_result_meta(res: Node) -> void:
+	if is_instance_valid(res):
+		res.queue_free()
+	get_tree().change_scene_to_file(MENU_SCENE_PATH)
 
 func _on_stairs_down() -> void:
 	GameManager.descend()
