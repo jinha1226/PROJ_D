@@ -531,6 +531,16 @@ static func _apply_mon_spell(m: Monster, target: Node, spell_id: String) -> bool
 	# Monster spell power scales with HD, roughly DCSS mons_power = HD * 12.
 	var hd: int = int(m.data.hd if m.data else 1)
 	var power: int = max(12, hd * 12)
+	# Pure cloud spells place a patch on the target's tile and consume the
+	# turn — no direct damage (the cloud's per-turn tick handles harm).
+	# Mephitic Cloud / Noxious Cloud / Miasma Breath all land here.
+	if _spell_is_pure_cloud(spell_id):
+		var ctype_pure: String = _cloud_type_for_spell(spell_id)
+		var radius_pure: int = 1 if spell_id == "spit_poison" else 2
+		_place_cloud_patch_at(m, target.grid_pos, ctype_pure, radius_pure)
+		var name_pc: String = m.data.display_name if m.data else "caster"
+		CombatLog.add("The %s releases %s!" % [name_pc, spell_id.replace("_", " ")])
+		return true
 	# Direct-damage zaps go through SpellRegistry.roll_damage with the
 	# element routed to the defender's resistance check.
 	var dmg: int = SpellRegistry.roll_damage(spell_id, power)
@@ -541,6 +551,10 @@ static func _apply_mon_spell(m: Monster, target: Node, spell_id: String) -> bool
 			var dmg_mname: String = m.data.display_name if m.data else "monster"
 			CombatLog.add("The %s casts %s for %d damage!" % [
 					dmg_mname, spell_id.replace("_", " "), dmg])
+		# Breath weapons that deal damage AND leave a trailing cloud.
+		var residue: String = _spell_breath_residue(spell_id)
+		if residue != "" and "grid_pos" in target:
+			_place_cloud_patch_at(m, target.grid_pos, residue, 1)
 		return true
 	# Non-damage spells: hex / heal-other / summon / invisibility. Minimum
 	# viable coverage so priests and wizards feel like DCSS rather than
@@ -679,6 +693,86 @@ static func _find_generator(tree: SceneTree) -> DungeonGenerator:
 	if dmap == null or not ("generator" in dmap):
 		return null
 	return dmap.generator
+
+
+## True for spells that are *only* a cloud drop (no direct damage). The
+## cloud's per-turn tick takes care of harming anyone standing in it.
+## DCSS lumps these under SPFLAG_CLOUD / the Mephitic Cloud / Noxious
+## Cloud / Freezing Cloud families.
+static func _spell_is_pure_cloud(spell_id: String) -> bool:
+	match spell_id:
+		"mephitic_cloud", "noxious_cloud", "poisonous_cloud", \
+		"freezing_cloud", "flaming_cloud", "petrifying_cloud", \
+		"ink_cloud", "spectral_cloud", "miasma_breath", "spit_poison":
+			return true
+		_:
+			return false
+
+
+## Cloud type id (CloudSystem.CLOUD_DEFS key) for cloud-placing spells,
+## used by both pure-cloud dispatch and breath-weapon residue.
+static func _cloud_type_for_spell(spell_id: String) -> String:
+	match spell_id:
+		"mephitic_cloud":
+			return "mephitic"
+		"noxious_cloud", "poisonous_cloud", "miasma_breath", "spit_poison":
+			return "noxious"
+		"freezing_cloud":
+			return "freezing"
+		"flaming_cloud":
+			return "fire"
+		"petrifying_cloud", "ink_cloud", "spectral_cloud":
+			return "smoke"
+		_:
+			return ""
+
+
+## Breath weapons that deal direct damage *and* leave a 1-radius cloud
+## patch at the target tile. Matches DCSS dragon-breath behaviour:
+## fire-breath scorches a flame trail, cold-breath frosts the ground.
+static func _spell_breath_residue(spell_id: String) -> String:
+	match spell_id:
+		"fire_breath", "searing_breath":
+			return "fire"
+		"cold_breath":
+			return "freezing"
+		"chaos_breath":
+			return "noxious"
+		_:
+			return ""
+
+
+## Place a cloud patch at `center_pos` of the given type. Scene-tree-lookup
+## version of GameBootstrap's cloud hook — pulls GameManager via the tree
+## root so the MonsterAI helper doesn't need an injected handle.
+static func _place_cloud_patch_at(m: Monster, center_pos: Vector2i,
+		cloud_type: String, radius: int) -> void:
+	if cloud_type == "" or m == null:
+		return
+	var tree: SceneTree = m.get_tree()
+	if tree == null:
+		return
+	var gm: Node = tree.root.get_node_or_null("GameManager")
+	if gm == null or not ("clouds" in gm):
+		return
+	CloudSystem.place_patch(gm.clouds, center_pos, cloud_type, radius)
+	var game: Node = tree.root.get_node_or_null("Game")
+	if game != null:
+		var dmap = game.get_node_or_null("DungeonLayer/DungeonMap")
+		if dmap != null:
+			if dmap.has_method("update_fov"):
+				# Smoke clouds block FOV — recompute around player so the
+				# sight mask catches the new opaque tiles.
+				var player: Node = game.get_node_or_null("EntityLayer/Player")
+				if player == null:
+					for c in game.get_node("EntityLayer").get_children():
+						if c.name == "Player":
+							player = c
+							break
+				if player != null and "grid_pos" in player:
+					dmap.update_fov(player.grid_pos)
+			if dmap.has_method("queue_redraw"):
+				dmap.queue_redraw()
 
 
 ## Wake a sleeping monster and propagate the alarm to adjacent sleepers.

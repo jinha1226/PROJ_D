@@ -289,6 +289,8 @@ func _ready() -> void:
 		bottom_hud.quickslot_pressed.connect(_on_quickslot_pressed)
 	if bottom_hud != null and bottom_hud.has_signal("quickslot_long_pressed"):
 		bottom_hud.quickslot_long_pressed.connect(_on_quickslot_long_pressed)
+	if bottom_hud != null and bottom_hud.has_signal("quickslot_swap_requested"):
+		bottom_hud.quickslot_swap_requested.connect(_on_quickslot_swap)
 	if player.has_signal("quickslots_changed"):
 		player.quickslots_changed.connect(_refresh_quickslots.bind(bottom_hud))
 	if player.has_signal("inventory_changed"):
@@ -690,6 +692,22 @@ func _process(_delta: float) -> void:
 ## Long-press on a quickslot → show its assigned item/spell info instead of
 ## firing it. Empty slots still just open the picker so users can assign
 ## something — no info to show.
+## Swap two quickslot bindings when the player drags from one slot to
+## another. Works for any combo (empty ↔ assigned, spell ↔ item, etc).
+func _on_quickslot_swap(from_index: int, to_index: int) -> void:
+	if player == null:
+		return
+	var slots: Array = player.quickslot_ids
+	if from_index < 0 or from_index >= slots.size():
+		return
+	if to_index < 0 or to_index >= slots.size():
+		return
+	var tmp: String = slots[from_index]
+	slots[from_index] = slots[to_index]
+	slots[to_index] = tmp
+	player.quickslots_changed.emit()
+
+
 func _on_quickslot_long_pressed(index: int) -> void:
 	if player == null:
 		return
@@ -1414,6 +1432,19 @@ func _on_monster_died(monster: Monster) -> void:
 	kill_count += 1
 	if monster != null and monster.data != null:
 		CombatLog.add("You kill the %s!" % String(monster.data.display_name))
+	# DCSS death clouds: rot / plague / elemental monsters release a cloud
+	# on death. Burst radius 1 for normal ids, 2 for explosive types so
+	# fire vortex / fire elemental deaths leave a real hazard trail.
+	if monster != null and monster.data != null and GameManager != null:
+		var death_info: Dictionary = _monster_death_cloud(String(monster.data.id))
+		var dtype: String = String(death_info.get("type", ""))
+		if dtype != "":
+			CloudSystem.place_patch(GameManager.clouds, monster.grid_pos,
+					dtype, int(death_info.get("radius", 1)))
+			var dmap_d: DungeonMap = $DungeonLayer/DungeonMap
+			if dmap_d != null:
+				dmap_d.update_fov(player.grid_pos if player != null else monster.grid_pos)
+				dmap_d.queue_redraw()
 	if meta != null and monster != null and monster.data != null:
 		meta.record_kill(String(monster.data.id))
 	# DCSS gold drop: 30% of intelligent humanoid kills drop a small pile
@@ -4323,32 +4354,50 @@ func _on_target_selected(pos: Vector2i) -> void:
 				_targeting_spell)))
 		return
 
-	# ----- Single-target (1-tap fire, unchanged) ------------------------
-	if dmap != null:
-		dmap.danger_tiles.clear()
-		dmap.aoe_preview_tiles.clear()
-		dmap.beam_preview_tiles.clear()
-		dmap.queue_redraw()
+	# ----- Single-target 2-tap confirm ---------------------------------
+	# Matches the area flow: first tap on a visible enemy paints the
+	# beam path from player to that target, second tap on the same
+	# enemy fires. Moving the tap repaints the beam onto the new
+	# target. Single-target spells still require a creature (tapping
+	# empty floor cancels), so the beam only starts tracking once the
+	# player has actually selected an enemy.
 	var target_monster: Monster = null
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if is_instance_valid(m) and m is Monster and m.is_alive and m.grid_pos == pos:
 			target_monster = m
 			break
 	if target_monster == null:
+		if dmap != null:
+			dmap.danger_tiles.clear()
+			dmap.aoe_preview_tiles.clear()
+			dmap.beam_preview_tiles.clear()
+			dmap.queue_redraw()
 		CombatLog.add("Targeting cancelled.")
 		_targeting_spell = ""
+		_pending_area_target = Vector2i(-1, -1)
 		return
 	if dmap != null and not dmap.is_tile_visible(target_monster.grid_pos):
 		CombatLog.add("Your line of sight is blocked.")
-		_targeting_spell = ""
 		return
 	if d > max_range:
-		CombatLog.add("Target is out of range (%d > %d)." % [d, max_range])
-		_targeting_spell = ""
+		CombatLog.add("Target is out of range (%d > %d). Tap a closer enemy." \
+				% [d, max_range])
 		return
-	var spell_id: String = _targeting_spell
-	_targeting_spell = ""
-	_execute_targeted_cast(spell_id, target_monster)
+	if _pending_area_target == pos:
+		var spell_id: String = _targeting_spell
+		_targeting_spell = ""
+		_pending_area_target = Vector2i(-1, -1)
+		if dmap != null:
+			dmap.danger_tiles.clear()
+			dmap.aoe_preview_tiles.clear()
+			dmap.beam_preview_tiles.clear()
+			dmap.queue_redraw()
+		_execute_targeted_cast(spell_id, target_monster)
+		return
+	_pending_area_target = pos
+	_repaint_beam_preview(target_monster, max_range)
+	CombatLog.add("Tap again to cast %s." % String(info_for_range.get("name",
+			_targeting_spell)))
 
 
 ## Paint the AoE tiles around the pending blast center so the 2-tap
@@ -4381,6 +4430,31 @@ func _repaint_area_preview(center: Vector2i) -> void:
 		if player.grid_pos.distance_to(m.grid_pos) <= float(spell_range):
 			enemies.append(m.grid_pos)
 	dmap.danger_tiles = enemies
+	dmap.queue_redraw()
+
+
+## Paint the single-target beam path so the 2-tap confirm flow shows
+## exactly which line the zap will travel (including wall stops and
+## monster interception). Mirrors _repaint_area_preview but uses a
+## Beam.trace along the player → target ray.
+func _repaint_beam_preview(target: Monster, spell_range: int) -> void:
+	var dmap: DungeonMap = $DungeonLayer/DungeonMap
+	if dmap == null or target == null or player == null or _targeting_spell == "":
+		return
+	var opaque_cb: Callable = func(cell: Vector2i) -> int:
+		return dmap._opaque_at(cell) if dmap != null else 0
+	var mon_cb: Callable = func(_cell: Vector2i):
+		return null
+	var pierce: bool = Beam.should_pierce(_targeting_spell)
+	var trace: Dictionary = Beam.trace(player.grid_pos, target.grid_pos,
+			spell_range, pierce, opaque_cb, mon_cb)
+	var cells: Array = trace.get("cells", [])
+	var beam: Array[Vector2i] = []
+	for c in cells:
+		beam.append(c)
+	dmap.beam_preview_tiles = beam
+	dmap.aoe_preview_tiles.clear()
+	dmap.danger_tiles = [target.grid_pos]
 	dmap.queue_redraw()
 
 
@@ -4864,6 +4938,29 @@ func _spell_cloud_residue(spell_id: String) -> String:
 			return "freezing"
 		_:
 			return ""
+
+
+## DCSS death-cloud table — a handful of monster ids release a cloud
+## on death. Keeps the set small (plague/rot undead + elementals) so
+## most kills stay clean; the cloud is the flavour reward for taking
+## down a notably nasty mob.
+func _monster_death_cloud(monster_id: String) -> Dictionary:
+	match monster_id:
+		# Plague / rot undead — decaying flesh bursts into miasma.
+		"bog_body", "plague_shambler", "rotting_hulk", "necrophage", \
+		"ghoul", "death_drake":
+			return {"type": "noxious", "radius": 1}
+		# Fire-bodied creatures burn up into a lingering flame cloud.
+		"fire_vortex", "fire_elemental", "creeping_inferno":
+			return {"type": "fire", "radius": 2}
+		# Cold-bodied elementals leave a freezing patch.
+		"frost_giant", "ice_statue", "simulacrum":
+			return {"type": "freezing", "radius": 1}
+		# Smoke-bodied / shadowy creatures dissolve into smoke.
+		"smoke_demon", "smoke_djinn":
+			return {"type": "smoke", "radius": 2}
+		_:
+			return {}
 
 
 func _cast_self_spell(spell_id: String, _info: Dictionary, _power: int) -> Dictionary:
