@@ -418,24 +418,85 @@ func _apply_test_character_boost() -> void:
 		for spell_id in SpellRegistry.SPELLS.keys():
 			if not player.learned_spells.has(spell_id):
 				player.learned_spells.append(String(spell_id))
-	# Stock a handful of utility consumables beyond the archmage kit so
-	# we can test scroll interactions without fishing for drops.
-	for extra_id in ["scroll_fog", "scroll_blink", "scroll_teleport",
-			"potion_might", "potion_resistance", "potion_berserk_rage"]:
-		if ConsumableRegistry.has(extra_id):
-			var cinfo: Dictionary = ConsumableRegistry.get_info(extra_id)
-			player.items.append({
-				"id": extra_id,
-				"name": String(cinfo.get("name", extra_id)),
-				"kind": String(cinfo.get("kind", "potion")),
-				"color": cinfo.get("color", Color(0.75, 0.75, 0.85)),
-			})
-			GameManager.identify(extra_id)
+	# Stock every consumable (potion / scroll / talisman / book) in the
+	# registry so the Bag reads like a QA checklist. Auto-identify each
+	# so pseudonyms don't hide anything during testing.
+	for cid in ConsumableRegistry.all_ids():
+		var cinfo: Dictionary = ConsumableRegistry.get_info(String(cid))
+		if cinfo.is_empty():
+			continue
+		player.items.append({
+			"id": String(cid),
+			"name": String(cinfo.get("name", cid)),
+			"kind": String(cinfo.get("kind", "potion")),
+			"color": cinfo.get("color", Color(0.75, 0.75, 0.85)),
+		})
+		GameManager.identify(String(cid))
+	# Every wand in the registry with a full charge bar — covers
+	# wand_digging, wand_polymorph, wand_paralysis, wand_charming, etc.
+	for wid in WandRegistry.all_ids():
+		var winfo: Dictionary = WandRegistry.get_info(String(wid))
+		player.items.append({
+			"id": String(wid),
+			"name": String(winfo.get("name", wid)),
+			"kind": "wand",
+			"color": winfo.get("color", Color(0.75, 0.75, 0.85)),
+			"charges": WandRegistry.roll_charges(String(wid)) + 10,
+		})
+		GameManager.identify(String(wid))
+	# One of each unrand slot at test-friendly depth so equip + tooltip
+	# + armour-ego identify paths can be exercised without farming drops.
+	for unrand_id in ["unrand_singing_sword", "unrand_plate_of_the_sunborne",
+			"unrand_ring_of_the_mage", "unrand_amulet_of_the_hearth",
+			"unrand_boots_of_the_skyborne", "unrand_helm_of_serafin",
+			"unrand_cloak_of_stormweaver", "unrand_gloves_of_vorpal_grip"]:
+		if UnrandartRegistry.has(unrand_id):
+			var ud: Dictionary = UnrandartRegistry.make_item(unrand_id)
+			if not ud.is_empty():
+				player.items.append(ud)
+	# A sack of gold so the Trove custodian and Gozag shops are testable.
+	player.gold += 2000
+	# Pre-identify every ego class that armour could roll with, so
+	# picked-up ego pieces read with their true name immediately.
+	for ego_name in ArmorRegistry.EGOS.keys():
+		GameManager.identify_armor_ego(String(ego_name))
+	# Pre-populate the fast-travel list: inject empty snapshots for every
+	# non-portal branch at its valid depth range. Travel dialog reads
+	# _floor_state and shows each as a clickable destination; clicking
+	# triggers a fresh regen (no saved map = _restore_floor is a no-op).
+	_seed_test_travel_destinations()
 	if player.has_signal("stats_changed"):
 		player.stats_changed.emit()
 	if player.has_signal("inventory_changed"):
 		player.inventory_changed.emit()
-	CombatLog.add("[Test character: XL 27, all spells learned.]")
+	CombatLog.add("[Test character: XL 27, all spells learned, every consumable / wand / key unrand in the bag.]")
+	CombatLog.add("Use the Map button → Travel to jump to any branch.")
+
+
+## Seed the fast-travel Travel list with every non-portal branch at its
+## canonical depth range. Stub snapshots keep _floor_state keys present
+## without serialising actual monster / item data, so Travel surfaces
+## each as a reachable row and the first visit generates a fresh floor.
+func _seed_test_travel_destinations() -> void:
+	# BranchRegistry doesn't expose a public id enumeration, so list the
+	# portable destinations explicitly. Dungeon trunk + every persistent
+	# (non-portal) branch we care about testing.
+	var branch_ids: Array = ["dungeon", "temple", "lair", "orc", "elf",
+			"swamp", "shoals", "snake", "spider", "slime",
+			"vaults", "crypt", "tomb", "depths", "zot",
+			"abyss", "pan", "dis", "gehenna", "cocytus", "tartarus",
+			"vestibule", "labyrinth"]
+	for bid in branch_ids:
+		var info: Dictionary = BranchRegistry.get_info(bid)
+		if info.is_empty():
+			continue
+		if bool(info.get("is_portal", false)):
+			continue
+		var floors: int = int(info.get("floors", 1))
+		for d in range(1, floors + 1):
+			var key: String = "%s:%d" % [bid, d]
+			if not _floor_state.has(key):
+				_floor_state[key] = {}
 
 
 ## Full combat-log history dialog — opened by tapping the 3-line strip
@@ -2039,6 +2100,19 @@ func _on_stairs_tapped(_pos: Vector2i) -> void:
 	if GameManager.current_branch == "dungeon":
 		if GameManager.current_depth >= MAX_DEPTH:
 			_end_run(true, "")
+			return
+	elif GameManager.current_branch == "pan":
+		# Pandemonium has no floor cap — each descent rolls a new random
+		# Pan floor. DCSS also plants random exit gates that drop the
+		# player back to the parent trunk; we model that here by giving
+		# a 1-in-20 chance per descent that the "stairs down" actually
+		# dump the player back through the branch return stack instead
+		# of continuing deeper.
+		if randi() % 20 == 0 and not GameManager.branch_return_stack.is_empty():
+			CombatLog.add("A gate to the mortal world yawns — you are cast out.")
+			_save_current_floor()
+			if GameManager.leave_branch():
+				_regenerate_dungeon(true, false)
 			return
 	else:
 		var branch_floors: int = BranchRegistry.floors_in(GameManager.current_branch)
