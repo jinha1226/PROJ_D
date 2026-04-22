@@ -13,14 +13,38 @@ const GRID_W: int = 35
 const GRID_H: int = 50
 const CELL_SIZE: int = 32
 
-const TEX_WALL: Texture2D = preload(
-	"res://assets/tiles/individual/dngn/wall/catacombs0.png")
-const TEX_FLOOR: Texture2D = preload(
-	"res://assets/tiles/individual/dngn/floor/limestone0.png")
 const TEX_STAIRS_UP: Texture2D = preload(
 	"res://assets/tiles/individual/dngn/gateways/metal_stairs_up.png")
 const TEX_STAIRS_DOWN: Texture2D = preload(
 	"res://assets/tiles/individual/dngn/gateways/metal_stairs_down.png")
+
+## Depth-banded terrain art. Each band declares its wall + floor tile
+## paths; picked by pick_atmosphere_for_depth() on generate().
+const TERRAIN_BANDS: Array = [
+	{
+		"until_depth": 3,
+		"wall": "res://assets/tiles/individual/dngn/wall/catacombs0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/dirt0.png",
+	},
+	{
+		"until_depth": 7,
+		"wall": "res://assets/tiles/individual/dngn/wall/catacombs0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/limestone0.png",
+	},
+	{
+		"until_depth": 12,
+		"wall": "res://assets/tiles/individual/dngn/wall/brick_brown-vines0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/cobble_blood3.png",
+	},
+	{
+		"until_depth": 99,
+		"wall": "res://assets/tiles/individual/dngn/wall/brick_brown-vines0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/crystal0.png",
+	},
+]
+
+var _tex_wall: Texture2D = null
+var _tex_floor: Texture2D = null
 
 var tiles: PackedByteArray = PackedByteArray()
 var visible_tiles: Dictionary = {}
@@ -69,7 +93,18 @@ func generate(map_seed: int = -1) -> void:
 	rooms = result["rooms"]
 	visible_tiles.clear()
 	explored.clear()
+	_load_atmosphere(GameManager.depth)
 	queue_redraw()
+
+func _load_atmosphere(depth: int) -> void:
+	for band in TERRAIN_BANDS:
+		if depth <= int(band.get("until_depth", 0)):
+			_tex_wall = load(band["wall"]) as Texture2D
+			_tex_floor = load(band["floor"]) as Texture2D
+			return
+	var last: Dictionary = TERRAIN_BANDS[TERRAIN_BANDS.size() - 1]
+	_tex_wall = load(last["wall"]) as Texture2D
+	_tex_floor = load(last["floor"]) as Texture2D
 
 func find_spawn() -> Vector2i:
 	return spawn_pos
@@ -132,9 +167,9 @@ func _draw() -> void:
 func _texture_for(t: int) -> Texture2D:
 	match t:
 		Tile.WALL:
-			return TEX_WALL
+			return _tex_wall
 		Tile.FLOOR:
-			return TEX_FLOOR
+			return _tex_floor
 		Tile.STAIRS_UP:
 			return TEX_STAIRS_UP
 		Tile.STAIRS_DOWN:

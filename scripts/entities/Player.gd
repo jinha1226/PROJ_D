@@ -134,6 +134,12 @@ func use_item(index: int) -> void:
 				Color(0.6, 1.0, 0.6))
 		"blink":
 			_blink(data.effect_value)
+		"might":
+			strength += data.effect_value
+			CombatLog.post("You feel mighty. (+%d STR)" % data.effect_value,
+				Color(1.0, 0.7, 0.55))
+		"map_reveal":
+			_reveal_map()
 		_:
 			CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
 	items.remove_at(index)
@@ -160,6 +166,18 @@ func refresh_ac_from_equipment() -> void:
 	if armor != null:
 		ac += armor.ac_bonus
 	emit_signal("stats_changed")
+
+func _reveal_map() -> void:
+	if _map == null:
+		return
+	for y in range(DungeonMap.GRID_H):
+		for x in range(DungeonMap.GRID_W):
+			var p := Vector2i(x, y)
+			if _map.tile_at(p) != DungeonMap.Tile.WALL:
+				_map.explored[p] = true
+	_map.queue_redraw()
+	CombatLog.post("The floor's layout becomes clear.",
+		Color(0.85, 0.7, 1.0))
 
 func _blink(max_dist: int) -> void:
 	for _i in range(24):

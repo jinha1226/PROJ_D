@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3 uid="uid://bitemmace00001"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "mace"
+display_name = "mace"
+kind = "weapon"
+tier = 2
+tile_path = "res://assets/tiles/individual/item/weapon/club.png"
+glyph = "("
+glyph_color = Color(0.85, 0.8, 0.7, 1)
+damage = 9
+delay = 1.2
+category = "blunt"
+brand = ""
+ac_bonus = 0
+ev_penalty = 0
+slot = ""
+effect = ""
+effect_value = 0
+plus = 0
+description = "Heavy blunt weapon. Higher damage, slower swing."
