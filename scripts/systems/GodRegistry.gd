@@ -166,7 +166,7 @@ const GODS: Dictionary = {
 		"name": "Ru", "title": "Ru the Awoken",
 		"color": Color(0.65, 0.25, 0.35), "piety_cap": 200, "kill_piety": 0,
 		"desc": "Meditative god. Demands sacrifice, answers with mighty bursts.",
-		"invocations": ["draw_out_power", "power_leap", "apocalypse"],
+		"invocations": ["sacrifice", "draw_out_power", "power_leap", "apocalypse"],
 	},
 	"wu_jian": {
 		"name": "Wu Jian Council", "title": "the Wu Jian Council",

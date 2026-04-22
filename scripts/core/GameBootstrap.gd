@@ -2180,6 +2180,78 @@ func _apply_god_conduct(god_id: String, monster: Monster, base_gain: int) -> int
 	return GodConducts.apply(god_id, monster, base_gain)
 
 
+## DCSS Ru sacrifice ritual (god-abil.cc ru_do_sacrifice). The only
+## way Ru gains piety is by permanently giving something up. Pop a
+## dialog with four representative sacrifices; accepting one applies
+## the permanent penalty and refunds +60 piety. Each sacrifice sets a
+## meta flag so it can only be offered once per run.
+func _ru_sacrifice_menu() -> void:
+	if player == null or player.stats == null:
+		return
+	var dlg := GameDialog.create("Ru demands a sacrifice", Vector2i(960, 1200))
+	add_child(dlg)
+	var vb: VBoxContainer = dlg.body()
+	vb.add_theme_constant_override("separation", 16)
+	var intro := Label.new()
+	intro.text = "Give something up to feed Ru's power. Each offering is permanent."
+	intro.add_theme_font_size_override("font_size", 40)
+	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vb.add_child(intro)
+	var offers: Array = [
+		{"key": "purity",    "label": "Sacrifice Purity  —  −2 STR, +60 piety", "stat": "STR", "delta": -2},
+		{"key": "arcana",    "label": "Sacrifice Arcana  —  −2 INT, +60 piety", "stat": "INT", "delta": -2},
+		{"key": "nimbleness", "label": "Sacrifice Nimbleness  —  −2 DEX, +60 piety", "stat": "DEX", "delta": -2},
+		{"key": "experience","label": "Sacrifice Experience  —  −25 HP max, +60 piety", "stat": "HP", "delta": -25},
+	]
+	for offer in offers:
+		var key: String = String(offer["key"])
+		if player.has_meta("_ru_sac_" + key):
+			continue  # already given this one
+		var btn := Button.new()
+		btn.text = String(offer["label"])
+		btn.custom_minimum_size = Vector2(0, 88)
+		btn.add_theme_font_size_override("font_size", 36)
+		btn.pressed.connect(_apply_ru_sacrifice.bind(offer, dlg))
+		vb.add_child(btn)
+	var cancel := Button.new()
+	cancel.text = "Not yet"
+	cancel.custom_minimum_size = Vector2(0, 72)
+	cancel.add_theme_font_size_override("font_size", 36)
+	cancel.modulate = Color(0.85, 0.85, 0.85)
+	cancel.pressed.connect(dlg.close)
+	vb.add_child(cancel)
+
+
+func _apply_ru_sacrifice(offer: Dictionary, dlg: GameDialog) -> void:
+	if player == null or player.stats == null:
+		dlg.close()
+		return
+	var stat_id: String = String(offer.get("stat", "STR"))
+	var delta: int = int(offer.get("delta", -1))
+	match stat_id:
+		"STR": player.stats.STR = maxi(1, player.stats.STR + delta)
+		"DEX": player.stats.DEX = maxi(1, player.stats.DEX + delta)
+		"INT": player.stats.INT = maxi(1, player.stats.INT + delta)
+		"HP":
+			player.stats.hp_max = maxi(10, player.stats.hp_max + delta)
+			player.stats.HP = mini(player.stats.HP, player.stats.hp_max)
+	# Base stats track what the racial/XL baseline should be; bake the
+	# permanent loss into base_stats too so gear-swap recomputes don't
+	# "un-sacrifice" the player by re-reading the pre-penalty baseline.
+	if player.base_stats != null:
+		match stat_id:
+			"STR": player.base_stats.STR = maxi(1, player.base_stats.STR + delta)
+			"DEX": player.base_stats.DEX = maxi(1, player.base_stats.DEX + delta)
+			"INT": player.base_stats.INT = maxi(1, player.base_stats.INT + delta)
+			"HP":  player.base_stats.hp_max = maxi(10, player.base_stats.hp_max + delta)
+	player.set_meta("_ru_sac_" + String(offer["key"]), true)
+	player.piety = mini(200, player.piety + 60)
+	player.stats_changed.emit()
+	CombatLog.add("You sacrifice %s. Ru's power swells within you." % \
+			String(offer["label"]).split("—")[0].strip_edges())
+	dlg.close()
+
+
 ## Oni (and any future magical-might race) get a 20% spell power bump so
 ## their conjurations hit harder than the base formula suggests.
 func _apply_racial_spellpower(power: int) -> int:

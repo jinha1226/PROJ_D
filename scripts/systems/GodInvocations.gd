@@ -298,6 +298,8 @@ static func dispatch(host: Node, effect: String) -> void:
 		"disaster_area":
 			host._aoe_damage_visible(12, 30, 60, "Disaster area erupts!")
 		# ---- Ru ----
+		"sacrifice":
+			host._ru_sacrifice_menu()
 		"draw_out_power":
 			if player.stats != null:
 				player.stats.HP = player.stats.hp_max
