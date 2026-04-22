@@ -5420,10 +5420,12 @@ func _on_status_pressed() -> void:
 	_status_build_piety(vb)
 	_status_build_attributes(vb)
 	_status_build_combat(vb)
+	_status_build_active_effects(vb)
 	_status_build_equipment(vb)
 	_status_build_rings(vb)
 	_status_build_resistances(vb)
 	_status_build_trait(vb)
+	_status_build_mutations(vb)
 	_status_build_runes(vb)
 
 	# Essence slots retained — each row handles its own cast/swap buttons.
@@ -5477,6 +5479,13 @@ func _status_build_piety(vb: VBoxContainer) -> void:
 	val_lbl.custom_minimum_size = Vector2(240, 0)
 	row.add_child(val_lbl)
 	vb.add_child(row)
+	# DCSS 6-star piety tier — filled stars vs cap/6 slices.
+	var tier: int = clampi(int(player.piety) * 6 / maxi(1, cap), 0, 6)
+	var stars := Label.new()
+	stars.text = "★".repeat(tier) + "☆".repeat(6 - tier) + "   (rank %d of 6)" % tier
+	stars.add_theme_font_size_override("font_size", 36)
+	stars.add_theme_color_override("font_color", info.get("color", Color(0.95, 0.82, 0.35)))
+	vb.add_child(stars)
 	# "+N piety per kill" hint so the player knows if their god is a
 	# kill-piety god or a gold/sacrifice-piety god.
 	var hint := Label.new()
@@ -5703,6 +5712,86 @@ func _status_stat_card(label: String, value: int, sub: String) -> Control:
 	sub_lbl.custom_minimum_size = Vector2(0, 0)
 	col.add_child(sub_lbl)
 	return panel
+
+
+## Active duration-meta readout — Haste / Invis / Poison / etc. with
+## remaining turns. DCSS surfaces these via status-light glyphs; mobile
+## port shows them as a colour-coded list so the player can see exactly
+## how long each effect has left.
+func _status_build_active_effects(vb: VBoxContainer) -> void:
+	if player == null:
+		return
+	# Meta key → {label, tint}. Order matters for readability.
+	var entries: Array = [
+		["_haste_turns",          "Haste",         Color(0.55, 1.00, 0.60)],
+		["_invisible_turns",      "Invisible",     Color(0.70, 0.85, 1.00)],
+		["_heroism_turns",        "Heroism",       Color(1.00, 0.85, 0.35)],
+		["_finesse_turns",        "Finesse",       Color(1.00, 0.85, 0.35)],
+		["_enlightened_turns",    "Enlightened",   Color(0.90, 0.85, 1.00)],
+		["_berserk_turns",        "Berserk",       Color(1.00, 0.50, 0.40)],
+		["_divine_shield_turns",  "Divine Shield", Color(1.00, 0.90, 0.55)],
+		["_shadow_form_turns",    "Shadow Form",   Color(0.70, 0.60, 1.00)],
+		["_fiery_armour_turns",   "Fiery Armour",  Color(1.00, 0.60, 0.30)],
+		["_heavenly_storm_turns", "Heavenly Storm", Color(1.00, 0.95, 0.55)],
+		["_slimify_turns",        "Slimify",       Color(0.55, 0.90, 0.45)],
+		["_tree_turns",           "Tree Form",     Color(0.45, 0.80, 0.35)],
+		["_sanctuary_turns",      "Sanctuary",     Color(0.85, 0.95, 1.00)],
+		["_pending_teleport_turns", "Teleporting in", Color(0.85, 0.75, 1.00)],
+		["_ambrosia_turns",       "Ambrosia",      Color(0.95, 0.80, 0.55)],
+		# Negative / debuff effects
+		["_silenced_turns",       "Silenced",      Color(0.75, 0.75, 0.80)],
+		["_confusion_turns",      "Confused",      Color(1.00, 0.70, 0.35)],
+		["_exhausted_turns",      "Exhausted",     Color(0.85, 0.70, 0.60)],
+		["_mesmerised_turns",     "Mesmerised",    Color(1.00, 0.55, 0.85)],
+		["_frozen_turns",         "Frozen",        Color(0.65, 0.85, 1.00)],
+		["_weak_turns",           "Weak",          Color(0.95, 0.65, 0.55)],
+		["_paralysis_turns",      "Paralysed",     Color(0.90, 0.40, 0.40)],
+		["_slowed_turns",         "Slowed",        Color(0.80, 0.60, 0.40)],
+		["_afraid_turns",         "Afraid",        Color(0.80, 0.55, 0.80)],
+		["_charmed_turns",        "Charmed",       Color(0.95, 0.55, 0.80)],
+		["_blind_turns",          "Blind",         Color(0.50, 0.50, 0.55)],
+		["_corona_turns",         "Revealed",      Color(1.00, 0.80, 0.40)],
+		["_dazed_turns",          "Dazed",         Color(0.85, 0.75, 0.55)],
+		["_petrifying_turns",     "Petrifying",    Color(0.75, 0.70, 0.60)],
+		["_petrified_turns",      "Petrified",     Color(0.55, 0.50, 0.45)],
+	]
+	var rows: Array = []
+	for e in entries:
+		var key: String = String(e[0])
+		if not player.has_meta(key):
+			continue
+		rows.append(e)
+	# Poison is special — also surface the per-turn damage when active.
+	var poison_t: int = int(player.get_meta("_poison_turns", 0)) if player.has_meta("_poison_turns") else 0
+	# Corrosion shows stacks rather than just turns.
+	var corro_t: int = int(player.get_meta("_corroded_turns", 0)) if player.has_meta("_corroded_turns") else 0
+	if rows.is_empty() and poison_t <= 0 and corro_t <= 0:
+		return
+	vb.add_child(_status_section_header("Active Effects"))
+	for e in rows:
+		var key: String = String(e[0])
+		var label: String = String(e[1])
+		var tint: Color = e[2]
+		var turns: int = int(player.get_meta(key, 0))
+		var row := Label.new()
+		row.text = "• %s  (%d turn%s)" % [label, turns, "s" if turns != 1 else ""]
+		row.add_theme_font_size_override("font_size", 36)
+		row.add_theme_color_override("font_color", tint)
+		vb.add_child(row)
+	if poison_t > 0:
+		var p_dmg: int = int(player.get_meta("_poison_dmg", 2))
+		var prow := Label.new()
+		prow.text = "• Poisoned  (%d turns, %d dmg/turn)" % [poison_t, p_dmg]
+		prow.add_theme_font_size_override("font_size", 36)
+		prow.add_theme_color_override("font_color", Color(0.65, 0.95, 0.55))
+		vb.add_child(prow)
+	if corro_t > 0:
+		var stacks: int = int(player.get_meta("_corrosion_stacks", 0))
+		var crow := Label.new()
+		crow.text = "• Corroded  (%d turns, −%d AC)" % [corro_t, stacks * 4]
+		crow.add_theme_font_size_override("font_size", 36)
+		crow.add_theme_color_override("font_color", Color(0.85, 0.70, 0.50))
+		vb.add_child(crow)
 
 
 ## One row per equipment slot with icon + name + stat summary.
@@ -5942,6 +6031,35 @@ func _status_build_trait(vb: VBoxContainer) -> void:
 	lbl.add_theme_font_size_override("font_size", 38)
 	panel.add_child(lbl)
 	vb.add_child(panel)
+
+
+## Acquired mutations — each with its current level and flag-tinted desc.
+## Good mutations green, bad red, neutral muted. Hidden when the dict is
+## empty so untouched characters don't show an empty header.
+func _status_build_mutations(vb: VBoxContainer) -> void:
+	if player == null or player.mutations.is_empty():
+		return
+	vb.add_child(_status_section_header("Mutations"))
+	var ids: Array = player.mutations.keys()
+	ids.sort()
+	for id in ids:
+		var lv: int = int(player.mutations[id])
+		if lv <= 0:
+			continue
+		var info: Dictionary = MutationRegistry.get_info(String(id))
+		var desc: String = String(info.get("desc", id))
+		var max_lv: int = int(info.get("levels", 1))
+		var flags: Array = info.get("flags", [])
+		var tint: Color = Color(0.85, 0.85, 0.90)
+		if flags.has("good"):
+			tint = Color(0.60, 0.90, 0.55)
+		elif flags.has("bad"):
+			tint = Color(0.95, 0.55, 0.50)
+		var row := Label.new()
+		row.text = "• %s  (%d / %d)" % [desc, lv, max_lv]
+		row.add_theme_font_size_override("font_size", 36)
+		row.add_theme_color_override("font_color", tint)
+		vb.add_child(row)
 
 
 ## Rune collection display. Header shows the count vs Zot gate
