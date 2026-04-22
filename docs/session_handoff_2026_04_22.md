@@ -35,17 +35,22 @@ GameBootstrap because they touch dialog re-open state.
 
 ## Active bug queue — user-reported
 
-Item `#1` and `#6` resolved. Others pending.
+Items `#1`, `#3`, `#4`, `#5`, `#6` resolved. Others pending.
 
 1. ✅ Second-tap area spell movement bug (fixed in `799411ad`).
 2. Status dialog — add move speed (Haste readout), mutation list,
    piety progress.
-3. Potion of Invisibility — dim the player sprite
-   (`player.modulate.a ≈ 0.45` while `_invis_turns > 0`).
-4. Scroll of Teleportation — defer teleport by N turns via a
-   `_pending_teleport_turns` meta + turn tick.
-5. `TileRenderer.ITEMS` dict — fill missing book + wand entries by
-   scanning `assets/dcss_tiles/individual/item/{book,wand}/`.
+3. ✅ Potion of Invisibility dims the player sprite — `Player._refresh_invisibility_visual`
+   drops `modulate.a` to 0.45 while `_invisible_turns > 0` and restores on
+   expire / cancellation. (Meta key was `_invisible_turns`, not the
+   `_invis_turns` the earlier handoff used.)
+4. ✅ Scroll of Teleportation defers the teleport 3-5 turns via
+   `_pending_teleport_turns`. Stasis (formicid / amulet) still fails the
+   scroll immediately; `_teleport_random()` re-checks stasis when the
+   counter fires, so mid-countdown stasis fizzles safely.
+5. ✅ `TileRenderer.ITEMS` — all 9 book ids were already mapped; added
+   the 12 `wand_*` entries to `scripts/core/TileRenderer.gd` (gem-material
+   tiles picked to evoke each wand's effect).
 6. ✅ Magic dialog — split by school header (MagicDialog now groups
    Conjurations / Fire / Cold / … under accent headers).
    ✅ Spellbook at full memory — Player._apply_consumable_effect

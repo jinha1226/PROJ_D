@@ -375,6 +375,19 @@ const ITEMS: Dictionary = {
 	"book_hexes":          "item/book/magenta.png",
 	"book_translocations": "item/book/purple.png",
 	"book_minor_magic":    "item/book/parchment.png",
+	# --- Wands — gem material chosen to evoke each effect ---
+	"wand_flame":       "item/wand/gem_copper.png",
+	"wand_iceblast":    "item/wand/gem_glass.png",
+	"wand_acid":        "item/wand/gem_brass.png",
+	"wand_light":       "item/wand/gem_ivory.png",
+	"wand_quicksilver": "item/wand/gem_silver.png",
+	"wand_mindburst":   "item/wand/gem_bronze.png",
+	"wand_warping":     "item/wand/gem_plastic.png",
+	"wand_roots":       "item/wand/gem_wood.png",
+	"wand_paralysis":   "item/wand/gem_bone.png",
+	"wand_charming":    "item/wand/gem_gold.png",
+	"wand_polymorph":   "item/wand/gem_iron.png",
+	"wand_digging":     "item/wand/gem_lead.png",
 }
 
 const PLAYER_RACES: Dictionary = {

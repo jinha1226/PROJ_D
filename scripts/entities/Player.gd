@@ -426,9 +426,19 @@ func _tick_duration_metas() -> void:
 	_tick_simple_meta("_haste_turns")
 	_tick_simple_meta("_enlightened_turns")
 	_tick_simple_meta("_invisible_turns")
+	_refresh_invisibility_visual()
 	_tick_simple_meta("_silenced_turns")
 	_tick_simple_meta("_heroism_turns")
 	_tick_simple_meta("_finesse_turns")
+	## Scroll of Teleportation defers the actual teleport by N turns (DCSS parity).
+	if has_meta("_pending_teleport_turns"):
+		var tpt: int = int(get_meta("_pending_teleport_turns", 0)) - 1
+		if tpt <= 0:
+			remove_meta("_pending_teleport_turns")
+			_teleport_random()
+		else:
+			set_meta("_pending_teleport_turns", tpt)
+			CombatLog.add("You feel strangely unstable. (teleporting in %d turns)" % tpt)
 	# Confusion duration: when _confusion_turns hits zero, also clear
 	# the boolean `_confused` so movement / spellcasting unblock.
 	if has_meta("_confusion_turns"):
@@ -1127,6 +1137,12 @@ func _tick_simple_meta(key: String) -> void:
 		remove_meta(key)
 	else:
 		set_meta(key, t)
+
+
+## Sync the sprite alpha with `_invisible_turns`. Dim to 0.45 while active
+## so the player gets the same visual cue DCSS gives with its glyph colour.
+func _refresh_invisibility_visual() -> void:
+	modulate.a = 0.45 if has_meta("_invisible_turns") else 1.0
 
 
 var trait_res: TraitData = null
@@ -2504,7 +2520,13 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 			CombatLog.add("Your magic surges! (+%d MP)" % restored)
 			return true
 		"teleport_random":
-			return _teleport_random()
+			if _is_formicid_stasis():
+				CombatLog.add("Your stasis prevents any teleportation.")
+				return true
+			var tp_turns: int = 3 + randi() % 3
+			set_meta("_pending_teleport_turns", tp_turns)
+			CombatLog.add("You feel strangely unstable. (teleporting in %d turns)" % tp_turns)
+			return true
 		"blink":
 			return _teleport_blink(4)
 		"magic_mapping":
@@ -2683,6 +2705,7 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 			resist_turns = 0
 			set_meta("_temp_buffs", [])
 			stats_changed.emit()
+			_refresh_invisibility_visual()
 			CombatLog.add("A rush of nothingness erases your enchantments.")
 			return true
 		"ambrosia":
@@ -2695,6 +2718,7 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 		"invisibility":
 			var dur_i: int = int(info.get("dur_base", 18)) + (randi() % max(int(info.get("dur_rand", 10)), 1))
 			set_meta("_invisible_turns", int(get_meta("_invisible_turns", 0)) + dur_i)
+			_refresh_invisibility_visual()
 			CombatLog.add("You vanish from sight. (%d turns invisible)" % dur_i)
 			return true
 		"experience":
