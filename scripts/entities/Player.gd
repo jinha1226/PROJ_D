@@ -4,6 +4,7 @@ signal stats_changed
 signal moved(new_pos: Vector2i)
 signal died
 signal stepped_on_stairs_down
+signal item_dropped(item_id: String, at_pos: Vector2i, plus: int)
 
 @export var grid_pos: Vector2i = Vector2i(1, 1)
 
@@ -23,7 +24,10 @@ var dexterity: int = 10
 var intelligence: int = 10
 var xl: int = 1
 var xp: int = 0
-var items: Array = []
+var gold: int = 0
+var items: Array = []  # [{id: String, plus: int}]
+var equipped_weapon_id: String = ""
+var equipped_armor_id: String = ""
 
 var _map: DungeonMap
 
@@ -72,9 +76,10 @@ func _try_move(dir: Vector2i) -> void:
 	position = _map.grid_to_world(grid_pos)
 	emit_signal("moved", grid_pos)
 	emit_signal("stats_changed")
+	_auto_pickup()
 	if _map.tile_at(grid_pos) == DungeonMap.Tile.STAIRS_DOWN:
 		emit_signal("stepped_on_stairs_down")
-		return  # regen will call end_player_turn or reset flow
+		return
 	TurnManager.end_player_turn()
 
 func _monster_at(pos: Vector2i) -> Monster:
@@ -85,6 +90,90 @@ func _monster_at(pos: Vector2i) -> Monster:
 		if n is Monster and n.grid_pos == pos:
 			return n
 	return null
+
+func _auto_pickup() -> void:
+	var tree := get_tree()
+	if tree == null:
+		return
+	for n in tree.get_nodes_in_group("floor_items"):
+		if n is FloorItem and n.grid_pos == grid_pos:
+			pickup(n)
+			break
+
+func pickup(floor_item: FloorItem) -> void:
+	if floor_item.data == null:
+		return
+	var data: ItemData = floor_item.data
+	if data.kind == "gold":
+		var amount: int = max(1, data.effect_value)
+		gold += amount
+		CombatLog.pickup("You pick up %d gold." % amount)
+	else:
+		items.append({"id": data.id, "plus": floor_item.plus})
+		CombatLog.pickup("You pick up %s." % data.display_name)
+	emit_signal("stats_changed")
+	floor_item.queue_free()
+
+func use_item(index: int) -> void:
+	if index < 0 or index >= items.size():
+		return
+	var entry: Dictionary = items[index]
+	var data: ItemData = ItemRegistry.get_by_id(entry.get("id", ""))
+	if data == null:
+		return
+	match data.effect:
+		"heal":
+			heal(data.effect_value)
+			CombatLog.post("You feel better. (+%d HP)" % data.effect_value,
+				Color(0.6, 1.0, 0.6))
+		"blink":
+			_blink(data.effect_value)
+		_:
+			CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
+	items.remove_at(index)
+	emit_signal("stats_changed")
+
+func drop_item(index: int) -> void:
+	if index < 0 or index >= items.size():
+		return
+	var entry: Dictionary = items[index]
+	var id: String = String(entry.get("id", ""))
+	var plus_val: int = int(entry.get("plus", 0))
+	if id == equipped_weapon_id:
+		equipped_weapon_id = ""
+	if id == equipped_armor_id:
+		equipped_armor_id = ""
+		refresh_ac_from_equipment()
+	items.remove_at(index)
+	emit_signal("item_dropped", id, grid_pos, plus_val)
+	emit_signal("stats_changed")
+
+func refresh_ac_from_equipment() -> void:
+	ac = 0
+	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id)
+	if armor != null:
+		ac += armor.ac_bonus
+	emit_signal("stats_changed")
+
+func _blink(max_dist: int) -> void:
+	for _i in range(24):
+		var dx: int = randi_range(-max_dist, max_dist)
+		var dy: int = randi_range(-max_dist, max_dist)
+		var target: Vector2i = grid_pos + Vector2i(dx, dy)
+		if target == grid_pos:
+			continue
+		if not _map.in_bounds(target):
+			continue
+		if not _map.is_walkable(target):
+			continue
+		if _monster_at(target) != null:
+			continue
+		grid_pos = target
+		position = _map.grid_to_world(target)
+		emit_signal("moved", grid_pos)
+		CombatLog.post("You blink.", Color(0.7, 0.85, 1.0))
+		return
+	CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
 
 func compute_fov() -> Dictionary:
 	if _map == null:
@@ -100,6 +189,18 @@ func take_damage(amount: int, _source: String = "") -> void:
 
 func heal(amount: int) -> void:
 	hp = min(hp_max, hp + amount)
+	emit_signal("stats_changed")
+
+func grant_xp(amount: int) -> void:
+	xp += amount
+	emit_signal("stats_changed")
+
+func wait_turn() -> void:
+	# Light regen while waiting.
+	if hp < hp_max:
+		hp = min(hp_max, hp + 1)
+	if mp < mp_max:
+		mp = min(mp_max, mp + 1)
 	emit_signal("stats_changed")
 
 func _draw() -> void:

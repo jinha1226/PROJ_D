@@ -17,7 +17,7 @@ func register_actor(actor) -> void:
 func unregister_actor(actor) -> void:
 	actors.erase(actor)
 
-func end_player_turn() -> void:
+func end_player_turn(immediate: bool = false) -> void:
 	if _ending_turn or not is_player_turn:
 		return
 	_ending_turn = true
@@ -28,7 +28,10 @@ func end_player_turn() -> void:
 			actor.take_turn()
 	emit_signal("turn_ended")
 	_ending_turn = false
-	call_deferred("_start_player_turn")
+	if immediate:
+		_start_player_turn()
+	else:
+		call_deferred("_start_player_turn")
 
 func _start_player_turn() -> void:
 	turn_number += 1

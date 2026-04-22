@@ -1,26 +1,36 @@
 class_name CombatSystem extends RefCounted
 
-## Minimal melee per guide §4.5a. Skills are stubbed at 0 until SkillSystem
-## lands (Week 2). Weapon damage reads from player's equipped item when
-## inventory is wired (Day 4); until then, unarmed fallback.
+## Minimal melee per guide §4.5a. Skills stubbed at 0; full formula with
+## weapon skill / brands lands with SkillSystem (Week 2).
 
-const UNARMED_DAMAGE: int = 3
+const UNARMED_DAMAGE: int = 2
 
 static func player_attack_monster(player: Player, monster: Monster) -> void:
 	if monster.data == null:
 		return
-	var stat_bonus: int = player.strength / 3
+	var weapon_dmg: int = UNARMED_DAMAGE
+	var stat_source: int = player.strength
+	if player.equipped_weapon_id != "":
+		var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
+		if w != null:
+			weapon_dmg = max(UNARMED_DAMAGE, w.damage)
+			if w.category == "dagger" or w.category == "short":
+				stat_source = player.dexterity
+	var stat_bonus: int = stat_source / 3
 	var to_hit_base: int = 15 + stat_bonus
 	var to_hit_roll: int = randi_range(0, to_hit_base)
 	if to_hit_roll < monster.data.ev:
 		CombatLog.miss("You miss the %s." % monster.data.display_name)
 		return
-	var weapon_dmg: int = UNARMED_DAMAGE
 	var raw: int = weapon_dmg + stat_bonus / 2 + randi_range(0, 3)
 	var soak: int = randi_range(0, monster.data.ac + 1)
 	var final: int = max(1, raw - soak)
 	CombatLog.hit("You hit the %s for %d." % [monster.data.display_name, final])
+	var was_alive: bool = monster.hp > 0
 	monster.take_damage(final)
+	if was_alive and monster.hp <= 0:
+		CombatLog.hit("You kill the %s." % monster.data.display_name)
+		player.grant_xp(monster.data.xp_value)
 
 static func monster_attack_player(monster: Monster, player: Player) -> void:
 	if monster.data == null or player.hp <= 0:

@@ -26,6 +26,7 @@ TurnManager="*res://scripts/core/TurnManager.gd"
 CombatLog="*res://scripts/core/CombatLog.gd"
 SaveManager="*res://scripts/core/SaveManager.gd"
 MonsterRegistry="*res://scripts/systems/MonsterRegistry.gd"
+ItemRegistry="*res://scripts/systems/ItemRegistry.gd"
 
 [display]
 

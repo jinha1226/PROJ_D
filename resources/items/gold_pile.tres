@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3 uid="uid://bitemgoldpile01"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "gold_pile"
+display_name = "gold"
+kind = "gold"
+tier = 1
+tile_path = "res://assets/tiles/individual/item/gold/01.png"
+glyph = "$"
+glyph_color = Color(1, 0.92, 0.3, 1)
+damage = 0
+delay = 1.0
+category = ""
+brand = ""
+ac_bonus = 0
+ev_penalty = 0
+slot = ""
+effect = "gold"
+effect_value = 10
+plus = 0
+description = "Shining coins."
