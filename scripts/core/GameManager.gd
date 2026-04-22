@@ -32,6 +32,23 @@ func is_simple_mode() -> bool:
 
 func is_classic_mode() -> bool:
 	return game_mode == GameMode.CLASSIC
+
+
+## Simple-mode depth → themed tileset + matching branch pool. Segments
+## of 5 floors each so each slice feels distinct: forest mid-game,
+## mines tier 3, vaults / zot endgame. Used by tileset_branch() + the
+## MonsterSpawner branch lookup so the mob roster rotates with the
+## scenery.
+func _simple_mode_tileset(depth: int) -> String:
+	if depth <= 5:
+		return "main"       # dungeon
+	elif depth <= 10:
+		return "forest"     # lair
+	elif depth <= 15:
+		return "mine"       # orc
+	elif depth <= 20:
+		return "vaults"
+	return "crystal"        # zot
 ## DCSS-style branch id that `current_depth` indexes into. "dungeon" on the
 ## main trunk; "lair" / "orc" / "vaults" / … once the player takes a
 ## branch entrance. Used as a key prefix in GameBootstrap._floor_state so
@@ -284,6 +301,10 @@ func floor_key() -> String:
 ## branch we route the branch id through; the trunk's Dungeon still
 ## rotates through thematic segments so D:1-5 vs D:11-15 look different.
 func tileset_branch() -> String:
+	# Simple mode rotates the trunk tileset every 5 floors so runs read
+	# visually distinct even though mechanically it's still "dungeon".
+	if current_branch == "dungeon" and is_simple_mode():
+		return _simple_mode_tileset(current_depth)
 	if current_branch != "dungeon":
 		# Map branch id → tileset bucket. Most branches get their own
 		# distinct tileset (snake / spider / slime / …); a handful

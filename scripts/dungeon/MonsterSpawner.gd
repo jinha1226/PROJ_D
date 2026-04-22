@@ -358,6 +358,11 @@ static func _branch_for(d: int) -> String:
 		var cb = mgr.current_branch
 		if typeof(cb) == TYPE_STRING and String(cb) != "" and String(cb) != "dungeon":
 			return String(cb)
+	# Simple mode syncs the monster pool with the tileset rotation so
+	# D6-10 feels like Lair, D11-15 like Orc, etc. Defer to GameManager
+	# so there's one source of truth.
+	if mgr != null and mgr.has_method("is_simple_mode") and mgr.is_simple_mode():
+		return String(mgr._simple_mode_tileset(d))
 	if d <= 5:
 		return "main"
 	if d <= 10:
