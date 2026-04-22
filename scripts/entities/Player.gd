@@ -147,6 +147,19 @@ func use_item(index: int) -> void:
 				Color(1.0, 0.7, 0.55))
 		"map_reveal":
 			_reveal_map()
+		"cure":
+			if statuses.has("poison"):
+				statuses.erase("poison")
+				CombatLog.post("The poison clears.", Color(0.6, 1.0, 0.7))
+			else:
+				CombatLog.post("You feel healthy.", Color(0.6, 1.0, 0.7))
+		"restore_mp":
+			var gain: int = max(1, data.effect_value)
+			mp = min(mp_max, mp + gain)
+			CombatLog.post("You feel recharged. (+%d MP)" % gain,
+				Color(0.5, 0.85, 1.0))
+		"teleport":
+			_teleport_far()
 		_:
 			CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
 	items.remove_at(index)
@@ -173,6 +186,26 @@ func refresh_ac_from_equipment() -> void:
 	if armor != null:
 		ac += armor.ac_bonus
 	emit_signal("stats_changed")
+
+func _teleport_far() -> void:
+	if _map == null:
+		return
+	for _i in range(80):
+		var p := Vector2i(
+			randi_range(1, DungeonMap.GRID_W - 2),
+			randi_range(1, DungeonMap.GRID_H - 2))
+		if not _map.is_walkable(p):
+			continue
+		if _monster_at(p) != null:
+			continue
+		if p == grid_pos:
+			continue
+		grid_pos = p
+		position = _map.grid_to_world(p)
+		emit_signal("moved", grid_pos)
+		CombatLog.post("You teleport.", Color(0.85, 0.7, 1.0))
+		return
+	CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
 
 func _reveal_map() -> void:
 	if _map == null:

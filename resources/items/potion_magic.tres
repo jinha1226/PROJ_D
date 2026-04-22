@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3 uid="uid://bitempotmagic1"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "potion_magic"
+display_name = "potion of magic"
+kind = "potion"
+tier = 2
+tile_path = "res://assets/tiles/individual/item/potion/cloudy.png"
+glyph = "!"
+glyph_color = Color(0.5, 0.75, 1, 1)
+damage = 0
+delay = 1.0
+category = ""
+brand = ""
+ac_bonus = 0
+ev_penalty = 0
+slot = ""
+effect = "restore_mp"
+effect_value = 10
+plus = 0
+description = "Restores MP."
