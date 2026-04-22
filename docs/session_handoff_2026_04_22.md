@@ -35,7 +35,7 @@ GameBootstrap because they touch dialog re-open state.
 
 ## Active bug queue — user-reported
 
-Items `#1`, `#2`, `#3`, `#4`, `#5`, `#6` resolved. Others pending.
+Items `#1`, `#2`, `#3`, `#4`, `#5`, `#6`, `#7`, `#8` all resolved.
 
 1. ✅ Second-tap area spell movement bug (fixed in `799411ad`).
 2. ✅ Status dialog expanded: **Active Effects** section lists every
@@ -60,14 +60,13 @@ Items `#1`, `#2`, `#3`, `#4`, `#5`, `#6` resolved. Others pending.
    ✅ Spellbook at full memory — Player._apply_consumable_effect
    "learn_spells" now returns false when nothing was learned, so
    the book stays in the bag.
-7. Paper-doll is nude when equipping test-character unrands —
-   `TileRenderer.doll_layer` has no entry for those ids. Add
-   generic slot overlays or wire each test unrand to a base-item
-   tile.
-8. Scroll of Silence — effect sets `_silenced_turns` correctly but
-   (a) no visible aura, (b) verify SpellCast reads it for the
-   player's own casts (the silence aura only blocks monsters in
-   the current implementation).
+7. ✅ Paper-doll nude fix — `TileRenderer.doll_layer` now falls back
+   to the unrand's base item tile (via `UnrandartRegistry.get_info`),
+   so equipping `unrand_storm_bow` paints the shortbow overlay.
+8. ✅ Scroll of Silence gets a visible aura — `Player._SilenceAura`
+   inner class draws a pulsing grey ring beneath the sprite while
+   `_silenced_turns > 0`. Self-cast check was already in place at
+   `SpellCast.gd:60`.
 
 ## Deferred port items (L-series, queued behind bugs)
 

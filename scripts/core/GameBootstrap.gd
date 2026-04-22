@@ -765,6 +765,10 @@ func _on_turn_tick_silence() -> void:
 	else:
 		if player.has_meta("_silence_aura_in"):
 			player.remove_meta("_silence_aura_in")
+	# Sync the visual aura each tick so the ring appears the instant the
+	# player steps into a silent_spectre's range, not a turn later.
+	if player.has_method("_refresh_silence_visual"):
+		player._refresh_silence_visual()
 
 
 func _on_turn_tick_clouds() -> void:

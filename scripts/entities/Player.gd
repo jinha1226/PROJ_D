@@ -428,6 +428,7 @@ func _tick_duration_metas() -> void:
 	_tick_simple_meta("_invisible_turns")
 	_refresh_invisibility_visual()
 	_tick_simple_meta("_silenced_turns")
+	_refresh_silence_visual()
 	_tick_simple_meta("_heroism_turns")
 	_tick_simple_meta("_finesse_turns")
 	## Scroll of Teleportation defers the actual teleport by N turns (DCSS parity).
@@ -1143,6 +1144,39 @@ func _tick_simple_meta(key: String) -> void:
 ## so the player gets the same visual cue DCSS gives with its glyph colour.
 func _refresh_invisibility_visual() -> void:
 	modulate.a = 0.45 if has_meta("_invisible_turns") else 1.0
+
+
+## Persistent silence indicator — a faint pulsing ring beneath the player
+## sprite while `_silenced_turns > 0`. Created on demand and freed when
+## silence clears so there's no per-frame cost off-effect.
+class _SilenceAura extends Node2D:
+	var phase: float = 0.0
+	func _process(delta: float) -> void:
+		phase += delta
+		queue_redraw()
+	func _draw() -> void:
+		var a: float = 0.30 + 0.18 * sin(phase * 3.0)
+		var col := Color(0.55, 0.55, 0.70, a)
+		draw_arc(Vector2.ZERO, 22.0, 0.0, TAU, 48, col, 2.0, true)
+		var col_in := Color(0.55, 0.55, 0.70, a * 0.55)
+		draw_arc(Vector2.ZERO, 15.0, 0.0, TAU, 32, col_in, 1.4, true)
+
+
+var _silence_aura: _SilenceAura = null
+
+
+## Show/hide the silence aura ring. Called from every path that flips
+## `_silenced_turns` (scroll use, turn-tick decrement, monster-aura
+## gate) so the visual tracks the meta without polling.
+func _refresh_silence_visual() -> void:
+	var silenced: bool = has_meta("_silenced_turns")
+	if silenced and _silence_aura == null:
+		_silence_aura = _SilenceAura.new()
+		_silence_aura.z_index = -1
+		add_child(_silence_aura)
+	elif not silenced and _silence_aura != null:
+		_silence_aura.queue_free()
+		_silence_aura = null
 
 
 var trait_res: TraitData = null
@@ -2902,6 +2936,7 @@ func _apply_consumable_effect(info: Dictionary) -> bool:
 		"silence":
 			var dur_s: int = int(info.get("dur_base", 12)) + (randi() % max(int(info.get("dur_rand", 8)), 1))
 			set_meta("_silenced_turns", int(get_meta("_silenced_turns", 0)) + dur_s)
+			_refresh_silence_visual()
 			CombatLog.add("Dead silence falls. (%d turns of silence)" % dur_s)
 			return true
 		"amnesia":
