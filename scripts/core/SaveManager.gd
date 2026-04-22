@@ -61,6 +61,7 @@ func save_run(player, game_manager) -> bool:
 			"known_spells": player.known_spells,
 			"statuses": player.statuses,
 			"skills": player.skills,
+			"quickslots": player.quickslots,
 		},
 	}
 	return save(data)

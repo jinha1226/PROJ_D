@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ClassData" load_steps=2 format=3 uid="uid://bclasswarrior1"]
+[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://bslyie0ioosx5"]
 
 [ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
 

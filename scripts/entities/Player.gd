@@ -34,6 +34,7 @@ var items: Array = []  # [{id: String, plus: int}]
 var known_spells: Array = []  # [String]
 var statuses: Dictionary = {}  # id -> turns_remaining
 var skills: Dictionary = {}  # skill_id -> {"level": int, "xp": float}
+var quickslots: Array = ["", "", "", "", "", "", "", ""]  # item ids, index = slot
 var equipped_weapon_id: String = ""
 var equipped_armor_id: String = ""
 
@@ -124,8 +125,54 @@ func pickup(floor_item: FloorItem) -> void:
 	else:
 		items.append({"id": data.id, "plus": floor_item.plus})
 		CombatLog.pickup("You pick up %s." % data.display_name)
+		auto_bind_quickslot(data.id)
 	emit_signal("stats_changed")
 	floor_item.queue_free()
+
+func auto_bind_quickslot(item_id: String) -> void:
+	if item_id == "":
+		return
+	var data: ItemData = ItemRegistry.get_by_id(item_id)
+	if data == null:
+		return
+	if data.kind != "potion" and data.kind != "scroll":
+		return
+	if quickslots.has(item_id):
+		return
+	for i in range(quickslots.size()):
+		if String(quickslots[i]) == "":
+			quickslots[i] = item_id
+			return
+
+func use_quickslot(index: int) -> bool:
+	if index < 0 or index >= quickslots.size():
+		return false
+	var id: String = String(quickslots[index])
+	if id == "":
+		return false
+	for i in range(items.size()):
+		if String(items[i].get("id", "")) == id:
+			use_item(i)
+			# If no more copies of that id remain, unbind the slot.
+			if count_item(id) <= 0:
+				quickslots[index] = ""
+			return true
+	quickslots[index] = ""
+	return false
+
+func count_item(id: String) -> int:
+	var n: int = 0
+	for entry in items:
+		if String(entry.get("id", "")) == id:
+			n += 1
+	return n
+
+func try_step(dir: Vector2i) -> void:
+	if _map == null or hp <= 0:
+		return
+	if not TurnManager.is_player_turn:
+		return
+	_try_move(dir)
 
 func use_item(index: int) -> void:
 	if index < 0 or index >= items.size():

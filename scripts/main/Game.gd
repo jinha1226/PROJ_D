@@ -19,6 +19,7 @@ var ui_layer: CanvasLayer
 var top_hud: TopHUD
 var bottom_hud: BottomHUD
 var log_strip: CombatLogStrip
+var minimap_overlay: TextureButton
 
 func _ready() -> void:
 	if not GameManager.run_in_progress:
@@ -37,8 +38,52 @@ func _ready() -> void:
 	_spawn_ui()
 	TurnManager.player_turn_started.connect(_on_player_turn_started)
 	_update_hud()
-	CombatLog.post("B%d — arrow/WASD to move, bump to attack, '>' descends." \
+	_refresh_quickslots()
+	CombatLog.post("B%d — tap a tile (or arrows) to step, bump to attack." \
 			% GameManager.depth, Color(0.7, 0.9, 1.0))
+
+func _unhandled_input(event: InputEvent) -> void:
+	if player == null or map == null or camera == null:
+		return
+	if player.hp <= 0 or not TurnManager.is_player_turn:
+		return
+	var screen_pos: Vector2 = Vector2.ZERO
+	var is_tap: bool = false
+	if event is InputEventScreenTouch and event.pressed:
+		screen_pos = event.position
+		is_tap = true
+	elif event is InputEventMouseButton and event.pressed \
+			and event.button_index == MOUSE_BUTTON_LEFT:
+		screen_pos = event.position
+		is_tap = true
+	if not is_tap:
+		return
+	_handle_tap(screen_pos)
+	get_viewport().set_input_as_handled()
+
+func _handle_tap(screen_pos: Vector2) -> void:
+	# Convert screen → world via canvas transform (camera-aware).
+	var canvas_tf: Transform2D = get_viewport().get_canvas_transform()
+	var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
+	var target: Vector2i = map.world_to_grid(world_pos)
+	if target == player.grid_pos:
+		# Tap on self = wait one turn.
+		player.wait_turn()
+		TurnManager.end_player_turn()
+		return
+	var dx: int = sign(target.x - player.grid_pos.x)
+	var dy: int = sign(target.y - player.grid_pos.y)
+	# Prefer diagonal only when the target is diagonal-ish; otherwise
+	# snap to the dominant axis so tapping a distant corridor tile
+	# walks straight rather than zig-zagging.
+	if abs(target.x - player.grid_pos.x) > abs(target.y - player.grid_pos.y) * 2:
+		dy = 0
+	elif abs(target.y - player.grid_pos.y) > abs(target.x - player.grid_pos.x) * 2:
+		dx = 0
+	var dir: Vector2i = Vector2i(dx, dy)
+	if dir == Vector2i.ZERO:
+		return
+	player.try_step(dir)
 
 func _apply_class_to_player(class_id: String) -> void:
 	var data: ClassData = ClassRegistry.get_by_id(class_id)
@@ -64,6 +109,7 @@ func _apply_class_to_player(class_id: String) -> void:
 	player.known_spells = data.starting_spells.duplicate()
 	for id in _class_starter_items(class_id):
 		player.items.append({"id": id, "plus": 0})
+		player.auto_bind_quickslot(id)
 	CombatLog.post("You start as %s." % data.display_name,
 		Color(0.85, 0.9, 1.0))
 
@@ -101,6 +147,9 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.skills = data.get("skills", {})
 	if player.skills.is_empty():
 		player.init_skills()
+	var saved_qs = data.get("quickslots", null)
+	if saved_qs is Array and saved_qs.size() == player.quickslots.size():
+		player.quickslots = saved_qs
 	CombatLog.post("Run resumed. Floor B%d." % GameManager.depth,
 		Color(0.7, 0.9, 1.0))
 
@@ -168,6 +217,21 @@ func _spawn_ui() -> void:
 	bottom_hud.rest_pressed.connect(_on_rest_pressed)
 	bottom_hud.skills_pressed.connect(_on_skills_pressed)
 	bottom_hud.magic_pressed.connect(_on_magic_pressed)
+	bottom_hud.quickslot_pressed.connect(_on_quickslot_pressed)
+	_spawn_minimap_overlay()
+	_refresh_quickslots()
+
+func _spawn_minimap_overlay() -> void:
+	minimap_overlay = TextureButton.new()
+	minimap_overlay.name = "MinimapOverlay"
+	minimap_overlay.position = Vector2(12, 260)
+	minimap_overlay.custom_minimum_size = Vector2(144, 180)
+	minimap_overlay.size = Vector2(144, 180)
+	minimap_overlay.ignore_texture_size = true
+	minimap_overlay.stretch_mode = TextureButton.STRETCH_SCALE
+	minimap_overlay.modulate = Color(1, 1, 1, 0.85)
+	minimap_overlay.pressed.connect(_on_minimap_tapped)
+	ui_layer.add_child(minimap_overlay)
 
 func _floor_seed(depth: int) -> int:
 	return GameManager.seed * 1009 + depth * 31
@@ -258,10 +322,27 @@ func _refresh_fov() -> void:
 	_update_minimap()
 
 func _update_minimap() -> void:
-	if top_hud == null or map == null or player == null:
+	if map == null or player == null:
 		return
 	var tex: ImageTexture = MinimapRenderer.render(map, player, self)
-	top_hud.set_minimap_texture(tex)
+	if top_hud != null:
+		top_hud.set_minimap_texture(tex)
+	if minimap_overlay != null:
+		minimap_overlay.texture_normal = tex
+
+func _on_minimap_tapped() -> void:
+	if map == null or player == null:
+		return
+	var dlg: GameDialog = GameDialog.create("Map")
+	add_child(dlg)
+	var body := dlg.body()
+	var tex: ImageTexture = MinimapRenderer.render(map, player, self, 8)
+	var rect := TextureRect.new()
+	rect.texture = tex
+	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	rect.custom_minimum_size = Vector2(0, 900)
+	rect.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(rect)
 
 func _center_camera_on_player(snap: bool = false) -> void:
 	if player == null or camera == null:
@@ -284,6 +365,7 @@ func _update_hud() -> void:
 func _on_player_moved(_new_pos: Vector2i) -> void:
 	_refresh_fov()
 	_center_camera_on_player()
+	_refresh_quickslots()
 
 func _on_player_turn_started() -> void:
 	if player != null and player.hp > 0:
@@ -415,6 +497,40 @@ func _on_skills_pressed() -> void:
 	if player == null:
 		return
 	SkillsDialog.open(player, self)
+
+func _on_quickslot_pressed(index: int) -> void:
+	if player == null or player.hp <= 0:
+		return
+	if not TurnManager.is_player_turn:
+		return
+	var used: bool = player.use_quickslot(index)
+	_refresh_quickslots()
+	if used:
+		TurnManager.end_player_turn()
+
+func _refresh_quickslots() -> void:
+	if bottom_hud == null or player == null:
+		return
+	for i in range(player.quickslots.size()):
+		var id: String = String(player.quickslots[i])
+		if id == "":
+			bottom_hud.set_quickslot(i, null, "")
+			continue
+		var data: ItemData = ItemRegistry.get_by_id(id)
+		if data == null:
+			bottom_hud.set_quickslot(i, null, "")
+			continue
+		var count: int = player.count_item(id)
+		if count <= 0:
+			player.quickslots[i] = ""
+			bottom_hud.set_quickslot(i, null, "")
+			continue
+		var text: String = ("x%d" % count) if count > 1 else ""
+		if GameManager.use_tiles and data.tile_path != "":
+			var tex: Texture2D = load(data.tile_path) as Texture2D
+			bottom_hud.set_quickslot(i, tex, text)
+		else:
+			bottom_hud.set_quickslot_display(i, data.glyph, data.glyph_color)
 
 func _on_magic_pressed() -> void:
 	if player == null:

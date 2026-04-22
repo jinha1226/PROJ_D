@@ -7,9 +7,11 @@ class_name MinimapRenderer extends RefCounted
 
 const SCALE: int = 2
 
-static func render(map: DungeonMap, player: Player, game: Node) -> ImageTexture:
-	var w: int = DungeonMap.GRID_W * SCALE
-	var h: int = DungeonMap.GRID_H * SCALE
+static func render(map: DungeonMap, player: Player, game: Node,
+		scale_override: int = -1) -> ImageTexture:
+	var scale: int = scale_override if scale_override > 0 else SCALE
+	var w: int = DungeonMap.GRID_W * scale
+	var h: int = DungeonMap.GRID_H * scale
 	var img: Image = Image.create(w, h, false, Image.FORMAT_RGBA8)
 	img.fill(Color(0, 0, 0, 0))
 
@@ -20,11 +22,11 @@ static func render(map: DungeonMap, player: Player, game: Node) -> ImageTexture:
 				continue
 			var t: int = map.tile_at(pos)
 			var is_vis: bool = map.visible_tiles.has(pos)
-			_plot(img, x * SCALE, y * SCALE, SCALE, _tile_color(t, is_vis))
+			_plot(img, x * scale, y * scale, scale, _tile_color(t, is_vis))
 
 	if player != null:
 		var ppos: Vector2i = player.grid_pos
-		_plot(img, ppos.x * SCALE, ppos.y * SCALE, SCALE,
+		_plot(img, ppos.x * scale, ppos.y * scale, scale,
 			Color(1.0, 0.45, 0.45))
 
 	if game != null:
@@ -33,7 +35,7 @@ static func render(map: DungeonMap, player: Player, game: Node) -> ImageTexture:
 				continue
 			if not map.visible_tiles.has(n.grid_pos):
 				continue
-			_plot(img, n.grid_pos.x * SCALE, n.grid_pos.y * SCALE, SCALE,
+			_plot(img, n.grid_pos.x * scale, n.grid_pos.y * scale, scale,
 				Color(1.0, 0.65, 0.3))
 
 	return ImageTexture.create_from_image(img)
