@@ -464,7 +464,7 @@
    "long_name": "a Hidden Treasure Trove",
    "abbrev": "Trv",
    "runes": [],
-   "entry_msg": "Gold glints \u2014 a custodian demands payment.",
+   "entry_msg": "Gold glints — a custodian demands payment.",
    "tileset": "vaults",
    "is_portal": true,
    "duration": 40,
@@ -518,6 +518,29 @@
     "war_gargoyle",
     "redback",
     "fire_crab"
+   ]
+  },
+  {
+   "id": "desolation",
+   "parent": "dungeon",
+   "min_depth": 11,
+   "max_depth": 14,
+   "floors": 1,
+   "abs_depth": 13,
+   "short_name": "Desolation",
+   "long_name": "a Desolation of Salt",
+   "abbrev": "Des",
+   "runes": [],
+   "entry_msg": "A salt-white waste stretches out — pillars rise and shift.",
+   "tileset": "vaults",
+   "is_portal": true,
+   "duration": 100,
+   "loot_bump": 3.0,
+   "monster_pool": [
+    "salt_gargoyle",
+    "peacekeeper",
+    "molten_gargoyle",
+    "salamander"
    ]
   }
  ],
@@ -826,6 +849,130 @@
    "entry_msg": "You feel the oppressive weight of Zot.",
    "tileset": "zot"
   },
+  "sewer": {
+   "id": "sewer",
+   "parent": "dungeon",
+   "min_depth": 3,
+   "max_depth": 6,
+   "floors": 1,
+   "abs_depth": 4,
+   "short_name": "Sewer",
+   "long_name": "the Sewer",
+   "abbrev": "Sew",
+   "runes": [],
+   "entry_msg": "A dank sewer...",
+   "tileset": "sewer",
+   "is_portal": true,
+   "duration": 80,
+   "loot_bump": 1.5,
+   "monster_pool": [
+    "rat",
+    "bat",
+    "giant_cockroach",
+    "giant_newt",
+    "giant_toad",
+    "adder"
+   ]
+  },
+  "ossuary": {
+   "id": "ossuary",
+   "parent": "dungeon",
+   "min_depth": 5,
+   "max_depth": 10,
+   "floors": 1,
+   "abs_depth": 7,
+   "short_name": "Ossuary",
+   "long_name": "an Ossuary",
+   "abbrev": "Oss",
+   "runes": [],
+   "entry_msg": "Bones crunch underfoot...",
+   "tileset": "crypt",
+   "is_portal": true,
+   "duration": 80,
+   "loot_bump": 1.5,
+   "monster_pool": [
+    "skeleton",
+    "zombie",
+    "wight",
+    "mummy",
+    "skeletal_warrior"
+   ]
+  },
+  "bailey": {
+   "id": "bailey",
+   "parent": "dungeon",
+   "min_depth": 7,
+   "max_depth": 12,
+   "floors": 1,
+   "abs_depth": 10,
+   "short_name": "Bailey",
+   "long_name": "a Bailey",
+   "abbrev": "Bai",
+   "runes": [],
+   "entry_msg": "Orcish warcries echo...",
+   "tileset": "orc",
+   "is_portal": true,
+   "duration": 80,
+   "loot_bump": 2.0,
+   "monster_pool": [
+    "orc",
+    "orc_warrior",
+    "orc_knight",
+    "orc_priest",
+    "gnoll",
+    "hobgoblin"
+   ]
+  },
+  "volcano": {
+   "id": "volcano",
+   "parent": "dungeon",
+   "min_depth": 10,
+   "max_depth": 14,
+   "floors": 1,
+   "abs_depth": 13,
+   "short_name": "Volcano",
+   "long_name": "a Volcano",
+   "abbrev": "Vol",
+   "runes": [],
+   "entry_msg": "Heat blasts from the depths...",
+   "tileset": "volcano",
+   "is_portal": true,
+   "duration": 60,
+   "loot_bump": 2.0,
+   "monster_pool": [
+    "fire_sprite",
+    "hell_hound",
+    "fire_giant",
+    "fire_dragon",
+    "efreet",
+    "lava_snake"
+   ]
+  },
+  "icecave": {
+   "id": "icecave",
+   "parent": "dungeon",
+   "min_depth": 11,
+   "max_depth": 15,
+   "floors": 1,
+   "abs_depth": 14,
+   "short_name": "Ice Cave",
+   "long_name": "an Ice Cave",
+   "abbrev": "Ice",
+   "runes": [],
+   "entry_msg": "Frigid air bites at your lungs...",
+   "tileset": "crystal",
+   "is_portal": true,
+   "duration": 60,
+   "loot_bump": 2.0,
+   "monster_pool": [
+    "ice_beast",
+    "white_imp",
+    "polar_bear",
+    "frost_giant",
+    "ice_devil",
+    "frost_dragon"
+   ]
+  },
   "wizlab": {
    "id": "wizlab",
    "parent": "dungeon",
@@ -861,7 +1008,7 @@
    "long_name": "a Hidden Treasure Trove",
    "abbrev": "Trv",
    "runes": [],
-   "entry_msg": "Gold glints \u2014 a custodian demands payment.",
+   "entry_msg": "Gold glints — a custodian demands payment.",
    "tileset": "vaults",
    "is_portal": true,
    "duration": 40,
@@ -915,6 +1062,29 @@
     "war_gargoyle",
     "redback",
     "fire_crab"
+   ]
+  },
+  "desolation": {
+   "id": "desolation",
+   "parent": "dungeon",
+   "min_depth": 11,
+   "max_depth": 14,
+   "floors": 1,
+   "abs_depth": 13,
+   "short_name": "Desolation",
+   "long_name": "a Desolation of Salt",
+   "abbrev": "Des",
+   "runes": [],
+   "entry_msg": "A salt-white waste stretches out — pillars rise and shift.",
+   "tileset": "vaults",
+   "is_portal": true,
+   "duration": 100,
+   "loot_bump": 3.0,
+   "monster_pool": [
+    "salt_gargoyle",
+    "peacekeeper",
+    "molten_gargoyle",
+    "salamander"
    ]
   }
  }

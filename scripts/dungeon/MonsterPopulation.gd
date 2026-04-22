@@ -60,10 +60,15 @@ const _BRANCH_MAP: Dictionary = {
 	# Note: "volcano" is already keyed above (as a legacy trunk bucket)
 	# and serves both the trunk rotation and the portal — same
 	# lava-fiery pool either way. "icecave" and the others are new.
-	"sewer":   ["Dungeon"],
-	"ossuary": ["Crypt"],
-	"bailey":  ["Orcish Mines"],
-	"icecave": ["Cocytus"],
+	"sewer":      ["Dungeon"],
+	"ossuary":    ["Crypt"],
+	"bailey":     ["Orcish Mines"],
+	"icecave":    ["Cocytus"],
+	"wizlab":     ["Dungeon", "Depths"],
+	"trove":      ["Vaults"],
+	"labyrinth":  ["Dungeon"],
+	"gauntlet":   ["Vaults", "Depths"],
+	"desolation": ["Vaults"],
 }
 
 static var _table: Dictionary = {}
