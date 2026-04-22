@@ -13,6 +13,6 @@ dex = 7
 ac = 8
 ev = 6
 sight_range = 6
-essence_drop_id = ""
+essence_drop_id = "titan_essence"
 xp_value = 180
 is_boss = false

@@ -13,5 +13,5 @@ dex = 7
 ac = 1
 ev = 12
 sight_range = 6
-essence_drop_id = ""
+essence_drop_id = "fire_sprite_essence"
 xp_value = 15

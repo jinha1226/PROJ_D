@@ -179,6 +179,7 @@ static func _build_from_dcss(id: String, entry: Dictionary) -> MonsterData:
 	d.spells_book = String(entry.get("spells", ""))
 	_apply_energy_overrides(d, id)
 	_apply_ranged_overrides(d, id)
+	_apply_essence_drop(d, id)
 	# Tier is a rough difficulty band we use for UI sorting. Map to DCSS HD.
 	if d.hd >= 20:
 		d.tier = 5
@@ -251,6 +252,48 @@ const _RANGED_OVERRIDES: Dictionary = {
 	"merfolk_javelineer":{"damage": 22, "range": 8},
 	"minotaur":          {"damage": 0,  "range": 0},   # explicit no-ranged override
 }
+
+
+## DCSS monster id → essence drop id. Covers the JSON-built creatures
+## that don't have hand-tuned .tres overrides (titans, ancient liches,
+## steam dragons, etc.) so the essence pool isn't limited to the eight
+## .tres'd monsters.
+const _ESSENCE_DROPS: Dictionary = {
+	# Giants → titan / ogre / ogre_mage
+	"titan":          "titan_essence",
+	"hill_giant":     "titan_essence",
+	"stone_giant":    "titan_essence",
+	"frost_giant":    "titan_essence",
+	"two_headed_ogre": "ogre_essence",
+	"ogre_mage":      "ogre_essence",
+	# Dragons
+	"ice_dragon":     "dragon_essence",
+	"steam_dragon":   "dragon_essence",
+	"storm_dragon":   "dragon_essence",
+	"shadow_dragon":  "dragon_essence",
+	"quicksilver_dragon": "dragon_essence",
+	# Undead
+	"ancient_lich":   "lich_essence",
+	"skeletal_warrior": "boneknight_essence",
+	"vampire_knight": "boneknight_essence",
+	"mummy":          "boneknight_essence",
+	"greater_mummy":  "boneknight_essence",
+	# Nature
+	"black_mamba":    "snake_essence",
+	"anaconda":       "snake_essence",
+	"guardian_serpent": "snake_essence",
+	# Elemental / fire
+	"fire_elemental": "fire_sprite_essence",
+	"fire_bat":       "fire_sprite_essence",
+	"efreet":         "fire_sprite_essence",
+}
+
+
+static func _apply_essence_drop(d: MonsterData, id: String) -> void:
+	# Only assign when no .tres override has set it already, so hand-
+	# tuned drops always win.
+	if "essence_drop_id" in d and String(d.essence_drop_id) == "":
+		d.essence_drop_id = String(_ESSENCE_DROPS.get(id, ""))
 
 
 static func _apply_ranged_overrides(d: MonsterData, id: String) -> void:

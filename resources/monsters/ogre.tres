@@ -13,6 +13,6 @@ dex = 6
 ac = 6
 ev = 5
 sight_range = 7
-essence_drop_id = ""
+essence_drop_id = "ogre_essence"
 xp_value = 150
 is_boss = true

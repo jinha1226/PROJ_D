@@ -13,6 +13,6 @@ dex = 9
 ac = 16
 ev = 8
 sight_range = 8
-essence_drop_id = ""
+essence_drop_id = "dragon_essence"
 xp_value = 650
 is_boss = true

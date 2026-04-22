@@ -13,6 +13,6 @@ dex = 12
 ac = 6
 ev = 14
 sight_range = 8
-essence_drop_id = ""
+essence_drop_id = "dryad_essence"
 xp_value = 240
 is_boss = true
