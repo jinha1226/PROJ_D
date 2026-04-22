@@ -13,7 +13,7 @@ bg_color = Color(0.870588, 0.690196, 0.133333, 1)
 
 [node name="TopHUD" type="Control"]
 anchor_right = 1.0
-offset_bottom = 250.0
+offset_bottom = 150.0
 script = ExtResource("1_tophud")
 
 [node name="BG" type="ColorRect" parent="."]
@@ -25,32 +25,46 @@ color = Color(0.08, 0.08, 0.1, 0.90)
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
+theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_bottom = 6
 
 [node name="HBox" type="HBoxContainer" parent="Margin"]
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
+
+[node name="ZoomColumn" type="VBoxContainer" parent="Margin/HBox"]
+custom_minimum_size = Vector2(110, 0)
+theme_override_constants/separation = 4
+
+[node name="ZoomInButton" type="Button" parent="Margin/HBox/ZoomColumn"]
+custom_minimum_size = Vector2(100, 62)
+theme_override_font_sizes/font_size = 30
+text = "＋"
+
+[node name="ZoomOutButton" type="Button" parent="Margin/HBox/ZoomColumn"]
+custom_minimum_size = Vector2(100, 62)
+theme_override_font_sizes/font_size = 30
+text = "－"
 
 [node name="MinimapButton" type="Button" parent="Margin/HBox"]
-custom_minimum_size = Vector2(220, 220)
-expand_icon = true
+visible = false
+custom_minimum_size = Vector2(0, 0)
 
 [node name="Bars" type="VBoxContainer" parent="Margin/HBox"]
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
+theme_override_constants/separation = 4
 
 [node name="HPRow" type="HBoxContainer" parent="Margin/HBox/Bars"]
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
 [node name="HPLabel" type="Label" parent="Margin/HBox/Bars/HPRow"]
-custom_minimum_size = Vector2(300, 70)
+custom_minimum_size = Vector2(180, 38)
 text = "HP 0/0"
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 22
 vertical_alignment = 1
 
 [node name="HPBar" type="ProgressBar" parent="Margin/HBox/Bars/HPRow"]
-custom_minimum_size = Vector2(0, 70)
+custom_minimum_size = Vector2(0, 38)
 size_flags_horizontal = 3
 max_value = 100.0
 value = 100.0
@@ -58,16 +72,16 @@ show_percentage = false
 theme_override_styles/fill = SubResource("SB_HP")
 
 [node name="MPRow" type="HBoxContainer" parent="Margin/HBox/Bars"]
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
 [node name="MPLabel" type="Label" parent="Margin/HBox/Bars/MPRow"]
-custom_minimum_size = Vector2(300, 70)
+custom_minimum_size = Vector2(180, 38)
 text = "MP 0/0"
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 22
 vertical_alignment = 1
 
 [node name="MPBar" type="ProgressBar" parent="Margin/HBox/Bars/MPRow"]
-custom_minimum_size = Vector2(0, 70)
+custom_minimum_size = Vector2(0, 38)
 size_flags_horizontal = 3
 max_value = 100.0
 value = 100.0
@@ -75,16 +89,16 @@ show_percentage = false
 theme_override_styles/fill = SubResource("SB_MP")
 
 [node name="XPRow" type="HBoxContainer" parent="Margin/HBox/Bars"]
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
 [node name="XPLabel" type="Label" parent="Margin/HBox/Bars/XPRow"]
-custom_minimum_size = Vector2(300, 70)
+custom_minimum_size = Vector2(180, 38)
 text = "Lv.1  B1F"
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 22
 vertical_alignment = 1
 
 [node name="XPBar" type="ProgressBar" parent="Margin/HBox/Bars/XPRow"]
-custom_minimum_size = Vector2(0, 70)
+custom_minimum_size = Vector2(0, 38)
 size_flags_horizontal = 3
 max_value = 100.0
 value = 0.0

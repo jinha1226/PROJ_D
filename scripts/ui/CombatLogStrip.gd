@@ -1,7 +1,10 @@
 class_name CombatLogStrip extends Control
 
 ## On-screen rolling text of the last few CombatLog entries. Lives in
-## the UI CanvasLayer between the map area and BottomHUD.
+## the UI CanvasLayer between the map area and BottomHUD. Tap the
+## strip to emit `tapped` — Game opens a full-history dialog on it.
+
+signal tapped
 
 const MAX_VISIBLE: int = 5
 
@@ -10,6 +13,7 @@ var _bg: ColorRect
 var _messages: Array = []
 
 func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_STOP
 	_bg = ColorRect.new()
 	_bg.color = Color(0.05, 0.04, 0.08, 0.55)
 	_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -32,11 +36,23 @@ func _ready() -> void:
 	add_child(_label)
 
 	CombatLog.message_added.connect(_on_message)
+	gui_input.connect(_on_gui_input)
 	# Prime with any existing history so a scene reload doesn't show empty.
 	for entry in CombatLog.history.slice(
 			max(0, CombatLog.history.size() - MAX_VISIBLE)):
 		_messages.append(entry)
 	_rebuild()
+
+func _on_gui_input(event: InputEvent) -> void:
+	var is_press: bool = false
+	if event is InputEventMouseButton and event.pressed \
+			and event.button_index == MOUSE_BUTTON_LEFT:
+		is_press = true
+	elif event is InputEventScreenTouch and event.pressed:
+		is_press = true
+	if is_press:
+		tapped.emit()
+		accept_event()
 
 func _on_message(text: String, color: Color) -> void:
 	_messages.append({"text": text, "color": color})

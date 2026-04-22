@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://braceselect001"]
+[gd_scene format=3 uid="uid://0024nm3y7m53"]
 
 [ext_resource type="Script" path="res://scripts/menu/RaceSelect.gd" id="1_raceselect"]
 

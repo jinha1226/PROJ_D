@@ -8,8 +8,12 @@ class_name TopHUD
 @onready var xp_bar: ProgressBar = $Margin/HBox/Bars/XPRow/XPBar
 @onready var xp_label: Label = $Margin/HBox/Bars/XPRow/XPLabel
 @onready var minimap_button: Button = $Margin/HBox/MinimapButton
+@onready var zoom_in_button: Button = $Margin/HBox/ZoomColumn/ZoomInButton
+@onready var zoom_out_button: Button = $Margin/HBox/ZoomColumn/ZoomOutButton
 
 signal minimap_pressed
+signal zoom_in_pressed
+signal zoom_out_pressed
 
 var _pulse_t: float = 0.0
 var _pulsing: bool = false
@@ -20,7 +24,12 @@ var _branch_label: String = "Dungeon"
 
 
 func _ready() -> void:
-	minimap_button.pressed.connect(func(): minimap_pressed.emit())
+	if minimap_button != null:
+		minimap_button.pressed.connect(func(): minimap_pressed.emit())
+	if zoom_in_button != null:
+		zoom_in_button.pressed.connect(func(): zoom_in_pressed.emit())
+	if zoom_out_button != null:
+		zoom_out_button.pressed.connect(func(): zoom_out_pressed.emit())
 
 
 func _process(delta: float) -> void:

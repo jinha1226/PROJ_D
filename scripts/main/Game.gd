@@ -198,6 +198,10 @@ func _spawn_player() -> void:
 	player.stats_changed.connect(_update_hud)
 	player.item_dropped.connect(_on_item_dropped)
 
+const ZOOM_MIN: float = 0.7
+const ZOOM_MAX: float = 2.2
+const ZOOM_STEP: float = 0.2
+
 func _spawn_camera() -> void:
 	camera = Camera2D.new()
 	camera.name = "Camera2D"
@@ -206,6 +210,12 @@ func _spawn_camera() -> void:
 	camera.position_smoothing_speed = 14.0
 	add_child(camera)
 	_center_camera_on_player(true)
+
+func _zoom_by(delta: float) -> void:
+	if camera == null:
+		return
+	var new_zoom: float = clamp(camera.zoom.x + delta, ZOOM_MIN, ZOOM_MAX)
+	camera.zoom = Vector2(new_zoom, new_zoom)
 
 func _spawn_ui() -> void:
 	ui_layer = CanvasLayer.new()
@@ -237,15 +247,21 @@ func _spawn_ui() -> void:
 	bottom_hud.skills_pressed.connect(_on_skills_pressed)
 	bottom_hud.magic_pressed.connect(_on_magic_pressed)
 	bottom_hud.quickslot_pressed.connect(_on_quickslot_pressed)
+	bottom_hud.quickslot_long_pressed.connect(_on_quickslot_long_pressed)
+	if top_hud.has_signal("zoom_in_pressed"):
+		top_hud.zoom_in_pressed.connect(func(): _zoom_by(ZOOM_STEP))
+	if top_hud.has_signal("zoom_out_pressed"):
+		top_hud.zoom_out_pressed.connect(func(): _zoom_by(-ZOOM_STEP))
+	log_strip.tapped.connect(_on_log_tapped)
 	_spawn_minimap_overlay()
 	_refresh_quickslots()
 
 func _spawn_minimap_overlay() -> void:
 	minimap_overlay = TextureButton.new()
 	minimap_overlay.name = "MinimapOverlay"
-	minimap_overlay.position = Vector2(12, 260)
-	minimap_overlay.custom_minimum_size = Vector2(144, 180)
-	minimap_overlay.size = Vector2(144, 180)
+	minimap_overlay.position = Vector2(12, 160)
+	minimap_overlay.custom_minimum_size = Vector2(92, 120)
+	minimap_overlay.size = Vector2(92, 120)
 	minimap_overlay.ignore_texture_size = true
 	minimap_overlay.stretch_mode = TextureButton.STRETCH_SCALE
 	minimap_overlay.modulate = Color(1, 1, 1, 0.85)
@@ -521,12 +537,24 @@ func _on_skills_pressed() -> void:
 func _on_quickslot_pressed(index: int) -> void:
 	if player == null or player.hp <= 0:
 		return
+	var slot_id: String = String(player.quickslots[index])
+	if slot_id == "" or player.count_item(slot_id) == 0:
+		QuickslotPicker.open(player, self, index, _refresh_quickslots)
+		return
 	if not TurnManager.is_player_turn:
 		return
 	var used: bool = player.use_quickslot(index)
 	_refresh_quickslots()
 	if used:
 		TurnManager.end_player_turn()
+
+func _on_quickslot_long_pressed(index: int) -> void:
+	if player == null:
+		return
+	QuickslotPicker.open(player, self, index, _refresh_quickslots)
+
+func _on_log_tapped() -> void:
+	LogDialog.open(self)
 
 func _refresh_quickslots() -> void:
 	if bottom_hud == null or player == null:
