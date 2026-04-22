@@ -1619,7 +1619,7 @@ func _on_monster_died(monster: Monster) -> void:
 	# on death. Burst radius 1 for normal ids, 2 for explosive types so
 	# fire vortex / fire elemental deaths leave a real hazard trail.
 	if monster != null and monster.data != null and GameManager != null:
-		var death_info: Dictionary = _monster_death_cloud(String(monster.data.id))
+		var death_info: Dictionary = CloudHooks.monster_death_cloud(String(monster.data.id))
 		var dtype: String = String(death_info.get("type", ""))
 		if dtype != "":
 			CloudSystem.place_patch(GameManager.clouds, monster.grid_pos,
@@ -1895,74 +1895,10 @@ func _makhleb_random_zap(major: bool) -> void:
 			[sname, _mon_name(target), dmg])
 
 
-## DCSS per-god kill conducts. Returns the adjusted piety gain for this
-## kill (negative = piety loss). Bonuses fire on favoured victims
-## (TSO evil-kill, Yred holy-kill), penalties on disliked victims
-## (Elyvilon neutral, Beogh orc, Fedhas plant). Gods not listed here
-## return `base_gain` unchanged.
+## Thin forwarder — per-god conduct math lives in GodConducts (pure
+## module). Keeps the old callsite signature intact.
 func _apply_god_conduct(god_id: String, monster: Monster, base_gain: int) -> int:
-	if monster == null or monster.data == null:
-		return base_gain
-	var holiness: String = ""
-	# Holiness derived the same way CombatSystem / Monster does — read
-	# shape + flags. "undead"/"demonic"/"holy"/"plant" are the four
-	# conduct-bearing classes.
-	if String(monster.data.shape) == "undead":
-		holiness = "undead"
-	elif monster.data.flags != null:
-		for f in monster.data.flags:
-			var lf: String = String(f).to_lower()
-			if lf in ["undead", "demonic", "holy", "plant", "natural"]:
-				holiness = lf
-				break
-	var mid: String = String(monster.data.id) if "id" in monster.data else ""
-	match god_id:
-		"the_shining_one":
-			# TSO +50% from evil kills (undead + demonic); penalty for
-			# slaughtering the natural-aligned.
-			if holiness == "undead" or holiness == "demonic":
-				return base_gain + maxi(1, base_gain / 2)
-		"yredelemnul":
-			# Yred loves necrotic prey flipped: bonus for holy kills,
-			# outright penalty for slaughtering the undead (they're allies
-			# in spirit).
-			if holiness == "holy":
-				return base_gain + 2
-			if holiness == "undead":
-				return -1
-		"zin":
-			# Zin forbids mutation + chaos. Chaos demons / shapeshifters
-			# anger Zin even on kill (player should be cleansing, not
-			# slaying chaos). Small penalty.
-			if "chaos" in mid or "shapeshifter" in mid:
-				return -1
-			if holiness == "demonic":
-				return base_gain + 1
-		"elyvilon":
-			# Elyvilon — the pacifist. Kills of neutral/natural creatures
-			# cost piety; only undead and demonic kills are rewarded.
-			if holiness == "undead" or holiness == "demonic":
-				return base_gain
-			return -1
-		"cheibriados":
-			# Cheibriados cares more about speed than kills — no per-kill
-			# conduct, but passes base through. The haste-ban is enforced
-			# elsewhere (caster/buff sites).
-			return base_gain
-		"beogh":
-			# Beogh — orc god. Killing non-orc non-pets gains piety; orc
-			# kills are a hard penalty ("Beogh frowns").
-			if mid.begins_with("orc") or "orc_" in mid or mid == "orc":
-				return -3
-		"fedhas":
-			# Fedhas — plant god. Any plant kill is a -2 penalty.
-			if holiness == "plant":
-				return -2
-		"okawaru":
-			# Okawaru — lone warrior. No penalty on kills, but the summon/
-			# ally ban lives in the invocation/essence paths.
-			return base_gain
-	return base_gain
+	return GodConducts.apply(god_id, monster, base_gain)
 
 
 ## Oni (and any future magical-might race) get a 20% spell power bump so
@@ -3496,74 +3432,7 @@ func _on_identify_one_requested() -> void:
 	# surfaces on top. Without this it stacks behind the bag and becomes
 	# untouchable.
 	_close_all_dialogs()
-	# Dedupe by item id — carrying three of the same unknown potion should
-	# show one row in the picker, and identifying it reveals all three.
-	# Also surfaces unidentified rings / amulets and ego-bearing armour
-	# so Scroll of Identify works the DCSS way (any unknown magical item,
-	# not just consumables).
-	var unidentified: Array = []
-	var seen_ids: Dictionary = {}
-	for it in player.get_items():
-		var iid: String = String(it.get("id", ""))
-		if iid == "" or seen_ids.has(iid):
-			continue
-		if iid.begins_with("randart_") or iid.begins_with("unrand_"):
-			continue
-		var kind_it: String = String(it.get("kind", ""))
-		var is_candidate: bool = false
-		if ConsumableRegistry.has(iid) and not GameManager.is_identified(iid):
-			is_candidate = true
-		elif (kind_it == "ring" or kind_it == "amulet") \
-				and not GameManager.is_identified(iid):
-			is_candidate = true
-		elif kind_it == "armor":
-			var ego_it: String = String(it.get("ego", ""))
-			if ego_it != "" and not GameManager.is_identified(
-					GameManager.armor_ego_key(ego_it)):
-				is_candidate = true
-		if is_candidate:
-			seen_ids[iid] = true
-			unidentified.append(it)
-	var dlg := GameDialog.create("Identify Which?", Vector2i(960, 1200))
-	add_child(dlg)
-	var vb: VBoxContainer = dlg.body()
-	vb.add_theme_constant_override("separation", 8)
-	if unidentified.is_empty():
-		var l := Label.new()
-		l.text = "You have nothing left to identify."
-		l.add_theme_font_size_override("font_size", 40)
-		vb.add_child(l)
-	else:
-		var prompt := Label.new()
-		prompt.text = "Choose an item to reveal:"
-		prompt.add_theme_font_size_override("font_size", 40)
-		vb.add_child(prompt)
-		for it in unidentified:
-			var iid: String = String(it.get("id", ""))
-			var kind: String = String(it.get("kind", ""))
-			var disp: String = GameManager.display_name_for_item(iid, String(it.get("name", "?")), kind)
-			var btn := Button.new()
-			btn.text = "%s [%s]" % [disp, kind]
-			btn.custom_minimum_size = Vector2(0, 80)
-			btn.add_theme_font_size_override("font_size", 40)
-			btn.pressed.connect(_on_identify_pick.bind(iid, dlg))
-			vb.add_child(btn)
-
-
-func _on_identify_pick(id: String, dlg: GameDialog) -> void:
-	# Armour egos are identified by the ego key, not the item id, so the
-	# picker resolves which path to use based on whether any inventory
-	# row under this id carries an ego.
-	GameManager.identify(id)
-	if player != null:
-		for it in player.get_items():
-			if String(it.get("id", "")) != id:
-				continue
-			var ego: String = String(it.get("ego", ""))
-			if ego != "":
-				GameManager.identify_armor_ego(ego)
-			break
-	dlg.close()
+	IdentifyDialog.open(self, player)
 
 
 ## Scroll of Enchant Weapon / Armour — pops a picker listing every
@@ -5044,7 +4913,7 @@ func _execute_targeted_cast(spell_id: String, target) -> void:
 		# Cloud residue (fireball/fire_storm/hailstorm) — same hook
 		# that _cast_area_spell uses, so tapped-tile casts leave the
 		# expected clouds behind.
-		var cloud_residue: String = _spell_cloud_residue(spell_id)
+		var cloud_residue: String = CloudHooks.spell_cloud_residue(spell_id)
 		if cloud_residue != "" and GameManager != null:
 			var dmap_c: DungeonMap = $DungeonLayer/DungeonMap
 			CloudSystem.place_patch(GameManager.clouds, target_grid, cloud_residue, radius)
@@ -5333,7 +5202,8 @@ func _cast_area_spell(spell_id: String, info: Dictionary, power: int, center_m: 
 		center = center_m.grid_pos
 		center_px = center_m.position
 	else:
-		center = _fallback_area_center(int(info.get("range", 4)))
+		center = CloudHooks.fallback_area_center(player, generator,
+				$DungeonLayer/DungeonMap, int(info.get("range", 4)))
 		center_px = Vector2(center.x * TILE_SIZE + TILE_SIZE / 2.0,
 				center.y * TILE_SIZE + TILE_SIZE / 2.0)
 	var radius: int = int(info.get("radius", 2))
@@ -5364,9 +5234,9 @@ func _cast_area_spell(spell_id: String, info: Dictionary, power: int, center_m: 
 			"%d dmg" % total_dmg, spell_color)
 
 	# DCSS cloud residue — some area spells leave behind a transient
-	# cloud patch. The spell_id → cloud_type map lives here so spells
-	# can opt in without knowing the CloudSystem exists.
-	var cloud_residue: String = _spell_cloud_residue(spell_id)
+	# cloud patch. The spell_id → cloud_type map lives in CloudHooks
+	# so spells can opt in without knowing the CloudSystem exists.
+	var cloud_residue: String = CloudHooks.spell_cloud_residue(spell_id)
 	if cloud_residue != "" and GameManager != null:
 		var dmap2: DungeonMap = $DungeonLayer/DungeonMap
 		CloudSystem.place_patch(GameManager.clouds, center, cloud_residue, radius)
@@ -5377,42 +5247,6 @@ func _cast_area_spell(spell_id: String, info: Dictionary, power: int, center_m: 
 	if hits == 0:
 		return {"success": true, "message": "%s hits nothing." % String(info.get("name", spell_id))}
 	return {"success": true, "message": "%s: %d hit(s), %d total dmg" % [String(info.get("name", spell_id)), hits, total_dmg]}
-
-
-## Spell → cloud type mapping. DCSS source: spl-zap.cc / spell data.
-## Fireball / Fire Storm leave fire clouds; Hailstorm leaves freezing
-## clouds. Extend here as cloud-placing spells are ported.
-func _spell_cloud_residue(spell_id: String) -> String:
-	match spell_id:
-		"fireball", "fire_storm":
-			return "fire"
-		"hailstorm":
-			return "freezing"
-		_:
-			return ""
-
-
-## DCSS death-cloud table — a handful of monster ids release a cloud
-## on death. Keeps the set small (plague/rot undead + elementals) so
-## most kills stay clean; the cloud is the flavour reward for taking
-## down a notably nasty mob.
-func _monster_death_cloud(monster_id: String) -> Dictionary:
-	match monster_id:
-		# Plague / rot undead — decaying flesh bursts into miasma.
-		"bog_body", "plague_shambler", "rotting_hulk", "necrophage", \
-		"ghoul", "death_drake":
-			return {"type": "noxious", "radius": 1}
-		# Fire-bodied creatures burn up into a lingering flame cloud.
-		"fire_vortex", "fire_elemental", "creeping_inferno":
-			return {"type": "fire", "radius": 2}
-		# Cold-bodied elementals leave a freezing patch.
-		"frost_giant", "ice_statue", "simulacrum":
-			return {"type": "freezing", "radius": 1}
-		# Smoke-bodied / shadowy creatures dissolve into smoke.
-		"smoke_demon", "smoke_djinn":
-			return {"type": "smoke", "radius": 2}
-		_:
-			return {}
 
 
 func _cast_self_spell(spell_id: String, _info: Dictionary, _power: int) -> Dictionary:
@@ -5626,36 +5460,6 @@ func _beam_path_hits(picked: Monster, spell_id: String, range_tiles: int) -> Arr
 	var trace: Dictionary = Beam.trace(player.grid_pos, picked.grid_pos,
 			range_tiles, true, opaque_cb, mon_cb)
 	return trace.get("hits", [])
-
-
-## Pick a walkable tile to drop an area spell on when no monster is in
-## range. Scans Chebyshev rings outward from the player for the first
-## visible walkable tile, capped at `max_range` so the explosion stays
-## reachable. Falls back to the player's own tile when nothing nearby
-## is walkable — harmless, since area spells hit 0 monsters then and
-## we still play FX + cloud residue.
-func _fallback_area_center(max_range: int) -> Vector2i:
-	if player == null or generator == null:
-		return Vector2i.ZERO
-	var dmap: DungeonMap = $DungeonLayer/DungeonMap
-	var r: int = max(2, min(max_range, 4))
-	for dist in range(2, r + 1):
-		# Prefer cardinal directions at the target distance for a clean
-		# forward blast; diagonals are considered after to broaden reach.
-		var rings: Array = [
-			Vector2i(dist, 0), Vector2i(-dist, 0),
-			Vector2i(0, dist), Vector2i(0, -dist),
-			Vector2i(dist, dist), Vector2i(-dist, -dist),
-			Vector2i(dist, -dist), Vector2i(-dist, dist),
-		]
-		for d in rings:
-			var cand: Vector2i = player.grid_pos + d
-			if not generator.is_walkable(cand):
-				continue
-			if dmap != null and not dmap.is_tile_visible(cand):
-				continue
-			return cand
-	return player.grid_pos
 
 
 func _find_nearest_visible_monster(range_tiles: int = 99) -> Monster:
