@@ -11,10 +11,13 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	var weapon_dmg: int = UNARMED_DAMAGE
 	var stat_source: int = player.strength
 	var skill_id: String = ""
+	var weapon_plus: int = 0
 	if player.equipped_weapon_id != "":
 		var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
 		if w != null:
-			weapon_dmg = max(UNARMED_DAMAGE, w.damage)
+			var entry: Dictionary = player.equipped_weapon_entry()
+			weapon_plus = int(entry.get("plus", 0))
+			weapon_dmg = max(UNARMED_DAMAGE, w.damage + weapon_plus)
 			skill_id = w.category
 			if w.category == "dagger":
 				stat_source = player.dexterity
@@ -22,7 +25,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	var skill_level: int = 0
 	if skill_id != "":
 		skill_level = player.get_skill_level(skill_id)
-	var to_hit_base: int = 15 + stat_bonus + skill_level
+	var to_hit_base: int = 15 + stat_bonus + skill_level + weapon_plus
 	var to_hit_roll: int = randi_range(0, to_hit_base)
 	if to_hit_roll < monster.data.ev:
 		CombatLog.miss("You miss the %s." % monster.data.display_name)

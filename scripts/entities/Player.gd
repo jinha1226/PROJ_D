@@ -160,6 +160,10 @@ func use_item(index: int) -> void:
 				Color(0.5, 0.85, 1.0))
 		"teleport":
 			_teleport_far()
+		"enchant_weapon":
+			_enchant_weapon(max(1, data.effect_value))
+		"enchant_armor":
+			_enchant_armor(max(1, data.effect_value))
 		_:
 			CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
 	items.remove_at(index)
@@ -180,17 +184,61 @@ func drop_item(index: int) -> void:
 	emit_signal("item_dropped", id, grid_pos, plus_val)
 	emit_signal("stats_changed")
 
+func equipped_weapon_entry() -> Dictionary:
+	for entry in items:
+		if entry.get("id", "") == equipped_weapon_id:
+			return entry
+	return {}
+
+func equipped_armor_entry() -> Dictionary:
+	for entry in items:
+		if entry.get("id", "") == equipped_armor_id:
+			return entry
+	return {}
+
 func refresh_ac_from_equipment() -> void:
 	ac = 0
 	ev = 5 + dexterity / 2
 	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id)
 	if armor != null:
-		ac += armor.ac_bonus
+		var armor_plus: int = int(equipped_armor_entry().get("plus", 0))
+		ac += armor.ac_bonus + armor_plus
 		var armor_skill: int = get_skill_level("armor")
 		var penalty_mult: float = max(0.0, 1.0 - float(armor_skill) * 0.1)
 		ev -= int(round(float(armor.ev_penalty) * penalty_mult))
 	ev = max(0, ev)
 	emit_signal("stats_changed")
+
+func _enchant_weapon(amount: int) -> void:
+	if equipped_weapon_id == "":
+		CombatLog.post("Nothing to enchant.", Color(0.8, 0.8, 0.6))
+		return
+	for i in range(items.size()):
+		var entry: Dictionary = items[i]
+		if entry.get("id", "") == equipped_weapon_id:
+			entry["plus"] = int(entry.get("plus", 0)) + amount
+			items[i] = entry
+			var data: ItemData = ItemRegistry.get_by_id(equipped_weapon_id)
+			var name_: String = data.display_name if data != null else "weapon"
+			CombatLog.post("Your %s glows. (+%d)" % [name_, amount],
+				Color(1.0, 0.9, 0.5))
+			return
+
+func _enchant_armor(amount: int) -> void:
+	if equipped_armor_id == "":
+		CombatLog.post("Nothing to enchant.", Color(0.8, 0.8, 0.6))
+		return
+	for i in range(items.size()):
+		var entry: Dictionary = items[i]
+		if entry.get("id", "") == equipped_armor_id:
+			entry["plus"] = int(entry.get("plus", 0)) + amount
+			items[i] = entry
+			var data: ItemData = ItemRegistry.get_by_id(equipped_armor_id)
+			var name_: String = data.display_name if data != null else "armor"
+			CombatLog.post("Your %s glows. (+%d)" % [name_, amount],
+				Color(0.85, 1.0, 0.7))
+			refresh_ac_from_equipment()
+			return
 
 func _teleport_far() -> void:
 	if _map == null:
