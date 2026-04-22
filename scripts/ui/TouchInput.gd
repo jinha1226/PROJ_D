@@ -92,12 +92,45 @@ func _unhandled_input(event: InputEvent) -> void:
 ## else emits `key_action` for GameBootstrap to dispatch the same way
 ## it handles on-screen button presses. Tapping a movement key while
 ## on stairs descends/ascends directly.
+## Player-editable keyboard macros. `user://macros.json` may contain:
+##   { "macros": { "113": "quaff", "101": "evoke", ... } }
+## where the keys are `keycode` integers (Godot KEY_* values) and the
+## values are action strings the `key_action` signal already handles
+## (quaff / read / evoke / magic / inventory / abilities / …).
+## Loaded lazily on first input so the file is optional.
+static var _macros_cache: Dictionary = {}
+static var _macros_loaded: bool = false
+
+
+static func _load_macros() -> void:
+	if _macros_loaded:
+		return
+	_macros_loaded = true
+	if not FileAccess.file_exists("user://macros.json"):
+		return
+	var f := FileAccess.open("user://macros.json", FileAccess.READ)
+	if f == null:
+		return
+	var parsed = JSON.parse_string(f.get_as_text())
+	f.close()
+	if typeof(parsed) == TYPE_DICTIONARY:
+		var m: Dictionary = parsed.get("macros", {})
+		for k in m.keys():
+			_macros_cache[int(String(k))] = String(m[k])
+
+
 func _handle_key(k: InputEventKey) -> void:
 	if not player.is_alive:
 		return
 	# Cancel auto-move on any keystroke so the player takes back control.
 	if _is_auto_moving and k.keycode != KEY_ESCAPE:
 		_cancel_auto_move()
+	# User-defined macros win over the built-in binding table — allows
+	# rebinding `q` to `rest`, mapping numpad keys to invocations, etc.
+	_load_macros()
+	if _macros_cache.has(k.keycode):
+		key_action.emit(String(_macros_cache[k.keycode]))
+		return
 	var delta: Vector2i = _key_to_dir(k.keycode)
 	if delta != Vector2i.ZERO:
 		player.try_move(delta)
