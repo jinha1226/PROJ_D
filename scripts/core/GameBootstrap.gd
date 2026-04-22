@@ -347,6 +347,8 @@ func _ready() -> void:
 		TurnManager.player_turn_started.connect(_on_turn_tick_silence)
 	if not TurnManager.player_turn_started.is_connected(_on_turn_tick_abyss):
 		TurnManager.player_turn_started.connect(_on_turn_tick_abyss)
+	if not TurnManager.player_turn_started.is_connected(_on_turn_tick_god_gifts):
+		TurnManager.player_turn_started.connect(_on_turn_tick_god_gifts)
 
 	_setup_combat_log(ui)
 	TurnManager.start_player_turn()
@@ -737,6 +739,131 @@ func _on_turn_tick_abyss() -> void:
 					player.moved.emit(dest)
 					CombatLog.add("The Abyss shifts around you.")
 					break
+
+
+## DCSS Trog / Okawaru / Sif Muna gift pipelines (god-gift.cc). These
+## three gods reward loyal worshippers with themed items at piety
+## milestones — Trog drops a weapon worthy of berserking, Okawaru gifts
+## weapons or armour, Sif Muna drops a spellbook the player hasn't
+## learned. Each pull rolls a cooldown so gifts feel rare (DCSS uses
+## ~200-400 turn gaps); on a successful roll the item spawns at the
+## player's feet as a FloorItem.
+const _TROG_WEAPONS: Array = [
+	"hand_axe", "war_axe", "broad_axe", "battleaxe",
+	"mace", "flail", "morningstar", "eveningstar",
+	"halberd", "glaive", "quarterstaff",
+]
+const _OKAWARU_WEAPONS: Array = [
+	"long_sword", "great_sword", "scimitar", "falchion",
+	"rapier", "trident", "spear", "longbow", "crossbow",
+]
+const _OKAWARU_ARMOUR: Array = [
+	"ring_mail", "scale_mail", "chain_mail", "plate_armour",
+	"helmet", "kite_shield", "tower_shield", "boots", "gloves",
+]
+
+
+func _on_turn_tick_god_gifts() -> void:
+	if player == null or not player.is_alive or player.current_god == "":
+		return
+	var god: String = player.current_god
+	if not (god == "trog" or god == "okawaru" or god == "sif_muna"):
+		return
+	if int(player.piety) < 30:
+		return
+	# Cooldown counter. Seeded at first check so every god's first
+	# gift isn't trivially dropped on pledge + step.
+	var key: String = "_gift_cd_" + god
+	if not player.has_meta(key):
+		player.set_meta(key, 120)
+	var left: int = int(player.get_meta(key, 1)) - 1
+	if left > 0:
+		player.set_meta(key, left)
+		return
+	# Cooldown expired — roll a piety-scaled chance. Piety 30 → 30%,
+	# 200 (capped) → ~100%. Reset cooldown even on miss so we don't
+	# auto-retry every turn.
+	player.set_meta(key, randi_range(120, 240))
+	if randf() * 200.0 > float(player.piety):
+		return
+	match god:
+		"trog":       _deliver_trog_gift()
+		"okawaru":    _deliver_okawaru_gift()
+		"sif_muna":   _deliver_sif_gift()
+
+
+func _deliver_trog_gift() -> void:
+	var wid: String = String(_TROG_WEAPONS[randi() % _TROG_WEAPONS.size()])
+	_drop_gifted_weapon(wid, "Trog tosses you a %s!")
+
+
+func _deliver_okawaru_gift() -> void:
+	if randi() % 2 == 0:
+		var wid: String = String(_OKAWARU_WEAPONS[randi() % _OKAWARU_WEAPONS.size()])
+		_drop_gifted_weapon(wid, "Okawaru lays a %s before you!")
+	else:
+		var aid: String = String(_OKAWARU_ARMOUR[randi() % _OKAWARU_ARMOUR.size()])
+		_drop_gifted_armour(aid, "Okawaru lays a %s before you!")
+
+
+func _deliver_sif_gift() -> void:
+	# DCSS Sif gifts a spellbook not yet cracked. We roll across the
+	# spellbook pool in ConsumableRegistry, skipping anything already in
+	# the player's inventory or whose spells are already all learned.
+	var pool: Array = []
+	for cid in ConsumableRegistry.all_ids():
+		var info: Dictionary = ConsumableRegistry.get_info(String(cid))
+		if String(info.get("kind", "")) != "book":
+			continue
+		var already_in_bag: bool = false
+		for it in player.get_items():
+			if String(it.get("id", "")) == String(cid):
+				already_in_bag = true
+				break
+		if already_in_bag:
+			continue
+		pool.append(String(cid))
+	if pool.is_empty():
+		return
+	var book_id: String = String(pool[randi() % pool.size()])
+	var binfo: Dictionary = ConsumableRegistry.get_info(book_id)
+	var entity_layer: Node = get_tree().get_first_node_in_group("entity_layer")
+	if entity_layer == null:
+		entity_layer = self
+	var fi := FloorItem.new()
+	entity_layer.add_child(fi)
+	fi.setup(player.grid_pos, book_id,
+			String(binfo.get("name", book_id)), "book",
+			binfo.get("color", Color(0.75, 0.65, 0.45)))
+	CombatLog.add("Sif Muna sets a spellbook at your feet: %s!" % \
+			String(binfo.get("name", book_id)))
+
+
+func _drop_gifted_weapon(wid: String, fmt: String) -> void:
+	var entity_layer: Node = get_tree().get_first_node_in_group("entity_layer")
+	if entity_layer == null:
+		entity_layer = self
+	var fi := FloorItem.new()
+	entity_layer.add_child(fi)
+	var wname: String = WeaponRegistry.display_name_for(wid)
+	fi.setup(player.grid_pos, wid, wname, "weapon",
+			Color(0.85, 0.70, 0.55), {"cursed": false})
+	CombatLog.add(fmt % wname)
+
+
+func _drop_gifted_armour(aid: String, fmt: String) -> void:
+	var entity_layer: Node = get_tree().get_first_node_in_group("entity_layer")
+	if entity_layer == null:
+		entity_layer = self
+	var info: Dictionary = ArmorRegistry.get_info(aid)
+	var fi := FloorItem.new()
+	entity_layer.add_child(fi)
+	var extra: Dictionary = {"cursed": false}
+	if info.has("slot"):
+		extra["slot"] = String(info["slot"])
+	fi.setup(player.grid_pos, aid, String(info.get("name", aid)),
+			"armor", Color(0.85, 0.70, 0.55), extra)
+	CombatLog.add(fmt % String(info.get("name", aid)))
 
 
 func _on_turn_tick_silence() -> void:
