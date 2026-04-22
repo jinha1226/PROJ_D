@@ -1781,9 +1781,37 @@ func _maybe_drop_gold(monster: Monster) -> void:
 			Color(1.0, 0.85, 0.30), {"gold": amount})
 
 
+## DCSS hell-lord / pan-lord / unique boss → guaranteed unrand drop
+## table (mon-gear.cc:give_unique_item). Mapped here rather than in
+## MonsterData so the registry stays a pure stat sheet; the spawn
+## frequency is already controlled by where these monsters appear.
+const _BOSS_UNRAND_DROPS: Dictionary = {
+	"cerebov":      "unrand_cerebov",
+	"dispater":     "unrand_dispater",
+	"asmodeus":     "unrand_asmodeus",
+}
+
+
 func _maybe_drop_loot(monster: Monster) -> void:
 	if monster == null or not ("grid_pos" in monster):
 		return
+	# Boss-unrand guarantee: each of the hell/pan lords drops their
+	# signature artefact on death (DCSS give_unique_item). The drop
+	# bypasses the 30% generic loot gate below.
+	if monster.data != null and _BOSS_UNRAND_DROPS.has(String(monster.data.id)):
+		var uid: String = String(_BOSS_UNRAND_DROPS[String(monster.data.id)])
+		if UnrandartRegistry.has(uid):
+			var udict: Dictionary = UnrandartRegistry.make_item(uid)
+			var ufi: FloorItem = FloorItem.new()
+			$EntityLayer.add_child(ufi)
+			ufi.setup(monster.grid_pos, uid,
+					String(udict.get("name", uid)),
+					String(udict.get("kind", "weapon")),
+					udict.get("color", Color.WHITE), udict)
+			CombatLog.add("The %s drops %s!" % [
+					String(monster.data.display_name),
+					String(udict.get("name", uid))])
+			return
 	# DCSS species-specific drops: trolls exclusively drop their own hide
 	# armour (troll_leather_armour is never floor-generated). Gate this
 	# before the generic roll so the yield is independent of the 30%
