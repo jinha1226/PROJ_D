@@ -93,39 +93,87 @@ static func altar_tex(god_id: String) -> Texture2D:
 	return load(_ALTAR_DIR + fname) as Texture2D
 
 ## Per-branch overrides. DungeonMap picks the right floor/wall/etc. by
-## passing the current branch id; missing keys fall back to FEATURES.
+## passing the current branch id (mapped through GameManager.tileset_branch);
+## missing keys fall back to FEATURES. Filenames mirror the canonical DCSS
+## rltiles mapping so each branch reads at a glance: Lair looks like
+## tangled forest, Orcish Mines like rough mineshaft, Crypt like stone
+## catacombs, and so on.
 const BRANCH_TILESETS: Dictionary = {
 	"main": {
-		"floor": "dngn/floor/grey_dirt0.png",
+		"floor": "dngn/floor/pebble_brown0.png",
 		"wall":  "dngn/wall/stone2_gray0.png",
 	},
-	"forest": {
-		"floor": "dngn/floor/grass/grass0.png",
-		"wall":  "dngn/trees/tree1.png",
-	},
-	"mine": {
+	"mine": {   # Orcish Mines
 		"floor": "dngn/floor/cage0.png",
-		"wall":  "dngn/wall/iron0-0.png",
+		"wall":  "dngn/wall/orc0.png",
 	},
-	"crypt": {
-		"floor": "dngn/floor/crypt0.png",
-		"wall":  "dngn/wall/tomb0.png",
+	"forest": {  # Lair, Spider fallback
+		"floor": "dngn/floor/grass/grass0.png",
+		"wall":  "dngn/wall/lair0.png",
 	},
-	"volcano": {
-		"floor": "dngn/floor/volcanic_floor0.png",
-		"wall":  "dngn/wall/hell01.png",
+	"spider": {
+		"floor": "dngn/floor/spider00.png",
+		"wall":  "dngn/wall/spider00.png",
+	},
+	"snake": {
+		"floor": "dngn/floor/snake-a0.png",
+		"wall":  "dngn/wall/snake0.png",
+	},
+	"shoals": {
+		"floor": "dngn/floor/sand1.png",
+		"wall":  "dngn/wall/shoals_wall1.png",
 	},
 	"swamp": {
 		"floor": "dngn/floor/swamp0.png",
 		"wall":  "dngn/wall/marble_wall1.png",
 	},
-	"crystal": {
-		"floor": "dngn/floor/crystal_floor0.png",
-		"wall":  "dngn/wall/crystal_wall_blue.png",
+	"slime": {
+		"floor": "dngn/floor/acidic_floor0.png",
+		"wall":  "dngn/wall/slime0.png",
 	},
-	"sandstone": {
+	"elf": {    # Elven Halls
+		"floor": "dngn/floor/marble_floor1.png",
+		"wall":  "dngn/wall/elf-stone0.png",
+	},
+	"vaults": {
+		"floor": "dngn/floor/rect_gray0.png",
+		"wall":  "dngn/wall/vault0.png",
+	},
+	"crypt": {  # Crypt / Tomb / Ossuary
+		"floor": "dngn/floor/crypt0.png",
+		"wall":  "dngn/wall/catacombs0.png",
+	},
+	"crystal": {  # Zot / Icecave fallback
+		"floor": "dngn/floor/crystal_floor0.png",
+		"wall":  "dngn/wall/crystal_wall00.png",
+	},
+	"icecave": {
+		"floor": "dngn/floor/ice0.png",
+		"wall":  "dngn/wall/ice_wall0.png",
+	},
+	"sandstone": {  # Depths
 		"floor": "dngn/floor/sandstone_floor0.png",
 		"wall":  "dngn/wall/sandstone_wall0.png",
+	},
+	"hell": {  # Dis / Gehenna / Cocytus / Tartarus / Vestibule
+		"floor": "dngn/floor/infernal01.png",
+		"wall":  "dngn/wall/stone2_dark0.png",
+	},
+	"abyss": {
+		"floor": "dngn/floor/black_cobalt01.png",
+		"wall":  "dngn/wall/stone2_dark0.png",
+	},
+	"pan": {   # Pandemonium
+		"floor": "dngn/floor/demonic_red1.png",
+		"wall":  "dngn/wall/brick_dark_1_0.png",
+	},
+	"volcano": {
+		"floor": "dngn/floor/volcanic_floor0.png",
+		"wall":  "dngn/wall/volcanic_wall0.png",
+	},
+	"sewer": {
+		"floor": "dngn/floor/cobble_blood1.png",
+		"wall":  "dngn/wall/brick_brown0.png",
 	},
 }
 
@@ -533,10 +581,16 @@ static func _load(path_rel: String) -> Texture2D:
 
 
 ## Texture for a feature id — uses the active branch override when present.
+## Routes through `GameManager.tileset_branch()` (not the raw branch id) so
+## each real branch picks up its dedicated tileset bucket: Lair→forest,
+## Orc→mine, Zot→crystal, Dis→hell, etc. Missing tileset entries still
+## fall back to the generic FEATURES defaults.
 static func feature(id: String, branch: String = "") -> Texture2D:
 	if branch == "" and Engine.get_main_loop() != null:
 		var gm: Object = Engine.get_main_loop().root.get_node_or_null("GameManager")
-		if gm != null and "current_branch" in gm:
+		if gm != null and gm.has_method("tileset_branch"):
+			branch = String(gm.call("tileset_branch"))
+		elif gm != null and "current_branch" in gm:
 			var cb = gm.current_branch
 			if typeof(cb) == TYPE_STRING:
 				branch = String(cb)
@@ -547,8 +601,156 @@ static func feature(id: String, branch: String = "") -> Texture2D:
 	return _load(String(FEATURES.get(id, "")))
 
 
+## Static tile index built from assets/dcss_tiles/individual/mon/** at pack
+## time (see tools/gen_monster_tile_index.py). Maps a filename stem to the
+## relative PNG path, giving us ~1500 candidates without having to hand-code
+## them in MONSTERS. Loaded lazily on first monster() call.
+const _MON_INDEX_JSON: String = "res://assets/dcss_tiles/monster_tile_index.json"
+static var _mon_index: Dictionary = {}
+static var _mon_index_loaded: bool = false
+
+## Generic → specific monster aliases for ids that don't match a tile
+## filename stem directly. Value is another key in `_mon_index` (or `MONSTERS`)
+## so the lookup chain stays declarative. Picked so bucket types (dragon,
+## zombie, draconian) route to a representative variant instead of falling
+## back to the ASCII glyph.
+const _MON_ALIASES: Dictionary = {
+	# Generic animal buckets
+	"bear":          "black_bear",
+	"frog":          "bullfrog",
+	"giant_frog":    "bullfrog",
+	"crab":          "fire_crab",
+	"giant_lizard":  "iguana",
+	"hell_rat":      "rat",
+	"river_rat":     "rat",
+	"moth":          "ghost_moth",
+	"howler_monkey": "howler",
+	"dire_elephant": "elephant",
+	"hellephant":    "elephant",
+	"snake":         "black_mamba",
+	"spider":        "redback",
+	"felid":         "shadow_felid",
+	"hydra":         "hydra1",
+	"lernaean_hydra": "hydra1",
+	# Humanoid buckets
+	"giant":         "fire_giant",
+	"knight":        "human",
+	"battlemage":    "orc_wizard",
+	"hexer":         "human",
+	"djinni":        "efreet",
+	"dragon":        "fire_dragon",
+	"drake":         "swamp_drake",
+	"fire_sprite":   "fire_bat",
+	"sphinx":        "guardian_sphinx",
+	"chaos_spawn":   "chaos_spawn1",
+	# Draconian colour variants
+	"draconian":         "draco-base-black",
+	"black_draconian":   "draco-base-black",
+	"red_draconian":     "draco-base-red",
+	"green_draconian":   "draco-base-green",
+	"white_draconian":   "draco-base-white",
+	"purple_draconian":  "draco-base-purple",
+	"yellow_draconian":  "draco-base-yellow",
+	"grey_draconian":    "draco-base-grey",
+	"pale_draconian":    "draco-base-pale",
+	"draconian_annihilator": "draco-job-annihilator",
+	"draconian_knight":      "draco-job-knight",
+	"draconian_monk":        "draco-job-monk",
+	"draconian_scorcher":    "draco-job-scorcher",
+	"draconian_shifter":     "draco-job-shifter",
+	"draconian_stormcaller": "draco-job-stormcaller",
+	# Plants / fungi
+	"plant":         "plant_01",
+	"fungus":        "toadstool_left",
+	"toadstool":     "toadstool_left",
+	# Undead buckets
+	"skeleton":      "skeletal_warrior",
+	"zombie":        "zombie_kobold",
+	"draugr":        "skeletal_warrior",
+	"bound_soul":    "wraith",
+	"simulacrum":    "ice_statue",
+	# Demons / Pan / Abyss
+	"demonspawn_blood_saint":  "demonspawn",
+	"demonspawn_corrupter":    "demonspawn",
+	"demonspawn_soul_scholar": "demonspawn",
+	"demonspawn_warmonger":    "demonspawn",
+	"demonic_plant":           "plant_01",
+	# Elementals / vortices
+	"fire_vortex":   "fire_elemental",
+	"twister":       "air_elemental",
+	"creeping_inferno": "fire_elemental",
+	"elemental":     "earth_elemental",
+	# Eyes
+	"floating_eye":  "eye_of_devastation",
+	# Tentacles / segments / starspawn
+	"tentacle":                   "eldritch_tentacle1",
+	"tentacle_segment":           "eldritch_tentacle1",
+	"eldritch_tentacle":          "eldritch_tentacle1",
+	"eldritch_tentacle_segment":  "eldritch_tentacle1",
+	"starspawn_tentacle":         "eldritch_tentacle1",
+	"starspawn_tentacle_segment": "eldritch_tentacle1",
+	"snaplasher_vine":            "vine_stalker",
+	"snaplasher_vine_segment":    "vine_stalker",
+	# Walking tomes
+	"walking_tome":            "crystal_tome",
+	"walking_crystal_tome":    "crystal_tome",
+	"walking_earthen_tome":    "earthen_tome",
+	"walking_divine_tome":     "divine_tome",
+	"walking_frostbound_tome": "frostbound_tome",
+	# Golems / statues
+	"golem":         "iron_golem",
+	"statue":        "statue_base",
+	"dancing_weapon":  "lost_soul",
+	# Misc / gnoll
+	"gnoll_bouda":   "gnoll_shaman",
+	# Engine placeholders — route all "sensed" sentinels to the player tile
+	# so they at least render something and don't break the draw loop.
+	"sensed_monster":           "player_shadow",
+	"easy_sensed_monster":      "player_shadow",
+	"friendly_sensed_monster":  "player_shadow",
+	"nasty_sensed_monster":     "player_shadow",
+	"tough_sensed_monster":     "player_shadow",
+	"trivial_sensed_monster":   "player_shadow",
+	"program_bug":              "player_shadow",
+	"player_ghost":             "player_shadow",
+	"player_illusion":          "player_shadow",
+}
+
+
+static func _ensure_mon_index() -> void:
+	if _mon_index_loaded:
+		return
+	_mon_index_loaded = true
+	var f := FileAccess.open(_MON_INDEX_JSON, FileAccess.READ)
+	if f == null:
+		return
+	var parsed = JSON.parse_string(f.get_as_text())
+	f.close()
+	if typeof(parsed) == TYPE_DICTIONARY:
+		_mon_index = parsed
+
+
+## Monster tile resolution chain:
+##   1. MONSTERS dict override (explicit per-id path, wins when set).
+##   2. File-index lookup: `mon/**/<id>.png` from the generated JSON.
+##   3. Alias table → re-enter the chain with the aliased id.
+##   4. Return null → caller falls back to the ASCII glyph.
 static func monster(id: String) -> Texture2D:
-	return _load(String(MONSTERS.get(id, "")))
+	if id == "":
+		return null
+	var direct: String = String(MONSTERS.get(id, ""))
+	if direct != "":
+		return _load(direct)
+	_ensure_mon_index()
+	var indexed: String = String(_mon_index.get(id, ""))
+	if indexed != "":
+		return _load(indexed)
+	var alias: String = String(_MON_ALIASES.get(id, ""))
+	if alias != "":
+		var aliased: String = String(_mon_index.get(alias, ""))
+		if aliased != "":
+			return _load(aliased)
+	return null
 
 
 static func item(id: String) -> Texture2D:

@@ -220,13 +220,15 @@ func floor_key() -> String:
 ## rotates through thematic segments so D:1-5 vs D:11-15 look different.
 func tileset_branch() -> String:
 	if current_branch != "dungeon":
-		# Map branch id → tileset name. Some branches share a tileset.
+		# Map branch id → tileset bucket. Most branches get their own
+		# distinct tileset (snake / spider / slime / …); a handful
+		# alias into a shared one when DCSS itself does the same.
 		match current_branch:
 			"lair": return "forest"
 			"swamp": return "swamp"
 			"shoals": return "shoals"
 			"snake": return "snake"
-			"spider": return "forest"
+			"spider": return "spider"
 			"slime": return "slime"
 			"orc": return "mine"
 			"elf": return "elf"
@@ -240,23 +242,19 @@ func tileset_branch() -> String:
 				return "hell"
 			"depths": return "sandstone"
 			# Portal vaults each reuse an existing floor-gen theme that
-			# matches their flavour. Sewer = forest (caves + water).
+			# matches their flavour.
 			"sewer": return "sewer"
 			"ossuary": return "crypt"
 			"bailey": return "mine"
 			"volcano": return "volcano"
-			"icecave": return "crystal"
+			"icecave": return "icecave"
 			_: return current_branch
-	# Main trunk thematic rotation.
-	if current_depth <= 5:
-		return "main"
-	if current_depth <= 10:
-		return "mine"
-	if current_depth <= 15:
-		return "forest"
-	if current_depth <= 20:
-		return "swamp"
-	return "volcano"
+	# Main dungeon trunk keeps a single consistent tileset across D:1-15.
+	# Earlier we rotated by depth (main/mine/forest/swamp/volcano) so the
+	# look "changed with elevation", but that blurred the distinction
+	# between D:6-10 and the actual Orcish Mines branch — the whole point
+	# of branches is a visual break, so the trunk stays neutral grey.
+	return "main"
 
 
 ## Legacy compat — kept so older callers (TileRenderer tile selection)
