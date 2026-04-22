@@ -351,6 +351,8 @@ func _ready() -> void:
 		TurnManager.player_turn_started.connect(_on_turn_tick_god_gifts)
 	if not TurnManager.player_turn_started.is_connected(_on_turn_tick_xom):
 		TurnManager.player_turn_started.connect(_on_turn_tick_xom)
+	if not TurnManager.player_turn_started.is_connected(_on_turn_tick_golubria):
+		TurnManager.player_turn_started.connect(_on_turn_tick_golubria)
 
 	_setup_combat_log(ui)
 	TurnManager.start_player_turn()
@@ -741,6 +743,53 @@ func _on_turn_tick_abyss() -> void:
 					player.moved.emit(dest)
 					CombatLog.add("The Abyss shifts around you.")
 					break
+
+
+## Walk outward from `origin` in expanding rings; return the first
+## walkable, unoccupied floor tile whose Chebyshev distance falls
+## inside [min_d, max_d]. Used by Golubria to pick the two portal
+## anchors.
+func _find_nearby_floor_tile(origin: Vector2i, min_d: int, max_d: int) -> Vector2i:
+	if generator == null:
+		return origin
+	for _try in 80:
+		var dx: int = randi_range(-max_d, max_d)
+		var dy: int = randi_range(-max_d, max_d)
+		var d: int = maxi(abs(dx), abs(dy))
+		if d < min_d or d > max_d:
+			continue
+		var p: Vector2i = origin + Vector2i(dx, dy)
+		if not generator.is_walkable(p):
+			continue
+		if p == origin:
+			continue
+		var blocked: bool = false
+		for mm in get_tree().get_nodes_in_group("monsters"):
+			if is_instance_valid(mm) and mm is Monster and mm.grid_pos == p:
+				blocked = true
+				break
+		if blocked:
+			continue
+		return p
+	return origin
+
+
+## Golubria portal timeout. Decrements `_golubria_turns` each player
+## turn; when it expires without being used, the pair dissolves.
+func _on_turn_tick_golubria() -> void:
+	if player == null or not player.has_meta("_golubria_turns"):
+		return
+	var left: int = int(player.get_meta("_golubria_turns", 0)) - 1
+	if left <= 0:
+		player.remove_meta("_golubria_turns")
+		player.remove_meta("_golubria_pair_a")
+		player.remove_meta("_golubria_pair_b")
+		CombatLog.add("The Golubria portals fade.")
+		var dmap_gc: DungeonMap = $DungeonLayer/DungeonMap
+		if dmap_gc != null:
+			dmap_gc.queue_redraw()
+	else:
+		player.set_meta("_golubria_turns", left)
 
 
 ## DCSS Xom passive (god-xom.cc). The chaos god acts on random turns
@@ -2478,6 +2527,31 @@ func _on_player_moved(new_pos: Vector2i) -> void:
 	# traps — player can disarm via stealth in the real game).
 	if generator != null and generator.get_tile(new_pos) == DungeonGenerator.TileType.TRAP:
 		_trigger_trap(new_pos)
+	# DCSS Passage of Golubria — stepping onto either linked portal
+	# tile teleports the player to the paired one. Consumed on use
+	# (both metas cleared) so the spell is a single round-trip.
+	if player != null and player.has_meta("_golubria_pair_a") \
+			and player.has_meta("_golubria_pair_b"):
+		var pa: Vector2i = player.get_meta("_golubria_pair_a")
+		var pb: Vector2i = player.get_meta("_golubria_pair_b")
+		var jump: Vector2i = Vector2i(-1, -1)
+		if new_pos == pa:
+			jump = pb
+		elif new_pos == pb:
+			jump = pa
+		if jump != Vector2i(-1, -1) and generator != null \
+				and generator.is_walkable(jump):
+			player.remove_meta("_golubria_pair_a")
+			player.remove_meta("_golubria_pair_b")
+			player.remove_meta("_golubria_turns")
+			var old_px_g: Vector2 = player.position
+			player.grid_pos = jump
+			player.position = Vector2(jump.x * TILE_SIZE + TILE_SIZE / 2.0,
+					jump.y * TILE_SIZE + TILE_SIZE / 2.0)
+			player.moved.emit(jump)
+			SpellFX.cast_blink($EntityLayer, old_px_g, player.position)
+			CombatLog.add("You step through the portal!")
+			return
 	var cam: Camera2D = $Camera2D
 	var cam_target: Vector2 = Vector2(new_pos.x * TILE_SIZE + TILE_SIZE / 2.0, new_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
 	if _cam_tween != null and _cam_tween.is_valid():
@@ -5255,43 +5329,26 @@ func _cast_self_spell(spell_id: String, _info: Dictionary, _power: int) -> Dicti
 			return {"success": true,
 				"message": "%d foes turn to flee in terror." % scared}
 		"passage":
-			# DCSS Passage of Golubria places a pair of portals on the
-			# floor and walking into one emerges the other. Our map lacks
-			# a paired-portal construct, so approximate with a longer-
-			# ranged blink (radius 15 vs blink's 6) keyed off the same
-			# stasis gate.
+			# DCSS Passage of Golubria — place a pair of linked portals
+			# near the player. Stepping onto either tile teleports to
+			# the other (handled in `_on_player_moved`). Pair expires
+			# after 20 turns; tick handled by `_on_turn_tick_golubria`.
 			if player != null and player.race_res != null \
 					and player.race_res.racial_trait == "formicid_stasis":
 				return {"success": true, "message": "Your stasis prevents the passage."}
-			for _i in 80:
-				var dx_p: int = randi_range(-15, 15)
-				var dy_p: int = randi_range(-15, 15)
-				if abs(dx_p) + abs(dy_p) < 6:
-					continue
-				var dest_p: Vector2i = player.grid_pos + Vector2i(dx_p, dy_p)
-				if generator == null or not generator.is_walkable(dest_p):
-					continue
-				var blocked_p: bool = false
-				for m in get_tree().get_nodes_in_group("monsters"):
-					if is_instance_valid(m) and m is Monster and m.grid_pos == dest_p:
-						blocked_p = true
-						break
-				if blocked_p:
-					continue
-				var old_px_p: Vector2 = player.position
-				player.grid_pos = dest_p
-				player.position = Vector2(dest_p.x * TILE_SIZE + TILE_SIZE / 2,
-						dest_p.y * TILE_SIZE + TILE_SIZE / 2)
-				var dmap_p: DungeonMap = $DungeonLayer/DungeonMap
-				if dmap_p != null:
-					dmap_p.update_fov(dest_p)
-				var cam_p: Camera2D = $Camera2D
-				cam_p.position = player.position
-				SpellFX.cast_blink($EntityLayer, old_px_p, player.position)
+			var a: Vector2i = _find_nearby_floor_tile(player.grid_pos, 2, 5)
+			var b: Vector2i = _find_nearby_floor_tile(player.grid_pos, 6, 12)
+			if a == player.grid_pos or b == player.grid_pos or a == b:
 				return {"success": true,
-					"message": "A shimmering portal opens and you step through."}
+					"message": "Passage of Golubria finds no safe pair."}
+			player.set_meta("_golubria_pair_a", a)
+			player.set_meta("_golubria_pair_b", b)
+			player.set_meta("_golubria_turns", 20)
+			var dmap_ga: DungeonMap = $DungeonLayer/DungeonMap
+			if dmap_ga != null:
+				dmap_ga.queue_redraw()
 			return {"success": true,
-				"message": "Passage of Golubria finds no safe tile."}
+				"message": "Two shimmering portals open in the air."}
 		"passwall":
 			# Step through the nearest orthogonal wall run up to 3 cells.
 			if generator == null:
