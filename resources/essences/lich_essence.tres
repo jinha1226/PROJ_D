@@ -13,3 +13,7 @@ int_bonus = 4
 hp_bonus = 4
 source_monsters = Array[String](["lich", "ancient_lich"])
 drop_chance = 0.15
+ability_id = "essence_siphon"
+ability_mp = 6
+ability_cooldown = 18
+ability_desc = "Siphon life from the nearest foe — drain HP proportional to the damage dealt."

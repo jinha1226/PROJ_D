@@ -1775,38 +1775,113 @@ func get_current_weapon_skill() -> String:
 ## essence_channeling skill so investing in it matters late-game.
 func _invoke_essence_ability(e: EssenceData) -> bool:
 	var lv: int = _essence_channeling_level()
+	var fx_layer: Node = get_tree().get_first_node_in_group("entity_layer")
+	if fx_layer == null:
+		fx_layer = get_parent()
 	match e.ability_id:
 		"essence_heal":
 			if stats == null:
 				return false
-			stats.HP = min(stats.hp_max, stats.HP + 20 + lv * 2)
+			var heal_a: int = 20 + lv * 2
+			stats.HP = min(stats.hp_max, stats.HP + heal_a)
 			stats_changed.emit()
+			if fx_layer != null:
+				SpellFX.burst_ring(fx_layer, position, 26.0,
+						Color(0.55, 0.95, 0.55), 0.0, 3.0)
+			CombatLog.add("Essence channels — +%d HP." % heal_a)
 			return true
 		"essence_blink":
+			if fx_layer != null:
+				SpellFX.burst_ring(fx_layer, position, 20.0,
+						Color(0.70, 0.55, 1.00), 0.0, 2.5)
 			return _teleport_blink(4 + lv / 6)
 		"essence_stomp":
-			# Hit every monster within 1 tile (Chebyshev). Damage scales.
-			var dmg: int = 6 + lv / 2
+			var dmg_s: int = 6 + lv / 2
 			var hit_count: int = 0
 			for m in get_tree().get_nodes_in_group("monsters"):
 				if not is_instance_valid(m) or not m.is_alive:
 					continue
 				if "grid_pos" in m and max(abs(m.grid_pos.x - grid_pos.x), abs(m.grid_pos.y - grid_pos.y)) <= 1:
-					m.take_damage(dmg)
+					m.take_damage(dmg_s)
 					hit_count += 1
-			print("Stomp hit %d enemies (%d dmg each)." % [hit_count, dmg])
+			if fx_layer != null:
+				SpellFX.burst_ring(fx_layer, position, 36.0,
+						Color(0.85, 0.55, 0.25), 0.0, 3.5)
+			CombatLog.add("Ogre stomp — %d foes × %d dmg." % [hit_count, dmg_s])
 			return true
 		"essence_breath":
 			return _fire_breath_line(lv)
 		"essence_regen":
 			if stats == null:
 				return false
-			stats.HP = min(stats.hp_max, stats.HP + 12 + lv)
+			var heal_r: int = 12 + lv
+			stats.HP = min(stats.hp_max, stats.HP + heal_r)
 			stats_changed.emit()
+			if fx_layer != null:
+				SpellFX.burst_ring(fx_layer, position, 22.0,
+						Color(0.35, 0.85, 0.45), 0.0, 2.8)
+			CombatLog.add("Dryad vitality — +%d HP." % heal_r)
 			return true
 		"essence_summon":
-			# GameBootstrap listens and spawns the actual Companion node.
 			summon_companion_requested.emit(e.id)
+			return true
+		"essence_siphon":
+			# Lich essence: drain nearest visible foe for HD*2 dmg and
+			# refund half as HP. Routes through take_damage so resists
+			# apply normally.
+			var target: Node = _nearest_visible_hostile()
+			if target == null:
+				CombatLog.add("No soul in reach to siphon.")
+				return false
+			var hd_s: int = 4
+			if "data" in target and target.data != null:
+				hd_s = int(target.data.hd)
+			var siphon: int = maxi(6, hd_s * 2 + lv / 2)
+			if target.has_method("take_damage"):
+				target.take_damage(siphon, "neg")
+			var drained: int = siphon / 2
+			if stats != null:
+				stats.HP = mini(stats.hp_max, stats.HP + drained)
+				stats_changed.emit()
+			if fx_layer != null and target is Node2D:
+				SpellFX.cast_single(fx_layer, position, target, siphon,
+						Color(0.60, 0.20, 0.60), "necromancy")
+			CombatLog.add("Life siphon — %d drained, +%d HP." % [siphon, drained])
+			return true
+		"essence_quake":
+			# Titan essence: damage every visible foe and knock them
+			# one tile directly away from the player. Damage scales
+			# with essence_channeling.
+			var dmap_q: Node = get_tree().get_first_node_in_group("dmap")
+			var dmg_q: int = 8 + lv / 2
+			var shook: int = 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				if not is_instance_valid(m) or not (m is Monster) or not m.is_alive:
+					continue
+				if dmap_q != null and dmap_q.has_method("is_tile_visible") \
+						and not dmap_q.is_tile_visible(m.grid_pos):
+					continue
+				m.take_damage(dmg_q)
+				# Knockback — move one tile in the outward direction
+				# if walkable + unoccupied.
+				var dir: Vector2i = Vector2i(
+						sign(m.grid_pos.x - grid_pos.x),
+						sign(m.grid_pos.y - grid_pos.y))
+				if dir != Vector2i.ZERO and generator != null:
+					var dest: Vector2i = m.grid_pos + dir
+					if generator.is_walkable(dest) and not _tile_has_actor(dest):
+						m.grid_pos = dest
+						if "position" in m:
+							m.position = Vector2(
+									dest.x * tile_size + tile_size / 2.0,
+									dest.y * tile_size + tile_size / 2.0)
+				shook += 1
+			if fx_layer != null:
+				SpellFX.burst_ring(fx_layer, position, 48.0,
+						Color(0.70, 0.60, 0.40), 0.0, 4.0)
+				SpellFX.burst_ring(fx_layer, position, 68.0,
+						Color(0.55, 0.45, 0.30), 0.08, 3.0)
+			CombatLog.add("Titan quake — %d foes rocked for %d dmg." % [shook, dmg_q])
 			return true
 		_:
 			print("Unknown essence ability: %s" % e.ability_id)

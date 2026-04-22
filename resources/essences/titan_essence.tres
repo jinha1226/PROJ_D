@@ -14,3 +14,7 @@ hp_bonus = 12
 armor_bonus = 2
 source_monsters = Array[String](["titan", "stone_giant"])
 drop_chance = 0.2
+ability_id = "essence_quake"
+ability_mp = 9
+ability_cooldown = 20
+ability_desc = "Quake — damage every visible foe and knock them back one tile."
