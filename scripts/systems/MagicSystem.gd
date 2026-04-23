@@ -60,6 +60,19 @@ static func _apply_element_bonus(spell: SpellData, target: Monster, dmg: int) ->
 		return int(ceil(dmg * 1.5))
 	return dmg
 
+static func _element_status(element: String) -> Array:
+	# [status_id, turns] — empty array = no status from this element.
+	match element:
+		"fire":      return ["burning", 3]
+		"cold":      return ["frozen", 2]
+		"poison":    return ["poison", 4]
+	return []
+
+static func _apply_elemental_side_effects(spell: SpellData, target: Monster) -> void:
+	var pair: Array = _element_status(spell.element)
+	if pair.size() == 2 and target.hp > 0:
+		Status.apply(target, String(pair[0]), int(pair[1]))
+
 static func _damage_auto_target(spell: SpellData, player: Player,
 		power: int, game: Node) -> void:
 	var target: Monster = _find_nearest_visible(player, game, spell.max_range)
@@ -76,8 +89,16 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 		var half := Vector2(cell * 0.5, cell * 0.5)
 		game.spawn_projectile(player.position + half, target.position + half,
 				_spell_bolt_color(spell.effect))
+	var scaled: int = Status.resist_scale(dmg, target.data.resists, spell.element)
+	if scaled <= 0 and dmg > 0:
+		CombatLog.post("The %s is immune to %s."
+				% [target.data.display_name, spell.display_name],
+			Color(0.65, 0.75, 0.85))
+		return
 	var was_alive: bool = target.hp > 0
-	target.take_damage(dmg)
+	target.take_damage(scaled)
+	if was_alive and target.hp > 0:
+		_apply_elemental_side_effects(spell, target)
 	if was_alive and target.hp <= 0:
 		CombatLog.hit("You kill the %s." % target.data.display_name)
 		player.grant_xp(target.data.xp_value)
@@ -129,10 +150,15 @@ static func _aoe_damage(spell: SpellData, player: Player,
 			continue
 		var dmg: int = spell.base_damage + randi_range(0, 3) + power / 3
 		dmg = _apply_element_bonus(spell, n, dmg)
-		CombatLog.hit("%s burns the %s for %d." \
-				% [spell.display_name, n.data.display_name, dmg])
+		var scaled: int = Status.resist_scale(dmg, n.data.resists, spell.element)
+		if scaled <= 0 and dmg > 0:
+			continue
+		CombatLog.hit("%s hits the %s for %d." \
+				% [spell.display_name, n.data.display_name, scaled])
 		var was_alive: bool = n.hp > 0
-		n.take_damage(dmg)
+		n.take_damage(scaled)
+		if was_alive and n.hp > 0:
+			_apply_elemental_side_effects(spell, n)
 		if was_alive and n.hp <= 0:
 			CombatLog.hit("You kill the %s." % n.data.display_name)
 			player.grant_xp(n.data.xp_value)

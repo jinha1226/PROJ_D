@@ -53,7 +53,8 @@ var kills: int = 0
 var last_killer: String = ""
 var items: Array = []  # [{id: String, plus: int}]
 var known_spells: Array = []  # [String]
-var statuses: Dictionary = {}  # id -> turns_remaining
+var statuses: Dictionary = {}  # id -> turns_remaining (Status.gd manages)
+var resists: Array = []  # ["fire", "cold-2", "poison+"] scaled by Status.resist_scale
 var skills: Dictionary = {}  # skill_id -> {"level": int, "xp": float}
 var quickslots: Array = ["", "", "", "", "", "", "", ""]  # item ids, index = slot
 var equipped_weapon_id: String = ""
@@ -488,49 +489,25 @@ func wait_turn() -> void:
 	emit_signal("stats_changed")
 
 func apply_status(id: String, turns: int) -> void:
-	statuses[id] = max(int(statuses.get(id, 0)), turns)
+	Status.apply(self, id, turns)
 	emit_signal("stats_changed")
 
 func has_status(id: String) -> bool:
-	return int(statuses.get(id, 0)) > 0
+	return Status.has(self, id)
 
 func tick_statuses() -> void:
-	if statuses.is_empty():
-		return
-	var ids: Array = statuses.keys().duplicate()
-	for id in ids:
-		_apply_status_tick(id)
-		var left: int = int(statuses.get(id, 0)) - 1
-		if left <= 0:
-			_on_status_removed(id)
-			statuses.erase(id)
-			CombatLog.post("Your %s effect wears off." % id,
-				Color(0.75, 0.8, 0.9))
-		else:
-			statuses[id] = left
-	emit_signal("stats_changed")
-
-func _apply_status_tick(id: String) -> void:
-	match id:
-		"poison":
-			if hp > 1:
-				hp -= 1
-				CombatLog.damage_taken("Poison burns you. (-1 HP)")
-		"berserk":
-			# Passive — STR bonus was granted on apply; nothing per tick.
-			pass
-
-func _on_status_removed(id: String) -> void:
-	match id:
-		"berserk":
-			strength = max(1, strength - 4)
+	var expired: Array = Status.tick_actor(self)
+	for id in expired:
+		CombatLog.post("Your %s wears off." % Status.display_name(id),
+			Color(0.75, 0.8, 0.9))
+	if not statuses.is_empty() or not expired.is_empty():
+		emit_signal("stats_changed")
 
 func apply_berserk(turns: int) -> void:
-	if not has_status("berserk"):
-		strength += 4
-	apply_status("berserk", turns)
+	Status.apply(self, "berserk", turns)
 	CombatLog.post("You enter a berserk rage. (+4 STR)",
 		Color(1.0, 0.55, 0.35))
+	emit_signal("stats_changed")
 
 func set_race_from_id(race_id: String) -> void:
 	var race: RaceData = RaceRegistry.get_by_id(race_id)

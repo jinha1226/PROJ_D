@@ -34,10 +34,7 @@ func take_turn() -> void:
 	MonsterAI.take_turn(self, _map)
 
 func _tick_statuses() -> void:
-	for key in status.keys():
-		status[key] -= 1
-		if status[key] <= 0:
-			status.erase(key)
+	Status.tick_actor(self)
 
 func is_wet() -> bool:
 	return status.get("wet", 0) > 0
