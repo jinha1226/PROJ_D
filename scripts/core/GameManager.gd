@@ -6,10 +6,20 @@ signal settings_changed
 
 const SETTINGS_PATH: String = "user://settings.json"
 
+const _POTION_ADJ: Array = ["bubbling", "fizzy", "cloudy", "smoky",
+	"viscous", "silky", "oily", "murky", "glowing", "still",
+	"opaque", "effervescent"]
+const _SCROLL_WORDS: Array = ["GIB XON", "VEL AMR", "HYAR ZED",
+	"MOR TEX", "ARN BEK", "DUO LIS", "KER NAR", "FAL MIR",
+	"QUA ZEN", "ORA TUM", "BEL TOR", "NIX HAL"]
+const _BOOK_ADJ: Array = ["obsidian", "crimson", "ancient", "gilded",
+	"rotting", "starlit", "iron-bound", "vellum"]
+
 var depth: int = 1
 var seed: int = 0
 var gold: int = 0
-var identified: Dictionary = {}
+var identified: Dictionary = {}  # item_id -> true once identified
+var pseudonyms: Dictionary = {}  # item_id -> "fuzzy potion" for this run
 var run_in_progress: bool = false
 
 # Character selection — set by menus before start_new_run().
@@ -89,6 +99,37 @@ func is_identified(item_id: String) -> bool:
 
 func identify(item_id: String) -> void:
 	identified[item_id] = true
+
+func _generate_pseudonyms() -> void:
+	pseudonyms.clear()
+	var potions: Array = _POTION_ADJ.duplicate()
+	var scrolls: Array = _SCROLL_WORDS.duplicate()
+	var books: Array = _BOOK_ADJ.duplicate()
+	potions.shuffle()
+	scrolls.shuffle()
+	books.shuffle()
+	for item in ItemRegistry.all:
+		match item.kind:
+			"potion":
+				if not potions.is_empty():
+					pseudonyms[item.id] = "%s potion" % potions.pop_back()
+			"scroll":
+				if not scrolls.is_empty():
+					pseudonyms[item.id] = "scroll labeled %s" % scrolls.pop_back()
+			"book":
+				if not books.is_empty():
+					pseudonyms[item.id] = "%s tome" % books.pop_back()
+
+func display_name_of(item_id: String) -> String:
+	var data = ItemRegistry.get_by_id(item_id)
+	if data == null:
+		return item_id
+	# Weapons / armor / gold are always recognisable.
+	if data.kind != "potion" and data.kind != "scroll" and data.kind != "book":
+		return data.display_name
+	if is_identified(item_id):
+		return data.display_name
+	return pseudonyms.get(item_id, data.display_name)
 
 func toggle_tiles() -> void:
 	use_tiles = not use_tiles
