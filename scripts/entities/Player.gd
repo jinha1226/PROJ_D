@@ -256,6 +256,13 @@ func use_item(index: int) -> void:
 		var sname: String = s.display_name if s != null else data.grants_spell_id
 		CombatLog.post("You learn %s." % sname, Color(0.7, 0.95, 1.0))
 		had_effect = true
+	for sid in data.grants_spell_ids:
+		if not known_spells.has(sid):
+			known_spells.append(sid)
+			var s2: SpellData = SpellRegistry.get_by_id(sid)
+			var sname2: String = s2.display_name if s2 != null else sid
+			CombatLog.post("You learn %s." % sname2, Color(0.7, 0.95, 1.0))
+			had_effect = true
 	if String(data.unlocks_class_id) != "":
 		GameManager.try_use_unlock(data.id)
 		had_effect = true

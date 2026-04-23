@@ -32,6 +32,8 @@ class_name ItemData extends Resource
 @export var unlocks_class_id: String = ""
 ## When used, teach the spell with this id to the player (if not known).
 @export var grants_spell_id: String = ""
+## When used, teach all spells in this list (multi-spell books).
+@export var grants_spell_ids: Array[String] = []
 
 @export_group("Visuals")
 ## Overlay tile drawn on top of `tile_path` once GameManager.identify(id)

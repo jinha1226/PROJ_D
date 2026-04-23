@@ -23,8 +23,13 @@ const _FROST_DAGGER: Resource = preload("res://resources/items/frost_dagger.tres
 const _VENOM_DAGGER: Resource = preload("res://resources/items/venom_dagger.tres")
 const _SHOCK_MACE: Resource = preload("res://resources/items/shock_mace.tres")
 const _POTION_BERSERK: Resource = preload("res://resources/items/potion_berserk.tres")
-const _BOOK_ICE_MAGIC: Resource = preload("res://resources/items/book_ice_magic.tres")
 const _SCROLL_IDENTIFY: Resource = preload("res://resources/items/scroll_identify.tres")
+const _BOOK_EVOCATION: Resource = preload("res://resources/items/book_evocation.tres")
+const _BOOK_CONJURATION: Resource = preload("res://resources/items/book_conjuration.tres")
+const _BOOK_TRANSMUTATION: Resource = preload("res://resources/items/book_transmutation.tres")
+const _BOOK_NECROMANCY: Resource = preload("res://resources/items/book_necromancy.tres")
+const _BOOK_ABJURATION: Resource = preload("res://resources/items/book_abjuration.tres")
+const _BOOK_ENCHANTMENT: Resource = preload("res://resources/items/book_enchantment.tres")
 
 const _ALL_ITEMS: Array = [
 	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE,
@@ -34,7 +39,8 @@ const _ALL_ITEMS: Array = [
 	_POTION_BERSERK,
 	_SCROLL_BLINKING, _SCROLL_MAGIC_MAPPING, _SCROLL_TELEPORT,
 	_SCROLL_ENCHANT_WEAPON, _SCROLL_ENCHANT_ARMOR, _SCROLL_IDENTIFY,
-	_BOOK_ICE_MAGIC,
+	_BOOK_EVOCATION, _BOOK_CONJURATION, _BOOK_TRANSMUTATION,
+	_BOOK_NECROMANCY, _BOOK_ABJURATION, _BOOK_ENCHANTMENT,
 	_GOLD_PILE,
 ]
 
