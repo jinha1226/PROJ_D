@@ -28,10 +28,10 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 	var a: ItemData = ItemRegistry.get_by_id(player.equipped_armor_id)
 	body.add_child(_equipped_row("Weapon",
 			w.display_name if w != null else "(unarmed)",
-			"d%d" % (w.damage if w != null else 2)))
+			"d%d" % ((w.damage + w_plus) if w != null else 2)))
 	body.add_child(_equipped_row("Armor",
 			a.display_name if a != null else "(none)",
-			"+%d AC" % (a.ac_bonus if a != null else 0)))
+			"+%d AC" % ((a.ac_bonus + a_plus) if a != null else 0)))
 
 	# Inventory — grouped by (id, plus)
 	body.add_child(UICards.section_header("INVENTORY  (%d)" % player.items.size()))
@@ -59,7 +59,7 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 		var data: ItemData = ItemRegistry.get_by_id(stack.id)
 		if data == null:
 			continue
-		body.add_child(_build_item_row(data, stack.indices, player, dlg))
+		body.add_child(_build_item_row(data, stack.indices, stack.plus, player, dlg))
 
 
 static func _equipped_row(slot: String, name_s: String, stat: String) -> Control:
@@ -110,8 +110,8 @@ static func _make_thumbnail(data: ItemData) -> Control:
 	return container
 
 
-static func _build_item_row(data: ItemData, indices: Array, player: Player,
-		dlg: GameDialog) -> Control:
+static func _build_item_row(data: ItemData, indices: Array, plus: int,
+		player: Player, dlg: GameDialog) -> Control:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 
@@ -119,10 +119,12 @@ static func _build_item_row(data: ItemData, indices: Array, player: Player,
 
 	var name_lbl := Label.new()
 	var label_text: String = GameManager.display_name_of(data.id)
+	if plus > 0:
+		label_text += " +%d" % plus
 	if data.kind == "weapon" and data.damage > 0:
-		label_text += "  (d%d)" % data.damage
+		label_text += "  (d%d)" % (data.damage + plus)
 	elif data.kind == "armor" and data.ac_bonus > 0:
-		label_text += "  (+%d AC)" % data.ac_bonus
+		label_text += "  (+%d AC)" % (data.ac_bonus + plus)
 	if indices.size() > 1:
 		label_text += "  x%d" % indices.size()
 	name_lbl.text = label_text

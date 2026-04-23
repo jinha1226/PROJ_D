@@ -33,6 +33,7 @@ var _auto_prev_hp: int = 0
 var _auto_known_ids: Dictionary = {}
 # Set when ACT triggers continuous auto-explore; cleared on cancel or completion.
 var _auto_exploring: bool = false
+var _path_overlay: PathOverlay = null
 
 func _ready() -> void:
 	if not GameManager.run_in_progress:
@@ -40,6 +41,7 @@ func _ready() -> void:
 	_spawn_map()
 	_spawn_items_layer()
 	_spawn_monsters_layer()
+	_spawn_path_overlay()
 	_spawn_player()
 	if not GameManager.pending_player_state.is_empty():
 		_apply_loaded_player_state(GameManager.pending_player_state)
@@ -112,11 +114,14 @@ func _handle_tap(screen_pos: Vector2) -> void:
 	# mid-walk halts it via _advance_auto_walk.
 	var chebyshev: int = max(abs(target.x - player.grid_pos.x),
 			abs(target.y - player.grid_pos.y))
-	if chebyshev > 1 and map.explored.has(target) \
+	if chebyshev > 1 \
+			and (map.explored.has(target) or map.visible_tiles.has(target)) \
 			and map.is_walkable(target):
 		var path: Array = _bfs_path(player.grid_pos, target)
 		if path.size() > 0:
 			_auto_path = path
+			if _path_overlay != null:
+				_path_overlay.set_path(_auto_path)
 			_auto_prev_hp = player.hp
 			_auto_known_ids = _snapshot_visible_monster_ids()
 			_advance_auto_walk()
@@ -160,7 +165,7 @@ func _bfs_path(start: Vector2i, goal: Vector2i) -> Array:
 				continue
 			if not map.in_bounds(n) or not map.is_walkable(n):
 				continue
-			if not map.explored.has(n):
+			if not map.explored.has(n) and not map.visible_tiles.has(n):
 				continue
 			came_from[n] = p
 			frontier.append(n)
@@ -181,6 +186,8 @@ func _advance_auto_walk() -> void:
 		_cancel_auto_walk("path broken")
 		return
 	_auto_path.remove_at(0)
+	if _path_overlay != null:
+		_path_overlay.set_path(_auto_path)
 	_auto_prev_hp = player.hp
 	player.try_step(dir)
 
@@ -205,6 +212,8 @@ func _cancel_auto_walk(reason: String) -> void:
 	if _auto_path.is_empty() and not _auto_exploring:
 		return
 	_auto_path.clear()
+	if _path_overlay != null:
+		_path_overlay.set_path([])
 	_auto_exploring = false
 	_auto_known_ids.clear()
 	if reason == "new enemy":
@@ -315,6 +324,12 @@ func _spawn_monsters_layer() -> void:
 	monsters_layer = Node2D.new()
 	monsters_layer.name = "Monsters"
 	add_child(monsters_layer)
+
+func _spawn_path_overlay() -> void:
+	_path_overlay = PathOverlay.new()
+	_path_overlay.name = "PathOverlay"
+	_path_overlay.z_index = 4
+	add_child(_path_overlay)
 
 func _spawn_player() -> void:
 	player = PlayerScene.new()
@@ -571,38 +586,70 @@ func _on_minimap_tapped() -> void:
 	if map == null or player == null:
 		return
 	_cache_current_floor()
-	var dlg: GameDialog = GameDialog.create("Floors")
+	const MAP_SCALE: int = 6
+	var tex: ImageTexture = MinimapRenderer.render(map, player, self, MAP_SCALE)
+	var dlg: GameDialog = GameDialog.create("Map")
 	add_child(dlg)
 	var body := dlg.body()
+	if body == null:
+		return
+
+	var map_rect := TextureRect.new()
+	map_rect.texture = tex
+	map_rect.stretch_mode = TextureRect.STRETCH_SCALE
+	map_rect.custom_minimum_size = Vector2(
+			DungeonMap.GRID_W * MAP_SCALE, DungeonMap.GRID_H * MAP_SCALE)
+	map_rect.mouse_filter = Control.MOUSE_FILTER_STOP
+	body.add_child(map_rect)
+
+	map_rect.gui_input.connect(func(ev: InputEvent) -> void:
+		var is_press := false
+		if ev is InputEventScreenTouch and ev.pressed:
+			is_press = true
+		elif ev is InputEventMouseButton \
+				and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			is_press = true
+		if not is_press:
+			return
+		var local_pos := map_rect.get_local_mouse_position()
+		var gx := int(local_pos.x / MAP_SCALE)
+		var gy := int(local_pos.y / MAP_SCALE)
+		var nav_target := Vector2i(gx, gy)
+		if not map.in_bounds(nav_target) or not map.explored.has(nav_target) \
+				or not map.is_walkable(nav_target) or nav_target == player.grid_pos:
+			return
+		dlg.close()
+		var nav_path := _bfs_path(player.grid_pos, nav_target)
+		if nav_path.size() > 0:
+			_auto_path = nav_path
+			if _path_overlay != null:
+				_path_overlay.set_path(_auto_path)
+			_auto_prev_hp = player.hp
+			_auto_known_ids = _snapshot_visible_monster_ids()
+			_advance_auto_walk())
 
 	var all_depths: Array = GameManager.floor_cache.keys().duplicate()
 	all_depths.sort()
-
-	for d in all_depths:
-		var is_current: bool = (d == GameManager.depth)
-		var thumb_tex: ImageTexture
-		if is_current:
-			thumb_tex = MinimapRenderer.render(map, player, self, 2)
-		else:
-			thumb_tex = MinimapRenderer.render_from_state(
-					GameManager.floor_cache[d], 2)
-
-		var btn := Button.new()
-		btn.icon = thumb_tex
-		btn.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		btn.expand_icon = false
-		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		btn.text = "  B%d%s" % [d, "  ← here" if is_current else ""]
-		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		btn.custom_minimum_size = Vector2(0, DungeonMap.GRID_H * 2 + 20)
-		if is_current:
-			btn.disabled = true
-		else:
-			var target_d: int = d
-			btn.pressed.connect(func():
-				dlg.close()
-				_travel_to_floor(target_d))
-		body.add_child(btn)
+	if all_depths.size() > 1:
+		body.add_child(UICards.section_header("FLOORS", 24))
+		var floor_row := HBoxContainer.new()
+		floor_row.add_theme_constant_override("separation", 6)
+		floor_row.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		body.add_child(floor_row)
+		for d in all_depths:
+			var is_current: bool = (d == GameManager.depth)
+			var fbtn := Button.new()
+			fbtn.text = "B%d" % d
+			fbtn.custom_minimum_size = Vector2(80, 52)
+			fbtn.add_theme_font_size_override("font_size", 22)
+			if is_current:
+				fbtn.disabled = true
+			else:
+				var target_d: int = d
+				fbtn.pressed.connect(func():
+					dlg.close()
+					_travel_to_floor(target_d))
+			floor_row.add_child(fbtn)
 
 func _center_camera_on_player(snap: bool = false) -> void:
 	if player == null or camera == null:
@@ -864,10 +911,23 @@ func _refresh_quickslots() -> void:
 			continue
 		var text: String = ("x%d" % count) if count > 1 else ""
 		if GameManager.use_tiles and data.tile_path != "":
-			var tex: Texture2D = load(data.tile_path) as Texture2D
+			var tex: Texture2D = _make_item_icon(data)
 			bottom_hud.set_quickslot(i, tex, text)
 		else:
 			bottom_hud.set_quickslot_display(i, data.glyph, data.glyph_color)
+
+func _make_item_icon(data: ItemData) -> Texture2D:
+	if data.tile_path == "" or not ResourceLoader.exists(data.tile_path):
+		return null
+	if GameManager.is_identified(data.id) and data.identified_tile_path != "" \
+			and ResourceLoader.exists(data.identified_tile_path):
+		var img_base: Image = (load(data.tile_path) as Texture2D).get_image()
+		var img_over: Image = (load(data.identified_tile_path) as Texture2D).get_image()
+		if img_base.get_size() == img_over.get_size():
+			img_base.blend_rect(img_over,
+					Rect2i(Vector2i.ZERO, img_over.get_size()), Vector2i.ZERO)
+		return ImageTexture.create_from_image(img_base)
+	return load(data.tile_path) as Texture2D
 
 func _on_magic_pressed() -> void:
 	if player == null:
@@ -927,6 +987,8 @@ func _start_auto_explore() -> void:
 		CombatLog.post("Can't reach unexplored area.", Color(0.7, 0.7, 0.5))
 		return
 	_auto_path = path
+	if _path_overlay != null:
+		_path_overlay.set_path(_auto_path)
 	_auto_prev_hp = player.hp
 	_auto_known_ids = _snapshot_visible_monster_ids()
 	_auto_exploring = true
