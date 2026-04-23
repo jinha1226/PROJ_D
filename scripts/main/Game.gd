@@ -306,6 +306,20 @@ func _class_starter_items(class_id: String) -> Array:
 			return ["scroll_blinking", "scroll_blinking", "potion_healing"]
 		"rogue":
 			return ["potion_healing", "scroll_blinking"]
+		"archmage":
+			return [
+				"potion_healing", "potion_healing", "potion_healing",
+				"potion_might", "potion_might",
+				"potion_cure_poison", "potion_cure_poison",
+				"potion_magic", "potion_magic",
+				"potion_berserk",
+				"scroll_blinking", "scroll_blinking",
+				"scroll_magic_mapping", "scroll_magic_mapping",
+				"scroll_teleport", "scroll_teleport",
+				"scroll_enchant_weapon", "scroll_enchant_weapon",
+				"scroll_enchant_armor", "scroll_enchant_armor",
+				"scroll_identify", "scroll_identify",
+			]
 	return []
 
 func _apply_loaded_player_state(data: Dictionary) -> void:
