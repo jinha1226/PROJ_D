@@ -3,15 +3,17 @@ extends Control
 const GAME_SCENE_PATH: String = "res://scenes/main/Game.tscn"
 const RACE_SELECT_PATH: String = "res://scenes/menu/RaceSelect.tscn"
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
+const DEFAULT_BASE_PATH: String = \
+	"res://assets/tiles/individual/player/base/human_m.png"
 
+@onready var _scroll: ScrollContainer = $ScrollContainer
 @onready var _container: VBoxContainer = $ScrollContainer/VBox
 @onready var _back_btn: Button = $BackButton
 
 func _ready() -> void:
 	theme = GameTheme.create()
 	_back_btn.pressed.connect(_on_back)
-	# Defensive rescan: if autoload loaded before ClassData's script
-	# was resolved, by_id can be empty on first run after a pull.
+	TouchScrollHelper.install(_scroll)
 	if ClassRegistry.all.is_empty():
 		ClassRegistry._scan()
 	_build_cards()
@@ -22,9 +24,7 @@ func _build_cards() -> void:
 	var ids: Array = ClassRegistry.ids_in_order()
 	if ids.is_empty():
 		var lab := Label.new()
-		lab.text = "No classes loaded.\n"\
-			+ "Try re-opening the project in the Godot editor so that "\
-			+ "resources/classes/*.tres gets imported, then run again."
+		lab.text = "No classes loaded."
 		lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		lab.add_theme_font_size_override("font_size", 26)
 		lab.add_theme_color_override("font_color", Color(1.0, 0.6, 0.5))
@@ -38,77 +38,135 @@ func _build_cards() -> void:
 
 func _make_card(data: ClassData) -> Control:
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(0, 280)
-
-	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 6)
-	panel.add_child(vb)
+	panel.custom_minimum_size = Vector2(0, 200)
 
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 18)
-	margin.add_theme_constant_override("margin_right", 18)
-	margin.add_theme_constant_override("margin_top", 14)
-	margin.add_theme_constant_override("margin_bottom", 14)
-	vb.add_child(margin)
+	margin.add_theme_constant_override("margin_left", 14)
+	margin.add_theme_constant_override("margin_right", 14)
+	margin.add_theme_constant_override("margin_top", 12)
+	margin.add_theme_constant_override("margin_bottom", 12)
+	panel.add_child(margin)
 
-	var inner := VBoxContainer.new()
-	inner.add_theme_constant_override("separation", 6)
-	margin.add_child(inner)
+	var hb := HBoxContainer.new()
+	hb.add_theme_constant_override("separation", 14)
+	margin.add_child(hb)
+
+	var unlocked: bool = ClassRegistry.is_unlocked(data.id)
+	hb.add_child(_make_portrait(data, not unlocked))
+
+	var vb := VBoxContainer.new()
+	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vb.add_theme_constant_override("separation", 4)
+	hb.add_child(vb)
 
 	var name_lab := Label.new()
 	name_lab.text = data.display_name
-	name_lab.add_theme_font_size_override("font_size", 44)
+	name_lab.add_theme_font_size_override("font_size", 36)
 	name_lab.add_theme_color_override("font_color", Color(0.95, 0.85, 0.5))
-	inner.add_child(name_lab)
+	vb.add_child(name_lab)
+
+	var gear_lab := Label.new()
+	gear_lab.text = _gear_line(data)
+	gear_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	gear_lab.add_theme_font_size_override("font_size", 20)
+	gear_lab.add_theme_color_override("font_color", Color(0.78, 0.82, 0.9))
+	vb.add_child(gear_lab)
+
+	var skill_lab := Label.new()
+	skill_lab.text = _skills_line(data)
+	skill_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	skill_lab.add_theme_font_size_override("font_size", 20)
+	skill_lab.add_theme_color_override("font_color", Color(0.72, 0.9, 0.72))
+	vb.add_child(skill_lab)
 
 	var stat_lab := Label.new()
-	stat_lab.text = "HP %d  MP %d   STR %d  DEX %d  INT %d" % [
+	stat_lab.text = "HP %d  MP %d   STR %d · DEX %d · INT %d" % [
 		data.starting_hp, data.starting_mp,
 		data.starting_str, data.starting_dex, data.starting_int]
-	stat_lab.add_theme_font_size_override("font_size", 22)
-	inner.add_child(stat_lab)
+	stat_lab.add_theme_font_size_override("font_size", 18)
+	stat_lab.add_theme_color_override("font_color", Color(0.6, 0.62, 0.7))
+	vb.add_child(stat_lab)
 
-	if data.starting_weapon != "" or data.starting_armor != "":
-		var eq_lab := Label.new()
-		var parts: Array = []
-		if data.starting_weapon != "":
-			parts.append(_item_name(data.starting_weapon))
-		if data.starting_armor != "":
-			parts.append(_item_name(data.starting_armor))
-		eq_lab.text = "Gear: " + ", ".join(parts)
-		eq_lab.add_theme_font_size_override("font_size", 20)
-		eq_lab.add_theme_color_override("font_color", Color(0.75, 0.72, 0.6))
-		inner.add_child(eq_lab)
-
-	var desc_lab := Label.new()
-	desc_lab.text = data.description
-	desc_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_lab.add_theme_font_size_override("font_size", 20)
-	desc_lab.add_theme_color_override("font_color", Color(0.68, 0.65, 0.6))
-	desc_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	inner.add_child(desc_lab)
-
-	var unlocked: bool = ClassRegistry.is_unlocked(data.id)
 	if not unlocked:
 		var hint_lab := Label.new()
 		hint_lab.text = data.unlock_hint()
-		hint_lab.add_theme_font_size_override("font_size", 20)
-		hint_lab.add_theme_color_override("font_color", Color(1.0, 0.7, 0.45))
 		hint_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		inner.add_child(hint_lab)
+		hint_lab.add_theme_font_size_override("font_size", 18)
+		hint_lab.add_theme_color_override("font_color", Color(1.0, 0.7, 0.45))
+		vb.add_child(hint_lab)
 
 	var pick_btn := Button.new()
-	pick_btn.custom_minimum_size = Vector2(0, 72)
-	pick_btn.add_theme_font_size_override("font_size", 28)
+	pick_btn.custom_minimum_size = Vector2(0, 56)
+	pick_btn.add_theme_font_size_override("font_size", 24)
 	if unlocked:
 		pick_btn.text = "Start as %s" % data.display_name
 		pick_btn.pressed.connect(_on_pick.bind(data.id))
 	else:
 		pick_btn.text = "Locked"
 		pick_btn.disabled = true
-	inner.add_child(pick_btn)
+	vb.add_child(pick_btn)
 
 	return panel
+
+func _make_portrait(data: ClassData, dim: bool) -> Control:
+	var cont := Control.new()
+	cont.custom_minimum_size = Vector2(120, 130)
+	cont.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
+	var base_path: String = DEFAULT_BASE_PATH
+	if race != null and race.base_sprite_path != "" \
+			and ResourceLoader.exists(race.base_sprite_path):
+		base_path = race.base_sprite_path
+	_add_layer(cont, base_path, dim)
+	if data != null:
+		if data.starting_armor != "" \
+				and Player.DOLL_BODY_MAP.has(data.starting_armor):
+			_add_layer(cont, String(Player.DOLL_BODY_MAP[data.starting_armor]), dim)
+		if data.starting_weapon != "" \
+				and Player.DOLL_HAND1_MAP.has(data.starting_weapon):
+			_add_layer(cont, String(Player.DOLL_HAND1_MAP[data.starting_weapon]), dim)
+	return cont
+
+func _add_layer(parent: Control, path: String, dim: bool) -> void:
+	if not ResourceLoader.exists(path):
+		return
+	var rect := TextureRect.new()
+	rect.texture = load(path)
+	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	rect.anchor_right = 1.0
+	rect.anchor_bottom = 1.0
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if dim:
+		rect.modulate = Color(0.4, 0.4, 0.45, 1)
+	parent.add_child(rect)
+
+func _gear_line(data: ClassData) -> String:
+	var parts: Array = []
+	if data.starting_weapon != "":
+		parts.append(_item_name(data.starting_weapon))
+	if data.starting_armor != "":
+		parts.append(_item_name(data.starting_armor))
+	for extra in _starter_extras(data.id):
+		parts.append(extra)
+	if parts.is_empty():
+		return "Gear: —"
+	return "Gear: " + " · ".join(parts)
+
+func _starter_extras(class_id: String) -> Array:
+	match class_id:
+		"warrior":  return ["healing ×2"]
+		"mage":     return ["blink ×2", "healing"]
+		"rogue":    return ["healing", "blink"]
+	return []
+
+func _skills_line(data: ClassData) -> String:
+	if data.starting_skills.is_empty():
+		return "Skills: —"
+	var parts: Array = []
+	for key in data.starting_skills.keys():
+		parts.append("%s %d" % [String(key).capitalize(),
+			int(data.starting_skills[key])])
+	return "Skills: " + " · ".join(parts)
 
 func _item_name(id: String) -> String:
 	var it: ItemData = ItemRegistry.get_by_id(id)

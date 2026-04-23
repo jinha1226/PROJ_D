@@ -30,6 +30,7 @@ var _targeting_node: SpellTargetOverlay = null
 # until we hit the goal, an enemy enters view, or HP drops.
 var _auto_path: Array = []
 var _auto_prev_hp: int = 0
+var _auto_known_ids: Dictionary = {}
 
 func _ready() -> void:
 	if not GameManager.run_in_progress:
@@ -99,15 +100,18 @@ func _handle_tap(screen_pos: Vector2) -> void:
 		player.wait_turn()
 		TurnManager.end_player_turn()
 		return
-	# Distant explored tile with no enemy in sight = auto-walk.
+	# Distant explored tile → auto-walk. Existing visible enemies don't
+	# block the start (DCSS-style travel); a _new_ monster entering FOV
+	# mid-walk halts it via _advance_auto_walk.
 	var chebyshev: int = max(abs(target.x - player.grid_pos.x),
 			abs(target.y - player.grid_pos.y))
 	if chebyshev > 1 and map.explored.has(target) \
-			and map.is_walkable(target) and not _monster_in_sight():
+			and map.is_walkable(target):
 		var path: Array = _bfs_path(player.grid_pos, target)
 		if path.size() > 0:
 			_auto_path = path
 			_auto_prev_hp = player.hp
+			_auto_known_ids = _snapshot_visible_monster_ids()
 			_advance_auto_walk()
 			return
 	var dx: int = sign(target.x - player.grid_pos.x)
@@ -158,8 +162,8 @@ func _bfs_path(start: Vector2i, goal: Vector2i) -> Array:
 func _advance_auto_walk() -> void:
 	if _auto_path.is_empty():
 		return
-	if _monster_in_sight():
-		_cancel_auto_walk("enemy in sight")
+	if _new_monster_in_sight():
+		_cancel_auto_walk("new enemy")
 		return
 	if player.hp < _auto_prev_hp:
 		_cancel_auto_walk("took damage")
@@ -173,12 +177,30 @@ func _advance_auto_walk() -> void:
 	_auto_prev_hp = player.hp
 	player.try_step(dir)
 
+func _snapshot_visible_monster_ids() -> Dictionary:
+	var out: Dictionary = {}
+	for n in get_tree().get_nodes_in_group("monsters"):
+		if n is Monster and map.visible_tiles.has(n.grid_pos):
+			out[n.get_instance_id()] = true
+	return out
+
+func _new_monster_in_sight() -> bool:
+	for n in get_tree().get_nodes_in_group("monsters"):
+		if not (n is Monster):
+			continue
+		if not map.visible_tiles.has(n.grid_pos):
+			continue
+		if not _auto_known_ids.has(n.get_instance_id()):
+			return true
+	return false
+
 func _cancel_auto_walk(reason: String) -> void:
 	if _auto_path.is_empty():
 		return
 	_auto_path.clear()
-	if reason == "enemy in sight":
-		CombatLog.post("You stop — enemy in sight.", Color(1.0, 0.7, 0.5))
+	_auto_known_ids.clear()
+	if reason == "new enemy":
+		CombatLog.post("You stop — enemy approaches.", Color(1.0, 0.7, 0.5))
 
 func _apply_class_to_player(class_id: String) -> void:
 	var data: ClassData = ClassRegistry.get_by_id(class_id)
@@ -262,8 +284,9 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	if player.skills.is_empty():
 		player.init_skills()
 	var saved_qs = data.get("quickslots", null)
-	if saved_qs is Array and saved_qs.size() == player.quickslots.size():
-		player.quickslots = saved_qs
+	if saved_qs is Array:
+		for i in range(min(int(saved_qs.size()), player.quickslots.size())):
+			player.quickslots[i] = String(saved_qs[i])
 	player.set_race_from_id(GameManager.selected_race_id)
 	player._refresh_paperdoll()
 	CombatLog.post("Run resumed. Floor B%d." % GameManager.depth,

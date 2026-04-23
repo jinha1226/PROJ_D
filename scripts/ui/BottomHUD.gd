@@ -18,9 +18,6 @@ signal menu_pressed
 	$Margin/VBox/Row1/QuickSlot2,
 	$Margin/VBox/Row1/QuickSlot3,
 	$Margin/VBox/Row1/QuickSlot4,
-	$Margin/VBox/Row1/QuickSlot5,
-	$Margin/VBox/Row1/QuickSlot6,
-	$Margin/VBox/Row1/QuickSlot7,
 ]
 @onready var rest_button: Button = $Margin/VBox/Row1/RestButton
 @onready var bag_button: Button = $Margin/VBox/Row2/BagButton

@@ -57,18 +57,6 @@ size_flags_vertical = 3
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="QuickSlot5" type="Button" parent="Margin/VBox/Row1" instance=ExtResource("2_qs")]
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="QuickSlot6" type="Button" parent="Margin/VBox/Row1" instance=ExtResource("2_qs")]
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="QuickSlot7" type="Button" parent="Margin/VBox/Row1" instance=ExtResource("2_qs")]
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
 [node name="RestButton" type="Button" parent="Margin/VBox/Row1"]
 custom_minimum_size = Vector2(150, 0)
 size_flags_vertical = 3

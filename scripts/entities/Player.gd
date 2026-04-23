@@ -60,7 +60,7 @@ var known_spells: Array = []  # [String]
 var statuses: Dictionary = {}  # id -> turns_remaining (Status.gd manages)
 var resists: Array = []  # ["fire", "cold-2", "poison+"] scaled by Status.resist_scale
 var skills: Dictionary = {}  # skill_id -> {"level": int, "xp": float}
-var quickslots: Array = ["", "", "", "", "", "", "", ""]  # item ids, index = slot
+var quickslots: Array = ["", "", "", "", ""]  # item ids, index = slot
 var equipped_weapon_id: String = ""
 var equipped_armor_id: String = ""
 
