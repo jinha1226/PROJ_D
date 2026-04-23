@@ -45,13 +45,24 @@ static func _build_header(body: VBoxContainer, player: Player) -> void:
 	var hb := HBoxContainer.new()
 	hb.add_theme_constant_override("separation", 12)
 	body.add_child(hb)
-	# Portrait square using race base sprite
-	var portrait := TextureRect.new()
-	portrait.custom_minimum_size = Vector2(96, 96)
-	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	# Paper-doll composite: race base + current body armor + hand1 weapon.
+	var portrait := Control.new()
+	portrait.custom_minimum_size = Vector2(120, 130)
+	portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var base_path: String = \
+		"res://assets/tiles/individual/player/base/human_m.png"
 	if race != null and race.base_sprite_path != "" \
 			and ResourceLoader.exists(race.base_sprite_path):
-		portrait.texture = load(race.base_sprite_path)
+		base_path = race.base_sprite_path
+	_add_portrait_layer(portrait, base_path)
+	if player.equipped_armor_id != "" \
+			and Player.DOLL_BODY_MAP.has(player.equipped_armor_id):
+		_add_portrait_layer(portrait,
+			String(Player.DOLL_BODY_MAP[player.equipped_armor_id]))
+	if player.equipped_weapon_id != "" \
+			and Player.DOLL_HAND1_MAP.has(player.equipped_weapon_id):
+		_add_portrait_layer(portrait,
+			String(Player.DOLL_HAND1_MAP[player.equipped_weapon_id]))
 	hb.add_child(portrait)
 	var vb := VBoxContainer.new()
 	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -155,6 +166,17 @@ static func _build_meta(body: VBoxContainer, player: Player) -> void:
 		Color(0.85, 0.65, 0.45)))
 	body.add_child(_kv_row("Turn", "%d" % TurnManager.turn_number,
 		Color(0.65, 0.75, 0.65)))
+
+static func _add_portrait_layer(parent: Control, path: String) -> void:
+	if not ResourceLoader.exists(path):
+		return
+	var rect := TextureRect.new()
+	rect.texture = load(path)
+	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	rect.anchor_right = 1.0
+	rect.anchor_bottom = 1.0
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(rect)
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 static func _kv_row(key: String, value: String, tint: Color) -> Control:
