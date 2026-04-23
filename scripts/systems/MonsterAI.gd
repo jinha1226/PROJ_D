@@ -1,14 +1,13 @@
 class_name MonsterAI extends RefCounted
 
-## Minimal AI per guide §4.9. Monster.take_turn() delegates here.
-## Per-turn decision: adjacent → attack; player in FOV → step toward;
-## else → 50% idle / 50% random step.
+## Monster AI: adjacent → attack; player in FOV → step toward + update
+## last_known_player_pos; alerted but no LOS → chase last known position;
+## idle → random step.
 
 static func take_turn(monster: Monster, map: DungeonMap) -> void:
 	var player: Player = _find_player()
 	if player == null or player.hp <= 0:
 		return
-	# Status-driven overrides.
 	if Status.will_skip_turn(monster):
 		return
 	if Status.has(player, "time_stopped"):
@@ -27,9 +26,19 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 		CombatSystem.monster_attack_player(monster, player)
 		return
 	if _can_see(monster, map, player.grid_pos):
+		monster.last_known_player_pos = player.grid_pos
+		monster.is_alerted = true
 		if _try_ranged(monster, player, dist):
 			return
 		_step_toward(monster, map, player.grid_pos)
+	elif monster.is_alerted and monster.last_known_player_pos != Vector2i(-1, -1):
+		# Chase the last known position. Clear alert once we reach it.
+		var chase_dist: int = _chebyshev(monster.grid_pos, monster.last_known_player_pos)
+		if chase_dist <= 1:
+			monster.is_alerted = false
+			monster.last_known_player_pos = Vector2i(-1, -1)
+		else:
+			_step_toward(monster, map, monster.last_known_player_pos)
 	else:
 		_random_step(monster, map)
 

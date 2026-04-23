@@ -7,7 +7,7 @@ class_name StatusDialog extends RefCounted
 ##   Combat       — AC / EV / WL
 ##   Equipment    — all body slots
 ##   Resistances  — every element with +++/--- bar
-##   Essence      — placeholder for future essence system
+##   Essence      — 3 equipped slots + inventory swap
 ##   Effects      — active statuses with turns remaining
 ##   Run          — depth / gold / kills / turns
 
@@ -154,12 +154,103 @@ static func _build_resists(body: VBoxContainer, player: Player) -> void:
 		var lvl: int = Status.resist_level(player.resists, elem)
 		body.add_child(_resist_row(elem, lvl))
 
-static func _build_essence(body: VBoxContainer, _player: Player) -> void:
-	var lbl := Label.new()
-	lbl.text = "(none)"
-	lbl.add_theme_font_size_override("font_size", 22)
-	lbl.add_theme_color_override("font_color", Color(0.55, 0.55, 0.6))
-	body.add_child(lbl)
+static func _build_essence(body: VBoxContainer, player: Player) -> void:
+	for i in range(EssenceSystem.SLOT_COUNT):
+		var slot_id: String = String(player.essence_slots[i]) if i < player.essence_slots.size() else ""
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+
+		var slot_lbl := Label.new()
+		slot_lbl.text = "Slot %d" % (i + 1)
+		slot_lbl.custom_minimum_size = Vector2(60, 0)
+		slot_lbl.add_theme_font_size_override("font_size", 20)
+		slot_lbl.add_theme_color_override("font_color", Color(0.55, 0.6, 0.65))
+		slot_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		row.add_child(slot_lbl)
+
+		var name_lbl := Label.new()
+		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		name_lbl.add_theme_font_size_override("font_size", 24)
+		if slot_id != "":
+			name_lbl.text = EssenceSystem.display_name(slot_id)
+			name_lbl.add_theme_color_override("font_color", EssenceSystem.color_of(slot_id))
+		else:
+			name_lbl.text = "(empty)"
+			name_lbl.add_theme_color_override("font_color", Color(0.45, 0.45, 0.5))
+		row.add_child(name_lbl)
+
+		var swap_btn := Button.new()
+		swap_btn.text = "Swap"
+		swap_btn.custom_minimum_size = Vector2(90, 44)
+		swap_btn.add_theme_font_size_override("font_size", 20)
+		var slot_idx := i
+		swap_btn.pressed.connect(func(): _open_essence_swap(slot_idx, player, body))
+		row.add_child(swap_btn)
+		body.add_child(row)
+
+	if player.essence_inventory.is_empty():
+		var inv_lbl := Label.new()
+		inv_lbl.text = "Inventory: (none)"
+		inv_lbl.add_theme_font_size_override("font_size", 20)
+		inv_lbl.add_theme_color_override("font_color", Color(0.5, 0.5, 0.55))
+		body.add_child(inv_lbl)
+	else:
+		var names: Array = player.essence_inventory.map(
+			func(id): return EssenceSystem.display_name(id))
+		var inv_lbl := Label.new()
+		inv_lbl.text = "Inventory: " + ", ".join(names)
+		inv_lbl.add_theme_font_size_override("font_size", 20)
+		inv_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		inv_lbl.add_theme_color_override("font_color", Color(0.7, 0.75, 0.8))
+		body.add_child(inv_lbl)
+
+
+static func _open_essence_swap(slot: int, player: Player, body: VBoxContainer) -> void:
+	var dlg: GameDialog = GameDialog.create_ratio("Swap Essence Slot %d" % (slot + 1), 0.75, 0.85)
+	body.get_tree().current_scene.add_child(dlg)
+	var swap_body: VBoxContainer = dlg.body()
+	if swap_body == null:
+		return
+
+	var cur_id: String = String(player.essence_slots[slot]) if slot < player.essence_slots.size() else ""
+
+	var cur_lbl := Label.new()
+	cur_lbl.add_theme_font_size_override("font_size", 22)
+	cur_lbl.add_theme_color_override("font_color", Color(0.65, 0.7, 0.75))
+	if cur_id != "":
+		cur_lbl.text = "Equipped: %s" % EssenceSystem.display_name(cur_id)
+	else:
+		cur_lbl.text = "Slot is empty"
+	swap_body.add_child(cur_lbl)
+	swap_body.add_child(HSeparator.new())
+
+	for ess_id in player.essence_inventory:
+		var btn := Button.new()
+		btn.text = "%s\n%s" % [EssenceSystem.display_name(ess_id), EssenceSystem.description(ess_id)]
+		btn.custom_minimum_size = Vector2(0, 64)
+		btn.add_theme_font_size_override("font_size", 20)
+		var eid := ess_id
+		btn.pressed.connect(func():
+			player.equip_essence(slot, eid)
+			dlg.close())
+		swap_body.add_child(btn)
+
+	if cur_id != "":
+		var clear_btn := Button.new()
+		clear_btn.text = "[Remove essence]"
+		clear_btn.add_theme_font_size_override("font_size", 20)
+		clear_btn.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
+		clear_btn.pressed.connect(func():
+			player.equip_essence(slot, "")
+			dlg.close())
+		swap_body.add_child(clear_btn)
+
+	if player.essence_inventory.is_empty() and cur_id == "":
+		var empty_lbl := Label.new()
+		empty_lbl.text = "No essences in inventory."
+		empty_lbl.add_theme_color_override("font_color", Color(0.55, 0.55, 0.6))
+		swap_body.add_child(empty_lbl)
 
 static func _build_effects(body: VBoxContainer, player: Player) -> void:
 	for id in player.statuses.keys():

@@ -335,6 +335,16 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	if saved_qs is Array:
 		for i in range(min(int(saved_qs.size()), player.quickslots.size())):
 			player.quickslots[i] = String(saved_qs[i])
+	var saved_es = data.get("essence_slots", null)
+	if saved_es is Array:
+		for i in range(mini(int(saved_es.size()), player.essence_slots.size())):
+			var eid: String = String(saved_es[i])
+			player.essence_slots[i] = eid
+			if eid != "":
+				EssenceSystem.apply(player, eid)
+	var saved_ei = data.get("essence_inventory", null)
+	if saved_ei is Array:
+		player.essence_inventory = saved_ei.duplicate()
 	player.set_race_from_id(GameManager.selected_race_id)
 	player._refresh_paperdoll()
 	CombatLog.post("Run resumed. Floor B%d." % GameManager.depth,
@@ -516,6 +526,7 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 		m.status = entry.get("status", {}).duplicate()
 		if m.has_signal("hit_taken"):
 			m.hit_taken.connect(_on_monster_hit.bind(m))
+		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
 
 func _spawn_monsters_for_floor(depth: int) -> void:
@@ -542,6 +553,7 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 		monsters_layer.add_child(m)
 		m.setup(data, map, p)
 		m.hit_taken.connect(_on_monster_hit.bind(m))
+		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
 		placed += 1
 
@@ -1061,6 +1073,17 @@ func _greedy_step_toward(target: Vector2i) -> Vector2i:
 		return Vector2i(0, dy)
 	return Vector2i.ZERO
 
+
+func _on_monster_died(_monster: Monster) -> void:
+	if player == null or player.hp <= 0:
+		return
+	# 8% drop chance per kill; deeper floors slightly more likely.
+	var chance: float = 0.08 + GameManager.depth * 0.005
+	if randf() < chance:
+		var essence_id: String = EssenceSystem.random_id()
+		player.add_essence(essence_id)
+		CombatLog.post("An essence materializes! (%s)" % EssenceSystem.display_name(essence_id),
+			Color(0.8, 0.6, 1.0))
 
 func _on_monster_hit(amount: int, monster: Monster) -> void:
 	if not is_instance_valid(monster):

@@ -61,6 +61,8 @@ var skills: Dictionary = {}  # skill_id -> {"level": int, "xp": float}
 var quickslots: Array = ["", "", "", "", ""]  # item ids, index = slot
 var equipped_weapon_id: String = ""
 var equipped_armor_id: String = ""
+var essence_slots: Array = ["", "", ""]   # equipped essence ids (max 3)
+var essence_inventory: Array = []         # collected but unequipped essence ids
 
 const SKILL_IDS: Array = ["blade", "blunt", "dagger", "polearm", "ranged",
 	"armor", "magic", "stealth"]
@@ -503,6 +505,24 @@ func tick_statuses() -> void:
 			Color(0.75, 0.8, 0.9))
 	if not statuses.is_empty() or not expired.is_empty():
 		emit_signal("stats_changed")
+	EssenceSystem.tick(self)
+
+func equip_essence(slot: int, essence_id: String) -> void:
+	if slot < 0 or slot >= essence_slots.size():
+		return
+	var old: String = String(essence_slots[slot])
+	if old != "":
+		EssenceSystem.remove(self, old)
+		essence_inventory.append(old)
+	if essence_id != "":
+		essence_inventory.erase(essence_id)
+		EssenceSystem.apply(self, essence_id)
+	essence_slots[slot] = essence_id
+	emit_signal("stats_changed")
+
+func add_essence(essence_id: String) -> void:
+	essence_inventory.append(essence_id)
+	emit_signal("stats_changed")
 
 func apply_berserk(turns: int) -> void:
 	Status.apply(self, "berserk", turns)

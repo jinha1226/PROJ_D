@@ -8,6 +8,8 @@ var data: MonsterData
 var hp: int = 0
 var grid_pos: Vector2i = Vector2i.ZERO
 var status: Dictionary = {}
+var last_known_player_pos: Vector2i = Vector2i(-1, -1)
+var is_alerted: bool = false
 
 var _map: DungeonMap
 var _tex: Texture2D = null

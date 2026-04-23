@@ -52,6 +52,8 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	monster.take_damage(final)
 	if brand != "" and brand_extra > 0 and monster.hp > 0:
 		_apply_brand_status(monster, brand)
+	if monster.hp > 0 and EssenceSystem.has_venom_touch(player):
+		Status.apply(monster, "poison", 3)
 	if skill_id != "":
 		player.grant_skill_xp(skill_id, 1.0)
 	if was_alive and monster.hp <= 0:
