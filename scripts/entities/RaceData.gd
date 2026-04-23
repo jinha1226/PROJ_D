@@ -22,6 +22,10 @@ class_name RaceData extends Resource
 @export var hp_mod: int = 0
 @export var mp_mod: int = 0
 
+## Racial resistance entries appended to Player.resists on class-apply.
+## Format: Status.gd — ["fire+", "cold++", "necromancy+"], etc.
+@export var resist_mods: Array = []
+
 func unlock_hint() -> String:
 	if unlocked:
 		return ""
