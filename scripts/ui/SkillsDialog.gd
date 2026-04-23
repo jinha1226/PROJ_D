@@ -35,10 +35,29 @@ static func open(player: Player, parent: Node) -> void:
 		body.add_child(UICards.section_header(String(cat_entry[0])))
 		for id: String in cat_entry[1]:
 			var s: Dictionary = player.skills.get(id, {"level": 0, "xp": 0.0})
-			body.add_child(_make_skill_row(id, s, parent))
+			body.add_child(_make_skill_row(id, s, player, parent))
 
 
-static func _make_skill_row(id: String, s: Dictionary, parent: Node) -> Control:
+static func _bonus_text(id: String, level: int, player: Player) -> String:
+	if level == 0:
+		return "(no bonus yet)"
+	match id:
+		"blade", "blunt", "polearm", "ranged":
+			return "+%d to-hit  ·  +%d%% dmg" % [level, level * 5]
+		"dagger":
+			return "+%d to-hit  ·  +%d%% dmg  ·  stab vs unaware" % [level, level * 5]
+		"armor":
+			var pct: int = min(level * 10, 100)
+			return "EV penalty -%d%% reduced" % pct
+		"magic":
+			var power: int = int(player.intelligence + level * player.intelligence / 10.0)
+			var fizzle_cut: int = level * 3
+			return "power %d  ·  fizzle -%d%%" % [power, fizzle_cut]
+		"stealth":
+			return "detection delay +%d turns" % level
+	return ""
+
+static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: Node) -> Control:
 	var level: int = int(s.get("level", 0))
 	var xp: float = float(s.get("xp", 0.0))
 	var needed: int = 0
@@ -74,15 +93,23 @@ static func _make_skill_row(id: String, s: Dictionary, parent: Node) -> Control:
 	# Name + level row
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
-	row.custom_minimum_size = Vector2(0, 44)
 	vb.add_child(row)
+
+	var name_col := VBoxContainer.new()
+	name_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_col.add_theme_constant_override("separation", 0)
+	row.add_child(name_col)
 
 	var name_lbl := Label.new()
 	name_lbl.text = id.capitalize()
-	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_lbl.add_theme_font_size_override("font_size", 28)
-	name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	row.add_child(name_lbl)
+	name_col.add_child(name_lbl)
+
+	var bonus_lbl := Label.new()
+	bonus_lbl.text = _bonus_text(id, level, player)
+	bonus_lbl.add_theme_font_size_override("font_size", 18)
+	bonus_lbl.add_theme_color_override("font_color", Color(0.6, 0.75, 0.6))
+	name_col.add_child(bonus_lbl)
 
 	var lv_color: Color
 	if level >= 20:
