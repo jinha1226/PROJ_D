@@ -13,7 +13,7 @@ bg_color = Color(0.870588, 0.690196, 0.133333, 1)
 
 [node name="TopHUD" type="Control"]
 anchor_right = 1.0
-offset_bottom = 150.0
+offset_bottom = 170.0
 script = ExtResource("1_tophud")
 
 [node name="BG" type="ColorRect" parent="."]
@@ -32,26 +32,37 @@ theme_override_constants/margin_bottom = 6
 [node name="HBox" type="HBoxContainer" parent="Margin"]
 theme_override_constants/separation = 8
 
-[node name="MinimapButton" type="Button" parent="Margin/HBox"]
+[node name="MinimapCol" type="VBoxContainer" parent="Margin/HBox"]
 custom_minimum_size = Vector2(130, 0)
+theme_override_constants/separation = 2
+
+[node name="MinimapButton" type="Button" parent="Margin/HBox/MinimapCol"]
+size_flags_horizontal = 3
 size_flags_vertical = 3
 expand_icon = true
 
+[node name="DepthLabel" type="Label" parent="Margin/HBox/MinimapCol"]
+size_flags_horizontal = 3
+horizontal_alignment = 1
+text = "Dungeon:1"
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.75, 0.78, 0.9)
+
 [node name="Bars" type="VBoxContainer" parent="Margin/HBox"]
 size_flags_horizontal = 3
-theme_override_constants/separation = 4
+theme_override_constants/separation = 3
 
 [node name="HPRow" type="HBoxContainer" parent="Margin/HBox/Bars"]
 theme_override_constants/separation = 6
 
 [node name="HPLabel" type="Label" parent="Margin/HBox/Bars/HPRow"]
-custom_minimum_size = Vector2(180, 38)
+custom_minimum_size = Vector2(150, 36)
 text = "HP 0/0"
 theme_override_font_sizes/font_size = 22
 vertical_alignment = 1
 
 [node name="HPBar" type="ProgressBar" parent="Margin/HBox/Bars/HPRow"]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 36)
 size_flags_horizontal = 3
 max_value = 100.0
 value = 100.0
@@ -62,13 +73,13 @@ theme_override_styles/fill = SubResource("SB_HP")
 theme_override_constants/separation = 6
 
 [node name="MPLabel" type="Label" parent="Margin/HBox/Bars/MPRow"]
-custom_minimum_size = Vector2(180, 38)
+custom_minimum_size = Vector2(150, 36)
 text = "MP 0/0"
 theme_override_font_sizes/font_size = 22
 vertical_alignment = 1
 
 [node name="MPBar" type="ProgressBar" parent="Margin/HBox/Bars/MPRow"]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 36)
 size_flags_horizontal = 3
 max_value = 100.0
 value = 100.0
@@ -79,29 +90,44 @@ theme_override_styles/fill = SubResource("SB_MP")
 theme_override_constants/separation = 6
 
 [node name="XPLabel" type="Label" parent="Margin/HBox/Bars/XPRow"]
-custom_minimum_size = Vector2(180, 38)
-text = "Lv.1  B1F"
+custom_minimum_size = Vector2(150, 36)
+text = "XP 0/10"
 theme_override_font_sizes/font_size = 22
 vertical_alignment = 1
 
 [node name="XPBar" type="ProgressBar" parent="Margin/HBox/Bars/XPRow"]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 36)
 size_flags_horizontal = 3
 max_value = 100.0
 value = 0.0
 show_percentage = false
 theme_override_styles/fill = SubResource("SB_XP")
 
-[node name="ZoomColumn" type="VBoxContainer" parent="Margin/HBox"]
-custom_minimum_size = Vector2(110, 0)
-theme_override_constants/separation = 4
+[node name="StatsRow" type="HBoxContainer" parent="Margin/HBox/Bars"]
+theme_override_constants/separation = 8
 
-[node name="ZoomInButton" type="Button" parent="Margin/HBox/ZoomColumn"]
-custom_minimum_size = Vector2(100, 62)
-theme_override_font_sizes/font_size = 30
+[node name="LevelLabel" type="Label" parent="Margin/HBox/Bars/StatsRow"]
+text = "Lv.1"
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1.0, 0.88, 0.3)
+
+[node name="GoldLabel" type="Label" parent="Margin/HBox/Bars/StatsRow"]
+size_flags_horizontal = 3
+text = "0g"
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1.0, 0.85, 0.2)
+
+[node name="TurnLabel" type="Label" parent="Margin/HBox/Bars/StatsRow"]
+text = "T:0"
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.65, 0.75, 0.65)
+
+[node name="ZoomInButton" type="Button" parent="Margin/HBox/Bars/StatsRow"]
+custom_minimum_size = Vector2(56, 40)
+theme_override_font_sizes/font_size = 26
 text = "＋"
 
-[node name="ZoomOutButton" type="Button" parent="Margin/HBox/ZoomColumn"]
-custom_minimum_size = Vector2(100, 62)
-theme_override_font_sizes/font_size = 30
+[node name="ZoomOutButton" type="Button" parent="Margin/HBox/Bars/StatsRow"]
+custom_minimum_size = Vector2(56, 40)
+theme_override_font_sizes/font_size = 26
 text = "－"

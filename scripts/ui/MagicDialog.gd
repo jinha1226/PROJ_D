@@ -11,65 +11,68 @@ static func _populate(dlg: GameDialog, player: Player, game: Node) -> void:
 		return
 	for child in body.get_children():
 		child.queue_free()
-	body.add_theme_constant_override("separation", 12)
+	body.add_theme_constant_override("separation", 8)
 
 	# MP status
-	var mp_lbl := UICards.accent_value("MP  %d / %d" % [player.mp, player.mp_max])
+	var mp_lbl := Label.new()
+	mp_lbl.text = "MP  %d / %d" % [player.mp, player.mp_max]
+	mp_lbl.add_theme_font_size_override("font_size", 30)
 	mp_lbl.add_theme_color_override("font_color", Color(0.5, 0.75, 1.0))
 	body.add_child(mp_lbl)
 
 	if player.known_spells.is_empty():
-		body.add_child(UICards.dim_hint("You know no spells."))
+		var empty := Label.new()
+		empty.text = "You know no spells."
+		empty.add_theme_color_override("font_color", Color(0.55, 0.55, 0.6))
+		body.add_child(empty)
 		return
+
+	body.add_child(UICards.section_header("SPELLS"))
 
 	for spell_id in player.known_spells:
 		var spell: SpellData = SpellRegistry.get_by_id(String(spell_id))
 		if spell == null:
 			continue
-		body.add_child(_make_spell_card(spell, player, dlg, game))
+		body.add_child(_make_spell_row(spell, player, dlg, game))
 
 
-static func _make_spell_card(spell: SpellData, player: Player,
+static func _make_spell_row(spell: SpellData, player: Player,
 		dlg: GameDialog, game: Node) -> Control:
-	var tint := _effect_color(spell.effect)
-	var card := UICards.card(tint)
-	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 6)
-	card.add_child(vb)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
 
-	# Top row: name + cast button
-	var top_row := HBoxContainer.new()
-	top_row.add_theme_constant_override("separation", 8)
-	vb.add_child(top_row)
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info.add_theme_constant_override("separation", 2)
+	row.add_child(info)
 
 	var name_lbl := Label.new()
 	name_lbl.text = spell.display_name
-	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_lbl.add_theme_font_size_override("font_size", 32)
-	name_lbl.add_theme_color_override("font_color", tint)
-	top_row.add_child(name_lbl)
+	name_lbl.add_theme_font_size_override("font_size", 28)
+	name_lbl.add_theme_color_override("font_color", _effect_color(spell.effect))
+	info.add_child(name_lbl)
+
+	var fail_pct: int = _fail_pct(player, spell)
+	var stat_lbl := Label.new()
+	stat_lbl.text = "MP:%d  Fail:%d%%  %s  %s" % [
+		spell.mp_cost, fail_pct,
+		("%d tiles" % spell.max_range) if spell.max_range > 0 else "self",
+		_describe(player, spell)]
+	stat_lbl.add_theme_font_size_override("font_size", 20)
+	stat_lbl.add_theme_color_override("font_color", Color(0.65, 0.65, 0.7))
+	stat_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	info.add_child(stat_lbl)
 
 	var btn := Button.new()
 	btn.text = "Cast"
-	btn.custom_minimum_size = Vector2(130, 56)
-	btn.add_theme_font_size_override("font_size", 26)
+	btn.custom_minimum_size = Vector2(110, 52)
+	btn.add_theme_font_size_override("font_size", 24)
 	btn.disabled = player.mp < spell.mp_cost
 	if not btn.disabled:
 		btn.pressed.connect(func(): _on_cast(spell.id, player, dlg, game))
-	top_row.add_child(btn)
+	row.add_child(btn)
 
-	# Stats row: MP + fail%
-	var fail_pct: int = _fail_pct(player, spell)
-	var stats_lbl := UICards.dim_hint(
-		"MP: %d   Fail: %d%%   Range: %s" % [
-			spell.mp_cost, fail_pct,
-			("%d tiles" % spell.max_range) if spell.max_range > 0 else "self"])
-	vb.add_child(stats_lbl)
-
-	# Effect description
-	vb.add_child(UICards.dim_hint(_describe(player, spell), 26))
-
-	return card
+	return row
 
 
 static func _describe(player: Player, spell: SpellData) -> String:
@@ -78,20 +81,19 @@ static func _describe(player: Player, spell: SpellData) -> String:
 		"damage":
 			var lo: int = spell.base_damage + power / 3
 			var hi: int = spell.base_damage + 2 + power / 3
-			return "Bolt — deals %d–%d damage to nearest enemy" % [lo, hi]
+			return "%d-%d dmg" % [lo, hi]
 		"multi_damage":
 			var lo: int = spell.base_damage + power / 4
 			var hi: int = spell.base_damage + 2 + power / 4
-			return "3 darts — %d–%d each, auto-targets nearest" % [lo, hi]
+			return "3×%d-%d" % [lo, hi]
 		"aoe_damage":
 			var lo: int = spell.base_damage + power / 3
 			var hi: int = spell.base_damage + 3 + power / 3
-			return "AoE — %d–%d to all visible enemies in %d tiles" % [lo, hi, spell.max_range]
+			return "AoE %d-%d" % [lo, hi]
 		"heal":
-			var amt: int = 12 + power / 2
-			return "Heals %d HP  (12 + power/2)" % amt
+			return "+%dHP" % (12 + power / 2)
 		"blink":
-			return "Teleports you to a random tile ≥%d tiles away" % spell.max_range
+			return "Teleport"
 	return ""
 
 
@@ -120,14 +122,12 @@ static func _on_cast(spell_id: String, player: Player,
 	var spell: SpellData = SpellRegistry.get_by_id(spell_id)
 	if spell == null:
 		return
-	# Self-targeting spells fire immediately
 	if spell.effect == "heal" or spell.effect == "blink":
 		var ok: bool = MagicSystem.cast(spell_id, player, game)
 		dlg.close()
 		if ok:
 			TurnManager.end_player_turn()
 		return
-	# Offensive spells enter tile-targeting mode
 	dlg.close()
 	if game != null and game.has_method("begin_spell_targeting"):
 		game.begin_spell_targeting(spell, player)

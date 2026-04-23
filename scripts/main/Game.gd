@@ -367,6 +367,15 @@ func _refresh_fov() -> void:
 		return
 	map.set_fov(player.compute_fov())
 	_update_minimap()
+	_refresh_entity_visibility()
+
+func _refresh_entity_visibility() -> void:
+	for n in get_tree().get_nodes_in_group("monsters"):
+		if n is Monster:
+			n.visible = map.visible_tiles.has(n.grid_pos)
+	for n in get_tree().get_nodes_in_group("floor_items"):
+		if n is FloorItem:
+			n.visible = map.explored.has(n.grid_pos)
 
 func _update_minimap() -> void:
 	if map == null or player == null:
@@ -406,6 +415,7 @@ func _update_hud() -> void:
 	top_hud.set_xp(player.xp, player.xp_to_next(), player.xl)
 	top_hud.set_depth(GameManager.depth)
 	top_hud.set_gold(player.gold)
+	top_hud.set_turn(TurnManager.turn_number)
 
 func _on_player_moved(_new_pos: Vector2i) -> void:
 	_refresh_fov()
