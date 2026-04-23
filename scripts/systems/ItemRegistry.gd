@@ -18,12 +18,17 @@ const _SCROLL_ENCHANT_WEAPON: Resource = preload("res://resources/items/scroll_e
 const _SCROLL_ENCHANT_ARMOR: Resource = preload("res://resources/items/scroll_enchant_armor.tres")
 const _GOLD_PILE: Resource = preload("res://resources/items/gold_pile.tres")
 const _BATTLE_AXE: Resource = preload("res://resources/items/battle_axe.tres")
+const _FLAMING_SWORD: Resource = preload("res://resources/items/flaming_sword.tres")
+const _FROST_DAGGER: Resource = preload("res://resources/items/frost_dagger.tres")
+const _VENOM_DAGGER: Resource = preload("res://resources/items/venom_dagger.tres")
+const _SHOCK_MACE: Resource = preload("res://resources/items/shock_mace.tres")
 const _POTION_BERSERK: Resource = preload("res://resources/items/potion_berserk.tres")
 const _BOOK_ICE_MAGIC: Resource = preload("res://resources/items/book_ice_magic.tres")
 const _SCROLL_IDENTIFY: Resource = preload("res://resources/items/scroll_identify.tres")
 
 const _ALL_ITEMS: Array = [
 	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE,
+	_FLAMING_SWORD, _FROST_DAGGER, _VENOM_DAGGER, _SHOCK_MACE,
 	_LEATHER_ARMOR, _ROBE, _CHAIN_MAIL,
 	_POTION_HEALING, _POTION_MIGHT, _POTION_CURE_POISON, _POTION_MAGIC,
 	_POTION_BERSERK,

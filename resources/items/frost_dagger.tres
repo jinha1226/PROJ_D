@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3 uid="uid://bitemfrostdag1"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "frost_dagger"
+display_name = "frost dagger"
+kind = "weapon"
+tier = 3
+tile_path = "res://assets/tiles/individual/item/weapon/dagger.png"
+glyph = "("
+glyph_color = Color(0.55, 0.85, 1, 1)
+damage = 4
+delay = 0.8
+category = "dagger"
+brand = "freezing"
+ac_bonus = 0
+ev_penalty = 0
+slot = ""
+effect = ""
+effect_value = 0
+plus = 0
+description = "Rimed dagger. +1d6 cold damage; chance to freeze targets on hit."
+unlocks_class_id = ""
+grants_spell_id = ""

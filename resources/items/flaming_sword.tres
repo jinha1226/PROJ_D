@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3 uid="uid://bitemflameswd1"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "flaming_sword"
+display_name = "flaming short sword"
+kind = "weapon"
+tier = 3
+tile_path = "res://assets/tiles/individual/item/weapon/falchion1.png"
+glyph = "("
+glyph_color = Color(1, 0.5, 0.2, 1)
+damage = 6
+delay = 1.0
+category = "blade"
+brand = "flaming"
+ac_bonus = 0
+ev_penalty = 0
+slot = ""
+effect = ""
+effect_value = 0
+plus = 0
+description = "Short sword wreathed in flame. +1d6 fire damage and sets foes alight."
+unlocks_class_id = ""
+grants_spell_id = ""

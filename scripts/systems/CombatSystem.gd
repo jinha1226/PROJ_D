@@ -35,9 +35,21 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	var base_final: int = max(1, raw - soak)
 	var mult: float = 1.0 + float(skill_level) * 0.05
 	var final: int = max(1, int(round(float(base_final) * mult)))
-	CombatLog.hit("You hit the %s for %d." % [monster.data.display_name, final])
+	# Brand adds a separate elemental hit on top of the physical one,
+	# scaled by the target's resists (vulnerable targets take more).
+	var brand: String = _weapon_brand(player)
+	var brand_extra: int = 0
+	if brand != "":
+		var brand_element: String = brand_element_of(brand)
+		var roll: int = randi_range(1, 6)
+		brand_extra = Status.resist_scale(roll, monster.data.resists,
+			brand_element)
+		final += brand_extra
+	CombatLog.hit(_hit_log(monster.data.display_name, brand, final, brand_extra))
 	var was_alive: bool = monster.hp > 0
 	monster.take_damage(final)
+	if brand != "" and brand_extra > 0 and monster.hp > 0:
+		_apply_brand_status(monster, brand)
 	if skill_id != "":
 		player.grant_skill_xp(skill_id, 1.0)
 	if was_alive and monster.hp <= 0:
@@ -45,6 +57,45 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		player.grant_xp(monster.data.xp_value)
 		player.register_kill()
 		GameManager.try_kill_unlock(monster.data.id)
+
+static func _weapon_brand(player: Player) -> String:
+	if player.equipped_weapon_id == "":
+		return ""
+	var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
+	if w == null:
+		return ""
+	return String(w.brand)
+
+static func brand_element_of(brand: String) -> String:
+	match brand:
+		"flaming":  return "fire"
+		"freezing": return "cold"
+		"venom":    return "poison"
+		"electric": return "electric"
+		"draining": return "necromancy"
+	return ""
+
+static func _apply_brand_status(target: Monster, brand: String) -> void:
+	match brand:
+		"flaming":  Status.apply(target, "burning", 2)
+		"freezing": Status.apply(target, "frozen", 1)
+		"venom":    Status.apply(target, "poison", 3)
+
+static func _hit_log(name: String, brand: String, total: int, extra: int) -> String:
+	if brand == "" or extra <= 0:
+		return "You hit the %s for %d." % [name, total]
+	match brand:
+		"flaming":
+			return "You torch the %s for %d (+%d fire)." % [name, total, extra]
+		"freezing":
+			return "You chill the %s for %d (+%d cold)." % [name, total, extra]
+		"venom":
+			return "You envenom the %s for %d (+%d poison)." % [name, total, extra]
+		"electric":
+			return "You shock the %s for %d (+%d electric)." % [name, total, extra]
+		"draining":
+			return "You drain the %s for %d (+%d)." % [name, total, extra]
+	return "You hit the %s for %d (+%d)." % [name, total, extra]
 
 static func monster_ranged_attack_player(monster: Monster, player: Player,
 		ra: Dictionary) -> void:
