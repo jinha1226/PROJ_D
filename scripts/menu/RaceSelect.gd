@@ -3,12 +3,14 @@ extends Control
 const JOB_SELECT_PATH: String = "res://scenes/menu/JobSelect.tscn"
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 
+@onready var _scroll: ScrollContainer = $ScrollContainer
 @onready var _container: VBoxContainer = $ScrollContainer/VBox
 @onready var _back_btn: Button = $BackButton
 
 func _ready() -> void:
 	theme = GameTheme.create()
 	_back_btn.pressed.connect(_on_back)
+	TouchScrollHelper.install(_scroll)
 	_build_cards()
 
 func _build_cards() -> void:
