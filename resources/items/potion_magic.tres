@@ -9,6 +9,7 @@ display_name = "potion of magic"
 kind = "potion"
 tier = 2
 tile_path = "res://assets/tiles/individual/item/potion/cloudy.png"
+identified_tile_path = "res://assets/tiles/individual/item/potion/i-magic.png"
 glyph = "!"
 glyph_color = Color(0.5, 0.75, 1, 1)
 damage = 0

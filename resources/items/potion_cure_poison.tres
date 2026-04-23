@@ -9,6 +9,7 @@ display_name = "potion of curing"
 kind = "potion"
 tier = 1
 tile_path = "res://assets/tiles/individual/item/potion/bubbly.png"
+identified_tile_path = "res://assets/tiles/individual/item/potion/i-curing.png"
 glyph = "!"
 glyph_color = Color(0.6, 1, 0.7, 1)
 damage = 0

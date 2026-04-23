@@ -9,6 +9,7 @@ display_name = "potion of healing"
 kind = "potion"
 tier = 1
 tile_path = "res://assets/tiles/individual/item/potion/brown.png"
+identified_tile_path = "res://assets/tiles/individual/item/potion/i-heal-wounds.png"
 glyph = "!"
 glyph_color = Color(1, 0.42, 0.42, 1)
 damage = 0

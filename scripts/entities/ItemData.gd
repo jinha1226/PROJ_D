@@ -32,3 +32,10 @@ class_name ItemData extends Resource
 @export var unlocks_class_id: String = ""
 ## When used, teach the spell with this id to the player (if not known).
 @export var grants_spell_id: String = ""
+
+@export_group("Visuals")
+## Overlay tile drawn on top of `tile_path` once GameManager.identify(id)
+## has been called. DCSS-style "base parchment + stamped symbol" for
+## scrolls / potions / books — lets pseudonym-only items show a
+## generic look before the player learns what they are.
+@export var identified_tile_path: String = ""
