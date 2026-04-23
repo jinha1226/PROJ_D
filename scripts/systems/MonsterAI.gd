@@ -52,17 +52,44 @@ static func _can_see(monster: Monster, map: DungeonMap, target: Vector2i) -> boo
 static func _step_toward(monster: Monster, map: DungeonMap, target: Vector2i) -> void:
 	var dx: int = sign(target.x - monster.grid_pos.x)
 	var dy: int = sign(target.y - monster.grid_pos.y)
-	var options: Array = [Vector2i(dx, dy), Vector2i(dx, 0), Vector2i(0, dy)]
-	for opt in options:
-		if opt == Vector2i.ZERO:
+	var tried: Array = []
+	for opt in [Vector2i(dx, dy), Vector2i(dx, 0), Vector2i(0, dy)]:
+		if opt == Vector2i.ZERO or tried.has(opt):
 			continue
+		tried.append(opt)
 		var next: Vector2i = monster.grid_pos + opt
 		if map.is_walkable(next) and not _occupied(next, monster):
 			monster.try_move(opt)
 			return
+	# Fallback: any 8-dir neighbor that doesn't increase chebyshev
+	# distance to the target. Keeps chasers pushing through a blocked
+	# cardinal step instead of idling for a turn.
+	var best: Vector2i = Vector2i.ZERO
+	var best_d: int = _chebyshev(monster.grid_pos, target)
+	for ddx in [-1, 0, 1]:
+		for ddy in [-1, 0, 1]:
+			if ddx == 0 and ddy == 0:
+				continue
+			var opt := Vector2i(ddx, ddy)
+			if tried.has(opt):
+				continue
+			var next: Vector2i = monster.grid_pos + opt
+			if not map.is_walkable(next):
+				continue
+			if _occupied(next, monster):
+				continue
+			var d: int = _chebyshev(next, target)
+			if d < best_d:
+				best = opt
+				best_d = d
+	if best != Vector2i.ZERO:
+		monster.try_move(best)
 
 static func _random_step(monster: Monster, map: DungeonMap) -> void:
-	if randf() > 0.5:
+	# Was 50% idle — felt too slack. 20% idle keeps wandering enemies
+	# closing on the player more often without turning it into a full
+	# chase while they're out of sight.
+	if randf() < 0.2:
 		return
 	var dirs: Array = [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1)]
 	dirs.shuffle()

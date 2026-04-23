@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3 uid="uid://bitembookice01"]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bv1s2ksa3rom"]
 
 [ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
 

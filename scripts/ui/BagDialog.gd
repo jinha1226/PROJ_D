@@ -110,6 +110,10 @@ static func _build_item_row(data: ItemData, index: int, player: Player,
 			var btn := _action_btn("Use")
 			btn.pressed.connect(func(): _use_item(index, player, dlg))
 			btn_row.add_child(btn)
+		"book":
+			var btn := _action_btn("Read")
+			btn.pressed.connect(func(): _use_item(index, player, dlg))
+			btn_row.add_child(btn)
 
 	var drop_btn := _action_btn("Drop")
 	drop_btn.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
@@ -133,6 +137,7 @@ static func _item_color(kind: String) -> Color:
 		"armor":  return Color(0.55, 0.8, 1.0)
 		"potion": return Color(0.5, 1.0, 0.6)
 		"scroll": return Color(1.0, 0.95, 0.55)
+		"book":   return Color(0.7, 0.55, 1.0)
 		_:        return Color(0.85, 0.85, 0.85)
 
 

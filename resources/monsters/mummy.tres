@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bmonmummy00001"]
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bq6rxlx8liwu"]
 
 [ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
 
