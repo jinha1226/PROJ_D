@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://class_transmute01"]
+
+[ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
+
+[resource]
+script = ExtResource("1_cdata")
+id = "transmuter"
+display_name = "Transmuter"
+description = "Transmutation specialist. Reshapes body and matter. Fast and adaptable."
+starting_hp = 24
+starting_mp = 10
+starting_str = 9
+starting_dex = 12
+starting_int = 14
+starting_weapon = "dagger"
+starting_armor = "robe"
+starting_skills = {"magic": 5, "dagger": 2}
+starting_xl = 0
+starting_spells = ["expeditious_retreat", "enlarge", "haste"]
+passive = ""
+unlocked = false
+unlock_kind = "use_item"
+unlock_trigger_id = "book_transmutation"

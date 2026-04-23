@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002039"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "lich"
+display_name = "lich"
+tier = 5
+hp = 70
+hd = 10
+ac = 7
+ev = 8
+speed = 10
+sight_range = 8
+attacks = [{"damage": 12, "flavour": "touch"}]
+ranged_attack = {}
+resists = ["cold"]
+min_depth = 12
+max_depth = 20
+weight = 5
+xp_value = 25
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/undead/lich.png"
+glyph = "L"
+glyph_color = Color(0.85, 0.82, 0.55, 1)

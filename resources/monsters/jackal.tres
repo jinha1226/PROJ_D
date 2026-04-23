@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002002"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "jackal"
+display_name = "jackal"
+tier = 1
+hp = 5
+hd = 1
+ac = 1
+ev = 11
+speed = 11
+sight_range = 8
+attacks = [{"damage": 2, "flavour": "bite"}]
+ranged_attack = {}
+resists = []
+min_depth = 1
+max_depth = 3
+weight = 15
+xp_value = 1
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/jackal.png"
+glyph = "d"
+glyph_color = Color(0.78, 0.65, 0.3, 1)

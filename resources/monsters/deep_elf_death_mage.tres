@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002045"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "deep_elf_death_mage"
+display_name = "deep elf death mage"
+tier = 5
+hp = 45
+hd = 7
+ac = 3
+ev = 10
+speed = 11
+sight_range = 8
+attacks = [{"damage": 7, "flavour": "hit"}]
+ranged_attack = {}
+resists = []
+min_depth = 10
+max_depth = 18
+weight = 5
+xp_value = 22
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/humanoids/elves/deep_elf_death_mage.png"
+glyph = "e"
+glyph_color = Color(0.6, 0.25, 0.75, 1)

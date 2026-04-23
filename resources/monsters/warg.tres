@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002010"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "warg"
+display_name = "warg"
+tier = 2
+hp = 28
+hd = 5
+ac = 3
+ev = 9
+speed = 12
+sight_range = 8
+attacks = [{"damage": 9, "flavour": "bite"}]
+ranged_attack = {}
+resists = []
+min_depth = 3
+max_depth = 8
+weight = 12
+xp_value = 8
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/warg.png"
+glyph = "d"
+glyph_color = Color(0.4, 0.4, 0.4, 1)

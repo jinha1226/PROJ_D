@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002029"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "red_devil"
+display_name = "red devil"
+tier = 4
+hp = 52
+hd = 7
+ac = 6
+ev = 8
+speed = 11
+sight_range = 8
+attacks = [{"damage": 10, "flavour": "claw"}]
+ranged_attack = {}
+resists = ["fire"]
+min_depth = 7
+max_depth = 14
+weight = 8
+xp_value = 16
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/demons/red_devil.png"
+glyph = "&"
+glyph_color = Color(0.85, 0.2, 0.1, 1)

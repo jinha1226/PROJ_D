@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://class_necro001"]
+
+[ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
+
+[resource]
+script = ExtResource("1_cdata")
+id = "necromancer"
+display_name = "Necromancer"
+description = "Necromancy specialist. Drains life, weakens foes, walks among the dead."
+starting_hp = 20
+starting_mp = 12
+starting_str = 7
+starting_dex = 9
+starting_int = 16
+starting_weapon = "dagger"
+starting_armor = "robe"
+starting_skills = {"magic": 6}
+starting_xl = 0
+starting_spells = ["inflict_wounds", "ray_of_enfeeblement", "vampiric_touch"]
+passive = ""
+unlocked = false
+unlock_kind = "use_item"
+unlock_trigger_id = "book_necromancy"

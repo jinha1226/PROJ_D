@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002033"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "swamp_dragon"
+display_name = "swamp dragon"
+tier = 4
+hp = 65
+hd = 9
+ac = 6
+ev = 6
+speed = 10
+sight_range = 8
+attacks = [{"damage": 15, "flavour": "bite"}]
+ranged_attack = {}
+resists = []
+min_depth = 8
+max_depth = 15
+weight = 6
+xp_value = 19
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/dragons/swamp_dragon.png"
+glyph = "D"
+glyph_color = Color(0.45, 0.55, 0.2, 1)

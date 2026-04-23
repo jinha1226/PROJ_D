@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002011"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "orc_priest"
+display_name = "orc priest"
+tier = 2
+hp = 28
+hd = 5
+ac = 3
+ev = 7
+speed = 10
+sight_range = 8
+attacks = [{"damage": 7, "flavour": "hit"}]
+ranged_attack = {}
+resists = []
+min_depth = 3
+max_depth = 9
+weight = 12
+xp_value = 9
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/humanoids/orcs/orc_priest.png"
+glyph = "o"
+glyph_color = Color(0.9, 0.75, 0.2, 1)

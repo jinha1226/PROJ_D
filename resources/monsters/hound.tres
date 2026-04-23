@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002001"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "hound"
+display_name = "hound"
+tier = 1
+hp = 7
+hd = 2
+ac = 1
+ev = 10
+speed = 12
+sight_range = 8
+attacks = [{"damage": 3, "flavour": "bite"}]
+ranged_attack = {}
+resists = []
+min_depth = 1
+max_depth = 4
+weight = 20
+xp_value = 2
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/hound.png"
+glyph = "d"
+glyph_color = Color(0.75, 0.6, 0.35, 1)

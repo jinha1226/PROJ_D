@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002032"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "wyvern"
+display_name = "wyvern"
+tier = 4
+hp = 60
+hd = 8
+ac = 6
+ev = 8
+speed = 11
+sight_range = 8
+attacks = [{"damage": 13, "flavour": "bite"}]
+ranged_attack = {}
+resists = []
+min_depth = 8
+max_depth = 15
+weight = 6
+xp_value = 18
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/dragons/wyvern.png"
+glyph = "D"
+glyph_color = Color(0.35, 0.65, 0.2, 1)

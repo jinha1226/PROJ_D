@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002008"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "scorpion"
+display_name = "scorpion"
+tier = 2
+hp = 12
+hd = 2
+ac = 3
+ev = 8
+speed = 10
+sight_range = 8
+attacks = [{"damage": 5, "flavour": "sting"}]
+ranged_attack = {}
+resists = []
+min_depth = 2
+max_depth = 6
+weight = 16
+xp_value = 4
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/scorpion.png"
+glyph = "a"
+glyph_color = Color(0.8, 0.7, 0.3, 1)

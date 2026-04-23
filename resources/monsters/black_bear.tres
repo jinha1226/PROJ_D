@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002013"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "black_bear"
+display_name = "black bear"
+tier = 3
+hp = 22
+hd = 4
+ac = 3
+ev = 8
+speed = 10
+sight_range = 8
+attacks = [{"damage": 8, "flavour": "claw"}]
+ranged_attack = {}
+resists = []
+min_depth = 3
+max_depth = 8
+weight = 14
+xp_value = 7
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/black_bear.png"
+glyph = "B"
+glyph_color = Color(0.15, 0.1, 0.05, 1)

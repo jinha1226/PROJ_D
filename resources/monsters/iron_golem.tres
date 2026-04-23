@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002035"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "iron_golem"
+display_name = "iron golem"
+tier = 5
+hp = 80
+hd = 10
+ac = 14
+ev = 2
+speed = 7
+sight_range = 8
+attacks = [{"damage": 18, "flavour": "slam"}]
+ranged_attack = {}
+resists = []
+min_depth = 9
+max_depth = 16
+weight = 6
+xp_value = 24
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/nonliving/iron_golem.png"
+glyph = "8"
+glyph_color = Color(0.65, 0.65, 0.68, 1)

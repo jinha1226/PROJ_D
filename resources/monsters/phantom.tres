@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002021"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "phantom"
+display_name = "phantom"
+tier = 3
+hp = 35
+hd = 6
+ac = 4
+ev = 12
+speed = 11
+sight_range = 8
+attacks = [{"damage": 9, "flavour": "touch"}]
+ranged_attack = {}
+resists = ["cold"]
+min_depth = 5
+max_depth = 12
+weight = 10
+xp_value = 13
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/undead/phantom.png"
+glyph = "W"
+glyph_color = Color(0.75, 0.8, 0.95, 1)

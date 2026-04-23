@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002006"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "vampire_bat"
+display_name = "vampire bat"
+tier = 2
+hp = 10
+hd = 2
+ac = 2
+ev = 14
+speed = 11
+sight_range = 8
+attacks = [{"damage": 4, "flavour": "drain"}]
+ranged_attack = {}
+resists = []
+min_depth = 2
+max_depth = 6
+weight = 14
+xp_value = 4
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/vampire_bat.png"
+glyph = "b"
+glyph_color = Color(0.5, 0.2, 0.6, 1)

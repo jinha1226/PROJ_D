@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002022"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "steam_dragon"
+display_name = "steam dragon"
+tier = 3
+hp = 45
+hd = 7
+ac = 6
+ev = 8
+speed = 11
+sight_range = 8
+attacks = [{"damage": 11, "flavour": "bite"}]
+ranged_attack = {}
+resists = ["fire"]
+min_depth = 5
+max_depth = 11
+weight = 9
+xp_value = 14
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/dragons/steam_dragon.png"
+glyph = "D"
+glyph_color = Color(0.8, 0.8, 0.8, 1)

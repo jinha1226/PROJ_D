@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002005"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "orc_warrior"
+display_name = "orc warrior"
+tier = 2
+hp = 20
+hd = 4
+ac = 4
+ev = 7
+speed = 10
+sight_range = 8
+attacks = [{"damage": 8, "flavour": "hit"}]
+ranged_attack = {}
+resists = []
+min_depth = 2
+max_depth = 8
+weight = 16
+xp_value = 6
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/humanoids/orcs/orc_warrior.png"
+glyph = "o"
+glyph_color = Color(0.55, 0.42, 0.18, 1)

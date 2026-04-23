@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002023"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "basilisk"
+display_name = "basilisk"
+tier = 3
+hp = 40
+hd = 6
+ac = 5
+ev = 5
+speed = 8
+sight_range = 8
+attacks = [{"damage": 9, "flavour": "bite"}]
+ranged_attack = {}
+resists = []
+min_depth = 5
+max_depth = 12
+weight = 10
+xp_value = 12
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/basilisk.png"
+glyph = "l"
+glyph_color = Color(0.35, 0.6, 0.25, 1)

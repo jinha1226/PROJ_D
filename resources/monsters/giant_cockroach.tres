@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002003"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "giant_cockroach"
+display_name = "giant cockroach"
+tier = 1
+hp = 8
+hd = 1
+ac = 3
+ev = 8
+speed = 10
+sight_range = 8
+attacks = [{"damage": 3, "flavour": "bite"}]
+ranged_attack = {}
+resists = []
+min_depth = 1
+max_depth = 4
+weight = 20
+xp_value = 2
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/giant_cockroach.png"
+glyph = "a"
+glyph_color = Color(0.55, 0.35, 0.1, 1)

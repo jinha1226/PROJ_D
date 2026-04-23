@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002025"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "cyclops"
+display_name = "cyclops"
+tier = 4
+hp = 65
+hd = 9
+ac = 5
+ev = 4
+speed = 10
+sight_range = 8
+attacks = [{"damage": 14, "flavour": "club"}]
+ranged_attack = {}
+resists = []
+min_depth = 6
+max_depth = 14
+weight = 8
+xp_value = 18
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/humanoids/giants/cyclops.png"
+glyph = "C"
+glyph_color = Color(0.78, 0.68, 0.45, 1)

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002024"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "two_headed_ogre"
+display_name = "two-headed ogre"
+tier = 4
+hp = 55
+hd = 8
+ac = 4
+ev = 5
+speed = 10
+sight_range = 8
+attacks = [{"damage": 12, "flavour": "hit"}, {"damage": 12, "flavour": "hit"}]
+ranged_attack = {}
+resists = []
+min_depth = 5
+max_depth = 13
+weight = 9
+xp_value = 15
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/humanoids/two_headed_ogre.png"
+glyph = "O"
+glyph_color = Color(0.6, 0.55, 0.3, 1)

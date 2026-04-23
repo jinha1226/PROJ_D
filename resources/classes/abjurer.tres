@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://class_abjurer01"]
+
+[ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
+
+[resource]
+script = ExtResource("1_cdata")
+id = "abjurer"
+display_name = "Abjurer"
+description = "Abjuration specialist. Protects with magical wards and shields."
+starting_hp = 26
+starting_mp = 10
+starting_str = 9
+starting_dex = 9
+starting_int = 14
+starting_weapon = "dagger"
+starting_armor = "robe"
+starting_skills = {"magic": 5, "armor": 2}
+starting_xl = 0
+starting_spells = ["mage_armor", "blur", "protection_from_energy"]
+passive = ""
+unlocked = false
+unlock_kind = "use_item"
+unlock_trigger_id = "book_abjuration"

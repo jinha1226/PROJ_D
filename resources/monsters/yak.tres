@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002009"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "yak"
+display_name = "yak"
+tier = 2
+hp = 30
+hd = 5
+ac = 4
+ev = 6
+speed = 10
+sight_range = 8
+attacks = [{"damage": 10, "flavour": "gore"}]
+ranged_attack = {}
+resists = []
+min_depth = 3
+max_depth = 7
+weight = 12
+xp_value = 8
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/yak.png"
+glyph = "Y"
+glyph_color = Color(0.55, 0.4, 0.15, 1)

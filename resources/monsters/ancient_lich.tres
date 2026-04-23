@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002046"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "ancient_lich"
+display_name = "ancient lich"
+tier = 6
+hp = 110
+hd = 14
+ac = 10
+ev = 8
+speed = 11
+sight_range = 8
+attacks = [{"damage": 18, "flavour": "touch"}]
+ranged_attack = {}
+resists = ["cold"]
+min_depth = 15
+max_depth = 25
+weight = 3
+xp_value = 40
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/undead/ancient_lich.png"
+glyph = "L"
+glyph_color = Color(0.6, 0.85, 0.45, 1)

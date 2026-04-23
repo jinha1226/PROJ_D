@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002037"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "fire_dragon"
+display_name = "fire dragon"
+tier = 5
+hp = 90
+hd = 11
+ac = 8
+ev = 5
+speed = 11
+sight_range = 8
+attacks = [{"damage": 20, "flavour": "bite"}]
+ranged_attack = {}
+resists = ["fire"]
+min_depth = 11
+max_depth = 19
+weight = 5
+xp_value = 28
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/dragons/fire_dragon.png"
+glyph = "D"
+glyph_color = Color(0.9, 0.35, 0.1, 1)
