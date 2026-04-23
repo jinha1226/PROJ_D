@@ -54,6 +54,12 @@ static func _roll_fizzle(player: Player, spell: SpellData) -> bool:
 			- player.intelligence / 2)
 	return randi() % 100 < fail
 
+static func _apply_element_bonus(spell: SpellData, target: Monster, dmg: int) -> int:
+	if spell.element == "lightning" and target.is_wet():
+		CombatLog.post("Soaked! Lightning surges for extra damage!", Color(0.6, 0.85, 1.0))
+		return int(ceil(dmg * 1.5))
+	return dmg
+
 static func _damage_auto_target(spell: SpellData, player: Player,
 		power: int, game: Node) -> void:
 	var target: Monster = _find_nearest_visible(player, game, spell.max_range)
@@ -61,6 +67,7 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
 		return
 	var dmg: int = spell.base_damage + randi_range(0, 2) + power / 3
+	dmg = _apply_element_bonus(spell, target, dmg)
 	CombatLog.hit("You hit the %s with %s for %d." \
 			% [target.data.display_name, spell.display_name, dmg])
 	# Projectile visual
@@ -88,6 +95,7 @@ static func _multi_damage(spell: SpellData, player: Player,
 		if target == null:
 			break
 		var dmg: int = spell.base_damage + randi_range(0, 2) + power / 4
+		dmg = _apply_element_bonus(spell, target, dmg)
 		CombatLog.hit("A dart strikes the %s for %d." \
 				% [target.data.display_name, dmg])
 		var was_alive: bool = target.hp > 0
@@ -120,6 +128,7 @@ static func _aoe_damage(spell: SpellData, player: Player,
 		if d > spell.max_range:
 			continue
 		var dmg: int = spell.base_damage + randi_range(0, 3) + power / 3
+		dmg = _apply_element_bonus(spell, n, dmg)
 		CombatLog.hit("%s burns the %s for %d." \
 				% [spell.display_name, n.data.display_name, dmg])
 		var was_alive: bool = n.hp > 0

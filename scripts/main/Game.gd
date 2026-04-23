@@ -21,6 +21,10 @@ var bottom_hud: BottomHUD
 var log_strip: CombatLogStrip
 var _effect_layer: Node2D
 
+var _targeting_spell: SpellData = null
+var _targeting_tiles: Array = []
+var _targeting_node: SpellTargetOverlay = null
+
 func _ready() -> void:
 	if not GameManager.run_in_progress:
 		GameManager.start_new_run()
@@ -45,7 +49,7 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if player == null or map == null or camera == null:
 		return
-	if player.hp <= 0 or not TurnManager.is_player_turn:
+	if player.hp <= 0:
 		return
 	var screen_pos: Vector2 = Vector2.ZERO
 	var is_tap: bool = false
@@ -57,6 +61,19 @@ func _unhandled_input(event: InputEvent) -> void:
 		screen_pos = event.position
 		is_tap = true
 	if not is_tap:
+		return
+	if _targeting_spell != null:
+		var canvas_tf: Transform2D = get_viewport().get_canvas_transform()
+		var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
+		var tile: Vector2i = map.world_to_grid(world_pos)
+		if _targeting_tiles.has(tile):
+			_confirm_targeting()
+		else:
+			_cancel_targeting()
+			CombatLog.post("Spell cancelled.", Color(0.65, 0.65, 0.65))
+		get_viewport().set_input_as_handled()
+		return
+	if not TurnManager.is_player_turn:
 		return
 	_handle_tap(screen_pos)
 	get_viewport().set_input_as_handled()
@@ -520,6 +537,35 @@ func _on_status_pressed() -> void:
 		st_vb.add_child(UICards.dim_hint(", ".join(parts)))
 		body.add_child(st_card)
 
+func begin_spell_targeting(spell: SpellData, p: Player) -> void:
+	_cancel_targeting()
+	_targeting_spell = spell
+	var visible: Dictionary = p.compute_fov()
+	_targeting_tiles = []
+	for tile: Vector2i in visible.keys():
+		var d: int = max(abs(tile.x - p.grid_pos.x), abs(tile.y - p.grid_pos.y))
+		if d > 0 and d <= spell.max_range:
+			_targeting_tiles.append(tile)
+	_targeting_node = SpellTargetOverlay.new()
+	_effect_layer.add_child(_targeting_node)
+	_targeting_node.init(spell, p, _targeting_tiles)
+	CombatLog.post("Tap highlighted tile to cast %s — tap elsewhere to cancel." \
+			% spell.display_name, Color(0.8, 0.75, 1.0))
+
+func _cancel_targeting() -> void:
+	_targeting_spell = null
+	_targeting_tiles = []
+	if _targeting_node != null:
+		_targeting_node.queue_free()
+		_targeting_node = null
+
+func _confirm_targeting() -> void:
+	var spell := _targeting_spell
+	_cancel_targeting()
+	var ok: bool = MagicSystem.cast(spell.id, player, self)
+	if ok:
+		TurnManager.end_player_turn()
+
 func _on_rest_pressed() -> void:
 	if player == null or player.hp <= 0 or not TurnManager.is_player_turn:
 		return
@@ -563,9 +609,12 @@ func _on_quickslot_pressed(index: int) -> void:
 	if spell != null:
 		if not TurnManager.is_player_turn:
 			return
-		var ok: bool = MagicSystem.cast(slot_id, player, self)
-		if ok:
-			TurnManager.end_player_turn()
+		if spell.effect == "heal" or spell.effect == "blink":
+			var ok: bool = MagicSystem.cast(slot_id, player, self)
+			if ok:
+				TurnManager.end_player_turn()
+		else:
+			begin_spell_targeting(spell, player)
 		return
 	# Item path
 	if player.count_item(slot_id) == 0:

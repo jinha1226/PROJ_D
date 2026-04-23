@@ -30,7 +30,20 @@ func setup(monster_data: MonsterData, map: DungeonMap, pos: Vector2i) -> void:
 func take_turn() -> void:
 	if hp <= 0 or data == null or _map == null:
 		return
+	_tick_statuses()
 	MonsterAI.take_turn(self, _map)
+
+func _tick_statuses() -> void:
+	for key in status.keys():
+		status[key] -= 1
+		if status[key] <= 0:
+			status.erase(key)
+
+func is_wet() -> bool:
+	return status.get("wet", 0) > 0
+
+func apply_wet(turns: int = 4) -> void:
+	status["wet"] = max(status.get("wet", 0), turns)
 
 func try_move(dir: Vector2i) -> bool:
 	var target: Vector2i = grid_pos + dir

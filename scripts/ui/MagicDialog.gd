@@ -117,7 +117,17 @@ static func _effect_color(effect: String) -> Color:
 
 static func _on_cast(spell_id: String, player: Player,
 		dlg: GameDialog, game: Node) -> void:
-	var ok: bool = MagicSystem.cast(spell_id, player, game)
+	var spell: SpellData = SpellRegistry.get_by_id(spell_id)
+	if spell == null:
+		return
+	# Self-targeting spells fire immediately
+	if spell.effect == "heal" or spell.effect == "blink":
+		var ok: bool = MagicSystem.cast(spell_id, player, game)
+		dlg.close()
+		if ok:
+			TurnManager.end_player_turn()
+		return
+	# Offensive spells enter tile-targeting mode
 	dlg.close()
-	if ok:
-		TurnManager.end_player_turn()
+	if game != null and game.has_method("begin_spell_targeting"):
+		game.begin_spell_targeting(spell, player)
