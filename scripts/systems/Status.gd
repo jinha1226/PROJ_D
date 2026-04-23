@@ -11,24 +11,43 @@ class_name Status extends RefCounted
 
 const INFO: Dictionary = {
 	# Damage-over-time
-	"poison":   {"name": "Poisoned",  "color": Color(0.45, 1.0, 0.4),
+	"poison":       {"name": "Poisoned",     "color": Color(0.45, 1.0, 0.4),
 		"ticks_hp": 1, "element": "poison", "non_lethal": true},
-	"burning":  {"name": "Burning",   "color": Color(1.0, 0.55, 0.25),
+	"burning":      {"name": "Burning",      "color": Color(1.0, 0.55, 0.25),
 		"ticks_hp": 2, "element": "fire"},
+	"diseased":     {"name": "Diseased",     "color": Color(0.6, 0.8, 0.3),
+		"ticks_hp": 1, "element": "poison", "non_lethal": true},
 	# Action-denial
-	"frozen":   {"name": "Frozen",    "color": Color(0.55, 0.85, 1.0),
+	"frozen":       {"name": "Frozen",       "color": Color(0.55, 0.85, 1.0),
 		"skip_turn": true, "element": "cold"},
-	"confused": {"name": "Confused",  "color": Color(0.85, 0.4, 0.85),
+	"paralyzed":    {"name": "Paralyzed",    "color": Color(0.5, 0.75, 1.0),
+		"skip_turn": true},
+	"sleeping":     {"name": "Sleeping",     "color": Color(0.6, 0.65, 0.9),
+		"skip_turn": true},
+	"stunned":      {"name": "Stunned",      "color": Color(0.9, 0.85, 0.4),
+		"skip_turn": true},
+	"confused":     {"name": "Confused",     "color": Color(0.85, 0.4, 0.85),
 		"random_move": 0.4},
-	"feared":   {"name": "Feared",    "color": Color(0.65, 0.5, 0.9),
+	"feared":       {"name": "Feared",       "color": Color(0.65, 0.5, 0.9),
 		"flee": true},
-	# Stat mods (str delta applied on_apply, undone on_remove)
-	"berserk":  {"name": "Berserk",   "color": Color(1.0, 0.45, 0.3),
+	# Stat debuffs
+	"berserk":      {"name": "Berserk",      "color": Color(1.0, 0.45, 0.3),
 		"str_bonus": 4},
-	"might":    {"name": "Mighty",    "color": Color(1.0, 0.7, 0.5),
+	"might":        {"name": "Mighty",       "color": Color(1.0, 0.7, 0.5),
 		"str_bonus": 2},
-	"weak":     {"name": "Weakened",  "color": Color(0.55, 0.55, 0.58),
+	"weak":         {"name": "Weakened",     "color": Color(0.55, 0.55, 0.58),
 		"str_bonus": -2},
+	"weakened":     {"name": "Weakened",     "color": Color(0.55, 0.55, 0.6),
+		"str_bonus": -4},
+	# Player buffs (effects checked externally in Combat/Player systems)
+	"mage_armor":   {"name": "Mage Armor",   "color": Color(0.5, 0.7, 1.0)},
+	"blur":         {"name": "Blur",         "color": Color(0.7, 0.75, 1.0)},
+	"stoneskin":    {"name": "Stoneskin",    "color": Color(0.8, 0.8, 0.65)},
+	"magic_ward":   {"name": "Magic Ward",   "color": Color(0.75, 0.5, 1.0)},
+	"invulnerable": {"name": "Invulnerable", "color": Color(1.0, 0.95, 0.5)},
+	"hasted":       {"name": "Hasted",       "color": Color(0.4, 1.0, 0.65)},
+	"time_stopped": {"name": "Time Stop",    "color": Color(0.9, 0.6, 1.0)},
+	"damage_boost": {"name": "Empowered",    "color": Color(1.0, 0.65, 0.3)},
 }
 
 # ── Resist scaling ────────────────────────────────────────────────────────
@@ -132,7 +151,8 @@ static func tick_actor(actor) -> Array:
 
 # ── AI hooks ──────────────────────────────────────────────────────────────
 static func will_skip_turn(actor) -> bool:
-	return has(actor, "frozen")
+	return has(actor, "frozen") or has(actor, "paralyzed") \
+		or has(actor, "sleeping") or has(actor, "stunned")
 
 static func confusion_chance(actor) -> float:
 	if has(actor, "confused"):

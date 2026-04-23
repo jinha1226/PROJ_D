@@ -302,6 +302,8 @@ func refresh_ac_from_equipment() -> void:
 		var armor_skill: int = get_skill_level("armor")
 		var penalty_mult: float = max(0.0, 1.0 - float(armor_skill) * 0.1)
 		ev -= int(round(float(armor.ev_penalty) * penalty_mult))
+	if has_status("mage_armor"):
+		ac = max(ac, 13 + dexterity / 2)
 	ev = max(0, ev)
 	emit_signal("stats_changed")
 
@@ -395,6 +397,9 @@ func compute_fov() -> Dictionary:
 	return FieldOfView.compute(grid_pos, SIGHT_RADIUS, is_opaque)
 
 func take_damage(amount: int, source: String = "") -> void:
+	if has_status("invulnerable"):
+		CombatLog.post("You are invulnerable!", Color(1.0, 0.95, 0.5))
+		return
 	hp = max(0, hp - amount)
 	if source != "":
 		last_killer = source

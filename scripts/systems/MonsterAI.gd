@@ -10,7 +10,11 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 		return
 	# Status-driven overrides.
 	if Status.will_skip_turn(monster):
-		return  # frozen, paralysed, etc.
+		return
+	if Status.has(player, "time_stopped"):
+		return
+	if Status.has(player, "hasted") and randf() < 0.5:
+		return
 	if Status.is_fleeing(monster):
 		_flee_step(monster, map, player.grid_pos)
 		return
