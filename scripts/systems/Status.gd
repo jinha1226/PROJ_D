@@ -32,23 +32,48 @@ const INFO: Dictionary = {
 }
 
 # ── Resist scaling ────────────────────────────────────────────────────────
-# resists entries:
-#   "fire"    → half damage (rounds toward floor)
-#   "fire-2"  → quarter damage
-#   "fire+"   → vulnerable, 1.5× damage
-# Empty element or empty resists array = full damage.
-static func resist_scale(base: int, resists, element: String) -> int:
+# Resist entries: element name + optional "+" / "-" suffix chars.
+#   "fire"      → +1 resist (half damage)
+#   "fire+"     → +1 resist (explicit)
+#   "fire++"    → +2 resist (quarter)
+#   "fire+++"   → +3 resist (1/10, near-immune)
+#   "fire-"     → -1 vulnerable (1.5× damage)
+#   "fire--"    → -2 (2×)
+#   "fire---"   → -3 (3×)
+# Entries stack — e.g. ["fire+", "fire+"] = level +2. Final level is
+# clamped to [-3, +3]. Empty element / empty resists = full damage.
+const _RESIST_MULT: Dictionary = {
+	3: 0.10,  2: 0.25,  1: 0.50,  0: 1.00,
+	-1: 1.50, -2: 2.00, -3: 3.00,
+}
+
+static func resist_level(resists, element: String) -> int:
 	if element == "" or resists == null:
-		return base
+		return 0
 	if typeof(resists) != TYPE_ARRAY or resists.is_empty():
+		return 0
+	var level: int = 0
+	for entry in resists:
+		var s: String = String(entry)
+		if not s.begins_with(element):
+			continue
+		var suffix: String = s.substr(element.length())
+		if suffix == "":
+			level += 1
+			continue
+		for ch in suffix:
+			if ch == "+":
+				level += 1
+			elif ch == "-":
+				level -= 1
+	return clampi(level, -3, 3)
+
+static func resist_scale(base: int, resists, element: String) -> int:
+	if element == "":
 		return base
-	if resists.has(element + "+"):
-		return int(round(float(base) * 1.5))
-	if resists.has(element + "-2"):
-		return max(0, base / 4)
-	if resists.has(element) or resists.has(element + "-1"):
-		return max(0, base / 2)
-	return base
+	var level: int = resist_level(resists, element)
+	var mult: float = float(_RESIST_MULT.get(level, 1.0))
+	return int(round(float(base) * mult))
 
 # ── Status application ────────────────────────────────────────────────────
 static func has(actor, id: String) -> bool:
