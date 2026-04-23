@@ -911,8 +911,8 @@ func _nearest_visible_monster() -> Monster:
 
 
 func _greedy_step_toward(target: Vector2i) -> Vector2i:
-	var dx := sign(target.x - player.grid_pos.x)
-	var dy := sign(target.y - player.grid_pos.y)
+	var dx: int = sign(target.x - player.grid_pos.x)
+	var dy: int = sign(target.y - player.grid_pos.y)
 	if dx != 0 and dy != 0 and map.is_walkable(player.grid_pos + Vector2i(dx, dy)):
 		return Vector2i(dx, dy)
 	if dx != 0 and map.is_walkable(player.grid_pos + Vector2i(dx, 0)):
