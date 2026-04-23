@@ -34,6 +34,11 @@ var _auto_known_ids: Dictionary = {}
 # Set when ACT triggers continuous auto-explore; cleared on cancel or completion.
 var _auto_exploring: bool = false
 var _path_overlay: PathOverlay = null
+var _auto_step_token: int = 0
+var _auto_step_queued: bool = false
+
+const AUTO_PATH_PREVIEW_SEC: float = 0.12
+const AUTO_STEP_DELAY_SEC: float = 0.05
 
 func _ready() -> void:
 	if not GameManager.run_in_progress:
@@ -119,12 +124,7 @@ func _handle_tap(screen_pos: Vector2) -> void:
 			and map.is_walkable(target):
 		var path: Array = _bfs_path(player.grid_pos, target)
 		if path.size() > 0:
-			_auto_path = path
-			if _path_overlay != null:
-				_path_overlay.set_path(_auto_path)
-			_auto_prev_hp = player.hp
-			_auto_known_ids = _snapshot_visible_monster_ids()
-			_advance_auto_walk()
+			_begin_auto_walk(path, false)
 			return
 	var dx: int = sign(target.x - player.grid_pos.x)
 	var dy: int = sign(target.y - player.grid_pos.y)
@@ -191,6 +191,35 @@ func _advance_auto_walk() -> void:
 	_auto_prev_hp = player.hp
 	player.try_step(dir)
 
+func _begin_auto_walk(path: Array, keep_exploring: bool) -> void:
+	if path.is_empty():
+		return
+	_auto_step_token += 1
+	_auto_step_queued = false
+	_auto_path = path
+	_auto_exploring = keep_exploring
+	if _path_overlay != null:
+		_path_overlay.set_path(_auto_path)
+	_auto_prev_hp = player.hp
+	_auto_known_ids = _snapshot_visible_monster_ids()
+	_queue_auto_walk_step(AUTO_PATH_PREVIEW_SEC)
+
+func _queue_auto_walk_step(delay_sec: float = AUTO_STEP_DELAY_SEC) -> void:
+	if _auto_path.is_empty() or _auto_step_queued:
+		return
+	_auto_step_queued = true
+	var token: int = _auto_step_token
+	_defer_auto_walk_step(token, delay_sec)
+
+func _defer_auto_walk_step(token: int, delay_sec: float) -> void:
+	await get_tree().create_timer(delay_sec).timeout
+	if token != _auto_step_token:
+		return
+	_auto_step_queued = false
+	if _auto_path.is_empty() or not TurnManager.is_player_turn:
+		return
+	_advance_auto_walk()
+
 func _snapshot_visible_monster_ids() -> Dictionary:
 	var out: Dictionary = {}
 	for n in get_tree().get_nodes_in_group("monsters"):
@@ -211,6 +240,8 @@ func _new_monster_in_sight() -> bool:
 func _cancel_auto_walk(reason: String) -> void:
 	if _auto_path.is_empty() and not _auto_exploring:
 		return
+	_auto_step_token += 1
+	_auto_step_queued = false
 	_auto_path.clear()
 	if _path_overlay != null:
 		_path_overlay.set_path([])
@@ -621,12 +652,7 @@ func _on_minimap_tapped() -> void:
 		dlg.close()
 		var nav_path := _bfs_path(player.grid_pos, nav_target)
 		if nav_path.size() > 0:
-			_auto_path = nav_path
-			if _path_overlay != null:
-				_path_overlay.set_path(_auto_path)
-			_auto_prev_hp = player.hp
-			_auto_known_ids = _snapshot_visible_monster_ids()
-			_advance_auto_walk())
+			_begin_auto_walk(nav_path, false)
 
 	var all_depths: Array = GameManager.floor_cache.keys().duplicate()
 	all_depths.sort()
@@ -679,7 +705,7 @@ func _on_player_turn_started() -> void:
 	if player != null and player.hp > 0:
 		player.tick_statuses()
 	if not _auto_path.is_empty():
-		_advance_auto_walk()
+		_queue_auto_walk_step()
 	elif _auto_exploring:
 		_start_auto_explore()
 
@@ -986,13 +1012,7 @@ func _start_auto_explore() -> void:
 		_auto_exploring = false
 		CombatLog.post("Can't reach unexplored area.", Color(0.7, 0.7, 0.5))
 		return
-	_auto_path = path
-	if _path_overlay != null:
-		_path_overlay.set_path(_auto_path)
-	_auto_prev_hp = player.hp
-	_auto_known_ids = _snapshot_visible_monster_ids()
-	_auto_exploring = true
-	_advance_auto_walk()
+	_begin_auto_walk(path, true)
 
 
 func _find_explore_target() -> Vector2i:

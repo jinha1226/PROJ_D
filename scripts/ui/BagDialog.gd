@@ -26,6 +26,8 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 	body.add_child(UICards.section_header("EQUIPPED"))
 	var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
 	var a: ItemData = ItemRegistry.get_by_id(player.equipped_armor_id)
+	var w_plus: int = int(player.equipped_weapon_entry().get("plus", 0)) if w != null else 0
+	var a_plus: int = int(player.equipped_armor_entry().get("plus", 0)) if a != null else 0
 	body.add_child(_equipped_row("Weapon",
 			w.display_name if w != null else "(unarmed)",
 			"d%d" % ((w.damage + w_plus) if w != null else 2)))
