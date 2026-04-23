@@ -16,3 +16,4 @@ dex_mod = 1
 int_mod = -3
 hp_mod = 4
 mp_mod = -1
+resist_mods = []

@@ -224,6 +224,7 @@ func _apply_race_mods(race_id: String) -> void:
 	player.hp = player.hp_max
 	player.mp_max = max(0, player.mp_max + race.mp_mod)
 	player.mp = player.mp_max
+	player.resists = race.resist_mods.duplicate()
 
 func _class_starter_items(class_id: String) -> Array:
 	match class_id:
@@ -256,6 +257,7 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.last_killer = String(data.get("last_killer", ""))
 	player.known_spells = data.get("known_spells", [])
 	player.statuses = data.get("statuses", {})
+	player.resists = data.get("resists", [])
 	player.skills = data.get("skills", {})
 	if player.skills.is_empty():
 		player.init_skills()
@@ -664,62 +666,7 @@ func _on_bag_pressed() -> void:
 func _on_status_pressed() -> void:
 	if player == null:
 		return
-	var dlg: GameDialog = GameDialog.create("Status")
-	add_child(dlg)
-	var body := dlg.body()
-	body.add_theme_constant_override("separation", 10)
-
-	# Character card
-	var char_card := UICards.card(Color(0.5, 0.8, 1.0))
-	var char_vb := VBoxContainer.new()
-	char_vb.add_theme_constant_override("separation", 4)
-	char_card.add_child(char_vb)
-	char_vb.add_child(UICards.accent_value("Lv.%d  — XP %d / %d" % [player.xl, player.xp, player.xp_to_next()]))
-	char_vb.add_child(UICards.dim_hint("Kills: %d   Gold: %dg   Floor: B%d" % [player.kills, player.gold, GameManager.depth]))
-	body.add_child(char_card)
-
-	# Vitals card
-	var vital_card := UICards.card(Color(1.0, 0.4, 0.4))
-	var vital_vb := VBoxContainer.new()
-	vital_vb.add_theme_constant_override("separation", 4)
-	vital_card.add_child(vital_vb)
-	vital_vb.add_child(UICards.accent_value("HP  %d / %d" % [player.hp, player.hp_max]))
-	vital_vb.add_child(UICards.accent_value("MP  %d / %d" % [player.mp, player.mp_max], 34))
-	body.add_child(vital_card)
-
-	# Stats card
-	var stat_card := UICards.card(Color(0.9, 0.75, 0.3))
-	var stat_vb := VBoxContainer.new()
-	stat_vb.add_theme_constant_override("separation", 4)
-	stat_card.add_child(stat_vb)
-	stat_vb.add_child(UICards.accent_value("STR %d   DEX %d   INT %d" % [player.strength, player.dexterity, player.intelligence]))
-	stat_vb.add_child(UICards.dim_hint("AC %d   EV %d   WL %d" % [player.ac, player.ev, player.wl]))
-	body.add_child(stat_card)
-
-	# Equipment card
-	var w_data: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
-	var a_data: ItemData = ItemRegistry.get_by_id(player.equipped_armor_id)
-	var eq_card := UICards.card(Color(0.6, 0.9, 0.6))
-	var eq_vb := VBoxContainer.new()
-	eq_vb.add_theme_constant_override("separation", 4)
-	eq_card.add_child(eq_vb)
-	eq_vb.add_child(UICards.section_header("EQUIPMENT"))
-	eq_vb.add_child(UICards.dim_hint("⚔  " + (w_data.display_name if w_data != null else "unarmed")))
-	eq_vb.add_child(UICards.dim_hint("🛡  " + (a_data.display_name if a_data != null else "none")))
-	body.add_child(eq_card)
-
-	# Active statuses
-	if not player.statuses.is_empty():
-		var st_card := UICards.card(Color(1.0, 0.5, 0.8))
-		var st_vb := VBoxContainer.new()
-		st_vb.add_theme_constant_override("separation", 4)
-		st_card.add_child(st_vb)
-		st_vb.add_child(UICards.section_header("STATUSES"))
-		var parts: Array = []
-		for sid in player.statuses.keys():
-			parts.append("%s (%d)" % [sid, int(player.statuses[sid])])
-		st_vb.add_child(UICards.dim_hint(", ".join(parts)))
-		body.add_child(st_card)
+	StatusDialog.open(player, self)
 
 func begin_spell_targeting(spell: SpellData, p: Player) -> void:
 	_cancel_targeting()

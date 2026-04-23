@@ -16,3 +16,4 @@ dex_mod = -2
 int_mod = -2
 hp_mod = 8
 mp_mod = -2
+resist_mods = ["cold+"]

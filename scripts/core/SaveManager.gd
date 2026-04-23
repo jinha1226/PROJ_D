@@ -62,6 +62,7 @@ func save_run(player, game_manager) -> bool:
 			"last_killer": player.last_killer,
 			"known_spells": player.known_spells,
 			"statuses": player.statuses,
+			"resists": player.resists,
 			"skills": player.skills,
 			"quickslots": player.quickslots,
 		},
