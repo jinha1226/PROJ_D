@@ -9,6 +9,10 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 	var spell: SpellData = SpellRegistry.get_by_id(spell_id)
 	if spell == null:
 		return false
+	if spell.xl_required > 0 and player.xl < spell.xl_required:
+		CombatLog.post("%s requires level %d." % [spell.display_name, spell.xl_required],
+			Color(1.0, 0.7, 0.5))
+		return false
 	if player.mp < spell.mp_cost:
 		CombatLog.post("Not enough MP for %s." % spell.display_name,
 			Color(1.0, 0.7, 0.5))

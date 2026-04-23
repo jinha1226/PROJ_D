@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://cw5be27tykaj8"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "ray_of_enfeeblement"
+display_name = "Ray of Enfeeblement"
+school = "necromancy"
+spell_level = 2
+xl_required = 3
+mp_cost = 3
+difficulty = 2
+base_damage = 0
+max_range = 5
+targeting = "single"
+element = "necromancy"
+effect = "debuff_str"
+description = "A black ray halves a creature's weapon damage on failed CON save."

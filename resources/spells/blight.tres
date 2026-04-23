@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://a8a4twzkfky7l"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "blight"
+display_name = "Blight"
+school = "necromancy"
+spell_level = 4
+xl_required = 7
+mp_cost = 6
+difficulty = 4
+base_damage = 36
+max_range = 6
+targeting = "single"
+element = "necromancy"
+effect = "damage"
+description = "Drain the vitality from a creature for 8d8 necrotic damage."

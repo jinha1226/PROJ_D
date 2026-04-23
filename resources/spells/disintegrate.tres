@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://1pnm7qwjfmgi0"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "disintegrate"
+display_name = "Disintegrate"
+school = "transmutation"
+spell_level = 6
+xl_required = 11
+mp_cost = 9
+difficulty = 6
+base_damage = 75
+max_range = 6
+targeting = "single"
+element = "force"
+effect = "damage"
+description = "A green ray reduces a target to dust. Deals 10d6+40 force damage."

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://oadm0hm31mwbq"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "power_word_kill"
+display_name = "Power Word Kill"
+school = "enchantment"
+spell_level = 9
+xl_required = 17
+mp_cost = 15
+difficulty = 9
+base_damage = 0
+max_range = 5
+targeting = "single"
+element = ""
+effect = "instant_kill"
+description = "Utter a word of power. A creature with 100 HP or fewer dies instantly."

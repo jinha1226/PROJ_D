@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://bdvw6nd9c5buv"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "fire_storm"
+display_name = "Fire Storm"
+school = "evocation"
+spell_level = 7
+xl_required = 13
+mp_cost = 10
+difficulty = 7
+base_damage = 38
+max_range = 8
+targeting = "aoe"
+element = "fire"
+effect = "aoe_damage"
+description = "Sheets of roaring flame deal 7d10 fire damage across a wide area."

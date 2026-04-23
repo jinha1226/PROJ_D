@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://r88g5if0e4fgo"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "cloudkill"
+display_name = "Cloudkill"
+school = "conjuration"
+spell_level = 5
+xl_required = 9
+mp_cost = 7
+difficulty = 5
+base_damage = 22
+max_range = 6
+targeting = "aoe"
+element = "poison"
+effect = "aoe_damage"
+description = "Poisonous yellow-green fog deals 5d8 poison damage per turn."

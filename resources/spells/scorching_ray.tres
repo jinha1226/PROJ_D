@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://z866w2ty3grm9"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "scorching_ray"
+display_name = "Scorching Ray"
+school = "evocation"
+spell_level = 2
+xl_required = 3
+mp_cost = 3
+difficulty = 2
+base_damage = 7
+max_range = 6
+targeting = "single"
+element = "fire"
+effect = "multi_damage"
+description = "Three rays of fire each deal 2d6 fire damage."

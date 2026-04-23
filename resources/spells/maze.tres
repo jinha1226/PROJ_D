@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://kjxe0yiym0kla"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "maze"
+display_name = "Maze"
+school = "conjuration"
+spell_level = 8
+xl_required = 15
+mp_cost = 12
+difficulty = 8
+base_damage = 0
+max_range = 5
+targeting = "single"
+element = ""
+effect = "banish"
+description = "Banish a creature to a demiplane maze for several turns."

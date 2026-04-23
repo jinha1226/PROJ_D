@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://m2r40e0bpq4dx"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "mage_armor"
+display_name = "Mage Armor"
+school = "abjuration"
+spell_level = 1
+xl_required = 1
+mp_cost = 2
+difficulty = 1
+base_damage = 0
+max_range = 0
+targeting = "self"
+element = ""
+effect = "buff_ac"
+description = "Magical force surrounds you. AC becomes 13 + DEX modifier."

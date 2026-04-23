@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://nhm5b9wriaweh"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "protection_from_energy"
+display_name = "Protection from Energy"
+school = "abjuration"
+spell_level = 3
+xl_required = 5
+mp_cost = 5
+difficulty = 3
+base_damage = 0
+max_range = 0
+targeting = "self"
+element = ""
+effect = "buff_resist"
+description = "Gain resistance to one element: fire, cold, electric, or poison."

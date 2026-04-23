@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://g3yxtvo1l5so5"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "mind_blank"
+display_name = "Mind Blank"
+school = "abjuration"
+spell_level = 8
+xl_required = 15
+mp_cost = 12
+difficulty = 8
+base_damage = 0
+max_range = 0
+targeting = "self"
+element = ""
+effect = "buff_mind_blank"
+description = "Gain immunity to psychic damage and all mind-affecting magic."

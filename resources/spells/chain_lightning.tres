@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://61p922tmusv11"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "chain_lightning"
+display_name = "Chain Lightning"
+school = "evocation"
+spell_level = 6
+xl_required = 11
+mp_cost = 9
+difficulty = 6
+base_damage = 45
+max_range = 8
+targeting = "single"
+element = "electric"
+effect = "chain_damage"
+description = "Lightning deals 10d8 and bounces to up to 3 nearby targets."

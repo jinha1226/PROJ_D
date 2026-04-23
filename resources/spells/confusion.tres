@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://2b8eu621yi6kr"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "confusion"
+display_name = "Confusion"
+school = "enchantment"
+spell_level = 4
+xl_required = 7
+mp_cost = 6
+difficulty = 4
+base_damage = 0
+max_range = 6
+targeting = "aoe"
+element = ""
+effect = "confusion"
+description = "Creatures act randomly — attacking allies or standing dazed."

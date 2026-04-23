@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://scm3l9xl7ox76"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "time_stop"
+display_name = "Time Stop"
+school = "transmutation"
+spell_level = 9
+xl_required = 17
+mp_cost = 15
+difficulty = 9
+base_damage = 0
+max_range = 0
+targeting = "self"
+element = ""
+effect = "time_stop"
+description = "Time freezes. Take 1d4+1 extra turns before anything else can act."

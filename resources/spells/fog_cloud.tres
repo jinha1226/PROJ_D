@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://cyy3uw0rixxw8"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "fog_cloud"
+display_name = "Fog Cloud"
+school = "conjuration"
+spell_level = 1
+xl_required = 1
+mp_cost = 2
+difficulty = 1
+base_damage = 0
+max_range = 5
+targeting = "aoe"
+element = ""
+effect = "fog"
+description = "A sphere of thick fog fills the area, blocking all vision."

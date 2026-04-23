@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://xavzrfzfquuw5"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "misty_step"
+display_name = "Misty Step"
+school = "conjuration"
+spell_level = 2
+xl_required = 3
+mp_cost = 3
+difficulty = 2
+base_damage = 0
+max_range = 5
+targeting = "self"
+element = ""
+effect = "blink"
+description = "Surrounded by silver mist, teleport up to 5 tiles away."

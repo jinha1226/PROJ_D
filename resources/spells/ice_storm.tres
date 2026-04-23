@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://n9vcvnhjgvtvz"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "ice_storm"
+display_name = "Ice Storm"
+school = "evocation"
+spell_level = 4
+xl_required = 7
+mp_cost = 6
+difficulty = 4
+base_damage = 22
+max_range = 7
+targeting = "aoe"
+element = "cold"
+effect = "aoe_damage"
+description = "Hail and sleet deal 4d6 cold + 2d6 bludgeoning in the area."

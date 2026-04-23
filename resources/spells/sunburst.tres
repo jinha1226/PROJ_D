@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://ljnw1b4u493wk"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "sunburst"
+display_name = "Sunburst"
+school = "evocation"
+spell_level = 8
+xl_required = 15
+mp_cost = 12
+difficulty = 8
+base_damage = 54
+max_range = 10
+targeting = "aoe"
+element = "fire"
+effect = "aoe_damage"
+description = "Brilliant light deals 12d6 radiant damage and blinds all in range."

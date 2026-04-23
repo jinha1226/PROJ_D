@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://bnhjgbplif1sz"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "finger_of_death"
+display_name = "Finger of Death"
+school = "necromancy"
+spell_level = 7
+xl_required = 13
+mp_cost = 10
+difficulty = 7
+base_damage = 61
+max_range = 6
+targeting = "single"
+element = "necromancy"
+effect = "damage"
+description = "Send negative energy surging through a creature for 7d8+30 necrotic damage."

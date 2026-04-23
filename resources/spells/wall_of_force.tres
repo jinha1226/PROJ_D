@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://3ekbf6oie3z0m"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "wall_of_force"
+display_name = "Wall of Force"
+school = "abjuration"
+spell_level = 5
+xl_required = 9
+mp_cost = 7
+difficulty = 5
+base_damage = 0
+max_range = 4
+targeting = "aoe"
+element = ""
+effect = "wall"
+description = "An invisible impassable wall blocks movement and all attacks."

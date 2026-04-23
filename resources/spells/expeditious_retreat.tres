@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://mmmwmj7mhf6rt"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "expeditious_retreat"
+display_name = "Expeditious Retreat"
+school = "transmutation"
+spell_level = 1
+xl_required = 1
+mp_cost = 2
+difficulty = 1
+base_damage = 0
+max_range = 0
+targeting = "self"
+element = ""
+effect = "buff_speed"
+description = "Your speed doubles, letting you dash past enemies."

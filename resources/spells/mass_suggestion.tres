@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://9wscngl4gbu8l"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "mass_suggestion"
+display_name = "Mass Suggestion"
+school = "enchantment"
+spell_level = 6
+xl_required = 11
+mp_cost = 9
+difficulty = 6
+base_damage = 0
+max_range = 5
+targeting = "aoe"
+element = ""
+effect = "charm"
+description = "Up to 12 creatures obey a reasonable one-sentence command."

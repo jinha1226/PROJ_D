@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://s59dpzd7lz6do"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "meteor_swarm"
+display_name = "Meteor Swarm"
+school = "evocation"
+spell_level = 9
+xl_required = 17
+mp_cost = 15
+difficulty = 9
+base_damage = 140
+max_range = 10
+targeting = "aoe"
+element = "fire"
+effect = "aoe_damage"
+description = "Four meteors strike for 20d6 fire + 20d6 bludgeoning damage each."

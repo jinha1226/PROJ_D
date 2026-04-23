@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://wsp9whdv8ssoo"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "teleport"
+display_name = "Teleport"
+school = "conjuration"
+spell_level = 7
+xl_required = 13
+mp_cost = 10
+difficulty = 7
+base_damage = 0
+max_range = 0
+targeting = "self"
+element = ""
+effect = "floor_travel"
+description = "Instantly travel to any previously visited floor of the dungeon."

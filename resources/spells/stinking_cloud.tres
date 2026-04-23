@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://h2uct4l5vwd2o"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "stinking_cloud"
+display_name = "Stinking Cloud"
+school = "conjuration"
+spell_level = 3
+xl_required = 5
+mp_cost = 5
+difficulty = 3
+base_damage = 0
+max_range = 6
+targeting = "aoe"
+element = "poison"
+effect = "aoe_status"
+description = "Noxious fumes incapacitate creatures that fail a CON save."

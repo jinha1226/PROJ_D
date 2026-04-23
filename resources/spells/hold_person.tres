@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://m0k2zve3g4owp"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "hold_person"
+display_name = "Hold Person"
+school = "enchantment"
+spell_level = 2
+xl_required = 3
+mp_cost = 3
+difficulty = 2
+base_damage = 0
+max_range = 5
+targeting = "single"
+element = ""
+effect = "hold"
+description = "Paralyze a humanoid. It cannot move or act until the spell ends."

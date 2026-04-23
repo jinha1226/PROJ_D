@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://pp21em72y08h2"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "power_word_pain"
+display_name = "Power Word Pain"
+school = "enchantment"
+spell_level = 7
+xl_required = 13
+mp_cost = 10
+difficulty = 7
+base_damage = 0
+max_range = 5
+targeting = "single"
+element = ""
+effect = "power_word_pain"
+description = "A creature with 100 HP or fewer is wracked with agony and incapacitated."

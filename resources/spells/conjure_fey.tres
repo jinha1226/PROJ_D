@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://2jr7418trdhqc"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "conjure_fey"
+display_name = "Conjure Fey"
+school = "conjuration"
+spell_level = 6
+xl_required = 11
+mp_cost = 9
+difficulty = 6
+base_damage = 0
+max_range = 4
+targeting = "self"
+element = ""
+effect = "summon"
+description = "Summon a powerful fey spirit to fight by your side."
