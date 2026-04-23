@@ -20,6 +20,12 @@ var selected_race_id: String = "human"
 # load and writes into the freshly-instantiated Player, then clears it.
 var pending_player_state: Dictionary = {}
 
+# Per-depth cached floor state — kept in-memory across ascend/descend
+# so revisiting a floor restores its tiles, explored fog, remaining
+# items, and survivor monsters. Not persisted to disk (save on stairs
+# is canonical; multi-floor snapshots would bloat saves).
+var floor_cache: Dictionary = {}
+
 # Display / meta state (persisted).
 var use_tiles: bool = true
 var rune_shards: int = 0
@@ -40,6 +46,8 @@ func start_new_run(random_seed: int = -1) -> void:
 	depth = 1
 	gold = 0
 	identified.clear()
+	floor_cache.clear()
+	_generate_pseudonyms()
 	pending_player_state.clear()
 	run_in_progress = true
 	emit_signal("depth_changed", depth)
@@ -48,8 +56,13 @@ func descend() -> void:
 	depth += 1
 	emit_signal("depth_changed", depth)
 
+func ascend() -> void:
+	depth = max(1, depth - 1)
+	emit_signal("depth_changed", depth)
+
 func end_run(result: String) -> void:
 	run_in_progress = false
+	floor_cache.clear()
 	if result == "death":
 		SaveManager.delete_save()
 	emit_signal("run_ended", result)

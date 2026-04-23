@@ -290,6 +290,7 @@ func _spawn_player() -> void:
 	player.moved.connect(_on_player_moved)
 	player.died.connect(_on_player_died)
 	player.stepped_on_stairs_down.connect(_on_stairs_down)
+	player.stepped_on_stairs_up.connect(_on_stairs_up)
 	player.stats_changed.connect(_update_hud)
 	player.item_dropped.connect(_on_item_dropped)
 
@@ -360,12 +361,85 @@ func _spawn_ui() -> void:
 func _floor_seed(depth: int) -> int:
 	return GameManager.seed * 1009 + depth * 31
 
-func _generate_floor(depth: int, map_seed: int) -> void:
-	map.generate(map_seed)
-	player.bind_map(map, map.spawn_pos)
-	_spawn_items_for_floor(depth)
-	_spawn_monsters_for_floor(depth)
+func _generate_floor(depth: int, map_seed: int,
+		arrive_from_above: bool = true) -> void:
+	if GameManager.floor_cache.has(depth):
+		_restore_floor_from_cache(depth, arrive_from_above)
+	else:
+		map.generate(map_seed)
+		player.bind_map(map, map.spawn_pos)
+		_spawn_items_for_floor(depth)
+		_spawn_monsters_for_floor(depth)
 	_refresh_fov()
+
+func _cache_current_floor() -> void:
+	if map == null or GameManager == null:
+		return
+	var state: Dictionary = {
+		"tiles": PackedByteArray(map.tiles),
+		"explored": map.explored.duplicate(true),
+		"spawn_pos": map.spawn_pos,
+		"stairs_down_pos": map.stairs_down_pos,
+		"stairs_up_pos": map.stairs_up_pos,
+		"rooms": map.rooms.duplicate(),
+		"items": [],
+		"monsters": [],
+	}
+	for n in get_tree().get_nodes_in_group("floor_items"):
+		if n is FloorItem and n.data != null:
+			state.items.append({
+				"id": n.data.id,
+				"pos": n.grid_pos,
+				"plus": n.plus,
+			})
+	for n in get_tree().get_nodes_in_group("monsters"):
+		if n is Monster and n.data != null and n.hp > 0:
+			state.monsters.append({
+				"id": n.data.id,
+				"pos": n.grid_pos,
+				"hp": n.hp,
+				"status": n.status.duplicate(),
+			})
+	GameManager.floor_cache[GameManager.depth] = state
+
+func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
+	var state: Dictionary = GameManager.floor_cache[depth]
+	map.tiles = state.tiles
+	map.explored = state.explored.duplicate(true)
+	map.spawn_pos = state.spawn_pos
+	map.stairs_down_pos = state.stairs_down_pos
+	map.stairs_up_pos = state.stairs_up_pos
+	map.rooms = state.rooms.duplicate()
+	map.visible_tiles.clear()
+	map._load_atmosphere(depth)
+	map.queue_redraw()
+	var arrival: Vector2i = map.stairs_up_pos if arrive_from_above \
+			else map.stairs_down_pos
+	player.bind_map(map, arrival)
+	for entry in state.items:
+		var d: ItemData = ItemRegistry.get_by_id(String(entry.get("id", "")))
+		if d == null:
+			continue
+		var p: Vector2i = entry.get("pos", Vector2i.ZERO)
+		if p == player.grid_pos:
+			continue  # Don't spawn item under player on arrival.
+		_spawn_floor_item(d, p, int(entry.get("plus", 0)))
+	for entry in state.monsters:
+		var md: MonsterData = MonsterRegistry.get_by_id(
+				String(entry.get("id", "")))
+		if md == null:
+			continue
+		var p: Vector2i = entry.get("pos", Vector2i.ZERO)
+		if p == player.grid_pos:
+			continue  # Skip monster that would spawn on top of player.
+		var m: Monster = MonsterScene.new()
+		monsters_layer.add_child(m)
+		m.setup(md, map, p)
+		m.hp = int(entry.get("hp", md.hp))
+		m.status = entry.get("status", {}).duplicate()
+		if m.has_signal("hit_taken"):
+			m.hit_taken.connect(_on_monster_hit.bind(m))
+		TurnManager.register_actor(m)
 
 func _spawn_monsters_for_floor(depth: int) -> void:
 	var count: int = _monster_count_for_depth(depth)
@@ -544,12 +618,32 @@ func _on_result_meta(res: Node) -> void:
 	get_tree().change_scene_to_file(MENU_SCENE_PATH)
 
 func _on_stairs_down() -> void:
+	_cache_current_floor()
 	GameManager.descend()
 	CombatLog.post("You descend to B%d." % GameManager.depth,
 		Color(0.6, 1.0, 1.0))
 	_clear_monsters()
 	_clear_floor_items()
-	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth))
+	_auto_path.clear()
+	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth), true)
+	_center_camera_on_player(true)
+	_update_hud()
+	SaveManager.save_run(player, GameManager)
+	TurnManager.end_player_turn()
+
+func _on_stairs_up() -> void:
+	if GameManager.depth <= 1:
+		CombatLog.post("The way up is blocked.", Color(0.7, 0.7, 0.7))
+		TurnManager.end_player_turn()
+		return
+	_cache_current_floor()
+	GameManager.ascend()
+	CombatLog.post("You climb to B%d." % GameManager.depth,
+		Color(0.85, 1.0, 0.85))
+	_clear_monsters()
+	_clear_floor_items()
+	_auto_path.clear()
+	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth), false)
 	_center_camera_on_player(true)
 	_update_hud()
 	SaveManager.save_run(player, GameManager)

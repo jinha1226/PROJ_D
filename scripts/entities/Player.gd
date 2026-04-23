@@ -4,6 +4,7 @@ signal stats_changed
 signal moved(new_pos: Vector2i)
 signal died
 signal stepped_on_stairs_down
+signal stepped_on_stairs_up
 signal item_dropped(item_id: String, at_pos: Vector2i, plus: int)
 
 @export var grid_pos: Vector2i = Vector2i(1, 1)
@@ -113,6 +114,9 @@ func _try_move(dir: Vector2i) -> void:
 	_auto_pickup()
 	if _map.tile_at(grid_pos) == DungeonMap.Tile.STAIRS_DOWN:
 		emit_signal("stepped_on_stairs_down")
+		return
+	if _map.tile_at(grid_pos) == DungeonMap.Tile.STAIRS_UP:
+		emit_signal("stepped_on_stairs_up")
 		return
 	TurnManager.end_player_turn()
 
