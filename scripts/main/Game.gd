@@ -272,6 +272,8 @@ func _apply_class_to_player(class_id: String) -> void:
 	player.init_skills()
 	for skill_id in data.starting_skills.keys():
 		player.skills[skill_id]["level"] = int(data.starting_skills[skill_id])
+	if data.starting_xl > 0:
+		player.xl = data.starting_xl
 	player.refresh_ac_from_equipment()
 	player._refresh_paperdoll()
 	player.known_spells = data.starting_spells.duplicate()

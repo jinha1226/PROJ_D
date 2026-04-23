@@ -1,0 +1,90 @@
+[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://class_archmage01"]
+
+[ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
+
+[resource]
+script = ExtResource("1_cdata")
+id = "archmage"
+display_name = "Archmage [TEST]"
+description = "Test character. Knows all spells, max skills, full stats."
+starting_hp = 60
+starting_mp = 99
+starting_str = 12
+starting_dex = 12
+starting_int = 20
+starting_weapon = "dagger"
+starting_armor = "robe"
+starting_skills = {
+"blade": 20,
+"blunt": 20,
+"dagger": 20,
+"polearm": 20,
+"ranged": 20,
+"armor": 20,
+"magic": 20,
+"stealth": 20
+}
+starting_xl = 20
+starting_spells = [
+"magic_missile",
+"scorching_ray",
+"fireball",
+"burning_hands",
+"chain_lightning",
+"cone_of_cold",
+"ice_storm",
+"fire_storm",
+"sunburst",
+"fog_cloud",
+"misty_step",
+"stinking_cloud",
+"dimension_door",
+"conjure_fey",
+"animate_objects",
+"cloudkill",
+"gate",
+"expeditious_retreat",
+"enlarge",
+"haste",
+"blink",
+"polymorph",
+"teleport",
+"reverse_gravity",
+"disintegrate",
+"inflict_wounds",
+"ray_of_enfeeblement",
+"vampiric_touch",
+"blight",
+"contagion",
+"harm",
+"horrid_wilting",
+"finger_of_death",
+"mage_armor",
+"blur",
+"protection_from_energy",
+"stoneskin",
+"globe_of_invulnerability",
+"invulnerability",
+"wall_of_force",
+"mind_blank",
+"sleep",
+"hold_person",
+"fear",
+"confusion",
+"mass_suggestion",
+"hold_monster",
+"maze",
+"heal_wounds",
+"power_word_pain",
+"power_word_stun",
+"power_word_kill",
+"earthquake",
+"time_stop",
+"prismatic_spray",
+"astral_projection",
+"meteor_swarm"
+]
+passive = ""
+unlocked = true
+unlock_kind = ""
+unlock_trigger_id = ""

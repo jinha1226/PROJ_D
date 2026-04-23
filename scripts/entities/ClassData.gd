@@ -12,6 +12,7 @@ class_name ClassData extends Resource
 @export var starting_armor: String = ""
 @export var starting_skills: Dictionary = {}
 @export var starting_spells: Array = []
+@export var starting_xl: int = 0
 @export var passive: String = ""
 
 ## Unlock gating. See RaceData for field contract. Default-true for the
