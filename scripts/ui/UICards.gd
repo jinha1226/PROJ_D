@@ -6,10 +6,10 @@ const HINT := Color(0.78, 0.78, 0.85)
 const ACCENT_GOLD := Color(0.85, 0.72, 0.30)
 
 
-static func section_header(text: String) -> Label:
+static func section_header(text: String, font_size: int = 44) -> Label:
 	var lbl := Label.new()
 	lbl.text = text
-	lbl.add_theme_font_size_override("font_size", 44)
+	lbl.add_theme_font_size_override("font_size", font_size)
 	lbl.add_theme_color_override("font_color", GOLD)
 	return lbl
 

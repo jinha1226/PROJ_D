@@ -7,6 +7,25 @@ class_name MinimapRenderer extends RefCounted
 
 const SCALE: int = 2
 
+static func render_from_state(state: Dictionary, scale_override: int = -1) -> ImageTexture:
+	var scale: int = scale_override if scale_override > 0 else SCALE
+	var w: int = DungeonMap.GRID_W * scale
+	var h: int = DungeonMap.GRID_H * scale
+	var img: Image = Image.create(w, h, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0, 0, 0, 0))
+	var tiles: PackedByteArray = state.get("tiles", PackedByteArray())
+	var explored: Dictionary = state.get("explored", {})
+	if tiles.size() > 0:
+		for y in range(DungeonMap.GRID_H):
+			for x in range(DungeonMap.GRID_W):
+				var pos := Vector2i(x, y)
+				if not explored.has(pos):
+					continue
+				var t: int = tiles[y * DungeonMap.GRID_W + x]
+				_plot(img, x * scale, y * scale, scale, _tile_color(t, false))
+	return ImageTexture.create_from_image(img)
+
+
 static func render(map: DungeonMap, player: Player, game: Node,
 		scale_override: int = -1) -> ImageTexture:
 	var scale: int = scale_override if scale_override > 0 else SCALE

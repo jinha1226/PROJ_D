@@ -1,16 +1,31 @@
 class_name StatusDialog extends RefCounted
 
-## Full character sheet. Sections (per clean-room guide §6):
+## Full character sheet. Sections:
 ##   Header       — race / class / XL
 ##   Vitals       — HP / MP / XP progress
 ##   Stats        — STR / DEX / INT
 ##   Combat       — AC / EV / WL
-##   Equipment    — weapon / armor summary
-##   Resistances  — per-element level with +/- bar
+##   Equipment    — all body slots
+##   Resistances  — every element with +++/--- bar
+##   Essence      — placeholder for future essence system
 ##   Effects      — active statuses with turns remaining
-##   Meta         — depth / gold / kills / turns
+##   Run          — depth / gold / kills / turns
 
 const _ELEMENTS: Array = ["fire", "cold", "electric", "poison", "necromancy"]
+
+const _EQUIP_SLOTS: Array = [
+	["⚔ Weapon",  "weapon"],
+	["🛡 Body",    "body"],
+	["🪖 Head",    "head"],
+	["🧥 Cloak",   "cloak"],
+	["🧤 Gloves",  "gloves"],
+	["👢 Boots",   "boots"],
+	["📿 Amulet",  "amulet"],
+	["💍 Ring L",  "ring_l"],
+	["💍 Ring R",  "ring_r"],
+]
+
+const _HDR := 28  # section header font size
 
 static func open(player: Player, parent: Node) -> void:
 	var dlg: GameDialog = GameDialog.create("Character")
@@ -25,18 +40,20 @@ static func open(player: Player, parent: Node) -> void:
 	_build_header(body, player)
 	body.add_child(HSeparator.new())
 	_build_vitals(body, player)
-	body.add_child(UICards.section_header("STATS"))
+	body.add_child(UICards.section_header("STATS", _HDR))
 	_build_stats(body, player)
-	body.add_child(UICards.section_header("COMBAT"))
+	body.add_child(UICards.section_header("COMBAT", _HDR))
 	_build_combat(body, player)
-	body.add_child(UICards.section_header("EQUIPMENT"))
+	body.add_child(UICards.section_header("EQUIPMENT", _HDR))
 	_build_equipment(body, player)
-	body.add_child(UICards.section_header("RESISTANCES"))
+	body.add_child(UICards.section_header("RESISTANCES", _HDR))
 	_build_resists(body, player)
+	body.add_child(UICards.section_header("ESSENCE", _HDR))
+	_build_essence(body, player)
 	if not player.statuses.is_empty():
-		body.add_child(UICards.section_header("ACTIVE EFFECTS"))
+		body.add_child(UICards.section_header("ACTIVE EFFECTS", _HDR))
 		_build_effects(body, player)
-	body.add_child(UICards.section_header("RUN"))
+	body.add_child(UICards.section_header("RUN", _HDR))
 	_build_meta(body, player)
 
 static func _build_header(body: VBoxContainer, player: Player) -> void:
@@ -45,12 +62,10 @@ static func _build_header(body: VBoxContainer, player: Player) -> void:
 	var hb := HBoxContainer.new()
 	hb.add_theme_constant_override("separation", 12)
 	body.add_child(hb)
-	# Paper-doll composite: race base + current body armor + hand1 weapon.
 	var portrait := Control.new()
 	portrait.custom_minimum_size = Vector2(120, 130)
 	portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var base_path: String = \
-		"res://assets/tiles/individual/player/base/human_m.png"
+	var base_path: String = "res://assets/tiles/individual/player/base/human_m.png"
 	if race != null and race.base_sprite_path != "" \
 			and ResourceLoader.exists(race.base_sprite_path):
 		base_path = race.base_sprite_path
@@ -105,39 +120,46 @@ static func _build_combat(body: VBoxContainer, player: Player) -> void:
 static func _build_equipment(body: VBoxContainer, player: Player) -> void:
 	var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
 	var a: ItemData = ItemRegistry.get_by_id(player.equipped_armor_id)
-	var w_plus: int = int(player.equipped_weapon_entry().get("plus", 0)) \
-			if w != null else 0
-	var a_plus: int = int(player.equipped_armor_entry().get("plus", 0)) \
-			if a != null else 0
-	var w_text: String = "(unarmed)"
-	if w != null:
-		w_text = "%s %s(d%d)" % [w.display_name,
-				("+%d " % w_plus) if w_plus > 0 else "",
-				w.damage + w_plus]
-	var a_text: String = "(none)"
-	if a != null:
-		a_text = "%s %s(+%d AC" % [a.display_name,
-				("+%d " % a_plus) if a_plus > 0 else "",
-				a.ac_bonus + a_plus]
-		if a.ev_penalty > 0:
-			a_text += ", -%d EV" % a.ev_penalty
-		a_text += ")"
-	body.add_child(_kv_row("⚔ Weapon", w_text, Color(1.0, 0.75, 0.4)))
-	body.add_child(_kv_row("🛡 Armor", a_text, Color(0.55, 0.8, 1.0)))
+	var w_plus: int = int(player.equipped_weapon_entry().get("plus", 0)) if w != null else 0
+	var a_plus: int = int(player.equipped_armor_entry().get("plus", 0)) if a != null else 0
+
+	for slot_entry in _EQUIP_SLOTS:
+		var label: String = slot_entry[0]
+		var slot_id: String = slot_entry[1]
+		var value: String = "—"
+		var tint: Color = Color(0.45, 0.45, 0.5)
+		match slot_id:
+			"weapon":
+				if w != null:
+					value = "%s%s (d%d)" % [w.display_name,
+							" +%d" % w_plus if w_plus > 0 else "",
+							w.damage + w_plus]
+					tint = Color(1.0, 0.75, 0.4)
+				else:
+					value = "(unarmed)"
+					tint = Color(0.6, 0.6, 0.65)
+			"body":
+				if a != null:
+					value = "%s%s (+%d AC" % [a.display_name,
+							" +%d" % a_plus if a_plus > 0 else "",
+							a.ac_bonus + a_plus]
+					if a.ev_penalty > 0:
+						value += ", -%d EV" % a.ev_penalty
+					value += ")"
+					tint = Color(0.55, 0.8, 1.0)
+		body.add_child(_kv_row(label, value, tint))
 
 static func _build_resists(body: VBoxContainer, player: Player) -> void:
-	var any: bool = false
 	for elem in _ELEMENTS:
 		var lvl: int = Status.resist_level(player.resists, elem)
-		if lvl == 0:
-			continue
-		any = true
 		body.add_child(_resist_row(elem, lvl))
-	if not any:
-		var lab := Label.new()
-		lab.text = "(no resistances)"
-		lab.add_theme_color_override("font_color", Color(0.55, 0.55, 0.6))
-		body.add_child(lab)
+
+static func _build_essence(body: VBoxContainer, _player: Player) -> void:
+	var lbl := Label.new()
+	lbl.text = "(none)"
+	lbl.add_theme_font_size_override("font_size", 22)
+	lbl.add_theme_color_override("font_color", Color(0.55, 0.55, 0.6))
+	body.add_child(lbl)
 
 static func _build_effects(body: VBoxContainer, player: Player) -> void:
 	for id in player.statuses.keys():
@@ -147,12 +169,12 @@ static func _build_effects(body: VBoxContainer, player: Player) -> void:
 		var name_lab := Label.new()
 		name_lab.text = Status.display_name(id)
 		name_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		name_lab.add_theme_font_size_override("font_size", 24)
+		name_lab.add_theme_font_size_override("font_size", 22)
 		name_lab.add_theme_color_override("font_color", Status.color_of(id))
 		row.add_child(name_lab)
 		var turns_lab := Label.new()
 		turns_lab.text = "%d turns" % turns
-		turns_lab.add_theme_font_size_override("font_size", 22)
+		turns_lab.add_theme_font_size_override("font_size", 20)
 		turns_lab.add_theme_color_override("font_color", Color(0.75, 0.75, 0.8))
 		row.add_child(turns_lab)
 		body.add_child(row)
@@ -185,13 +207,13 @@ static func _kv_row(key: String, value: String, tint: Color) -> Control:
 	var k := Label.new()
 	k.text = key
 	k.custom_minimum_size = Vector2(130, 0)
-	k.add_theme_font_size_override("font_size", 22)
+	k.add_theme_font_size_override("font_size", 20)
 	k.add_theme_color_override("font_color", Color(0.7, 0.72, 0.78))
 	row.add_child(k)
 	var v := Label.new()
 	v.text = value
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	v.add_theme_font_size_override("font_size", 24)
+	v.add_theme_font_size_override("font_size", 22)
 	v.add_theme_color_override("font_color", tint)
 	row.add_child(v)
 	return row
@@ -203,13 +225,13 @@ static func _stat_block(label: String, value: int, tint: Color) -> Control:
 	var lbl := Label.new()
 	lbl.text = label
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl.add_theme_font_size_override("font_size", 20)
+	lbl.add_theme_font_size_override("font_size", 18)
 	lbl.add_theme_color_override("font_color", Color(0.65, 0.68, 0.72))
 	vb.add_child(lbl)
 	var val := Label.new()
 	val.text = str(value)
 	val.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	val.add_theme_font_size_override("font_size", 34)
+	val.add_theme_font_size_override("font_size", 30)
 	val.add_theme_color_override("font_color", tint)
 	vb.add_child(val)
 	return vb
@@ -217,29 +239,35 @@ static func _stat_block(label: String, value: int, tint: Color) -> Control:
 static func _resist_row(element: String, level: int) -> Control:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
-	var name := Label.new()
-	name.text = element.capitalize()
-	name.custom_minimum_size = Vector2(150, 0)
-	name.add_theme_font_size_override("font_size", 24)
-	name.add_theme_color_override("font_color", _element_color(element))
-	row.add_child(name)
-	var bar := Label.new()
-	bar.text = _resist_bar(level)
-	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	bar.add_theme_font_size_override("font_size", 24)
-	var tint: Color = Color(0.55, 0.9, 0.55) if level > 0 \
-			else Color(1.0, 0.55, 0.55)
-	bar.add_theme_color_override("font_color", tint)
-	row.add_child(bar)
+	var name_lbl := Label.new()
+	name_lbl.text = element.capitalize()
+	name_lbl.custom_minimum_size = Vector2(130, 0)
+	name_lbl.add_theme_font_size_override("font_size", 22)
+	name_lbl.add_theme_color_override("font_color", _element_color(element))
+	row.add_child(name_lbl)
+	var bar_lbl := Label.new()
+	bar_lbl.text = _resist_bar(level)
+	bar_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bar_lbl.add_theme_font_size_override("font_size", 22)
+	var tint: Color
+	if level > 0:
+		tint = Color(0.4, 0.95, 0.5)
+	elif level < 0:
+		tint = Color(1.0, 0.4, 0.4)
+	else:
+		tint = Color(0.45, 0.45, 0.5)
+	bar_lbl.add_theme_color_override("font_color", tint)
+	row.add_child(bar_lbl)
 	return row
 
 static func _resist_bar(level: int) -> String:
-	# Visual: "+++  " for +3, "-    " for -1, blank at 0.
-	if level > 0:
-		return "+".repeat(level) + " (" + str(level) + ")"
-	if level < 0:
-		return "-".repeat(-level) + " (" + str(level) + ")"
-	return "—"
+	if level >= 3:  return "+++"
+	if level == 2:  return "++"
+	if level == 1:  return "+"
+	if level == 0:  return "·"
+	if level == -1: return "-"
+	if level == -2: return "--"
+	return "---"
 
 static func _element_color(element: String) -> Color:
 	match element:

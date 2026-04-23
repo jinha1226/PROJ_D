@@ -70,6 +70,10 @@ func ascend() -> void:
 	depth = max(1, depth - 1)
 	emit_signal("depth_changed", depth)
 
+func travel_to(d: int) -> void:
+	depth = d
+	emit_signal("depth_changed", depth)
+
 func end_run(result: String) -> void:
 	run_in_progress = false
 	floor_cache.clear()

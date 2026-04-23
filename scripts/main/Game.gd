@@ -31,6 +31,8 @@ var _targeting_node: SpellTargetOverlay = null
 var _auto_path: Array = []
 var _auto_prev_hp: int = 0
 var _auto_known_ids: Dictionary = {}
+# Set when ACT triggers continuous auto-explore; cleared on cancel or completion.
+var _auto_exploring: bool = false
 
 func _ready() -> void:
 	if not GameManager.run_in_progress:
@@ -72,7 +74,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	# Any tap during auto-walk cancels it. The tap itself is then
 	# processed as a fresh action (most commonly the same tile the
 	# user already wanted).
-	if not _auto_path.is_empty():
+	if not _auto_path.is_empty() or _auto_exploring:
 		_cancel_auto_walk("tapped")
 	if _targeting_spell != null:
 		var canvas_tf: Transform2D = get_viewport().get_canvas_transform()
@@ -96,9 +98,14 @@ func _handle_tap(screen_pos: Vector2) -> void:
 	var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
 	var target: Vector2i = map.world_to_grid(world_pos)
 	if target == player.grid_pos:
-		# Tap on self = wait one turn.
-		player.wait_turn()
-		TurnManager.end_player_turn()
+		var tile: int = map.tile_at(player.grid_pos)
+		if tile == DungeonMap.Tile.STAIRS_DOWN:
+			_on_stairs_down()
+		elif tile == DungeonMap.Tile.STAIRS_UP:
+			_on_stairs_up()
+		else:
+			player.wait_turn()
+			TurnManager.end_player_turn()
 		return
 	# Distant explored tile → auto-walk. Existing visible enemies don't
 	# block the start (DCSS-style travel); a _new_ monster entering FOV
@@ -195,9 +202,10 @@ func _new_monster_in_sight() -> bool:
 	return false
 
 func _cancel_auto_walk(reason: String) -> void:
-	if _auto_path.is_empty():
+	if _auto_path.is_empty() and not _auto_exploring:
 		return
 	_auto_path.clear()
+	_auto_exploring = false
 	_auto_known_ids.clear()
 	if reason == "new enemy":
 		CombatLog.post("You stop — enemy approaches.", Color(1.0, 0.7, 0.5))
@@ -314,8 +322,6 @@ func _spawn_player() -> void:
 	add_child(player)
 	player.moved.connect(_on_player_moved)
 	player.died.connect(_on_player_died)
-	player.stepped_on_stairs_down.connect(_on_stairs_down)
-	player.stepped_on_stairs_up.connect(_on_stairs_up)
 	player.stats_changed.connect(_update_hud)
 	player.item_dropped.connect(_on_item_dropped)
 
@@ -564,16 +570,39 @@ func _update_minimap() -> void:
 func _on_minimap_tapped() -> void:
 	if map == null or player == null:
 		return
-	var dlg: GameDialog = GameDialog.create("Map")
+	_cache_current_floor()
+	var dlg: GameDialog = GameDialog.create("Floors")
 	add_child(dlg)
 	var body := dlg.body()
-	var tex: ImageTexture = MinimapRenderer.render(map, player, self, 8)
-	var rect := TextureRect.new()
-	rect.texture = tex
-	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	rect.custom_minimum_size = Vector2(0, 900)
-	rect.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	body.add_child(rect)
+
+	var all_depths: Array = GameManager.floor_cache.keys().duplicate()
+	all_depths.sort()
+
+	for d in all_depths:
+		var is_current: bool = (d == GameManager.depth)
+		var thumb_tex: ImageTexture
+		if is_current:
+			thumb_tex = MinimapRenderer.render(map, player, self, 2)
+		else:
+			thumb_tex = MinimapRenderer.render_from_state(
+					GameManager.floor_cache[d], 2)
+
+		var btn := Button.new()
+		btn.icon = thumb_tex
+		btn.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn.expand_icon = false
+		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn.text = "  B%d%s" % [d, "  ← here" if is_current else ""]
+		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		btn.custom_minimum_size = Vector2(0, DungeonMap.GRID_H * 2 + 20)
+		if is_current:
+			btn.disabled = true
+		else:
+			var target_d: int = d
+			btn.pressed.connect(func():
+				dlg.close()
+				_travel_to_floor(target_d))
+		body.add_child(btn)
 
 func _center_camera_on_player(snap: bool = false) -> void:
 	if player == null or camera == null:
@@ -604,6 +633,8 @@ func _on_player_turn_started() -> void:
 		player.tick_statuses()
 	if not _auto_path.is_empty():
 		_advance_auto_walk()
+	elif _auto_exploring:
+		_start_auto_explore()
 
 func _on_player_died() -> void:
 	CombatLog.post("You have died.", Color(1.0, 0.4, 0.4))
@@ -643,13 +674,13 @@ func _on_result_meta(res: Node) -> void:
 	get_tree().change_scene_to_file(MENU_SCENE_PATH)
 
 func _on_stairs_down() -> void:
+	_cancel_auto_walk("stairs")
 	_cache_current_floor()
 	GameManager.descend()
 	CombatLog.post("You descend to B%d." % GameManager.depth,
 		Color(0.6, 1.0, 1.0))
 	_clear_monsters()
 	_clear_floor_items()
-	_auto_path.clear()
 	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth), true)
 	_center_camera_on_player(true)
 	_update_hud()
@@ -661,14 +692,32 @@ func _on_stairs_up() -> void:
 		CombatLog.post("The way up is blocked.", Color(0.7, 0.7, 0.7))
 		TurnManager.end_player_turn()
 		return
+	_cancel_auto_walk("stairs")
 	_cache_current_floor()
 	GameManager.ascend()
 	CombatLog.post("You climb to B%d." % GameManager.depth,
 		Color(0.85, 1.0, 0.85))
 	_clear_monsters()
 	_clear_floor_items()
-	_auto_path.clear()
 	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth), false)
+	_center_camera_on_player(true)
+	_update_hud()
+	SaveManager.save_run(player, GameManager)
+	TurnManager.end_player_turn()
+
+func _travel_to_floor(target_depth: int) -> void:
+	if target_depth == GameManager.depth:
+		return
+	if not GameManager.floor_cache.has(target_depth):
+		return
+	_cancel_auto_walk("floor travel")
+	_cache_current_floor()
+	_clear_monsters()
+	_clear_floor_items()
+	var going_down: bool = target_depth > GameManager.depth
+	GameManager.travel_to(target_depth)
+	CombatLog.post("You travel to B%d." % target_depth, Color(0.7, 0.9, 1.0))
+	_generate_floor(target_depth, _floor_seed(target_depth), going_down)
 	_center_camera_on_player(true)
 	_update_hud()
 	SaveManager.save_run(player, GameManager)
@@ -851,6 +900,9 @@ func _item_at(pos: Vector2i) -> FloorItem:
 func _on_act_pressed() -> void:
 	if player == null or player.hp <= 0 or not TurnManager.is_player_turn:
 		return
+	if _auto_exploring:
+		_cancel_auto_walk("act cancel")
+		return
 	var nearest := _nearest_visible_monster()
 	if nearest != null:
 		var dir := _greedy_step_toward(nearest.grid_pos)
@@ -860,12 +912,48 @@ func _on_act_pressed() -> void:
 			CombatLog.post("Can't reach the %s." % nearest.data.display_name,
 					Color(1.0, 0.7, 0.5))
 	else:
-		# Auto-explore: walk toward stairs
-		var dir := _greedy_step_toward(map.stairs_down_pos)
-		if dir != Vector2i.ZERO:
-			player.try_step(dir)
-		else:
-			CombatLog.post("Nothing to do.", Color(0.7, 0.7, 0.5))
+		_start_auto_explore()
+
+
+func _start_auto_explore() -> void:
+	var target := _find_explore_target()
+	if target == Vector2i(-1, -1):
+		_auto_exploring = false
+		CombatLog.post("Nowhere left to explore.", Color(0.7, 0.9, 0.7))
+		return
+	var path := _bfs_path(player.grid_pos, target)
+	if path.is_empty():
+		_auto_exploring = false
+		CombatLog.post("Can't reach unexplored area.", Color(0.7, 0.7, 0.5))
+		return
+	_auto_path = path
+	_auto_prev_hp = player.hp
+	_auto_known_ids = _snapshot_visible_monster_ids()
+	_auto_exploring = true
+	_advance_auto_walk()
+
+
+func _find_explore_target() -> Vector2i:
+	var dirs8 := [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1),
+		Vector2i(1,1), Vector2i(1,-1), Vector2i(-1,1), Vector2i(-1,-1)]
+	var visited: Dictionary = {player.grid_pos: true}
+	var queue: Array = [player.grid_pos]
+	while not queue.is_empty():
+		var p: Vector2i = queue.pop_front()
+		if p != player.grid_pos:
+			for d in dirs8:
+				var n: Vector2i = p + d
+				if map.in_bounds(n) and not map.explored.has(n):
+					return p
+		for d in dirs8:
+			var n: Vector2i = p + d
+			if visited.has(n) or not map.in_bounds(n):
+				continue
+			if not map.is_walkable(n) or not map.explored.has(n):
+				continue
+			visited[n] = true
+			queue.append(n)
+	return Vector2i(-1, -1)
 
 
 func _nearest_visible_monster() -> Monster:

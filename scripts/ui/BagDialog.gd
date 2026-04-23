@@ -1,5 +1,7 @@
 class_name BagDialog extends RefCounted
 
+const THUMB_SIZE := 48
+
 static func open(player: Player, parent: Node) -> void:
 	var dlg: GameDialog = GameDialog.create("Bag")
 	parent.add_child(dlg)
@@ -31,7 +33,7 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 			a.display_name if a != null else "(none)",
 			"+%d AC" % (a.ac_bonus if a != null else 0)))
 
-	# Inventory
+	# Inventory — grouped by (id, plus)
 	body.add_child(UICards.section_header("INVENTORY  (%d)" % player.items.size()))
 	if player.items.is_empty():
 		var empty := Label.new()
@@ -40,12 +42,24 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 		body.add_child(empty)
 		return
 
+	var stacks: Dictionary = {}
+	var order: Array = []
 	for i in range(player.items.size()):
 		var entry: Dictionary = player.items[i]
-		var data: ItemData = ItemRegistry.get_by_id(entry.get("id", ""))
+		var id: String = entry.get("id", "")
+		var plus: int = entry.get("plus", 0)
+		var key: String = "%s|%d" % [id, plus]
+		if not stacks.has(key):
+			stacks[key] = {"id": id, "plus": plus, "indices": []}
+			order.append(key)
+		stacks[key].indices.append(i)
+
+	for key in order:
+		var stack: Dictionary = stacks[key]
+		var data: ItemData = ItemRegistry.get_by_id(stack.id)
 		if data == null:
 			continue
-		body.add_child(_build_item_row(data, i, player, dlg))
+		body.add_child(_build_item_row(data, stack.indices, player, dlg))
 
 
 static func _equipped_row(slot: String, name_s: String, stat: String) -> Control:
@@ -70,10 +84,38 @@ static func _equipped_row(slot: String, name_s: String, stat: String) -> Control
 	return row
 
 
-static func _build_item_row(data: ItemData, index: int, player: Player,
+static func _make_thumbnail(data: ItemData) -> Control:
+	var container := Control.new()
+	container.custom_minimum_size = Vector2(THUMB_SIZE, THUMB_SIZE)
+	container.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var base_path: String = data.tile_path if data.tile_path != "" else ""
+	var show_identified: bool = GameManager.is_identified(data.id)
+	if base_path != "" and ResourceLoader.exists(base_path):
+		var rect := TextureRect.new()
+		rect.texture = load(base_path) as Texture2D
+		rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		rect.anchor_right = 1.0
+		rect.anchor_bottom = 1.0
+		rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		container.add_child(rect)
+	if show_identified and data.identified_tile_path != "" \
+			and ResourceLoader.exists(data.identified_tile_path):
+		var overlay := TextureRect.new()
+		overlay.texture = load(data.identified_tile_path) as Texture2D
+		overlay.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		overlay.anchor_right = 1.0
+		overlay.anchor_bottom = 1.0
+		overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		container.add_child(overlay)
+	return container
+
+
+static func _build_item_row(data: ItemData, indices: Array, player: Player,
 		dlg: GameDialog) -> Control:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
+
+	row.add_child(_make_thumbnail(data))
 
 	var name_lbl := Label.new()
 	var label_text: String = GameManager.display_name_of(data.id)
@@ -81,8 +123,11 @@ static func _build_item_row(data: ItemData, index: int, player: Player,
 		label_text += "  (d%d)" % data.damage
 	elif data.kind == "armor" and data.ac_bonus > 0:
 		label_text += "  (+%d AC)" % data.ac_bonus
+	if indices.size() > 1:
+		label_text += "  x%d" % indices.size()
 	name_lbl.text = label_text
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	name_lbl.add_theme_font_size_override("font_size", 26)
 	name_lbl.add_theme_color_override("font_color", _item_color(data.kind))
 	row.add_child(name_lbl)
@@ -91,33 +136,34 @@ static func _build_item_row(data: ItemData, index: int, player: Player,
 	btn_row.add_theme_constant_override("separation", 4)
 	row.add_child(btn_row)
 
+	var first: int = indices[0]
 	match data.kind:
 		"weapon":
 			var btn := _action_btn(
 					"Equipped" if player.equipped_weapon_id == data.id else "Equip")
 			btn.disabled = (player.equipped_weapon_id == data.id)
 			if not btn.disabled:
-				btn.pressed.connect(func(): _equip_weapon(index, player, dlg))
+				btn.pressed.connect(func(): _equip_weapon(first, player, dlg))
 			btn_row.add_child(btn)
 		"armor":
 			var btn := _action_btn(
 					"Equipped" if player.equipped_armor_id == data.id else "Equip")
 			btn.disabled = (player.equipped_armor_id == data.id)
 			if not btn.disabled:
-				btn.pressed.connect(func(): _equip_armor(index, player, dlg))
+				btn.pressed.connect(func(): _equip_armor(first, player, dlg))
 			btn_row.add_child(btn)
 		"potion", "scroll":
 			var btn := _action_btn("Use")
-			btn.pressed.connect(func(): _use_item(index, player, dlg))
+			btn.pressed.connect(func(): _use_item(first, player, dlg))
 			btn_row.add_child(btn)
 		"book":
 			var btn := _action_btn("Read")
-			btn.pressed.connect(func(): _use_item(index, player, dlg))
+			btn.pressed.connect(func(): _use_item(first, player, dlg))
 			btn_row.add_child(btn)
 
 	var drop_btn := _action_btn("Drop")
 	drop_btn.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
-	drop_btn.pressed.connect(func(): _drop_item(index, player, dlg))
+	drop_btn.pressed.connect(func(): _drop_item(first, player, dlg))
 	btn_row.add_child(drop_btn)
 
 	return row

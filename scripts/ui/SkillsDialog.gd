@@ -19,7 +19,7 @@ const _DESCRIPTIONS: Dictionary = {
 }
 
 static func open(player: Player, parent: Node) -> void:
-	var dlg: GameDialog = GameDialog.create("Skills  (hold to see description)")
+	var dlg: GameDialog = GameDialog.create_ratio("Skills  (hold for info)", 0.92, 0.92)
 	parent.add_child(dlg)
 	var body: VBoxContainer = dlg.body()
 	if body == null:
