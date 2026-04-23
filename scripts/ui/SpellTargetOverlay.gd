@@ -28,7 +28,7 @@ func _compute_hit_tiles(spell: SpellData, player: Player, valid: Array) -> Array
 					continue
 				if not valid.has(n.grid_pos):
 					continue
-				var d := max(abs(n.grid_pos.x - player.grid_pos.x),
+				var d: int = max(abs(n.grid_pos.x - player.grid_pos.x),
 						abs(n.grid_pos.y - player.grid_pos.y))
 				if d < best:
 					best = d
