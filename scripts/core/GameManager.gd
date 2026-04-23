@@ -64,6 +64,9 @@ func load_run() -> bool:
 	selected_class_id = String(data.get("selected_class_id", ""))
 	selected_race_id = String(data.get("selected_race_id", "human"))
 	identified = data.get("identified", {})
+	pseudonyms = data.get("pseudonyms", {})
+	if pseudonyms.is_empty():
+		_generate_pseudonyms()
 	pending_player_state = data.get("player", {})
 	run_in_progress = true
 	return true

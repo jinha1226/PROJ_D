@@ -144,7 +144,7 @@ func pickup(floor_item: FloorItem) -> void:
 		CombatLog.pickup("You pick up %d gold." % amount)
 	else:
 		items.append({"id": data.id, "plus": floor_item.plus})
-		CombatLog.pickup("You pick up %s." % data.display_name)
+		CombatLog.pickup("You pick up %s." % GameManager.display_name_of(data.id))
 		auto_bind_quickslot(data.id)
 	emit_signal("stats_changed")
 	floor_item.queue_free()
@@ -236,6 +236,13 @@ func use_item(index: int) -> void:
 			apply_berserk(max(1, data.effect_value))
 		"study":
 			CombatLog.post("You study the tome.", Color(0.7, 0.85, 1.0))
+		"identify":
+			items.remove_at(index)
+			emit_signal("stats_changed")
+			var picker_parent: Node = get_tree().current_scene \
+					if get_tree() != null else self
+			IdentifyPicker.open(self, picker_parent)
+			return
 		_:
 			had_effect = false
 	# Side grants — run regardless of match.
@@ -251,6 +258,9 @@ func use_item(index: int) -> void:
 		had_effect = true
 	if not had_effect:
 		CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
+	# Auto-identify on first successful use (consumables only).
+	if data.kind == "potion" or data.kind == "scroll" or data.kind == "book":
+		GameManager.identify(data.id)
 	items.remove_at(index)
 	emit_signal("stats_changed")
 

@@ -560,7 +560,7 @@ func _on_item_dropped(item_id: String, at_pos: Vector2i, plus: int) -> void:
 	if data == null:
 		return
 	_spawn_floor_item(data, at_pos, plus)
-	CombatLog.post("You drop %s." % data.display_name)
+	CombatLog.post("You drop %s." % GameManager.display_name_of(item_id))
 
 func _on_bag_pressed() -> void:
 	if player == null:

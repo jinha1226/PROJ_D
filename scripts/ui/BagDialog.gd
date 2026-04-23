@@ -76,7 +76,7 @@ static func _build_item_row(data: ItemData, index: int, player: Player,
 	row.add_theme_constant_override("separation", 8)
 
 	var name_lbl := Label.new()
-	var label_text: String = data.display_name
+	var label_text: String = GameManager.display_name_of(data.id)
 	if data.kind == "weapon" and data.damage > 0:
 		label_text += "  (d%d)" % data.damage
 	elif data.kind == "armor" and data.ac_bonus > 0:

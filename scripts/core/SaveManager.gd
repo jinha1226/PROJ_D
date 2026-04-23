@@ -40,6 +40,7 @@ func save_run(player, game_manager) -> bool:
 		"selected_class_id": game_manager.selected_class_id,
 		"selected_race_id": game_manager.selected_race_id,
 		"identified": game_manager.identified,
+		"pseudonyms": game_manager.pseudonyms,
 		"player": {
 			"hp": player.hp,
 			"hp_max": player.hp_max,

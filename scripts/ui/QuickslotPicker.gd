@@ -120,7 +120,7 @@ static func _make_item_row(data: ItemData, player: Player, slot_index: int,
 
 	var name_lab := Label.new()
 	var count: int = player.count_item(data.id)
-	name_lab.text = "%s  ×%d" % [data.display_name, count]
+	name_lab.text = "%s  ×%d" % [GameManager.display_name_of(data.id), count]
 	name_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_lab.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	name_lab.add_theme_font_size_override("font_size", 24)
@@ -153,5 +153,4 @@ static func _name_of(id: String) -> String:
 	var spell: SpellData = SpellRegistry.get_by_id(id)
 	if spell != null:
 		return spell.display_name
-	var d: ItemData = ItemRegistry.get_by_id(id)
-	return d.display_name if d != null else id
+	return GameManager.display_name_of(id)
