@@ -216,7 +216,9 @@ static func _on_cast(spell_id: String, player: Player,
 	var spell: SpellData = SpellRegistry.get_by_id(spell_id)
 	if spell == null:
 		return
-	if spell.targeting == "self":
+	# Auto-cast: self, nearest (auto-target), aoe/area (all visible).
+	# "single" opens the targeting UI for explicit tile selection.
+	if spell.targeting != "single":
 		var ok: bool = MagicSystem.cast(spell_id, player, game)
 		dlg.close()
 		if ok:
