@@ -25,6 +25,12 @@ var _targeting_spell: SpellData = null
 var _targeting_tiles: Array = []
 var _targeting_node: SpellTargetOverlay = null
 
+# Auto-walk state — when the player taps a distant explored tile,
+# we enqueue a BFS path here and step one tile each player turn
+# until we hit the goal, an enemy enters view, or HP drops.
+var _auto_path: Array = []
+var _auto_prev_hp: int = 0
+
 func _ready() -> void:
 	if not GameManager.run_in_progress:
 		GameManager.start_new_run()
@@ -62,6 +68,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		is_tap = true
 	if not is_tap:
 		return
+	# Any tap during auto-walk cancels it. The tap itself is then
+	# processed as a fresh action (most commonly the same tile the
+	# user already wanted).
+	if not _auto_path.is_empty():
+		_cancel_auto_walk("tapped")
 	if _targeting_spell != null:
 		var canvas_tf: Transform2D = get_viewport().get_canvas_transform()
 		var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
@@ -88,6 +99,17 @@ func _handle_tap(screen_pos: Vector2) -> void:
 		player.wait_turn()
 		TurnManager.end_player_turn()
 		return
+	# Distant explored tile with no enemy in sight = auto-walk.
+	var chebyshev: int = max(abs(target.x - player.grid_pos.x),
+			abs(target.y - player.grid_pos.y))
+	if chebyshev > 1 and map.explored.has(target) \
+			and map.is_walkable(target) and not _monster_in_sight():
+		var path: Array = _bfs_path(player.grid_pos, target)
+		if path.size() > 0:
+			_auto_path = path
+			_auto_prev_hp = player.hp
+			_advance_auto_walk()
+			return
 	var dx: int = sign(target.x - player.grid_pos.x)
 	var dy: int = sign(target.y - player.grid_pos.y)
 	# Prefer diagonal only when the target is diagonal-ish; otherwise
@@ -101,6 +123,62 @@ func _handle_tap(screen_pos: Vector2) -> void:
 	if dir == Vector2i.ZERO:
 		return
 	player.try_step(dir)
+
+func _bfs_path(start: Vector2i, goal: Vector2i) -> Array:
+	if start == goal:
+		return []
+	if not map.is_walkable(goal):
+		return []
+	var came_from: Dictionary = {start: start}
+	var frontier: Array = [start]
+	var dirs: Array = [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1),
+		Vector2i(1,1), Vector2i(1,-1), Vector2i(-1,1), Vector2i(-1,-1)]
+	while not frontier.is_empty():
+		var p: Vector2i = frontier.pop_front()
+		if p == goal:
+			var path: Array = []
+			var cur: Vector2i = goal
+			while cur != start:
+				path.append(cur)
+				cur = came_from[cur]
+			path.reverse()
+			return path
+		for d in dirs:
+			var n: Vector2i = p + d
+			if came_from.has(n):
+				continue
+			if not map.in_bounds(n) or not map.is_walkable(n):
+				continue
+			if not map.explored.has(n):
+				continue
+			came_from[n] = p
+			frontier.append(n)
+	return []
+
+func _advance_auto_walk() -> void:
+	if _auto_path.is_empty():
+		return
+	if _monster_in_sight():
+		_cancel_auto_walk("enemy in sight")
+		return
+	if player.hp < _auto_prev_hp:
+		_cancel_auto_walk("took damage")
+		return
+	var next: Vector2i = _auto_path[0]
+	var dir: Vector2i = next - player.grid_pos
+	if abs(dir.x) > 1 or abs(dir.y) > 1:
+		_cancel_auto_walk("path broken")
+		return
+	_auto_path.remove_at(0)
+	_auto_prev_hp = player.hp
+	player.try_step(dir)
+
+func _cancel_auto_walk(reason: String) -> void:
+	if _auto_path.is_empty():
+		return
+	_auto_path.clear()
+	if reason == "enemy in sight":
+		CombatLog.post("You stop — enemy in sight.", Color(1.0, 0.7, 0.5))
 
 func _apply_class_to_player(class_id: String) -> void:
 	var data: ClassData = ClassRegistry.get_by_id(class_id)
@@ -425,6 +503,8 @@ func _on_player_moved(_new_pos: Vector2i) -> void:
 func _on_player_turn_started() -> void:
 	if player != null and player.hp > 0:
 		player.tick_statuses()
+	if not _auto_path.is_empty():
+		_advance_auto_walk()
 
 func _on_player_died() -> void:
 	CombatLog.post("You have died.", Color(1.0, 0.4, 0.4))
