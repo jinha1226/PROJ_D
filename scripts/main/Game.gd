@@ -19,7 +19,7 @@ var ui_layer: CanvasLayer
 var top_hud: TopHUD
 var bottom_hud: BottomHUD
 var log_strip: CombatLogStrip
-var minimap_overlay: TextureButton
+var _effect_layer: Node2D
 
 func _ready() -> void:
 	if not GameManager.run_in_progress:
@@ -241,9 +241,9 @@ func _spawn_ui() -> void:
 	ui_layer.add_child(log_strip)
 	bottom_hud.bag_pressed.connect(_on_bag_pressed)
 	bottom_hud.status_pressed.connect(_on_status_pressed)
-	bottom_hud.wait_pressed.connect(_on_wait_pressed)
-	bottom_hud.menu_pressed.connect(_on_menu_pressed)
 	bottom_hud.rest_pressed.connect(_on_rest_pressed)
+	bottom_hud.act_pressed.connect(_on_act_pressed)
+	bottom_hud.menu_pressed.connect(_on_menu_pressed)
 	bottom_hud.skills_pressed.connect(_on_skills_pressed)
 	bottom_hud.magic_pressed.connect(_on_magic_pressed)
 	bottom_hud.quickslot_pressed.connect(_on_quickslot_pressed)
@@ -252,21 +252,15 @@ func _spawn_ui() -> void:
 		top_hud.zoom_in_pressed.connect(func(): _zoom_by(ZOOM_STEP))
 	if top_hud.has_signal("zoom_out_pressed"):
 		top_hud.zoom_out_pressed.connect(func(): _zoom_by(-ZOOM_STEP))
+	if top_hud.has_signal("minimap_pressed"):
+		top_hud.minimap_pressed.connect(_on_minimap_tapped)
 	log_strip.tapped.connect(_on_log_tapped)
-	_spawn_minimap_overlay()
+	_effect_layer = Node2D.new()
+	_effect_layer.name = "EffectLayer"
+	_effect_layer.z_index = 5
+	add_child(_effect_layer)
 	_refresh_quickslots()
 
-func _spawn_minimap_overlay() -> void:
-	minimap_overlay = TextureButton.new()
-	minimap_overlay.name = "MinimapOverlay"
-	minimap_overlay.position = Vector2(12, 160)
-	minimap_overlay.custom_minimum_size = Vector2(92, 120)
-	minimap_overlay.size = Vector2(92, 120)
-	minimap_overlay.ignore_texture_size = true
-	minimap_overlay.stretch_mode = TextureButton.STRETCH_SCALE
-	minimap_overlay.modulate = Color(1, 1, 1, 0.85)
-	minimap_overlay.pressed.connect(_on_minimap_tapped)
-	ui_layer.add_child(minimap_overlay)
 
 func _floor_seed(depth: int) -> int:
 	return GameManager.seed * 1009 + depth * 31
@@ -301,6 +295,7 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 		var m: Monster = MonsterScene.new()
 		monsters_layer.add_child(m)
 		m.setup(data, map, p)
+		m.hit_taken.connect(_on_monster_hit.bind(m))
 		TurnManager.register_actor(m)
 		placed += 1
 
@@ -362,8 +357,6 @@ func _update_minimap() -> void:
 	var tex: ImageTexture = MinimapRenderer.render(map, player, self)
 	if top_hud != null:
 		top_hud.set_minimap_texture(tex)
-	if minimap_overlay != null:
-		minimap_overlay.texture_normal = tex
 
 func _on_minimap_tapped() -> void:
 	if map == null or player == null:
@@ -473,54 +466,78 @@ func _on_status_pressed() -> void:
 	var dlg: GameDialog = GameDialog.create("Status")
 	add_child(dlg)
 	var body := dlg.body()
-	for text in _status_lines():
-		var lab := Label.new()
-		lab.text = text
-		lab.add_theme_font_size_override("font_size", 26)
-		body.add_child(lab)
+	body.add_theme_constant_override("separation", 10)
 
-func _status_lines() -> Array:
+	# Character card
+	var char_card := UICards.card(Color(0.5, 0.8, 1.0))
+	var char_vb := VBoxContainer.new()
+	char_vb.add_theme_constant_override("separation", 4)
+	char_card.add_child(char_vb)
+	char_vb.add_child(UICards.accent_value("Lv.%d  — XP %d / %d" % [player.xl, player.xp, player.xp_to_next()]))
+	char_vb.add_child(UICards.dim_hint("Kills: %d   Gold: %dg   Floor: B%d" % [player.kills, player.gold, GameManager.depth]))
+	body.add_child(char_card)
+
+	# Vitals card
+	var vital_card := UICards.card(Color(1.0, 0.4, 0.4))
+	var vital_vb := VBoxContainer.new()
+	vital_vb.add_theme_constant_override("separation", 4)
+	vital_card.add_child(vital_vb)
+	vital_vb.add_child(UICards.accent_value("HP  %d / %d" % [player.hp, player.hp_max]))
+	vital_vb.add_child(UICards.accent_value("MP  %d / %d" % [player.mp, player.mp_max], 34))
+	body.add_child(vital_card)
+
+	# Stats card
+	var stat_card := UICards.card(Color(0.9, 0.75, 0.3))
+	var stat_vb := VBoxContainer.new()
+	stat_vb.add_theme_constant_override("separation", 4)
+	stat_card.add_child(stat_vb)
+	stat_vb.add_child(UICards.accent_value("STR %d   DEX %d   INT %d" % [player.strength, player.dexterity, player.intelligence]))
+	stat_vb.add_child(UICards.dim_hint("AC %d   EV %d   WL %d" % [player.ac, player.ev, player.wl]))
+	body.add_child(stat_card)
+
+	# Equipment card
 	var w_data: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
 	var a_data: ItemData = ItemRegistry.get_by_id(player.equipped_armor_id)
-	var lines: Array = [
-		"Level: %d  (XP %d / %d)" % [player.xl, player.xp, player.xp_to_next()],
-		"HP: %d / %d" % [player.hp, player.hp_max],
-		"MP: %d / %d" % [player.mp, player.mp_max],
-		"STR %d  DEX %d  INT %d" % [player.strength, player.dexterity, player.intelligence],
-		"AC %d  EV %d  WL %d" % [player.ac, player.ev, player.wl],
-		"Weapon: %s" % (w_data.display_name if w_data != null else "(unarmed)"),
-		"Armor: %s" % (a_data.display_name if a_data != null else "(none)"),
-		"Gold: %d   Kills: %d" % [player.gold, player.kills],
-		"Depth: B%d" % GameManager.depth,
-	]
-	if not player.statuses.is_empty():
-		var parts: Array = []
-		for id in player.statuses.keys():
-			parts.append("%s (%d)" % [id, int(player.statuses[id])])
-		lines.append("Status: " + ", ".join(parts))
-	return lines
+	var eq_card := UICards.card(Color(0.6, 0.9, 0.6))
+	var eq_vb := VBoxContainer.new()
+	eq_vb.add_theme_constant_override("separation", 4)
+	eq_card.add_child(eq_vb)
+	eq_vb.add_child(UICards.section_header("EQUIPMENT"))
+	eq_vb.add_child(UICards.dim_hint("⚔  " + (w_data.display_name if w_data != null else "unarmed")))
+	eq_vb.add_child(UICards.dim_hint("🛡  " + (a_data.display_name if a_data != null else "none")))
+	body.add_child(eq_card)
 
-func _on_wait_pressed() -> void:
-	if player == null or not TurnManager.is_player_turn or player.hp <= 0:
-		return
-	player.wait_turn()
-	TurnManager.end_player_turn()
+	# Active statuses
+	if not player.statuses.is_empty():
+		var st_card := UICards.card(Color(1.0, 0.5, 0.8))
+		var st_vb := VBoxContainer.new()
+		st_vb.add_theme_constant_override("separation", 4)
+		st_card.add_child(st_vb)
+		st_vb.add_child(UICards.section_header("STATUSES"))
+		var parts: Array = []
+		for sid in player.statuses.keys():
+			parts.append("%s (%d)" % [sid, int(player.statuses[sid])])
+		st_vb.add_child(UICards.dim_hint(", ".join(parts)))
+		body.add_child(st_card)
 
 func _on_rest_pressed() -> void:
-	# Auto-rest until HP/MP full or a monster appears in view.
-	if player == null:
+	if player == null or player.hp <= 0 or not TurnManager.is_player_turn:
 		return
 	if _monster_in_sight():
-		CombatLog.post("Can't rest — enemy in sight.", Color(1.0, 0.7, 0.5))
+		# WAIT: single turn pass when enemies are visible
+		player.wait_turn()
+		TurnManager.end_player_turn()
+		return
+	if player.hp >= player.hp_max and player.mp >= player.mp_max:
+		CombatLog.post("You are already fully rested.", Color(0.7, 0.9, 0.6))
 		return
 	var ticks: int = 0
-	while ticks < 60 and player.hp < player.hp_max and player.hp > 0:
+	while ticks < 100 and (player.hp < player.hp_max or player.mp < player.mp_max) and player.hp > 0:
 		player.wait_turn()
 		TurnManager.end_player_turn(true)
 		ticks += 1
 		if _monster_in_sight():
-			CombatLog.post("You stop resting — enemy spotted.",
-				Color(1.0, 0.7, 0.5))
+			CombatLog.post("You stop resting — enemy spotted.", Color(1.0, 0.7, 0.5))
 			break
 
 func _monster_in_sight() -> bool:
@@ -538,7 +555,20 @@ func _on_quickslot_pressed(index: int) -> void:
 	if player == null or player.hp <= 0:
 		return
 	var slot_id: String = String(player.quickslots[index])
-	if slot_id == "" or player.count_item(slot_id) == 0:
+	if slot_id == "":
+		QuickslotPicker.open(player, self, index, _refresh_quickslots)
+		return
+	# Check if it's a spell
+	var spell: SpellData = SpellRegistry.get_by_id(slot_id)
+	if spell != null:
+		if not TurnManager.is_player_turn:
+			return
+		var ok: bool = MagicSystem.cast(slot_id, player, self)
+		if ok:
+			TurnManager.end_player_turn()
+		return
+	# Item path
+	if player.count_item(slot_id) == 0:
 		QuickslotPicker.open(player, self, index, _refresh_quickslots)
 		return
 	if not TurnManager.is_player_turn:
@@ -564,6 +594,13 @@ func _refresh_quickslots() -> void:
 		if id == "":
 			bottom_hud.set_quickslot(i, null, "")
 			continue
+		# Spell slot
+		var spell: SpellData = SpellRegistry.get_by_id(id)
+		if spell != null:
+			bottom_hud.set_quickslot_display(i, spell.display_name.left(3),
+					Color(0.7, 0.5, 1.0))
+			continue
+		# Item slot
 		var data: ItemData = ItemRegistry.get_by_id(id)
 		if data == null:
 			bottom_hud.set_quickslot(i, null, "")
@@ -606,3 +643,101 @@ func _item_at(pos: Vector2i) -> FloorItem:
 		if n is FloorItem and n.grid_pos == pos:
 			return n
 	return null
+
+
+func _on_act_pressed() -> void:
+	if player == null or player.hp <= 0 or not TurnManager.is_player_turn:
+		return
+	var nearest := _nearest_visible_monster()
+	if nearest != null:
+		var dir := _greedy_step_toward(nearest.grid_pos)
+		if dir != Vector2i.ZERO:
+			player.try_step(dir)
+		else:
+			CombatLog.post("Can't reach the %s." % nearest.data.display_name,
+					Color(1.0, 0.7, 0.5))
+	else:
+		# Auto-explore: walk toward stairs
+		var dir := _greedy_step_toward(map.stairs_down_pos)
+		if dir != Vector2i.ZERO:
+			player.try_step(dir)
+		else:
+			CombatLog.post("Nothing to do.", Color(0.7, 0.7, 0.5))
+
+
+func _nearest_visible_monster() -> Monster:
+	var nearest: Monster = null
+	var best: int = 99999
+	for n in get_tree().get_nodes_in_group("monsters"):
+		if n is Monster and map.visible_tiles.has(n.grid_pos):
+			var d := _chebyshev(player.grid_pos, n.grid_pos)
+			if d < best:
+				best = d
+				nearest = n
+	return nearest
+
+
+func _greedy_step_toward(target: Vector2i) -> Vector2i:
+	var dx := sign(target.x - player.grid_pos.x)
+	var dy := sign(target.y - player.grid_pos.y)
+	if dx != 0 and dy != 0 and map.is_walkable(player.grid_pos + Vector2i(dx, dy)):
+		return Vector2i(dx, dy)
+	if dx != 0 and map.is_walkable(player.grid_pos + Vector2i(dx, 0)):
+		return Vector2i(dx, 0)
+	if dy != 0 and map.is_walkable(player.grid_pos + Vector2i(0, dy)):
+		return Vector2i(0, dy)
+	return Vector2i.ZERO
+
+
+func _on_monster_hit(amount: int, monster: Monster) -> void:
+	if not is_instance_valid(monster):
+		return
+	var cell_size: float = DungeonMap.CELL_SIZE
+	var world_pos: Vector2 = monster.position + Vector2(cell_size * 0.5, 0.0)
+	spawn_damage_number(world_pos, amount, Color(1.0, 0.85, 0.2))
+
+
+## Spawn a floating damage number at the given world position.
+func spawn_damage_number(world_pos: Vector2, amount: int, color: Color) -> void:
+	if _effect_layer == null:
+		return
+	var lbl := Label.new()
+	lbl.text = "-%d" % amount
+	lbl.add_theme_font_size_override("font_size", 28)
+	lbl.add_theme_color_override("font_color", color)
+	lbl.position = world_pos + Vector2(-20, -32)
+	lbl.z_index = 10
+	_effect_layer.add_child(lbl)
+	var tw := lbl.create_tween()
+	tw.tween_property(lbl, "position:y", lbl.position.y - 48.0, 0.65)
+	tw.parallel().tween_property(lbl, "modulate:a", 0.0, 0.65)
+	tw.tween_callback(lbl.queue_free)
+
+
+## Spawn a brief hit flash on a monster sprite node.
+func spawn_hit_flash(target_node: Node2D) -> void:
+	if target_node == null:
+		return
+	var tw := target_node.create_tween()
+	tw.tween_property(target_node, "modulate", Color(1.0, 0.3, 0.3, 1.0), 0.06)
+	tw.tween_property(target_node, "modulate", Color.WHITE, 0.12)
+
+
+## Spawn a projectile that travels from world_start to world_end, then calls on_arrive.
+func spawn_projectile(world_start: Vector2, world_end: Vector2,
+		color: Color, on_arrive: Callable = Callable()) -> void:
+	if _effect_layer == null:
+		if on_arrive.is_valid():
+			on_arrive.call()
+		return
+	var dot := ColorRect.new()
+	dot.size = Vector2(10, 10)
+	dot.color = color
+	dot.position = world_start
+	dot.z_index = 8
+	_effect_layer.add_child(dot)
+	var tw := dot.create_tween()
+	tw.tween_property(dot, "position", world_end, 0.18)
+	tw.tween_callback(dot.queue_free)
+	if on_arrive.is_valid():
+		tw.tween_callback(on_arrive)

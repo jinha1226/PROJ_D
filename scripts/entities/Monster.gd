@@ -2,6 +2,7 @@ class_name Monster extends Node2D
 
 signal died(monster)
 signal stats_changed
+signal hit_taken(amount: int)
 
 var data: MonsterData
 var hp: int = 0
@@ -42,6 +43,11 @@ func try_move(dir: Vector2i) -> bool:
 func take_damage(amount: int) -> void:
 	hp = max(0, hp - amount)
 	emit_signal("stats_changed")
+	hit_taken.emit(amount)
+	# Red flash
+	modulate = Color(1.0, 0.25, 0.25, 1.0)
+	var tw := create_tween()
+	tw.tween_property(self, "modulate", Color.WHITE, 0.18)
 	if hp <= 0:
 		die()
 
@@ -49,7 +55,10 @@ func die() -> void:
 	emit_signal("died", self)
 	TurnManager.unregister_actor(self)
 	remove_from_group("monsters")
-	queue_free()
+	# Brief fade-out before freeing
+	var tw := create_tween()
+	tw.tween_property(self, "modulate:a", 0.0, 0.12)
+	tw.tween_callback(queue_free)
 
 func _draw() -> void:
 	if data == null:

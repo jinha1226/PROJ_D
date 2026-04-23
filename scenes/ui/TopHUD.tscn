@@ -32,23 +32,10 @@ theme_override_constants/margin_bottom = 6
 [node name="HBox" type="HBoxContainer" parent="Margin"]
 theme_override_constants/separation = 8
 
-[node name="ZoomColumn" type="VBoxContainer" parent="Margin/HBox"]
-custom_minimum_size = Vector2(110, 0)
-theme_override_constants/separation = 4
-
-[node name="ZoomInButton" type="Button" parent="Margin/HBox/ZoomColumn"]
-custom_minimum_size = Vector2(100, 62)
-theme_override_font_sizes/font_size = 30
-text = "＋"
-
-[node name="ZoomOutButton" type="Button" parent="Margin/HBox/ZoomColumn"]
-custom_minimum_size = Vector2(100, 62)
-theme_override_font_sizes/font_size = 30
-text = "－"
-
 [node name="MinimapButton" type="Button" parent="Margin/HBox"]
-visible = false
-custom_minimum_size = Vector2(0, 0)
+custom_minimum_size = Vector2(130, 0)
+size_flags_vertical = 3
+expand_icon = true
 
 [node name="Bars" type="VBoxContainer" parent="Margin/HBox"]
 size_flags_horizontal = 3
@@ -104,3 +91,17 @@ max_value = 100.0
 value = 0.0
 show_percentage = false
 theme_override_styles/fill = SubResource("SB_XP")
+
+[node name="ZoomColumn" type="VBoxContainer" parent="Margin/HBox"]
+custom_minimum_size = Vector2(110, 0)
+theme_override_constants/separation = 4
+
+[node name="ZoomInButton" type="Button" parent="Margin/HBox/ZoomColumn"]
+custom_minimum_size = Vector2(100, 62)
+theme_override_font_sizes/font_size = 30
+text = "＋"
+
+[node name="ZoomOutButton" type="Button" parent="Margin/HBox/ZoomColumn"]
+custom_minimum_size = Vector2(100, 62)
+theme_override_font_sizes/font_size = 30
+text = "－"

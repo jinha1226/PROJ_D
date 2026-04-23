@@ -70,10 +70,10 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="RestButton" type="Button" parent="Margin/VBox/Row1"]
-custom_minimum_size = Vector2(180, 0)
+custom_minimum_size = Vector2(150, 0)
 size_flags_vertical = 3
 text = "REST"
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 26
 
 [node name="Row2" type="HBoxContainer" parent="Margin/VBox"]
 size_flags_horizontal = 3
@@ -84,46 +84,34 @@ theme_override_constants/separation = 6
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "BAG"
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 26
 
 [node name="SkillsButton" type="Button" parent="Margin/VBox/Row2"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "SKILLS"
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 26
 
 [node name="MagicButton" type="Button" parent="Margin/VBox/Row2"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "MAGIC"
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 26
 
 [node name="StatusButton" type="Button" parent="Margin/VBox/Row2"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "STATUS"
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 26
 
-[node name="WaitButton" type="Button" parent="Margin/VBox/Row2"]
+[node name="ActButton" type="Button" parent="Margin/VBox/Row2"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "WAIT"
-theme_override_font_sizes/font_size = 24
-
-[node name="AutoMoveButton" type="Button" parent="Margin/VBox/Row2"]
-size_flags_horizontal = 3
-size_flags_vertical = 3
-text = "AUTO"
-theme_override_font_sizes/font_size = 24
-
-[node name="AutoAttackButton" type="Button" parent="Margin/VBox/Row2"]
-size_flags_horizontal = 3
-size_flags_vertical = 3
-text = "ATCK"
-theme_override_font_sizes/font_size = 24
+text = "ACT"
+theme_override_font_sizes/font_size = 26
 
 [node name="MenuButton" type="Button" parent="Margin/VBox/Row2"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "MENU"
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 26

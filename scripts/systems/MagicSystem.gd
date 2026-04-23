@@ -28,6 +28,8 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 			player.heal(amt)
 			CombatLog.post("You cast %s. (+%d HP)" % [spell.display_name, amt],
 				Color(0.6, 1.0, 0.6))
+			if game != null and game.has_method("spawn_damage_number"):
+				game.spawn_damage_number(player.position, amt, Color(0.4, 1.0, 0.5))
 		"blink":
 			player._blink(max(2, spell.max_range))
 			CombatLog.post("You cast %s." % spell.display_name,
@@ -61,6 +63,12 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 	var dmg: int = spell.base_damage + randi_range(0, 2) + power / 3
 	CombatLog.hit("You hit the %s with %s for %d." \
 			% [target.data.display_name, spell.display_name, dmg])
+	# Projectile visual
+	if game != null and game.has_method("spawn_projectile"):
+		var cell: float = DungeonMap.CELL_SIZE
+		var half := Vector2(cell * 0.5, cell * 0.5)
+		game.spawn_projectile(player.position + half, target.position + half,
+				_spell_bolt_color(spell.effect))
 	var was_alive: bool = target.hp > 0
 	target.take_damage(dmg)
 	if was_alive and target.hp <= 0:
@@ -125,6 +133,13 @@ static func _aoe_damage(spell: SpellData, player: Player,
 	if hits == 0:
 		CombatLog.post("The flames find no target.",
 			Color(0.75, 0.75, 0.75))
+
+static func _spell_bolt_color(effect: String) -> Color:
+	match effect:
+		"aoe_damage": return Color(1.0, 0.5, 0.1)
+		"multi_damage": return Color(0.8, 0.5, 1.0)
+		_: return Color(0.4, 0.7, 1.0)
+
 
 static func _find_nearest_visible(player: Player, game: Node,
 		max_range: int) -> Monster:

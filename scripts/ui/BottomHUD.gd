@@ -9,10 +9,8 @@ signal bag_pressed
 signal skills_pressed
 signal magic_pressed
 signal status_pressed
-signal wait_pressed
+signal act_pressed
 signal menu_pressed
-signal auto_move_pressed
-signal auto_attack_pressed
 
 @onready var quick_slots: Array = [
 	$Margin/VBox/Row1/QuickSlot0,
@@ -29,9 +27,7 @@ signal auto_attack_pressed
 @onready var skills_button: Button = $Margin/VBox/Row2/SkillsButton
 @onready var magic_button: Button = $Margin/VBox/Row2/MagicButton
 @onready var status_button: Button = $Margin/VBox/Row2/StatusButton
-@onready var wait_button: Button = $Margin/VBox/Row2/WaitButton
-@onready var auto_move_button: Button = $Margin/VBox/Row2/AutoMoveButton
-@onready var auto_attack_button: Button = $Margin/VBox/Row2/AutoAttackButton
+@onready var act_button: Button = $Margin/VBox/Row2/ActButton
 @onready var menu_button: Button = $Margin/VBox/Row2/MenuButton
 
 
@@ -51,10 +47,14 @@ func _ready() -> void:
 	skills_button.pressed.connect(func(): skills_pressed.emit())
 	magic_button.pressed.connect(func(): magic_pressed.emit())
 	status_button.pressed.connect(func(): status_pressed.emit())
-	wait_button.pressed.connect(func(): wait_pressed.emit())
-	auto_move_button.pressed.connect(func(): auto_move_pressed.emit())
-	auto_attack_button.pressed.connect(func(): auto_attack_pressed.emit())
+	act_button.pressed.connect(func(): act_pressed.emit())
 	menu_button.pressed.connect(func(): menu_pressed.emit())
+
+
+## Update REST button label to hint at current mode.
+func set_rest_label(monster_in_sight: bool) -> void:
+	if rest_button != null:
+		rest_button.text = "WAIT" if monster_in_sight else "REST"
 
 
 func set_quickslot(i: int, icon: Texture2D, text: String) -> void:
@@ -67,16 +67,6 @@ func set_quickslot_display(i: int, txt: String, color: Color) -> void:
 		quick_slots[i].set_slot_display(txt, color)
 
 
-func set_essence(_id: String, _type_color: Color) -> void:
-	pass
-
-signal essence_slot_tapped
-
-
-## Resolve a drag's release position to the quickslot sitting under the
-## finger and fire the swap signal. Silent no-op when the release
-## lands outside every slot or back on the origin — a misfire shouldn't
-## steal the player's current binding.
 func _on_quickslot_drag_released(from_index: int, release_pos: Vector2) -> void:
 	var to_index: int = -1
 	for i in quick_slots.size():
