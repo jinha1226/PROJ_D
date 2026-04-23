@@ -30,6 +30,10 @@ const DOLL_HAND1_MAP: Dictionary = {
 	"mace": "res://assets/tiles/individual/player/hand1/mace.png",
 	"long_sword": "res://assets/tiles/individual/player/hand1/long_sword_slant.png",
 	"battle_axe": "res://assets/tiles/individual/player/hand1/battle_axe1.png",
+	"flaming_sword": "res://assets/tiles/individual/player/hand1/short_sword.png",
+	"frost_dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
+	"venom_dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
+	"shock_mace": "res://assets/tiles/individual/player/hand1/mace.png",
 }
 
 var _base_tex: Texture2D = DEFAULT_BASE_TEX
