@@ -117,10 +117,14 @@ static func _multi_damage(spell: SpellData, player: Player,
 			break
 		var dmg: int = spell.base_damage + randi_range(0, 2) + power / 4
 		dmg = _apply_element_bonus(spell, target, dmg)
+		var scaled: int = Status.resist_scale(dmg, target.data.resists,
+			spell.element)
 		CombatLog.hit("A dart strikes the %s for %d." \
-				% [target.data.display_name, dmg])
+				% [target.data.display_name, scaled])
 		var was_alive: bool = target.hp > 0
-		target.take_damage(dmg)
+		target.take_damage(scaled)
+		if was_alive and target.hp > 0:
+			_apply_elemental_side_effects(spell, target)
 		if was_alive and target.hp <= 0:
 			CombatLog.hit("You kill the %s." % target.data.display_name)
 			player.grant_xp(target.data.xp_value)
