@@ -45,6 +45,7 @@ func save_run(player, game_manager) -> bool:
 		"player": {
 			"hp": player.hp,
 			"hp_max": player.hp_max,
+			"injury": player.injury,
 			"mp": player.mp,
 			"mp_max": player.mp_max,
 			"ac": player.ac,

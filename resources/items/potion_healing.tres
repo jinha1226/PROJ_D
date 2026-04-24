@@ -20,6 +20,6 @@ ac_bonus = 0
 ev_penalty = 0
 slot = ""
 effect = "heal"
-effect_value = 10
+effect_value = 15
 plus = 0
 description = "Restores 15 HP."

@@ -1,0 +1,62 @@
+{
+  "version": "balance_v1",
+  "design_rules": {
+    "stat_mod_range": [-2, 2],
+    "hp_mod_range": [-4, 6],
+    "mp_mod_range": [-3, 4],
+    "resistance_bonus_usual": 1,
+    "passive_power_target": "small but noticeable"
+  },
+  "examples": [
+    {
+      "id": "human",
+      "str_mod": 0,
+      "dex_mod": 0,
+      "int_mod": 0,
+      "hp_mod": 0,
+      "mp_mod": 0,
+      "resist_mods": [],
+      "passive_tags": ["adaptable"]
+    },
+    {
+      "id": "orc",
+      "str_mod": 2,
+      "dex_mod": 0,
+      "int_mod": -1,
+      "hp_mod": 4,
+      "mp_mod": 0,
+      "resist_mods": [],
+      "passive_tags": ["minor_melee_bonus"]
+    },
+    {
+      "id": "elf",
+      "str_mod": -1,
+      "dex_mod": 0,
+      "int_mod": 2,
+      "hp_mod": 0,
+      "mp_mod": 3,
+      "resist_mods": [],
+      "passive_tags": ["minor_magic_bonus"]
+    },
+    {
+      "id": "kobold",
+      "str_mod": -1,
+      "dex_mod": 2,
+      "int_mod": 0,
+      "hp_mod": -2,
+      "mp_mod": 0,
+      "resist_mods": [],
+      "passive_tags": ["minor_stealth_bonus"]
+    },
+    {
+      "id": "troll",
+      "str_mod": 2,
+      "dex_mod": 0,
+      "int_mod": -2,
+      "hp_mod": 6,
+      "mp_mod": -2,
+      "resist_mods": ["fire-"],
+      "passive_tags": ["hp_regen_small"]
+    }
+  ]
+}

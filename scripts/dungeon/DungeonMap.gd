@@ -50,6 +50,7 @@ var tiles: PackedByteArray = PackedByteArray()
 var visible_tiles: Dictionary = {}
 var explored: Dictionary = {}
 var reveal_all: bool = false
+var fog_tiles: Dictionary = {}  # Vector2i -> turns_remaining
 
 var spawn_pos: Vector2i = Vector2i(1, 1)
 var stairs_down_pos: Vector2i = Vector2i(1, 1)
@@ -76,7 +77,30 @@ func is_walkable(p: Vector2i) -> bool:
 
 func is_opaque(p: Vector2i) -> bool:
 	var t := tile_at(p)
-	return t == Tile.WALL or t == Tile.DOOR_CLOSED
+	return t == Tile.WALL or t == Tile.DOOR_CLOSED or fog_tiles.has(p)
+
+
+func add_fog(center: Vector2i, radius: int, turns: int) -> void:
+	for dy in range(-radius, radius + 1):
+		for dx in range(-radius, radius + 1):
+			var p := center + Vector2i(dx, dy)
+			if in_bounds(p) and tile_at(p) == Tile.FLOOR:
+				fog_tiles[p] = turns
+	queue_redraw()
+
+
+func tick_fog() -> bool:
+	if fog_tiles.is_empty():
+		return false
+	var to_remove: Array = []
+	for p in fog_tiles.keys():
+		fog_tiles[p] -= 1
+		if fog_tiles[p] <= 0:
+			to_remove.append(p)
+	for p in to_remove:
+		fog_tiles.erase(p)
+	queue_redraw()
+	return true
 
 func grid_to_world(p: Vector2i) -> Vector2:
 	return Vector2(p.x * CELL_SIZE, p.y * CELL_SIZE)
@@ -93,6 +117,7 @@ func generate(map_seed: int = -1) -> void:
 	rooms = result["rooms"]
 	visible_tiles.clear()
 	explored.clear()
+	fog_tiles.clear()
 	_load_atmosphere(GameManager.depth)
 	queue_redraw()
 
@@ -163,6 +188,13 @@ func _draw() -> void:
 			draw_string(ThemeDB.fallback_font,
 				Vector2(x * CELL_SIZE + 6, y * CELL_SIZE + CELL_SIZE - 6),
 				glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6, glyph_color)
+
+	# Fog overlay on visible fog tiles
+	for fp in fog_tiles.keys():
+		if reveal_all or visible_tiles.has(fp):
+			var fr := Rect2(Vector2(fp.x * CELL_SIZE, fp.y * CELL_SIZE),
+					Vector2(CELL_SIZE, CELL_SIZE))
+			draw_rect(fr, Color(0.55, 0.65, 0.8, 0.55))
 
 func _texture_for(t: int) -> Texture2D:
 	match t:

@@ -1,0 +1,17 @@
+{
+  "version": "balance_v1",
+  "status_effects": {
+    "poison": { "duration_turns": [3, 5], "type": "damage_over_time" },
+    "burning": { "duration_turns": [2, 4], "type": "damage_over_time" },
+    "frozen": { "duration_turns": [1, 2], "type": "short_hard_control" },
+    "confused": { "duration_turns": [2, 4], "type": "soft_control" },
+    "fear": { "duration_turns": [2, 4], "type": "position_break" },
+    "sleep": { "duration_turns": [2, 5], "type": "conditional_hard_control" },
+    "stun": { "duration_turns": [1, 3], "type": "hard_control" },
+    "paralyze": { "duration_turns": [1, 2], "type": "hard_control" }
+  },
+  "rules": {
+    "hard_control_soft_cap_turns": 3,
+    "long_duration_allowed_for_dot_only": true
+  }
+}

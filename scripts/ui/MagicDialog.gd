@@ -70,7 +70,8 @@ static func _populate(dlg: GameDialog, player: Player, game: Node) -> void:
 
 static func _make_spell_row(spell: SpellData, player: Player,
 		dlg: GameDialog, game: Node) -> Control:
-	var locked: bool = spell.xl_required > 0 and player.xl < spell.xl_required
+	var skill_id: String = spell.school if spell.school != "" else "magic"
+	var locked: bool = spell.spell_level > player.get_skill_level(skill_id)
 	var no_mp: bool = player.mp < spell.mp_cost
 
 	var row := HBoxContainer.new()
@@ -106,13 +107,19 @@ static func _make_spell_row(spell: SpellData, player: Player,
 
 	var stat_lbl := Label.new()
 	if locked:
-		stat_lbl.text = "Requires level %d" % spell.xl_required
+		var sk: String = spell.school.capitalize() if spell.school != "" else "Magic"
+		stat_lbl.text = "%s skill %d required" % [sk, spell.spell_level]
 		stat_lbl.add_theme_color_override("font_color", Color(0.55, 0.45, 0.45))
 	else:
 		var range_str: String = "%d tiles" % spell.max_range if spell.max_range > 0 else "self"
-		stat_lbl.text = "MP:%d  %s  %s" % [
-			spell.mp_cost, range_str, _describe(player, spell)]
-		stat_lbl.add_theme_color_override("font_color", Color(0.6, 0.62, 0.68))
+		var armor_mult: float = _armor_spell_mult(player)
+		var armor_note: String = ""
+		if armor_mult < 1.0:
+			armor_note = "  ⚠-%d%%" % int(round((1.0 - armor_mult) * 100.0))
+		stat_lbl.text = "MP:%d  %s  %s%s" % [
+			spell.mp_cost, range_str, _describe(player, spell), armor_note]
+		var stat_color: Color = Color(0.85, 0.55, 0.35) if armor_mult < 1.0 else Color(0.6, 0.62, 0.68)
+		stat_lbl.add_theme_color_override("font_color", stat_color)
 	stat_lbl.add_theme_font_size_override("font_size", 19)
 	stat_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	info.add_child(stat_lbl)
@@ -193,10 +200,18 @@ static func _describe(player: Player, spell: SpellData) -> String:
 	return spell.description.left(28)
 
 
+static func _armor_spell_mult(player: Player) -> float:
+	match player.equipped_armor_id:
+		"robe", "": return 1.0
+		"leather_armor": return 0.85
+		"chain_mail": return 0.65
+		_: return 0.5
+
+
 static func _compute_power(player: Player, spell: SpellData) -> int:
 	var skill_id: String = spell.school if spell.school != "" else "magic"
 	var skill: int = player.get_skill_level(skill_id)
-	return int(float(player.intelligence) * (1.0 + float(skill) * 0.06))
+	return int(float(player.intelligence) * (1.0 + float(skill) * 0.06) * _armor_spell_mult(player))
 
 
 static func _school_color(school: String) -> Color:

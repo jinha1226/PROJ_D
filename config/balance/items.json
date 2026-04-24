@@ -1,0 +1,78 @@
+{
+  "version": "balance_v1",
+  "model": "fixed_base_plus_tier_plus_brand_plus_enchant",
+  "weapon_tiers": {
+    "dagger_line": [
+      { "id": "dagger", "tier": 1, "damage": 4, "required_skill": 0 },
+      { "id": "stiletto", "tier": 2, "damage": 5, "required_skill": 2 },
+      { "id": "dirk", "tier": 3, "damage": 6, "required_skill": 4 },
+      { "id": "assassin_blade", "tier": 4, "damage": 7, "required_skill": 6 },
+      { "id": "quick_blade", "tier": 5, "damage": 8, "required_skill": 8 }
+    ],
+    "blade_line": [
+      { "id": "short_sword", "tier": 1, "damage": 5, "required_skill": 0 },
+      { "id": "arming_sword", "tier": 2, "damage": 6, "required_skill": 2 },
+      { "id": "long_sword", "tier": 3, "damage": 7, "required_skill": 4 },
+      { "id": "bastard_sword", "tier": 4, "damage": 8, "required_skill": 6 },
+      { "id": "great_blade", "tier": 5, "damage": 10, "required_skill": 8 }
+    ]
+  },
+  "armor_tiers": [
+    { "tier": 1, "ac": [1, 2], "ev_penalty": [0, 1], "required_armor_skill": 0 },
+    { "tier": 2, "ac": [3, 4], "ev_penalty": [1, 2], "required_armor_skill": 2 },
+    { "tier": 3, "ac": [5, 6], "ev_penalty": [2, 3], "required_armor_skill": 4 },
+    { "tier": 4, "ac": [7, 8], "ev_penalty": [3, 4], "required_armor_skill": 6 },
+    { "tier": 5, "ac": [9, 11], "ev_penalty": [4, 5], "required_armor_skill": 8 }
+  ],
+  "shield_tiers": [
+    { "tier": 1, "block_pct": 10, "ev_penalty": 0, "required_shield_skill": 0 },
+    { "tier": 2, "block_pct": 16, "ev_penalty": 1, "required_shield_skill": 2 },
+    { "tier": 3, "block_pct": 22, "ev_penalty": 1, "required_shield_skill": 4 },
+    { "tier": 4, "block_pct": 28, "ev_penalty": 2, "required_shield_skill": 6 },
+    { "tier": 5, "block_pct": 34, "ev_penalty": 2, "required_shield_skill": 8 }
+  ],
+  "under_requirement_penalties": {
+    "weapon": {
+      "hit_penalty_per_missing_level": -2,
+      "damage_penalty_pct_per_missing_level": -5
+    },
+    "armor": {
+      "ev_penalty_per_missing_level": 1
+    },
+    "shield": {
+      "block_penalty_pct_per_missing_level": -4
+    }
+  },
+  "brands": {
+    "flaming": {
+      "bonus_damage": "1d4_fire",
+      "status": { "id": "burning", "turns": 2 }
+    },
+    "freezing": {
+      "bonus_damage": "1d4_cold",
+      "status": { "id": "frozen", "turns": 1 }
+    },
+    "venom": {
+      "bonus_damage": "1d3_poison",
+      "status": { "id": "poison", "turns": 3 }
+    },
+    "electric": {
+      "bonus_damage": "1d6_electric",
+      "wet_target_bonus": true
+    },
+    "draining": {
+      "bonus_damage": "1d4_necromancy"
+    }
+  },
+  "consumables": {
+    "healing_potion": {
+      "healing_pct_of_standard_hp": [30, 40]
+    },
+    "mana_potion": {
+      "mana_pct_of_standard_mp": [35, 50]
+    },
+    "enchant_scroll": {
+      "enchant_value": 1
+    }
+  }
+}

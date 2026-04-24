@@ -1,0 +1,69 @@
+{
+  "version": "balance_v1",
+  "tiers": {
+    "t1": {
+      "hp": [8, 14],
+      "hd": [1, 1],
+      "ac": [0, 2],
+      "ev": [4, 7],
+      "damage": [2, 4]
+    },
+    "t2": {
+      "hp": [14, 24],
+      "hd": [2, 3],
+      "ac": [1, 4],
+      "ev": [5, 8],
+      "damage": [4, 7]
+    },
+    "t3": {
+      "hp": [24, 40],
+      "hd": [4, 5],
+      "ac": [3, 6],
+      "ev": [6, 10],
+      "damage": [6, 10]
+    },
+    "t4": {
+      "hp": [40, 65],
+      "hd": [6, 8],
+      "ac": [5, 9],
+      "ev": [7, 11],
+      "damage": [9, 14]
+    },
+    "t5": {
+      "hp": [65, 100],
+      "hd": [9, 12],
+      "ac": [8, 12],
+      "ev": [8, 12],
+      "damage": [12, 20]
+    }
+  },
+  "roles": {
+    "bruiser": {
+      "hp_multiplier": 1.2,
+      "ac_bonus": 1,
+      "ev_penalty": -1
+    },
+    "skirmisher": {
+      "hp_multiplier": 0.85,
+      "ev_bonus": 2
+    },
+    "archer": {
+      "hp_multiplier": 0.8,
+      "ranged_attack_enabled": true
+    },
+    "caster": {
+      "hp_multiplier": 0.75,
+      "special_effect_focus": true
+    },
+    "tank": {
+      "hp_multiplier": 1.3,
+      "ac_bonus": 2,
+      "speed_penalty": -1
+    },
+    "assassin": {
+      "hp_multiplier": 0.8,
+      "ev_bonus": 2,
+      "damage_bonus": 2
+    }
+  }
+}

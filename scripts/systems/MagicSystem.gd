@@ -4,8 +4,10 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 	var spell: SpellData = SpellRegistry.get_by_id(spell_id)
 	if spell == null:
 		return false
-	if spell.xl_required > 0 and player.xl < spell.xl_required:
-		CombatLog.post("%s requires level %d." % [spell.display_name, spell.xl_required],
+	var _skill_id: String = spell.school if spell.school != "" else "magic"
+	if spell.spell_level > player.get_skill_level(_skill_id):
+		CombatLog.post("%s requires %s skill %d." % [
+				spell.display_name, _skill_id.capitalize(), spell.spell_level],
 			Color(1.0, 0.7, 0.5))
 		return false
 	if not RacePassiveSystem.on_spell_cast_mp_check(player, spell.mp_cost):
@@ -58,6 +60,8 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 		"banish":
 			_cast_banish(spell, player, game)
 		"fog":
+			if game != null and game.get("map") != null:
+				game.map.add_fog(player.grid_pos, 3, 8)
 			CombatLog.post("A thick fog fills the area.", Color(0.75, 0.8, 0.9))
 		"floor_travel":
 			player._teleport_far()
@@ -260,10 +264,18 @@ static func _cast_prismatic(spell: SpellData, player: Player, power: int, game: 
 		5: _cast_instant_kill(spell, player, game, 80)
 
 
+static func _armor_spell_mult(player: Player) -> float:
+	match player.equipped_armor_id:
+		"robe", "": return 1.0
+		"leather_armor": return 0.85
+		"chain_mail": return 0.65
+		_: return 0.5
+
+
 static func _compute_power(player: Player, spell: SpellData) -> int:
 	var skill_id: String = spell.school if spell.school != "" else "magic"
 	var skill: int = player.get_skill_level(skill_id)
-	return int(float(player.intelligence) * (1.0 + float(skill) * 0.06))
+	return int(float(player.intelligence) * (1.0 + float(skill) * 0.06) * _armor_spell_mult(player))
 
 
 static func _apply_element_bonus(spell: SpellData, target: Monster, dmg: int) -> int:

@@ -1,0 +1,68 @@
+{
+  "version": "balance_v1",
+  "model": "passive_only",
+  "slots": {
+    "early": 1,
+    "mid": 2,
+    "late": 3
+  },
+  "categories": {
+    "numeric": {
+      "examples": ["str", "dex", "int", "ac", "ev", "hp", "mp"]
+    },
+    "regen": {
+      "examples": ["hp_regen", "mp_regen", "rest_bonus"]
+    },
+    "conditional": {
+      "examples": [
+        "low_hp_bonus",
+        "vs_undead_bonus",
+        "poison_reduction",
+        "on_kill_minor_heal"
+      ]
+    }
+  },
+  "per_essence_budget": {
+    "major_benefit_count": 1,
+    "minor_benefit_count": 1,
+    "optional_penalty_count": 1
+  },
+  "caps": {
+    "max_resistance_level": 3,
+    "max_hp_regen_per_turn": 2,
+    "max_mp_regen_per_turn": 1,
+    "max_single_essence_primary_stat_bonus": 2,
+    "max_single_essence_ac_or_ev_bonus": 2
+  },
+  "example_essences": [
+    {
+      "id": "adder_essence",
+      "type": "numeric",
+      "bonuses": [
+        { "stat": "dex", "value": 1 },
+        { "resist": "poison", "value": 1 }
+      ]
+    },
+    {
+      "id": "troll_essence",
+      "type": "regen",
+      "bonuses": [
+        { "regen": "hp_regen", "value": 1 }
+      ],
+      "penalties": [
+        { "resist": "fire", "value": -1 }
+      ]
+    },
+    {
+      "id": "gargoyle_essence",
+      "type": "numeric",
+      "bonuses": [
+        { "stat": "ac", "value": 2 },
+        { "resist": "poison", "value": 99 }
+      ],
+      "penalties": [
+        { "stat": "ev", "value": -1 }
+      ]
+    }
+  ]
+}

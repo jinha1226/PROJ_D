@@ -1,0 +1,54 @@
+{
+  "version": "balance_v1",
+  "weapon_skills": {
+    "blade": { "damage_per_level_pct": 4, "hit_per_level": 1 },
+    "blunt": { "damage_per_level_pct": 4, "hit_per_level": 1 },
+    "dagger": { "damage_per_level_pct": 4, "hit_per_level": 1 },
+    "polearm": { "damage_per_level_pct": 4, "hit_per_level": 1 },
+    "ranged": { "damage_per_level_pct": 4, "hit_per_level": 1 }
+  },
+  "support_skills": {
+    "fighting": {
+      "hp_per_level": 3,
+      "flat_physical_damage_per_level": 0.5
+    },
+    "armor": {
+      "ev_penalty_reduction_per_level_pct": 10
+    },
+    "shield": {
+      "block_per_level_pct": 3
+    },
+    "dodge": {
+      "ev_per_level": 0.7
+    },
+    "stealth": {
+      "effect": "ambush, detection, sneak modifiers"
+    }
+  },
+  "magic_school_skills": {
+    "evocation": {
+      "spell_output_per_level_pct": 6,
+      "status_duration_per_level": 0.25
+    },
+    "conjuration": {
+      "spell_output_per_level_pct": 6,
+      "status_duration_per_level": 0.25
+    },
+    "transmutation": {
+      "spell_output_per_level_pct": 6,
+      "status_duration_per_level": 0.25
+    },
+    "necromancy": {
+      "spell_output_per_level_pct": 6,
+      "status_duration_per_level": 0.25
+    },
+    "abjuration": {
+      "spell_output_per_level_pct": 6,
+      "status_duration_per_level": 0.25
+    },
+    "enchantment": {
+      "spell_output_per_level_pct": 6,
+      "status_duration_per_level": 0.25
+    }
+  }
+}

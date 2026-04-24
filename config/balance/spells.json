@@ -1,0 +1,106 @@
+{
+  "version": "balance_v1",
+  "school_order": [
+    "evocation",
+    "conjuration",
+    "transmutation",
+    "necromancy",
+    "abjuration",
+    "enchantment"
+  ],
+  "school_roles": {
+    "evocation": {
+      "identity": "highest direct damage",
+      "constraints": "highest mp cost, weakest control"
+    },
+    "conjuration": {
+      "identity": "space control, movement, summon, battlefield shaping",
+      "constraints": "less pure damage than evocation"
+    },
+    "transmutation": {
+      "identity": "self-buff, transformation, mobility",
+      "constraints": "high versatility, moderate numbers"
+    },
+    "necromancy": {
+      "identity": "drain, decay, attrition, life manipulation",
+      "constraints": "less burst, more sustain and debuff"
+    },
+    "abjuration": {
+      "identity": "protection, warding, resistances",
+      "constraints": "must not become mandatory school"
+    },
+    "enchantment": {
+      "identity": "sleep, fear, confusion, hold",
+      "constraints": "short durations, no long hard-locks"
+    }
+  },
+  "spell_level_budget": {
+    "1": {
+      "mp_cost": [2, 3],
+      "role": "basic attack, weak control, short buff",
+      "expected_impact": "20-30% of standard enemy hp"
+    },
+    "2": {
+      "mp_cost": [3, 4],
+      "role": "improved basic, movement, utility"
+    },
+    "3": {
+      "mp_cost": [4, 5],
+      "role": "first real swing spell",
+      "expected_impact": "40-55% of standard enemy hp"
+    },
+    "4": {
+      "mp_cost": [5, 6],
+      "role": "aoe, strong buff, stronger control"
+    },
+    "5": {
+      "mp_cost": [6, 7],
+      "role": "mid-late game core spell",
+      "expected_impact": "60-80% of standard enemy hp"
+    },
+    "6": {
+      "mp_cost": [7, 8],
+      "role": "fight-shaping spell"
+    },
+    "7": {
+      "mp_cost": [8, 10],
+      "role": "high-tier, must have strong constraints"
+    },
+    "8": {
+      "mp_cost": [10, 12],
+      "role": "boss or crisis spell"
+    },
+    "9": {
+      "mp_cost": [12, 15],
+      "role": "top-tier finisher or encounter breaker"
+    }
+  },
+  "combat_expectation": {
+    "low_level_spell_casts_per_fight": [2, 4],
+    "mid_level_spell_casts_per_fight": [1, 2],
+    "high_level_spell_casts_per_fight": [0, 1]
+  },
+  "power_formula": {
+    "formula": "INT * (1 + skill * 0.06) * armor_mult",
+    "damage_single": "base_damage + power/4",
+    "damage_single_hi": "base_damage + 2 + power/4",
+    "damage_multi": "base_damage + power/4  (x3 hits, e.g. Magic Missile)",
+    "damage_aoe": "base_damage + power/3, hi base_damage + 3 + power/3",
+    "note": "power/4 replaces old power/3; base_damage reduced ~40% in v2 rebalance"
+  },
+  "armor_spell_penalty": {
+    "robe": 1.0,
+    "no_armor": 1.0,
+    "leather_armor": 0.85,
+    "chain_mail": 0.65,
+    "other_heavy": 0.5,
+    "display": "shown in Magic dialog as warning when penalty active"
+  },
+  "notable_spells": {
+    "magic_missile": {
+      "base_damage": 2,
+      "hits": 3,
+      "note": "3 staggered bolts, 0.09s delay each; damage intentionally low per bolt"
+    }
+  }
+}

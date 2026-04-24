@@ -308,24 +308,13 @@ func _class_starter_items(class_id: String) -> Array:
 		"rogue":
 			return ["potion_healing", "scroll_blinking"]
 		"archmage":
-			return [
-				"potion_healing", "potion_healing", "potion_healing",
-				"potion_might", "potion_might",
-				"potion_cure_poison", "potion_cure_poison",
-				"potion_magic", "potion_magic",
-				"potion_berserk",
-				"scroll_blinking", "scroll_blinking",
-				"scroll_magic_mapping", "scroll_magic_mapping",
-				"scroll_teleport", "scroll_teleport",
-				"scroll_enchant_weapon", "scroll_enchant_weapon",
-				"scroll_enchant_armor", "scroll_enchant_armor",
-				"scroll_identify", "scroll_identify",
-			]
+			return ["potion_healing", "potion_magic", "scroll_identify"]
 	return []
 
 func _apply_loaded_player_state(data: Dictionary) -> void:
-	player.hp = int(data.get("hp", 30))
-	player.hp_max = int(data.get("hp_max", 30))
+	player.hp = int(data.get("hp", 22))
+	player.hp_max = int(data.get("hp_max", 22))
+	player.injury = int(data.get("injury", 0))
 	player.mp = int(data.get("mp", 5))
 	player.mp_max = int(data.get("mp_max", 5))
 	player.ac = int(data.get("ac", 0))
@@ -612,7 +601,7 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 		placed += 1
 
 func _spawn_items_for_floor(depth: int) -> void:
-	var count: int = randi_range(4, 8)
+	var count: int = randi_range(2, 4)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = _floor_seed(depth) ^ 0x3C3C3C3C
 	var placed: int = 0
@@ -773,7 +762,7 @@ func _center_camera_on_player(snap: bool = false) -> void:
 func _update_hud() -> void:
 	if top_hud == null or player == null:
 		return
-	top_hud.set_hp(player.hp, player.hp_max)
+	top_hud.set_hp(player.hp, player.hp_max, player.injury)
 	top_hud.set_mp(player.mp, player.mp_max)
 	top_hud.set_xp(player.xp, player.xp_to_next(), player.xl)
 	top_hud.set_depth(GameManager.depth)
@@ -792,6 +781,8 @@ func _on_player_turn_started() -> void:
 	if player != null and player.hp > 0:
 		player.tick_statuses()
 		RacePassiveSystem.on_player_turn_end(player)
+	if map != null:
+		map.tick_fog()
 	if TurnManager.turn_number % _RESPAWN_INTERVAL == 0:
 		_try_respawn_monster()
 	if not _auto_path.is_empty():

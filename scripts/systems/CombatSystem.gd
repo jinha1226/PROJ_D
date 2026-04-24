@@ -254,7 +254,9 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 				CombatLog.miss("You parry the %s's attack!" % monster.data.display_name)
 				player.grant_skill_xp("blade", 0.3)
 				return
-	var raw: int = randi_range(1, max(1, dmg_base)) + monster.data.hd / 2
+	var dmg_lo: int = max(1, dmg_base * 3 / 5)
+	var dmg_hi: int = max(dmg_lo, dmg_base * 3 / 2)
+	var raw: int = randi_range(dmg_lo, dmg_hi) + monster.data.hd / 2
 	var soak: int = randi_range(0, player.ac + 1)
 	if Status.has(player, "stoneskin"):
 		soak += randi_range(2, 5)

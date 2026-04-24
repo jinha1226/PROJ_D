@@ -48,6 +48,7 @@ const _GREAT_BLADE: Resource = preload("res://resources/items/great_blade.tres")
 const _BUCKLER: Resource = preload("res://resources/items/buckler.tres")
 const _ROUND_SHIELD: Resource = preload("res://resources/items/round_shield.tres")
 const _TOWER_SHIELD: Resource = preload("res://resources/items/tower_shield.tres")
+const _BANDAGE: Resource = preload("res://resources/items/bandage.tres")
 
 const _ALL_ITEMS: Array = [
 	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE, _SPEAR,
@@ -59,7 +60,7 @@ const _ALL_ITEMS: Array = [
 	_FLAMING_SWORD, _FROST_DAGGER, _VENOM_DAGGER, _SHOCK_MACE,
 	_LEATHER_ARMOR, _ROBE, _CHAIN_MAIL,
 	_POTION_HEALING, _POTION_MIGHT, _POTION_CURE_POISON, _POTION_MAGIC,
-	_POTION_BERSERK,
+	_POTION_BERSERK, _BANDAGE,
 	_SCROLL_BLINKING, _SCROLL_MAGIC_MAPPING, _SCROLL_TELEPORT,
 	_SCROLL_ENCHANT_WEAPON, _SCROLL_ENCHANT_ARMOR, _SCROLL_IDENTIFY,
 	_BOOK_EVOCATION, _BOOK_CONJURATION, _BOOK_TRANSMUTATION,

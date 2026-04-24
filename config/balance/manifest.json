@@ -1,0 +1,20 @@
+{
+  "version": "balance_v1",
+  "master_spec": "docs/balance/balance_master.json",
+  "parts": [
+    "config/balance/core_rules.json",
+    "config/balance/player_stats.json",
+    "config/balance/skills.json",
+    "config/balance/spells.json",
+    "config/balance/status_effects.json",
+    "config/balance/monsters.json",
+    "config/balance/items.json",
+    "config/balance/drop_economy.json",
+    "config/balance/essences.json",
+    "config/balance/races.json"
+  ],
+  "notes": [
+    "Use these files as implementation references, not as the only runtime source of truth.",
+    "Keep actual content resources in resources/ as .tres files."
+  ]
+}

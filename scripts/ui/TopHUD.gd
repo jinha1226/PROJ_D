@@ -48,11 +48,14 @@ func _process(delta: float) -> void:
 		hp_bar.modulate = Color.WHITE
 
 
-func set_hp(cur: int, max_: int) -> void:
+func set_hp(cur: int, max_: int, injury: int = 0) -> void:
 	hp_bar.max_value = max(1, max_)
 	hp_bar.value = cur
 	if hp_label:
-		hp_label.text = "HP %d/%d" % [cur, max_]
+		if injury > 0:
+			hp_label.text = "HP %d/%d  ⚕-%d" % [cur, max_, injury]
+		else:
+			hp_label.text = "HP %d/%d" % [cur, max_]
 	var ratio: float = float(cur) / float(max(1, max_))
 	_pulsing = ratio < 0.3
 

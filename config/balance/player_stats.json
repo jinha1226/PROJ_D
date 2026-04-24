@@ -1,0 +1,41 @@
+{
+  "version": "balance_v1",
+  "player_baseline": {
+    "base_hp": 22,
+    "base_mp": 6,
+    "base_ac": 0,
+    "base_ev": 6,
+    "base_wl": 0
+  },
+  "target_ttk": {
+    "normal_enemy_turns_to_kill": [3, 5],
+    "elite_enemy_turns_to_kill": [6, 9],
+    "boss_enemy_turns_to_kill": [10, 14],
+    "player_danger_hits_from_normal_enemy": [4, 6]
+  },
+  "stats": {
+    "strength": {
+      "melee_damage_per_point": 0.35,
+      "hp_per_2_points": 1
+    },
+    "dexterity": {
+      "ev_per_2_points": 1,
+      "ranged_damage_per_point": 0.25,
+      "dagger_damage_per_point": 0.25
+    },
+    "intelligence": {
+      "mp_per_3_points": 1,
+      "spell_power_primary_stat": true
+    }
+  },
+  "resource_economy": {
+    "hp_regen": {
+      "natural_per_turn": 0,
+      "wait_action_per_turn": 0
+    },
+    "mp_regen": {
+      "natural_per_turn": 0,
+      "wait_action_per_turn": 1
+    }
+  }
+}

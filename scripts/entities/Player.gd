@@ -47,8 +47,9 @@ var _body_doll_tex: Texture2D = null
 var _hand1_doll_tex: Texture2D = null
 var _hand2_doll_tex: Texture2D = null
 
-var hp: int = 30
-var hp_max: int = 30
+var hp: int = 22
+var hp_max: int = 22
+var injury: int = 0  # grayed-out HP; only bandages can clear
 var mp: int = 5
 var mp_max: int = 6
 var ac: int = 0
@@ -80,8 +81,8 @@ const SKILL_IDS: Array = ["blade", "blunt", "dagger", "polearm", "ranged",
 	"fighting", "armor", "shield", "dodge", "stealth",
 	"magic",
 	"evocation", "necromancy", "transmutation", "enchantment", "conjuration", "abjuration"]
-const SKILL_XP_DELTA: Array = [20, 30, 50, 80, 120, 170, 230, 300, 400,
-	500, 700, 1000, 1400, 2000, 2800, 4000, 5500, 7500, 10000, 13000]
+const SKILL_XP_DELTA: Array = [13, 20, 32, 52, 78, 110, 150, 195, 260,
+	325, 455, 650, 910, 1300, 1820, 2600, 3575, 4875, 6500, 8450]
 
 var _map: DungeonMap
 
@@ -231,9 +232,21 @@ func use_item(index: int) -> void:
 	var had_effect: bool = true
 	match data.effect:
 		"heal":
+			heal_injury(data.effect_value)
 			heal(data.effect_value)
 			CombatLog.post("You feel better. (+%d HP)" % data.effect_value,
 				Color(0.6, 1.0, 0.6))
+		"bandage":
+			var inj_before: int = injury
+			heal_injury(data.effect_value)
+			var cleared: int = inj_before - injury
+			if cleared > 0:
+				hp = min(hp_max - injury, hp + cleared / 2)
+				CombatLog.post("You bandage your wounds. (-%d injury)" % cleared,
+					Color(0.85, 0.9, 0.65))
+			else:
+				CombatLog.post("You have no injuries to treat.", Color(0.6, 0.6, 0.6))
+				had_effect = false
 		"blink":
 			_blink(data.effect_value)
 		"might":
@@ -469,6 +482,7 @@ func take_damage(amount: int, source: String = "") -> void:
 		CombatLog.post("You are invulnerable!", Color(1.0, 0.95, 0.5))
 		return
 	hp = max(0, hp - amount)
+	injury = min(hp_max - 1, injury + (amount + 1) / 2)
 	if source != "":
 		last_killer = source
 	emit_signal("damaged", amount)
@@ -476,11 +490,16 @@ func take_damage(amount: int, source: String = "") -> void:
 	if hp <= 0:
 		emit_signal("died")
 
+
+func heal_injury(amount: int) -> void:
+	injury = max(0, injury - amount)
+	emit_signal("stats_changed")
+
 func register_kill() -> void:
 	kills += 1
 
 func heal(amount: int) -> void:
-	hp = min(hp_max, hp + amount)
+	hp = min(max(1, hp_max - injury), hp + amount)
 	emit_signal("stats_changed")
 
 func init_skills() -> void:
@@ -527,7 +546,7 @@ func xp_to_next() -> int:
 
 func _level_up() -> void:
 	xl += 1
-	var hp_gain: int = 5 + strength / 5
+	var hp_gain: int = 3 + strength / 5
 	hp_max += hp_gain
 	hp = min(hp_max, hp + hp_gain)
 	var mp_gain: int = 1 + intelligence / 3
@@ -562,9 +581,9 @@ func _auto_stat_bump() -> void:
 	CombatLog.post("(+1 %s)" % lowest_name.to_upper(), Color(0.75, 0.85, 1))
 
 func wait_turn() -> void:
-	# Light regen while waiting.
-	if hp < hp_max:
-		hp = min(hp_max, hp + 1)
+	var hp_cap: int = max(1, hp_max - injury)
+	if hp < hp_cap:
+		hp = min(hp_cap, hp + 1)
 	if mp < mp_max:
 		mp = min(mp_max, mp + 1)
 	emit_signal("stats_changed")
