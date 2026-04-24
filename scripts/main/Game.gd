@@ -779,6 +779,7 @@ func _update_hud() -> void:
 	top_hud.set_depth(GameManager.depth)
 	top_hud.set_gold(player.gold)
 	top_hud.set_turn(TurnManager.turn_number)
+	top_hud.set_buffs(player.statuses)
 
 func _on_player_moved(_new_pos: Vector2i) -> void:
 	_refresh_fov()

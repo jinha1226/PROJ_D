@@ -117,6 +117,14 @@ static func _make_spell_row(spell: SpellData, player: Player,
 	stat_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	info.add_child(stat_lbl)
 
+	if not locked and spell.description != "":
+		var desc_lbl := Label.new()
+		desc_lbl.text = spell.description
+		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc_lbl.add_theme_font_size_override("font_size", 18)
+		desc_lbl.add_theme_color_override("font_color", Color(0.65, 0.68, 0.78))
+		info.add_child(desc_lbl)
+
 	# Cast button
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(110, 52)

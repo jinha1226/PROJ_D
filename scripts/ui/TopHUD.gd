@@ -21,6 +21,7 @@ signal zoom_out_pressed
 
 var _pulse_t: float = 0.0
 var _pulsing: bool = false
+var _buff_row: HFlowContainer = null
 
 
 func _ready() -> void:
@@ -30,6 +31,12 @@ func _ready() -> void:
 		zoom_in_button.pressed.connect(func(): zoom_in_pressed.emit())
 	if zoom_out_button != null:
 		zoom_out_button.pressed.connect(func(): zoom_out_pressed.emit())
+	var bars: VBoxContainer = get_node_or_null("Margin/HBox/Bars")
+	if bars != null:
+		_buff_row = HFlowContainer.new()
+		_buff_row.add_theme_constant_override("h_separation", 6)
+		_buff_row.add_theme_constant_override("v_separation", 2)
+		bars.add_child(_buff_row)
 
 
 func _process(delta: float) -> void:
@@ -103,6 +110,38 @@ func _update_depth_label(d: int = -1, branch: String = "") -> void:
 func set_minimap_texture(tex: Texture2D) -> void:
 	if minimap_button:
 		minimap_button.icon = tex
+
+
+func set_buffs(statuses: Dictionary) -> void:
+	if _buff_row == null:
+		return
+	for c in _buff_row.get_children():
+		c.queue_free()
+	for sid in statuses.keys():
+		var turns: int = int(statuses[sid])
+		if turns <= 0:
+			continue
+		var info: Dictionary = Status.INFO.get(sid, {})
+		var col: Color = info.get("color", Color(0.7, 0.7, 0.8))
+		var label_text: String = info.get("name", sid.capitalize())
+		var badge := _make_buff_badge(label_text, turns, col)
+		_buff_row.add_child(badge)
+
+
+static func _make_buff_badge(label: String, turns: int, col: Color) -> Control:
+	var panel := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(col.r, col.g, col.b, 0.25)
+	style.border_color = col
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(4)
+	panel.add_theme_stylebox_override("panel", style)
+	var lbl := Label.new()
+	lbl.text = "%s %d" % [label, turns]
+	lbl.add_theme_font_size_override("font_size", 17)
+	lbl.add_theme_color_override("font_color", col)
+	panel.add_child(lbl)
+	return panel
 
 
 # Compatibility stubs
