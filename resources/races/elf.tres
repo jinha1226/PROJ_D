@@ -16,3 +16,4 @@ dex_mod = 1
 int_mod = 1
 hp_mod = -3
 mp_mod = 2
+passive_id = "keen_eyes"

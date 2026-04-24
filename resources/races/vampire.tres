@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3 uid="uid://vampirerace01"]
+
+[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+
+[resource]
+script = ExtResource("1_rdata")
+id = "vampire"
+display_name = "Vampire"
+description = "Undead predator. +1 STR / +1 DEX, -2 HP. Negative energy resistant. Melee kills restore 3 HP."
+base_sprite_path = "res://assets/tiles/individual/player/base/vampire_m.png"
+unlocked = false
+unlock_kind = "kill"
+unlock_trigger_id = "vampire"
+str_mod = 1
+dex_mod = 1
+int_mod = 0
+hp_mod = -2
+mp_mod = 0
+resist_mods = ["neg+"]
+passive_id = "blood_drain"

@@ -31,6 +31,7 @@ ClassRegistry="*res://scripts/systems/ClassRegistry.gd"
 SpellRegistry="*res://scripts/systems/SpellRegistry.gd"
 RaceRegistry="*res://scripts/systems/RaceRegistry.gd"
 ZoneManager="*res://scripts/core/ZoneManager.gd"
+RacePassiveSystem="*res://scripts/systems/RacePassiveSystem.gd"
 
 [display]
 

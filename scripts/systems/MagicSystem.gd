@@ -8,7 +8,7 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 		CombatLog.post("%s requires level %d." % [spell.display_name, spell.xl_required],
 			Color(1.0, 0.7, 0.5))
 		return false
-	if player.mp < spell.mp_cost:
+	if not RacePassiveSystem.on_spell_cast_mp_check(player, spell.mp_cost):
 		CombatLog.post("Not enough MP for %s." % spell.display_name,
 			Color(1.0, 0.7, 0.5))
 		return false

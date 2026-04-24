@@ -63,6 +63,7 @@ var equipped_weapon_id: String = ""
 var equipped_armor_id: String = ""
 var essence_slots: Array = ["", "", ""]   # equipped essence ids (max 3)
 var essence_inventory: Array = []         # collected but unequipped essence ids
+var fov_radius_bonus: int = 0             # set by RacePassiveSystem (keen_eyes)
 
 const SKILL_IDS: Array = ["blade", "blunt", "dagger", "polearm", "ranged",
 	"armor", "magic", "stealth"]
@@ -403,7 +404,7 @@ func compute_fov() -> Dictionary:
 	if _map == null:
 		return {}
 	var is_opaque := func(p: Vector2i) -> bool: return _map.is_opaque(p)
-	return FieldOfView.compute(grid_pos, SIGHT_RADIUS, is_opaque)
+	return FieldOfView.compute(grid_pos, SIGHT_RADIUS + fov_radius_bonus, is_opaque)
 
 func take_damage(amount: int, source: String = "") -> void:
 	if has_status("invulnerable"):

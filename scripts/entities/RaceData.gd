@@ -26,6 +26,9 @@ class_name RaceData extends Resource
 ## Format: Status.gd — ["fire+", "cold++", "necromancy+"], etc.
 @export var resist_mods: Array = []
 
+## Passive ability id. Looked up by RacePassiveSystem on game start.
+@export var passive_id: String = ""
+
 func unlock_hint() -> String:
 	if unlocked:
 		return ""
