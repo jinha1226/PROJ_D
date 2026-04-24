@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bhydra0001"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "hydra"
+display_name = "hydra"
+tier = 4
+hp = 55
+hd = 7
+ac = 3
+ev = 5
+speed = 9
+sight_range = 8
+attacks = [{"damage": 10, "flavour": "bite"}, {"damage": 10, "flavour": "bite"}, {"damage": 10, "flavour": "bite"}]
+ranged_attack = {}
+resists = ["poison"]
+min_depth = 11
+max_depth = 12
+weight = 7
+xp_value = 22
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/dragons/hydra3.png"
+glyph = "D"
+glyph_color = Color(0.3, 0.6, 0.3, 1)

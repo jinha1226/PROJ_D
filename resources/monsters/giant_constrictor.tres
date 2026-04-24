@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bgconstr01"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "giant_constrictor"
+display_name = "giant constrictor"
+tier = 4
+hp = 48
+hd = 6
+ac = 3
+ev = 7
+speed = 9
+sight_range = 7
+attacks = [{"damage": 12, "flavour": "bite"}, {"damage": 8, "flavour": "constrict"}]
+ranged_attack = {}
+resists = ["poison"]
+min_depth = 11
+max_depth = 12
+weight = 7
+xp_value = 18
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/anaconda.png"
+glyph = "s"
+glyph_color = Color(0.5, 0.7, 0.3, 1)

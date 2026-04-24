@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bblizzdem1"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "blizzard_demon"
+display_name = "blizzard demon"
+tier = 5
+hp = 62
+hd = 8
+ac = 5
+ev = 8
+speed = 11
+sight_range = 8
+attacks = [{"damage": 14, "flavour": "claw"}]
+ranged_attack = {"damage": 12, "range": 4, "verb": "blasts", "flavour": "cold"}
+resists = ["cold"]
+min_depth = 18
+max_depth = 18
+weight = 5
+xp_value = 26
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/demons/blizzard_demon.png"
+glyph = "&"
+glyph_color = Color(0.6, 0.8, 1.0, 1)

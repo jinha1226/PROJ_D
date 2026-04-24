@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bgiantliz01"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "giant_lizard"
+display_name = "giant lizard"
+tier = 2
+hp = 18
+hd = 3
+ac = 3
+ev = 6
+speed = 9
+sight_range = 7
+attacks = [{"damage": 6, "flavour": "bite"}]
+ranged_attack = {}
+resists = []
+min_depth = 4
+max_depth = 6
+weight = 12
+xp_value = 5
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/komodo_dragon.png"
+glyph = "l"
+glyph_color = Color(0.5, 0.4, 0.2, 1)

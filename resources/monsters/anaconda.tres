@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://banaconda1"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "anaconda"
+display_name = "anaconda"
+tier = 3
+hp = 30
+hd = 5
+ac = 2
+ev = 8
+speed = 9
+sight_range = 7
+attacks = [{"damage": 10, "flavour": "bite"}, {"damage": 6, "flavour": "constrict"}]
+ranged_attack = {}
+resists = []
+min_depth = 5
+max_depth = 6
+weight = 8
+xp_value = 10
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/anaconda.png"
+glyph = "s"
+glyph_color = Color(0.4, 0.6, 0.2, 1)

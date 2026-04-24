@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bicebeast1"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "ice_beast"
+display_name = "ice beast"
+tier = 3
+hp = 30
+hd = 5
+ac = 3
+ev = 7
+speed = 10
+sight_range = 7
+attacks = [{"damage": 10, "flavour": "bite"}]
+ranged_attack = {}
+resists = ["cold"]
+min_depth = 16
+max_depth = 17
+weight = 10
+xp_value = 12
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/ice_beast.png"
+glyph = "B"
+glyph_color = Color(0.7, 0.9, 1.0, 1)

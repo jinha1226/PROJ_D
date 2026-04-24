@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bantchamp1"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "ancient_champion"
+display_name = "ancient champion"
+tier = 5
+hp = 60
+hd = 8
+ac = 12
+ev = 5
+speed = 10
+sight_range = 8
+attacks = [{"damage": 16, "flavour": "hit"}, {"damage": 10, "flavour": "hit"}]
+ranged_attack = {}
+resists = ["neg", "cold"]
+min_depth = 15
+max_depth = 15
+weight = 5
+xp_value = 25
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/undead/ancient_champion.png"
+glyph = "W"
+glyph_color = Color(0.7, 0.8, 0.9, 1)

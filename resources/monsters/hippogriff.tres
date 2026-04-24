@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bhippogr01"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "hippogriff"
+display_name = "hippogriff"
+tier = 4
+hp = 40
+hd = 6
+ac = 5
+ev = 9
+speed = 11
+sight_range = 8
+attacks = [{"damage": 12, "flavour": "claw"}, {"damage": 8, "flavour": "bite"}]
+ranged_attack = {}
+resists = []
+min_depth = 6
+max_depth = 6
+weight = 6
+xp_value = 16
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/hippogriff.png"
+glyph = "H"
+glyph_color = Color(0.8, 0.6, 0.3, 1)

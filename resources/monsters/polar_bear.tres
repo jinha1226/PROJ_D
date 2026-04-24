@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bpolarbear1"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "polar_bear"
+display_name = "polar bear"
+tier = 3
+hp = 32
+hd = 5
+ac = 4
+ev = 5
+speed = 10
+sight_range = 7
+attacks = [{"damage": 10, "flavour": "claw"}, {"damage": 6, "flavour": "bite"}]
+ranged_attack = {}
+resists = ["cold"]
+min_depth = 5
+max_depth = 6
+weight = 8
+xp_value = 11
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/polar_bear.png"
+glyph = "B"
+glyph_color = Color(0.9, 0.95, 1.0, 1)

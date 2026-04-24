@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bmummypr01"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "mummy_priest"
+display_name = "mummy priest"
+tier = 4
+hp = 42
+hd = 6
+ac = 6
+ev = 4
+speed = 8
+sight_range = 8
+attacks = [{"damage": 10, "flavour": "hit"}]
+ranged_attack = {}
+resists = ["neg", "poison", "fire"]
+min_depth = 14
+max_depth = 15
+weight = 6
+xp_value = 18
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/undead/mummy_priest.png"
+glyph = "M"
+glyph_color = Color(0.9, 0.8, 0.5, 1)

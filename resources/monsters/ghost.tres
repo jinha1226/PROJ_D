@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bghost0001"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "ghost"
+display_name = "ghost"
+tier = 3
+hp = 22
+hd = 4
+ac = 0
+ev = 12
+speed = 10
+sight_range = 8
+attacks = [{"damage": 8, "flavour": "touch"}]
+ranged_attack = {}
+resists = ["neg", "poison"]
+min_depth = 13
+max_depth = 14
+weight = 10
+xp_value = 10
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/undead/ghost.png"
+glyph = "G"
+glyph_color = Color(0.8, 0.85, 1.0, 1)

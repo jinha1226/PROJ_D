@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://brimedrk1"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "rime_drake"
+display_name = "rime drake"
+tier = 4
+hp = 48
+hd = 6
+ac = 6
+ev = 8
+speed = 10
+sight_range = 8
+attacks = [{"damage": 12, "flavour": "bite"}]
+ranged_attack = {"damage": 10, "range": 4, "verb": "breathes", "flavour": "cold"}
+resists = ["cold"]
+min_depth = 16
+max_depth = 18
+weight = 8
+xp_value = 18
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/dragons/rime_drake.png"
+glyph = "d"
+glyph_color = Color(0.7, 0.9, 1.0, 1)

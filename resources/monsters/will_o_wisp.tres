@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bwillowisp1"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "will_o_wisp"
+display_name = "will-o'-wisp"
+tier = 3
+hp = 18
+hd = 3
+ac = 0
+ev = 14
+speed = 12
+sight_range = 8
+attacks = [{"damage": 8, "flavour": "zap"}]
+ranged_attack = {}
+resists = ["elec", "fire"]
+min_depth = 10
+max_depth = 12
+weight = 8
+xp_value = 10
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/nonliving/will_o_the_wisp.png"
+glyph = "w"
+glyph_color = Color(0.7, 0.9, 1.0, 1)

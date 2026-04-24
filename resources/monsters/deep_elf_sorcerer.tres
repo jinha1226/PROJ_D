@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bdelsrcr01"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "deep_elf_sorcerer"
+display_name = "deep elf sorcerer"
+tier = 5
+hp = 38
+hd = 6
+ac = 3
+ev = 12
+speed = 10
+sight_range = 8
+attacks = [{"damage": 6, "flavour": "hit"}]
+ranged_attack = {}
+resists = []
+min_depth = 20
+max_depth = 21
+weight = 6
+xp_value = 24
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/humanoids/elves/deep_elf_sorcerer.png"
+glyph = "e"
+glyph_color = Color(0.7, 0.5, 1.0, 1)

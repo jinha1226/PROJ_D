@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bkillerbee01"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "killer_bee"
+display_name = "killer bee"
+tier = 1
+hp = 8
+hd = 2
+ac = 2
+ev = 12
+speed = 12
+sight_range = 6
+attacks = [{"damage": 3, "flavour": "sting"}]
+ranged_attack = {}
+resists = ["poison"]
+min_depth = 1
+max_depth = 3
+weight = 15
+xp_value = 3
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/killer_bee.png"
+glyph = "b"
+glyph_color = Color(0.9, 0.8, 0.1, 1)
