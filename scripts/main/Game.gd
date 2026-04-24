@@ -1267,7 +1267,8 @@ func spawn_projectile(world_start: Vector2, world_end: Vector2,
 	spawn_spell_bolt(world_start, world_end, "", on_arrive)
 
 func spawn_spell_bolt(world_start: Vector2, world_end: Vector2,
-		element: String, on_arrive: Callable = Callable()) -> void:
+		element: String, on_arrive: Callable = Callable(),
+		delay: float = 0.0) -> void:
 	if _effect_layer == null:
 		if on_arrive.is_valid():
 			on_arrive.call()
@@ -1286,8 +1287,12 @@ func spawn_spell_bolt(world_start: Vector2, world_end: Vector2,
 		rect.rotation = (world_end - world_start).angle()
 		rect.position = world_start - half
 		rect.z_index = 8
+		rect.visible = false
 		_effect_layer.add_child(rect)
 		var tw := rect.create_tween()
+		if delay > 0.0:
+			tw.tween_interval(delay)
+		tw.tween_callback(func(): rect.visible = true)
 		tw.tween_property(rect, "position", world_end - half, 0.18)
 		tw.tween_callback(rect.queue_free)
 		if on_arrive.is_valid():

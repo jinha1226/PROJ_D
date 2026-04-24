@@ -325,7 +325,7 @@ static func _multi_damage(spell: SpellData, player: Player,
 		power: int, game: Node, darts: int) -> void:
 	var fired: int = 0
 	var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
-	for _i in range(darts):
+	for i in range(darts):
 		var target: Monster = _find_nearest_visible(player, game, spell.max_range)
 		if target == null:
 			break
@@ -334,7 +334,8 @@ static func _multi_damage(spell: SpellData, player: Player,
 		var scaled: int = Status.resist_scale(dmg, target.data.resists, spell.element)
 		CombatLog.hit("A dart strikes the %s for %d." % [target.data.display_name, scaled])
 		if game != null and game.has_method("spawn_spell_bolt"):
-			game.spawn_spell_bolt(player.position + half, target.position + half, spell.element)
+			game.spawn_spell_bolt(player.position + half, target.position + half,
+					spell.element, Callable(), i * 0.09)
 		var was_alive: bool = target.hp > 0
 		target.take_damage(scaled)
 		if was_alive and target.hp > 0:
