@@ -1148,7 +1148,7 @@ func _on_monster_died(monster: Monster) -> void:
 	var chance: float = 0.08 + GameManager.depth * 0.005
 	if randf() < chance:
 		var essence_id: String
-		if monster != null and monster.data != null and String(monster.data.get("essence_id", "")) != "":
+		if monster != null and monster.data != null and String(monster.data.essence_id) != "":
 			essence_id = String(monster.data.essence_id)
 		else:
 			essence_id = EssenceSystem.random_id()
