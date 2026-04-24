@@ -14,6 +14,7 @@ starting_dex = 9
 starting_int = 16
 starting_weapon = "dagger"
 starting_armor = "robe"
+robe_path = "res://assets/tiles/individual/player/body/robe_of_night.png"
 starting_skills = {"necromancy": 6}
 starting_xl = 0
 starting_spells = ["inflict_wounds", "ray_of_enfeeblement", "vampiric_touch"]

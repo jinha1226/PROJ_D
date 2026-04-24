@@ -166,9 +166,13 @@ func _make_portrait(data: ClassData, dim: bool) -> Control:
 		base_path = race.base_sprite_path
 	_add_layer(cont, base_path, dim)
 	if data != null:
-		if data.starting_armor != "" \
-				and Player.DOLL_BODY_MAP.has(data.starting_armor):
-			_add_layer(cont, String(Player.DOLL_BODY_MAP[data.starting_armor]), dim)
+		var body_path: String = ""
+		if String(data.robe_path) != "":
+			body_path = String(data.robe_path)
+		elif data.starting_armor != "" and Player.DOLL_BODY_MAP.has(data.starting_armor):
+			body_path = String(Player.DOLL_BODY_MAP[data.starting_armor])
+		if body_path != "":
+			_add_layer(cont, body_path, dim)
 		if data.starting_weapon != "" \
 				and Player.DOLL_HAND1_MAP.has(data.starting_weapon):
 			_add_layer(cont, String(Player.DOLL_HAND1_MAP[data.starting_weapon]), dim)

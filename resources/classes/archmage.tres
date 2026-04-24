@@ -14,6 +14,7 @@ starting_dex = 12
 starting_int = 20
 starting_weapon = "dagger"
 starting_armor = "robe"
+robe_path = "res://assets/tiles/individual/player/body/robe_black_gold.png"
 starting_skills = {
 "blade": 20,
 "blunt": 20,

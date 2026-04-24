@@ -43,14 +43,7 @@ func _make_card(data: RaceData) -> Control:
 	hb.add_theme_constant_override("separation", 16)
 	margin.add_child(hb)
 
-	var portrait := TextureRect.new()
-	portrait.custom_minimum_size = Vector2(96, 96)
-	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	if data.base_sprite_path != "" \
-			and ResourceLoader.exists(data.base_sprite_path):
-		portrait.texture = load(data.base_sprite_path)
-	if not data.unlocked:
-		portrait.modulate = Color(0.35, 0.35, 0.4, 1)
+	var portrait := _make_portrait(data)
 	hb.add_child(portrait)
 
 	var vb := VBoxContainer.new()
@@ -95,6 +88,31 @@ func _make_card(data: RaceData) -> Control:
 	vb.add_child(btn)
 
 	return panel
+
+const _DEFAULT_BODY: String = "res://assets/tiles/individual/player/body/leather_armour.png"
+
+func _make_portrait(data: RaceData) -> Control:
+	var cont := Control.new()
+	cont.custom_minimum_size = Vector2(96, 120)
+	cont.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var dim: bool = not RaceRegistry.is_unlocked(data.id)
+	if data.base_sprite_path != "" and ResourceLoader.exists(data.base_sprite_path):
+		_add_layer(cont, data.base_sprite_path, dim)
+	_add_layer(cont, _DEFAULT_BODY, dim)
+	return cont
+
+func _add_layer(parent: Control, path: String, dim: bool) -> void:
+	if not ResourceLoader.exists(path):
+		return
+	var rect := TextureRect.new()
+	rect.texture = load(path)
+	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	rect.anchor_right = 1.0
+	rect.anchor_bottom = 1.0
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if dim:
+		rect.modulate = Color(0.4, 0.4, 0.45, 1)
+	parent.add_child(rect)
 
 func _on_pick(race_id: String) -> void:
 	GameManager.selected_race_id = race_id

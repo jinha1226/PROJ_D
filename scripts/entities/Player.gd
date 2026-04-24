@@ -23,6 +23,12 @@ const DOLL_BODY_MAP: Dictionary = {
 	"robe": "res://assets/tiles/individual/player/body/robe_blue.png",
 }
 
+const DOLL_HAND2_MAP: Dictionary = {
+	"buckler": "res://assets/tiles/individual/player/hand2/buckler_round.png",
+	"round_shield": "res://assets/tiles/individual/player/hand2/doll_only/kite_shield_round1.png",
+	"tower_shield": "res://assets/tiles/individual/player/hand2/tower_shield_teal.png",
+}
+
 const DOLL_HAND1_MAP: Dictionary = {
 	"short_sword": "res://assets/tiles/individual/player/hand1/short_sword.png",
 	"dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
@@ -39,6 +45,7 @@ const DOLL_HAND1_MAP: Dictionary = {
 var _base_tex: Texture2D = DEFAULT_BASE_TEX
 var _body_doll_tex: Texture2D = null
 var _hand1_doll_tex: Texture2D = null
+var _hand2_doll_tex: Texture2D = null
 
 var hp: int = 30
 var hp_max: int = 30
@@ -648,6 +655,7 @@ func set_equipped_shield(id: String) -> void:
 		var new_s: ItemData = ItemRegistry.get_by_id(id)
 		if new_s != null:
 			ev = maxi(0, ev - new_s.ev_penalty)
+	_refresh_paperdoll()
 	emit_signal("stats_changed")
 
 func has_two_handed_weapon() -> bool:
@@ -683,14 +691,24 @@ func _remove_accessory_stat(id: String) -> void:
 func _refresh_paperdoll() -> void:
 	_body_doll_tex = null
 	_hand1_doll_tex = null
+	_hand2_doll_tex = null
 	if DOLL_BODY_MAP.has(equipped_armor_id):
-		var path: String = String(DOLL_BODY_MAP[equipped_armor_id])
-		if ResourceLoader.exists(path):
-			_body_doll_tex = load(path) as Texture2D
+		var body_path: String = String(DOLL_BODY_MAP[equipped_armor_id])
+		# Use class-specific robe if wearing a plain robe.
+		if equipped_armor_id == "robe":
+			var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id)
+			if cls != null and String(cls.robe_path) != "":
+				body_path = String(cls.robe_path)
+		if ResourceLoader.exists(body_path):
+			_body_doll_tex = load(body_path) as Texture2D
 	if DOLL_HAND1_MAP.has(equipped_weapon_id):
 		var path: String = String(DOLL_HAND1_MAP[equipped_weapon_id])
 		if ResourceLoader.exists(path):
 			_hand1_doll_tex = load(path) as Texture2D
+	if DOLL_HAND2_MAP.has(equipped_shield_id):
+		var path: String = String(DOLL_HAND2_MAP[equipped_shield_id])
+		if ResourceLoader.exists(path):
+			_hand2_doll_tex = load(path) as Texture2D
 	queue_redraw()
 
 func _draw() -> void:
@@ -702,6 +720,8 @@ func _draw() -> void:
 			draw_texture_rect(_body_doll_tex, rect, false)
 		if _hand1_doll_tex != null:
 			draw_texture_rect(_hand1_doll_tex, rect, false)
+		if _hand2_doll_tex != null:
+			draw_texture_rect(_hand2_doll_tex, rect, false)
 	else:
 		draw_string(ThemeDB.fallback_font,
 			Vector2(6, DungeonMap.CELL_SIZE - 6),

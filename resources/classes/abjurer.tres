@@ -14,6 +14,7 @@ starting_dex = 9
 starting_int = 14
 starting_weapon = "dagger"
 starting_armor = "robe"
+robe_path = "res://assets/tiles/individual/player/body/robe_white.png"
 starting_skills = {"abjuration": 5, "armor": 2}
 starting_xl = 0
 starting_spells = ["mage_armor", "blur", "protection_from_energy"]
