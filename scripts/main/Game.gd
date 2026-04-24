@@ -869,6 +869,11 @@ func _on_status_pressed() -> void:
 		return
 	StatusDialog.open(player, self)
 
+func _on_bestiary_pressed() -> void:
+	if player == null:
+		return
+	BestiaryDialog.open(self)
+
 func begin_spell_targeting(spell: SpellData, p: Player) -> void:
 	_cancel_targeting()
 	_targeting_spell = spell
@@ -1137,13 +1142,16 @@ func _greedy_step_toward(target: Vector2i) -> Vector2i:
 	return Vector2i.ZERO
 
 
-func _on_monster_died(_monster: Monster) -> void:
+func _on_monster_died(monster: Monster) -> void:
 	if player == null or player.hp <= 0:
 		return
-	# 8% drop chance per kill; deeper floors slightly more likely.
 	var chance: float = 0.08 + GameManager.depth * 0.005
 	if randf() < chance:
-		var essence_id: String = EssenceSystem.random_id()
+		var essence_id: String
+		if monster != null and monster.data != null and String(monster.data.get("essence_id", "")) != "":
+			essence_id = String(monster.data.essence_id)
+		else:
+			essence_id = EssenceSystem.random_id()
 		player.add_essence(essence_id)
 		CombatLog.post("An essence materializes! (%s)" % EssenceSystem.display_name(essence_id),
 			Color(0.8, 0.6, 1.0))

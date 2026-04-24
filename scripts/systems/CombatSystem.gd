@@ -56,6 +56,8 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		_apply_brand_status(monster, brand)
 	if monster.hp > 0 and EssenceSystem.has_venom_touch(player):
 		Status.apply(monster, "poison", 3)
+	if monster.hp > 0:
+		EssenceSystem.apply_melee_hit_effects(player, monster)
 	if skill_id != "":
 		player.grant_skill_xp(skill_id, 1.0)
 	player.grant_skill_xp("fighting", 0.5)
@@ -65,6 +67,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		player.register_kill()
 		GameManager.try_kill_unlock(monster.data.id)
 		RacePassiveSystem.on_player_killed_monster(player)
+		EssenceSystem.apply_on_kill_effects(player)
 
 static func _weapon_brand(player: Player) -> String:
 	if player.equipped_weapon_id == "":
@@ -116,6 +119,7 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	if to_hit_roll < player.ev:
 		CombatLog.miss("The %s %s at you and misses." \
 				% [monster.data.display_name, verb])
+		player.grant_skill_xp("dodge", 0.3)
 		return
 	var raw: int = randi_range(1, max(1, dmg_base))
 	var soak: int = randi_range(0, player.ac + 1)
@@ -138,6 +142,7 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	var to_hit_roll: int = randi_range(0, to_hit_base)
 	if to_hit_roll < eff_ev:
 		CombatLog.miss("The %s misses you." % monster.data.display_name)
+		player.grant_skill_xp("dodge", 0.5)
 		return
 	var raw: int = randi_range(1, max(1, dmg_base)) + monster.data.hd / 2
 	var soak: int = randi_range(0, player.ac + 1)

@@ -20,3 +20,5 @@ class_name MonsterData extends Resource
 @export var tile_path: String = ""
 @export var glyph: String = "r"
 @export var glyph_color: Color = Color(0.8, 0.8, 0.8)
+@export var description: String = ""
+@export var essence_id: String = ""   # specific essence this monster can drop; "" = random

@@ -45,6 +45,9 @@ var rune_shards: int = 0
 ## to settings.json so deaths don't revoke progress.
 var unlocks: Dictionary = {}
 
+## Kill counts per monster id — persisted across runs in settings.json.
+var kill_counts: Dictionary = {}  # monster_id → int
+
 func _ready() -> void:
 	_load_settings()
 
@@ -94,6 +97,9 @@ func load_run() -> bool:
 	pseudonyms = data.get("pseudonyms", {})
 	if pseudonyms.is_empty():
 		_generate_pseudonyms()
+	var saved_kc = data.get("kill_counts", null)
+	if saved_kc is Dictionary:
+		kill_counts = saved_kc
 	pending_player_state = data.get("player", {})
 	run_in_progress = true
 	return true
@@ -157,6 +163,8 @@ func is_unlocked(id: String) -> bool:
 	return bool(unlocks.get(id, false))
 
 func try_kill_unlock(monster_id: String) -> void:
+	kill_counts[monster_id] = kill_counts.get(monster_id, 0) + 1
+	_save_settings()
 	# Race unlock by kill.
 	for rid in RaceRegistry.by_id.keys():
 		var r: RaceData = RaceRegistry.get_by_id(rid)
@@ -196,12 +204,16 @@ func _load_settings() -> void:
 	var saved_unlocks = parsed.get("unlocks", null)
 	if saved_unlocks is Dictionary:
 		unlocks = saved_unlocks
+	var saved_kill_counts = parsed.get("kill_counts", null)
+	if saved_kill_counts is Dictionary:
+		kill_counts = saved_kill_counts
 
 func _save_settings() -> void:
 	var data := {
 		"use_tiles": use_tiles,
 		"rune_shards": rune_shards,
 		"unlocks": unlocks,
+		"kill_counts": kill_counts,
 	}
 	var f := FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
 	if f == null:
