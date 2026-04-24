@@ -136,49 +136,26 @@ static func _build_item_row(data: ItemData, indices: Array, plus: int,
 	name_lbl.add_theme_color_override("font_color", _item_color(data.kind))
 	row.add_child(name_lbl)
 
-	var btn_row := HBoxContainer.new()
-	btn_row.add_theme_constant_override("separation", 4)
-	row.add_child(btn_row)
+	var hint := Label.new()
+	hint.text = "›"
+	hint.add_theme_font_size_override("font_size", 36)
+	hint.add_theme_color_override("font_color", Color(0.5, 0.5, 0.55))
+	hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(hint)
 
 	var first: int = indices[0]
-	match data.kind:
-		"weapon":
-			var btn := _action_btn(
-					"Equipped" if player.equipped_weapon_id == data.id else "Equip")
-			btn.disabled = (player.equipped_weapon_id == data.id)
-			if not btn.disabled:
-				btn.pressed.connect(func(): _equip_weapon(first, player, dlg))
-			btn_row.add_child(btn)
-		"armor":
-			var btn := _action_btn(
-					"Equipped" if player.equipped_armor_id == data.id else "Equip")
-			btn.disabled = (player.equipped_armor_id == data.id)
-			if not btn.disabled:
-				btn.pressed.connect(func(): _equip_armor(first, player, dlg))
-			btn_row.add_child(btn)
-		"potion", "scroll":
-			var btn := _action_btn("Use")
-			btn.pressed.connect(func(): _use_item(first, player, dlg))
-			btn_row.add_child(btn)
-		"book":
-			var btn := _action_btn("Read")
-			btn.pressed.connect(func(): _use_item(first, player, dlg))
-			btn_row.add_child(btn)
-
-	var drop_btn := _action_btn("Drop")
-	drop_btn.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
-	drop_btn.pressed.connect(func(): _drop_item(first, player, dlg))
-	btn_row.add_child(drop_btn)
+	row.mouse_filter = Control.MOUSE_FILTER_STOP
+	row.gui_input.connect(func(ev: InputEvent) -> void:
+		var tapped := false
+		if ev is InputEventMouseButton \
+				and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			tapped = true
+		elif ev is InputEventScreenTouch and ev.pressed:
+			tapped = true
+		if tapped:
+			ItemDetailDialog.open(first, player, dlg, dlg.get_parent()))
 
 	return row
-
-
-static func _action_btn(label: String) -> Button:
-	var btn := Button.new()
-	btn.text = label
-	btn.custom_minimum_size = Vector2(120, 52)
-	btn.add_theme_font_size_override("font_size", 22)
-	return btn
 
 
 static func _item_color(kind: String) -> Color:
@@ -191,33 +168,3 @@ static func _item_color(kind: String) -> Color:
 		_:        return Color(0.85, 0.85, 0.85)
 
 
-static func _equip_weapon(index: int, player: Player, dlg: GameDialog) -> void:
-	if index < 0 or index >= player.items.size():
-		return
-	var entry: Dictionary = player.items[index]
-	player.set_equipped_weapon(String(entry.get("id", "")))
-	CombatLog.post("You equip %s." % _name_of(entry))
-	dlg.close()
-	TurnManager.end_player_turn()
-
-static func _equip_armor(index: int, player: Player, dlg: GameDialog) -> void:
-	if index < 0 or index >= player.items.size():
-		return
-	var entry: Dictionary = player.items[index]
-	player.set_equipped_armor(String(entry.get("id", "")))
-	CombatLog.post("You don %s." % _name_of(entry))
-	dlg.close()
-	TurnManager.end_player_turn()
-
-static func _use_item(index: int, player: Player, dlg: GameDialog) -> void:
-	player.use_item(index)
-	dlg.close()
-	TurnManager.end_player_turn()
-
-static func _drop_item(index: int, player: Player, dlg: GameDialog) -> void:
-	player.drop_item(index)
-	_populate(dlg, player)
-
-static func _name_of(entry: Dictionary) -> String:
-	var data: ItemData = ItemRegistry.get_by_id(entry.get("id", ""))
-	return data.display_name if data != null else "something"
