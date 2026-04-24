@@ -1055,11 +1055,7 @@ func _on_magic_pressed() -> void:
 	MagicDialog.open(player, self)
 
 func _on_menu_pressed() -> void:
-	# Save on quit so Continue can pick up the run.
-	if player != null and player.hp > 0:
-		SaveManager.save_run(player, GameManager)
-	GameManager.run_in_progress = false
-	get_tree().change_scene_to_file(MENU_SCENE_PATH)
+	PauseMenuDialog.open(self)
 
 func _chebyshev(a: Vector2i, b: Vector2i) -> int:
 	return max(abs(a.x - b.x), abs(a.y - b.y))
