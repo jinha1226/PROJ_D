@@ -112,7 +112,7 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 		vb.add_child(desc_lbl)
 
 	# Essence drop info
-	var eid: String = String(data.get("essence_id", ""))
+	var eid: String = String(data.essence_id)
 	if eid != "":
 		var ess_lbl := Label.new()
 		ess_lbl.text = "Essence: %s — %s" % [
