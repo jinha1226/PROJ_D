@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RaceData" format=3 uid="uid://002sjm48val3"]
+
+[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+
+[resource]
+script = ExtResource("1_rdata")
+id = "halfling"
+display_name = "Halfling"
+description = "Small and nimble. +2 DEX, -1 STR / -1 HP. Once per floor, a heavy blow glances off."
+base_sprite_path = "res://assets/tiles/individual/player/base/halfling_m.png"
+unlocked = false
+unlock_kind = "kill"
+unlock_trigger_id = "halfling"
+str_mod = -1
+dex_mod = 2
+int_mod = 0
+hp_mod = -1
+mp_mod = 0
+resist_mods = []
+passive_id = "lucky"

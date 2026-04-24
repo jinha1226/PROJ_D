@@ -297,6 +297,7 @@ func _apply_race_mods(race_id: String) -> void:
 	player.mp_max = max(0, player.mp_max + race.mp_mod)
 	player.mp = player.mp_max
 	player.resists = race.resist_mods.duplicate()
+	RacePassiveSystem.register(player)
 
 func _class_starter_items(class_id: String) -> Array:
 	match class_id:
@@ -366,6 +367,7 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	if saved_ei is Array:
 		player.essence_inventory = saved_ei.duplicate()
 	player.set_race_from_id(GameManager.selected_race_id)
+	RacePassiveSystem.register(player)
 	player._refresh_paperdoll()
 	CombatLog.post("Run resumed. Floor B%d." % GameManager.depth,
 		Color(0.7, 0.9, 1.0))
@@ -697,11 +699,20 @@ func _on_minimap_tapped() -> void:
 		all_depths = GameManager.floor_cache.keys().duplicate()
 		all_depths.sort()
 	if all_depths.size() > 1:
-		body.add_child(UICards.section_header("FLOORS", 24))
+		# Add floor nav as a footer outside the scrollable body.
+		var window_vbox: VBoxContainer = dlg.get_node_or_null(
+				"Dim/Window/Margin/VBox") as VBoxContainer
+		var footer_target: Node = window_vbox if window_vbox != null else body
+		var floor_header: Label = UICards.section_header("FLOORS", 24)
+		footer_target.add_child(floor_header)
+		if window_vbox != null:
+			window_vbox.move_child(floor_header, window_vbox.get_child_count() - 2)
 		var floor_row := HBoxContainer.new()
 		floor_row.add_theme_constant_override("separation", 6)
 		floor_row.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		body.add_child(floor_row)
+		footer_target.add_child(floor_row)
+		if window_vbox != null:
+			window_vbox.move_child(floor_row, window_vbox.get_child_count() - 2)
 		for d in all_depths:
 			var is_current: bool = (d == GameManager.depth)
 			var fbtn := Button.new()
@@ -744,6 +755,7 @@ func _on_player_moved(_new_pos: Vector2i) -> void:
 func _on_player_turn_started() -> void:
 	if player != null and player.hp > 0:
 		player.tick_statuses()
+		RacePassiveSystem.on_player_turn_end(player)
 	if not _auto_path.is_empty():
 		_queue_auto_walk_step()
 	elif _auto_exploring:
@@ -795,6 +807,7 @@ func _on_stairs_down() -> void:
 	_clear_monsters()
 	_clear_floor_items()
 	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth), true)
+	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
 	SaveManager.save_run(player, GameManager)
@@ -813,6 +826,7 @@ func _on_stairs_up() -> void:
 	_clear_monsters()
 	_clear_floor_items()
 	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth), false)
+	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
 	SaveManager.save_run(player, GameManager)
@@ -832,6 +846,7 @@ func _travel_to_floor(target_depth: int) -> void:
 	GameManager.travel_to(target_depth)
 	CombatLog.post("You travel to B%d." % target_depth, Color(0.7, 0.9, 1.0))
 	_generate_floor(target_depth, _floor_seed(target_depth), going_down)
+	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
 	SaveManager.save_run(player, GameManager)
@@ -1043,6 +1058,13 @@ func _on_act_pressed() -> void:
 
 
 func _start_auto_explore() -> void:
+	# Route to nearest reachable floor item first.
+	var item_target := _find_item_target()
+	if item_target != Vector2i(-1, -1):
+		var ipath := _bfs_path(player.grid_pos, item_target)
+		if not ipath.is_empty():
+			_begin_auto_walk(ipath, true)
+			return
 	var target := _find_explore_target()
 	if target == Vector2i(-1, -1):
 		_auto_exploring = false
@@ -1054,6 +1076,18 @@ func _start_auto_explore() -> void:
 		CombatLog.post("Can't reach unexplored area.", Color(0.7, 0.7, 0.5))
 		return
 	_begin_auto_walk(path, true)
+
+func _find_item_target() -> Vector2i:
+	var best: Vector2i = Vector2i(-1, -1)
+	var best_dist: int = 9999
+	for n in get_tree().get_nodes_in_group("floor_items"):
+		if not (n is FloorItem) or not map.explored.has(n.grid_pos):
+			continue
+		var d: int = (n.grid_pos - player.grid_pos).length_squared()
+		if d < best_dist:
+			best_dist = d
+			best = n.grid_pos
+	return best
 
 
 func _find_explore_target() -> Vector2i:

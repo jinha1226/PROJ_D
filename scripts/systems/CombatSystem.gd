@@ -38,6 +38,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	var mult: float = 1.0 + float(skill_level) * 0.05
 	var final: int = max(1, int(round(float(base_final) * mult)))
 	final += player.get_skill_level("fighting") / 2
+	final += RacePassiveSystem.melee_damage_bonus(player)
 	# Brand adds a separate elemental hit on top of the physical one,
 	# scaled by the target's resists (vulnerable targets take more).
 	var brand: String = _weapon_brand(player)
@@ -63,6 +64,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		player.grant_xp(monster.data.xp_value)
 		player.register_kill()
 		GameManager.try_kill_unlock(monster.data.id)
+		RacePassiveSystem.on_player_killed_monster(player)
 
 static func _weapon_brand(player: Player) -> String:
 	if player.equipped_weapon_id == "":
@@ -118,6 +120,7 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	var raw: int = randi_range(1, max(1, dmg_base))
 	var soak: int = randi_range(0, player.ac + 1)
 	var final: int = max(1, raw - soak)
+	final = RacePassiveSystem.on_player_hit(player, final)
 	CombatLog.damage_taken("The %s %s you for %d." \
 			% [monster.data.display_name, verb, final])
 	player.take_damage(final, monster.data.id)
@@ -141,6 +144,7 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	if Status.has(player, "stoneskin"):
 		soak += randi_range(2, 5)
 	var final: int = max(1, raw - soak)
+	final = RacePassiveSystem.on_player_hit(player, final)
 	CombatLog.damage_taken("The %s hits you for %d." % [monster.data.display_name, final])
 	player.take_damage(final, monster.data.id)
 	var poison_turns: int = int(attack.get("poison_turns", 0))

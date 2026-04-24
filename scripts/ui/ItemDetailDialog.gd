@@ -89,8 +89,14 @@ static func _build_header(data: ItemData, plus: int) -> Control:
 # ── Description ───────────────────────────────────────────────────────────────
 
 static func _build_description(data: ItemData) -> Control:
-	var text: String = data.description if data.description != "" \
-		else _effect_desc(data)
+	var is_consumable: bool = data.kind in ["potion", "scroll", "book"]
+	var text: String
+	if is_consumable and not GameManager.is_identified(data.id):
+		text = "정체를 알 수 없다..."
+	elif data.description != "":
+		text = data.description
+	else:
+		text = _effect_desc(data)
 	var lbl := Label.new()
 	lbl.text = text
 	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -262,8 +268,13 @@ static func _build_buttons(item_index: int, data: ItemData, player: Player,
 	match data.kind:
 		"weapon":
 			if player.equipped_weapon_id == data.id:
-				action_btn.text = "장착 중"
-				action_btn.disabled = true
+				action_btn.text = "장착 해제"
+				action_btn.pressed.connect(func():
+					player.set_equipped_weapon("")
+					CombatLog.post("You unequip %s." % data.display_name)
+					detail_dlg.close()
+					BagDialog._populate(bag_dlg, player)
+					TurnManager.end_player_turn())
 			else:
 				action_btn.text = "장착"
 				action_btn.pressed.connect(func():
@@ -271,12 +282,17 @@ static func _build_buttons(item_index: int, data: ItemData, player: Player,
 							String(player.items[item_index].get("id", "")))
 					CombatLog.post("You equip %s." % data.display_name)
 					detail_dlg.close()
-					bag_dlg.close()
+					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
 		"armor":
 			if player.equipped_armor_id == data.id:
-				action_btn.text = "장착 중"
-				action_btn.disabled = true
+				action_btn.text = "장착 해제"
+				action_btn.pressed.connect(func():
+					player.set_equipped_armor("")
+					CombatLog.post("You unequip %s." % data.display_name)
+					detail_dlg.close()
+					BagDialog._populate(bag_dlg, player)
+					TurnManager.end_player_turn())
 			else:
 				action_btn.text = "장착"
 				action_btn.pressed.connect(func():
@@ -284,7 +300,7 @@ static func _build_buttons(item_index: int, data: ItemData, player: Player,
 							String(player.items[item_index].get("id", "")))
 					CombatLog.post("You don %s." % data.display_name)
 					detail_dlg.close()
-					bag_dlg.close()
+					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
 		"book":
 			action_btn.text = "읽기"

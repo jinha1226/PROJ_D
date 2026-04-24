@@ -17,3 +17,4 @@ int_mod = -1
 hp_mod = 3
 mp_mod = 0
 resist_mods = []
+passive_id = "bloodthirst"

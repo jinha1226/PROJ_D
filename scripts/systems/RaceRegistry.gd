@@ -6,12 +6,18 @@ const _ORC: Resource = preload("res://resources/races/orc.tres")
 const _TROLL: Resource = preload("res://resources/races/troll.tres")
 const _MINOTAUR: Resource = preload("res://resources/races/minotaur.tres")
 const _ELF: Resource = preload("res://resources/races/elf.tres")
+const _HALFLING: Resource = preload("res://resources/races/halfling.tres")
+const _DWARF: Resource = preload("res://resources/races/dwarf.tres")
+const _TIEFLING: Resource = preload("res://resources/races/tiefling.tres")
+const _SPRIGGAN: Resource = preload("res://resources/races/spriggan.tres")
+const _VAMPIRE: Resource = preload("res://resources/races/vampire.tres")
 
 var by_id: Dictionary = {}
 var all: Array = []
 
 func _ready() -> void:
-	for res in [_HUMAN, _KOBOLD, _ORC, _TROLL, _MINOTAUR, _ELF]:
+	for res in [_HUMAN, _KOBOLD, _ORC, _TROLL, _MINOTAUR, _ELF,
+			_HALFLING, _DWARF, _TIEFLING, _SPRIGGAN, _VAMPIRE]:
 		_register(res)
 	if all.is_empty():
 		push_warning("RaceRegistry: 0 races registered.")
@@ -30,7 +36,8 @@ func get_by_id(id: String) -> RaceData:
 	return by_id.get(id)
 
 func ids_in_order() -> Array:
-	var known: Array = ["human", "kobold", "orc", "elf", "troll", "minotaur"]
+	var known: Array = ["human", "kobold", "orc", "elf", "troll", "minotaur",
+		"halfling", "dwarf", "tiefling", "spriggan", "vampire"]
 	var result: Array = []
 	for id in known:
 		if by_id.has(id):

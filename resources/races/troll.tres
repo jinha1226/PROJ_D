@@ -17,3 +17,4 @@ int_mod = -2
 hp_mod = 8
 mp_mod = -2
 resist_mods = ["cold+"]
+passive_id = "regeneration"

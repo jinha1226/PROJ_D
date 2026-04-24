@@ -17,3 +17,4 @@ int_mod = 0
 hp_mod = -2
 mp_mod = 0
 resist_mods = ["poison+"]
+passive_id = "trapfinder"

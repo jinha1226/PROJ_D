@@ -136,21 +136,31 @@ static func _build_item_row(data: ItemData, indices: Array, plus: int,
 	name_lbl.add_theme_color_override("font_color", _item_color(data.kind))
 	row.add_child(name_lbl)
 
-	var hint := Label.new()
-	hint.text = "›"
-	hint.add_theme_font_size_override("font_size", 36)
-	hint.add_theme_color_override("font_color", Color(0.5, 0.5, 0.55))
-	hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	row.add_child(hint)
+	var is_equipped: bool = (data.kind == "weapon" and player.equipped_weapon_id == data.id) \
+		or (data.kind == "armor" and player.equipped_armor_id == data.id)
+	if is_equipped:
+		var eq_lbl := Label.new()
+		eq_lbl.text = "장착중"
+		eq_lbl.add_theme_font_size_override("font_size", 20)
+		eq_lbl.add_theme_color_override("font_color", Color(0.4, 0.9, 0.55))
+		eq_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		row.add_child(eq_lbl)
+	else:
+		var hint := Label.new()
+		hint.text = "›"
+		hint.add_theme_font_size_override("font_size", 36)
+		hint.add_theme_color_override("font_color", Color(0.5, 0.5, 0.55))
+		hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		row.add_child(hint)
 
 	var first: int = indices[0]
 	row.mouse_filter = Control.MOUSE_FILTER_STOP
 	row.gui_input.connect(func(ev: InputEvent) -> void:
 		var tapped := false
 		if ev is InputEventMouseButton \
-				and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+				and not ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
 			tapped = true
-		elif ev is InputEventScreenTouch and ev.pressed:
+		elif ev is InputEventScreenTouch and not ev.pressed:
 			tapped = true
 		if tapped:
 			ItemDetailDialog.open(first, player, dlg, dlg.get_parent()))
@@ -166,5 +176,3 @@ static func _item_color(kind: String) -> Color:
 		"scroll": return Color(1.0, 0.95, 0.55)
 		"book":   return Color(0.7, 0.55, 1.0)
 		_:        return Color(0.85, 0.85, 0.85)
-
-

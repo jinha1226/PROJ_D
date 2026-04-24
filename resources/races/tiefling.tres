@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RaceData" format=3 uid="uid://d1qw8aygq7iyy"]
+
+[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+
+[resource]
+script = ExtResource("1_rdata")
+id = "tiefling"
+display_name = "Tiefling"
+description = "Infernal heritage. +1 INT / +2 MP, -1 HP. Fire resistant. Once per floor, cast a spell even at 0 MP."
+base_sprite_path = "res://assets/tiles/individual/player/base/demonspawn_red_m.png"
+unlocked = false
+unlock_kind = "kill"
+unlock_trigger_id = "balrug"
+str_mod = 0
+dex_mod = 0
+int_mod = 1
+hp_mod = -1
+mp_mod = 2
+resist_mods = ["fire+"]
+passive_id = "hellish_legacy"
