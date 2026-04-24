@@ -2,7 +2,8 @@
 
 ## Current project (PocketCrawl, MIT, at repo root)
 - [UI conventions](ui_conventions.md) — popup/dialog UX rules (GameDialog patterns)
-- [Pending backlog](backlog_pocketcrawl.md) — 5개 미완료 버그/기능 (몬스터속도, 마법책, 미감정아이템, 계단, auto-walk)
+- [Pending backlog](backlog_pocketcrawl.md) — Zone expansion ✅완료 (branch pushed) + 기존 버그 5개
+- [Zone expansion spec](../../mnt/d/PROJ_D/docs/superpowers/specs/2026-04-23-zone-monster-expansion-design.md) — 8존×3층+보스, 38몬스터, 11종족, CA맵, 환경피해 — **모두 구현 완료**
 
 ## Feedback / collaboration
 - [Godot CanvasLayer accept_event trap](feedback_godot_canvaslayer.md) — accept_event() is Control-only; from CanvasLayer use get_viewport().set_input_as_handled(). Silent parse-error trap.

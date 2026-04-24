@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://059jmg628qc1w"]
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://cytb24okui3ic"]
 
 [ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
 
