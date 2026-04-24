@@ -376,6 +376,13 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.skills = data.get("skills", {})
 	if player.skills.is_empty():
 		player.init_skills()
+	else:
+		# Ensure all skills exist at minimum level 1.
+		for _sk_id: String in Player.SKILL_IDS:
+			if not player.skills.has(_sk_id):
+				player.skills[_sk_id] = {"level": 1, "xp": 0.0}
+			elif int(player.skills[_sk_id].get("level", 0)) < 1:
+				player.skills[_sk_id]["level"] = 1
 	var saved_qs = data.get("quickslots", null)
 	if saved_qs is Array:
 		for i in range(min(int(saved_qs.size()), player.quickslots.size())):
