@@ -152,13 +152,26 @@
 
 ---
 
-## 3. 신규 종족 (3종)
+## 3. 전체 종족 테이블 (11종)
 
-| id | 표시명 | 타일 | 특성 방향 |
-|---|---|---|---|
-| halfling | Halfling | mon/humanoids/halfling.png | 회피+, 스텔스 |
-| dwarf | Dwarf | mon/humanoids/deep_dwarf.png | HP+, AC+, 마법저항 |
-| spriggan | Spriggan | mon/humanoids/spriggans/spriggan.png | 속도++, HP- |
+| id | 표시명 | STR | DEX | INT | HP | MP | 저항 | 패시브 | 언락 |
+|---|---|---|---|---|---|---|---|---|---|
+| human | Human | 0 | 0 | 0 | 0 | 0 | — | **Adaptable**: 에센스 효과 지속 턴 +50% | 기본 |
+| elf | Elf | -1 | +1 | +1 | -3 | +2 | — | **Keen Eyes**: 시야 +1, sleep 면역 | deep_elf_archer 처치 |
+| orc | Orc | +2 | -1 | -1 | +3 | 0 | — | **Bloodthirst**: HP 50% 미만 시 근접 공격력 +4 | orc 처치 |
+| troll | Troll | +3 | -2 | -2 | +8 | -2 | cold+ | **Regeneration**: 3턴마다 HP 1 자동 회복 | troll 처치 |
+| kobold | Kobold | -1 | +1 | 0 | -2 | 0 | poison+ | **Trapfinder**: 함정 1칸 전 자동 감지 | kobold 처치 |
+| minotaur | Minotaur | +2 | +1 | -3 | +4 | -1 | — | **Headbutt**: 모든 근접 공격 +3 추가 대미지 | minotaur 처치 |
+| halfling | Halfling | -1 | +2 | 0 | -1 | 0 | — | **Lucky**: 치명타 피격 1회/층 일반 피격으로 전환 | halfling 처치 |
+| dwarf | Dwarf | +1 | -1 | 0 | +4 | 0 | poison+ | **Stone Sense**: 비밀 방/보물 방 인접 시 자동 발견 | deep_dwarf 처치 |
+| tiefling | Tiefling | 0 | 0 | +1 | -1 | +2 | fire+ | **Hellish Legacy**: MP 0에서도 주문 1회/층 시전 가능 | balrug 처치 |
+| spriggan | Spriggan | -2 | +3 | +1 | -5 | +1 | — | **Fleet**: 이동 속도 +3, 선제 공격 보정 | deep_troll 처치 |
+| vampire | Vampire | +1 | +1 | 0 | -2 | 0 | neg+ | **Blood Drain**: 근접 치명타 시 HP 3 흡수 | vampire 처치 |
+
+### 패시브 구현 난이도
+- **쉬움**: Keen Eyes(시야+), Regeneration(HP틱), Adaptable(에센스 배율), sleep면역, Bloodthirst(HP비율 체크)
+- **보통**: Lucky(피격 후킹), Trapfinder(함정 사전감지), Hellish Legacy(MP 체크), Headbutt(공격 플랫 보너스), Blood Drain(치명타 흡수)
+- **어려움**: Fleet(속도 시스템), Stone Sense(비밀방 시스템)
 
 ---
 
