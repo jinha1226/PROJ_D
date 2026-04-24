@@ -7,6 +7,8 @@ enum Tile {
 	STAIRS_DOWN = 3,
 	DOOR_CLOSED = 4,
 	DOOR_OPEN = 5,
+	WATER = 6,
+	LAVA = 7,
 }
 
 const GRID_W: int = 35
@@ -17,31 +19,10 @@ const TEX_STAIRS_UP: Texture2D = preload(
 	"res://assets/tiles/individual/dngn/gateways/metal_stairs_up.png")
 const TEX_STAIRS_DOWN: Texture2D = preload(
 	"res://assets/tiles/individual/dngn/gateways/metal_stairs_down.png")
-
-## Depth-banded terrain art. Each band declares its wall + floor tile
-## paths; picked by pick_atmosphere_for_depth() on generate().
-const TERRAIN_BANDS: Array = [
-	{
-		"until_depth": 3,
-		"wall": "res://assets/tiles/individual/dngn/wall/catacombs0.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/dirt0.png",
-	},
-	{
-		"until_depth": 7,
-		"wall": "res://assets/tiles/individual/dngn/wall/catacombs0.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/limestone0.png",
-	},
-	{
-		"until_depth": 12,
-		"wall": "res://assets/tiles/individual/dngn/wall/brick_brown-vines0.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/cobble_blood3.png",
-	},
-	{
-		"until_depth": 99,
-		"wall": "res://assets/tiles/individual/dngn/wall/brick_brown-vines0.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/crystal0.png",
-	},
-]
+const TEX_WATER: Texture2D = preload(
+	"res://assets/tiles/individual/dngn/water/deep_water.png")
+const TEX_LAVA: Texture2D = preload(
+	"res://assets/tiles/individual/dngn/floor/lava00.png")
 
 var _tex_wall: Texture2D = null
 var _tex_floor: Texture2D = null
@@ -84,8 +65,8 @@ func grid_to_world(p: Vector2i) -> Vector2:
 func world_to_grid(w: Vector2) -> Vector2i:
 	return Vector2i(int(floor(w.x / CELL_SIZE)), int(floor(w.y / CELL_SIZE)))
 
-func generate(map_seed: int = -1) -> void:
-	var result: Dictionary = MapGen.generate(GRID_W, GRID_H, map_seed)
+func generate(map_seed: int = -1, style: String = "bsp") -> void:
+	var result: Dictionary = MapGen.generate(GRID_W, GRID_H, map_seed, style)
 	tiles = result["tiles"]
 	spawn_pos = result["spawn"]
 	stairs_down_pos = result["stairs_down"]
@@ -97,14 +78,9 @@ func generate(map_seed: int = -1) -> void:
 	queue_redraw()
 
 func _load_atmosphere(depth: int) -> void:
-	for band in TERRAIN_BANDS:
-		if depth <= int(band.get("until_depth", 0)):
-			_tex_wall = load(band["wall"]) as Texture2D
-			_tex_floor = load(band["floor"]) as Texture2D
-			return
-	var last: Dictionary = TERRAIN_BANDS[TERRAIN_BANDS.size() - 1]
-	_tex_wall = load(last["wall"]) as Texture2D
-	_tex_floor = load(last["floor"]) as Texture2D
+	var cfg: Dictionary = ZoneManager.config_for_depth(depth)
+	_tex_wall = load(cfg["wall"]) as Texture2D
+	_tex_floor = load(cfg["floor"]) as Texture2D
 
 func find_spawn() -> Vector2i:
 	return spawn_pos
@@ -174,6 +150,10 @@ func _texture_for(t: int) -> Texture2D:
 			return TEX_STAIRS_UP
 		Tile.STAIRS_DOWN:
 			return TEX_STAIRS_DOWN
+		Tile.WATER:
+			return TEX_WATER
+		Tile.LAVA:
+			return TEX_LAVA
 	return null
 
 func _glyph_for(t: int) -> String:
@@ -190,6 +170,10 @@ func _glyph_for(t: int) -> String:
 			return "+"
 		Tile.DOOR_OPEN:
 			return "'"
+		Tile.WATER:
+			return "~"
+		Tile.LAVA:
+			return "~"
 	return "?"
 
 func _glyph_color_for(t: int) -> Color:
@@ -206,4 +190,8 @@ func _glyph_color_for(t: int) -> Color:
 			return Color(0.75, 0.55, 0.3)
 		Tile.DOOR_OPEN:
 			return Color(0.55, 0.4, 0.25)
+		Tile.WATER:
+			return Color(0.3, 0.5, 0.9)
+		Tile.LAVA:
+			return Color(1.0, 0.4, 0.1)
 	return Color.WHITE
