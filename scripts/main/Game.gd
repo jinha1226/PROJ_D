@@ -342,6 +342,10 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.kills = int(data.get("kills", 0))
 	player.last_killer = String(data.get("last_killer", ""))
 	player.known_spells = data.get("known_spells", [])
+	if player.known_spells.is_empty():
+		var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id)
+		if cls != null:
+			player.known_spells = cls.starting_spells.duplicate()
 	player.statuses = data.get("statuses", {})
 	player.resists = data.get("resists", [])
 	player.skills = data.get("skills", {})
