@@ -5,7 +5,6 @@ extends Node
 ## adding a line here and a .tres file under resources/classes/.
 
 const _WARRIOR: Resource = preload("res://resources/classes/warrior.tres")
-const _MAGE: Resource = preload("res://resources/classes/mage.tres")
 const _ROGUE: Resource = preload("res://resources/classes/rogue.tres")
 const _BERSERKER: Resource = preload("res://resources/classes/berserker.tres")
 const _ICE_MAGE: Resource = preload("res://resources/classes/ice_mage.tres")
@@ -24,7 +23,7 @@ var by_id: Dictionary = {}
 var all: Array = []
 
 func _ready() -> void:
-	for res in [_WARRIOR, _MAGE, _ROGUE, _BERSERKER, _ICE_MAGE, _ARCHMAGE,
+	for res in [_WARRIOR, _ROGUE, _BERSERKER, _ICE_MAGE, _ARCHMAGE,
 			_EVOKER, _CONJURER, _TRANSMUTER, _NECROMANCER, _ABJURER, _ENCHANTER,
 			_RANGER, _SPEARMAN, _CRUSHER]:
 		_register(res)
@@ -48,7 +47,7 @@ func get_by_id(id: String) -> ClassData:
 
 func ids_in_order() -> Array:
 	var known_order: Array = ["warrior", "spearman", "crusher", "berserker",
-		"ranger", "rogue", "mage", "evoker", "conjurer", "transmuter", "necromancer",
+		"ranger", "rogue", "evoker", "conjurer", "transmuter", "necromancer",
 		"abjurer", "enchanter", "archmage", "ice_mage"]
 	var result: Array = []
 	for id in known_order:
@@ -70,7 +69,7 @@ func is_unlocked(id: String) -> bool:
 # Legacy rescan path kept for JobSelect defensive call.
 func _scan() -> void:
 	if all.is_empty():
-		for res in [_WARRIOR, _MAGE, _ROGUE, _BERSERKER, _ICE_MAGE, _ARCHMAGE,
+		for res in [_WARRIOR, _ROGUE, _BERSERKER, _ICE_MAGE, _ARCHMAGE,
 				_EVOKER, _CONJURER, _TRANSMUTER, _NECROMANCER, _ABJURER, _ENCHANTER,
 				_RANGER, _SPEARMAN, _CRUSHER]:
 			_register(res)

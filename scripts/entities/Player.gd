@@ -271,7 +271,18 @@ func use_item(index: int) -> void:
 					had_effect = true
 					learned_count += 1
 			if learned_count == 0:
-				CombatLog.post("You already know all spells in this tome.", Color(0.7, 0.85, 1.0))
+				var dup_school: String = ""
+				for sid2 in all_ids:
+					var sp2: SpellData = SpellRegistry.get_by_id(String(sid2))
+					if sp2 != null and sp2.school != "":
+						dup_school = sp2.school
+						break
+				if dup_school != "":
+					grant_skill_xp(dup_school, 20.0)
+					CombatLog.post("You already know these spells. Your %s deepens." % dup_school, Color(0.7, 0.85, 1.0))
+					had_effect = true
+				else:
+					CombatLog.post("You already know all spells in this tome.", Color(0.7, 0.85, 1.0))
 		"identify":
 			items.remove_at(index)
 			emit_signal("stats_changed")
