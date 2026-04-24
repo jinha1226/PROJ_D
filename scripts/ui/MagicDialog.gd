@@ -136,7 +136,7 @@ static func _make_spell_row(spell: SpellData, player: Player,
 
 
 static func _describe(player: Player, spell: SpellData) -> String:
-	var power: int = _compute_power(player)
+	var power: int = _compute_power(player, spell)
 	match spell.effect:
 		"damage", "drain":
 			var lo: int = spell.base_damage + power / 3
@@ -185,9 +185,10 @@ static func _describe(player: Player, spell: SpellData) -> String:
 	return spell.description.left(28)
 
 
-static func _compute_power(player: Player) -> int:
-	var skill: int = player.get_skill_level("magic")
-	return int(player.intelligence + skill * player.intelligence / 10.0)
+static func _compute_power(player: Player, spell: SpellData) -> int:
+	var skill_id: String = spell.school if spell.school != "" else "magic"
+	var skill: int = player.get_skill_level(skill_id)
+	return int(player.intelligence + skill * player.intelligence / 8.0)
 
 
 static func _school_color(school: String) -> Color:
