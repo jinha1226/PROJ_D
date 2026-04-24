@@ -131,7 +131,7 @@ static func _cast_drain(spell: SpellData, player: Player, power: int, game: Node
 	if target == null:
 		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
 		return
-	var dmg: int = spell.base_damage + randi_range(0, 2) + power / 3
+	var dmg: int = spell.base_damage + randi_range(0, 2) + power / 4
 	var scaled: int = Status.resist_scale(dmg, target.data.resists, spell.element)
 	CombatLog.hit("You drain the %s for %d." % [target.data.display_name, scaled])
 	if game != null and game.has_method("spawn_spell_bolt"):
@@ -300,7 +300,7 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 	if target == null:
 		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
 		return
-	var dmg: int = spell.base_damage + randi_range(0, 2) + power / 3
+	var dmg: int = spell.base_damage + randi_range(0, 2) + power / 4
 	dmg = _apply_element_bonus(spell, target, dmg)
 	CombatLog.hit("You hit the %s with %s for %d." \
 			% [target.data.display_name, spell.display_name, dmg])
@@ -370,7 +370,7 @@ static func _chain_damage(spell: SpellData, player: Player,
 	var prev_pos: Vector2 = player.position + half
 	for i in range(bounces):
 		var t: Monster = targets[i]
-		var dmg: int = spell.base_damage + randi_range(0, 2) + power / 3
+		var dmg: int = spell.base_damage + randi_range(0, 2) + power / 4
 		dmg = int(dmg * pow(0.7, i))
 		dmg = _apply_element_bonus(spell, t, dmg)
 		var scaled: int = Status.resist_scale(dmg, t.data.resists, spell.element)
@@ -405,7 +405,7 @@ static func _aoe_damage(spell: SpellData, player: Player,
 				abs(n.grid_pos.y - player.grid_pos.y))
 		if d > spell.max_range:
 			continue
-		var dmg: int = spell.base_damage + randi_range(0, 3) + power / 3
+		var dmg: int = spell.base_damage + randi_range(0, 3) + power / 4
 		dmg = _apply_element_bonus(spell, n, dmg)
 		var scaled: int = Status.resist_scale(dmg, n.data.resists, spell.element)
 		if scaled <= 0 and dmg > 0:
