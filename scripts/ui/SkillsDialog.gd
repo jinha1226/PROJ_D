@@ -1,21 +1,25 @@
 class_name SkillsDialog extends RefCounted
 
-const _CATEGORIES: Array = [
-	["WEAPON SKILLS", ["blade", "blunt", "dagger", "polearm", "ranged"]],
-	["DEFENSE",       ["armor"]],
-	["MAGIC",         ["magic"]],
-	["STEALTH",       ["stealth"]],
+const _SCHOOL_IDS: Array = [
+	"evocation", "necromancy", "transmutation", "enchantment", "conjuration", "abjuration"
 ]
 
 const _DESCRIPTIONS: Dictionary = {
-	"blade":   "Sword, axe, long blade. +damage & accuracy. Trains on hit.",
-	"blunt":   "Mace, flail, hammer. +damage & accuracy. Trains on hit.",
-	"dagger":  "Dagger & short blade. Bonus stab damage vs unaware enemies.",
-	"polearm": "Spear, halberd. Reach: attack from 2 tiles away. Trains on hit.",
-	"ranged":  "Bow, sling. Reduces long-range accuracy penalty. Trains on hit.",
-	"armor":   "Reduces EV penalty from heavy armour. Trains when taking hits.",
-	"magic":   "Power = INT + skill×INT/10. Lowers spell fizzle chance. Trains on cast.",
-	"stealth": "Delays enemy detection. Passive growth over time.",
+	"blade":         "Sword, axe, long blade. +damage & accuracy. Trains on hit.",
+	"blunt":         "Mace, flail, hammer. +damage & accuracy. Trains on hit.",
+	"dagger":        "Dagger & short blade. Bonus stab damage vs unaware enemies.",
+	"polearm":       "Spear, halberd. Reach: attack from 2 tiles away. Trains on hit.",
+	"ranged":        "Bow, sling. Reduces long-range accuracy penalty. Trains on hit.",
+	"fighting":      "General combat. +5 max HP and +1 damage per 2 levels. Trains on every melee hit.",
+	"armor":         "Reduces EV penalty from heavy armour. Trains when taking hits.",
+	"magic":         "General spellcasting. Lowers fizzle chance. Trains on every cast.",
+	"evocation":     "Channelled force spells. Enhances spell power. Trains on casting.",
+	"necromancy":    "Death and undeath magic. Enhances spell power. Trains on casting.",
+	"transmutation": "Body and form magic. Enhances spell power. Trains on casting.",
+	"enchantment":   "Mind and charm magic. Enhances spell power. Trains on casting.",
+	"conjuration":   "Summoning magic. Enhances spell power. Trains on casting.",
+	"abjuration":    "Protective ward magic. Enhances spell power. Trains on casting.",
+	"stealth":       "Delays enemy detection. Passive growth over time.",
 }
 
 static func open(player: Player, parent: Node) -> void:
@@ -31,11 +35,32 @@ static func open(player: Player, parent: Node) -> void:
 	if player.skills.is_empty():
 		player.init_skills()
 
-	for cat_entry in _CATEGORIES:
-		body.add_child(UICards.section_header(String(cat_entry[0])))
-		for id: String in cat_entry[1]:
-			var s: Dictionary = player.skills.get(id, {"level": 0, "xp": 0.0})
-			body.add_child(_make_skill_row(id, s, player, parent))
+	# COMBAT
+	body.add_child(UICards.section_header("COMBAT"))
+	for id in ["blade", "blunt", "dagger", "polearm", "ranged", "fighting"]:
+		var s: Dictionary = player.skills.get(id, {"level": 0, "xp": 0.0})
+		body.add_child(_make_skill_row(id, s, player, parent))
+
+	# DEFENSE
+	body.add_child(UICards.section_header("DEFENSE"))
+	var s_armor: Dictionary = player.skills.get("armor", {"level": 0, "xp": 0.0})
+	body.add_child(_make_skill_row("armor", s_armor, player, parent))
+
+	# SPELLCASTING
+	body.add_child(UICards.section_header("SPELLCASTING"))
+	var s_magic: Dictionary = player.skills.get("magic", {"level": 0, "xp": 0.0})
+	body.add_child(_make_skill_row("magic", s_magic, player, parent))
+
+	# MAGIC SCHOOLS — each with known spells listed
+	body.add_child(UICards.section_header("MAGIC SCHOOLS"))
+	for school in _SCHOOL_IDS:
+		var s_school: Dictionary = player.skills.get(school, {"level": 0, "xp": 0.0})
+		body.add_child(_make_school_section(school, s_school, player, parent))
+
+	# STEALTH
+	body.add_child(UICards.section_header("STEALTH"))
+	var s_stealth: Dictionary = player.skills.get("stealth", {"level": 0, "xp": 0.0})
+	body.add_child(_make_skill_row("stealth", s_stealth, player, parent))
 
 
 static func _bonus_text(id: String, level: int, player: Player) -> String:
@@ -46,16 +71,67 @@ static func _bonus_text(id: String, level: int, player: Player) -> String:
 			return "+%d to-hit  ·  +%d%% dmg" % [level, level * 5]
 		"dagger":
 			return "+%d to-hit  ·  +%d%% dmg  ·  stab vs unaware" % [level, level * 5]
+		"fighting":
+			return "+%d max HP  ·  +%d melee dmg" % [level * 5, level / 2]
 		"armor":
 			var pct: int = min(level * 10, 100)
 			return "EV penalty -%d%% reduced" % pct
 		"magic":
-			var power: int = int(player.intelligence + level * player.intelligence / 10.0)
 			var fizzle_cut: int = level * 3
-			return "power %d  ·  fizzle -%d%%" % [power, fizzle_cut]
+			return "fizzle -%d%%  ·  base power +%d%%" % [fizzle_cut, level * 10]
 		"stealth":
 			return "detection delay +%d turns" % level
+	# School skills
+	if _SCHOOL_IDS.has(id):
+		var bonus: int = int(player.intelligence * level / 20.0)
+		return "spell power +%d  ·  +%d%% base" % [bonus, level * 5]
 	return ""
+
+
+static func _make_school_section(school: String, s: Dictionary,
+		player: Player, parent: Node) -> Control:
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 4)
+
+	vb.add_child(_make_skill_row(school, s, player, parent))
+
+	var known_spells: Array = SpellRegistry.get_by_school(school).filter(
+		func(sp: SpellData) -> bool: return player.known_spells.has(sp.id))
+	if not known_spells.is_empty():
+		var spell_list := VBoxContainer.new()
+		spell_list.add_theme_constant_override("separation", 2)
+		var indent := HBoxContainer.new()
+		indent.add_theme_constant_override("separation", 0)
+		var spacer := Control.new()
+		spacer.custom_minimum_size = Vector2(16, 0)
+		indent.add_child(spacer)
+		indent.add_child(spell_list)
+		vb.add_child(indent)
+		for sp: SpellData in known_spells:
+			var row := HBoxContainer.new()
+			row.add_theme_constant_override("separation", 8)
+			var lv_lbl := Label.new()
+			lv_lbl.text = "L%d" % sp.spell_level
+			lv_lbl.custom_minimum_size = Vector2(36, 0)
+			lv_lbl.add_theme_font_size_override("font_size", 20)
+			lv_lbl.add_theme_color_override("font_color", Color(0.6, 0.75, 0.9))
+			row.add_child(lv_lbl)
+			var name_lbl := Label.new()
+			name_lbl.text = sp.display_name
+			name_lbl.add_theme_font_size_override("font_size", 22)
+			name_lbl.add_theme_color_override("font_color", Color(0.8, 0.8, 0.9))
+			row.add_child(name_lbl)
+			var mp_lbl := Label.new()
+			mp_lbl.text = "%dMP" % sp.mp_cost
+			mp_lbl.add_theme_font_size_override("font_size", 20)
+			mp_lbl.add_theme_color_override("font_color", Color(0.55, 0.75, 1.0))
+			mp_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			mp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			row.add_child(mp_lbl)
+			spell_list.add_child(row)
+
+	return vb
+
 
 static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: Node) -> Control:
 	var level: int = int(s.get("level", 0))
@@ -68,7 +144,6 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 	vb.add_theme_constant_override("separation", 2)
 	vb.mouse_filter = Control.MOUSE_FILTER_STOP
 
-	# Long-press timer
 	var hold_timer := Timer.new()
 	hold_timer.wait_time = 0.5
 	hold_timer.one_shot = true
@@ -90,7 +165,6 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 		elif released:
 			hold_timer.stop())
 
-	# Name + level row
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	vb.add_child(row)
@@ -128,7 +202,6 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 	lv_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(lv_lbl)
 
-	# Thin XP bar
 	if level < 20 and needed > 0:
 		var xp_row := HBoxContainer.new()
 		xp_row.add_theme_constant_override("separation", 6)

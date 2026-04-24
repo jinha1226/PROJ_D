@@ -37,6 +37,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	var base_final: int = max(1, raw - soak)
 	var mult: float = 1.0 + float(skill_level) * 0.05
 	var final: int = max(1, int(round(float(base_final) * mult)))
+	final += player.get_skill_level("fighting") / 2
 	# Brand adds a separate elemental hit on top of the physical one,
 	# scaled by the target's resists (vulnerable targets take more).
 	var brand: String = _weapon_brand(player)
@@ -56,6 +57,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		Status.apply(monster, "poison", 3)
 	if skill_id != "":
 		player.grant_skill_xp(skill_id, 1.0)
+	player.grant_skill_xp("fighting", 0.5)
 	if was_alive and monster.hp <= 0:
 		CombatLog.hit("You kill the %s." % monster.data.display_name)
 		player.grant_xp(monster.data.xp_value)
