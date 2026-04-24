@@ -357,6 +357,16 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.kills = int(data.get("kills", 0))
 	player.last_killer = String(data.get("last_killer", ""))
 	player.known_spells = data.get("known_spells", [])
+	# Migrate old spell IDs that no longer exist in SpellRegistry.
+	var _spell_remap: Dictionary = {"magic_dart": "magic_missile", "blink": "", "heal_wounds": ""}
+	var _migrated: Array = []
+	for _sid: String in player.known_spells:
+		var _resolved: String = _sid
+		if _spell_remap.has(_sid):
+			_resolved = _spell_remap[_sid]
+		if _resolved != "" and SpellRegistry.get_by_id(_resolved) != null:
+			_migrated.append(_resolved)
+	player.known_spells = _migrated
 	if player.known_spells.is_empty():
 		var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id)
 		if cls != null:
@@ -668,7 +678,7 @@ func _on_minimap_tapped() -> void:
 	_cache_current_floor()
 	const MAP_SCALE: int = 6
 	var tex: ImageTexture = MinimapRenderer.render(map, player, self, MAP_SCALE)
-	var dlg: GameDialog = GameDialog.create("Map")
+	var dlg: GameDialog = GameDialog.create_ratio("Map", 0.96, 0.96)
 	add_child(dlg)
 	var body := dlg.body()
 	if body == null:
@@ -676,9 +686,10 @@ func _on_minimap_tapped() -> void:
 
 	var map_rect := TextureRect.new()
 	map_rect.texture = tex
-	map_rect.stretch_mode = TextureRect.STRETCH_SCALE
-	map_rect.custom_minimum_size = Vector2(
-			DungeonMap.GRID_W * MAP_SCALE, DungeonMap.GRID_H * MAP_SCALE)
+	map_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	map_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	map_rect.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	map_rect.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	map_rect.mouse_filter = Control.MOUSE_FILTER_STOP
 	body.add_child(map_rect)
 
@@ -692,8 +703,8 @@ func _on_minimap_tapped() -> void:
 		if not is_press:
 			return
 		var local_pos := map_rect.get_local_mouse_position()
-		var gx := int(local_pos.x / MAP_SCALE)
-		var gy := int(local_pos.y / MAP_SCALE)
+		var gx := int(local_pos.x * DungeonMap.GRID_W / map_rect.size.x)
+		var gy := int(local_pos.y * DungeonMap.GRID_H / map_rect.size.y)
 		var nav_target := Vector2i(gx, gy)
 		if not map.in_bounds(nav_target) or not map.explored.has(nav_target) \
 				or not map.is_walkable(nav_target) or nav_target == player.grid_pos:
