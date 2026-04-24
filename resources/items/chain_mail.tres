@@ -15,6 +15,7 @@ damage = 0
 delay = 1.0
 category = ""
 brand = ""
+required_skill = 4
 ac_bonus = 5
 ev_penalty = 2
 slot = "body"

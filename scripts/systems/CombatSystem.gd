@@ -200,8 +200,11 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	if player.equipped_shield_id != "" and not player.has_two_handed_weapon():
 		var _sh: ItemData = ItemRegistry.get_by_id(player.equipped_shield_id)
 		if _sh != null:
+			var _shield_skill: int = player.get_skill_level("shield")
+			var _missing_sh: int = max(0, _sh.required_skill - _shield_skill)
 			var block_pct: float = float(_sh.effect_value) / 100.0 \
-				+ player.get_skill_level("shield") * 0.03
+				+ _shield_skill * 0.03 \
+				- _missing_sh * 0.04
 			if randf() < block_pct:
 				CombatLog.miss("You block the %s's attack!" % monster.data.display_name)
 				player.grant_skill_xp("shield", 0.5)
@@ -233,8 +236,11 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	if player.equipped_shield_id != "" and not player.has_two_handed_weapon():
 		var _sh: ItemData = ItemRegistry.get_by_id(player.equipped_shield_id)
 		if _sh != null:
+			var _shield_skill: int = player.get_skill_level("shield")
+			var _missing_sh: int = max(0, _sh.required_skill - _shield_skill)
 			var block_pct: float = float(_sh.effect_value) / 100.0 \
-				+ player.get_skill_level("shield") * 0.03
+				+ _shield_skill * 0.03 \
+				- _missing_sh * 0.04
 			if randf() < block_pct:
 				CombatLog.miss("You block the %s's attack!" % monster.data.display_name)
 				player.grant_skill_xp("shield", 0.5)

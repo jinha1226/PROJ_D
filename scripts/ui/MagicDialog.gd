@@ -188,7 +188,7 @@ static func _describe(player: Player, spell: SpellData) -> String:
 static func _compute_power(player: Player, spell: SpellData) -> int:
 	var skill_id: String = spell.school if spell.school != "" else "magic"
 	var skill: int = player.get_skill_level(skill_id)
-	return int(player.intelligence + skill * player.intelligence / 8.0)
+	return int(float(player.intelligence) * (1.0 + float(skill) * 0.06))
 
 
 static func _school_color(school: String) -> Color:

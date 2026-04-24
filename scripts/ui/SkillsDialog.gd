@@ -153,14 +153,14 @@ static func _bonus_text(id: String, level: int, player: Player) -> String:
 		"dodge":
 			return "+%d EV" % level
 		"magic":
-			var power_bonus: int = int(player.intelligence * level / 8.0)
-			return "spell power +%d  (school-less spells only)" % power_bonus
+			var power: int = int(float(player.intelligence) * (1.0 + float(level) * 0.06))
+			return "spell power %d  (school-less spells only)" % power
 		"stealth":
 			return "detection delay +%d turns" % level
 	# School skills — power = INT + skill * INT / 8
 	if _SCHOOL_IDS.has(id):
-		var power_bonus: int = int(player.intelligence * level / 8.0)
-		return "spell power +%d  (INT %d × skill %d / 8)" % [power_bonus, player.intelligence, level]
+		var power: int = int(float(player.intelligence) * (1.0 + float(level) * 0.06))
+		return "spell power %d  (INT %d × +%d%%/lv)" % [power, player.intelligence, 6]
 	return ""
 
 

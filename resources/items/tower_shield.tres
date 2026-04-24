@@ -20,5 +20,6 @@ ev_penalty = 1
 slot = ""
 effect = "block"
 effect_value = 22
+required_skill = 4
 plus = 0
-description = "Heavy shield. 22% base block + Shield skill. -1 EV."
+description = "Heavy shield. 22% base block + Shield skill. -1 EV. Req Shield 4."

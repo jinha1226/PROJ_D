@@ -359,6 +359,8 @@ func refresh_ac_from_equipment() -> void:
 		var armor_skill: int = get_skill_level("armor")
 		var penalty_mult: float = max(0.0, 1.0 - float(armor_skill) * 0.1)
 		ev -= int(round(float(armor.ev_penalty) * penalty_mult))
+		var armor_missing: int = max(0, armor.required_skill - armor_skill)
+		ev -= armor_missing
 	if has_status("mage_armor"):
 		ac = max(ac, 13 + dexterity / 2)
 	ev = max(0, ev)
@@ -539,7 +541,13 @@ func _auto_stat_bump() -> void:
 		lowest_name = "intelligence"
 		lowest_val = intelligence
 	match lowest_name:
-		"strength": strength += 1
+		"strength":
+			var old_bonus: int = strength / 2
+			strength += 1
+			var hp_delta: int = strength / 2 - old_bonus
+			if hp_delta > 0:
+				hp_max += hp_delta
+				hp = min(hp_max, hp + hp_delta)
 		"dexterity": dexterity += 1
 		"intelligence": intelligence += 1
 	CombatLog.post("(+1 %s)" % lowest_name.to_upper(), Color(0.75, 0.85, 1))
@@ -651,7 +659,7 @@ func _apply_accessory_stat(id: String) -> void:
 	if d == null:
 		return
 	match d.effect:
-		"stat_str": strength += d.effect_value
+		"stat_str": strength += d.effect_value; hp_max += d.effect_value / 2; hp = mini(hp + d.effect_value / 2, hp_max)
 		"stat_int": intelligence += d.effect_value
 		"stat_dex": dexterity += d.effect_value; ev += 1
 		"hp_bonus": hp_max += d.effect_value; hp = mini(hp + d.effect_value, hp_max)
@@ -663,7 +671,7 @@ func _remove_accessory_stat(id: String) -> void:
 	if d == null:
 		return
 	match d.effect:
-		"stat_str": strength = maxi(1, strength - d.effect_value)
+		"stat_str": strength = maxi(1, strength - d.effect_value); hp_max = maxi(1, hp_max - d.effect_value / 2); hp = mini(hp, hp_max)
 		"stat_int": intelligence = maxi(1, intelligence - d.effect_value)
 		"stat_dex": dexterity = maxi(1, dexterity - d.effect_value); ev = maxi(0, ev - 1)
 		"hp_bonus": hp_max = maxi(1, hp_max - d.effect_value); hp = mini(hp, hp_max)

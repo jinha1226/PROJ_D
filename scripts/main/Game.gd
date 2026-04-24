@@ -254,13 +254,13 @@ func _apply_class_to_player(class_id: String) -> void:
 	var data: ClassData = ClassRegistry.get_by_id(class_id)
 	if data == null:
 		return
-	player.hp_max = data.starting_hp
-	player.hp = data.starting_hp
-	player.mp_max = data.starting_mp
-	player.mp = data.starting_mp
 	player.strength = data.starting_str
 	player.dexterity = data.starting_dex
 	player.intelligence = data.starting_int
+	player.hp_max = data.starting_hp + data.starting_str / 2
+	player.hp = player.hp_max
+	player.mp_max = data.starting_mp
+	player.mp = data.starting_mp
 	_apply_race_mods(GameManager.selected_race_id)
 	player.set_race_from_id(GameManager.selected_race_id)
 	if data.starting_weapon != "":
