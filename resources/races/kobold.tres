@@ -6,13 +6,13 @@
 script = ExtResource("1_rdata")
 id = "kobold"
 display_name = "Kobold"
-description = "Small, sly, and sneaky. +1 DEX, -1 STR, -2 HP."
+description = "Small and sly. +2 DEX, -1 STR, -2 HP. Detects traps automatically."
 base_sprite_path = "res://assets/tiles/individual/player/base/kobold_m.png"
 unlocked = false
 unlock_kind = "kill"
 unlock_trigger_id = "kobold"
 str_mod = -1
-dex_mod = 1
+dex_mod = 2
 int_mod = 0
 hp_mod = -2
 mp_mod = 0

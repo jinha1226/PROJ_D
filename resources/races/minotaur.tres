@@ -6,14 +6,14 @@
 script = ExtResource("1_rdata")
 id = "minotaur"
 display_name = "Minotaur"
-description = "Bullheaded warrior. +2 STR / +1 DEX / +4 HP, -3 INT."
+description = "Bullheaded warrior. +2 STR / +1 DEX / +4 HP, -2 INT."
 base_sprite_path = "res://assets/tiles/individual/player/base/minotaur_m.png"
 unlocked = false
 unlock_kind = "kill"
 unlock_trigger_id = "minotaur"
 str_mod = 2
 dex_mod = 1
-int_mod = -3
+int_mod = -2
 hp_mod = 4
 mp_mod = -1
 resist_mods = []
