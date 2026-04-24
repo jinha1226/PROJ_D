@@ -13,9 +13,8 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 			Color(1.0, 0.7, 0.5))
 		return false
 	player.mp = max(0, player.mp - spell.mp_cost)
-	player.grant_skill_xp("magic", float(spell.mp_cost))
-	if spell.school != "":
-		player.grant_skill_xp(spell.school, float(spell.mp_cost) * 0.5)
+	var xp_skill: String = spell.school if spell.school != "" else "magic"
+	player.grant_skill_xp(xp_skill, float(spell.mp_cost))
 	player.emit_signal("stats_changed")
 	var power: int = _compute_power(player, spell)
 	match spell.effect:
@@ -262,10 +261,9 @@ static func _cast_prismatic(spell: SpellData, player: Player, power: int, game: 
 
 
 static func _compute_power(player: Player, spell: SpellData) -> int:
-	var skill: int = player.get_skill_level("magic")
-	var school_skill: int = player.get_skill_level(spell.school) if spell.school != "" else 0
-	return int(player.intelligence + skill * player.intelligence / 10.0
-		+ school_skill * player.intelligence / 20.0)
+	var skill_id: String = spell.school if spell.school != "" else "magic"
+	var skill: int = player.get_skill_level(skill_id)
+	return int(player.intelligence + skill * player.intelligence / 8.0)
 
 
 static func _apply_element_bonus(spell: SpellData, target: Monster, dmg: int) -> int:

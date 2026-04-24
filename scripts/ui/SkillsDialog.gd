@@ -123,9 +123,11 @@ static func _build_defense_tab(player: Player, parent: Node) -> VBoxContainer:
 static func _build_magic_tab(player: Player, parent: Node) -> VBoxContainer:
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 6)
+	# "magic" skill shown only if the player actually has XP in it (generalist / school-less spells)
 	var s_magic: Dictionary = player.skills.get("magic", {"level": 0, "xp": 0.0})
-	vb.add_child(UICards.section_header("SPELLCASTING"))
-	vb.add_child(_make_skill_row("magic", s_magic, player, parent))
+	if s_magic.get("level", 0) > 0 or s_magic.get("xp", 0.0) > 0.0:
+		vb.add_child(UICards.section_header("GENERAL"))
+		vb.add_child(_make_skill_row("magic", s_magic, player, parent))
 	vb.add_child(UICards.section_header("SCHOOLS"))
 	for school in _SCHOOL_IDS:
 		var s_school: Dictionary = player.skills.get(school, {"level": 0, "xp": 0.0})
@@ -155,10 +157,10 @@ static func _bonus_text(id: String, level: int, player: Player) -> String:
 			return "fizzle -%d%%  ·  base power +%d%%" % [fizzle_cut, level * 10]
 		"stealth":
 			return "detection delay +%d turns" % level
-	# School skills
+	# School skills — power = INT + skill * INT / 8
 	if _SCHOOL_IDS.has(id):
-		var bonus: int = int(player.intelligence * level / 20.0)
-		return "spell power +%d  ·  +%d%% base" % [bonus, level * 5]
+		var power_bonus: int = int(player.intelligence * level / 8.0)
+		return "spell power +%d  (INT %d × skill %d / 8)" % [power_bonus, player.intelligence, level]
 	return ""
 
 

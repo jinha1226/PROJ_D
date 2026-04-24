@@ -271,7 +271,14 @@ func use_item(index: int) -> void:
 					had_effect = true
 					learned_count += 1
 			if learned_count > 0:
-				grant_skill_xp("magic", float(learned_count) * 2.0)
+				var book_school: String = ""
+				for sid2 in all_ids:
+					var sp2: SpellData = SpellRegistry.get_by_id(String(sid2))
+					if sp2 != null and sp2.school != "":
+						book_school = sp2.school
+						break
+				grant_skill_xp(book_school if book_school != "" else "magic",
+					float(learned_count) * 2.0)
 			else:
 				CombatLog.post("You already know all spells in this tome.", Color(0.7, 0.85, 1.0))
 		"identify":
