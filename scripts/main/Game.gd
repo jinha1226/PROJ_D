@@ -683,8 +683,15 @@ func _on_minimap_tapped() -> void:
 			_begin_auto_walk(nav_path, false)
 	)
 
-	var all_depths: Array = GameManager.floor_cache.keys().duplicate()
-	all_depths.sort()
+	var is_archmage: bool = GameManager.selected_class_id == "archmage"
+	var all_depths: Array
+	if is_archmage:
+		all_depths = []
+		for d in range(1, 26):
+			all_depths.append(d)
+	else:
+		all_depths = GameManager.floor_cache.keys().duplicate()
+		all_depths.sort()
 	if all_depths.size() > 1:
 		body.add_child(UICards.section_header("FLOORS", 24))
 		var floor_row := HBoxContainer.new()
@@ -810,7 +817,8 @@ func _on_stairs_up() -> void:
 func _travel_to_floor(target_depth: int) -> void:
 	if target_depth == GameManager.depth:
 		return
-	if not GameManager.floor_cache.has(target_depth):
+	var is_archmage: bool = GameManager.selected_class_id == "archmage"
+	if not is_archmage and not GameManager.floor_cache.has(target_depth):
 		return
 	_cancel_auto_walk("floor travel")
 	_cache_current_floor()
