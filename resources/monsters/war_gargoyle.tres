@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bwargar01"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "war_gargoyle"
+display_name = "war gargoyle"
+tier = 5
+hp = 58
+hd = 7
+ac = 14
+ev = 7
+speed = 9
+sight_range = 8
+attacks = [{"damage": 15, "flavour": "claw"}, {"damage": 12, "flavour": "bite"}]
+ranged_attack = {}
+resists = ["elec"]
+min_depth = 21
+max_depth = 21
+weight = 4
+xp_value = 24
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/nonliving/war_gargoyle.png"
+glyph = "G"
+glyph_color = Color(0.6, 0.6, 0.7, 1)

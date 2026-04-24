@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bstrmdrg1"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "storm_dragon"
+display_name = "storm dragon"
+tier = 6
+hp = 90
+hd = 10
+ac = 10
+ev = 9
+speed = 11
+sight_range = 8
+attacks = [{"damage": 22, "flavour": "bite"}]
+ranged_attack = {"damage": 18, "range": 5, "verb": "blasts", "flavour": "elec"}
+resists = ["elec"]
+min_depth = 24
+max_depth = 24
+weight = 3
+xp_value = 35
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/dragons/storm_dragon.png"
+glyph = "D"
+glyph_color = Color(0.5, 0.7, 1.0, 1)

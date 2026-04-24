@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bdelblade1"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "deep_elf_blademaster"
+display_name = "deep elf blademaster"
+tier = 5
+hp = 50
+hd = 7
+ac = 8
+ev = 14
+speed = 11
+sight_range = 8
+attacks = [{"damage": 16, "flavour": "hit"}, {"damage": 12, "flavour": "hit"}]
+ranged_attack = {}
+resists = []
+min_depth = 21
+max_depth = 21
+weight = 4
+xp_value = 28
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/humanoids/elves/deep_elf_blademaster.png"
+glyph = "e"
+glyph_color = Color(0.9, 0.9, 0.5, 1)

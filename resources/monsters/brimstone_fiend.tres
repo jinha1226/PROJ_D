@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bbrmstn01"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "brimstone_fiend"
+display_name = "brimstone fiend"
+tier = 5
+hp = 75
+hd = 9
+ac = 8
+ev = 7
+speed = 10
+sight_range = 8
+attacks = [{"damage": 18, "flavour": "claw"}, {"damage": 12, "flavour": "bite"}]
+ranged_attack = {}
+resists = ["fire"]
+min_depth = 24
+max_depth = 24
+weight = 4
+xp_value = 30
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/demons/brimstone_fiend.png"
+glyph = "&"
+glyph_color = Color(0.8, 0.2, 0.0, 1)

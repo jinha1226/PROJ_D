@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://birndrg01"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "iron_dragon"
+display_name = "iron dragon"
+tier = 5
+hp = 80
+hd = 9
+ac = 16
+ev = 5
+speed = 9
+sight_range = 8
+attacks = [{"damage": 20, "flavour": "bite"}, {"damage": 14, "flavour": "claw"}]
+ranged_attack = {}
+resists = []
+min_depth = 22
+max_depth = 24
+weight = 5
+xp_value = 28
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/dragons/iron_dragon.png"
+glyph = "D"
+glyph_color = Color(0.6, 0.6, 0.65, 1)

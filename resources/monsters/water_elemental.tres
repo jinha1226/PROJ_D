@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bwaterele1"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "water_elemental"
+display_name = "water elemental"
+tier = 4
+hp = 42
+hd = 6
+ac = 2
+ev = 8
+speed = 9
+sight_range = 8
+attacks = [{"damage": 12, "flavour": "slam"}]
+ranged_attack = {}
+resists = ["cold"]
+min_depth = 19
+max_depth = 21
+weight = 7
+xp_value = 16
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/nonliving/water_elemental.png"
+glyph = "E"
+glyph_color = Color(0.3, 0.5, 0.9, 1)

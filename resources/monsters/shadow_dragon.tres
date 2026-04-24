@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3 uid="uid://bshaddrg1"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "shadow_dragon"
+display_name = "shadow dragon"
+tier = 5
+hp = 75
+hd = 8
+ac = 8
+ev = 10
+speed = 11
+sight_range = 8
+attacks = [{"damage": 18, "flavour": "bite"}]
+ranged_attack = {}
+resists = ["neg", "cold"]
+min_depth = 23
+max_depth = 24
+weight = 5
+xp_value = 28
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/dragons/shadow_dragon.png"
+glyph = "D"
+glyph_color = Color(0.3, 0.2, 0.4, 1)
