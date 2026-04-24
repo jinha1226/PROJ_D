@@ -230,7 +230,7 @@ static func _open_essence_swap(slot: int, player: Player, body: VBoxContainer) -
 		btn.text = "%s\n%s" % [EssenceSystem.display_name(ess_id), EssenceSystem.description(ess_id)]
 		btn.custom_minimum_size = Vector2(0, 64)
 		btn.add_theme_font_size_override("font_size", 20)
-		var eid := ess_id
+		var eid: String = ess_id
 		btn.pressed.connect(func():
 			player.equip_essence(slot, eid)
 			dlg.close())

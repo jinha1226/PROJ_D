@@ -681,6 +681,7 @@ func _on_minimap_tapped() -> void:
 		var nav_path := _bfs_path(player.grid_pos, nav_target)
 		if nav_path.size() > 0:
 			_begin_auto_walk(nav_path, false)
+	)
 
 	var all_depths: Array = GameManager.floor_cache.keys().duplicate()
 	all_depths.sort()
