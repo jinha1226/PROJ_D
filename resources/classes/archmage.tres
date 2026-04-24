@@ -22,6 +22,12 @@ starting_skills = {
 "ranged": 20,
 "armor": 20,
 "magic": 20,
+"evocation": 20,
+"conjuration": 20,
+"transmutation": 20,
+"necromancy": 20,
+"enchantment": 20,
+"abjuration": 20,
 "stealth": 20
 }
 starting_xl = 20

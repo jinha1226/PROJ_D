@@ -15,12 +15,12 @@ const _DESCRIPTIONS: Dictionary = {
 	"shield":        "Block incoming attacks. Trains when hit while a shield is equipped.",
 	"dodge":         "+1 EV per level. Trains when dodging enemy attacks.",
 	"stealth":       "Delays enemy detection. Passive growth over time.",
-	"magic":         "General spellcasting. Lowers fizzle chance. Trains on every cast.",
-	"evocation":     "Channelled force spells. Enhances spell power. Trains on casting.",
-	"necromancy":    "Death and undeath magic. Enhances spell power. Trains on casting.",
-	"transmutation": "Body and form magic. Enhances spell power. Trains on casting.",
-	"enchantment":   "Mind and charm magic. Enhances spell power. Trains on casting.",
-	"conjuration":   "Summoning magic. Enhances spell power. Trains on casting.",
+	"magic":         "General spellcasting. Powers school-less spells (blink, fog, etc.).",
+	"evocation":     "Channelled force spells. Spell power = INT + skill × INT/8.",
+	"necromancy":    "Death and undeath magic. Spell power = INT + skill × INT/8.",
+	"transmutation": "Body and form magic. Spell power = INT + skill × INT/8.",
+	"enchantment":   "Mind and charm magic. Spell power = INT + skill × INT/8.",
+	"conjuration":   "Summoning magic. Spell power = INT + skill × INT/8.",
 	"abjuration":    "Protective ward magic. Enhances spell power. Trains on casting.",
 }
 
@@ -153,8 +153,8 @@ static func _bonus_text(id: String, level: int, player: Player) -> String:
 		"dodge":
 			return "+%d EV" % level
 		"magic":
-			var fizzle_cut: int = level * 3
-			return "fizzle -%d%%  ·  base power +%d%%" % [fizzle_cut, level * 10]
+			var power_bonus: int = int(player.intelligence * level / 8.0)
+			return "spell power +%d  (school-less spells only)" % power_bonus
 		"stealth":
 			return "detection delay +%d turns" % level
 	# School skills — power = INT + skill * INT / 8
