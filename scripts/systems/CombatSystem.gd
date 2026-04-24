@@ -10,8 +10,11 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		return
 	var weapon_dmg: int = UNARMED_DAMAGE
 	var stat_source: int = player.strength
+	var stat_scale: float = 0.35
 	var skill_id: String = ""
 	var weapon_plus: int = 0
+	var req_hit_pen: int = 0
+	var req_dmg_pct: float = 1.0
 	if player.equipped_weapon_id != "":
 		var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
 		if w != null:
@@ -19,33 +22,37 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 			weapon_plus = int(entry.get("plus", 0))
 			weapon_dmg = max(UNARMED_DAMAGE, w.damage + weapon_plus)
 			skill_id = w.category
-			if w.category == "dagger":
+			if w.category == "dagger" or w.category == "ranged":
 				stat_source = player.dexterity
+				stat_scale = 0.25
+			var pen: Dictionary = _weapon_req_penalty(player, w)
+			req_hit_pen = pen.hit
+			req_dmg_pct = pen.dmg_pct
 	var stat_bonus: int = stat_source / 3
 	var skill_level: int = 0
 	if skill_id != "":
 		skill_level = player.get_skill_level(skill_id)
-	var to_hit_base: int = 15 + stat_bonus + skill_level + weapon_plus
+	var to_hit_base: int = 15 + stat_bonus + skill_level + weapon_plus + req_hit_pen
 	var to_hit_roll: int = randi_range(0, to_hit_base)
 	if to_hit_roll < monster.data.ev:
 		CombatLog.miss("You miss the %s." % monster.data.display_name)
 		return
-	var raw: int = weapon_dmg + stat_bonus / 2 + randi_range(0, 3)
+	var raw: int = weapon_dmg + int(float(stat_source) * stat_scale) + randi_range(0, 3)
+	if req_dmg_pct < 1.0:
+		raw = max(1, int(float(raw) * req_dmg_pct))
 	if Status.has(player, "damage_boost"):
 		raw += randi_range(1, 4)
 	var soak: int = randi_range(0, monster.data.ac + 1)
 	var base_final: int = max(1, raw - soak)
-	var mult: float = 1.0 + float(skill_level) * 0.05
+	var mult: float = 1.0 + float(skill_level) * 0.04
 	var final: int = max(1, int(round(float(base_final) * mult)))
 	final += player.get_skill_level("fighting") / 2
 	final += RacePassiveSystem.melee_damage_bonus(player)
-	# Brand adds a separate elemental hit on top of the physical one,
-	# scaled by the target's resists (vulnerable targets take more).
 	var brand: String = _weapon_brand(player)
 	var brand_extra: int = 0
 	if brand != "":
 		var brand_element: String = brand_element_of(brand)
-		var roll: int = randi_range(1, 6)
+		var roll: int = _brand_damage_roll(brand)
 		brand_extra = Status.resist_scale(roll, monster.data.resists,
 			brand_element)
 		final += brand_extra
@@ -135,6 +142,25 @@ static func brand_element_of(brand: String) -> String:
 		"draining": return "necromancy"
 	return ""
 
+static func _brand_damage_roll(brand: String) -> int:
+	match brand:
+		"venom":   return randi_range(1, 3)
+		"electric": return randi_range(1, 6)
+		_:         return randi_range(1, 4)
+
+static func _weapon_req_penalty(player: Player, w: ItemData) -> Dictionary:
+	var req: int = w.required_skill
+	if req == 0:
+		return {"hit": 0, "dmg_pct": 1.0}
+	var skill_lv: int = player.get_skill_level(w.category)
+	var missing: int = max(0, req - skill_lv)
+	if missing == 0:
+		return {"hit": 0, "dmg_pct": 1.0}
+	return {
+		"hit": missing * -2,
+		"dmg_pct": max(0.3, 1.0 - float(missing) * 0.05),
+	}
+
 static func _apply_brand_status(target: Monster, brand: String) -> void:
 	match brand:
 		"flaming":  Status.apply(target, "burning", 2)
@@ -175,7 +201,7 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 		var _sh: ItemData = ItemRegistry.get_by_id(player.equipped_shield_id)
 		if _sh != null:
 			var block_pct: float = float(_sh.effect_value) / 100.0 \
-				+ player.get_skill_level("shield") * 0.04
+				+ player.get_skill_level("shield") * 0.03
 			if randf() < block_pct:
 				CombatLog.miss("You block the %s's attack!" % monster.data.display_name)
 				player.grant_skill_xp("shield", 0.5)
@@ -208,7 +234,7 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 		var _sh: ItemData = ItemRegistry.get_by_id(player.equipped_shield_id)
 		if _sh != null:
 			var block_pct: float = float(_sh.effect_value) / 100.0 \
-				+ player.get_skill_level("shield") * 0.04
+				+ player.get_skill_level("shield") * 0.03
 			if randf() < block_pct:
 				CombatLog.miss("You block the %s's attack!" % monster.data.display_name)
 				player.grant_skill_xp("shield", 0.5)

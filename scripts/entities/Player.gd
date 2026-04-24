@@ -43,7 +43,7 @@ var _hand1_doll_tex: Texture2D = null
 var hp: int = 30
 var hp_max: int = 30
 var mp: int = 5
-var mp_max: int = 5
+var mp_max: int = 6
 var ac: int = 0
 var ev: int = 5
 var wl: int = 0
@@ -351,7 +351,7 @@ func equipped_armor_entry() -> Dictionary:
 
 func refresh_ac_from_equipment() -> void:
 	ac = 0
-	ev = 5 + dexterity / 2
+	ev = 1 + dexterity / 2
 	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id)
 	if armor != null:
 		var armor_plus: int = int(equipped_armor_entry().get("plus", 0))
@@ -496,8 +496,8 @@ func grant_skill_xp(id: String, amount: float) -> void:
 				% [id.capitalize(), int(s["level"])],
 			Color(0.7, 0.95, 0.5))
 		if id == "fighting":
-			hp_max += 5
-			hp = min(hp_max, hp + 5)
+			hp_max += 3
+			hp = min(hp_max, hp + 3)
 		elif id == "dodge":
 			ev += 1
 	skills[id] = s
@@ -519,7 +519,7 @@ func _level_up() -> void:
 	var hp_gain: int = 5 + strength / 5
 	hp_max += hp_gain
 	hp = min(hp_max, hp + hp_gain)
-	var mp_gain: int = 2 + intelligence / 4
+	var mp_gain: int = 1 + intelligence / 3
 	mp_max += mp_gain
 	mp = min(mp_max, mp + mp_gain)
 	CombatLog.post("Level up! You are now level %d." % xl,

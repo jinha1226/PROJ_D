@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://pocketcrawl_quick_blade"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "quick_blade"
+display_name = "quick blade"
+kind = "weapon"
+tier = 5
+tile_path = "res://assets/tiles/individual/item/weapon/quickblade1.png"
+glyph = "("
+glyph_color = Color(0.65, 0.7, 0.9, 1)
+damage = 8
+delay = 0.7
+category = "dagger"
+brand = ""
+required_skill = 8
+ac_bonus = 0
+ev_penalty = 0
+slot = ""
+effect = ""
+effect_value = 0
+plus = 0
+description = "Impossibly swift. Requires Dagger skill 8."

@@ -149,7 +149,7 @@ static func _bonus_text(id: String, level: int, player: Player) -> String:
 			var pct: int = min(level * 10, 100)
 			return "EV penalty -%d%% reduced" % pct
 		"shield":
-			return "block chance +%d%%" % (level * 4)
+			return "block chance +%d%%" % (level * 3)
 		"dodge":
 			return "+%d EV" % level
 		"magic":

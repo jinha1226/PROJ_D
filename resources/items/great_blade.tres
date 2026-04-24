@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://pocketcrawl_great_blade"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "great_blade"
+display_name = "great blade"
+kind = "weapon"
+tier = 5
+tile_path = "res://assets/tiles/individual/item/weapon/greatsword1.png"
+glyph = "("
+glyph_color = Color(0.75, 0.8, 1, 1)
+damage = 10
+delay = 1.4
+category = "blade"
+brand = ""
+required_skill = 8
+ac_bonus = 0
+ev_penalty = 0
+slot = ""
+effect = ""
+effect_value = 0
+plus = 0
+description = "A massive two-handed blade. Requires Blade skill 8."

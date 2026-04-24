@@ -13,6 +13,7 @@ class_name ItemData extends Resource
 @export var delay: float = 1.0
 @export var category: String = ""
 @export var brand: String = ""
+@export var required_skill: int = 0
 
 @export_group("Armor")
 @export var ac_bonus: int = 0
