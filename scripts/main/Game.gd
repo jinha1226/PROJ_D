@@ -785,14 +785,46 @@ func _on_player_moved(_new_pos: Vector2i) -> void:
 	_center_camera_on_player()
 	_refresh_quickslots()
 
+const _RESPAWN_INTERVAL: int = 18
+
 func _on_player_turn_started() -> void:
 	if player != null and player.hp > 0:
 		player.tick_statuses()
 		RacePassiveSystem.on_player_turn_end(player)
+	if TurnManager.turn_number % _RESPAWN_INTERVAL == 0:
+		_try_respawn_monster()
 	if not _auto_path.is_empty():
 		_queue_auto_walk_step()
 	elif _auto_exploring:
 		_start_auto_explore()
+
+func _try_respawn_monster() -> void:
+	if map == null or player == null or player.hp <= 0:
+		return
+	var current: int = get_tree().get_nodes_in_group("monsters").size()
+	var max_count: int = _monster_count_for_depth(GameManager.depth)
+	if current >= max_count:
+		return
+	var attempts: int = 0
+	while attempts < 40:
+		attempts += 1
+		var p: Vector2i = map.random_floor_tile()
+		if not map.is_walkable(p):
+			continue
+		if _chebyshev(p, player.grid_pos) < 8:
+			continue
+		if _monster_at(p) != null:
+			continue
+		var data: MonsterData = MonsterRegistry.pick_by_depth(GameManager.depth)
+		if data == null:
+			return
+		var m: Monster = MonsterScene.new()
+		monsters_layer.add_child(m)
+		m.setup(data, map, p)
+		m.hit_taken.connect(_on_monster_hit.bind(m))
+		m.died.connect(_on_monster_died.bind(m))
+		TurnManager.register_actor(m)
+		return
 
 func _on_player_died() -> void:
 	CombatLog.post("You have died.", Color(1.0, 0.4, 0.4))
