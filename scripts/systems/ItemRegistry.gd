@@ -30,9 +30,10 @@ const _BOOK_TRANSMUTATION: Resource = preload("res://resources/items/book_transm
 const _BOOK_NECROMANCY: Resource = preload("res://resources/items/book_necromancy.tres")
 const _BOOK_ABJURATION: Resource = preload("res://resources/items/book_abjuration.tres")
 const _BOOK_ENCHANTMENT: Resource = preload("res://resources/items/book_enchantment.tres")
+const _SPEAR: Resource = preload("res://resources/items/spear.tres")
 
 const _ALL_ITEMS: Array = [
-	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE,
+	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE, _SPEAR,
 	_FLAMING_SWORD, _FROST_DAGGER, _VENOM_DAGGER, _SHOCK_MACE,
 	_LEATHER_ARMOR, _ROBE, _CHAIN_MAIL,
 	_POTION_HEALING, _POTION_MIGHT, _POTION_CURE_POISON, _POTION_MAGIC,

@@ -20,4 +20,4 @@ passive = ""
 unlocked = true
 unlock_kind = ""
 unlock_trigger_id = ""
-class_group = "fighter"
+class_group = "rogue"
