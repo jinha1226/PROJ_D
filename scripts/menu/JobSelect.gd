@@ -73,7 +73,7 @@ func _show_subclasses(group_id: String) -> void:
 	var shown: int = 0
 	for id in ids:
 		var data: ClassData = ClassRegistry.get_by_id(id)
-		if data == null or String(data.get("class_group", "")) != group_id:
+		if data == null or String(data.class_group) != group_id:
 			continue
 		_container.add_child(_make_card(data))
 		shown += 1
