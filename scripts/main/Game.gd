@@ -469,7 +469,8 @@ func _generate_floor(depth: int, map_seed: int,
 	if GameManager.floor_cache.has(depth):
 		_restore_floor_from_cache(depth, arrive_from_above)
 	else:
-		map.generate(map_seed)
+		var zone_cfg: Dictionary = ZoneManager.config_for_depth(depth)
+		map.generate(map_seed, zone_cfg["map_style"])
 		player.bind_map(map, map.spawn_pos)
 		_spawn_items_for_floor(depth)
 		_spawn_monsters_for_floor(depth)
@@ -546,6 +547,9 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 		TurnManager.register_actor(m)
 
 func _spawn_monsters_for_floor(depth: int) -> void:
+	if depth == 25:
+		_spawn_boss_floor()
+		return
 	var count: int = _monster_count_for_depth(depth)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = _floor_seed(depth) ^ 0x5A5A5A5A
@@ -572,6 +576,25 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
 		placed += 1
+
+func _spawn_monster_at(data: MonsterData, pos: Vector2i) -> void:
+	var m: Monster = MonsterScene.new()
+	monsters_layer.add_child(m)
+	m.setup(data, map, pos)
+	m.hit_taken.connect(_on_monster_hit.bind(m))
+	m.died.connect(_on_monster_died.bind(m))
+	TurnManager.register_actor(m)
+
+func _spawn_boss_floor() -> void:
+	var boss_data: MonsterData = MonsterRegistry.get_by_id("golden_dragon")
+	var titan_data: MonsterData = MonsterRegistry.get_by_id("titan")
+	var cx: int = DungeonMap.GRID_W / 2
+	var cy: int = DungeonMap.GRID_H / 2
+	if boss_data != null:
+		_spawn_monster_at(boss_data, Vector2i(cx, cy))
+	if titan_data != null:
+		_spawn_monster_at(titan_data, Vector2i(cx - 3, cy))
+		_spawn_monster_at(titan_data, Vector2i(cx + 3, cy))
 
 func _spawn_items_for_floor(depth: int) -> void:
 	var count: int = randi_range(4, 8)
@@ -728,6 +751,42 @@ func _on_player_moved(_new_pos: Vector2i) -> void:
 	_refresh_fov()
 	_center_camera_on_player()
 	_refresh_quickslots()
+	_apply_hazard_damage(_new_pos)
+
+func _apply_hazard_damage(pos: Vector2i) -> void:
+	var zone_cfg: Dictionary = ZoneManager.config_for_depth(GameManager.depth)
+	var element: String = zone_cfg.get("hazard_element", "")
+	if element == "":
+		return
+	var t: int = map.tile_at(pos)
+	var depth_in_zone: int = ZoneManager.depth_in_zone(GameManager.depth)
+	var intensity: float = 0.5 if depth_in_zone == 0 else 1.0
+	var hazard_tile: bool = (t == DungeonMap.Tile.LAVA or t == DungeonMap.Tile.WATER)
+	var passive_floor: bool = (element == "neg" or element == "cold") and t == DungeonMap.Tile.FLOOR
+	if not hazard_tile and not passive_floor:
+		return
+	if Status.resist_level(player.resists, element) >= 1:
+		return
+	var base_dmg: int = 0
+	match element:
+		"fire": base_dmg = 8
+		"poison": base_dmg = 4
+		"cold": base_dmg = 3
+		"neg": base_dmg = 2
+	var dmg: int = int(round(base_dmg * intensity))
+	dmg = Status.resist_scale(dmg, player.resists, element)
+	if dmg <= 0:
+		return
+	player.hp -= dmg
+	var msg: String = ""
+	match element:
+		"fire": msg = "The lava scorches you for %d damage!" % dmg
+		"poison": msg = "Toxic vapors poison you for %d damage!" % dmg
+		"cold": msg = "The frozen ground numbs you for %d damage!" % dmg
+		"neg": msg = "Negative energy drains you for %d damage!" % dmg
+	CombatLog.post(msg, Color(0.9, 0.4, 0.2))
+	if player.hp <= 0:
+		_on_player_died()
 
 func _on_player_turn_started() -> void:
 	if player != null and player.hp > 0:

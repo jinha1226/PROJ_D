@@ -73,6 +73,18 @@ const ESSENCES: Dictionary = {
 		"color": Color(0.45, 1.0, 0.4),
 		"effect": "venom_touch",
 	},
+	"essence_poison": {
+		"name": "Venom Ward",
+		"desc": "Grants poison resistance.",
+		"color": Color(0.45, 0.9, 0.35),
+		"effect": "resist_poison",
+	},
+	"essence_neg": {
+		"name": "Death Ward",
+		"desc": "Grants negative energy resistance.",
+		"color": Color(0.6, 0.5, 0.8),
+		"effect": "resist_neg",
+	},
 }
 
 static func all_ids() -> Array:
@@ -104,6 +116,12 @@ static func apply(player: Player, essence_id: String) -> void:
 		"resist_cold":
 			if not player.resists.has("cold+"):
 				player.resists.append("cold+")
+		"resist_poison":
+			if not player.resists.has("poison+"):
+				player.resists.append("poison+")
+		"resist_neg":
+			if not player.resists.has("neg+"):
+				player.resists.append("neg+")
 		"stat_str":
 			player.strength += value
 		"stat_int":
@@ -130,6 +148,10 @@ static func remove(player: Player, essence_id: String) -> void:
 			player.resists.erase("fire+")
 		"resist_cold":
 			player.resists.erase("cold+")
+		"resist_poison":
+			player.resists.erase("poison+")
+		"resist_neg":
+			player.resists.erase("neg+")
 		"stat_str":
 			player.strength = maxi(1, player.strength - value)
 		"stat_int":
