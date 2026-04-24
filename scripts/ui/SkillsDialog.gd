@@ -12,6 +12,9 @@ const _DESCRIPTIONS: Dictionary = {
 	"ranged":        "Bow, sling. Reduces long-range accuracy penalty. Trains on hit.",
 	"fighting":      "General combat. +5 max HP and +1 damage per 2 levels. Trains on every melee hit.",
 	"armor":         "Reduces EV penalty from heavy armour. Trains when taking hits.",
+	"shield":        "Block incoming attacks. Trains when hit while a shield is equipped.",
+	"dodge":         "+1 EV per level. Trains when dodging enemy attacks.",
+	"stealth":       "Delays enemy detection. Passive growth over time.",
 	"magic":         "General spellcasting. Lowers fizzle chance. Trains on every cast.",
 	"evocation":     "Channelled force spells. Enhances spell power. Trains on casting.",
 	"necromancy":    "Death and undeath magic. Enhances spell power. Trains on casting.",
@@ -19,11 +22,10 @@ const _DESCRIPTIONS: Dictionary = {
 	"enchantment":   "Mind and charm magic. Enhances spell power. Trains on casting.",
 	"conjuration":   "Summoning magic. Enhances spell power. Trains on casting.",
 	"abjuration":    "Protective ward magic. Enhances spell power. Trains on casting.",
-	"stealth":       "Delays enemy detection. Passive growth over time.",
 }
 
 static func open(player: Player, parent: Node) -> void:
-	var dlg: GameDialog = GameDialog.create_ratio("Skills  (hold for info)", 0.92, 0.92)
+	var dlg: GameDialog = GameDialog.create_ratio("Skills", 0.92, 0.92)
 	parent.add_child(dlg)
 	var body: VBoxContainer = dlg.body()
 	if body == null:
@@ -35,32 +37,100 @@ static func open(player: Player, parent: Node) -> void:
 	if player.skills.is_empty():
 		player.init_skills()
 
-	# COMBAT
-	body.add_child(UICards.section_header("COMBAT"))
+	# Tab bar
+	var tab_bar := HBoxContainer.new()
+	tab_bar.add_theme_constant_override("separation", 4)
+	body.add_child(tab_bar)
+
+	# Content container — swap visibility on tab switch
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 6)
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(content)
+
+	# Build all 4 tab contents
+	var tab_contents: Array = [
+		_build_learned_tab(player, parent),
+		_build_combat_tab(player, parent),
+		_build_defense_tab(player, parent),
+		_build_magic_tab(player, parent),
+	]
+	for tc in tab_contents:
+		tc.visible = false
+		content.add_child(tc)
+	tab_contents[0].visible = true  # LEARNED shown first
+
+	# Tab buttons
+	var tab_labels: Array = ["LEARNED", "COMBAT", "DEFENSE", "MAGIC"]
+	var tab_btns: Array = []
+	for i in range(tab_labels.size()):
+		var btn := Button.new()
+		btn.text = tab_labels[i]
+		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		btn.add_theme_font_size_override("font_size", 22)
+		var idx: int = i
+		btn.pressed.connect(func():
+			for j in range(tab_contents.size()):
+				tab_contents[j].visible = (j == idx)
+			for j in range(tab_btns.size()):
+				tab_btns[j].disabled = (j == idx))
+		tab_bar.add_child(btn)
+		tab_btns.append(btn)
+	tab_btns[0].disabled = true  # LEARNED active by default
+
+
+static func _build_learned_tab(player: Player, parent: Node) -> VBoxContainer:
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 6)
+	# Collect all skills with level > 0, sort by level desc
+	var leveled: Array = []
+	for id in Player.SKILL_IDS:
+		var s: Dictionary = player.skills.get(id, {"level": 0, "xp": 0.0})
+		var lv: int = int(s.get("level", 0))
+		if lv > 0:
+			leveled.append({"id": id, "s": s, "lv": lv})
+	leveled.sort_custom(func(a, b): return a.lv > b.lv)
+	if leveled.is_empty():
+		var lbl := Label.new()
+		lbl.text = "(No skills trained yet)"
+		lbl.add_theme_font_size_override("font_size", 26)
+		lbl.add_theme_color_override("font_color", Color(0.55, 0.55, 0.6))
+		vb.add_child(lbl)
+	else:
+		for entry in leveled:
+			vb.add_child(_make_skill_row(entry.id, entry.s, player, parent))
+	return vb
+
+
+static func _build_combat_tab(player: Player, parent: Node) -> VBoxContainer:
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 6)
 	for id in ["blade", "blunt", "dagger", "polearm", "ranged", "fighting"]:
 		var s: Dictionary = player.skills.get(id, {"level": 0, "xp": 0.0})
-		body.add_child(_make_skill_row(id, s, player, parent))
+		vb.add_child(_make_skill_row(id, s, player, parent))
+	return vb
 
-	# DEFENSE
-	body.add_child(UICards.section_header("DEFENSE"))
-	var s_armor: Dictionary = player.skills.get("armor", {"level": 0, "xp": 0.0})
-	body.add_child(_make_skill_row("armor", s_armor, player, parent))
 
-	# SPELLCASTING
-	body.add_child(UICards.section_header("SPELLCASTING"))
+static func _build_defense_tab(player: Player, parent: Node) -> VBoxContainer:
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 6)
+	for id in ["armor", "shield", "stealth", "dodge"]:
+		var s: Dictionary = player.skills.get(id, {"level": 0, "xp": 0.0})
+		vb.add_child(_make_skill_row(id, s, player, parent))
+	return vb
+
+
+static func _build_magic_tab(player: Player, parent: Node) -> VBoxContainer:
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 6)
 	var s_magic: Dictionary = player.skills.get("magic", {"level": 0, "xp": 0.0})
-	body.add_child(_make_skill_row("magic", s_magic, player, parent))
-
-	# MAGIC SCHOOLS — each with known spells listed
-	body.add_child(UICards.section_header("MAGIC SCHOOLS"))
+	vb.add_child(UICards.section_header("SPELLCASTING"))
+	vb.add_child(_make_skill_row("magic", s_magic, player, parent))
+	vb.add_child(UICards.section_header("SCHOOLS"))
 	for school in _SCHOOL_IDS:
 		var s_school: Dictionary = player.skills.get(school, {"level": 0, "xp": 0.0})
-		body.add_child(_make_school_section(school, s_school, player, parent))
-
-	# STEALTH
-	body.add_child(UICards.section_header("STEALTH"))
-	var s_stealth: Dictionary = player.skills.get("stealth", {"level": 0, "xp": 0.0})
-	body.add_child(_make_skill_row("stealth", s_stealth, player, parent))
+		vb.add_child(_make_school_section(school, s_school, player, parent))
+	return vb
 
 
 static func _bonus_text(id: String, level: int, player: Player) -> String:
@@ -76,6 +146,10 @@ static func _bonus_text(id: String, level: int, player: Player) -> String:
 		"armor":
 			var pct: int = min(level * 10, 100)
 			return "EV penalty -%d%% reduced" % pct
+		"shield":
+			return "block chance +%d%%" % (level * 4)
+		"dodge":
+			return "+%d EV" % level
 		"magic":
 			var fizzle_cut: int = level * 3
 			return "fizzle -%d%%  ·  base power +%d%%" % [fizzle_cut, level * 10]

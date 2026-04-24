@@ -6,9 +6,17 @@ const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 const DEFAULT_BASE_PATH: String = \
 	"res://assets/tiles/individual/player/base/human_m.png"
 
+const _GROUPS: Array = [
+	["fighter", "Fighter", "Melee warrior. Blade, axe, polearm, or bow."],
+	["wizard",  "Wizard",  "Arcane scholar. Choose your school of magic."],
+	["rogue",   "Rogue",   "Shadow striker. Dagger and guile."],
+]
+
 @onready var _scroll: ScrollContainer = $ScrollContainer
 @onready var _container: VBoxContainer = $ScrollContainer/VBox
 @onready var _back_btn: Button = $BackButton
+
+var _current_group: String = ""  # "" = group list, "fighter"/"wizard"/"rogue" = subclasses
 
 func _ready() -> void:
 	theme = GameTheme.create()
@@ -16,25 +24,64 @@ func _ready() -> void:
 	TouchScrollHelper.install(_scroll)
 	if ClassRegistry.all.is_empty():
 		ClassRegistry._scan()
-	_build_cards()
+	_build_group_list()
 
-func _build_cards() -> void:
+func _build_group_list() -> void:
+	_current_group = ""
+	for child in _container.get_children():
+		child.queue_free()
+	for entry in _GROUPS:
+		_container.add_child(_make_group_card(entry[0], entry[1], entry[2]))
+
+func _make_group_card(group_id: String, title: String, desc: String) -> Control:
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(0, 160)
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 14)
+	margin.add_theme_constant_override("margin_right", 14)
+	margin.add_theme_constant_override("margin_top", 12)
+	margin.add_theme_constant_override("margin_bottom", 12)
+	panel.add_child(margin)
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 8)
+	margin.add_child(vb)
+	var name_lab := Label.new()
+	name_lab.text = title
+	name_lab.add_theme_font_size_override("font_size", 42)
+	name_lab.add_theme_color_override("font_color", Color(0.95, 0.85, 0.5))
+	vb.add_child(name_lab)
+	var desc_lab := Label.new()
+	desc_lab.text = desc
+	desc_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	desc_lab.add_theme_font_size_override("font_size", 24)
+	desc_lab.add_theme_color_override("font_color", Color(0.78, 0.82, 0.9))
+	vb.add_child(desc_lab)
+	var btn := Button.new()
+	btn.text = "Choose %s →" % title
+	btn.custom_minimum_size = Vector2(0, 56)
+	btn.add_theme_font_size_override("font_size", 26)
+	var gid: String = group_id
+	btn.pressed.connect(func(): _show_subclasses(gid))
+	vb.add_child(btn)
+	return panel
+
+func _show_subclasses(group_id: String) -> void:
+	_current_group = group_id
 	for child in _container.get_children():
 		child.queue_free()
 	var ids: Array = ClassRegistry.ids_in_order()
-	if ids.is_empty():
-		var lab := Label.new()
-		lab.text = "No classes loaded."
-		lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		lab.add_theme_font_size_override("font_size", 26)
-		lab.add_theme_color_override("font_color", Color(1.0, 0.6, 0.5))
-		_container.add_child(lab)
-		return
+	var shown: int = 0
 	for id in ids:
 		var data: ClassData = ClassRegistry.get_by_id(id)
-		if data == null:
+		if data == null or String(data.get("class_group", "")) != group_id:
 			continue
 		_container.add_child(_make_card(data))
+		shown += 1
+	if shown == 0:
+		var lab := Label.new()
+		lab.text = "No classes available."
+		lab.add_theme_font_size_override("font_size", 26)
+		_container.add_child(lab)
 
 func _make_card(data: ClassData) -> Control:
 	var panel := PanelContainer.new()
@@ -178,4 +225,7 @@ func _on_pick(class_id: String) -> void:
 	get_tree().change_scene_to_file(GAME_SCENE_PATH)
 
 func _on_back() -> void:
-	get_tree().change_scene_to_file(RACE_SELECT_PATH)
+	if _current_group != "":
+		_build_group_list()
+	else:
+		get_tree().change_scene_to_file(RACE_SELECT_PATH)

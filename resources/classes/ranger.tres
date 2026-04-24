@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://pocketcrawl_ranger1"]
+
+[ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
+
+[resource]
+script = ExtResource("1_cdata")
+id = "ranger"
+display_name = "Ranger"
+description = "Agile archer. High DEX. Trains Ranged and Dodge skills."
+starting_hp = 28
+starting_mp = 3
+starting_str = 10
+starting_dex = 14
+starting_int = 9
+starting_weapon = "mace"
+starting_armor = "leather_armor"
+starting_skills = {"ranged": 3, "dodge": 2}
+starting_spells = []
+passive = ""
+unlocked = true
+unlock_kind = ""
+unlock_trigger_id = ""
+class_group = "fighter"

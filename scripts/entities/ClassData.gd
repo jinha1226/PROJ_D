@@ -14,6 +14,7 @@ class_name ClassData extends Resource
 @export var starting_spells: Array = []
 @export var starting_xl: int = 0
 @export var passive: String = ""
+@export var class_group: String = ""  # "fighter" | "wizard" | "rogue" — empty = archetype/test
 
 ## Unlock gating. See RaceData for field contract. Default-true for the
 ## 3 core classes (warrior / mage / rogue) that ship unlocked.

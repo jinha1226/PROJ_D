@@ -16,13 +16,15 @@ const _TRANSMUTER: Resource = preload("res://resources/classes/transmuter.tres")
 const _NECROMANCER: Resource = preload("res://resources/classes/necromancer.tres")
 const _ABJURER: Resource = preload("res://resources/classes/abjurer.tres")
 const _ENCHANTER: Resource = preload("res://resources/classes/enchanter.tres")
+const _RANGER: Resource = preload("res://resources/classes/ranger.tres")
 
 var by_id: Dictionary = {}
 var all: Array = []
 
 func _ready() -> void:
 	for res in [_WARRIOR, _MAGE, _ROGUE, _BERSERKER, _ICE_MAGE, _ARCHMAGE,
-			_EVOKER, _CONJURER, _TRANSMUTER, _NECROMANCER, _ABJURER, _ENCHANTER]:
+			_EVOKER, _CONJURER, _TRANSMUTER, _NECROMANCER, _ABJURER, _ENCHANTER,
+			_RANGER]:
 		_register(res)
 	if all.is_empty():
 		push_warning("ClassRegistry: 0 classes registered.")
@@ -43,9 +45,9 @@ func get_by_id(id: String) -> ClassData:
 	return by_id.get(id)
 
 func ids_in_order() -> Array:
-	var known_order: Array = ["warrior", "mage", "rogue", "berserker", "ice_mage",
-		"evoker", "conjurer", "transmuter", "necromancer", "abjurer", "enchanter",
-		"archmage"]
+	var known_order: Array = ["warrior", "ranger", "berserker", "mage", "rogue",
+		"ice_mage", "evoker", "conjurer", "transmuter", "necromancer", "abjurer",
+		"enchanter", "archmage"]
 	var result: Array = []
 	for id in known_order:
 		if by_id.has(id):
@@ -67,5 +69,6 @@ func is_unlocked(id: String) -> bool:
 func _scan() -> void:
 	if all.is_empty():
 		for res in [_WARRIOR, _MAGE, _ROGUE, _BERSERKER, _ICE_MAGE, _ARCHMAGE,
-				_EVOKER, _CONJURER, _TRANSMUTER, _NECROMANCER, _ABJURER, _ENCHANTER]:
+				_EVOKER, _CONJURER, _TRANSMUTER, _NECROMANCER, _ABJURER, _ENCHANTER,
+				_RANGER]:
 			_register(res)

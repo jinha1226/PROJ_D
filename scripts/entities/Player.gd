@@ -65,9 +65,9 @@ var essence_slots: Array = ["", "", ""]   # equipped essence ids (max 3)
 var essence_inventory: Array = []         # collected but unequipped essence ids
 
 const SKILL_IDS: Array = ["blade", "blunt", "dagger", "polearm", "ranged",
-	"fighting", "armor", "magic",
-	"evocation", "necromancy", "transmutation", "enchantment", "conjuration", "abjuration",
-	"stealth"]
+	"fighting", "armor", "shield", "dodge", "stealth",
+	"magic",
+	"evocation", "necromancy", "transmutation", "enchantment", "conjuration", "abjuration"]
 const SKILL_XP_DELTA: Array = [20, 30, 50, 80, 120, 170, 230, 300, 400,
 	500, 700, 1000, 1400, 2000, 2800, 4000, 5500, 7500, 10000, 13000]
 
@@ -451,6 +451,8 @@ func grant_skill_xp(id: String, amount: float) -> void:
 		if id == "fighting":
 			hp_max += 5
 			hp = min(hp_max, hp + 5)
+		elif id == "dodge":
+			ev += 1
 	skills[id] = s
 
 func grant_xp(amount: int) -> void:
