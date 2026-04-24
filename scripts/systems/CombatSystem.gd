@@ -61,6 +61,15 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	if skill_id != "":
 		player.grant_skill_xp(skill_id, 1.0)
 	player.grant_skill_xp("fighting", 0.5)
+	# Cleave: axe attacks all monsters adjacent to player
+	if skill_id == "axe":
+		_cleave_hit(player, monster, final)
+	# Swift Strike: dagger skill gives chance to attack again
+	if skill_id == "dagger" and monster.hp > 0:
+		var swift_chance: float = player.get_skill_level("dagger") * 0.05
+		if swift_chance > 0.0 and randf() < swift_chance:
+			CombatLog.hit("Swift strike!")
+			_dagger_swift_strike(player, monster)
 	if was_alive and monster.hp <= 0:
 		CombatLog.hit("You kill the %s." % monster.data.display_name)
 		player.grant_xp(monster.data.xp_value)
@@ -68,6 +77,46 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		GameManager.try_kill_unlock(monster.data.id)
 		RacePassiveSystem.on_player_killed_monster(player)
 		EssenceSystem.apply_on_kill_effects(player)
+
+static func _cleave_hit(player: Player, primary: Monster, base_dmg: int) -> void:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return
+	var cleave_dmg: int = max(1, base_dmg / 2)
+	for node in tree.get_nodes_in_group("monsters"):
+		if not (node is Monster):
+			continue
+		var m: Monster = node as Monster
+		if m == primary or m.hp <= 0:
+			continue
+		var dist: int = max(abs(m.grid_pos.x - player.grid_pos.x),
+				abs(m.grid_pos.y - player.grid_pos.y))
+		if dist <= 1:
+			CombatLog.hit("Cleave hits the %s for %d." % [m.data.display_name, cleave_dmg])
+			m.take_damage(cleave_dmg)
+
+static func _dagger_swift_strike(player: Player, monster: Monster) -> void:
+	if monster.hp <= 0 or monster.data == null:
+		return
+	var weapon_dmg: int = UNARMED_DAMAGE
+	if player.equipped_weapon_id != "":
+		var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
+		if w != null:
+			var entry: Dictionary = player.equipped_weapon_entry()
+			var wplus: int = int(entry.get("plus", 0))
+			weapon_dmg = max(UNARMED_DAMAGE, w.damage + wplus)
+	var stat_bonus: int = player.dexterity / 3
+	var raw: int = weapon_dmg + randi_range(0, 2)
+	var soak: int = randi_range(0, monster.data.ac + 1)
+	var final: int = max(1, raw - soak)
+	CombatLog.hit("You hit the %s for %d." % [monster.data.display_name, final])
+	var was_alive: bool = monster.hp > 0
+	monster.take_damage(final)
+	if was_alive and monster.hp <= 0:
+		CombatLog.hit("You kill the %s." % monster.data.display_name)
+		player.grant_xp(monster.data.xp_value)
+		player.register_kill()
+		GameManager.try_kill_unlock(monster.data.id)
 
 static func _weapon_brand(player: Player) -> String:
 	if player.equipped_weapon_id == "":
@@ -121,6 +170,16 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 				% [monster.data.display_name, verb])
 		player.grant_skill_xp("dodge", 0.3)
 		return
+	# Shield block (ranged)
+	if player.equipped_shield_id != "" and not player.has_two_handed_weapon():
+		var _sh: ItemData = ItemRegistry.get_by_id(player.equipped_shield_id)
+		if _sh != null:
+			var block_pct: float = float(_sh.effect_value) / 100.0 \
+				+ player.get_skill_level("shield") * 0.04
+			if randf() < block_pct:
+				CombatLog.miss("You block the %s's attack!" % monster.data.display_name)
+				player.grant_skill_xp("shield", 0.5)
+				return
 	var raw: int = randi_range(1, max(1, dmg_base))
 	var soak: int = randi_range(0, player.ac + 1)
 	var final: int = max(1, raw - soak)
@@ -144,6 +203,25 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 		CombatLog.miss("The %s misses you." % monster.data.display_name)
 		player.grant_skill_xp("dodge", 0.5)
 		return
+	# Shield block
+	if player.equipped_shield_id != "" and not player.has_two_handed_weapon():
+		var _sh: ItemData = ItemRegistry.get_by_id(player.equipped_shield_id)
+		if _sh != null:
+			var block_pct: float = float(_sh.effect_value) / 100.0 \
+				+ player.get_skill_level("shield") * 0.04
+			if randf() < block_pct:
+				CombatLog.miss("You block the %s's attack!" % monster.data.display_name)
+				player.grant_skill_xp("shield", 0.5)
+				return
+	# Parry: blade weapon skill gives chance to halve damage
+	if player.equipped_weapon_id != "":
+		var _wp: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
+		if _wp != null and _wp.category == "blade":
+			var parry_chance: float = player.get_skill_level("blade") * 0.03
+			if parry_chance > 0.0 and randf() < parry_chance:
+				CombatLog.miss("You parry the %s's attack!" % monster.data.display_name)
+				player.grant_skill_xp("blade", 0.3)
+				return
 	var raw: int = randi_range(1, max(1, dmg_base)) + monster.data.hd / 2
 	var soak: int = randi_range(0, player.ac + 1)
 	if Status.has(player, "stoneskin"):

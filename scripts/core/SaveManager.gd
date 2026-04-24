@@ -61,6 +61,7 @@ func save_run(player, game_manager) -> bool:
 			"armor": player.equipped_armor_id,
 			"ring": player.equipped_ring_id,
 			"amulet": player.equipped_amulet_id,
+			"shield": player.equipped_shield_id,
 			"kills": player.kills,
 			"last_killer": player.last_killer,
 			"known_spells": player.known_spells,

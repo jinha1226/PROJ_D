@@ -38,11 +38,15 @@ const _RING_PROTECTION: Resource = preload("res://resources/items/ring_protectio
 const _AMULET_LIFE: Resource = preload("res://resources/items/amulet_life.tres")
 const _AMULET_MAGIC: Resource = preload("res://resources/items/amulet_magic.tres")
 const _AMULET_STR: Resource = preload("res://resources/items/amulet_str.tres")
+const _BUCKLER: Resource = preload("res://resources/items/buckler.tres")
+const _ROUND_SHIELD: Resource = preload("res://resources/items/round_shield.tres")
+const _TOWER_SHIELD: Resource = preload("res://resources/items/tower_shield.tres")
 
 const _ALL_ITEMS: Array = [
 	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE, _SPEAR,
 	_RING_STR, _RING_INT, _RING_DEX, _RING_PROTECTION,
 	_AMULET_LIFE, _AMULET_MAGIC, _AMULET_STR,
+	_BUCKLER, _ROUND_SHIELD, _TOWER_SHIELD,
 	_FLAMING_SWORD, _FROST_DAGGER, _VENOM_DAGGER, _SHOCK_MACE,
 	_LEATHER_ARMOR, _ROBE, _CHAIN_MAIL,
 	_POTION_HEALING, _POTION_MIGHT, _POTION_CURE_POISON, _POTION_MAGIC,

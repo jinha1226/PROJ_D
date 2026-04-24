@@ -154,6 +154,17 @@ static func _build_stats_card(data: ItemData, plus: int) -> Control:
 				ev_row.add_child(_stat_label("EV Penalty"))
 				ev_row.add_child(UICards.accent_value("-%d" % data.ev_penalty, 30))
 				vbox.add_child(ev_row)
+		"shield":
+			vbox.add_child(UICards.dim_hint("STATS", 22))
+			var blk_row := HBoxContainer.new()
+			blk_row.add_child(_stat_label("차단율"))
+			blk_row.add_child(UICards.accent_value("%d%%" % data.effect_value, 30))
+			vbox.add_child(blk_row)
+			if data.ev_penalty > 0:
+				var ev_row := HBoxContainer.new()
+				ev_row.add_child(_stat_label("EV 페널티"))
+				ev_row.add_child(UICards.accent_value("-%d" % data.ev_penalty, 30))
+				vbox.add_child(ev_row)
 		"ring", "amulet":
 			vbox.add_child(UICards.dim_hint("BONUS", 22))
 			vbox.add_child(UICards.accent_value(BagDialog._accessory_stat_text(data), 28))
@@ -305,6 +316,28 @@ static func _build_buttons(item_index: int, data: ItemData, player: Player,
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
+		"shield":
+			if player.equipped_shield_id == data.id:
+				action_btn.text = "장착 해제"
+				action_btn.pressed.connect(func():
+					player.set_equipped_shield("")
+					CombatLog.post("You lower %s." % data.display_name)
+					detail_dlg.close()
+					BagDialog._populate(bag_dlg, player)
+					TurnManager.end_player_turn())
+			else:
+				action_btn.text = "장착"
+				action_btn.pressed.connect(func():
+					if player.has_two_handed_weapon():
+						CombatLog.post("2-hand weapon — cannot use a shield.",
+							Color(1.0, 0.6, 0.4))
+						detail_dlg.close()
+						return
+					player.set_equipped_shield(data.id)
+					CombatLog.post("You raise %s." % data.display_name)
+					detail_dlg.close()
+					BagDialog._populate(bag_dlg, player)
+					TurnManager.end_player_turn())
 		"ring":
 			if player.equipped_ring_id == data.id:
 				action_btn.text = "장착 해제"
@@ -382,6 +415,7 @@ static func _kind_label(kind: String) -> String:
 		"gold":   return "골드"
 		"ring":   return "반지"
 		"amulet": return "목걸이"
+		"shield": return "방패"
 		_:        return kind.capitalize()
 
 static func _kind_color(kind: String) -> Color:
@@ -393,4 +427,5 @@ static func _kind_color(kind: String) -> Color:
 		"book":   return Color(0.7, 0.55, 1.0)
 		"ring":   return Color(1.0, 0.7, 0.9)
 		"amulet": return Color(0.9, 0.75, 0.5)
+		"shield": return Color(0.6, 0.75, 0.65)
 		_:        return Color(0.75, 0.75, 0.75)

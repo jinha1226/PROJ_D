@@ -65,6 +65,7 @@ var equipped_weapon_id: String = ""
 var equipped_armor_id: String = ""
 var equipped_ring_id: String = ""
 var equipped_amulet_id: String = ""
+var equipped_shield_id: String = ""
 var essence_slots: Array = ["", "", ""]   # equipped essence ids (max 3)
 var essence_inventory: Array = []         # collected but unequipped essence ids
 
@@ -116,6 +117,16 @@ func _try_move(dir: Vector2i) -> void:
 		CombatSystem.player_attack_monster(self, monster)
 		TurnManager.end_player_turn()
 		return
+	# Reach: polearm can attack 2 tiles if adjacent tile is clear
+	if monster == null and equipped_weapon_id != "":
+		var _wreach: ItemData = ItemRegistry.get_by_id(equipped_weapon_id)
+		if _wreach != null and _wreach.category == "polearm":
+			var reach_pos: Vector2i = grid_pos + dir * 2
+			var reach_monster: Monster = _monster_at(reach_pos)
+			if reach_monster != null:
+				CombatSystem.player_attack_monster(self, reach_monster)
+				TurnManager.end_player_turn()
+				return
 	if not _map.is_walkable(target):
 		return
 	grid_pos = target
@@ -313,6 +324,8 @@ func drop_item(index: int) -> void:
 		set_equipped_ring("")
 	if id == equipped_amulet_id:
 		set_equipped_amulet("")
+	if id == equipped_shield_id:
+		set_equipped_shield("")
 	items.remove_at(index)
 	emit_signal("item_dropped", id, grid_pos, plus_val)
 	emit_signal("stats_changed")
@@ -605,6 +618,26 @@ func set_equipped_amulet(id: String) -> void:
 	if id != "":
 		_apply_accessory_stat(id)
 	emit_signal("stats_changed")
+
+func set_equipped_shield(id: String) -> void:
+	# Remove old shield EV penalty
+	if equipped_shield_id != "":
+		var old_s: ItemData = ItemRegistry.get_by_id(equipped_shield_id)
+		if old_s != null:
+			ev = maxi(0, ev - old_s.ev_penalty)
+	equipped_shield_id = id
+	# Apply new shield EV penalty
+	if id != "":
+		var new_s: ItemData = ItemRegistry.get_by_id(id)
+		if new_s != null:
+			ev = maxi(0, ev - new_s.ev_penalty)
+	emit_signal("stats_changed")
+
+func has_two_handed_weapon() -> bool:
+	if equipped_weapon_id == "":
+		return false
+	var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id)
+	return w != null and (w.category == "axe" or w.category == "polearm")
 
 func _apply_accessory_stat(id: String) -> void:
 	var d: ItemData = ItemRegistry.get_by_id(id)

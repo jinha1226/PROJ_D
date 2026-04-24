@@ -348,6 +348,12 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	if amulet_id != "":
 		player._apply_accessory_stat(amulet_id)
 	player.equipped_amulet_id = amulet_id
+	var shield_id: String = String(data.get("shield", ""))
+	if shield_id != "":
+		var sh: ItemData = ItemRegistry.get_by_id(shield_id)
+		if sh != null:
+			player.ev = maxi(0, player.ev - sh.ev_penalty)
+	player.equipped_shield_id = shield_id
 	player.kills = int(data.get("kills", 0))
 	player.last_killer = String(data.get("last_killer", ""))
 	player.known_spells = data.get("known_spells", [])

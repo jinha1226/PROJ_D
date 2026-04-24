@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://pocketcrawl_round_shield"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "round_shield"
+display_name = "원형 방패"
+kind = "shield"
+tier = 2
+tile_path = "res://assets/tiles/individual/item/armour/shields/kite_shield1.png"
+glyph = ")"
+glyph_color = Color(0.6, 0.7, 0.8, 1)
+damage = 0
+delay = 1.0
+category = ""
+brand = ""
+ac_bonus = 0
+ev_penalty = 2
+slot = ""
+effect = "block"
+effect_value = 35
+plus = 0
+description = "Medium shield. 35% base block + Shield skill. -2 EV."

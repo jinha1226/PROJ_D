@@ -28,6 +28,7 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 	var a: ItemData = ItemRegistry.get_by_id(player.equipped_armor_id)
 	var r: ItemData = ItemRegistry.get_by_id(player.equipped_ring_id)
 	var am: ItemData = ItemRegistry.get_by_id(player.equipped_amulet_id)
+	var sh: ItemData = ItemRegistry.get_by_id(player.equipped_shield_id)
 	var w_plus: int = int(player.equipped_weapon_entry().get("plus", 0)) if w != null else 0
 	var a_plus: int = int(player.equipped_armor_entry().get("plus", 0)) if a != null else 0
 	body.add_child(_equipped_row("무기",
@@ -36,6 +37,9 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 	body.add_child(_equipped_row("방어구",
 			a.display_name if a != null else "(없음)",
 			"+%d AC" % ((a.ac_bonus + a_plus) if a != null else 0)))
+	body.add_child(_equipped_row("방패",
+			sh.display_name if sh != null else "(없음)",
+			"%d%% 차단" % (sh.effect_value if sh != null else 0)))
 	body.add_child(_equipped_row("반지",
 			r.display_name if r != null else "(없음)",
 			_accessory_stat_text(r)))
@@ -111,7 +115,8 @@ static func _fill_inventory(container: VBoxContainer, player: Player,
 		var is_eq: bool = sid == player.equipped_weapon_id \
 			or sid == player.equipped_armor_id \
 			or sid == player.equipped_ring_id \
-			or sid == player.equipped_amulet_id
+			or sid == player.equipped_amulet_id \
+			or sid == player.equipped_shield_id
 		if is_eq:
 			equipped_keys.append(key)
 		else:
@@ -221,7 +226,8 @@ static func _build_item_row(data: ItemData, indices: Array, plus: int,
 	var is_equipped: bool = data.id == player.equipped_weapon_id \
 		or data.id == player.equipped_armor_id \
 		or data.id == player.equipped_ring_id \
-		or data.id == player.equipped_amulet_id
+		or data.id == player.equipped_amulet_id \
+		or data.id == player.equipped_shield_id
 	if is_equipped:
 		var eq_lbl := Label.new()
 		eq_lbl.text = "장착중"
@@ -261,4 +267,5 @@ static func _item_color(kind: String) -> Color:
 		"book":   return Color(0.7, 0.55, 1.0)
 		"ring":   return Color(1.0, 0.7, 0.9)
 		"amulet": return Color(0.9, 0.75, 0.5)
+		"shield": return Color(0.6, 0.75, 0.65)
 		_:        return Color(0.85, 0.85, 0.85)
