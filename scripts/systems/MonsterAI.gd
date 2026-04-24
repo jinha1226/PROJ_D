@@ -28,6 +28,7 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 	if _can_see(monster, map, player.grid_pos):
 		monster.last_known_player_pos = player.grid_pos
 		monster.is_alerted = true
+		_pack_alert(monster, player.grid_pos)
 		if _try_ranged(monster, player, dist):
 			return
 		_step_toward(monster, map, player.grid_pos)
@@ -127,6 +128,20 @@ static func _step_toward(monster: Monster, map: DungeonMap, target: Vector2i) ->
 				best_d = d
 	if best != Vector2i.ZERO:
 		monster.try_move(best)
+
+static func _pack_alert(source: Monster, player_pos: Vector2i) -> void:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return
+	for node in tree.get_nodes_in_group("monsters"):
+		if node == source or not (node is Monster):
+			continue
+		var m: Monster = node as Monster
+		if m.is_alerted or m.hp <= 0:
+			continue
+		if _chebyshev(source.grid_pos, m.grid_pos) <= 8:
+			m.is_alerted = true
+			m.last_known_player_pos = player_pos
 
 static func _random_step(monster: Monster, map: DungeonMap) -> void:
 	# Was 50% idle — felt too slack. 20% idle keeps wandering enemies

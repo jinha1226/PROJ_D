@@ -4,6 +4,7 @@ signal stats_changed
 signal moved(new_pos: Vector2i)
 signal died
 signal item_dropped(item_id: String, at_pos: Vector2i, plus: int)
+signal damaged(amount: int)
 
 @export var grid_pos: Vector2i = Vector2i(1, 1)
 
@@ -27,7 +28,8 @@ const DOLL_HAND1_MAP: Dictionary = {
 	"dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
 	"mace": "res://assets/tiles/individual/player/hand1/mace.png",
 	"long_sword": "res://assets/tiles/individual/player/hand1/long_sword_slant.png",
-	"battle_axe": "res://assets/tiles/individual/player/hand1/battle_axe1.png",
+	"battle_axe": "res://assets/tiles/individual/player/hand1/battleaxe.png",
+	"spear": "res://assets/tiles/individual/player/hand1/spear.png",
 	"flaming_sword": "res://assets/tiles/individual/player/hand1/short_sword.png",
 	"frost_dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
 	"venom_dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
@@ -438,6 +440,7 @@ func take_damage(amount: int, source: String = "") -> void:
 	hp = max(0, hp - amount)
 	if source != "":
 		last_killer = source
+	emit_signal("damaged", amount)
 	emit_signal("stats_changed")
 	if hp <= 0:
 		emit_signal("died")

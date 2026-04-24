@@ -410,6 +410,7 @@ func _spawn_player() -> void:
 	player.died.connect(_on_player_died)
 	player.stats_changed.connect(_update_hud)
 	player.item_dropped.connect(_on_item_dropped)
+	player.damaged.connect(_on_player_damaged)
 
 const ZOOM_MIN: float = 0.7
 const ZOOM_MAX: float = 2.2
@@ -1170,6 +1171,14 @@ func _on_monster_hit(amount: int, monster: Monster) -> void:
 	var cell_size: float = DungeonMap.CELL_SIZE
 	var world_pos: Vector2 = monster.position + Vector2(cell_size * 0.5, 0.0)
 	spawn_damage_number(world_pos, amount, Color(1.0, 0.85, 0.2))
+
+func _on_player_damaged(amount: int) -> void:
+	if player == null:
+		return
+	var cell_size: float = DungeonMap.CELL_SIZE
+	var world_pos: Vector2 = player.position + Vector2(cell_size * 0.5, 0.0)
+	spawn_damage_number(world_pos, amount, Color(1.0, 0.35, 0.35))
+	spawn_hit_flash(player)
 
 
 ## Spawn a floating damage number at the given world position.
