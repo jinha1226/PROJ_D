@@ -154,6 +154,9 @@ static func _build_stats_card(data: ItemData, plus: int) -> Control:
 				ev_row.add_child(_stat_label("EV Penalty"))
 				ev_row.add_child(UICards.accent_value("-%d" % data.ev_penalty, 30))
 				vbox.add_child(ev_row)
+		"ring", "amulet":
+			vbox.add_child(UICards.dim_hint("BONUS", 22))
+			vbox.add_child(UICards.accent_value(BagDialog._accessory_stat_text(data), 28))
 		"potion", "scroll", "book":
 			vbox.add_child(UICards.dim_hint("EFFECT", 22))
 			vbox.add_child(UICards.accent_value(_effect_desc(data), 28))
@@ -302,6 +305,40 @@ static func _build_buttons(item_index: int, data: ItemData, player: Player,
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
+		"ring":
+			if player.equipped_ring_id == data.id:
+				action_btn.text = "장착 해제"
+				action_btn.pressed.connect(func():
+					player.set_equipped_ring("")
+					CombatLog.post("You remove %s." % data.display_name)
+					detail_dlg.close()
+					BagDialog._populate(bag_dlg, player)
+					TurnManager.end_player_turn())
+			else:
+				action_btn.text = "장착"
+				action_btn.pressed.connect(func():
+					player.set_equipped_ring(data.id)
+					CombatLog.post("You put on %s." % data.display_name)
+					detail_dlg.close()
+					BagDialog._populate(bag_dlg, player)
+					TurnManager.end_player_turn())
+		"amulet":
+			if player.equipped_amulet_id == data.id:
+				action_btn.text = "장착 해제"
+				action_btn.pressed.connect(func():
+					player.set_equipped_amulet("")
+					CombatLog.post("You remove %s." % data.display_name)
+					detail_dlg.close()
+					BagDialog._populate(bag_dlg, player)
+					TurnManager.end_player_turn())
+			else:
+				action_btn.text = "장착"
+				action_btn.pressed.connect(func():
+					player.set_equipped_amulet(data.id)
+					CombatLog.post("You put on %s." % data.display_name)
+					detail_dlg.close()
+					BagDialog._populate(bag_dlg, player)
+					TurnManager.end_player_turn())
 		"book":
 			action_btn.text = "읽기"
 			action_btn.pressed.connect(func():
@@ -343,6 +380,8 @@ static func _kind_label(kind: String) -> String:
 		"scroll": return "스크롤"
 		"book":   return "마법책"
 		"gold":   return "골드"
+		"ring":   return "반지"
+		"amulet": return "목걸이"
 		_:        return kind.capitalize()
 
 static func _kind_color(kind: String) -> Color:
@@ -352,4 +391,6 @@ static func _kind_color(kind: String) -> Color:
 		"potion": return Color(0.5, 1.0, 0.6)
 		"scroll": return Color(1.0, 0.95, 0.55)
 		"book":   return Color(0.7, 0.55, 1.0)
+		"ring":   return Color(1.0, 0.7, 0.9)
+		"amulet": return Color(0.9, 0.75, 0.5)
 		_:        return Color(0.75, 0.75, 0.75)

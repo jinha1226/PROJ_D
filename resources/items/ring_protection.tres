@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://pocketcrawl_ring_prot"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "ring_protection"
+display_name = "반지 of Protection"
+kind = "ring"
+tier = 2
+tile_path = "res://assets/tiles/individual/item/ring/iron.png"
+glyph = "="
+glyph_color = Color(0.75, 0.75, 0.8, 1)
+damage = 0
+delay = 1.0
+category = ""
+brand = ""
+ac_bonus = 0
+ev_penalty = 0
+slot = "ring"
+effect = "ac_bonus"
+effect_value = 3
+plus = 0
+description = "+3 Armor Class while worn."

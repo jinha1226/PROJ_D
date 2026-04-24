@@ -340,6 +340,14 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.items = data.get("items", [])
 	player.equipped_weapon_id = String(data.get("weapon", ""))
 	player.equipped_armor_id = String(data.get("armor", ""))
+	var ring_id: String = String(data.get("ring", ""))
+	if ring_id != "":
+		player._apply_accessory_stat(ring_id)
+	player.equipped_ring_id = ring_id
+	var amulet_id: String = String(data.get("amulet", ""))
+	if amulet_id != "":
+		player._apply_accessory_stat(amulet_id)
+	player.equipped_amulet_id = amulet_id
 	player.kills = int(data.get("kills", 0))
 	player.last_killer = String(data.get("last_killer", ""))
 	player.known_spells = data.get("known_spells", [])

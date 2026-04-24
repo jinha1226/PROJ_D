@@ -61,6 +61,8 @@ var skills: Dictionary = {}  # skill_id -> {"level": int, "xp": float}
 var quickslots: Array = ["", "", "", "", ""]  # item ids, index = slot
 var equipped_weapon_id: String = ""
 var equipped_armor_id: String = ""
+var equipped_ring_id: String = ""
+var equipped_amulet_id: String = ""
 var essence_slots: Array = ["", "", ""]   # equipped essence ids (max 3)
 var essence_inventory: Array = []         # collected but unequipped essence ids
 
@@ -240,7 +242,25 @@ func use_item(index: int) -> void:
 		"berserk":
 			apply_berserk(max(1, data.effect_value))
 		"study":
-			CombatLog.post("You study the tome.", Color(0.7, 0.85, 1.0))
+			var all_ids: Array = []
+			if data.grants_spell_id != "":
+				all_ids.append(data.grants_spell_id)
+			for sid in data.grants_spell_ids:
+				all_ids.append(String(sid))
+			var learned_count: int = 0
+			for sid in all_ids:
+				var sid_s: String = String(sid)
+				if not known_spells.has(sid_s):
+					known_spells.append(sid_s)
+					var sp: SpellData = SpellRegistry.get_by_id(sid_s)
+					var sname: String = sp.display_name if sp != null else sid_s
+					CombatLog.post("You learn %s." % sname, Color(0.7, 0.95, 1.0))
+					had_effect = true
+					learned_count += 1
+			if learned_count > 0:
+				grant_skill_xp("magic", float(learned_count) * 2.0)
+			else:
+				CombatLog.post("You already know all spells in this tome.", Color(0.7, 0.85, 1.0))
 		"identify":
 			items.remove_at(index)
 			emit_signal("stats_changed")
@@ -287,6 +307,10 @@ func drop_item(index: int) -> void:
 	if id == equipped_armor_id:
 		equipped_armor_id = ""
 		refresh_ac_from_equipment()
+	if id == equipped_ring_id:
+		set_equipped_ring("")
+	if id == equipped_amulet_id:
+		set_equipped_amulet("")
 	items.remove_at(index)
 	emit_signal("item_dropped", id, grid_pos, plus_val)
 	emit_signal("stats_changed")
@@ -562,6 +586,46 @@ func set_equipped_armor(id: String) -> void:
 	equipped_armor_id = id
 	_refresh_paperdoll()
 	refresh_ac_from_equipment()  # emits stats_changed
+
+func set_equipped_ring(id: String) -> void:
+	if equipped_ring_id != "":
+		_remove_accessory_stat(equipped_ring_id)
+	equipped_ring_id = id
+	if id != "":
+		_apply_accessory_stat(id)
+	emit_signal("stats_changed")
+
+func set_equipped_amulet(id: String) -> void:
+	if equipped_amulet_id != "":
+		_remove_accessory_stat(equipped_amulet_id)
+	equipped_amulet_id = id
+	if id != "":
+		_apply_accessory_stat(id)
+	emit_signal("stats_changed")
+
+func _apply_accessory_stat(id: String) -> void:
+	var d: ItemData = ItemRegistry.get_by_id(id)
+	if d == null:
+		return
+	match d.effect:
+		"stat_str": strength += d.effect_value
+		"stat_int": intelligence += d.effect_value
+		"stat_dex": dexterity += d.effect_value; ev += 1
+		"hp_bonus": hp_max += d.effect_value; hp = mini(hp + d.effect_value, hp_max)
+		"ac_bonus": ac += d.effect_value
+		"mp_bonus": mp_max += d.effect_value; mp = mini(mp + d.effect_value, mp_max)
+
+func _remove_accessory_stat(id: String) -> void:
+	var d: ItemData = ItemRegistry.get_by_id(id)
+	if d == null:
+		return
+	match d.effect:
+		"stat_str": strength = maxi(1, strength - d.effect_value)
+		"stat_int": intelligence = maxi(1, intelligence - d.effect_value)
+		"stat_dex": dexterity = maxi(1, dexterity - d.effect_value); ev = maxi(0, ev - 1)
+		"hp_bonus": hp_max = maxi(1, hp_max - d.effect_value); hp = mini(hp, hp_max)
+		"ac_bonus": ac = maxi(0, ac - d.effect_value)
+		"mp_bonus": mp_max = maxi(1, mp_max - d.effect_value); mp = mini(mp, mp_max)
 
 func _refresh_paperdoll() -> void:
 	_body_doll_tex = null

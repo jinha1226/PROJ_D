@@ -31,9 +31,18 @@ const _BOOK_NECROMANCY: Resource = preload("res://resources/items/book_necromanc
 const _BOOK_ABJURATION: Resource = preload("res://resources/items/book_abjuration.tres")
 const _BOOK_ENCHANTMENT: Resource = preload("res://resources/items/book_enchantment.tres")
 const _SPEAR: Resource = preload("res://resources/items/spear.tres")
+const _RING_STR: Resource = preload("res://resources/items/ring_str.tres")
+const _RING_INT: Resource = preload("res://resources/items/ring_int.tres")
+const _RING_DEX: Resource = preload("res://resources/items/ring_dex.tres")
+const _RING_PROTECTION: Resource = preload("res://resources/items/ring_protection.tres")
+const _AMULET_LIFE: Resource = preload("res://resources/items/amulet_life.tres")
+const _AMULET_MAGIC: Resource = preload("res://resources/items/amulet_magic.tres")
+const _AMULET_STR: Resource = preload("res://resources/items/amulet_str.tres")
 
 const _ALL_ITEMS: Array = [
 	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE, _SPEAR,
+	_RING_STR, _RING_INT, _RING_DEX, _RING_PROTECTION,
+	_AMULET_LIFE, _AMULET_MAGIC, _AMULET_STR,
 	_FLAMING_SWORD, _FROST_DAGGER, _VENOM_DAGGER, _SHOCK_MACE,
 	_LEATHER_ARMOR, _ROBE, _CHAIN_MAIL,
 	_POTION_HEALING, _POTION_MIGHT, _POTION_CURE_POISON, _POTION_MAGIC,
