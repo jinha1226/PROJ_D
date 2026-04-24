@@ -82,6 +82,60 @@ const _GOLDEN_DRAGON: Resource = preload("res://resources/monsters/golden_dragon
 const _EXECUTIONER: Resource = preload("res://resources/monsters/executioner.tres")
 const _TITAN: Resource = preload("res://resources/monsters/titan.tres")
 
+# ── Zone 0: Dungeon (new) ─────────────────────────────────────────────────────
+const _KILLER_BEE: Resource = preload("res://resources/monsters/killer_bee.tres")
+const _BOMBARDIER_BEETLE: Resource = preload("res://resources/monsters/bombardier_beetle.tres")
+
+# ── Zone 1: Lair (new) ────────────────────────────────────────────────────────
+const _CROCODILE: Resource = preload("res://resources/monsters/crocodile.tres")
+const _GIANT_LIZARD: Resource = preload("res://resources/monsters/giant_lizard.tres")
+const _ANACONDA: Resource = preload("res://resources/monsters/anaconda.tres")
+const _POLAR_BEAR: Resource = preload("res://resources/monsters/polar_bear.tres")
+const _HIPPOGRIFF: Resource = preload("res://resources/monsters/hippogriff.tres")
+
+# ── Zone 2: Orc Mines (new) ───────────────────────────────────────────────────
+const _ORC_KNIGHT: Resource = preload("res://resources/monsters/orc_knight.tres")
+const _ORC_WARLORD: Resource = preload("res://resources/monsters/orc_warlord.tres")
+const _ETTIN: Resource = preload("res://resources/monsters/ettin.tres")
+
+# ── Zone 3: Swamp (new) ───────────────────────────────────────────────────────
+const _DEATH_YAK: Resource = preload("res://resources/monsters/death_yak.tres")
+const _HYDRA: Resource = preload("res://resources/monsters/hydra.tres")
+const _WILL_O_WISP: Resource = preload("res://resources/monsters/will_o_wisp.tres")
+const _GIANT_CONSTRICTOR: Resource = preload("res://resources/monsters/giant_constrictor.tres")
+
+# ── Zone 4: Crypt (new) ───────────────────────────────────────────────────────
+const _GHOST: Resource = preload("res://resources/monsters/ghost.tres")
+const _SHADOW: Resource = preload("res://resources/monsters/shadow.tres")
+const _MUMMY_PRIEST: Resource = preload("res://resources/monsters/mummy_priest.tres")
+const _ANCIENT_CHAMPION: Resource = preload("res://resources/monsters/ancient_champion.tres")
+
+# ── Zone 5: Ice Caves (new) ───────────────────────────────────────────────────
+const _ICE_BEAST: Resource = preload("res://resources/monsters/ice_beast.tres")
+const _RIME_DRAKE: Resource = preload("res://resources/monsters/rime_drake.tres")
+const _FREEZING_WRAITH: Resource = preload("res://resources/monsters/freezing_wraith.tres")
+const _BLIZZARD_DEMON: Resource = preload("res://resources/monsters/blizzard_demon.tres")
+
+# ── Zone 6: Elven Halls (new) ─────────────────────────────────────────────────
+const _DEEP_ELF_KNIGHT: Resource = preload("res://resources/monsters/deep_elf_knight.tres")
+const _DEEP_ELF_SORCERER: Resource = preload("res://resources/monsters/deep_elf_sorcerer.tres")
+const _DEEP_ELF_BLADEMASTER: Resource = preload("res://resources/monsters/deep_elf_blademaster.tres")
+const _DEEP_ELF_ANNIHILATOR: Resource = preload("res://resources/monsters/deep_elf_annihilator.tres")
+const _DEEP_ELF_HIGH_PRIEST: Resource = preload("res://resources/monsters/deep_elf_high_priest.tres")
+const _AIR_ELEMENTAL: Resource = preload("res://resources/monsters/air_elemental.tres")
+const _WATER_ELEMENTAL: Resource = preload("res://resources/monsters/water_elemental.tres")
+const _FLESH_GOLEM: Resource = preload("res://resources/monsters/flesh_golem.tres")
+const _WAR_GARGOYLE: Resource = preload("res://resources/monsters/war_gargoyle.tres")
+
+# ── Zone 7: Infernal (new) ────────────────────────────────────────────────────
+const _LEMURE: Resource = preload("res://resources/monsters/lemure.tres")
+const _HELL_HOUND: Resource = preload("res://resources/monsters/hell_hound.tres")
+const _EFREET: Resource = preload("res://resources/monsters/efreet.tres")
+const _BRIMSTONE_FIEND: Resource = preload("res://resources/monsters/brimstone_fiend.tres")
+const _IRON_DRAGON: Resource = preload("res://resources/monsters/iron_dragon.tres")
+const _SHADOW_DRAGON: Resource = preload("res://resources/monsters/shadow_dragon.tres")
+const _STORM_DRAGON: Resource = preload("res://resources/monsters/storm_dragon.tres")
+
 const _ALL_MONSTERS: Array = [
 	# original 18
 	_RAT, _BAT, _KOBOLD, _GOBLIN, _HOBGOBLIN, _ADDER, _GNOLL,
@@ -104,6 +158,25 @@ const _ALL_MONSTERS: Array = [
 	_DEEP_ELF_DEATH_MAGE,
 	# tier 6
 	_ANCIENT_LICH, _GOLDEN_DRAGON, _EXECUTIONER, _TITAN,
+	# zone 0 new
+	_KILLER_BEE, _BOMBARDIER_BEETLE,
+	# zone 1 new
+	_CROCODILE, _GIANT_LIZARD, _ANACONDA, _POLAR_BEAR, _HIPPOGRIFF,
+	# zone 2 new
+	_ORC_KNIGHT, _ORC_WARLORD, _ETTIN,
+	# zone 3 new
+	_DEATH_YAK, _HYDRA, _WILL_O_WISP, _GIANT_CONSTRICTOR,
+	# zone 4 new
+	_GHOST, _SHADOW, _MUMMY_PRIEST, _ANCIENT_CHAMPION,
+	# zone 5 new
+	_ICE_BEAST, _RIME_DRAKE, _FREEZING_WRAITH, _BLIZZARD_DEMON,
+	# zone 6 new
+	_DEEP_ELF_KNIGHT, _DEEP_ELF_SORCERER, _DEEP_ELF_BLADEMASTER,
+	_DEEP_ELF_ANNIHILATOR, _DEEP_ELF_HIGH_PRIEST,
+	_AIR_ELEMENTAL, _WATER_ELEMENTAL, _FLESH_GOLEM, _WAR_GARGOYLE,
+	# zone 7 new
+	_LEMURE, _HELL_HOUND, _EFREET, _BRIMSTONE_FIEND,
+	_IRON_DRAGON, _SHADOW_DRAGON, _STORM_DRAGON,
 ]
 
 var by_id: Dictionary = {}
