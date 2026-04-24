@@ -114,8 +114,11 @@ static func _cast_heal(spell: SpellData, player: Player, power: int, game: Node)
 	var amt: int = 12 + power / 2
 	player.heal(amt)
 	CombatLog.post("You cast %s. (+%d HP)" % [spell.display_name, amt], Color(0.6, 1.0, 0.6))
-	if game != null and game.has_method("spawn_damage_number"):
-		game.spawn_damage_number(player.position, amt, Color(0.4, 1.0, 0.5))
+	if game != null:
+		if game.has_method("spawn_damage_number"):
+			game.spawn_damage_number(player.position, amt, Color(0.4, 1.0, 0.5))
+		if game.has_method("spawn_hit_effect"):
+			game.spawn_hit_effect(player.position + Vector2(16, 16), "heal")
 
 
 static func _cast_buff(player: Player, status_id: String, turns: int,
@@ -132,6 +135,9 @@ static func _cast_drain(spell: SpellData, player: Player, power: int, game: Node
 	var dmg: int = spell.base_damage + randi_range(0, 2) + power / 3
 	var scaled: int = Status.resist_scale(dmg, target.data.resists, spell.element)
 	CombatLog.hit("You drain the %s for %d." % [target.data.display_name, scaled])
+	if game != null and game.has_method("spawn_spell_bolt"):
+		var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
+		game.spawn_spell_bolt(player.position + half, target.position + half, "drain")
 	var was_alive: bool = target.hp > 0
 	target.take_damage(scaled)
 	var heal_amt: int = max(1, scaled / 2)
@@ -175,6 +181,8 @@ static func _aoe_status(spell: SpellData, player: Player, game: Node,
 		return
 	var visible: Dictionary = player.compute_fov()
 	var hits: int = 0
+	var hit_positions: Array = []
+	var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
 	for n in tree.get_nodes_in_group("monsters"):
 		if not (n is Monster):
 			continue
@@ -185,11 +193,14 @@ static func _aoe_status(spell: SpellData, player: Player, game: Node,
 		if d > spell.max_range:
 			continue
 		Status.apply(n, status_id, turns)
+		hit_positions.append(n.position + half)
 		hits += 1
 	var label: String = Status.display_name(status_id).to_lower()
 	if hits > 0:
 		CombatLog.post("%s affects %d enemies!" % [spell.display_name, hits],
 			Color(0.8, 0.7, 1.0))
+		if game != null and game.has_method("spawn_aoe_burst"):
+			game.spawn_aoe_burst(hit_positions, spell.element)
 	else:
 		CombatLog.post("No targets in range.", Color(0.75, 0.75, 0.75))
 
@@ -295,11 +306,9 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 	dmg = _apply_element_bonus(spell, target, dmg)
 	CombatLog.hit("You hit the %s with %s for %d." \
 			% [target.data.display_name, spell.display_name, dmg])
-	if game != null and game.has_method("spawn_projectile"):
-		var cell: float = DungeonMap.CELL_SIZE
-		var half := Vector2(cell * 0.5, cell * 0.5)
-		game.spawn_projectile(player.position + half, target.position + half,
-				_spell_bolt_color(spell.effect))
+	if game != null and game.has_method("spawn_spell_bolt"):
+		var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
+		game.spawn_spell_bolt(player.position + half, target.position + half, spell.element)
 	var scaled: int = Status.resist_scale(dmg, target.data.resists, spell.element)
 	if scaled <= 0 and dmg > 0:
 		CombatLog.post("The %s is immune to %s."
@@ -317,6 +326,7 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 static func _multi_damage(spell: SpellData, player: Player,
 		power: int, game: Node, darts: int) -> void:
 	var fired: int = 0
+	var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
 	for _i in range(darts):
 		var target: Monster = _find_nearest_visible(player, game, spell.max_range)
 		if target == null:
@@ -325,6 +335,8 @@ static func _multi_damage(spell: SpellData, player: Player,
 		dmg = _apply_element_bonus(spell, target, dmg)
 		var scaled: int = Status.resist_scale(dmg, target.data.resists, spell.element)
 		CombatLog.hit("A dart strikes the %s for %d." % [target.data.display_name, scaled])
+		if game != null and game.has_method("spawn_spell_bolt"):
+			game.spawn_spell_bolt(player.position + half, target.position + half, spell.element)
 		var was_alive: bool = target.hp > 0
 		target.take_damage(scaled)
 		if was_alive and target.hp > 0:
@@ -356,13 +368,19 @@ static func _chain_damage(spell: SpellData, player: Player,
 		CombatLog.post("No targets in range.", Color(0.75, 0.75, 0.75))
 		return
 	var bounces: int = mini(3, targets.size())
+	var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
+	var prev_pos: Vector2 = player.position + half
 	for i in range(bounces):
 		var t: Monster = targets[i]
 		var dmg: int = spell.base_damage + randi_range(0, 2) + power / 3
-		dmg = int(dmg * pow(0.7, i))  # each bounce does 70% of previous
+		dmg = int(dmg * pow(0.7, i))
 		dmg = _apply_element_bonus(spell, t, dmg)
 		var scaled: int = Status.resist_scale(dmg, t.data.resists, spell.element)
 		CombatLog.hit("Lightning arcs through the %s for %d." % [t.data.display_name, scaled])
+		if game != null and game.has_method("spawn_spell_bolt"):
+			var tgt_pos: Vector2 = t.position + half
+			game.spawn_spell_bolt(prev_pos, tgt_pos, spell.element)
+			prev_pos = tgt_pos
 		var was_alive: bool = t.hp > 0
 		t.take_damage(scaled)
 		if was_alive and t.hp > 0:
@@ -378,6 +396,8 @@ static func _aoe_damage(spell: SpellData, player: Player,
 		return
 	var visible: Dictionary = player.compute_fov()
 	var hits: int = 0
+	var hit_positions: Array = []
+	var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
 	for n in tree.get_nodes_in_group("monsters"):
 		if not (n is Monster):
 			continue
@@ -394,6 +414,7 @@ static func _aoe_damage(spell: SpellData, player: Player,
 			continue
 		CombatLog.hit("%s hits the %s for %d." \
 				% [spell.display_name, n.data.display_name, scaled])
+		hit_positions.append(n.position + half)
 		var was_alive: bool = n.hp > 0
 		n.take_damage(scaled)
 		if was_alive and n.hp > 0:
@@ -403,15 +424,9 @@ static func _aoe_damage(spell: SpellData, player: Player,
 		hits += 1
 	if hits == 0:
 		CombatLog.post("The flames find no target.", Color(0.75, 0.75, 0.75))
+	if game != null and game.has_method("spawn_aoe_burst") and not hit_positions.is_empty():
+		game.spawn_aoe_burst(hit_positions, spell.element)
 
-
-static func _spell_bolt_color(effect: String) -> Color:
-	match effect:
-		"aoe_damage":   return Color(1.0, 0.5, 0.1)
-		"multi_damage": return Color(0.8, 0.5, 1.0)
-		"drain":        return Color(0.6, 0.3, 0.9)
-		"chain_damage": return Color(0.4, 0.6, 1.0)
-		_:              return Color(0.4, 0.7, 1.0)
 
 
 static func _find_nearest_visible(player: Player, game: Node,

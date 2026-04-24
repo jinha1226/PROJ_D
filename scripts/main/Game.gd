@@ -1213,21 +1213,102 @@ func spawn_hit_flash(target_node: Node2D) -> void:
 	tw.tween_property(target_node, "modulate", Color.WHITE, 0.12)
 
 
-## Spawn a projectile that travels from world_start to world_end, then calls on_arrive.
+const _BOLT_TILES: Dictionary = {
+	"fire":      "res://assets/tiles/effects/bolt/fire_bolt.png",
+	"cold":      "res://assets/tiles/effects/bolt/ice_bolt.png",
+	"lightning": "res://assets/tiles/effects/bolt/lightning_bolt.png",
+	"poison":    "res://assets/tiles/effects/bolt/poison_bolt.png",
+	"death":     "res://assets/tiles/effects/bolt/death_bolt.png",
+	"drain":     "res://assets/tiles/effects/bolt/drain_bolt.png",
+	"":          "res://assets/tiles/effects/bolt/magic_dart.png",
+}
+const _HIT_TILES: Dictionary = {
+	"fire":      ["res://assets/tiles/effects/hit/fire0.png",
+				  "res://assets/tiles/effects/hit/fire1.png",
+				  "res://assets/tiles/effects/hit/fire2.png"],
+	"cold":      ["res://assets/tiles/effects/hit/ice0.png",
+				  "res://assets/tiles/effects/hit/ice1.png",
+				  "res://assets/tiles/effects/hit/ice2.png"],
+	"lightning": ["res://assets/tiles/effects/hit/lightning0.png",
+				  "res://assets/tiles/effects/hit/lightning1.png",
+				  "res://assets/tiles/effects/hit/lightning2.png"],
+	"poison":    ["res://assets/tiles/effects/hit/poison0.png",
+				  "res://assets/tiles/effects/hit/poison1.png",
+				  "res://assets/tiles/effects/hit/poison2.png"],
+	"drain":     ["res://assets/tiles/effects/hit/drain0.png",
+				  "res://assets/tiles/effects/hit/drain1.png",
+				  "res://assets/tiles/effects/hit/drain2.png"],
+	"death":     ["res://assets/tiles/effects/hit/drain0.png",
+				  "res://assets/tiles/effects/hit/drain1.png",
+				  "res://assets/tiles/effects/hit/drain2.png"],
+	"heal":      ["res://assets/tiles/effects/hit/heal0.png",
+				  "res://assets/tiles/effects/hit/heal1.png"],
+	"":          ["res://assets/tiles/effects/hit/magic0.png",
+				  "res://assets/tiles/effects/hit/magic1.png"],
+}
+
+## Spawn a DCSS tile projectile from world_start to world_end.
 func spawn_projectile(world_start: Vector2, world_end: Vector2,
-		color: Color, on_arrive: Callable = Callable()) -> void:
+		_color: Color, on_arrive: Callable = Callable()) -> void:
+	spawn_spell_bolt(world_start, world_end, "", on_arrive)
+
+func spawn_spell_bolt(world_start: Vector2, world_end: Vector2,
+		element: String, on_arrive: Callable = Callable()) -> void:
 	if _effect_layer == null:
 		if on_arrive.is_valid():
 			on_arrive.call()
 		return
-	var dot := ColorRect.new()
-	dot.size = Vector2(10, 10)
-	dot.color = color
-	dot.position = world_start
-	dot.z_index = 8
-	_effect_layer.add_child(dot)
-	var tw := dot.create_tween()
-	tw.tween_property(dot, "position", world_end, 0.18)
-	tw.tween_callback(dot.queue_free)
-	if on_arrive.is_valid():
-		tw.tween_callback(on_arrive)
+	var key: String = element if _BOLT_TILES.has(element) else ""
+	var tile_path: String = _BOLT_TILES[key]
+	const SZ := 32.0
+	var half := Vector2(SZ * 0.5, SZ * 0.5)
+	if ResourceLoader.exists(tile_path):
+		var rect := TextureRect.new()
+		rect.texture = load(tile_path)
+		rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		rect.custom_minimum_size = Vector2(SZ, SZ)
+		rect.size = Vector2(SZ, SZ)
+		rect.pivot_offset = half
+		rect.rotation = (world_end - world_start).angle()
+		rect.position = world_start - half
+		rect.z_index = 8
+		_effect_layer.add_child(rect)
+		var tw := rect.create_tween()
+		tw.tween_property(rect, "position", world_end - half, 0.18)
+		tw.tween_callback(rect.queue_free)
+		if on_arrive.is_valid():
+			tw.tween_callback(on_arrive)
+		tw.tween_callback(func(): spawn_hit_effect(world_end, element))
+	else:
+		if on_arrive.is_valid():
+			on_arrive.call()
+
+func spawn_hit_effect(world_pos: Vector2, element: String) -> void:
+	if _effect_layer == null:
+		return
+	var key: String = element if _HIT_TILES.has(element) else ""
+	var frames: Array = _HIT_TILES[key]
+	const SZ := 32.0
+	var half := Vector2(SZ * 0.5, SZ * 0.5)
+	if frames.is_empty() or not ResourceLoader.exists(frames[0]):
+		return
+	var rect := TextureRect.new()
+	rect.texture = load(frames[0])
+	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	rect.custom_minimum_size = Vector2(SZ, SZ)
+	rect.size = Vector2(SZ, SZ)
+	rect.position = world_pos - half
+	rect.z_index = 9
+	_effect_layer.add_child(rect)
+	var tw := rect.create_tween()
+	for i in range(1, frames.size()):
+		var fp: String = frames[i]
+		if ResourceLoader.exists(fp):
+			tw.tween_callback(func(): rect.texture = load(fp))
+		tw.tween_interval(0.08)
+	tw.tween_property(rect, "modulate:a", 0.0, 0.1)
+	tw.tween_callback(rect.queue_free)
+
+func spawn_aoe_burst(target_positions: Array, element: String) -> void:
+	for pos in target_positions:
+		spawn_hit_effect(pos, element)
