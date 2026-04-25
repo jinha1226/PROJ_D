@@ -98,7 +98,7 @@
         "mp_efficiency_per_level_pct": 3
       },
       "scope": "all schools share one progression axis",
-      "spell_learning": "books_and_items_only"
+      "spell_learning": "magic_level_up_offers_one_random_spell_per_school_plus_books"
     },
     "defense": {
       "effects": {
@@ -134,7 +134,8 @@
     },
     "mage": {
       "starting_skills": {
-        "magic": 2
+        "magic": 2,
+        "agility": 1
       },
       "active_skills": ["magic"]
     }
