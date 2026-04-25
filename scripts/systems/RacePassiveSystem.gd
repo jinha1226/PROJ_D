@@ -17,6 +17,8 @@ func register(player: Node) -> void:
 	_regen_counter = 0
 	_lucky_used = false
 	_hellish_used = false
+	if player != null:
+		player.fov_radius_bonus = 0
 	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
 	if race == null:
 		return
@@ -56,7 +58,7 @@ func melee_damage_bonus(player: Node) -> int:
 			if player.hp * 2 < player.hp_max:
 				return 4
 		"headbutt":
-			return 3
+			return 2
 	return 0
 
 # ── After player kills a monster ──────────────────────────────────────────────

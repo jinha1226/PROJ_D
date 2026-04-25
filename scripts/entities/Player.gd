@@ -56,6 +56,7 @@ var mp_max: int = 6
 var ac: int = 0
 var ev: int = 5
 var wl: int = 0
+var fov_radius_bonus: int = 0
 var strength: int = 10
 var dexterity: int = 10
 var intelligence: int = 10
@@ -482,7 +483,7 @@ func compute_fov() -> Dictionary:
 	if _map == null:
 		return {}
 	var is_opaque := func(p: Vector2i) -> bool: return _map.is_opaque(p)
-	return FieldOfView.compute(grid_pos, SIGHT_RADIUS, is_opaque)
+	return FieldOfView.compute(grid_pos, SIGHT_RADIUS + fov_radius_bonus, is_opaque)
 
 func take_damage(amount: int, source: String = "") -> void:
 	if has_status("invulnerable"):
