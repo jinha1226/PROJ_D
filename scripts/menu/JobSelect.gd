@@ -1,87 +1,33 @@
 extends Control
 
 const GAME_SCENE_PATH: String = "res://scenes/main/Game.tscn"
-const RACE_SELECT_PATH: String = "res://scenes/menu/RaceSelect.tscn"
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 const DEFAULT_BASE_PATH: String = \
 	"res://assets/tiles/individual/player/base/human_m.png"
 
-const _GROUPS: Array = [
-	["fighter", "Fighter", "Melee warrior. Blade, axe, polearm, or bow."],
-	["wizard",  "Wizard",  "Arcane scholar. Choose your school of magic."],
-	["rogue",   "Rogue",   "Shadow striker. Dagger and guile."],
-]
+const BASE_CLASSES: Array = ["warrior", "mage", "rogue"]
 
 @onready var _scroll: ScrollContainer = $ScrollContainer
 @onready var _container: VBoxContainer = $ScrollContainer/VBox
 @onready var _back_btn: Button = $BackButton
 
-var _current_group: String = ""  # "" = group list, "fighter"/"wizard"/"rogue" = subclasses
-
 func _ready() -> void:
 	theme = GameTheme.create()
 	_back_btn.pressed.connect(_on_back)
 	TouchScrollHelper.install(_scroll)
+	if GameManager.selected_race_id == "":
+		GameManager.selected_race_id = "human"
 	if ClassRegistry.all.is_empty():
 		ClassRegistry._scan()
-	_build_group_list()
+	_build_class_list()
 
-func _build_group_list() -> void:
-	_current_group = ""
+func _build_class_list() -> void:
 	for child in _container.get_children():
 		child.queue_free()
-	for entry in _GROUPS:
-		_container.add_child(_make_group_card(entry[0], entry[1], entry[2]))
-
-func _make_group_card(group_id: String, title: String, desc: String) -> Control:
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(0, 160)
-	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 14)
-	margin.add_theme_constant_override("margin_right", 14)
-	margin.add_theme_constant_override("margin_top", 12)
-	margin.add_theme_constant_override("margin_bottom", 12)
-	panel.add_child(margin)
-	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 8)
-	margin.add_child(vb)
-	var name_lab := Label.new()
-	name_lab.text = title
-	name_lab.add_theme_font_size_override("font_size", 42)
-	name_lab.add_theme_color_override("font_color", Color(0.95, 0.85, 0.5))
-	vb.add_child(name_lab)
-	var desc_lab := Label.new()
-	desc_lab.text = desc
-	desc_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_lab.add_theme_font_size_override("font_size", 24)
-	desc_lab.add_theme_color_override("font_color", Color(0.78, 0.82, 0.9))
-	vb.add_child(desc_lab)
-	var btn := Button.new()
-	btn.text = "Choose %s →" % title
-	btn.custom_minimum_size = Vector2(0, 56)
-	btn.add_theme_font_size_override("font_size", 26)
-	var gid: String = group_id
-	btn.pressed.connect(func(): _show_subclasses(gid))
-	vb.add_child(btn)
-	return panel
-
-func _show_subclasses(group_id: String) -> void:
-	_current_group = group_id
-	for child in _container.get_children():
-		child.queue_free()
-	var ids: Array = ClassRegistry.ids_in_order()
-	var shown: int = 0
-	for id in ids:
+	for id in BASE_CLASSES:
 		var data: ClassData = ClassRegistry.get_by_id(id)
-		if data == null or String(data.class_group) != group_id:
-			continue
-		_container.add_child(_make_card(data))
-		shown += 1
-	if shown == 0:
-		var lab := Label.new()
-		lab.text = "No classes available."
-		lab.add_theme_font_size_override("font_size", 26)
-		_container.add_child(lab)
+		if data != null:
+			_container.add_child(_make_card(data))
 
 func _make_card(data: ClassData) -> Control:
 	var panel := PanelContainer.new()
@@ -195,6 +141,8 @@ func _gear_line(data: ClassData) -> String:
 	var parts: Array = []
 	if data.starting_weapon != "":
 		parts.append(_item_name(data.starting_weapon))
+	if data.starting_shield != "":
+		parts.append(_item_name(data.starting_shield))
 	if data.starting_armor != "":
 		parts.append(_item_name(data.starting_armor))
 	for extra in _starter_extras(data.id):
@@ -205,9 +153,9 @@ func _gear_line(data: ClassData) -> String:
 
 func _starter_extras(class_id: String) -> Array:
 	match class_id:
-		"warrior":  return ["healing ×2"]
-		"mage":     return ["blink ×2", "healing"]
-		"rogue":    return ["healing", "blink"]
+		"warrior": return ["healing ×2"]
+		"ranger":  return ["healing", "bandage"]
+		"mage":    return ["healing", "magic potion"]
 	return []
 
 func _skills_line(data: ClassData) -> String:
@@ -229,7 +177,4 @@ func _on_pick(class_id: String) -> void:
 	get_tree().change_scene_to_file(GAME_SCENE_PATH)
 
 func _on_back() -> void:
-	if _current_group != "":
-		_build_group_list()
-	else:
-		get_tree().change_scene_to_file(RACE_SELECT_PATH)
+	get_tree().change_scene_to_file(MENU_SCENE_PATH)

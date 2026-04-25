@@ -1,7 +1,7 @@
 extends Control
 
 const GAME_SCENE_PATH: String = "res://scenes/main/Game.tscn"
-const RACE_SELECT_PATH: String = "res://scenes/menu/RaceSelect.tscn"
+const JOB_SELECT_PATH: String = "res://scenes/menu/JobSelect.tscn"
 const BUILD_VERSION_LABEL: PackedScene = preload("res://scenes/ui/BuildVersionLabel.tscn")
 
 @onready var _continue_btn: Button = $VBox/ContinueButton
@@ -28,9 +28,9 @@ func _on_continue() -> void:
 		get_tree().change_scene_to_file(GAME_SCENE_PATH)
 
 func _on_start() -> void:
-	GameManager.selected_race_id = ""
+	GameManager.selected_race_id = "human"
 	GameManager.selected_class_id = ""
-	get_tree().change_scene_to_file(RACE_SELECT_PATH)
+	get_tree().change_scene_to_file(JOB_SELECT_PATH)
 
 func _on_toggle_display() -> void:
 	GameManager.toggle_tiles()
