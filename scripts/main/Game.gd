@@ -296,6 +296,10 @@ func _apply_class_to_player(class_id: String) -> void:
 	player.refresh_ac_from_equipment()
 	player._refresh_paperdoll()
 	player.known_spells = data.starting_spells.duplicate()
+	if player.known_spells.is_empty():
+		var magic_level: int = player.get_skill_level("magic")
+		for spell_level in range(1, magic_level + 1):
+			player.request_magic_spell_choices(spell_level)
 	GameManager.selected_starting_weapon_id = ""
 	for id in _class_starter_items(class_id):
 		player.items.append({"id": id, "plus": 0})

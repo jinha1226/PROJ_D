@@ -654,6 +654,11 @@ func learn_spell(spell_id: String) -> bool:
 	emit_signal("stats_changed")
 	return true
 
+func request_magic_spell_choices(spell_level: int) -> void:
+	var spell_choices: Array = _generate_magic_spell_choices(spell_level)
+	if not spell_choices.is_empty():
+		emit_signal("spell_choices_requested", spell_level, spell_choices)
+
 func _generate_magic_spell_choices(spell_level: int) -> Array:
 	var choices: Array = []
 	for school in MAGIC_SCHOOLS:
