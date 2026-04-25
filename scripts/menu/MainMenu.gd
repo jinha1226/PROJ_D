@@ -37,7 +37,7 @@ func _on_toggle_display() -> void:
 	_refresh_display_label()
 
 func _refresh_display_label() -> void:
-	_display_btn.text = "Display: %s" % ("Tiles" if GameManager.use_tiles else "ASCII")
+	_display_btn.text = "[ DISPLAY: %s ]" % ("TILES" if GameManager.use_tiles else "ASCII")
 
 func _on_shards() -> void:
 	var dlg: GameDialog = GameDialog.create("Rune Shards")
