@@ -24,6 +24,8 @@ var _effect_layer: Node2D
 var _targeting_spell: SpellData = null
 var _targeting_tiles: Array = []
 var _targeting_node: SpellTargetOverlay = null
+var _pending_spell_choices: Array = []
+var _spell_choice_popup_open: bool = false
 
 # Auto-walk state — when the player taps a distant explored tile,
 # we enqueue a BFS path here and step one tile each player turn
@@ -266,9 +268,12 @@ func _apply_class_to_player(class_id: String) -> void:
 	player.mp = data.starting_mp
 	_apply_race_mods(GameManager.selected_race_id)
 	player.set_race_from_id(GameManager.selected_race_id)
-	if data.starting_weapon != "":
-		player.items.append({"id": data.starting_weapon, "plus": 0})
-		player.equipped_weapon_id = data.starting_weapon
+	var starting_weapon_id: String = data.starting_weapon
+	if class_id == "warrior" and GameManager.selected_starting_weapon_id != "":
+		starting_weapon_id = GameManager.selected_starting_weapon_id
+	if starting_weapon_id != "":
+		player.items.append({"id": starting_weapon_id, "plus": 0})
+		player.equipped_weapon_id = starting_weapon_id
 	if data.starting_armor != "":
 		player.items.append({"id": data.starting_armor, "plus": 0})
 		player.equipped_armor_id = data.starting_armor
@@ -291,6 +296,7 @@ func _apply_class_to_player(class_id: String) -> void:
 	player.refresh_ac_from_equipment()
 	player._refresh_paperdoll()
 	player.known_spells = data.starting_spells.duplicate()
+	GameManager.selected_starting_weapon_id = ""
 	for id in _class_starter_items(class_id):
 		player.items.append({"id": id, "plus": 0})
 		player.auto_bind_quickslot(id)
@@ -466,6 +472,37 @@ func _spawn_player() -> void:
 	player.stats_changed.connect(_update_hud)
 	player.item_dropped.connect(_on_item_dropped)
 	player.damaged.connect(_on_player_damaged)
+	player.spell_choices_requested.connect(_on_spell_choices_requested)
+
+func _on_spell_choices_requested(spell_level: int, spell_ids: Array) -> void:
+	if spell_ids.is_empty():
+		return
+	_pending_spell_choices.append({
+		"level": spell_level,
+		"spell_ids": spell_ids.duplicate(),
+	})
+	_try_open_spell_choice_popup()
+
+func _try_open_spell_choice_popup() -> void:
+	if _spell_choice_popup_open or _pending_spell_choices.is_empty():
+		return
+	var entry: Dictionary = _pending_spell_choices.pop_front()
+	var spell_level: int = int(entry.get("level", 1))
+	var spell_ids: Array = entry.get("spell_ids", [])
+	if spell_ids.is_empty():
+		_try_open_spell_choice_popup()
+		return
+	_spell_choice_popup_open = true
+	var popup := PopupManager.new()
+	add_child(popup)
+	popup.show_spell_learn_popup(spell_level, spell_ids, func(spell_id: String) -> void:
+		if player != null:
+			player.learn_spell(spell_id)
+		_spell_choice_popup_open = false
+		if is_instance_valid(popup):
+			popup.queue_free()
+		_try_open_spell_choice_popup()
+	)
 
 const ZOOM_MIN: float = 0.7
 const ZOOM_MAX: float = 2.2

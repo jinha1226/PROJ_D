@@ -5,6 +5,7 @@ signal moved(new_pos: Vector2i)
 signal died
 signal item_dropped(item_id: String, at_pos: Vector2i, plus: int)
 signal damaged(amount: int)
+signal spell_choices_requested(spell_level: int, spell_ids: Array)
 
 @export var grid_pos: Vector2i = Vector2i(1, 1)
 
@@ -82,6 +83,10 @@ const MAX_XL: int = 20
 const MAX_SKILL_LEVEL: int = 9
 const SKILL_IDS: Array = ["melee", "ranged", "magic", "defense", "agility"]
 const SKILL_XP_DELTA: Array = [12, 28, 55, 95, 150, 230, 340, 490, 700]
+const MAGIC_SCHOOLS: Array = [
+	"evocation", "conjuration", "transmutation",
+	"necromancy", "abjuration", "enchantment",
+]
 
 var _map: DungeonMap
 
@@ -572,6 +577,10 @@ func grant_skill_xp(id: String, amount: float) -> void:
 			hp = min(hp_max, hp + 3)
 		elif id == "agility":
 			ev += 1
+		elif id == "magic":
+			var spell_choices: Array = _generate_magic_spell_choices(int(s["level"]))
+			if not spell_choices.is_empty():
+				emit_signal("spell_choices_requested", int(s["level"]), spell_choices)
 	skills[id] = s
 
 func grant_xp(amount: int) -> void:
@@ -621,6 +630,36 @@ func _auto_stat_bump() -> void:
 		"dexterity": dexterity += 1
 		"intelligence": intelligence += 1
 	CombatLog.post("(+1 %s)" % lowest_name.to_upper(), Color(0.75, 0.85, 1))
+
+func learn_spell(spell_id: String) -> bool:
+	var sid: String = String(spell_id)
+	if sid == "" or known_spells.has(sid):
+		return false
+	var spell: SpellData = SpellRegistry.get_by_id(sid)
+	if spell == null:
+		return false
+	known_spells.append(sid)
+	CombatLog.post("You memorize %s." % spell.display_name, Color(0.7, 0.95, 1.0))
+	emit_signal("stats_changed")
+	return true
+
+func _generate_magic_spell_choices(spell_level: int) -> Array:
+	var choices: Array = []
+	for school in MAGIC_SCHOOLS:
+		var candidates: Array = []
+		for spell in SpellRegistry.get_by_school(school):
+			if spell == null:
+				continue
+			if spell.spell_level != spell_level:
+				continue
+			if known_spells.has(spell.id):
+				continue
+			candidates.append(spell.id)
+		if not candidates.is_empty():
+			candidates.shuffle()
+			choices.append(String(candidates[0]))
+	choices.shuffle()
+	return choices
 
 func wait_turn() -> void:
 	var hp_cap: int = max(1, hp_max - injury)

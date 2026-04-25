@@ -25,6 +25,7 @@ var run_in_progress: bool = false
 # Character selection — set by menus before start_new_run().
 var selected_class_id: String = ""
 var selected_race_id: String = "human"
+var selected_starting_weapon_id: String = ""
 
 # Staging slot for loaded player stats. Game.gd consumes this on scene
 # load and writes into the freshly-instantiated Player, then clears it.
