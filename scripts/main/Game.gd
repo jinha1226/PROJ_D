@@ -174,13 +174,16 @@ func _bfs_path(start: Vector2i, goal: Vector2i) -> Array:
 func _advance_auto_walk() -> void:
 	if _auto_path.is_empty():
 		return
-	if _new_monster_in_sight():
+	if _monster_in_sight():
 		_cancel_auto_walk("new enemy")
 		return
 	if player.hp < _auto_prev_hp:
 		_cancel_auto_walk("took damage")
 		return
 	var next: Vector2i = _auto_path[0]
+	if _monster_at(next) != null:
+		_cancel_auto_walk("new enemy")
+		return
 	var dir: Vector2i = next - player.grid_pos
 	if abs(dir.x) > 1 or abs(dir.y) > 1:
 		_cancel_auto_walk("path broken")
@@ -829,11 +832,18 @@ func _on_player_turn_started() -> void:
 		RacePassiveSystem.on_player_turn_end(player)
 	if map != null:
 		map.tick_fog()
+		_refresh_entity_visibility()
 	if TurnManager.turn_number % _RESPAWN_INTERVAL == 0:
 		_try_respawn_monster()
 	if not _auto_path.is_empty():
+		if _monster_in_sight():
+			_cancel_auto_walk("new enemy")
+			return
 		_queue_auto_walk_step()
 	elif _auto_exploring:
+		if _monster_in_sight():
+			_cancel_auto_walk("new enemy")
+			return
 		_start_auto_explore()
 
 func _try_respawn_monster() -> void:
