@@ -3,6 +3,7 @@ class_name Monster extends Node2D
 signal died(monster)
 signal stats_changed
 signal hit_taken(amount: int)
+signal awareness_changed(monster, aware: bool)
 
 var data: MonsterData
 var hp: int = 0
@@ -65,13 +66,21 @@ func take_damage(amount: int) -> void:
 		die()
 
 func become_aware(player_pos: Vector2i) -> void:
+	if is_aware:
+		last_known_player_pos = player_pos
+		is_alerted = true
+		return
 	is_aware = true
 	is_alerted = true
 	last_known_player_pos = player_pos
+	awareness_changed.emit(self, true)
 	queue_redraw()
 
 func lose_awareness() -> void:
+	if not is_aware:
+		return
 	is_aware = false
+	awareness_changed.emit(self, false)
 	queue_redraw()
 
 func die() -> void:

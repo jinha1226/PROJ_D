@@ -609,6 +609,8 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 		m.status = entry.get("status", {}).duplicate()
 		if m.has_signal("hit_taken"):
 			m.hit_taken.connect(_on_monster_hit.bind(m))
+		if m.has_signal("awareness_changed"):
+			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
 
@@ -636,6 +638,8 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 		monsters_layer.add_child(m)
 		m.setup(data, map, p)
 		m.hit_taken.connect(_on_monster_hit.bind(m))
+		if m.has_signal("awareness_changed"):
+			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
 		placed += 1
@@ -856,6 +860,8 @@ func _try_respawn_monster() -> void:
 		monsters_layer.add_child(m)
 		m.setup(data, map, p)
 		m.hit_taken.connect(_on_monster_hit.bind(m))
+		if m.has_signal("awareness_changed"):
+			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
 		return
@@ -1258,6 +1264,21 @@ func _on_monster_hit(amount: int, monster: Monster) -> void:
 	var world_pos: Vector2 = monster.position + Vector2(cell_size * 0.5, 0.0)
 	spawn_damage_number(world_pos, amount, Color(1.0, 0.85, 0.2))
 
+func _on_monster_awareness_changed(monster: Monster, aware: bool) -> void:
+	if not is_instance_valid(monster) or monster.data == null or player == null or map == null:
+		return
+	var sees_monster: bool = map.visible_tiles.has(monster.grid_pos)
+	if not sees_monster:
+		return
+	var cell_size: float = DungeonMap.CELL_SIZE
+	var world_pos: Vector2 = monster.position + Vector2(cell_size * 0.5, -6.0)
+	if aware:
+		CombatLog.post("The %s notices you!" % monster.data.display_name, Color(1.0, 0.72, 0.45))
+		spawn_text_popup(world_pos, "!", Color(1.0, 0.72, 0.35), 32, 0.55)
+	else:
+		CombatLog.post("The %s loses track of you." % monster.data.display_name, Color(0.7, 0.82, 0.95))
+		spawn_text_popup(world_pos, "?", Color(0.75, 0.88, 1.0), 26, 0.5)
+
 func _on_player_damaged(amount: int) -> void:
 	if player == null:
 		return
@@ -1281,6 +1302,22 @@ func spawn_damage_number(world_pos: Vector2, amount: int, color: Color) -> void:
 	var tw := lbl.create_tween()
 	tw.tween_property(lbl, "position:y", lbl.position.y - 48.0, 0.65)
 	tw.parallel().tween_property(lbl, "modulate:a", 0.0, 0.65)
+	tw.tween_callback(lbl.queue_free)
+
+func spawn_text_popup(world_pos: Vector2, text: String, color: Color,
+		font_size: int = 28, duration: float = 0.6) -> void:
+	if _effect_layer == null:
+		return
+	var lbl := Label.new()
+	lbl.text = text
+	lbl.add_theme_font_size_override("font_size", font_size)
+	lbl.add_theme_color_override("font_color", color)
+	lbl.position = world_pos + Vector2(-12, -24)
+	lbl.z_index = 10
+	_effect_layer.add_child(lbl)
+	var tw := lbl.create_tween()
+	tw.tween_property(lbl, "position:y", lbl.position.y - 28.0, duration)
+	tw.parallel().tween_property(lbl, "modulate:a", 0.0, duration)
 	tw.tween_callback(lbl.queue_free)
 
 
