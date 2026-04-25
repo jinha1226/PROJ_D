@@ -572,10 +572,7 @@ func grant_skill_xp(id: String, amount: float) -> void:
 		CombatLog.post("%s skill reaches %d." \
 				% [id.capitalize(), int(s["level"])],
 			Color(0.7, 0.95, 0.5))
-		if id == "melee":
-			hp_max += 3
-			hp = min(hp_max, hp + 3)
-		elif id == "agility":
+		if id == "agility":
 			ev += 1
 		elif id == "magic":
 			var spell_choices: Array = _generate_magic_spell_choices(int(s["level"]))
@@ -597,7 +594,7 @@ func xp_to_next() -> int:
 
 func _level_up() -> void:
 	xl += 1
-	var hp_gain: int = 3 + strength / 5
+	var hp_gain: int = _level_up_hp_gain()
 	hp_max += hp_gain
 	hp = min(hp_max, hp + hp_gain)
 	var mp_gain: int = 1 + intelligence / 3
@@ -607,6 +604,19 @@ func _level_up() -> void:
 		Color(1.0, 0.9, 0.3))
 	if xl == 12 or xl == 15 or xl == 18:
 		_auto_stat_bump()
+
+func _level_up_hp_gain() -> int:
+	var base_gain: int = 4
+	var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id)
+	var class_group: String = String(cls.class_group) if cls != null else ""
+	match class_group:
+		"fighter":
+			base_gain = 5
+		"rogue":
+			base_gain = 4
+		"mage":
+			base_gain = 3
+	return max(2, base_gain + strength / 6)
 
 func _auto_stat_bump() -> void:
 	# Pick the lowest stat and +1. Simplification of the classic
