@@ -22,4 +22,4 @@ passive = ""
 unlocked = true
 unlock_kind = "use_item"
 unlock_trigger_id = "book_enchantment"
-class_group = "wizard"
+class_group = "mage"
