@@ -70,8 +70,7 @@ static func _populate(dlg: GameDialog, player: Player, game: Node) -> void:
 
 static func _make_spell_row(spell: SpellData, player: Player,
 		dlg: GameDialog, game: Node) -> Control:
-	var skill_id: String = spell.school if spell.school != "" else "magic"
-	var locked: bool = spell.spell_level > player.get_skill_level(skill_id)
+	var locked: bool = spell.spell_level > player.get_skill_level("magic")
 	var no_mp: bool = player.mp < spell.mp_cost
 
 	var row := HBoxContainer.new()
@@ -107,8 +106,7 @@ static func _make_spell_row(spell: SpellData, player: Player,
 
 	var stat_lbl := Label.new()
 	if locked:
-		var sk: String = spell.school.capitalize() if spell.school != "" else "Magic"
-		stat_lbl.text = "%s skill %d required" % [sk, spell.spell_level]
+		stat_lbl.text = "Magic skill %d required" % spell.spell_level
 		stat_lbl.add_theme_color_override("font_color", Color(0.55, 0.45, 0.45))
 	else:
 		var range_str: String = "%d tiles" % spell.max_range if spell.max_range > 0 else "self"
@@ -178,7 +176,7 @@ static func _describe(player: Player, spell: SpellData) -> String:
 		"buff_haste":   return "Extra action"
 		"buff_damage":  return "+1d4 dmg"
 		"buff_resist":  return "Elem resist"
-		"buff_blur":    return "Dodge bonus"
+		"buff_blur":    return "Agility bonus"
 		"buff_stoneskin": return "Phys resist"
 		"buff_magic_ward": return "Spell ward"
 		"buff_invulnerable": return "Immune dmg"
@@ -209,8 +207,7 @@ static func _armor_spell_mult(player: Player) -> float:
 
 
 static func _compute_power(player: Player, spell: SpellData) -> int:
-	var skill_id: String = spell.school if spell.school != "" else "magic"
-	var skill: int = player.get_skill_level(skill_id)
+	var skill: int = player.get_skill_level("magic")
 	return int(float(player.intelligence) * (1.0 + float(skill) * 0.06) * _armor_spell_mult(player))
 
 

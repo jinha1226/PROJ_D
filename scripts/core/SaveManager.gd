@@ -69,6 +69,7 @@ func save_run(player, game_manager) -> bool:
 			"statuses": player.statuses,
 			"resists": player.resists,
 			"skills": player.skills,
+			"active_skills": player.active_skills,
 			"quickslots": player.quickslots,
 			"essence_slots": player.essence_slots,
 			"essence_inventory": player.essence_inventory,

@@ -24,10 +24,10 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 	var dist: int = _chebyshev(monster.grid_pos, player.grid_pos)
 	if dist == 1:
 		CombatSystem.monster_attack_player(monster, player)
+		monster.become_aware(player.grid_pos)
 		return
 	if _can_see(monster, map, player.grid_pos):
-		monster.last_known_player_pos = player.grid_pos
-		monster.is_alerted = true
+		monster.become_aware(player.grid_pos)
 		_pack_alert(monster, player.grid_pos)
 		if _try_ranged(monster, player, dist):
 			return
@@ -37,6 +37,7 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 		var chase_dist: int = _chebyshev(monster.grid_pos, monster.last_known_player_pos)
 		if chase_dist <= 1:
 			monster.is_alerted = false
+			monster.lose_awareness()
 			monster.last_known_player_pos = Vector2i(-1, -1)
 		else:
 			_step_toward(monster, map, monster.last_known_player_pos)
@@ -86,12 +87,27 @@ static func _chebyshev(a: Vector2i, b: Vector2i) -> int:
 	return max(abs(a.x - b.x), abs(a.y - b.y))
 
 static func _can_see(monster: Monster, map: DungeonMap, target: Vector2i) -> bool:
-	var radius: int = monster.data.sight_range
+	var player: Player = _find_player()
+	var radius: int = _effective_sight_range(monster, player)
 	if _chebyshev(monster.grid_pos, target) > radius:
 		return false
 	var is_opaque := func(p: Vector2i) -> bool: return map.is_opaque(p)
 	var vis: Dictionary = FieldOfView.compute(monster.grid_pos, radius, is_opaque)
 	return vis.has(target)
+
+static func _effective_sight_range(monster: Monster, player: Player) -> int:
+	var radius: int = monster.data.sight_range
+	if player == null:
+		return radius
+	var stealth_score: int = player.get_skill_level("agility")
+	var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id)
+	if cls != null and cls.class_group == "rogue":
+		stealth_score += 2
+	if player.equipped_weapon_id != "":
+		var weapon: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
+		if weapon != null and weapon.category == "dagger":
+			stealth_score += 1
+	return maxi(2, radius - int(floor(float(stealth_score) / 3.0)))
 
 static func _step_toward(monster: Monster, map: DungeonMap, target: Vector2i) -> void:
 	var dx: int = sign(target.x - monster.grid_pos.x)
@@ -140,8 +156,7 @@ static func _pack_alert(source: Monster, player_pos: Vector2i) -> void:
 		if m.is_alerted or m.hp <= 0:
 			continue
 		if _chebyshev(source.grid_pos, m.grid_pos) <= 8:
-			m.is_alerted = true
-			m.last_known_player_pos = player_pos
+			m.become_aware(player_pos)
 
 static func _random_step(monster: Monster, map: DungeonMap) -> void:
 	# Was 50% idle — felt too slack. 20% idle keeps wandering enemies

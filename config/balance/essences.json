@@ -1,5 +1,5 @@
 {
-  "version": "balance_v1",
+  "version": "balance_v2_mobile",
   "model": "passive_only",
   "slots": {
     "early": 1,
@@ -18,7 +18,8 @@
         "low_hp_bonus",
         "vs_undead_bonus",
         "poison_reduction",
-        "on_kill_minor_heal"
+        "on_kill_minor_heal",
+        "awareness_reduction_bonus"
       ]
     }
   },

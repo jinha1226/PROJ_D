@@ -10,6 +10,7 @@ var grid_pos: Vector2i = Vector2i.ZERO
 var status: Dictionary = {}
 var last_known_player_pos: Vector2i = Vector2i(-1, -1)
 var is_alerted: bool = false
+var is_aware: bool = false
 
 var _map: DungeonMap
 var _tex: Texture2D = null
@@ -63,6 +64,16 @@ func take_damage(amount: int) -> void:
 	if hp <= 0:
 		die()
 
+func become_aware(player_pos: Vector2i) -> void:
+	is_aware = true
+	is_alerted = true
+	last_known_player_pos = player_pos
+	queue_redraw()
+
+func lose_awareness() -> void:
+	is_aware = false
+	queue_redraw()
+
 func die() -> void:
 	emit_signal("died", self)
 	TurnManager.unregister_actor(self)
@@ -78,7 +89,13 @@ func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
 	if GameManager.use_tiles and _tex != null:
 		draw_texture_rect(_tex, rect, false)
-		return
-	draw_string(_font, Vector2(6, DungeonMap.CELL_SIZE - 6),
-		data.glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, DungeonMap.CELL_SIZE - 6,
-		data.glyph_color)
+	else:
+		draw_string(_font, Vector2(6, DungeonMap.CELL_SIZE - 6),
+			data.glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, DungeonMap.CELL_SIZE - 6,
+			data.glyph_color)
+	if not is_aware and hp > 0:
+		var center := Vector2(DungeonMap.CELL_SIZE * 0.5, 4.0)
+		draw_circle(center, 5.0, Color(0.1, 0.15, 0.2, 0.85))
+		draw_circle(center, 4.0, Color(0.9, 0.95, 1.0, 0.95))
+		draw_string(_font, Vector2(center.x - 2.5, 8.5), "?",
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color(0.15, 0.25, 0.45))

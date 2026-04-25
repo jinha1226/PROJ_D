@@ -1,7 +1,7 @@
 {
-  "version": "balance_v1",
+  "version": "balance_v2_mobile",
   "player_baseline": {
-    "base_hp": 22,
+    "base_hp": 30,
     "base_mp": 6,
     "base_ac": 0,
     "base_ev": 6,
@@ -20,8 +20,7 @@
     },
     "dexterity": {
       "ev_per_2_points": 1,
-      "ranged_damage_per_point": 0.25,
-      "dagger_damage_per_point": 0.25
+      "ranged_damage_per_point": 0.25
     },
     "intelligence": {
       "mp_per_3_points": 1,
@@ -31,11 +30,28 @@
   "resource_economy": {
     "hp_regen": {
       "natural_per_turn": 0,
-      "wait_action_per_turn": 0
+      "wait_action_per_turn": 1
     },
     "mp_regen": {
       "natural_per_turn": 0,
       "wait_action_per_turn": 1
+    }
+  },
+  "injury_system": {
+    "enabled": true,
+    "description": "injury reduces effective hp_max until treated",
+    "potion_heal": {
+      "restores_injury": true,
+      "flat_heal_min": 15,
+      "heal_pct_of_max_hp": 20
+    },
+    "bandage": {
+      "injury_restore": 10,
+      "hp_restore_half_of_injury_healed": true
+    },
+    "natural_recovery": {
+      "recover_1_injury_every_n_turns": 4,
+      "cannot_exceed_effective_hp_cap": true
     }
   }
 }

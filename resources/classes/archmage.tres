@@ -16,20 +16,11 @@ starting_weapon = "dagger"
 starting_armor = "robe"
 robe_path = "res://assets/tiles/individual/player/body/robe_black_gold.png"
 starting_skills = {
-"blade": 20,
-"blunt": 20,
-"dagger": 20,
-"polearm": 20,
-"ranged": 20,
-"armor": 20,
-"magic": 20,
-"evocation": 20,
-"conjuration": 20,
-"transmutation": 20,
-"necromancy": 20,
-"enchantment": 20,
-"abjuration": 20,
-"stealth": 20
+"melee": 9,
+"ranged": 9,
+"magic": 9,
+"defense": 9,
+"agility": 9
 }
 starting_xl = 20
 starting_spells = [

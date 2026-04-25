@@ -1,6 +1,7 @@
 {
-  "version": "balance_v1",
+  "version": "balance_v2_mobile",
   "master_spec": "docs/balance/balance_master.json",
+  "source_doc": "docs/balance/skill_and_progression.md",
   "parts": [
     "config/balance/core_rules.json",
     "config/balance/player_stats.json",
@@ -14,7 +15,7 @@
     "config/balance/races.json"
   ],
   "notes": [
-    "Use these files as implementation references, not as the only runtime source of truth.",
-    "Keep actual content resources in resources/ as .tres files."
+    "These files are implementation references for the current mobile-oriented progression model.",
+    "Actual runtime content should still live in resources/ as .tres or equivalent data assets."
   ]
 }

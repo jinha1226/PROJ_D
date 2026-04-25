@@ -1,5 +1,5 @@
 {
-  "version": "balance_v1",
+  "version": "balance_v2_mobile",
   "tiers": {
     "t1": {
       "hp": [8, 14],
@@ -64,6 +64,19 @@
       "hp_multiplier": 0.8,
       "ev_bonus": 2,
       "damage_bonus": 2
+    }
+  },
+  "awareness": {
+    "states": ["unaware", "aware"],
+    "detect_range_formula": {
+      "base": "monster.sight_range",
+      "reduction": "floor(player.agility_level / 3) + rogue_bonus + gear_bonus + race_bonus + essence_bonus",
+      "minimum_detect_range": 2
+    },
+    "rules": {
+      "enter_detect_range_sets_aware": true,
+      "taking_damage_sets_aware": true,
+      "ally_alert_can_propagate": true
     }
   }
 }

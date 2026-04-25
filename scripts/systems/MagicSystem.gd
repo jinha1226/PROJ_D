@@ -4,10 +4,10 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 	var spell: SpellData = SpellRegistry.get_by_id(spell_id)
 	if spell == null:
 		return false
-	var _skill_id: String = spell.school if spell.school != "" else "magic"
+	var _skill_id: String = "magic"
 	if spell.spell_level > player.get_skill_level(_skill_id):
-		CombatLog.post("%s requires %s skill %d." % [
-				spell.display_name, _skill_id.capitalize(), spell.spell_level],
+		CombatLog.post("%s requires Magic skill %d." % [
+				spell.display_name, spell.spell_level],
 			Color(1.0, 0.7, 0.5))
 		return false
 	if not RacePassiveSystem.on_spell_cast_mp_check(player, spell.mp_cost):
@@ -15,8 +15,6 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 			Color(1.0, 0.7, 0.5))
 		return false
 	player.mp = max(0, player.mp - spell.mp_cost)
-	var xp_skill: String = spell.school if spell.school != "" else "magic"
-	player.grant_skill_xp(xp_skill, float(spell.mp_cost))
 	player.emit_signal("stats_changed")
 	var power: int = _compute_power(player, spell)
 	match spell.effect:
@@ -143,6 +141,7 @@ static func _cast_drain(spell: SpellData, player: Player, power: int, game: Node
 		game.spawn_spell_bolt(player.position + half, target.position + half, "drain")
 	var was_alive: bool = target.hp > 0
 	target.take_damage(scaled)
+	target.become_aware(player.grid_pos)
 	var heal_amt: int = max(1, scaled / 2)
 	player.heal(heal_amt)
 	CombatLog.post("You absorb %d HP." % heal_amt, Color(0.6, 0.9, 0.6))
@@ -160,6 +159,7 @@ static func _apply_status_to_target(spell: SpellData, player: Player,
 	CombatLog.post("The %s is %s!" % [target.data.display_name, label],
 		Color(0.8, 0.7, 1.0))
 	Status.apply(target, status_id, turns)
+	target.become_aware(player.grid_pos)
 
 
 static func _cast_sleep(spell: SpellData, player: Player, game: Node) -> void:
@@ -172,9 +172,11 @@ static func _cast_sleep(spell: SpellData, player: Player, game: Node) -> void:
 	if target.hp > hp_threshold:
 		CombatLog.post("The %s resists the sleep!" % target.data.display_name,
 			Color(0.75, 0.75, 0.75))
+		target.become_aware(player.grid_pos)
 		return
 	CombatLog.post("The %s falls asleep!" % target.data.display_name, Color(0.6, 0.65, 0.9))
 	Status.apply(target, "sleeping", 6)
+	target.become_aware(player.grid_pos)
 
 
 static func _aoe_status(spell: SpellData, player: Player, game: Node,
@@ -239,9 +241,11 @@ static func _cast_power_word(spell: SpellData, player: Player, game: Node,
 		var dmg: int = target.hp / 2
 		CombatLog.hit("The %s writhes in agony! (-%d HP)" % [target.data.display_name, dmg])
 		target.take_damage(dmg)
+		target.become_aware(player.grid_pos)
 	elif mode == "stun":
 		Status.apply(target, "stunned", 4)
 		CombatLog.hit("The %s is stunned!" % target.data.display_name)
+		target.become_aware(player.grid_pos)
 
 
 static func _cast_banish(spell: SpellData, player: Player, game: Node) -> void:
@@ -251,6 +255,7 @@ static func _cast_banish(spell: SpellData, player: Player, game: Node) -> void:
 		return
 	CombatLog.hit("You banish the %s!" % target.data.display_name)
 	target.take_damage(99999)
+	target.become_aware(player.grid_pos)
 
 
 static func _cast_prismatic(spell: SpellData, player: Player, power: int, game: Node) -> void:
@@ -273,8 +278,7 @@ static func _armor_spell_mult(player: Player) -> float:
 
 
 static func _compute_power(player: Player, spell: SpellData) -> int:
-	var skill_id: String = spell.school if spell.school != "" else "magic"
-	var skill: int = player.get_skill_level(skill_id)
+	var skill: int = player.get_skill_level("magic")
 	return int(float(player.intelligence) * (1.0 + float(skill) * 0.06) * _armor_spell_mult(player))
 
 
@@ -302,6 +306,7 @@ static func _apply_elemental_side_effects(spell: SpellData, target: Monster) -> 
 static func _on_kill(target: Monster, player: Player) -> void:
 	CombatLog.hit("You kill the %s." % target.data.display_name)
 	player.grant_xp(target.data.xp_value)
+	player.grant_kill_skill_xp(float(target.data.xp_value), "magic")
 	player.register_kill()
 	GameManager.try_kill_unlock(target.data.id)
 
@@ -327,6 +332,7 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 		return
 	var was_alive: bool = target.hp > 0
 	target.take_damage(scaled)
+	target.become_aware(player.grid_pos)
 	if was_alive and target.hp > 0:
 		_apply_elemental_side_effects(spell, target)
 	if was_alive and target.hp <= 0:
@@ -350,6 +356,7 @@ static func _multi_damage(spell: SpellData, player: Player,
 					spell.element, Callable(), i * 0.09)
 		var was_alive: bool = target.hp > 0
 		target.take_damage(scaled)
+		target.become_aware(player.grid_pos)
 		if was_alive and target.hp > 0:
 			_apply_elemental_side_effects(spell, target)
 		if was_alive and target.hp <= 0:
@@ -394,6 +401,7 @@ static func _chain_damage(spell: SpellData, player: Player,
 			prev_pos = tgt_pos
 		var was_alive: bool = t.hp > 0
 		t.take_damage(scaled)
+		t.become_aware(player.grid_pos)
 		if was_alive and t.hp > 0:
 			_apply_elemental_side_effects(spell, t)
 		if was_alive and t.hp <= 0:
@@ -428,6 +436,7 @@ static func _aoe_damage(spell: SpellData, player: Player,
 		hit_positions.append(n.position + half)
 		var was_alive: bool = n.hp > 0
 		n.take_damage(scaled)
+		n.become_aware(player.grid_pos)
 		if was_alive and n.hp > 0:
 			_apply_elemental_side_effects(spell, n)
 		if was_alive and n.hp <= 0:

@@ -68,6 +68,7 @@ var known_spells: Array = []  # [String]
 var statuses: Dictionary = {}  # id -> turns_remaining (Status.gd manages)
 var resists: Array = []  # ["fire", "cold-2", "poison+"] scaled by Status.resist_scale
 var skills: Dictionary = {}  # skill_id -> {"level": int, "xp": float}
+var active_skills: Array = []  # active skill ids receiving kill XP
 var quickslots: Array = ["", "", "", "", ""]  # item ids, index = slot
 var equipped_weapon_id: String = ""
 var equipped_armor_id: String = ""
@@ -77,12 +78,10 @@ var equipped_shield_id: String = ""
 var essence_slots: Array = ["", "", ""]   # equipped essence ids (max 3)
 var essence_inventory: Array = []         # collected but unequipped essence ids
 
-const SKILL_IDS: Array = ["blade", "blunt", "dagger", "polearm", "ranged",
-	"fighting", "armor", "shield", "dodge", "stealth",
-	"magic",
-	"evocation", "necromancy", "transmutation", "enchantment", "conjuration", "abjuration"]
-const SKILL_XP_DELTA: Array = [13, 20, 32, 52, 78, 110, 150, 195, 260,
-	325, 455, 650, 910, 1300, 1820, 2600, 3575, 4875, 6500, 8450]
+const MAX_XL: int = 20
+const MAX_SKILL_LEVEL: int = 9
+const SKILL_IDS: Array = ["melee", "ranged", "magic", "defense", "agility"]
+const SKILL_XP_DELTA: Array = [12, 28, 55, 95, 150, 230, 340, 490, 700]
 
 var _map: DungeonMap
 
@@ -298,8 +297,8 @@ func use_item(index: int) -> void:
 						dup_school = sp2.school
 						break
 				if dup_school != "":
-					grant_skill_xp(dup_school, 20.0)
-					CombatLog.post("You already know these spells. Your %s deepens." % dup_school, Color(0.7, 0.85, 1.0))
+					grant_skill_xp("magic", 20.0)
+					CombatLog.post("You already know these spells. Your magic deepens.", Color(0.7, 0.85, 1.0))
 					had_effect = true
 				else:
 					CombatLog.post("You already know all spells in this tome.", Color(0.7, 0.85, 1.0))
@@ -373,16 +372,19 @@ func equipped_armor_entry() -> Dictionary:
 
 func refresh_ac_from_equipment() -> void:
 	ac = 0
-	ev = 1 + dexterity / 2
+	ev = 1 + dexterity / 2 + get_skill_level("agility")
 	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id)
 	if armor != null:
 		var armor_plus: int = int(equipped_armor_entry().get("plus", 0))
 		ac += armor.ac_bonus + armor_plus
-		var armor_skill: int = get_skill_level("armor")
+		var armor_skill: int = get_skill_level("defense")
 		var penalty_mult: float = max(0.0, 1.0 - float(armor_skill) * 0.1)
 		ev -= int(round(float(armor.ev_penalty) * penalty_mult))
 		var armor_missing: int = max(0, armor.required_skill - armor_skill)
 		ev -= armor_missing
+	var shield: ItemData = ItemRegistry.get_by_id(equipped_shield_id)
+	if shield != null:
+		ev -= shield.ev_penalty
 	if has_status("mage_armor"):
 		ac = max(ac, 13 + dexterity / 2)
 	ev = max(0, ev)
@@ -505,7 +507,47 @@ func heal(amount: int) -> void:
 func init_skills() -> void:
 	for id in SKILL_IDS:
 		if not skills.has(id):
-			skills[id] = {"level": 1, "xp": 0.0}
+			skills[id] = {"level": 0, "xp": 0.0}
+	if active_skills.is_empty():
+		active_skills = ["melee"]
+
+func is_skill_active(id: String) -> bool:
+	return active_skills.has(id)
+
+func set_active_skills(ids: Array) -> void:
+	active_skills.clear()
+	for id in ids:
+		var sid: String = String(id)
+		if SKILL_IDS.has(sid) and not active_skills.has(sid):
+			active_skills.append(sid)
+	if active_skills.is_empty():
+		active_skills = ["melee"]
+	emit_signal("stats_changed")
+
+func toggle_skill_active(id: String) -> bool:
+	if not SKILL_IDS.has(id):
+		return false
+	if active_skills.has(id):
+		if active_skills.size() <= 1:
+			return false
+		active_skills.erase(id)
+	else:
+		active_skills.append(id)
+	emit_signal("stats_changed")
+	return true
+
+func grant_kill_skill_xp(amount: float, preferred_skill: String = "") -> void:
+	var targets: Array = []
+	for id in active_skills:
+		var sid: String = String(id)
+		if SKILL_IDS.has(sid):
+			targets.append(sid)
+	if targets.is_empty():
+		var fallback: String = preferred_skill if SKILL_IDS.has(preferred_skill) else "melee"
+		targets = [fallback]
+	var share: float = amount / float(targets.size())
+	for sid in targets:
+		grant_skill_xp(String(sid), share)
 
 func get_skill_level(id: String) -> int:
 	var s: Dictionary = skills.get(id, {})
@@ -518,23 +560,23 @@ func grant_skill_xp(id: String, amount: float) -> void:
 		skills[id] = {"level": 0, "xp": 0.0}
 	var s: Dictionary = skills[id]
 	s["xp"] = float(s.get("xp", 0.0)) + amount
-	while int(s.get("level", 0)) < 20 \
+	while int(s.get("level", 0)) < MAX_SKILL_LEVEL \
 			and float(s.get("xp", 0.0)) >= SKILL_XP_DELTA[int(s.get("level", 0))]:
 		s["xp"] = float(s["xp"]) - SKILL_XP_DELTA[int(s["level"])]
 		s["level"] = int(s["level"]) + 1
 		CombatLog.post("%s skill reaches %d." \
 				% [id.capitalize(), int(s["level"])],
 			Color(0.7, 0.95, 0.5))
-		if id == "fighting":
+		if id == "melee":
 			hp_max += 3
 			hp = min(hp_max, hp + 3)
-		elif id == "dodge":
+		elif id == "agility":
 			ev += 1
 	skills[id] = s
 
 func grant_xp(amount: int) -> void:
 	xp += amount
-	while xl < 27 and xp >= xp_to_next():
+	while xl < MAX_XL and xp >= xp_to_next():
 		_level_up()
 	emit_signal("stats_changed")
 
@@ -663,19 +705,9 @@ func set_equipped_amulet(id: String) -> void:
 	emit_signal("stats_changed")
 
 func set_equipped_shield(id: String) -> void:
-	# Remove old shield EV penalty
-	if equipped_shield_id != "":
-		var old_s: ItemData = ItemRegistry.get_by_id(equipped_shield_id)
-		if old_s != null:
-			ev = maxi(0, ev - old_s.ev_penalty)
 	equipped_shield_id = id
-	# Apply new shield EV penalty
-	if id != "":
-		var new_s: ItemData = ItemRegistry.get_by_id(id)
-		if new_s != null:
-			ev = maxi(0, ev - new_s.ev_penalty)
 	_refresh_paperdoll()
-	emit_signal("stats_changed")
+	refresh_ac_from_equipment()
 
 func has_two_handed_weapon() -> bool:
 	if equipped_weapon_id == "":

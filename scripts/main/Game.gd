@@ -269,9 +269,20 @@ func _apply_class_to_player(class_id: String) -> void:
 	if data.starting_armor != "":
 		player.items.append({"id": data.starting_armor, "plus": 0})
 		player.equipped_armor_id = data.starting_armor
+	if data.starting_shield != "":
+		player.items.append({"id": data.starting_shield, "plus": 0})
+		player.equipped_shield_id = data.starting_shield
 	player.init_skills()
+	var default_active: Array = []
 	for skill_id in data.starting_skills.keys():
-		player.skills[skill_id]["level"] = int(data.starting_skills[skill_id])
+		var mapped_skill: String = skill_id
+		if mapped_skill == "stealth" or mapped_skill == "dodge":
+			mapped_skill = "agility"
+		if player.skills.has(mapped_skill):
+			player.skills[mapped_skill]["level"] = clampi(int(data.starting_skills[skill_id]), 0, Player.MAX_SKILL_LEVEL)
+			if not default_active.has(mapped_skill):
+				default_active.append(mapped_skill)
+	player.set_active_skills(_class_default_active_skills(class_id, default_active))
 	if data.starting_xl > 0:
 		player.xl = data.starting_xl
 	player.refresh_ac_from_equipment()
@@ -303,13 +314,27 @@ func _class_starter_items(class_id: String) -> Array:
 	match class_id:
 		"warrior":
 			return ["potion_healing", "potion_healing"]
+		"ranger":
+			return ["potion_healing", "bandage"]
 		"mage":
-			return ["scroll_blinking", "scroll_blinking", "potion_healing"]
-		"rogue":
-			return ["potion_healing", "scroll_blinking"]
+			return ["potion_healing", "potion_magic"]
 		"archmage":
 			return ["potion_healing", "potion_magic", "scroll_identify"]
 	return []
+
+func _class_default_active_skills(class_id: String, fallback: Array) -> Array:
+	match class_id:
+		"warrior", "berserker", "crusher", "spearman":
+			return ["melee", "defense"]
+		"ranger":
+			return ["ranged"]
+		"mage", "archmage", "conjurer", "evoker", "abjurer", "necromancer", "transmuter", "ice_mage":
+			return ["magic"]
+		"rogue", "enchanter":
+			return ["melee", "agility"]
+	if not fallback.is_empty():
+		return fallback
+	return ["melee"]
 
 func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.hp = int(data.get("hp", 22))
@@ -324,6 +349,7 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.dexterity = int(data.get("dex", 10))
 	player.intelligence = int(data.get("int", 10))
 	player.xl = int(data.get("xl", 1))
+	player.xl = clampi(player.xl, 1, Player.MAX_XL)
 	player.xp = int(data.get("xp", 0))
 	player.gold = int(data.get("gold", 0))
 	player.items = data.get("items", [])
@@ -338,10 +364,6 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 		player._apply_accessory_stat(amulet_id)
 	player.equipped_amulet_id = amulet_id
 	var shield_id: String = String(data.get("shield", ""))
-	if shield_id != "":
-		var sh: ItemData = ItemRegistry.get_by_id(shield_id)
-		if sh != null:
-			player.ev = maxi(0, player.ev - sh.ev_penalty)
 	player.equipped_shield_id = shield_id
 	player.kills = int(data.get("kills", 0))
 	player.last_killer = String(data.get("last_killer", ""))
@@ -363,15 +385,32 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.statuses = data.get("statuses", {})
 	player.resists = data.get("resists", [])
 	player.skills = data.get("skills", {})
+	player.active_skills = data.get("active_skills", [])
+	if player.skills.has("dodge") and not player.skills.has("agility"):
+		player.skills["agility"] = player.skills["dodge"]
+	player.skills.erase("dodge")
+	if player.skills.has("stealth") and not player.skills.has("agility"):
+		player.skills["agility"] = player.skills["stealth"]
+	player.skills.erase("stealth")
 	if player.skills.is_empty():
 		player.init_skills()
 	else:
-		# Ensure all skills exist at minimum level 1.
+		# Ensure all simplified skills exist and clamp legacy saves.
 		for _sk_id: String in Player.SKILL_IDS:
 			if not player.skills.has(_sk_id):
-				player.skills[_sk_id] = {"level": 1, "xp": 0.0}
-			elif int(player.skills[_sk_id].get("level", 0)) < 1:
-				player.skills[_sk_id]["level"] = 1
+				player.skills[_sk_id] = {"level": 0, "xp": 0.0}
+			else:
+				player.skills[_sk_id]["level"] = clampi(int(player.skills[_sk_id].get("level", 0)), 0, Player.MAX_SKILL_LEVEL)
+	if player.active_skills.has("dodge") and not player.active_skills.has("agility"):
+		player.active_skills.append("agility")
+	player.active_skills.erase("dodge")
+	if player.active_skills.has("stealth") and not player.active_skills.has("agility"):
+		player.active_skills.append("agility")
+	player.active_skills.erase("stealth")
+	if player.active_skills.is_empty():
+		player.set_active_skills(_class_default_active_skills(GameManager.selected_class_id, []))
+	else:
+		player.set_active_skills(player.active_skills)
 	var saved_qs = data.get("quickslots", null)
 	if saved_qs is Array:
 		for i in range(min(int(saved_qs.size()), player.quickslots.size())):
@@ -386,6 +425,7 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	var saved_ei = data.get("essence_inventory", null)
 	if saved_ei is Array:
 		player.essence_inventory = saved_ei.duplicate()
+	player.refresh_ac_from_equipment()
 	player.set_race_from_id(GameManager.selected_race_id)
 	RacePassiveSystem.register(player)
 	player._refresh_paperdoll()
@@ -680,12 +720,14 @@ func _on_minimap_tapped() -> void:
 	if body == null:
 		return
 
+	var vp_size := get_viewport().get_visible_rect().size
 	var map_rect := TextureRect.new()
 	map_rect.texture = tex
 	map_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	map_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	map_rect.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	map_rect.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	map_rect.custom_minimum_size = Vector2(vp_size.x * 0.88, vp_size.y * 0.78)
 	map_rect.mouse_filter = Control.MOUSE_FILTER_STOP
 	body.add_child(map_rect)
 
@@ -1003,7 +1045,7 @@ func _on_quickslot_pressed(index: int) -> void:
 	if spell != null:
 		if not TurnManager.is_player_turn:
 			return
-		if spell.effect == "heal" or spell.effect == "blink":
+		if spell.targeting != "single":
 			var ok: bool = MagicSystem.cast(slot_id, player, self)
 			if ok:
 				TurnManager.end_player_turn()

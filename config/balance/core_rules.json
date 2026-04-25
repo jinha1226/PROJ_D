@@ -1,23 +1,25 @@
 {
-  "version": "balance_v1",
+  "version": "balance_v2_mobile",
   "combat_pillars": {
-    "melee": "stable, no resource cost, best sustained single-target baseline",
-    "ranged": "safer than melee, slightly lower baseline damage, positioning advantage",
-    "magic": "highest flexibility and burst, controlled by mp cost and spell level",
-    "support": "low direct damage, high survival and tempo value"
+    "melee": "stable frontline damage and basic weapon mastery",
+    "ranged": "safer damage with positioning advantage and lower sustained throughput",
+    "magic": "broad utility and burst controlled by MP, books, and spell level",
+    "defense": "armor, shield, injury mitigation, and attrition resistance",
+    "agility": "evasion, detection control, ambush power, and mobility"
   },
   "rules": {
     "spell_failure": false,
-    "item_model": "fixed_base_plus_tier_plus_brand_plus_enchant",
+    "skill_model": "five_skill_mobile_core",
+    "skill_xp_source": "kill_xp_allocated_to_active_skills",
+    "skill_activation_toggle": true,
     "essence_model": "passive_only",
-    "race_role": "starting bias, not full build definition"
+    "awareness_model": "unaware_aware",
+    "item_model": "fixed_base_plus_tier_plus_brand_plus_enchant"
   },
-  "armor_magic_interaction": {
-    "rule": "wearing non-robe armor reduces spell power multiplicatively",
-    "leather_armor": "-15% spell power",
-    "chain_mail": "-35% spell power",
-    "other_heavy": "-50% spell power",
-    "design_intent": "encourages mages to stay in robes; no hard failure, just output penalty"
+  "progression": {
+    "max_xl": 20,
+    "target_xl_at_floor_25": [18, 19],
+    "max_skill_level": 9
   },
   "hard_caps": {
     "resist_max": 3,

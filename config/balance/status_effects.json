@@ -1,5 +1,5 @@
 {
-  "version": "balance_v1",
+  "version": "balance_v2_mobile",
   "status_effects": {
     "poison": { "duration_turns": [3, 5], "type": "damage_over_time" },
     "burning": { "duration_turns": [2, 4], "type": "damage_over_time" },
@@ -12,6 +12,7 @@
   },
   "rules": {
     "hard_control_soft_cap_turns": 3,
-    "long_duration_allowed_for_dot_only": true
+    "long_duration_allowed_for_dot_only": true,
+    "status_resistance_model": "resist_tags_and_monster_specific_immunities"
   }
 }

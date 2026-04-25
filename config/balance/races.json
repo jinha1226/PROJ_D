@@ -1,5 +1,5 @@
 {
-  "version": "balance_v1",
+  "version": "balance_v2_mobile",
   "design_rules": {
     "stat_mod_range": [-2, 2],
     "hp_mod_range": [-4, 6],
@@ -46,7 +46,7 @@
       "hp_mod": -2,
       "mp_mod": 0,
       "resist_mods": [],
-      "passive_tags": ["minor_stealth_bonus"]
+      "passive_tags": ["minor_agility_bonus"]
     },
     {
       "id": "troll",

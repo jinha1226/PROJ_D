@@ -6,7 +6,7 @@
 script = ExtResource("1_cdata")
 id = "rogue"
 display_name = "Rogue"
-description = "Agile. DEX-driven daggers, high dodge. Blink scrolls for escape."
+description = "Agile. DEX-driven daggers, high agility. Blink scrolls for escape."
 starting_hp = 24
 starting_mp = 4
 starting_str = 10
@@ -14,7 +14,7 @@ starting_dex = 14
 starting_int = 10
 starting_weapon = "dagger"
 starting_armor = "leather_armor"
-starting_skills = {"dagger": 3, "stealth": 2}
+starting_skills = {"melee": 3, "agility": 2}
 starting_spells = []
 passive = ""
 unlocked = true
