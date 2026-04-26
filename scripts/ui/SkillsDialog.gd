@@ -1,7 +1,7 @@
 class_name SkillsDialog extends RefCounted
 
 const _DESCRIPTIONS: Dictionary = {
-	"melee": "All melee weapons. Improves close combat damage and accuracy. Grants +3 max HP per level.",
+	"melee": "All melee weapons. Improves close combat damage and accuracy.",
 	"ranged": "Bows and thrown weapons. Improves ranged damage and accuracy.",
 	"magic": "All spells. Unlocks higher spell levels and improves spell power.",
 	"defense": "Armor and shields. Reduces armor penalty and improves blocking.",
@@ -40,7 +40,7 @@ static func _bonus_text(id: String, level: int, player: Player) -> String:
 		return "(no bonus yet)"
 	match id:
 		"melee":
-			return "+%d to-hit / +%d%% dmg / +%d max HP" % [level, level * 4, level * 3]
+			return "+%d to-hit / +%d%% dmg" % [level, level * 4]
 		"ranged":
 			return "+%d to-hit / +%d%% dmg" % [level, level * 4]
 		"magic":

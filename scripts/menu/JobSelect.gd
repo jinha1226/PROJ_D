@@ -4,7 +4,7 @@ const GAME_SCENE_PATH: String = "res://scenes/main/Game.tscn"
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 const DEFAULT_BASE_PATH: String = \
 	"res://assets/tiles/individual/player/base/human_m.png"
-const FIGHTER_START_WEAPONS: Array = ["short_sword", "mace", "spear"]
+const FIGHTER_START_WEAPONS: Array = ["short_sword", "mace", "battle_axe", "spear"]
 
 const BASE_CLASSES: Array = ["warrior", "mage", "rogue"]
 
