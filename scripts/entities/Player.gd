@@ -314,28 +314,22 @@ func use_item(index: int) -> void:
 			for sid in data.grants_spell_ids:
 				all_ids.append(String(sid))
 			var learned_count: int = 0
+			var blocked_count: int = 0
 			for sid in all_ids:
 				var sid_s: String = String(sid)
-				if not known_spells.has(sid_s):
-					known_spells.append(sid_s)
-					var sp: SpellData = SpellRegistry.get_by_id(sid_s)
-					var sname: String = sp.display_name if sp != null else sid_s
-					CombatLog.post("You learn %s." % sname, Color(0.7, 0.95, 1.0))
-					had_effect = true
+				if learn_spell(sid_s):
 					learned_count += 1
-			if learned_count == 0:
-				var dup_school: String = ""
-				for sid2 in all_ids:
-					var sp2: SpellData = SpellRegistry.get_by_id(String(sid2))
-					if sp2 != null and sp2.school != "":
-						dup_school = sp2.school
-						break
-				if dup_school != "":
-					grant_skill_xp("magic", 20.0)
-					CombatLog.post("You already know these spells. Your magic deepens.", Color(0.7, 0.85, 1.0))
 					had_effect = true
+				elif not known_spells.has(sid_s):
+					blocked_count += 1
+			if learned_count == 0:
+				if blocked_count > 0:
+					CombatLog.post("The tome is beyond your current intellect.", Color(1.0, 0.72, 0.5))
+					if data.kind == "book":
+						return
 				else:
 					CombatLog.post("You already know all spells in this tome.", Color(0.7, 0.85, 1.0))
+					had_effect = false
 		"identify":
 			items.remove_at(index)
 			emit_signal("stats_changed")
@@ -627,7 +621,7 @@ func grant_skill_xp(id: String, amount: float) -> void:
 
 func _can_offer_magic_choices() -> bool:
 	var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id)
-	return cls != null and cls.class_group == "mage"
+	return (cls != null and cls.class_group == "mage") or not known_spells.is_empty()
 
 func grant_xp(amount: int) -> void:
 	xp += amount
@@ -697,6 +691,10 @@ func learn_spell(spell_id: String) -> bool:
 	var spell: SpellData = SpellRegistry.get_by_id(sid)
 	if spell == null:
 		return false
+	var int_req: int = int_required_for_spell(spell)
+	if intelligence < int_req:
+		CombatLog.post("%s requires INT %d." % [spell.display_name, int_req], Color(1.0, 0.72, 0.5))
+		return false
 	known_spells.append(sid)
 	CombatLog.post("You memorize %s." % spell.display_name, Color(0.7, 0.95, 1.0))
 	emit_signal("stats_changed")
@@ -718,12 +716,19 @@ func _generate_magic_spell_choices(spell_level: int) -> Array:
 				continue
 			if known_spells.has(spell.id):
 				continue
+			if intelligence < int_required_for_spell(spell):
+				continue
 			candidates.append(spell.id)
 		if not candidates.is_empty():
 			candidates.shuffle()
 			choices.append(String(candidates[0]))
 	choices.shuffle()
 	return choices
+
+func int_required_for_spell(spell: SpellData) -> int:
+	if spell == null:
+		return 99
+	return 8 + max(0, spell.spell_level - 1) * 2
 
 func _chebyshev(a: Vector2i, b: Vector2i) -> int:
 	return max(abs(a.x - b.x), abs(a.y - b.y))
