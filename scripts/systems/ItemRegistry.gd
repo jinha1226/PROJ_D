@@ -163,6 +163,12 @@ func pick_floor_loot(depth: int) -> ItemData:
 		return _pick_weighted(depth, ["gold"])
 	return _pick_weighted(depth, ["weapon", "armor", "ring", "amulet", "shield"])
 
+func pick_kind(depth: int, kind: String) -> ItemData:
+	return _pick_weighted(depth, [kind])
+
+func pick_equipment(depth: int) -> ItemData:
+	return _pick_weighted(depth, ["weapon", "armor", "ring", "amulet", "shield"])
+
 func _pick_weighted(depth: int, kinds: Array[String]) -> ItemData:
 	var candidates: Array = []
 	for it in all:

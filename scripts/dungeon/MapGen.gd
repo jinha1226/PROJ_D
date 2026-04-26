@@ -5,14 +5,14 @@ class_name MapGen extends RefCounted
 ## Cross-connections added to reduce dead ends.
 ## Doors placed at room entrances (narrow passage points).
 
-const MIN_LEAF_AREA: int = 70
+const MIN_LEAF_AREA: int = 55
 const MIN_ROOM_W: int = 4
 const MIN_ROOM_H: int = 3
-const MAX_ROOM_W: int = 9
-const MAX_ROOM_H: int = 7
+const MAX_ROOM_W: int = 8
+const MAX_ROOM_H: int = 6
 const MAX_SPLIT_DEPTH: int = 4
-const SPLIT_MIN: float = 0.38
-const SPLIT_MAX: float = 0.62
+const SPLIT_MIN: float = 0.42
+const SPLIT_MAX: float = 0.58
 
 static func generate(width: int, height: int, map_seed: int = -1) -> Dictionary:
 	var rng := RandomNumberGenerator.new()

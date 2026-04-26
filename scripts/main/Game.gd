@@ -772,25 +772,68 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 		placed += 1
 
 func _spawn_items_for_floor(depth: int) -> void:
-	var count: int = randi_range(7, 11)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = _floor_seed(depth) ^ 0x3C3C3C3C
-	var placed: int = 0
-	var attempts: int = 0
-	while placed < count and attempts < 400:
-		attempts += 1
-		var p: Vector2i = map.random_floor_tile(rng)
-		if not map.is_walkable(p):
+
+	# Build the item list to place this floor.
+	var to_place: Array[ItemData] = []
+
+	# ── Per-floor random drops ──────────────────────────────────────────
+	for _i in range(rng.randi_range(1, 3)):
+		var d: ItemData = ItemRegistry.pick_kind(depth, "potion")
+		if d != null: to_place.append(d)
+	for _i in range(rng.randi_range(1, 3)):
+		var d: ItemData = ItemRegistry.pick_kind(depth, "scroll")
+		if d != null: to_place.append(d)
+	for _i in range(rng.randi_range(1, 2)):
+		var d: ItemData = ItemRegistry.pick_equipment(depth)
+		if d != null: to_place.append(d)
+
+	# ── Sector guaranteed drops (sector = 3-floor block) ───────────────
+	# Distribute so sector total = 2-3 enhance scrolls, 1-2 wands, 2-3 healing potions.
+	const ENHANCE_SCROLLS: Array = [
+		"scroll_enchant_weapon", "scroll_enchant_armor", "scroll_upgrade"
+	]
+	var floor_in_sector: int = (depth - 1) % 3  # 0, 1, or 2
+	if floor_in_sector == 0:
+		# Floor 1: healing + enhance scroll + wand
+		to_place.append(ItemRegistry.get_by_id("potion_healing"))
+		to_place.append(ItemRegistry.get_by_id(ENHANCE_SCROLLS[rng.randi() % 3]))
+		var wd: ItemData = ItemRegistry.pick_kind(depth, "wand")
+		if wd != null: to_place.append(wd)
+	elif floor_in_sector == 1:
+		# Floor 2: healing + enhance scroll
+		to_place.append(ItemRegistry.get_by_id("potion_healing"))
+		to_place.append(ItemRegistry.get_by_id(ENHANCE_SCROLLS[rng.randi() % 3]))
+	else:
+		# Floor 3: 50% each for extra healing / enhance scroll / wand
+		if rng.randf() < 0.5:
+			to_place.append(ItemRegistry.get_by_id("potion_healing"))
+		if rng.randf() < 0.5:
+			to_place.append(ItemRegistry.get_by_id(ENHANCE_SCROLLS[rng.randi() % 3]))
+		if rng.randf() < 0.5:
+			var wd: ItemData = ItemRegistry.pick_kind(depth, "wand")
+			if wd != null: to_place.append(wd)
+
+	# ── Guaranteed essence per floor ────────────────────────────────────
+	_queue_essence_pickup(EssenceSystem.random_id())
+
+	# ── Place all items on random floor tiles ───────────────────────────
+	for item in to_place:
+		if item == null:
 			continue
-		if p == player.grid_pos:
-			continue
-		if _item_at(p) != null:
-			continue
-		var data: ItemData = ItemRegistry.pick_floor_loot(depth)
-		if data == null:
-			return
-		_spawn_floor_item(data, p, 0)
-		placed += 1
+		var attempts: int = 0
+		while attempts < 40:
+			attempts += 1
+			var p: Vector2i = map.random_floor_tile(rng)
+			if not map.is_walkable(p):
+				continue
+			if p == player.grid_pos:
+				continue
+			if _item_at(p) != null:
+				continue
+			_spawn_floor_item(item, p, 0)
+			break
 
 func _spawn_floor_item(data: ItemData, pos: Vector2i, plus: int) -> void:
 	if items_layer == null:
