@@ -501,6 +501,13 @@ func _try_open_spell_choice_popup() -> void:
 	if spell_ids.is_empty():
 		_try_open_spell_choice_popup()
 		return
+	if GameManager.simulation_mode:
+		if player != null:
+			for sid in spell_ids:
+				if player.learn_spell(String(sid)):
+					break
+		_try_open_spell_choice_popup()
+		return
 	_spell_choice_popup_open = true
 	var popup := PopupManager.new()
 	add_child(popup)
@@ -925,9 +932,11 @@ func _try_respawn_monster() -> void:
 func _on_player_died() -> void:
 	CombatLog.post("You have died.", Color(1.0, 0.4, 0.4))
 	var shards: int = max(1, GameManager.depth * 2 + player.xl * 3)
-	GameManager.add_rune_shards(shards)
+	if not GameManager.simulation_mode:
+		GameManager.add_rune_shards(shards)
 	GameManager.end_run("death")
-	_show_result_screen(false, shards)
+	if not GameManager.simulation_mode:
+		_show_result_screen(false, shards)
 
 func _show_result_screen(victory: bool, shards: int) -> void:
 	var res = ResultScreenScene.instantiate()
@@ -971,7 +980,8 @@ func _on_stairs_down() -> void:
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
-	SaveManager.save_run(player, GameManager)
+	if not GameManager.simulation_mode:
+		SaveManager.save_run(player, GameManager)
 	TurnManager.end_player_turn()
 
 func _on_stairs_up() -> void:
@@ -990,7 +1000,8 @@ func _on_stairs_up() -> void:
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
-	SaveManager.save_run(player, GameManager)
+	if not GameManager.simulation_mode:
+		SaveManager.save_run(player, GameManager)
 	TurnManager.end_player_turn()
 
 func _travel_to_floor(target_depth: int) -> void:
@@ -1010,7 +1021,8 @@ func _travel_to_floor(target_depth: int) -> void:
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
-	SaveManager.save_run(player, GameManager)
+	if not GameManager.simulation_mode:
+		SaveManager.save_run(player, GameManager)
 	TurnManager.end_player_turn()
 
 func _on_item_dropped(item_id: String, at_pos: Vector2i, plus: int) -> void:
