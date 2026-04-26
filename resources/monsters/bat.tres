@@ -23,3 +23,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/animals/bat.png"
 glyph = "b"
 glyph_color = Color(0.55, 0.35, 0.35, 1)
+essence_id = "essence_swiftness"

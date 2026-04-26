@@ -911,6 +911,8 @@ func tick_statuses() -> void:
 func equip_essence(slot: int, essence_id: String) -> void:
 	if slot < 0 or slot >= essence_slots.size():
 		return
+	if not EssenceSystem.slot_is_unlocked(self, slot):
+		return
 	var old: String = String(essence_slots[slot])
 	if old != "":
 		EssenceSystem.remove(self, old)
@@ -922,6 +924,10 @@ func equip_essence(slot: int, essence_id: String) -> void:
 	emit_signal("stats_changed")
 
 func add_essence(essence_id: String) -> void:
+	if essence_id == "" or essence_inventory.has(essence_id):
+		return
+	if essence_slots.has(essence_id):
+		return
 	essence_inventory.append(essence_id)
 	emit_signal("stats_changed")
 

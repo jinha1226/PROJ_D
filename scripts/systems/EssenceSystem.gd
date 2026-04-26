@@ -3,7 +3,10 @@ class_name EssenceSystem extends RefCounted
 ## Passive essence system. Essences can grant flat bonuses, recurring effects,
 ## or conditional passives such as on-hit / on-kill triggers.
 
+static var TurnManager = Engine.get_main_loop().root.get_node_or_null("/root/TurnManager") if Engine.get_main_loop() is SceneTree else null
+
 const SLOT_COUNT: int = 3
+const SLOT_UNLOCK_LEVELS: Array = [1, 8, 16]
 
 const ESSENCES: Dictionary = {
 	"essence_fire": {
@@ -24,62 +27,62 @@ const ESSENCES: Dictionary = {
 	},
 	"essence_might": {
 		"name": "War Essence",
-		"desc": "+3 Strength.",
+		"desc": "+2 Strength.",
 		"passive_desc": "Flat strength bonus.",
 		"passive_effect": "",
 		"color": Color(1.0, 0.45, 0.3),
 		"effect": "stat_str",
-		"value": 3,
+		"value": 2,
 	},
 	"essence_arcana": {
 		"name": "Arcane Essence",
-		"desc": "+3 Intelligence.",
+		"desc": "+2 Intelligence.",
 		"passive_desc": "Flat intelligence bonus.",
 		"passive_effect": "",
 		"color": Color(0.5, 0.7, 1.0),
 		"effect": "stat_int",
-		"value": 3,
+		"value": 2,
 	},
 	"essence_swiftness": {
 		"name": "Swift Essence",
-		"desc": "+2 Dexterity, +1 Evasion.",
+		"desc": "+1 Dexterity, +1 Evasion.",
 		"passive_desc": "Flat agility bonus.",
 		"passive_effect": "",
 		"color": Color(0.4, 1.0, 0.65),
 		"effect": "stat_dex",
-		"value": 2,
+		"value": 1,
 	},
 	"essence_vitality": {
 		"name": "Life Essence",
-		"desc": "+20 maximum HP.",
-		"passive_desc": "Restore 3 HP on kill.",
+		"desc": "+8 maximum HP.",
+		"passive_desc": "Restore 2 HP on kill.",
 		"passive_effect": "on_kill_heal",
 		"color": Color(0.5, 1.0, 0.55),
 		"effect": "hp_max",
-		"value": 20,
+		"value": 8,
 	},
 	"essence_stone": {
 		"name": "Stone Essence",
-		"desc": "+5 Armor Class.",
+		"desc": "+2 Armor Class.",
 		"passive_desc": "Flat armor bonus.",
 		"passive_effect": "",
 		"color": Color(0.8, 0.8, 0.65),
 		"effect": "ac_bonus",
-		"value": 5,
+		"value": 2,
 	},
 	"essence_warding": {
 		"name": "Ward Essence",
-		"desc": "+8 Will.",
+		"desc": "+5 Will.",
 		"passive_desc": "Flat will bonus.",
 		"passive_effect": "",
 		"color": Color(0.75, 0.5, 1.0),
 		"effect": "wl_bonus",
-		"value": 8,
+		"value": 5,
 	},
 	"essence_regeneration": {
 		"name": "Regen Essence",
-		"desc": "Recover 1 HP per turn.",
-		"passive_desc": "Regenerate 1 HP each turn.",
+		"desc": "Recover 1 HP every few turns.",
+		"passive_desc": "Regenerate slowly over time.",
 		"passive_effect": "regen",
 		"color": Color(0.6, 1.0, 0.7),
 		"effect": "regen",
@@ -112,6 +115,18 @@ const ESSENCES: Dictionary = {
 
 static func all_ids() -> Array:
 	return ESSENCES.keys()
+
+static func active_slot_count(player: Player) -> int:
+	if player == null:
+		return 1
+	var count: int = 0
+	for needed_xl in SLOT_UNLOCK_LEVELS:
+		if player.xl >= int(needed_xl):
+			count += 1
+	return clampi(count, 1, SLOT_COUNT)
+
+static func slot_is_unlocked(player: Player, slot_index: int) -> bool:
+	return slot_index >= 0 and slot_index < active_slot_count(player)
 
 static func display_name(id: String) -> String:
 	return String(ESSENCES.get(id, {}).get("name", id))
@@ -190,9 +205,12 @@ static func remove(player: Player, essence_id: String) -> void:
 	player.emit_signal("stats_changed")
 
 static func tick(player: Player) -> void:
+	var regen_count: int = 0
 	for slot in player.essence_slots:
-		if slot == "essence_regeneration" and player.hp < player.hp_max:
-			player.heal(1)
+		if slot == "essence_regeneration":
+			regen_count += 1
+	if regen_count > 0 and player.hp < player.hp_max and TurnManager.turn_count % 3 == 0:
+		player.heal(regen_count)
 
 static func has_venom_touch(player: Player) -> bool:
 	return player.essence_slots.has("essence_venom")
@@ -218,8 +236,8 @@ static func apply_on_kill_effects(player: Player) -> void:
 	for slot in player.essence_slots:
 		var effect_id: String = passive_effect(slot)
 		if effect_id == "on_kill_heal":
-			player.heal(3)
+			player.heal(2)
 		elif effect_id == "on_kill_fury":
 			Status.apply(player, "damage_boost", 1)
 		elif effect_id == "on_kill_drain":
-			player.heal(5)
+			player.heal(4)

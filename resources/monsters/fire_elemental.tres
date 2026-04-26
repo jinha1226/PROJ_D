@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/nonliving/fire_elemental.png"
 glyph = "E"
 glyph_color = Color(0.95, 0.45, 0.1, 1)
+essence_id = "essence_fire"

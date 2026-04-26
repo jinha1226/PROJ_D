@@ -451,6 +451,10 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	if saved_es is Array:
 		for i in range(mini(int(saved_es.size()), player.essence_slots.size())):
 			var eid: String = String(saved_es[i])
+			if not EssenceSystem.slot_is_unlocked(player, i):
+				if eid != "":
+					player.essence_inventory.append(eid)
+				continue
 			player.essence_slots[i] = eid
 			if eid != "":
 				EssenceSystem.apply(player, eid)
@@ -1315,7 +1319,8 @@ func _greedy_step_toward(target: Vector2i) -> Vector2i:
 func _on_monster_died(monster: Monster) -> void:
 	if player == null or player.hp <= 0:
 		return
-	var chance: float = 0.08 + GameManager.depth * 0.005
+	var chance: float = 0.14 + GameManager.depth * 0.006
+	chance = min(chance, 0.28)
 	if randf() < chance:
 		var essence_id: String
 		if monster != null and monster.data != null and String(monster.data.essence_id) != "":

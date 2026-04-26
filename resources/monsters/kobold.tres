@@ -23,3 +23,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/kobold.png"
 glyph = "K"
 glyph_color = Color(0.55, 0.7, 0.45, 1)
+essence_id = "essence_swiftness"

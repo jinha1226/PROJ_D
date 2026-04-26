@@ -159,8 +159,10 @@ static func _build_resists(body: VBoxContainer, player: Player) -> void:
 		body.add_child(_resist_row(elem, lvl))
 
 static func _build_essence(body: VBoxContainer, player: Player) -> void:
+	var unlocked_slots: int = EssenceSystem.active_slot_count(player)
 	for i in range(EssenceSystem.SLOT_COUNT):
 		var slot_id: String = String(player.essence_slots[i]) if i < player.essence_slots.size() else ""
+		var slot_unlocked: bool = i < unlocked_slots
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
 
@@ -176,7 +178,10 @@ static func _build_essence(body: VBoxContainer, player: Player) -> void:
 		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		name_lbl.add_theme_font_size_override("font_size", 24)
-		if slot_id != "":
+		if not slot_unlocked:
+			name_lbl.text = "(locked)"
+			name_lbl.add_theme_color_override("font_color", Color(0.4, 0.4, 0.45))
+		elif slot_id != "":
 			name_lbl.text = EssenceSystem.display_name(slot_id)
 			name_lbl.add_theme_color_override("font_color", EssenceSystem.color_of(slot_id))
 		else:
@@ -188,10 +193,17 @@ static func _build_essence(body: VBoxContainer, player: Player) -> void:
 		swap_btn.text = "Swap"
 		swap_btn.custom_minimum_size = Vector2(90, 44)
 		swap_btn.add_theme_font_size_override("font_size", 20)
+		swap_btn.disabled = not slot_unlocked
 		var slot_idx := i
 		swap_btn.pressed.connect(func(): _open_essence_swap(slot_idx, player, body))
 		row.add_child(swap_btn)
 		body.add_child(row)
+
+	var unlock_lbl := Label.new()
+	unlock_lbl.text = "Slots unlock at XL 1 / 8 / 16. Current: %d/%d" % [unlocked_slots, EssenceSystem.SLOT_COUNT]
+	unlock_lbl.add_theme_font_size_override("font_size", 18)
+	unlock_lbl.add_theme_color_override("font_color", Color(0.6, 0.66, 0.72))
+	body.add_child(unlock_lbl)
 
 	if player.essence_inventory.is_empty():
 		var inv_lbl := Label.new()
@@ -211,6 +223,8 @@ static func _build_essence(body: VBoxContainer, player: Player) -> void:
 
 
 static func _open_essence_swap(slot: int, player: Player, body: VBoxContainer) -> void:
+	if not EssenceSystem.slot_is_unlocked(player, slot):
+		return
 	var dlg: GameDialog = GameDialog.create_ratio("Swap Essence Slot %d" % (slot + 1), 0.75, 0.85)
 	body.get_tree().current_scene.add_child(dlg)
 	var swap_body: VBoxContainer = dlg.body()

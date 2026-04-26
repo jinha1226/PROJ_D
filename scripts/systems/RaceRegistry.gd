@@ -1,5 +1,7 @@
 extends Node
 
+const ACTIVE_RACE_IDS: Array = ["human", "orc", "elf", "kobold", "troll", "tiefling"]
+
 const _HUMAN: Resource = preload("res://resources/races/human.tres")
 const _KOBOLD: Resource = preload("res://resources/races/kobold.tres")
 const _ORC: Resource = preload("res://resources/races/orc.tres")
@@ -36,16 +38,15 @@ func get_by_id(id: String) -> RaceData:
 	return by_id.get(id)
 
 func ids_in_order() -> Array:
-	var known: Array = ["human", "kobold", "orc", "elf", "troll", "minotaur",
-		"halfling", "dwarf", "tiefling", "spriggan", "vampire"]
+	var known: Array = ACTIVE_RACE_IDS.duplicate()
 	var result: Array = []
 	for id in known:
 		if by_id.has(id):
 			result.append(id)
-	for id in by_id.keys():
-		if not result.has(id):
-			result.append(id)
 	return result
+
+func active_race_ids() -> Array:
+	return ACTIVE_RACE_IDS.duplicate()
 
 func is_unlocked(id: String) -> bool:
 	var r: RaceData = get_by_id(id)

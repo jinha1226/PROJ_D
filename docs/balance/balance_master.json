@@ -412,7 +412,8 @@
     "slots": {
       "early": 1,
       "mid": 2,
-      "late": 3
+      "late": 3,
+      "unlock_xl": [1, 8, 16]
     },
     "categories": {
       "numeric": {
