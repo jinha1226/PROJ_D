@@ -14,10 +14,6 @@ const MAX_SPLIT_DEPTH: int = 4
 const SPLIT_MIN: float = 0.38
 const SPLIT_MAX: float = 0.62
 
-# Temporary tile value used during generation to distinguish corridors from rooms.
-# Converted to FLOOR (or DOOR) in post-process.
-const _COR: int = 6
-
 static func generate(width: int, height: int, map_seed: int = -1) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = map_seed if map_seed >= 0 else randi()
@@ -38,9 +34,8 @@ static func generate(width: int, height: int, map_seed: int = -1) -> Dictionary:
 		_connect_rooms(rooms[i], rooms[i + 1], tiles, width, rng)
 	# Extra cross-connections between close non-adjacent rooms → fewer dead ends.
 	_add_cross_connections(rooms, tiles, width, rng)
-	# Place doors at room entrances, then flush _COR → FLOOR.
+	# Place doors at narrow room entrances.
 	_place_doors(rooms, tiles, width, height)
-	_flush_corridors(tiles, width, height)
 	var spawn := rooms[0].get_center()
 	var stairs_down := _farthest_floor(spawn, tiles, width, height)
 	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
@@ -174,7 +169,7 @@ static func _try_place_door(x: int, y: int, tiles: PackedByteArray,
 		width: int, height: int) -> void:
 	if x < 1 or y < 1 or x >= width - 1 or y >= height - 1:
 		return
-	if tiles[y * width + x] != _COR:
+	if tiles[y * width + x] != DungeonMap.Tile.FLOOR:
 		return
 	# Only place door where walls flank on the perpendicular axis
 	# (ensures it's a 1-tile-wide passage, not an open area).
@@ -188,11 +183,6 @@ static func _try_place_door(x: int, y: int, tiles: PackedByteArray,
 	if h_pass or v_pass:
 		tiles[y * width + x] = DungeonMap.Tile.DOOR_CLOSED
 
-static func _flush_corridors(tiles: PackedByteArray, width: int, height: int) -> void:
-	for i in tiles.size():
-		if tiles[i] == _COR:
-			tiles[i] = DungeonMap.Tile.FLOOR
-
 # ── Carve helpers ──────────────────────────────────────────────────────────
 
 static func _carve_h(y: int, x0: int, x1: int,
@@ -200,14 +190,14 @@ static func _carve_h(y: int, x0: int, x1: int,
 	var lo := min(x0, x1); var hi := max(x0, x1)
 	for x in range(lo, hi + 1):
 		if tiles[y * width + x] == DungeonMap.Tile.WALL:
-			tiles[y * width + x] = _COR
+			tiles[y * width + x] = DungeonMap.Tile.FLOOR
 
 static func _carve_v(x: int, y0: int, y1: int,
 		tiles: PackedByteArray, width: int) -> void:
 	var lo := min(y0, y1); var hi := max(y0, y1)
 	for y in range(lo, hi + 1):
 		if tiles[y * width + x] == DungeonMap.Tile.WALL:
-			tiles[y * width + x] = _COR
+			tiles[y * width + x] = DungeonMap.Tile.FLOOR
 
 # ── BFS farthest floor ─────────────────────────────────────────────────────
 
