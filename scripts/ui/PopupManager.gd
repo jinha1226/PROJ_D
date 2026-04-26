@@ -35,7 +35,7 @@ func show_essence_swap_popup(slot_index: int, current_id: String, inventory: Arr
 	vb.add_child(HSeparator.new())
 	for essence_id in inventory:
 		var b := Button.new()
-		b.text = str(essence_id)
+		b.text = EssenceSystem.display_name(String(essence_id))
 		b.pressed.connect(func():
 			if callback.is_valid(): callback.call(essence_id)
 			dlg.queue_free())
@@ -52,6 +52,60 @@ func show_essence_swap_popup(slot_index: int, current_id: String, inventory: Arr
 	dlg.confirmed.connect(func(): dlg.queue_free())
 	dlg.canceled.connect(func(): dlg.queue_free())
 	dlg.popup_centered(Vector2i(480, 600))
+
+func show_essence_pickup_popup(essence_id: String, inventory: Array, cap: int, callbacks: Dictionary) -> void:
+	var dlg := AcceptDialog.new()
+	dlg.title = EssenceSystem.display_name(essence_id)
+	dlg.dialog_hide_on_ok = false
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 10)
+	var desc := Label.new()
+	desc.text = EssenceSystem.description(essence_id)
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	desc.add_theme_font_size_override("font_size", 24)
+	vb.add_child(desc)
+	var inv := Label.new()
+	inv.text = "Carried essences: %d / %d" % [inventory.size(), cap]
+	inv.add_theme_font_size_override("font_size", 18)
+	inv.add_theme_color_override("font_color", Color(0.68, 0.72, 0.8))
+	vb.add_child(inv)
+	if inventory.size() < cap:
+		var take_btn := Button.new()
+		take_btn.text = "Take"
+		take_btn.custom_minimum_size = Vector2(0, 60)
+		take_btn.pressed.connect(func():
+			if callbacks.has("take"):
+				callbacks["take"].call()
+			dlg.queue_free())
+		vb.add_child(take_btn)
+	else:
+		var full := Label.new()
+		full.text = "Inventory full. Replace one carried essence or leave it behind."
+		full.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		full.add_theme_font_size_override("font_size", 20)
+		full.add_theme_color_override("font_color", Color(1.0, 0.76, 0.48))
+		vb.add_child(full)
+		for existing_id in inventory:
+			var swap_btn := Button.new()
+			swap_btn.text = "Replace %s" % EssenceSystem.display_name(String(existing_id))
+			swap_btn.custom_minimum_size = Vector2(0, 56)
+			swap_btn.pressed.connect(func():
+				if callbacks.has("replace"):
+					callbacks["replace"].call(String(existing_id))
+				dlg.queue_free())
+			vb.add_child(swap_btn)
+	var leave_btn := Button.new()
+	leave_btn.text = "Leave"
+	leave_btn.custom_minimum_size = Vector2(0, 56)
+	leave_btn.pressed.connect(func():
+		if callbacks.has("leave"):
+			callbacks["leave"].call()
+		dlg.queue_free())
+	vb.add_child(leave_btn)
+	dlg.add_child(vb)
+	dlg.get_ok_button().visible = false
+	add_child(dlg)
+	dlg.popup_centered(Vector2i(760, 720))
 
 func show_levelup_popup(level: int, callback: Callable) -> void:
 	var dlg := AcceptDialog.new()

@@ -14,7 +14,7 @@
       "skill_model": "five_skill_mobile_core_current_main",
       "skill_xp_source": "kill_xp_allocated_to_active_skills",
       "skill_activation_toggle": true,
-      "essence_model": "passive_only",
+      "essence_model": "resonance_passive_with_penalty",
       "awareness_model": "unaware_aware",
       "item_model": "fixed_base_plus_tier_plus_brand_plus_enchant"
     }
@@ -409,6 +409,8 @@
     }
   },
   "essence_system": {
+    "model": "resonance_passive_with_penalty",
+    "inventory_cap": 4,
     "slots": {
       "early": 1,
       "mid": 2,
@@ -434,7 +436,7 @@
     "per_essence_budget": {
       "major_benefit_count": 1,
       "minor_benefit_count": 1,
-      "optional_penalty_count": 1
+      "required_penalty_count": 1
     },
     "caps": {
       "max_resistance_level": 3,
@@ -442,6 +444,19 @@
       "max_mp_regen_per_turn": 1,
       "max_single_essence_primary_stat_bonus": 2,
       "max_single_essence_ac_or_ev_bonus": 2
+    },
+    "pickup_flow": {
+      "auto_collect": false,
+      "decision_required": true,
+      "replace_when_full": true
+    },
+    "resonance_pairs": [
+      "fire+arcana",
+      "cold+arcana",
+      "arcana+warding",
+      "swiftness+venom",
+      "stone+vitality",
+      "fury+drain"
     }
   },
   "races": {

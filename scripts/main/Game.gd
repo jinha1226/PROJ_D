@@ -37,6 +37,8 @@ var _targeting_tiles: Array = []
 var _targeting_node: SpellTargetOverlay = null
 var _pending_spell_choices: Array = []
 var _spell_choice_popup_open: bool = false
+var _pending_essence_pickups: Array = []
+var _essence_pickup_popup_open: bool = false
 
 # Auto-walk state — when the player taps a distant explored tile,
 # we enqueue a BFS path here and step one tile each player turn
@@ -511,7 +513,7 @@ func _on_spell_choices_requested(spell_level: int, spell_ids: Array) -> void:
 	_try_open_spell_choice_popup()
 
 func _try_open_spell_choice_popup() -> void:
-	if _spell_choice_popup_open or _pending_spell_choices.is_empty():
+	if _spell_choice_popup_open or _essence_pickup_popup_open or _pending_spell_choices.is_empty():
 		return
 	var entry: Dictionary = _pending_spell_choices.pop_front()
 	var spell_level: int = int(entry.get("level", 1))
@@ -529,7 +531,65 @@ func _try_open_spell_choice_popup() -> void:
 		if is_instance_valid(popup):
 			popup.queue_free()
 		_try_open_spell_choice_popup()
+		_try_open_essence_pickup_popup()
 	)
+
+func _queue_essence_pickup(essence_id: String) -> void:
+	if player == null or essence_id == "":
+		return
+	if player.essence_slots.has(essence_id) or player.essence_inventory.has(essence_id):
+		CombatLog.post("An essence fades away. (%s)" % EssenceSystem.display_name(essence_id),
+			Color(0.6, 0.55, 0.7))
+		return
+	_pending_essence_pickups.append(essence_id)
+	_try_open_essence_pickup_popup()
+
+func _try_open_essence_pickup_popup() -> void:
+	if _essence_pickup_popup_open or _spell_choice_popup_open or _pending_essence_pickups.is_empty():
+		return
+	if player == null:
+		_pending_essence_pickups.clear()
+		return
+	var essence_id: String = String(_pending_essence_pickups.pop_front())
+	if essence_id == "" or player.essence_slots.has(essence_id) or player.essence_inventory.has(essence_id):
+		_try_open_essence_pickup_popup()
+		return
+	_essence_pickup_popup_open = true
+	var popup := PopupManager.new()
+	add_child(popup)
+	var take_cb := func() -> void:
+		if player != null and player.add_essence(essence_id):
+			CombatLog.post("You claim %s." % EssenceSystem.display_name(essence_id),
+				Color(0.82, 0.64, 1.0))
+		_close_essence_pickup_popup(popup)
+	var replace_cb := func(replaced_id: String) -> void:
+		if player != null and player.replace_inventory_essence(replaced_id, essence_id):
+			CombatLog.post("You leave %s and take %s." % [
+				EssenceSystem.display_name(replaced_id),
+				EssenceSystem.display_name(essence_id),
+			], Color(0.82, 0.64, 1.0))
+		_close_essence_pickup_popup(popup)
+	var leave_cb := func() -> void:
+		CombatLog.post("You leave %s behind." % EssenceSystem.display_name(essence_id),
+			Color(0.62, 0.62, 0.72))
+		_close_essence_pickup_popup(popup)
+	popup.show_essence_pickup_popup(
+		essence_id,
+		player.essence_inventory.duplicate(),
+		EssenceSystem.inventory_capacity(player),
+		{
+			"take": take_cb,
+			"replace": replace_cb,
+			"leave": leave_cb,
+		}
+	)
+
+func _close_essence_pickup_popup(popup: PopupManager) -> void:
+	_essence_pickup_popup_open = false
+	if is_instance_valid(popup):
+		popup.queue_free()
+	_try_open_spell_choice_popup()
+	_try_open_essence_pickup_popup()
 
 const ZOOM_MIN: float = 0.7
 const ZOOM_MAX: float = 2.2
@@ -1327,9 +1387,9 @@ func _on_monster_died(monster: Monster) -> void:
 			essence_id = String(monster.data.essence_id)
 		else:
 			essence_id = EssenceSystem.random_id()
-		player.add_essence(essence_id)
 		CombatLog.post("An essence materializes! (%s)" % EssenceSystem.display_name(essence_id),
 			Color(0.8, 0.6, 1.0))
+		_queue_essence_pickup(essence_id)
 
 func _on_monster_hit(amount: int, monster: Monster) -> void:
 	if not is_instance_valid(monster):

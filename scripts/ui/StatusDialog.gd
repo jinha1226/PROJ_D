@@ -207,7 +207,7 @@ static func _build_essence(body: VBoxContainer, player: Player) -> void:
 
 	if player.essence_inventory.is_empty():
 		var inv_lbl := Label.new()
-		inv_lbl.text = "Inventory: (none)"
+		inv_lbl.text = "Inventory: 0/%d (none)" % EssenceSystem.inventory_capacity(player)
 		inv_lbl.add_theme_font_size_override("font_size", 20)
 		inv_lbl.add_theme_color_override("font_color", Color(0.5, 0.5, 0.55))
 		body.add_child(inv_lbl)
@@ -215,11 +215,28 @@ static func _build_essence(body: VBoxContainer, player: Player) -> void:
 		var names: Array = player.essence_inventory.map(
 			func(id): return EssenceSystem.display_name(id))
 		var inv_lbl := Label.new()
-		inv_lbl.text = "Inventory: " + ", ".join(names)
+		inv_lbl.text = "Inventory: %d/%d  " % [
+			player.essence_inventory.size(),
+			EssenceSystem.inventory_capacity(player),
+		] + ", ".join(names)
 		inv_lbl.add_theme_font_size_override("font_size", 20)
 		inv_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		inv_lbl.add_theme_color_override("font_color", Color(0.7, 0.75, 0.8))
 		body.add_child(inv_lbl)
+	var synergies: Array = EssenceSystem.active_synergies(player)
+	if not synergies.is_empty():
+		var sync_hdr := Label.new()
+		sync_hdr.text = "Resonance"
+		sync_hdr.add_theme_font_size_override("font_size", 20)
+		sync_hdr.add_theme_color_override("font_color", Color(0.92, 0.82, 0.56))
+		body.add_child(sync_hdr)
+		for line in synergies:
+			var syn_lbl := Label.new()
+			syn_lbl.text = "- %s" % String(line)
+			syn_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			syn_lbl.add_theme_font_size_override("font_size", 18)
+			syn_lbl.add_theme_color_override("font_color", Color(0.75, 0.78, 0.88))
+			body.add_child(syn_lbl)
 
 
 static func _open_essence_swap(slot: int, player: Player, body: VBoxContainer) -> void:

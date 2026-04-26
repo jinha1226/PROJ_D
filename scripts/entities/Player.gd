@@ -557,6 +557,8 @@ func refresh_ac_from_equipment() -> void:
 		ev -= shield.ev_penalty
 	if has_status("mage_armor"):
 		ac = max(ac, 13 + dexterity / 2)
+	ac += EssenceSystem.bonus_ac(self)
+	ev += EssenceSystem.bonus_ev(self)
 	ev = max(0, ev)
 	emit_signal("stats_changed")
 
@@ -677,6 +679,7 @@ func take_damage(amount: int, source: String = "") -> void:
 			injury_gain = maxi(0, injury_gain - (1 if amount < 10 else 0))
 	var defense_level: int = get_skill_level("defense")
 	injury_gain = maxi(0, injury_gain - int(defense_level / 3))
+	injury_gain = maxi(0, injury_gain - EssenceSystem.injury_reduction(self))
 	if amount >= 12:
 		injury_gain += 1
 	injury = min(hp_max - 1, injury + injury_gain)
@@ -914,6 +917,11 @@ func equip_essence(slot: int, essence_id: String) -> void:
 	if not EssenceSystem.slot_is_unlocked(self, slot):
 		return
 	var old: String = String(essence_slots[slot])
+	if old == essence_id:
+		return
+	if old != "" and essence_id == "" and EssenceSystem.inventory_is_full(self):
+		CombatLog.post("Your essence inventory is full.", Color(1.0, 0.72, 0.5))
+		return
 	if old != "":
 		EssenceSystem.remove(self, old)
 		essence_inventory.append(old)
@@ -923,13 +931,35 @@ func equip_essence(slot: int, essence_id: String) -> void:
 	essence_slots[slot] = essence_id
 	emit_signal("stats_changed")
 
-func add_essence(essence_id: String) -> void:
-	if essence_id == "" or essence_inventory.has(essence_id):
-		return
+func can_add_essence(essence_id: String) -> bool:
+	if essence_id == "":
+		return false
+	if essence_inventory.has(essence_id):
+		return false
 	if essence_slots.has(essence_id):
-		return
+		return false
+	return essence_inventory.size() < EssenceSystem.inventory_capacity(self)
+
+func add_essence(essence_id: String) -> bool:
+	if not can_add_essence(essence_id):
+		return false
 	essence_inventory.append(essence_id)
 	emit_signal("stats_changed")
+	return true
+
+func replace_inventory_essence(old_id: String, new_id: String) -> bool:
+	if old_id == "" or new_id == "":
+		return false
+	if not essence_inventory.has(old_id):
+		return false
+	if essence_inventory.has(new_id) or essence_slots.has(new_id):
+		return false
+	var idx: int = essence_inventory.find(old_id)
+	if idx < 0:
+		return false
+	essence_inventory[idx] = new_id
+	emit_signal("stats_changed")
+	return true
 
 func apply_berserk(turns: int) -> void:
 	Status.apply(self, "berserk", turns)

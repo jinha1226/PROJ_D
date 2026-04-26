@@ -283,7 +283,8 @@ static func _armor_spell_mult(player: Player) -> float:
 
 static func _compute_power(player: Player, spell: SpellData) -> int:
 	var skill: int = player.get_skill_level("magic")
-	return int(float(player.intelligence) * (1.0 + float(skill) * 0.06) * _armor_spell_mult(player))
+	var base: int = int(float(player.intelligence) * (1.0 + float(skill) * 0.06) * _armor_spell_mult(player))
+	return base + EssenceSystem.spell_power_bonus(player, spell)
 
 
 static func _apply_element_bonus(spell: SpellData, target: Monster, dmg: int) -> int:
