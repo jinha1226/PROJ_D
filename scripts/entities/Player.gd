@@ -376,6 +376,45 @@ func use_item(index: int) -> void:
 			if game_sil != null and game_sil.has_method("apply_silence_aoe"):
 				game_sil.apply_silence_aoe(grid_pos, 6, data.effect_value)
 			CombatLog.post("Silence falls upon your foes.", Color(0.7, 0.85, 1.0))
+		"scroll_immolation":
+			var game_imm: Node = get_tree().current_scene if get_tree() != null else null
+			if game_imm != null and game_imm.has_method("apply_immolation_aoe"):
+				game_imm.apply_immolation_aoe(grid_pos, data.effect_value)
+			else:
+				var imm_map = _map
+				if imm_map != null:
+					for eid in imm_map.entities:
+						var ent = imm_map.entities[eid]
+						if ent == self:
+							continue
+						if not imm_map.visible_tiles.has(ent.grid_pos):
+							continue
+						ent.take_damage(data.effect_value, "fire")
+			CombatLog.post("Nearby enemies burst into flame!", Color(1.0, 0.5, 0.1))
+		"scroll_noise":
+			var game_ns: Node = get_tree().current_scene if get_tree() != null else null
+			if game_ns != null and game_ns.has_method("alert_all_monsters"):
+				game_ns.alert_all_monsters()
+			else:
+				var ns_map = _map
+				if ns_map != null:
+					for eid in ns_map.entities:
+						var ent = ns_map.entities[eid]
+						if ent != self and ent.has_method("alert"):
+							ent.alert(grid_pos)
+			CombatLog.post("A loud noise echoes through the dungeon!", Color(1.0, 0.8, 0.4))
+		"resistance":
+			apply_status("resist_fire", data.effect_value)
+			apply_status("resist_cold", data.effect_value)
+			apply_status("resist_poison", data.effect_value)
+			CombatLog.post("You feel resistant to fire, cold and poison.", Color(0.4, 0.7, 1.0))
+		"cancellation":
+			var neg_statuses := ["poison", "slow", "fear", "blind", "silence", "burning", "frozen", "paralyzed"]
+			for st in neg_statuses:
+				if statuses.has(st):
+					statuses.erase(st)
+			stats_changed.emit()
+			CombatLog.post("Your negative effects are cancelled.", Color(0.85, 0.85, 0.85))
 		# --- Wand effects ---
 		"wand_haste":
 			apply_status("haste", 12)

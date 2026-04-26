@@ -81,6 +81,10 @@ const _JAVELIN: Resource = preload("res://resources/items/javelin.tres")
 const _BOMB: Resource = preload("res://resources/items/bomb.tres")
 const _POISON_FLASK: Resource = preload("res://resources/items/poison_flask.tres")
 const _SMOKE_BOMB: Resource = preload("res://resources/items/smoke_bomb.tres")
+const _POTION_RESISTANCE: Resource = preload("res://resources/items/potion_resistance.tres")
+const _POTION_CANCELLATION: Resource = preload("res://resources/items/potion_cancellation.tres")
+const _SCROLL_IMMOLATION: Resource = preload("res://resources/items/scroll_immolation.tres")
+const _SCROLL_NOISE: Resource = preload("res://resources/items/scroll_noise.tres")
 
 const _ALL_ITEMS: Array = [
 	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE, _SPEAR,
@@ -106,6 +110,8 @@ const _ALL_ITEMS: Array = [
 	_WAND_FIRE, _WAND_FROST, _WAND_LIGHTNING, _WAND_TELEPORT,
 	_WAND_FEAR, _WAND_HASTE, _WAND_DIGGING,
 	_THROWING_KNIFE, _JAVELIN, _BOMB, _POISON_FLASK, _SMOKE_BOMB,
+	_POTION_RESISTANCE, _POTION_CANCELLATION,
+	_SCROLL_IMMOLATION, _SCROLL_NOISE,
 ]
 
 var by_id: Dictionary = {}
