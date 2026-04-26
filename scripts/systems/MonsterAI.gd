@@ -100,7 +100,7 @@ static func _can_see(monster: Monster, map: DungeonMap, target: Vector2i) -> boo
 	return vis.has(target)
 
 static func _effective_sight_range(monster: Monster, player: Player) -> int:
-	var radius: int = monster.data.sight_range
+	var radius: int = max(3, monster.data.sight_range - 1)
 	if player == null:
 		return radius
 	var stealth_score: int = player.get_skill_level("agility")

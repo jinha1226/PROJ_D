@@ -14,7 +14,7 @@ signal spell_choices_requested(spell_level: int, spell_ids: Array)
 
 @export var grid_pos: Vector2i = Vector2i(1, 1)
 
-const SIGHT_RADIUS: int = 8
+const SIGHT_RADIUS: int = 6
 const DEFAULT_BASE_TEX: Texture2D = preload(
 	"res://assets/tiles/individual/player/base/human_m.png")
 

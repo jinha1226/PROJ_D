@@ -3,6 +3,14 @@ class_name MagicSystem extends RefCounted
 static var SpellRegistry = Engine.get_main_loop().root.get_node_or_null("/root/SpellRegistry") if Engine.get_main_loop() is SceneTree else null
 static var CombatLog = Engine.get_main_loop().root.get_node_or_null("/root/CombatLog") if Engine.get_main_loop() is SceneTree else null
 static var RacePassiveSystem = Engine.get_main_loop().root.get_node_or_null("/root/RacePassiveSystem") if Engine.get_main_loop() is SceneTree else null
+const GLOBAL_RANGE_REDUCTION: int = 1
+
+static func effective_spell_range(spell: SpellData) -> int:
+	if spell == null:
+		return 0
+	if spell.max_range <= 0:
+		return 0
+	return max(1, spell.max_range - GLOBAL_RANGE_REDUCTION)
 
 static func cast(spell_id: String, player: Player, game: Node) -> bool:
 	var spell: SpellData = SpellRegistry.get_by_id(spell_id)
@@ -25,7 +33,7 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 		"heal":
 			_cast_heal(spell, player, power, game)
 		"blink":
-			player._blink(max(2, spell.max_range))
+			player._blink(max(2, effective_spell_range(spell)))
 			CombatLog.post("You cast %s." % spell.display_name, Color(0.7, 0.85, 1.0))
 		"damage":
 			_damage_auto_target(spell, player, power, game)
@@ -133,7 +141,7 @@ static func _cast_buff(player: Player, status_id: String, turns: int,
 
 
 static func _cast_drain(spell: SpellData, player: Player, power: int, game: Node) -> void:
-	var target: Monster = _find_nearest_visible(player, game, spell.max_range)
+	var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 	if target == null:
 		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
 		return
@@ -155,7 +163,7 @@ static func _cast_drain(spell: SpellData, player: Player, power: int, game: Node
 
 static func _apply_status_to_target(spell: SpellData, player: Player,
 		game: Node, status_id: String, turns: int) -> void:
-	var target: Monster = _find_nearest_visible(player, game, spell.max_range)
+	var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 	if target == null:
 		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
 		return
@@ -169,7 +177,7 @@ static func _apply_status_to_target(spell: SpellData, player: Player,
 static func _cast_sleep(spell: SpellData, player: Player, game: Node) -> void:
 	var hp_threshold: int = randi_range(25, 40) + randi_range(0, 8) \
 		+ randi_range(0, 8) + randi_range(0, 8) + randi_range(0, 8) + randi_range(0, 8)
-	var target: Monster = _find_nearest_visible(player, game, spell.max_range)
+	var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 	if target == null:
 		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
 		return
@@ -189,6 +197,7 @@ static func _aoe_status(spell: SpellData, player: Player, game: Node,
 	if tree == null:
 		return
 	var visible: Dictionary = player.compute_fov()
+	var range_val: int = effective_spell_range(spell)
 	var hits: int = 0
 	var hit_positions: Array = []
 	var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
@@ -199,7 +208,7 @@ static func _aoe_status(spell: SpellData, player: Player, game: Node,
 			continue
 		var d: int = max(abs(n.grid_pos.x - player.grid_pos.x),
 				abs(n.grid_pos.y - player.grid_pos.y))
-		if d > spell.max_range:
+		if d > range_val:
 			continue
 		Status.apply(n, status_id, turns)
 		hit_positions.append(n.position + half)
@@ -216,7 +225,7 @@ static func _aoe_status(spell: SpellData, player: Player, game: Node,
 
 static func _cast_instant_kill(spell: SpellData, player: Player,
 		game: Node, hp_max: int) -> void:
-	var target: Monster = _find_nearest_visible(player, game, spell.max_range)
+	var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 	if target == null:
 		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
 		return
@@ -233,7 +242,7 @@ static func _cast_instant_kill(spell: SpellData, player: Player,
 
 static func _cast_power_word(spell: SpellData, player: Player, game: Node,
 		hp_threshold: int, mode: String) -> void:
-	var target: Monster = _find_nearest_visible(player, game, spell.max_range)
+	var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 	if target == null:
 		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
 		return
@@ -253,7 +262,7 @@ static func _cast_power_word(spell: SpellData, player: Player, game: Node,
 
 
 static func _cast_banish(spell: SpellData, player: Player, game: Node) -> void:
-	var target: Monster = _find_nearest_visible(player, game, spell.max_range)
+	var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 	if target == null:
 		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
 		return
@@ -318,7 +327,7 @@ static func _on_kill(target: Monster, player: Player) -> void:
 
 static func _damage_auto_target(spell: SpellData, player: Player,
 		power: int, game: Node) -> void:
-	var target: Monster = _find_nearest_visible(player, game, spell.max_range)
+	var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 	if target == null:
 		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
 		return
@@ -349,7 +358,7 @@ static func _multi_damage(spell: SpellData, player: Player,
 	var fired: int = 0
 	var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
 	for i in range(darts):
-		var target: Monster = _find_nearest_visible(player, game, spell.max_range)
+		var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 		if target == null:
 			break
 		var dmg: int = spell.base_damage + randi_range(0, 2) + power / 4
@@ -377,6 +386,7 @@ static func _chain_damage(spell: SpellData, player: Player,
 	if tree == null:
 		return
 	var visible: Dictionary = player.compute_fov()
+	var range_val: int = effective_spell_range(spell)
 	var targets: Array = []
 	for n in tree.get_nodes_in_group("monsters"):
 		if not (n is Monster):
@@ -385,7 +395,7 @@ static func _chain_damage(spell: SpellData, player: Player,
 			continue
 		var d: int = max(abs(n.grid_pos.x - player.grid_pos.x),
 				abs(n.grid_pos.y - player.grid_pos.y))
-		if d <= spell.max_range:
+		if d <= range_val:
 			targets.append(n)
 	if targets.is_empty():
 		CombatLog.post("No targets in range.", Color(0.75, 0.75, 0.75))
@@ -419,6 +429,7 @@ static func _aoe_damage(spell: SpellData, player: Player,
 	if tree == null:
 		return
 	var visible: Dictionary = player.compute_fov()
+	var range_val: int = effective_spell_range(spell)
 	var hits: int = 0
 	var hit_positions: Array = []
 	var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
@@ -429,7 +440,7 @@ static func _aoe_damage(spell: SpellData, player: Player,
 			continue
 		var d: int = max(abs(n.grid_pos.x - player.grid_pos.x),
 				abs(n.grid_pos.y - player.grid_pos.y))
-		if d > spell.max_range:
+		if d > range_val:
 			continue
 		var dmg: int = spell.base_damage + randi_range(0, 3) + power / 4
 		dmg = _apply_element_bonus(spell, n, dmg)

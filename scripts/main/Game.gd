@@ -1109,10 +1109,11 @@ func begin_spell_targeting(spell: SpellData, p: Player) -> void:
 	_cancel_targeting()
 	_targeting_spell = spell
 	var visible: Dictionary = p.compute_fov()
+	var range_val: int = MagicSystem.effective_spell_range(spell)
 	_targeting_tiles = []
 	for tile: Vector2i in visible.keys():
 		var d: int = max(abs(tile.x - p.grid_pos.x), abs(tile.y - p.grid_pos.y))
-		if d > 0 and d <= spell.max_range:
+		if d > 0 and d <= range_val:
 			_targeting_tiles.append(tile)
 	_targeting_node = SpellTargetOverlay.new()
 	_effect_layer.add_child(_targeting_node)

@@ -122,7 +122,8 @@ static func _make_spell_row(spell: SpellData, player: Player,
 		stat_lbl.text = "Magic skill %d required" % spell.spell_level
 		stat_lbl.add_theme_color_override("font_color", Color(0.55, 0.45, 0.45))
 	else:
-		var range_str: String = "%d tiles" % spell.max_range if spell.max_range > 0 else "self"
+		var effective_range: int = MagicSystem.effective_spell_range(spell)
+		var range_str: String = "%d tiles" % effective_range if effective_range > 0 else "self"
 		var armor_mult: float = _armor_spell_mult(player)
 		var armor_note: String = ""
 		if armor_mult < 1.0:
