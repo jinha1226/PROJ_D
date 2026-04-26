@@ -598,7 +598,7 @@ const ZOOM_STEP: float = 0.2
 func _spawn_camera() -> void:
 	camera = Camera2D.new()
 	camera.name = "Camera2D"
-	camera.zoom = Vector2(1.2, 1.2)
+	camera.zoom = Vector2(1.6, 1.6)
 	camera.position_smoothing_enabled = true
 	camera.position_smoothing_speed = 14.0
 	add_child(camera)
