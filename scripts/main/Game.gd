@@ -4,7 +4,6 @@ const DungeonMapScene = preload("res://scripts/dungeon/DungeonMap.gd")
 const PlayerScene = preload("res://scripts/entities/Player.gd")
 const MonsterScene = preload("res://scripts/entities/Monster.gd")
 const FloorItemScene = preload("res://scripts/entities/FloorItem.gd")
-const SimulationBotRef = preload("res://scripts/tools/SimulationBot.gd")
 const TopHUDScene = preload("res://scenes/ui/TopHUD.tscn")
 const BottomHUDScene = preload("res://scenes/ui/BottomHUD.tscn")
 const ResultScreenScene = preload("res://scenes/ui/ResultScreen.tscn")
@@ -50,10 +49,6 @@ var _auto_exploring: bool = false
 var _path_overlay: PathOverlay = null
 var _auto_step_token: int = 0
 var _auto_step_queued: bool = false
-var _watch_simulation: bool = false
-var _watch_sim_step_token: int = 0
-var _watch_sim_step_queued: bool = false
-var _watch_sim_internal_action: bool = false
 
 const AUTO_PATH_PREVIEW_SEC: float = 0.12
 const AUTO_STEP_DELAY_SEC: float = 0.05
@@ -96,8 +91,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		is_tap = true
 	if not is_tap:
 		return
-	if _watch_simulation:
-		_cancel_watch_simulation("manual")
 	# Any tap during auto-walk cancels it. The tap itself is then
 	# processed as a fresh action (most commonly the same tile the
 	# user already wanted).
@@ -528,24 +521,6 @@ func _try_open_spell_choice_popup() -> void:
 	if spell_ids.is_empty():
 		_try_open_spell_choice_popup()
 		return
-	if GameManager.simulation_mode:
-		if player != null:
-			for sid in spell_ids:
-				if player.learn_spell(String(sid)):
-					break
-		_try_open_spell_choice_popup()
-		return
-	if _watch_simulation:
-		if player != null:
-			for sid in spell_ids:
-				if player.learn_spell(String(sid)):
-					var learned: SpellData = SpellRegistry.get_by_id(String(sid))
-					if learned != null:
-						CombatLog.post("SIM learns %s." % learned.display_name,
-							Color(0.7, 0.95, 1.0))
-					break
-		_try_open_spell_choice_popup()
-		return
 	_spell_choice_popup_open = true
 	var popup := PopupManager.new()
 	add_child(popup)
@@ -603,7 +578,6 @@ func _spawn_ui() -> void:
 	bottom_hud.status_pressed.connect(_on_status_pressed)
 	bottom_hud.rest_pressed.connect(_on_rest_pressed)
 	bottom_hud.act_pressed.connect(_on_act_pressed)
-	bottom_hud.simulation_pressed.connect(_on_simulation_pressed)
 	bottom_hud.menu_pressed.connect(_on_menu_pressed)
 	bottom_hud.skills_pressed.connect(_on_skills_pressed)
 	bottom_hud.magic_pressed.connect(_on_magic_pressed)
@@ -621,7 +595,6 @@ func _spawn_ui() -> void:
 	_effect_layer.z_index = 5
 	add_child(_effect_layer)
 	_refresh_quickslots()
-	bottom_hud.set_simulation_active(_watch_simulation)
 
 
 func _floor_seed(depth: int) -> int:
@@ -809,7 +782,6 @@ func _update_minimap() -> void:
 		top_hud.set_minimap_texture(tex)
 
 func _on_minimap_tapped() -> void:
-	_cancel_watch_simulation("manual")
 	if map == null or player == null:
 		return
 	_cache_current_floor()
@@ -929,9 +901,6 @@ func _on_player_turn_started() -> void:
 		_refresh_entity_visibility()
 	if TurnManager.turn_number % _RESPAWN_INTERVAL == 0:
 		_try_respawn_monster()
-	if _watch_simulation:
-		_queue_watch_simulation_step()
-		return
 	if not _auto_path.is_empty():
 		if _monster_in_sight():
 			_cancel_auto_walk("new enemy")
@@ -942,55 +911,6 @@ func _on_player_turn_started() -> void:
 			_cancel_auto_walk("new enemy")
 			return
 		_start_auto_explore()
-
-func _on_simulation_pressed() -> void:
-	if _watch_simulation:
-		_cancel_watch_simulation("button")
-	else:
-		_start_watch_simulation()
-
-func _start_watch_simulation() -> void:
-	if player == null or player.hp <= 0:
-		return
-	_watch_simulation = true
-	_watch_sim_step_token += 1
-	_watch_sim_step_queued = false
-	if bottom_hud != null:
-		bottom_hud.set_simulation_active(true)
-	CombatLog.post("SIM controls the current run.", Color(0.7, 0.95, 1.0))
-	if TurnManager.is_player_turn:
-		_queue_watch_simulation_step()
-
-func _cancel_watch_simulation(reason: String = "") -> void:
-	if not _watch_simulation:
-		return
-	_watch_simulation = false
-	_watch_sim_step_token += 1
-	_watch_sim_step_queued = false
-	if bottom_hud != null:
-		bottom_hud.set_simulation_active(false)
-	if reason == "manual" or reason == "button":
-		CombatLog.post("SIM stopped.", Color(0.75, 0.8, 0.85))
-
-func _queue_watch_simulation_step(delay_sec: float = 0.1) -> void:
-	if not _watch_simulation or _watch_sim_step_queued:
-		return
-	_watch_sim_step_queued = true
-	var token: int = _watch_sim_step_token
-	_defer_watch_simulation_step(token, delay_sec)
-
-func _defer_watch_simulation_step(token: int, delay_sec: float) -> void:
-	await get_tree().create_timer(delay_sec).timeout
-	if token != _watch_sim_step_token:
-		return
-	_watch_sim_step_queued = false
-	if not _watch_simulation or not TurnManager.is_player_turn:
-		return
-	if player == null or player.hp <= 0:
-		return
-	_watch_sim_internal_action = true
-	SimulationBotRef.take_turn(self, GameManager.selected_class_id)
-	_watch_sim_internal_action = false
 
 func _try_respawn_monster() -> void:
 	if map == null or player == null or player.hp <= 0:
@@ -1023,14 +943,11 @@ func _try_respawn_monster() -> void:
 		return
 
 func _on_player_died() -> void:
-	_cancel_watch_simulation("death")
 	CombatLog.post("You have died.", Color(1.0, 0.4, 0.4))
 	var shards: int = max(1, GameManager.depth * 2 + player.xl * 3)
-	if not GameManager.simulation_mode:
-		GameManager.add_rune_shards(shards)
+	GameManager.add_rune_shards(shards)
 	GameManager.end_run("death")
-	if not GameManager.simulation_mode:
-		_show_result_screen(false, shards)
+	_show_result_screen(false, shards)
 
 func _show_result_screen(victory: bool, shards: int) -> void:
 	var res = ResultScreenScene.instantiate()
@@ -1074,8 +991,7 @@ func _on_stairs_down() -> void:
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
-	if not GameManager.simulation_mode:
-		SaveManager.save_run(player, GameManager)
+	SaveManager.save_run(player, GameManager)
 	TurnManager.end_player_turn()
 
 func _on_stairs_up() -> void:
@@ -1094,8 +1010,7 @@ func _on_stairs_up() -> void:
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
-	if not GameManager.simulation_mode:
-		SaveManager.save_run(player, GameManager)
+	SaveManager.save_run(player, GameManager)
 	TurnManager.end_player_turn()
 
 func _travel_to_floor(target_depth: int) -> void:
@@ -1115,8 +1030,7 @@ func _travel_to_floor(target_depth: int) -> void:
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
-	if not GameManager.simulation_mode:
-		SaveManager.save_run(player, GameManager)
+	SaveManager.save_run(player, GameManager)
 	TurnManager.end_player_turn()
 
 func _on_item_dropped(item_id: String, at_pos: Vector2i, plus: int) -> void:
@@ -1127,19 +1041,16 @@ func _on_item_dropped(item_id: String, at_pos: Vector2i, plus: int) -> void:
 	CombatLog.post("You drop %s." % GameManager.display_name_of(item_id))
 
 func _on_bag_pressed() -> void:
-	_cancel_watch_simulation("manual")
 	if player == null:
 		return
 	BagDialog.open(player, self)
 
 func _on_status_pressed() -> void:
-	_cancel_watch_simulation("manual")
 	if player == null:
 		return
 	StatusDialog.open(player, self)
 
 func _on_bestiary_pressed() -> void:
-	_cancel_watch_simulation("manual")
 	if player == null:
 		return
 	BestiaryDialog.open(self)
@@ -1174,8 +1085,6 @@ func _confirm_targeting() -> void:
 		TurnManager.end_player_turn()
 
 func _on_rest_pressed() -> void:
-	if _watch_simulation and not _watch_sim_internal_action:
-		_cancel_watch_simulation("manual")
 	if player == null or player.hp <= 0 or not TurnManager.is_player_turn:
 		return
 	if _monster_in_sight():
@@ -1202,13 +1111,11 @@ func _monster_in_sight() -> bool:
 	return false
 
 func _on_skills_pressed() -> void:
-	_cancel_watch_simulation("manual")
 	if player == null:
 		return
 	SkillsDialog.open(player, self)
 
 func _on_quickslot_pressed(index: int) -> void:
-	_cancel_watch_simulation("manual")
 	if player == null or player.hp <= 0:
 		return
 	var slot_id: String = String(player.quickslots[index])
@@ -1239,13 +1146,11 @@ func _on_quickslot_pressed(index: int) -> void:
 		TurnManager.end_player_turn()
 
 func _on_quickslot_long_pressed(index: int) -> void:
-	_cancel_watch_simulation("manual")
 	if player == null:
 		return
 	QuickslotPicker.open(player, self, index, _refresh_quickslots)
 
 func _on_log_tapped() -> void:
-	_cancel_watch_simulation("manual")
 	LogDialog.open(self)
 
 func _refresh_quickslots() -> void:
@@ -1293,13 +1198,11 @@ func _make_item_icon(data: ItemData) -> Texture2D:
 	return load(data.tile_path) as Texture2D
 
 func _on_magic_pressed() -> void:
-	_cancel_watch_simulation("manual")
 	if player == null:
 		return
 	MagicDialog.open(player, self)
 
 func _on_menu_pressed() -> void:
-	_cancel_watch_simulation("manual")
 	PauseMenuDialog.open(self)
 
 func _chebyshev(a: Vector2i, b: Vector2i) -> int:
@@ -1319,8 +1222,6 @@ func _item_at(pos: Vector2i) -> FloorItem:
 
 
 func _on_act_pressed() -> void:
-	if _watch_simulation and not _watch_sim_internal_action:
-		_cancel_watch_simulation("manual")
 	if player == null or player.hp <= 0 or not TurnManager.is_player_turn:
 		return
 	if _auto_exploring:

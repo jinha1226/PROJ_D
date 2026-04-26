@@ -29,7 +29,6 @@ func _run() -> void:
 	for class_id in CLASS_IDS:
 		var summary := await _simulate_class(class_id, DEFAULT_RACE, _runs_per_class)
 		print(JSON.stringify(summary))
-	GameManager.simulation_mode = false
 	quit()
 
 func _simulate_class(class_id: String, race_id: String, runs: int) -> Dictionary:
@@ -58,7 +57,6 @@ func _simulate_class(class_id: String, race_id: String, runs: int) -> Dictionary
 
 func _simulate_run(class_id: String, race_id: String, seed: int) -> Dictionary:
 	_reset_globals()
-	GameManager.simulation_mode = true
 	GameManager.selected_class_id = class_id
 	GameManager.selected_race_id = race_id
 	GameManager.selected_starting_weapon_id = "short_sword" if class_id == "warrior" else ""
@@ -93,7 +91,6 @@ func _simulate_run(class_id: String, race_id: String, seed: int) -> Dictionary:
 		"turns": final_turns,
 		"reached_goal": reached_goal,
 	}
-	GameManager.simulation_mode = false
 	GameManager.run_in_progress = false
 	return result
 

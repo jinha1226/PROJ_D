@@ -21,7 +21,6 @@ var gold: int = 0
 var identified: Dictionary = {}  # item_id -> true once identified
 var pseudonyms: Dictionary = {}  # item_id -> "fuzzy potion" for this run
 var run_in_progress: bool = false
-var simulation_mode: bool = false
 
 # Character selection — set by menus before start_new_run().
 var selected_class_id: String = ""
@@ -82,7 +81,7 @@ func travel_to(d: int) -> void:
 func end_run(result: String) -> void:
 	run_in_progress = false
 	floor_cache.clear()
-	if result == "death" and not simulation_mode:
+	if result == "death":
 		SaveManager.delete_save()
 	emit_signal("run_ended", result)
 

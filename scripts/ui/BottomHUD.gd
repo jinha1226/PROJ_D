@@ -10,7 +10,6 @@ signal skills_pressed
 signal magic_pressed
 signal status_pressed
 signal act_pressed
-signal simulation_pressed
 signal menu_pressed
 
 @onready var quick_slots: Array = [
@@ -26,7 +25,6 @@ signal menu_pressed
 @onready var magic_button: Button = $Margin/VBox/Row2/MagicButton
 @onready var status_button: Button = $Margin/VBox/Row2/StatusButton
 @onready var act_button: Button = $Margin/VBox/Row2/ActButton
-@onready var simulation_button: Button = $Margin/VBox/Row2/SimButton
 @onready var menu_button: Button = $Margin/VBox/Row2/MenuButton
 
 
@@ -47,7 +45,6 @@ func _ready() -> void:
 	magic_button.pressed.connect(func(): magic_pressed.emit())
 	status_button.pressed.connect(func(): status_pressed.emit())
 	act_button.pressed.connect(func(): act_pressed.emit())
-	simulation_button.pressed.connect(func(): simulation_pressed.emit())
 	menu_button.pressed.connect(func(): menu_pressed.emit())
 
 
@@ -65,11 +62,6 @@ func set_quickslot(i: int, icon: Texture2D, text: String) -> void:
 func set_quickslot_display(i: int, txt: String, color: Color) -> void:
 	if i >= 0 and i < quick_slots.size():
 		quick_slots[i].set_slot_display(txt, color)
-
-
-func set_simulation_active(active: bool) -> void:
-	if simulation_button != null:
-		simulation_button.text = "STOP" if active else "SIM"
 
 
 func _on_quickslot_drag_released(from_index: int, release_pos: Vector2) -> void:
