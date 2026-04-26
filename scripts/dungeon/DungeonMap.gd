@@ -19,10 +19,8 @@ const TEX_STAIRS_UP: Texture2D = preload(
 	"res://assets/tiles/individual/dngn/gateways/metal_stairs_up.png")
 const TEX_STAIRS_DOWN: Texture2D = preload(
 	"res://assets/tiles/individual/dngn/gateways/metal_stairs_down.png")
-const TEX_DOOR_CLOSED: Texture2D = preload(
-	"res://assets/tiles/individual/dngn/doors/closed_door.png")
-const TEX_DOOR_OPEN: Texture2D = preload(
-	"res://assets/tiles/individual/dngn/doors/open_door.png")
+var _tex_door_closed: Texture2D = null
+var _tex_door_open: Texture2D = null
 
 ## Depth-banded terrain art. Each band declares its wall + floor tile
 ## paths; picked by pick_atmosphere_for_depth() on generate().
@@ -83,7 +81,7 @@ func is_walkable(p: Vector2i) -> bool:
 
 func is_opaque(p: Vector2i) -> bool:
 	var t := tile_at(p)
-	return t == Tile.WALL or t == Tile.DOOR_CLOSED or fog_tiles.has(p)
+	return t == Tile.WALL or fog_tiles.has(p)
 
 
 func add_fog(center: Vector2i, radius: int, turns: int) -> void:
@@ -129,6 +127,8 @@ func generate(map_seed: int = -1) -> void:
 
 func _ready() -> void:
 	GameManager = get_node_or_null("/root/GameManager")
+	_tex_door_closed = load("res://assets/tiles/individual/dngn/doors/closed_door.png") as Texture2D
+	_tex_door_open = load("res://assets/tiles/individual/dngn/doors/open_door.png") as Texture2D
 
 func _load_atmosphere(depth: int) -> void:
 	for band in TERRAIN_BANDS:
@@ -216,9 +216,9 @@ func _texture_for(t: int) -> Texture2D:
 		Tile.STAIRS_DOWN:
 			return TEX_STAIRS_DOWN
 		Tile.DOOR_CLOSED:
-			return TEX_DOOR_CLOSED
+			return _tex_door_closed
 		Tile.DOOR_OPEN:
-			return TEX_DOOR_OPEN
+			return _tex_door_open
 	return null
 
 func _glyph_for(t: int) -> String:
