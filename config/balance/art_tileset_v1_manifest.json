@@ -1,0 +1,65 @@
+{
+  "version": "generated_tileset_v1",
+  "runtime_tile_size": 32,
+  "view": "topdown",
+  "style": {
+    "mood": "dark_fantasy_dungeon",
+    "readability_priority": "mobile_first",
+    "outline_strength": "high",
+    "background_contrast": "muted",
+    "interactive_accent": "bright"
+  },
+  "paper_doll_layers": {
+    "base": "assets/tiles/individual/player/base",
+    "body": "assets/tiles/individual/player/body",
+    "hand1": "assets/tiles/individual/player/hand1",
+    "hand2": "assets/tiles/individual/player/hand2"
+  },
+  "active_races": [
+    "human",
+    "orc",
+    "elf",
+    "kobold",
+    "troll",
+    "tiefling"
+  ],
+  "phase1_overlays": {
+    "body": ["robe", "leather_armor", "chain_mail"],
+    "hand1": ["dagger", "short_sword", "mace", "spear", "bow", "staff"],
+    "hand2": ["buckler", "round_shield"]
+  },
+  "phase1_items": {
+    "potion_layers": ["base_bottle", "effect_fill"],
+    "scroll_layers": ["base_parchment", "effect_rune"],
+    "single_icons": ["spellbook", "wand", "amulet", "ring", "bandage", "essence"]
+  },
+  "phase1_monsters": [
+    "goblin",
+    "skeleton",
+    "bat",
+    "slime",
+    "wolf",
+    "orc",
+    "spider",
+    "cultist",
+    "fire_elemental",
+    "ice_wraith",
+    "gargoyle",
+    "troll"
+  ],
+  "phase1_environment": [
+    "floor",
+    "cracked_floor",
+    "wall",
+    "door",
+    "stairs_down",
+    "stairs_up",
+    "chest",
+    "altar",
+    "pillar",
+    "trap",
+    "water",
+    "lava"
+  ],
+  "reference_board": "assets/generated_tileset_v1/reference/concept_board_v1.png"
+}
