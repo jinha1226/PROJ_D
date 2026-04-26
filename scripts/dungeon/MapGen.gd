@@ -4,12 +4,12 @@ class_name MapGen extends RefCounted
 ## Output keys: tiles (PackedByteArray), spawn (Vector2i),
 ## stairs_down (Vector2i), stairs_up (Vector2i), rooms (Array[Rect2i]).
 
-const MIN_LEAF_AREA: int = 80
-const MIN_ROOM_W: int = 4
-const MIN_ROOM_H: int = 3
-const MAX_ROOM_W: int = 8
-const MAX_ROOM_H: int = 7
-const MAX_SPLIT_DEPTH: int = 4
+const MIN_LEAF_AREA: int = 96
+const MIN_ROOM_W: int = 5
+const MIN_ROOM_H: int = 4
+const MAX_ROOM_W: int = 10
+const MAX_ROOM_H: int = 8
+const MAX_SPLIT_DEPTH: int = 3
 
 static func generate(width: int, height: int, map_seed: int = -1) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
@@ -60,7 +60,7 @@ static func _split(rect: Rect2i, depth: int, rng: RandomNumberGenerator,
 	else:
 		horizontal = rng.randf() < 0.5
 	if horizontal:
-		var split_at: int = int(rect.size.y * rng.randf_range(0.4, 0.6))
+		var split_at: int = int(rect.size.y * rng.randf_range(0.45, 0.55))
 		if split_at < MIN_ROOM_H + 1 or rect.size.y - split_at < MIN_ROOM_H + 1:
 			_carve_room(rect, rng, tiles, width, rooms)
 			return
@@ -70,7 +70,7 @@ static func _split(rect: Rect2i, depth: int, rng: RandomNumberGenerator,
 				Vector2i(rect.size.x, rect.size.y - split_at)),
 			depth + 1, rng, tiles, width, rooms)
 	else:
-		var split_at: int = int(rect.size.x * rng.randf_range(0.4, 0.6))
+		var split_at: int = int(rect.size.x * rng.randf_range(0.45, 0.55))
 		if split_at < MIN_ROOM_W + 1 or rect.size.x - split_at < MIN_ROOM_W + 1:
 			_carve_room(rect, rng, tiles, width, rooms)
 			return

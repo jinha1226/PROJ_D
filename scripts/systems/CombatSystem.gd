@@ -9,6 +9,7 @@ const BACKSTAB_PER_AGILITY: float = 0.05
 const BACKSTAB_ROGUE_BONUS: float = 0.25
 const BACKSTAB_DAGGER_BONUS: float = 0.25
 const BACKSTAB_MAX_BONUS: float = 1.0
+const XP_PACE_MULTIPLIER: float = 1.35
 
 static func player_attack_monster(player: Player, monster: Monster) -> void:
 	if monster.data == null:
@@ -98,8 +99,9 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 				_dagger_swift_strike(player, monster)
 	if was_alive and monster.hp <= 0:
 		CombatLog.hit("You kill the %s." % monster.data.display_name)
-		player.grant_xp(monster.data.xp_value)
-		player.grant_kill_skill_xp(float(monster.data.xp_value), skill_id)
+		var xp_award: int = max(1, int(round(float(monster.data.xp_value) * XP_PACE_MULTIPLIER)))
+		player.grant_xp(xp_award)
+		player.grant_kill_skill_xp(float(xp_award), skill_id)
 		player.register_kill()
 		GameManager.try_kill_unlock(monster.data.id)
 		RacePassiveSystem.on_player_killed_monster(player)
@@ -142,8 +144,9 @@ static func _dagger_swift_strike(player: Player, monster: Monster) -> void:
 	monster.become_aware(player.grid_pos)
 	if was_alive and monster.hp <= 0:
 		CombatLog.hit("You kill the %s." % monster.data.display_name)
-		player.grant_xp(monster.data.xp_value)
-		player.grant_kill_skill_xp(float(monster.data.xp_value), "melee")
+		var xp_award: int = max(1, int(round(float(monster.data.xp_value) * XP_PACE_MULTIPLIER)))
+		player.grant_xp(xp_award)
+		player.grant_kill_skill_xp(float(xp_award), "melee")
 		player.register_kill()
 		GameManager.try_kill_unlock(monster.data.id)
 

@@ -133,14 +133,23 @@ func pick_by_depth(depth: int) -> MonsterData:
 	var total_weight: int = 0
 	for m in all:
 		if depth >= m.min_depth and depth <= m.max_depth:
-			candidates.append(m)
-			total_weight += max(1, m.weight)
+			var eff_weight: int = max(1, m.weight)
+			if depth <= 3 and m.xp_value <= 2:
+				eff_weight = max(1, int(eff_weight / 4))
+			elif depth <= 5 and m.xp_value <= 4:
+				eff_weight = max(1, int(eff_weight / 2))
+			if depth >= 2 and m.tier >= 2:
+				eff_weight += 2
+			if depth >= 4 and m.tier >= 3:
+				eff_weight += 3
+			candidates.append({"data": m, "weight": eff_weight})
+			total_weight += eff_weight
 	if candidates.is_empty():
 		return null
 	var roll: int = randi_range(1, total_weight)
 	var accum: int = 0
-	for m in candidates:
-		accum += max(1, m.weight)
+	for entry in candidates:
+		accum += int(entry["weight"])
 		if roll <= accum:
-			return m
-	return candidates[0]
+			return entry["data"]
+	return candidates[0]["data"]

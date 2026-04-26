@@ -11,8 +11,8 @@ enum Tile {
 	DOOR_OPEN = 5,
 }
 
-const GRID_W: int = 35
-const GRID_H: int = 50
+const GRID_W: int = 30
+const GRID_H: int = 42
 const CELL_SIZE: int = 32
 
 const TEX_STAIRS_UP: Texture2D = preload(
