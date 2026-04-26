@@ -113,6 +113,7 @@ static func _effective_sight_range(monster: Monster, player: Player) -> int:
 			stealth_score += 2
 	if Status.has(player, "shrouded"):
 		stealth_score += 8
+	stealth_score += EssenceSystem.stealth_bonus(player)
 	return maxi(2, radius - int(floor(float(stealth_score) / 3.0)))
 
 static func _step_toward(monster: Monster, map: DungeonMap, target: Vector2i) -> void:

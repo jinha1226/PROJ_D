@@ -879,7 +879,7 @@ func _generate_magic_spell_choices(spell_level: int) -> Array:
 func int_required_for_spell(spell: SpellData) -> int:
 	if spell == null:
 		return 99
-	return 7 + spell.spell_level * 2
+	return max(7, 7 + spell.spell_level * 2 - EssenceSystem.spell_int_discount(self))
 
 func _chebyshev(a: Vector2i, b: Vector2i) -> int:
 	return max(abs(a.x - b.x), abs(a.y - b.y))

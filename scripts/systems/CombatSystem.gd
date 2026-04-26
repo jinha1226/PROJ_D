@@ -260,6 +260,7 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	var raw: int = randi_range(1, max(1, dmg_base))
 	var soak: int = randi_range(0, player.ac + 1)
 	var final: int = max(1, raw - soak)
+	final = max(1, final - EssenceSystem.incoming_damage_reduction(player))
 	final = RacePassiveSystem.on_player_hit(player, final)
 	CombatLog.damage_taken("The %s %s you for %d." \
 			% [monster.data.display_name, verb, final])
@@ -306,6 +307,7 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	if Status.has(player, "stoneskin"):
 		soak += randi_range(2, 5)
 	var final: int = max(1, raw - soak)
+	final = max(1, final - EssenceSystem.incoming_damage_reduction(player))
 	final = RacePassiveSystem.on_player_hit(player, final)
 	CombatLog.damage_taken("The %s hits you for %d." % [monster.data.display_name, final])
 	player.take_damage(final, monster.data.id)
