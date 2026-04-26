@@ -42,7 +42,7 @@ var use_tiles: bool = true
 var rune_shards: int = 0
 
 ## Permanent unlock registry — race / class ids the player has earned
-## across runs. Keyed by plain id (e.g. "kobold", "berserker"). Written
+## across runs. Keyed by plain id (e.g. "kobold", "rogue"). Written
 ## to settings.json so deaths don't revoke progress.
 var unlocks: Dictionary = {}
 

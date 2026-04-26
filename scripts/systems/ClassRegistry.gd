@@ -1,5 +1,7 @@
 extends Node
 
+const ACTIVE_BASE_IDS: Array = ["warrior", "mage", "rogue"]
+
 ## Preload baked at script parse time — survives any filesystem / import
 ## quirk Godot's autoload phase might have. Adding a new class means
 ## adding a line here and a .tres file under resources/classes/.
@@ -47,9 +49,7 @@ func get_by_id(id: String) -> ClassData:
 	return by_id.get(id)
 
 func ids_in_order() -> Array:
-	var known_order: Array = ["warrior", "mage", "rogue", "ranger", "spearman", "crusher", "berserker",
-		"evoker", "conjurer", "transmuter", "necromancer",
-		"abjurer", "enchanter", "archmage", "ice_mage"]
+	var known_order: Array = ACTIVE_BASE_IDS.duplicate()
 	var result: Array = []
 	for id in known_order:
 		if by_id.has(id):
@@ -58,6 +58,9 @@ func ids_in_order() -> Array:
 		if not result.has(id):
 			result.append(id)
 	return result
+
+func active_base_ids() -> Array:
+	return ACTIVE_BASE_IDS.duplicate()
 
 func is_unlocked(id: String) -> bool:
 	var c: ClassData = get_by_id(id)

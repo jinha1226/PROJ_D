@@ -350,25 +350,19 @@ func _class_starter_items(class_id: String) -> Array:
 	match class_id:
 		"warrior":
 			return ["potion_healing", "potion_healing"]
-		"ranger":
-			return ["potion_healing", "bandage"]
 		"mage":
 			return ["potion_healing", "potion_magic"]
 		"rogue":
 			return ["potion_healing", "scroll_shrouding", "scroll_blinking"]
-		"archmage":
-			return ["potion_healing", "potion_magic", "scroll_identify"]
 	return []
 
 func _class_default_active_skills(class_id: String, fallback: Array) -> Array:
 	match class_id:
-		"warrior", "berserker", "crusher", "spearman":
+		"warrior":
 			return ["melee", "defense"]
-		"ranger":
-			return ["ranged"]
-		"mage", "archmage", "conjurer", "evoker", "abjurer", "necromancer", "transmuter", "ice_mage":
+		"mage":
 			return ["magic"]
-		"rogue", "enchanter":
+		"rogue":
 			return ["melee", "agility"]
 	if not fallback.is_empty():
 		return fallback
@@ -826,15 +820,8 @@ func _on_minimap_tapped() -> void:
 			_begin_auto_walk(nav_path, false)
 	)
 
-	var is_archmage: bool = GameManager.selected_class_id == "archmage"
-	var all_depths: Array
-	if is_archmage:
-		all_depths = []
-		for d in range(1, 26):
-			all_depths.append(d)
-	else:
-		all_depths = GameManager.floor_cache.keys().duplicate()
-		all_depths.sort()
+	var all_depths: Array = GameManager.floor_cache.keys().duplicate()
+	all_depths.sort()
 	if all_depths.size() > 1:
 		# Add floor nav as a footer outside the scrollable body.
 		var window_vbox: VBoxContainer = dlg.get_node_or_null(
@@ -1016,8 +1003,7 @@ func _on_stairs_up() -> void:
 func _travel_to_floor(target_depth: int) -> void:
 	if target_depth == GameManager.depth:
 		return
-	var is_archmage: bool = GameManager.selected_class_id == "archmage"
-	if not is_archmage and not GameManager.floor_cache.has(target_depth):
+	if not GameManager.floor_cache.has(target_depth):
 		return
 	_cancel_auto_walk("floor travel")
 	_cache_current_floor()

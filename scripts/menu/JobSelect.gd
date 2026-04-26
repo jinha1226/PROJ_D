@@ -155,7 +155,6 @@ func _gear_line(data: ClassData) -> String:
 func _starter_extras(class_id: String) -> Array:
 	match class_id:
 		"warrior": return ["healing ×2"]
-		"ranger":  return ["healing", "bandage"]
 		"mage":    return ["healing", "magic potion"]
 		"rogue":   return ["healing", "shrouding", "blinking"]
 	return []
