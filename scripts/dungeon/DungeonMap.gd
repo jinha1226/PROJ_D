@@ -19,6 +19,10 @@ const TEX_STAIRS_UP: Texture2D = preload(
 	"res://assets/tiles/individual/dngn/gateways/metal_stairs_up.png")
 const TEX_STAIRS_DOWN: Texture2D = preload(
 	"res://assets/tiles/individual/dngn/gateways/metal_stairs_down.png")
+const TEX_DOOR_CLOSED: Texture2D = preload(
+	"res://assets/tiles/individual/dngn/doors/closed_door.png")
+const TEX_DOOR_OPEN: Texture2D = preload(
+	"res://assets/tiles/individual/dngn/doors/open_door.png")
 
 ## Depth-banded terrain art. Each band declares its wall + floor tile
 ## paths; picked by pick_atmosphere_for_depth() on generate().
@@ -211,6 +215,10 @@ func _texture_for(t: int) -> Texture2D:
 			return TEX_STAIRS_UP
 		Tile.STAIRS_DOWN:
 			return TEX_STAIRS_DOWN
+		Tile.DOOR_CLOSED:
+			return TEX_DOOR_CLOSED
+		Tile.DOOR_OPEN:
+			return TEX_DOOR_OPEN
 	return null
 
 func _glyph_for(t: int) -> String:

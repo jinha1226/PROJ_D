@@ -97,6 +97,8 @@ const MAGIC_SCHOOLS: Array = [
 ]
 
 var _map: DungeonMap
+var _regen_hp_ticker: int = 0
+var _regen_mp_ticker: int = 0
 
 func _ready() -> void:
 	TurnManager = get_node_or_null("/root/TurnManager")
@@ -137,6 +139,11 @@ func _dir_for_key(k: int) -> Vector2i:
 func _try_move(dir: Vector2i) -> void:
 	var target: Vector2i = grid_pos + dir
 	if try_attack_tile(target):
+		return
+	if _map.tile_at(target) == DungeonMap.Tile.DOOR_CLOSED:
+		_map.set_tile(target, DungeonMap.Tile.DOOR_OPEN)
+		emit_signal("moved", grid_pos)  # refresh FOV from current pos
+		TurnManager.end_player_turn()
 		return
 	if not _map.is_walkable(target):
 		return
@@ -909,6 +916,22 @@ func tick_statuses() -> void:
 	for id in expired:
 		CombatLog.post("Your %s wears off." % Status.display_name(id),
 			Color(0.75, 0.8, 0.9))
+	# Passive regen: 1 HP per 5 turns, 1 MP per 6 turns (out of combat feel)
+	var hp_cap: int = max(1, hp_max - injury)
+	if hp < hp_cap:
+		_regen_hp_ticker += 1
+		if _regen_hp_ticker >= 5:
+			_regen_hp_ticker = 0
+			hp = min(hp_cap, hp + 1)
+	else:
+		_regen_hp_ticker = 0
+	if mp < mp_max:
+		_regen_mp_ticker += 1
+		if _regen_mp_ticker >= 6:
+			_regen_mp_ticker = 0
+			mp = min(mp_max, mp + 1)
+	else:
+		_regen_mp_ticker = 0
 	if not statuses.is_empty() or not expired.is_empty():
 		emit_signal("stats_changed")
 	EssenceSystem.tick(self)

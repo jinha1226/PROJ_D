@@ -53,6 +53,9 @@ func apply_wet(turns: int = 4) -> void:
 
 func try_move(dir: Vector2i) -> bool:
 	var target: Vector2i = grid_pos + dir
+	if _map.tile_at(target) == DungeonMap.Tile.DOOR_CLOSED:
+		_map.set_tile(target, DungeonMap.Tile.DOOR_OPEN)
+		return true
 	if not _map.is_walkable(target):
 		return false
 	grid_pos = target
