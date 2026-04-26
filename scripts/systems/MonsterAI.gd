@@ -1,5 +1,9 @@
 class_name MonsterAI extends RefCounted
 
+static var GameManager = Engine.get_main_loop().root.get_node_or_null("/root/GameManager") if Engine.get_main_loop() is SceneTree else null
+static var ClassRegistry = Engine.get_main_loop().root.get_node_or_null("/root/ClassRegistry") if Engine.get_main_loop() is SceneTree else null
+static var ItemRegistry = Engine.get_main_loop().root.get_node_or_null("/root/ItemRegistry") if Engine.get_main_loop() is SceneTree else null
+
 ## Monster AI: adjacent → attack; player in FOV → step toward + update
 ## last_known_player_pos; alerted but no LOS → chase last known position;
 ## idle → random step.

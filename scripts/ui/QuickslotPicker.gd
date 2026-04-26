@@ -1,5 +1,8 @@
 class_name QuickslotPicker extends RefCounted
 
+static var SpellRegistry = Engine.get_main_loop().root.get_node_or_null("/root/SpellRegistry") if Engine.get_main_loop() is SceneTree else null
+static var ItemRegistry = Engine.get_main_loop().root.get_node_or_null("/root/ItemRegistry") if Engine.get_main_loop() is SceneTree else null
+
 ## Bind-to-quickslot picker. Lists consumable items AND known spells.
 ## Prefix "spell:" is NOT used — spell ids are stored raw (e.g. "magic_dart").
 ## Game.gd detects a spell slot by checking SpellRegistry first.

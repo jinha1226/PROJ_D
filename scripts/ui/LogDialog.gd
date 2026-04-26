@@ -1,5 +1,7 @@
 class_name LogDialog extends RefCounted
 
+static var CombatLog = Engine.get_main_loop().root.get_node_or_null("/root/CombatLog") if Engine.get_main_loop() is SceneTree else null
+
 ## Full-history combat log viewer. Shows every message currently in
 ## CombatLog.history (up to MAX_HISTORY), newest at bottom, inside a
 ## GameDialog-wrapped scroll container so the player can review

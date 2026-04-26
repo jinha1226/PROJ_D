@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bow_long0001"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "longbow"
+display_name = "longbow"
+kind = "weapon"
+tier = 2
+tile_path = "res://assets/tiles/individual/item/weapon/ranged/longbow1.png"
+glyph = "("
+glyph_color = Color(0.6, 0.5, 0.3, 1)
+damage = 11
+delay = 1.6
+category = "ranged"
+brand = ""
+ac_bonus = 0
+ev_penalty = 0
+slot = ""
+effect = ""
+effect_value = 8
+plus = 0
+description = "A powerful bow. Slow to fire, high damage. Range: 8."

@@ -11,8 +11,10 @@ const MAX_VISIBLE: int = 5
 var _label: RichTextLabel
 var _bg: ColorRect
 var _messages: Array = []
+var CombatLog = null
 
 func _ready() -> void:
+	CombatLog = get_node_or_null("/root/CombatLog")
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_bg = ColorRect.new()
 	_bg.color = Color(0.05, 0.04, 0.08, 0.55)

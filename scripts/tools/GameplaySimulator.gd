@@ -1,6 +1,7 @@
 extends SceneTree
 
 const GAME_SCENE: PackedScene = preload("res://scenes/main/Game.tscn")
+const SimulationBotRef = preload("res://scripts/tools/SimulationBot.gd")
 const CLASS_IDS: Array[String] = ["warrior", "rogue", "mage"]
 const DEFAULT_RACE: String = "human"
 
@@ -8,7 +9,16 @@ var _runs_per_class: int = 10
 var _max_turns: int = 2500
 var _depth_goal: int = 8
 
+var GameManager = null
+var TurnManager = null
+var CombatLog = null
+
 func _init() -> void:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree != null:
+		GameManager = tree.root.get_node_or_null("/root/GameManager")
+		TurnManager = tree.root.get_node_or_null("/root/TurnManager")
+		CombatLog = tree.root.get_node_or_null("/root/CombatLog")
 	call_deferred("_run")
 
 func _run() -> void:
@@ -69,7 +79,7 @@ func _simulate_run(class_id: String, race_id: String, seed: int) -> Dictionary:
 			reached_goal = true
 			break
 		if TurnManager.is_player_turn:
-			SimulationBot.take_turn(game, class_id)
+			SimulationBotRef.take_turn(game, class_id)
 	var final_kills: int = game.player.kills if is_instance_valid(game) and game.player != null else 0
 	var final_depth: int = GameManager.depth
 	var final_turns: int = TurnManager.turn_number

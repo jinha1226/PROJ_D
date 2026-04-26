@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://boss_orc_warchief"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "orc_warchief"
+display_name = "Orc Warchief"
+tier = 2
+hp = 45
+hd = 6
+ac = 4
+ev = 6
+speed = 10
+sight_range = 8
+attacks = [{"damage": 9, "flavour": "cleave"}]
+resists = []
+min_depth = 3
+max_depth = 3
+weight = 0
+xp_value = 25
+is_boss = true
+tile_path = "res://assets/tiles/individual/mon/humanoids/orcs/orc_warlord.png"
+glyph = "O"
+glyph_color = Color(0.9, 0.3, 0.2, 1)

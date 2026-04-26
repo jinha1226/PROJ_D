@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://boss_gnoll_warlord"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "gnoll_warlord"
+display_name = "Gnoll Warlord"
+tier = 3
+hp = 70
+hd = 8
+ac = 5
+ev = 7
+speed = 10
+sight_range = 8
+attacks = [{"damage": 12, "flavour": "strike"}]
+resists = []
+min_depth = 6
+max_depth = 6
+weight = 0
+xp_value = 35
+is_boss = true
+tile_path = "res://assets/tiles/individual/mon/humanoids/gnoll.png"
+glyph = "G"
+glyph_color = Color(0.85, 0.65, 0.2, 1)

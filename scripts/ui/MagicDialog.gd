@@ -4,6 +4,8 @@ const _SCHOOL_ORDER: Array = [
 	"evocation", "conjuration", "transmutation",
 	"necromancy", "abjuration", "enchantment",
 ]
+static var SpellRegistry = Engine.get_main_loop().root.get_node_or_null("/root/SpellRegistry") if Engine.get_main_loop() is SceneTree else null
+static var TurnManager = Engine.get_main_loop().root.get_node_or_null("/root/TurnManager") if Engine.get_main_loop() is SceneTree else null
 
 static func open(player: Player, parent: Node) -> void:
 	var dlg: GameDialog = GameDialog.create_ratio("Magic", 0.96, 0.96)

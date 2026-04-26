@@ -1,5 +1,7 @@
 class_name DungeonMap extends Node2D
 
+var GameManager = null
+
 enum Tile {
 	WALL = 0,
 	FLOOR = 1,
@@ -120,6 +122,9 @@ func generate(map_seed: int = -1) -> void:
 	fog_tiles.clear()
 	_load_atmosphere(GameManager.depth)
 	queue_redraw()
+
+func _ready() -> void:
+	GameManager = get_node_or_null("/root/GameManager")
 
 func _load_atmosphere(depth: int) -> void:
 	for band in TERRAIN_BANDS:

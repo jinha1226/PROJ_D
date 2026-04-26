@@ -10,6 +10,7 @@ class_name ClassData extends Resource
 @export var starting_int: int = 8
 @export var starting_weapon: String = ""
 @export var starting_armor: String = ""
+@export var starting_shield: String = ""
 @export var robe_path: String = ""  # overrides DOLL_BODY_MAP for portrait and paperdoll
 @export var starting_skills: Dictionary = {}
 @export var starting_spells: Array = []

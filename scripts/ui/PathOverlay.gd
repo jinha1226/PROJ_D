@@ -5,12 +5,12 @@ class_name PathOverlay
 
 var path: Array = []
 const CELL := DungeonMap.CELL_SIZE
-const DOT_COLOR := Color(1.0, 0.88, 0.25, 0.26)
-const LINE_COLOR := Color(1.0, 0.95, 0.45, 0.78)
-const HEAD_COLOR := Color(0.55, 1.0, 0.75, 0.95)
-const GOAL_COLOR := Color(1.0, 0.65, 0.35, 0.95)
-const DOT_INSET := 6.0
-const LINE_WIDTH := 4.0
+const DOT_COLOR := Color(0.85, 0.85, 0.85, 0.10)
+const LINE_COLOR := Color(0.9, 0.9, 0.9, 0.30)
+const HEAD_COLOR := Color(0.8, 0.9, 1.0, 0.55)
+const GOAL_COLOR := Color(0.8, 0.9, 1.0, 0.55)
+const DOT_INSET := 8.0
+const LINE_WIDTH := 2.0
 
 func _tile_center(tile: Vector2i) -> Vector2:
 	return Vector2(

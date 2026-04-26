@@ -1,5 +1,8 @@
 class_name Monster extends Node2D
 
+var TurnManager = null
+var GameManager = null
+
 signal died(monster)
 signal stats_changed
 signal hit_taken(amount: int)
@@ -18,6 +21,8 @@ var _tex: Texture2D = null
 var _font: Font
 
 func _ready() -> void:
+	TurnManager = get_node_or_null("/root/TurnManager")
+	GameManager = get_node_or_null("/root/GameManager")
 	_font = ThemeDB.fallback_font
 	add_to_group("monsters")
 

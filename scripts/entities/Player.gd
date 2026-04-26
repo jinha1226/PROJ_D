@@ -1,5 +1,10 @@
 class_name Player extends Node2D
 
+var TurnManager = null
+var CombatLog = null
+var GameManager = null
+var ItemRegistry = null
+
 signal stats_changed
 signal moved(new_pos: Vector2i)
 signal died
@@ -92,6 +97,10 @@ const MAGIC_SCHOOLS: Array = [
 var _map: DungeonMap
 
 func _ready() -> void:
+	TurnManager = get_node_or_null("/root/TurnManager")
+	CombatLog = get_node_or_null("/root/CombatLog")
+	GameManager = get_node_or_null("/root/GameManager")
+	ItemRegistry = get_node_or_null("/root/ItemRegistry")
 	add_to_group("player")
 
 func bind_map(map: DungeonMap, spawn: Vector2i) -> void:
@@ -163,7 +172,10 @@ func pickup(floor_item: FloorItem) -> void:
 		gold += amount
 		CombatLog.pickup("You pick up %d gold." % amount)
 	else:
-		items.append({"id": data.id, "plus": floor_item.plus})
+		var new_entry: Dictionary = {"id": data.id, "plus": floor_item.plus}
+		if data.kind == "wand":
+			new_entry["charges"] = data.effect_value
+		items.append(new_entry)
 		CombatLog.pickup("You pick up %s." % GameManager.display_name_of(data.id))
 		auto_bind_quickslot(data.id)
 	emit_signal("stats_changed")
@@ -232,7 +244,20 @@ func _attack_target_for_tile(target: Vector2i) -> Monster:
 	if equipped_weapon_id == "":
 		return null
 	var weapon: ItemData = ItemRegistry.get_by_id(equipped_weapon_id)
-	if weapon == null or weapon.category != "polearm":
+	if weapon == null:
+		return null
+	# Ranged weapon: attack any visible monster within range
+	if weapon.category == "ranged":
+		if direct == null:
+			return null
+		var range_val: int = weapon.effect_value if weapon.effect_value > 0 else 6
+		if _chebyshev(target, grid_pos) > range_val:
+			return null
+		if _map != null and not _map.visible_tiles.has(target):
+			return null
+		return direct
+	# Polearm: reach 2 tiles in a straight line
+	if weapon.category != "polearm":
 		return null
 	var delta: Vector2i = target - grid_pos
 	var reach: int = _chebyshev(target, grid_pos)
@@ -307,6 +332,70 @@ func use_item(index: int) -> void:
 			_enchant_armor(max(1, data.effect_value))
 		"berserk":
 			apply_berserk(max(1, data.effect_value))
+		# --- New potion effects ---
+		"haste":
+			apply_status("haste", data.effect_value)
+			CombatLog.post("You feel a surge of speed.", Color(0.4, 1.0, 0.6))
+		"invisible":
+			apply_status("invisible", data.effect_value)
+			CombatLog.post("You fade from sight.", Color(0.7, 0.7, 1.0))
+		"stat_dex":
+			dexterity += data.effect_value
+			refresh_ac_from_equipment()
+			CombatLog.post("You feel more agile. (+1 DEX)", Color(0.3, 0.8, 1.0))
+		"stat_int":
+			intelligence += data.effect_value
+			CombatLog.post("You feel sharper. (+1 INT)", Color(0.9, 0.9, 0.4))
+		"grant_xp":
+			grant_xp(data.effect_value)
+			CombatLog.post("You feel more experienced.", Color(0.9, 0.6, 1.0))
+		# --- New scroll effects ---
+		"scroll_fear":
+			var game_node: Node = get_tree().current_scene if get_tree() != null else null
+			if game_node != null and game_node.has_method("apply_fear_aoe"):
+				game_node.apply_fear_aoe(grid_pos, 6, data.effect_value)
+			CombatLog.post("The enemies flee in terror!", Color(0.9, 0.7, 1.0))
+		"scroll_upgrade":
+			if equipped_weapon_id != "":
+				_enchant_weapon(1)
+			elif equipped_armor_id != "":
+				_enchant_armor(1)
+			else:
+				CombatLog.post("Nothing to upgrade.", Color(0.7, 0.7, 0.7))
+				had_effect = false
+		"scroll_fog":
+			var game_fog: Node = get_tree().current_scene if get_tree() != null else null
+			if game_fog != null and game_fog.has_method("apply_fog_aoe"):
+				game_fog.apply_fog_aoe(grid_pos, 4, data.effect_value)
+			CombatLog.post("Fog spreads around you.", Color(0.75, 0.85, 0.95))
+		"scroll_brand":
+			_enchant_weapon(1)
+			CombatLog.post("Your weapon glows with new power.", Color(1.0, 0.85, 0.3))
+		"scroll_silence":
+			var game_sil: Node = get_tree().current_scene if get_tree() != null else null
+			if game_sil != null and game_sil.has_method("apply_silence_aoe"):
+				game_sil.apply_silence_aoe(grid_pos, 6, data.effect_value)
+			CombatLog.post("Silence falls upon your foes.", Color(0.7, 0.85, 1.0))
+		# --- Wand effects ---
+		"wand_haste":
+			apply_status("haste", 12)
+			CombatLog.post("You feel a surge of speed.", Color(0.4, 1.0, 0.6))
+		"wand_fear":
+			var game_wf: Node = get_tree().current_scene if get_tree() != null else null
+			if game_wf != null and game_wf.has_method("apply_fear_aoe"):
+				game_wf.apply_fear_aoe(grid_pos, 5, 8)
+			CombatLog.post("Your foes turn and flee!", Color(0.9, 0.7, 1.0))
+		"wand_digging":
+			var game_wd: Node = get_tree().current_scene if get_tree() != null else null
+			if game_wd != null and game_wd.has_method("dig_toward"):
+				game_wd.dig_toward(grid_pos)
+			CombatLog.post("The wand pulses with digging energy.", Color(0.8, 0.7, 0.5))
+		"wand_fire", "wand_frost", "wand_lightning", "wand_teleport":
+			CombatLog.post("This wand requires a target. (not yet implemented)", Color(0.7, 0.7, 0.7))
+			had_effect = false
+		# --- Throwing effects ---
+		"throw_pierce", "throw_heavy", "throw_fire_aoe", "throw_poison", "throw_smoke":
+			CombatLog.post("You throw the %s." % data.display_name, Color(0.85, 0.85, 0.7))
 		"study":
 			var all_ids: Array = []
 			if data.grants_spell_id != "":
@@ -359,6 +448,20 @@ func use_item(index: int) -> void:
 		had_effect = true
 	if not had_effect:
 		CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
+	# Wand: consume a charge instead of removing the item entirely.
+	if data.kind == "wand":
+		var wand_entry: Dictionary = items[index]
+		var charges: int = int(wand_entry.get("charges", data.effect_value))
+		charges -= 1
+		if charges <= 0:
+			CombatLog.post("The %s is exhausted." % data.display_name, Color(0.6, 0.6, 0.6))
+			items.remove_at(index)
+		else:
+			wand_entry["charges"] = charges
+			items[index] = wand_entry
+			CombatLog.post("(%d charges remaining)" % charges, Color(0.5, 0.8, 0.9))
+		emit_signal("stats_changed")
+		return
 	# Auto-identify on first successful use (consumables only).
 	if data.kind == "potion" or data.kind == "scroll" or data.kind == "book":
 		GameManager.identify(data.id)

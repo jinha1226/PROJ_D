@@ -1,6 +1,8 @@
 extends CanvasLayer
 class_name PopupManager
 
+var SpellRegistry = null
+
 # Minimal runtime popup manager. All popups are built from AcceptDialog / ConfirmationDialog
 # created on demand; the Panel template in the .tscn exists as a reusable shell if needed.
 
@@ -76,6 +78,8 @@ func show_levelup_popup(level: int, callback: Callable) -> void:
 	dlg.popup_centered(Vector2i(640, 620))
 
 func show_spell_learn_popup(spell_level: int, spell_ids: Array, callback: Callable) -> void:
+	if SpellRegistry == null:
+		SpellRegistry = get_node_or_null("/root/SpellRegistry")
 	var dlg := AcceptDialog.new()
 	dlg.title = "Learn Spell Lv.%d" % spell_level
 	dlg.dialog_hide_on_ok = false

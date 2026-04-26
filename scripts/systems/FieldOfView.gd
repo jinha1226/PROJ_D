@@ -20,6 +20,10 @@ const _OCTANTS: Array = [
 static func compute(origin: Vector2i, radius: int, is_opaque: Callable) -> Dictionary:
 	var visible: Dictionary = {}
 	visible[origin] = true
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			if dx != 0 or dy != 0:
+				visible[origin + Vector2i(dx, dy)] = true
 	for oct in _OCTANTS:
 		_cast(origin, 1, 1.0, 0.0, radius, oct, is_opaque, visible)
 	return visible

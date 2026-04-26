@@ -1,5 +1,8 @@
 class_name BestiaryDialog extends RefCounted
 
+static var MonsterRegistry = Engine.get_main_loop().root.get_node_or_null("/root/MonsterRegistry") if Engine.get_main_loop() is SceneTree else null
+static var GameManager = Engine.get_main_loop().root.get_node_or_null("/root/GameManager") if Engine.get_main_loop() is SceneTree else null
+
 static func open(parent: Node) -> void:
 	var dlg: GameDialog = GameDialog.create_ratio("Bestiary", 0.92, 0.92)
 	parent.add_child(dlg)

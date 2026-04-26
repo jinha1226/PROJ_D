@@ -1,6 +1,10 @@
 extends RefCounted
 class_name SimulationBot
 
+static var TurnManager = Engine.get_main_loop().root.get_node_or_null("/root/TurnManager") if Engine.get_main_loop() is SceneTree else null
+static var MagicSystem = Engine.get_main_loop().root.get_node_or_null("/root/MagicSystem") if Engine.get_main_loop() is SceneTree else null
+static var SpellRegistry = Engine.get_main_loop().root.get_node_or_null("/root/SpellRegistry") if Engine.get_main_loop() is SceneTree else null
+
 static func take_turn(game, class_id: String) -> void:
 	var player = game.player
 	if player == null or player.hp <= 0:

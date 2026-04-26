@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://pot_brill01"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "potion_brilliance"
+display_name = "potion of brilliance"
+kind = "potion"
+tier = 3
+tile_path = "res://assets/tiles/individual/item/potion/brown.png"
+identified_tile_path = "res://assets/tiles/individual/item/potion/i-brilliance.png"
+glyph = "!"
+glyph_color = Color(0.9, 0.9, 0.4, 1)
+damage = 0
+delay = 1.0
+category = ""
+brand = ""
+ac_bonus = 0
+ev_penalty = 0
+slot = ""
+effect = "stat_int"
+effect_value = 1
+plus = 0
+description = "Permanently increases your Intelligence by 1."

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://boss_ogre_chief"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "ogre_chieftain"
+display_name = "Ogre Chieftain"
+tier = 4
+hp = 95
+hd = 10
+ac = 6
+ev = 4
+speed = 9
+sight_range = 8
+attacks = [{"damage": 16, "flavour": "slam"}]
+resists = []
+min_depth = 9
+max_depth = 9
+weight = 0
+xp_value = 50
+is_boss = true
+tile_path = "res://assets/tiles/individual/mon/humanoids/ogre.png"
+glyph = "O"
+glyph_color = Color(0.6, 0.4, 0.2, 1)

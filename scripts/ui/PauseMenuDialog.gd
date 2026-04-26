@@ -1,4 +1,6 @@
 class_name PauseMenuDialog extends RefCounted
+static var GameManager = Engine.get_main_loop().root.get_node_or_null("/root/GameManager") if Engine.get_main_loop() is SceneTree else null
+static var SaveManager = Engine.get_main_loop().root.get_node_or_null("/root/SaveManager") if Engine.get_main_loop() is SceneTree else null
 
 static func open(game: Node) -> void:
 	var dlg: GameDialog = GameDialog.create("Menu")

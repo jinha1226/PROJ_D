@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://shield_kite01"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "kite_shield"
+display_name = "kite shield"
+kind = "shield"
+tier = 2
+tile_path = "res://assets/tiles/individual/item/armour/shields/kite_shield1.png"
+glyph = ")"
+glyph_color = Color(0.55, 0.65, 0.75, 1)
+damage = 0
+delay = 1.0
+category = ""
+brand = ""
+ac_bonus = 2
+ev_penalty = 2
+slot = ""
+effect = "block"
+effect_value = 20
+required_skill = 3
+plus = 0
+description = "Large shield. 20% base block + Shield skill. +2 AC, -2 EV. Req Defense 3."

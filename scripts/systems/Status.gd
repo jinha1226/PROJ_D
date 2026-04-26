@@ -213,6 +213,10 @@ static func _resists_of(actor) -> Array:
 
 static func _log_tick_damage(actor, id: String, dmg: int) -> void:
 	if actor is Player:
-		CombatLog.damage_taken("%s ravages you. (-%d HP)"
-			% [display_name(id), dmg])
+		var tree := Engine.get_main_loop() as SceneTree
+		if tree != null:
+			var combat_log = tree.root.get_node_or_null("/root/CombatLog")
+			if combat_log != null:
+				combat_log.damage_taken("%s ravages you. (-%d HP)"
+					% [display_name(id), dmg])
 	# Monster ticks don't log — too noisy.

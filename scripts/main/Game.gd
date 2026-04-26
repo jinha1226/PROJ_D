@@ -125,7 +125,16 @@ func _handle_tap(screen_pos: Vector2) -> void:
 	var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
 	var target: Vector2i = map.world_to_grid(world_pos)
 	if player.can_attack_tile(target):
-		player.try_attack_tile(target)
+		var w_id: String = player.equipped_weapon_id
+		var w: ItemData = ItemRegistry.get_by_id(w_id) if w_id != "" else null
+		var dist: int = max(abs(target.x - player.grid_pos.x), abs(target.y - player.grid_pos.y))
+		if w != null and w.category == "ranged" and dist > 1:
+			var cs: float = DungeonMap.CELL_SIZE
+			var world_start := player.position + Vector2(cs * 0.5, cs * 0.5)
+			var world_end := map.grid_to_world(target) + Vector2(cs * 0.5, cs * 0.5)
+			spawn_spell_bolt(world_start, world_end, "", func(): player.try_attack_tile(target))
+		else:
+			player.try_attack_tile(target)
 		return
 	if target == player.grid_pos:
 		var tile: int = map.tile_at(player.grid_pos)

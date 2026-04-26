@@ -1,5 +1,7 @@
 class_name FloorItem extends Node2D
 
+var GameManager = null
+
 var data: ItemData
 var grid_pos: Vector2i = Vector2i.ZERO
 var plus: int = 0
@@ -10,6 +12,7 @@ var _overlay_tex: Texture2D = null
 var _font: Font
 
 func _ready() -> void:
+	GameManager = get_node_or_null("/root/GameManager")
 	_font = ThemeDB.fallback_font
 	add_to_group("floor_items")
 

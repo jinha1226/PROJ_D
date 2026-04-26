@@ -1,5 +1,9 @@
 class_name StatusDialog extends RefCounted
 
+static var GameManager = Engine.get_main_loop().root.get_node_or_null("/root/GameManager") if Engine.get_main_loop() is SceneTree else null
+static var RaceRegistry = Engine.get_main_loop().root.get_node_or_null("/root/RaceRegistry") if Engine.get_main_loop() is SceneTree else null
+static var ClassRegistry = Engine.get_main_loop().root.get_node_or_null("/root/ClassRegistry") if Engine.get_main_loop() is SceneTree else null
+
 ## Full character sheet. Sections:
 ##   Header       — race / class / XL
 ##   Vitals       — HP / MP / XP progress

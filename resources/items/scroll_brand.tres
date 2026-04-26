@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://scr_brand01"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "scroll_brand"
+display_name = "scroll of brand"
+kind = "scroll"
+tier = 3
+tile_path = "res://assets/tiles/individual/item/scroll/scroll.png"
+glyph = "?"
+glyph_color = Color(0.85, 0.85, 1, 1)
+damage = 0
+delay = 1.0
+category = ""
+brand = ""
+ac_bonus = 0
+ev_penalty = 0
+slot = ""
+effect = "scroll_brand"
+effect_value = 0
+plus = 0
+description = "Brands your wielded weapon with a random enchant."

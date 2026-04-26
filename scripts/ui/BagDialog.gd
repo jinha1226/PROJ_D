@@ -1,6 +1,7 @@
 class_name BagDialog extends RefCounted
 
 const THUMB_SIZE := 48
+static var ItemRegistry = Engine.get_main_loop().root.get_node_or_null("/root/ItemRegistry") if Engine.get_main_loop() is SceneTree else null
 
 static func open(player: Player, parent: Node) -> void:
 	var dlg: GameDialog = GameDialog.create_ratio("Bag", 0.92, 0.92)
