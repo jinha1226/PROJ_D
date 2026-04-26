@@ -1,167 +1,63 @@
-# PocketCrawl — 게임 컨셉 테이블
+# PocketCrawl - Current Concept Tables
 
 _Last updated: 2026-04-26_
 
----
+This file summarizes the current mainline game loop.
 
-## 직업 (3 베이스 클래스)
+## Active Base Classes
 
-| 직업 | 핵심 스킬 | 깊이 출처 | 시작 장비 | 2차 전직 |
-|------|----------|----------|----------|---------|
-| Fighter | melee, defense | 무기 타입 + 인챈트 | 단검 or 단검, 체인메일, 버클러 | 버서커 / 나이트 / 듀얼리스트 |
-| Ranger | ranged, agility | 활 타입 + 포지셔닝 | 단궁, 가죽갑옷, 단검 | 어쌔신 / 아처 |
-| Mage | magic | 학파 스펠 조합 | 스태프, 로브, 스펠북 1권 | 이보커 / 인챈터 / 네크로맨서 / 컨저러 / 트랜스뮤터 / 아브저러 |
+| Class | Main skill | Secondary skill | Core feel |
+| --- | --- | --- | --- |
+| Fighter | `defense` | `melee` | stable frontline combat |
+| Mage | `magic` | `agility` | spell choice and MP management |
+| Rogue | `agility` | `melee` | ambush, awareness control, evasive pressure |
 
----
+## Active Skills
 
-## 스킬 (5종)
+| Skill | Meaning now | Notes |
+| --- | --- | --- |
+| `melee` | all close-range weapon combat | shared by Fighter and Rogue |
+| `ranged` | bows, thrown, future ranged archetypes | not a base-class focus right now |
+| `magic` | all spellcasting progression | schools are not growth axes |
+| `defense` | armor, shields, attrition | Fighter anchor |
+| `agility` | EV, detection pressure, ambush | Rogue anchor |
 
-| 스킬 | 효과 | 주요 사용 직업 | 스킬 9 엔드게임 효과 |
-|------|------|-------------|-------------------|
-| melee | 근접 명중/데미지 | Fighter | 어빌리티 해금 (클리브, 연속공격 등) |
-| ranged | 원거리 명중/데미지 + 투척 보너스 | Ranger | 장거리 정밀사격, 투척 데미지 증가 |
-| magic | 스펠 위력, MP 소비 감소 | Mage | 고레벨 스펠 효율 극대화 |
-| defense | AC, 방패 블록률 | Fighter | 중갑 패널티 감소, 방패 블록 강화 |
-| agility | EV(회피), 스텔스 | Ranger | 기습 보너스, 회피율 극대화 |
+## Current Start Snapshot
 
-### 스킬 레벨업
-- 레벨업 시 1포인트 자유 배분
-- **비용 스케일링**: 1~3레벨 = 1pt, 4~6레벨 = 2pt, 7~9레벨 = 3pt (만렙 총 18pt)
-- 클래스 핵심 스킬만 9까지 가능, 나머지 최대 5~6
+| Class | HP | MP | STR | DEX | INT | Start skills |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| Fighter | 30 | 2 | 14 | 10 | 6 | `melee 2`, `defense 1` |
+| Mage | 22 | 8 | 7 | 10 | 14 | `magic 2`, `agility 1` |
+| Rogue | 24 | 3 | 10 | 14 | 10 | `melee 1`, `agility 2` |
 
----
+## Magic Structure
 
-## 무기 타입
+| Layer | Current rule |
+| --- | --- |
+| schools | spell categories only |
+| progression | one shared `magic` skill |
+| learning gate | `magic` level + `INT` |
+| level-up offers | one random spell candidate per school |
+| fallback acquisition | spellbooks |
 
-### 근접 무기
+## Awareness Structure
 
-| 무기 | 속도 | 특성 | 사용 스킬 |
-|------|------|------|---------|
-| 단검 (Dagger) | 빠름 | DEX 스케일, 기습 시 보너스 | melee |
-| 검 (Sword) | 보통 | 균형형 | melee |
-| 도끼 (Axe) | 보통 | 인접 적 동시 공격 (클리브) | melee |
-| 메이스 (Mace) | 느림 | 방어 무시, 스턴 확률 | melee |
-| 창 (Spear) | 보통 | 2칸 공격 가능 | melee |
-| 스태프 (Staff) | 보통 | INT 스케일, magic 스킬 | magic |
+| State | Meaning |
+| --- | --- |
+| `unaware` | enemy has not detected the player |
+| `aware` | enemy has detected the player |
 
-### 원거리 무기
+| System piece | Current use |
+| --- | --- |
+| `agility` | lowers detection pressure and improves ambush payoff |
+| Rogue | derives the most class value from `unaware` targets |
+| ambush rule | based on awareness, not facing |
 
-| 무기 | 속도 | 특성 |
-|------|------|------|
-| 단궁 (Shortbow) | 빠름 | 짧은 사거리, 가벼움 |
-| 장궁 (Longbow) | 느림 | 높은 데미지, 긴 사거리 |
-| 석궁 (Crossbow) | 매우 느림 | 방어 무시, 강력한 단발 |
+## Current Cleanup Rule
 
----
+If old resource content conflicts with current mainline behavior:
 
-## 무기/방어구 인챈트
-
-| 인챈트 | 효과 | 부착 대상 |
-|--------|------|---------|
-| 화염 (Flame) | 화염 데미지 추가 | 무기 |
-| 냉기 (Frost) | 냉기 데미지 + 슬로우 | 무기 |
-| 독 (Venom) | 독 상태이상 | 무기 |
-| 흡혈 (Vampiric) | 데미지의 일부 HP 회복 | 무기 |
-| 번개 (Shock) | 번개 데미지 + 체인 | 무기 |
-| 강화 (Hardening) | AC 증가 | 방어구 |
-| 반사 (Reflection) | 마법 저항 | 방어구 |
-| 경량 (Nimble) | 패널티 감소 | 방어구 |
-
-- **브랜드 스크롤**로 적용, 재적용 가능 (스크롤 소모)
-- 인챈트된 무기/방어구도 희귀 드랍으로 등장
-
----
-
-## 아이템 체계
-
-### 포션
-
-| 포션 | 효과 |
-|------|------|
-| 치유 포션 | injury 전부 회복 + HP max의 20% 회복 |
-| 마력 포션 | MP 전체 회복 |
-| 힘 포션 | STR 영구 +1 |
-| 민첩 포션 | DEX 영구 +1 |
-| 지능 포션 | INT 영구 +1 |
-| 속도 포션 | 수 턴간 Haste 상태 |
-| 투명 포션 | 수 턴간 Invisible 상태 |
-| 광기 포션 | 적에게 혼란 유발 (투척 가능) |
-
-### 스크롤
-
-| 스크롤 | 효과 |
-|--------|------|
-| 브랜드 스크롤 | 무기/방어구 인챈트 적용 |
-| 강화 스크롤 | 무기/방어구 +1 |
-| 식별 스크롤 | 아이템 정체 확인 |
-| 순간이동 스크롤 | 랜덤 위치로 이동 |
-| 공포 스크롤 | 주변 적 공포 상태 |
-| 지도 스크롤 | 현재 층 전체 공개 |
-| 분노 스크롤 | 플레이어 버서크 상태 |
-
-### 완드
-
-| 완드 | 효과 | magic 스킬 보너스 |
-|------|------|----------------|
-| 화염 완드 | 화염 볼트 발사 | 데미지 증가 |
-| 냉기 완드 | 냉기 볼트 + 슬로우 | 슬로우 지속 증가 |
-| 번개 완드 | 번개 + 체인 | 체인 범위 증가 |
-| 순간이동 완드 | 대상 순간이동 | 범위 증가 |
-| 공포 완드 | 대상 공포 상태 | 지속시간 증가 |
-| 강화 완드 | 대상 일시 강화 | 지속시간 증가 |
-| 마법투사 완드 | 마법 미사일 | 발사체 수 증가 |
-
-- 충전 횟수 제한, 누구나 사용 가능
-- magic 스킬 높을수록 효과 강화
-
-### 투척 아이템
-
-| 아이템 | 효과 | ranged 스킬 보너스 |
-|--------|------|-----------------|
-| 투척 단검 | 빠른 투척, 낮은 데미지 | 명중률/데미지 |
-| 투창 (Javelin) | 높은 데미지 | 관통 확률 |
-| 폭탄 | 범위 폭발 데미지 | 범위 증가 |
-| 독 플라스크 | 독 상태이상 범위 | 지속시간 |
-| 섬광 플라스크 | 시야 방해, 도주용 | 효과 범위 |
-
-- 누구나 사용 가능, 수량 제한
-- ranged 스킬 높으면 명중/데미지 보너스
-
-### 소모품 기타
-
-| 아이템 | 효과 |
-|--------|------|
-| 붕대 | injury 10 회복, HP 소량 회복 |
-| 스펠북 | 해당 학파 마법 해금 |
-| 훈련 교본 | 특정 스킬 XP 즉시 부여 |
-
----
-
-## 마법 학파
-
-| 학파 | 컨셉 | 대표 스펠 |
-|------|------|---------|
-| Evocation | 직접 화력 | 매직 미사일, 화염구, 번개 |
-| Conjuration | 공간/소환 | 안개 구름, 순간이동, 악취 구름 |
-| Transmutation | 변신/강화 | 신속, 비대화, 하스트 |
-| Necromancy | 생명력 흡수 | 상처 유발, 허약 광선, 흡혈 접촉 |
-| Abjuration | 방어/버프 | 마법 방패, 저항, 회복 |
-| Enchantment | 정신 조종 | 수면, 공포, 마비 |
-
----
-
-## 2차 전직 조건 (초안)
-
-| 2차 직업 | 조건 | 패시브 특성 |
-|---------|------|-----------|
-| 버서커 | melee 5+ | 분노 게이지, 데미지 증가 |
-| 나이트 | melee 3+ defense 4+ | 방패 반격, 헤비아머 무패널티 |
-| 듀얼리스트 | melee 3+ agility 4+ | 회피 후 반격 |
-| 아처 | ranged 5+ | 스나이핑, 화살 인챈트 |
-| 어쌔신 | ranged 3+ agility 4+ | 기습 피해 2배, 독 특화 |
-| 이보커 | magic 5+ (Evocation 스펠 3+) | 주문 시전 비용 감소 |
-| 인챈터 | magic 5+ (Enchantment 스펠 3+) | 정신 마법 범위/지속 증가 |
-| 네크로맨서 | magic 5+ (Necromancy 스펠 3+) | 흡혈 강화, 언데드 소환 |
-| 컨저러 | magic 5+ (Conjuration 스펠 3+) | 소환 지속시간, 안개 강화 |
-| 트랜스뮤터 | magic 5+ (Transmutation 스펠 3+) | 변신 지속시간, 속도 강화 |
-| 아브저러 | magic 5+ (Abjuration 스펠 3+) | 방어막 강화, 마법 반사 |
+1. `Fighter / Mage / Rogue` are the active starting classes
+2. `melee / ranged / magic / defense / agility` are the live skills
+3. spell schools are categories, not separate progression tracks
+4. extra subclasses are future/disabled unless intentionally brought back

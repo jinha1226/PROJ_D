@@ -80,7 +80,7 @@ starting_spells = [
 "meteor_swarm"
 ]
 passive = ""
-unlocked = true
+unlocked = false
 unlock_kind = ""
 unlock_trigger_id = ""
 class_group = ""

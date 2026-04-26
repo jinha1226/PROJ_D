@@ -20,5 +20,5 @@ passive = "warrior_regen"
 unlocked = false
 unlock_kind = "use_item"
 unlock_trigger_id = "potion_berserk"
-unlocked = true
+unlocked = false
 class_group = "fighter"

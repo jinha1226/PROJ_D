@@ -53,19 +53,12 @@
     }
   },
   "class_starts": {
-    "fighter": {
+    "warrior": {
       "starting_skills": {
         "melee": 2,
         "defense": 1
       },
       "active_skills": ["melee", "defense"]
-    },
-    "ranger": {
-      "starting_skills": {
-        "ranged": 2,
-        "melee": 1
-      },
-      "active_skills": ["ranged"]
     },
     "mage": {
       "starting_skills": {
@@ -73,6 +66,13 @@
         "agility": 1
       },
       "active_skills": ["magic"]
+    },
+    "rogue": {
+      "starting_skills": {
+        "melee": 1,
+        "agility": 2
+      },
+      "active_skills": ["melee", "agility"]
     }
   }
 }

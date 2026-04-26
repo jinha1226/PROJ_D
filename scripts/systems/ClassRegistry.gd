@@ -47,7 +47,7 @@ func get_by_id(id: String) -> ClassData:
 	return by_id.get(id)
 
 func ids_in_order() -> Array:
-	var known_order: Array = ["warrior", "ranger", "mage", "rogue", "spearman", "crusher", "berserker",
+	var known_order: Array = ["warrior", "mage", "rogue", "ranger", "spearman", "crusher", "berserker",
 		"evoker", "conjurer", "transmuter", "necromancer",
 		"abjurer", "enchanter", "archmage", "ice_mage"]
 	var result: Array = []

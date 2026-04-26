@@ -11,7 +11,7 @@
     },
     "rules": {
       "spell_failure": false,
-      "skill_model": "five_skill_mobile_core",
+      "skill_model": "five_skill_mobile_core_current_main",
       "skill_xp_source": "kill_xp_allocated_to_active_skills",
       "skill_activation_toggle": true,
       "essence_model": "passive_only",
@@ -118,19 +118,12 @@
     }
   },
   "class_starts": {
-    "fighter": {
+    "warrior": {
       "starting_skills": {
         "melee": 2,
         "defense": 1
       },
       "active_skills": ["melee", "defense"]
-    },
-    "ranger": {
-      "starting_skills": {
-        "ranged": 2,
-        "melee": 1
-      },
-      "active_skills": ["ranged"]
     },
     "mage": {
       "starting_skills": {
@@ -138,6 +131,13 @@
         "agility": 1
       },
       "active_skills": ["magic"]
+    },
+    "rogue": {
+      "starting_skills": {
+        "melee": 1,
+        "agility": 2
+      },
+      "active_skills": ["melee", "agility"]
     }
   },
   "awareness_and_backstab": {

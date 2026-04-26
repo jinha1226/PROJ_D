@@ -1,104 +1,103 @@
-# PocketCrawl — Skill & Progression Design
+# PocketCrawl - Current Skill and Progression
 
-_Last updated: 2026-04-25_
+_Last updated: 2026-04-26_
 
----
+This document tracks the current main-branch ruleset.
+Older prototype ideas are not the source of truth anymore.
 
-## 캐릭터 레벨 (XL)
+## Current Baseline
 
-- **최대 레벨: 20**
-- 25층 기준 클리어 시 XL 18~19 도달 목표
-- 레벨업 시 스킬 포인트 팝업 없음 — 스킬은 별도 XP 시스템으로 성장
+- Base classes: `Fighter`, `Mage`, `Rogue`
+- Live skills: `melee`, `ranged`, `magic`, `defense`, `agility`
+- Spell schools remain as spell categories only
+- There are no per-school magic skills
+- Old `dodge` / `stealth` split is retired
 
----
+## XL and Skill Caps
 
-## 스킬 목록 (5종)
+- Max XL: `20`
+- Max skill level: `9`
+- Expected late-game XL around floor 25: `18-19`
 
-| 스킬 | 성장 방식 | 주요 효과 |
-|------|----------|----------|
-| melee | Kill XP 분배 | 근접 명중/데미지 |
-| ranged | Kill XP 분배 | 원거리 명중/데미지 |
-| magic | Kill XP 분배 | 마법 위력/MP 소비 감소 |
-| defense | Kill XP 분배 | AC, 방패 블록률 |
-| dodge | Kill XP 분배 | EV (회피율) |
+## Skill XP Model
 
-> **stealth**: 추후 2차 전직 시스템 구현 시 추가 예정
+- Skill XP source: `kill XP`
+- XP is distributed only to active skills
+- At least one skill must remain active
+- Curve intent:
+  - `1-3`: fast
+  - `4-6`: medium
+  - `7-9`: slow
 
----
+## Live Skill Roles
 
-## 스킬 레벨 시스템 (DCSS 스타일)
+| Skill | Current role |
+| --- | --- |
+| `melee` | all close-range weapon offense |
+| `ranged` | bows, thrown weapons, future ranged builds |
+| `magic` | spell access, spell power, caster progression |
+| `defense` | armor, shields, blocking, attrition |
+| `agility` | EV, awareness pressure, ambush value |
 
-### 기본 구조
-- 스킬창에서 **활성/비활성 토글** 가능
-- 활성화된 스킬들만 몬스터 처치 XP를 균등 분배받아 성장
-- 비활성 스킬은 XP를 받지 않음
+## Base Class Starts
 
-### 스킬 최대 레벨: 9
+### Fighter
 
-### 몰빵 방지
-- XL/2 같은 하드 캡 없음
-- 대신 **스킬 XP 커브를 지수 증가**로 설계:
-  - 1→3 레벨: 빠름 (초반 던전 XP로 충분)
-  - 4→6 레벨: 중간
-  - 7→9 레벨: 매우 느림 (후반 고XP 몬스터 필요)
-- 초반 몬스터는 XP가 적어 자연스럽게 던전 깊이와 스킬 레벨이 맞춰짐
-- 스킬 만렙 도달 시 해당 스킬로 XP가 더 이상 분배되지 않아 자동으로 다른 스킬 성장 유도
+- Start skills: `melee 2`, `defense 1`
+- Core feel: reliable frontline, shield/armor value, low-risk combat
 
-### 활성 스킬 흐름 예시
-```
-melee만 활성 → melee 빠르게 성장
-→ 중반 이후 성장 속도 급감
-→ dodge, defense 활성화해서 병행 성장
-→ 후반엔 2~3개 스킬이 6~8 수준
-```
+### Mage
 
----
+- Start skills: `magic 2`, `agility 1`
+- Core feel: fragile caster, book-driven progression, MP economy
 
-## 직업별 시작 스킬
+### Rogue
 
-| 직업 | 시작 스킬 | 기본 활성 |
-|------|----------|----------|
-| Fighter | melee 2, defense 1 | melee, defense |
-| Ranger | ranged 2, melee 1 | ranged |
-| Mage | magic 2 | magic |
+- Start skills: `melee 1`, `agility 2`
+- Core feel: ambush, awareness control, dagger utility, evasive fighting
 
-- 시작 스킬은 미리 투자된 포인트로 간주
-- 기본 활성 스킬은 게임 시작 시 자동 활성화
+## Magic Rules
 
----
+- `magic` is the only live spellcasting skill
+- Schools are used for:
+  - UI grouping
+  - theme
+  - spellbook identity
+  - future item/passive hooks
 
-## 엔드게임 스킬 분포 목표
+### Spell Learning
 
-- **전문화 빌드**: 1개 스킬 9 + 1개 스킬 6~7
-- **균형 빌드**: 2~3개 스킬 5~6 수준
-- 총 25층 클리어 기준 활성 스킬 전체 합산 약 20~22 레벨 분량의 XP 획득 예상
+- Higher `magic` unlocks higher spell levels
+- Level-up spell offers do not start at `magic 1`
+- Current direction:
+  - one random candidate per school
+  - choose one
+  - books remain an alternate learning path
 
----
+### Intelligence Gate
 
-## 2차 전직 (추후 구현)
+- Spell learning is also gated by `INT`
+- Low-INT off-class characters should not become full casters just by dumping points into `magic`
 
-- **타이밍**: XL 12~15 또는 특정 아이템 획득 시
-- **조건**: 주요 스킬 조합에 따라 옵션 결정
-  - melee + defense 높음 → 나이트 / 팔라딘
-  - ranged + dodge 높음 → 어쌔신 / 아처
-  - magic + melee 높음 → 스펠소드 / 배틀메이지
-  - magic 집중 → 인챈터 / 네크로맨서 / 이보커 등
-- 2차 전직 시 해당 직업 전용 패시브 + 스타팅 스킬 보너스 부여
+## Awareness Model
 
----
+- Enemies are either `unaware` or `aware`
+- `agility` helps reduce detection pressure
+- Ambush/backstab style damage is based on awareness state, not facing direction
 
-## 마법 스킬 특이사항
+## Injury Model
 
-- **마법 스킬**은 위력/효율에 영향, 스펠 잠금 해제는 **스펠북 아이템**으로만 가능
-- 즉 magic 스킬 9여도 스펠북 없으면 해당 마법 사용 불가
-- magic XP는 활성화 시 kill XP에서 분배됨 (마법 시전과 무관)
+- Injury reduces effective max HP until treated
+- It remains part of the current ruleset
+- It is still under active balance tuning, especially for melee-heavy runs
 
----
+## Not Current Baseline
 
-## 부상(Injury) 시스템
+The following are not current balance truth, even if files still exist:
 
-- 피격 시 `injury` 증가 → 유효 hp_max 감소
-- **포션**: injury 전부 회복 + hp_max의 20% 또는 최소 15 회복
-- **붕대**: injury 소량 회복 (10), hp += 회복량/2
-- **자동 회복**: 4턴마다 HP 1 회복, 단 `hp_max - injury` 이하까지만
-- HP바에서 injury 부분은 회색으로 표시
+- `Ranger` as a core start class
+- school-specific magic skill growth
+- old DCSS-like subclass tree as default progression
+- separate `dodge` and `stealth` skills
+
+These are future or disabled content unless explicitly reactivated.
