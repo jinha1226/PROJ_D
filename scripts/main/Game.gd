@@ -754,7 +754,7 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 			continue
 		if p == player.grid_pos:
 			continue
-		if _chebyshev(p, player.grid_pos) < 5:
+		if _chebyshev(p, player.grid_pos) < 4:
 			continue
 		if _monster_at(p) != null:
 			continue
@@ -772,7 +772,7 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 		placed += 1
 
 func _spawn_items_for_floor(depth: int) -> void:
-	var count: int = randi_range(5, 8)
+	var count: int = randi_range(6, 10)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = _floor_seed(depth) ^ 0x3C3C3C3C
 	var placed: int = 0
@@ -801,10 +801,10 @@ func _spawn_floor_item(data: ItemData, pos: Vector2i, plus: int) -> void:
 
 func _monster_count_for_depth(d: int) -> int:
 	if d <= 5:
-		return randi_range(8, 12)
+		return randi_range(11, 15)
 	if d <= 15:
-		return randi_range(15, 22)
-	return randi_range(10, 18)
+		return randi_range(17, 24)
+	return randi_range(12, 20)
 
 func _clear_monsters() -> void:
 	for n in get_tree().get_nodes_in_group("monsters"):
@@ -1379,8 +1379,8 @@ func _greedy_step_toward(target: Vector2i) -> Vector2i:
 func _on_monster_died(monster: Monster) -> void:
 	if player == null or player.hp <= 0:
 		return
-	var chance: float = 0.14 + GameManager.depth * 0.006
-	chance = min(chance, 0.28)
+	var chance: float = 0.22 + GameManager.depth * 0.01
+	chance = min(chance, 0.40)
 	if randf() < chance:
 		var essence_id: String
 		if monster != null and monster.data != null and String(monster.data.essence_id) != "":
