@@ -42,7 +42,7 @@ const DOLL_HAND1_MAP: Dictionary = {
 	"long_sword": "res://assets/tiles/individual/player/hand1/long_sword_slant.png",
 	"battle_axe": "res://assets/tiles/individual/player/hand1/battleaxe.png",
 	"spear": "res://assets/tiles/individual/player/hand1/spear.png",
-	"shortbow": "res://assets/tiles/individual/player/hand1/bow.png",
+	"shortbow": "res://assets/tiles/individual/player/hand1/shortbow.png",
 	"staff": "res://assets/tiles/individual/player/hand1/staff.png",
 	"flaming_sword": "res://assets/tiles/individual/player/hand1/short_sword.png",
 	"frost_dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
@@ -1043,10 +1043,10 @@ func _refresh_paperdoll() -> void:
 	_body_doll_tex = null
 	_hand1_doll_tex = null
 	_hand2_doll_tex = null
-	# Current generated race bases are full-body sprites, so layering the old
-	# armour body sheets on top hides most of the character. Keep weapon/shield
-	# overlays active, but temporarily disable body overlays until matching
-	# generated armour-only sheets are prepared.
+	if DOLL_BODY_MAP.has(equipped_armor_id):
+		var body_path: String = String(DOLL_BODY_MAP[equipped_armor_id])
+		if ResourceLoader.exists(body_path):
+			_body_doll_tex = load(body_path) as Texture2D
 	if DOLL_HAND1_MAP.has(equipped_weapon_id):
 		var path: String = String(DOLL_HAND1_MAP[equipped_weapon_id])
 		if ResourceLoader.exists(path):
