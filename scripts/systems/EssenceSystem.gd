@@ -9,6 +9,21 @@ static var TurnManager = Engine.get_main_loop().root.get_node_or_null("/root/Tur
 const SLOT_COUNT: int = 3
 const SLOT_UNLOCK_LEVELS: Array = [1, 8, 16]
 const INVENTORY_CAP: int = 4
+const ESSENCE_ICON_DIR := "res://assets/tiles/individual/item/essence/"
+const ESSENCE_TIER_BY_ID := {
+	"essence_fire": "normal",
+	"essence_cold": "normal",
+	"essence_swiftness": "normal",
+	"essence_vitality": "normal",
+	"essence_regeneration": "normal",
+	"essence_venom": "normal",
+	"essence_might": "rare",
+	"essence_stone": "rare",
+	"essence_warding": "rare",
+	"essence_arcana": "unique",
+	"essence_fury": "unique",
+	"essence_drain": "unique",
+}
 
 const ESSENCES: Dictionary = {
 	"essence_fire": {
@@ -188,6 +203,18 @@ static func description(id: String) -> String:
 
 static func color_of(id: String) -> Color:
 	return ESSENCES.get(id, {}).get("color", Color(0.8, 0.8, 0.85))
+
+static func tier_of(id: String) -> String:
+	return String(ESSENCE_TIER_BY_ID.get(id, "normal"))
+
+static func icon_path_of(id: String) -> String:
+	return ESSENCE_ICON_DIR + "essence_%s.png" % tier_of(id)
+
+static func icon_texture_of(id: String) -> Texture2D:
+	var path := icon_path_of(id)
+	if ResourceLoader.exists(path):
+		return load(path) as Texture2D
+	return null
 
 static func random_id() -> String:
 	var keys: Array = ESSENCES.keys()

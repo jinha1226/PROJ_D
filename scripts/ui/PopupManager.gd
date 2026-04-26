@@ -36,6 +36,7 @@ func show_essence_swap_popup(slot_index: int, current_id: String, inventory: Arr
 	for essence_id in inventory:
 		var b := Button.new()
 		b.text = EssenceSystem.display_name(String(essence_id))
+		b.icon = EssenceSystem.icon_texture_of(String(essence_id))
 		b.pressed.connect(func():
 			if callback.is_valid(): callback.call(essence_id)
 			dlg.queue_free())
@@ -59,11 +60,21 @@ func show_essence_pickup_popup(essence_id: String, inventory: Array, cap: int, c
 	dlg.dialog_hide_on_ok = false
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 10)
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 12)
+	var icon := TextureRect.new()
+	icon.texture = EssenceSystem.icon_texture_of(essence_id)
+	icon.custom_minimum_size = Vector2(48, 48)
+	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	header.add_child(icon)
 	var desc := Label.new()
 	desc.text = EssenceSystem.description(essence_id)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc.add_theme_font_size_override("font_size", 24)
-	vb.add_child(desc)
+	desc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(desc)
+	vb.add_child(header)
 	var inv := Label.new()
 	inv.text = "Carried essences: %d / %d" % [inventory.size(), cap]
 	inv.add_theme_font_size_override("font_size", 18)
@@ -88,6 +99,7 @@ func show_essence_pickup_popup(essence_id: String, inventory: Array, cap: int, c
 		for existing_id in inventory:
 			var swap_btn := Button.new()
 			swap_btn.text = "Replace %s" % EssenceSystem.display_name(String(existing_id))
+			swap_btn.icon = EssenceSystem.icon_texture_of(String(existing_id))
 			swap_btn.custom_minimum_size = Vector2(0, 56)
 			swap_btn.pressed.connect(func():
 				if callbacks.has("replace"):

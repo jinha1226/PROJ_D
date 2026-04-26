@@ -174,6 +174,14 @@ static func _build_essence(body: VBoxContainer, player: Player) -> void:
 		slot_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		row.add_child(slot_lbl)
 
+		var icon := TextureRect.new()
+		icon.custom_minimum_size = Vector2(32, 32)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		if slot_unlocked and slot_id != "":
+			icon.texture = EssenceSystem.icon_texture_of(slot_id)
+		row.add_child(icon)
+
 		var name_lbl := Label.new()
 		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -263,6 +271,7 @@ static func _open_essence_swap(slot: int, player: Player, body: VBoxContainer) -
 	for ess_id in player.essence_inventory:
 		var btn := Button.new()
 		btn.text = "%s\n%s" % [EssenceSystem.display_name(ess_id), EssenceSystem.description(ess_id)]
+		btn.icon = EssenceSystem.icon_texture_of(String(ess_id))
 		btn.custom_minimum_size = Vector2(0, 64)
 		btn.add_theme_font_size_override("font_size", 20)
 		var eid: String = ess_id
