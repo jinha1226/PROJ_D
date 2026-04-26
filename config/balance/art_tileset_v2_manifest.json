@@ -1,0 +1,71 @@
+{
+  "version": "generated_tileset_v2",
+  "runtime_tile_size": 32,
+  "render_contract": "strict_paper_doll_layers",
+  "view": "topdown",
+  "active_races": [
+    "human",
+    "orc",
+    "elf",
+    "kobold",
+    "troll",
+    "tiefling"
+  ],
+  "base_bounds": {
+    "x": 5,
+    "y": 0,
+    "w": 21,
+    "h": 32
+  },
+  "body_bounds": {
+    "x": 4,
+    "y": 0,
+    "w": 24,
+    "h": 32
+  },
+  "hand1_bounds": {
+    "x": 5,
+    "y": 0,
+    "w": 22,
+    "h": 32
+  },
+  "hand2_bounds": {
+    "x": 1,
+    "y": 0,
+    "w": 29,
+    "h": 32
+  },
+  "sheet_templates": {
+    "bases": "assets/generated_tileset_v2/templates/player_bases_sheet_template.png",
+    "body": "assets/generated_tileset_v2/templates/player_body_sheet_template.png",
+    "hand1": "assets/generated_tileset_v2/templates/player_hand1_sheet_template.png",
+    "hand2": "assets/generated_tileset_v2/templates/player_hand2_sheet_template.png"
+  },
+  "phase1_overlays": {
+    "body": [
+      "robe",
+      "leather_armor",
+      "chain_mail"
+    ],
+    "hand1": [
+      "dagger",
+      "short_sword",
+      "mace",
+      "spear",
+      "bow",
+      "staff"
+    ],
+    "hand2": [
+      "buckler",
+      "round_shield"
+    ]
+  },
+  "generation_rules": [
+    "Every sprite must fit inside its 32x32 cell.",
+    "Transparent background only.",
+    "Do not render a full outfit into race bases; race bases are bare-body adventurer bases only.",
+    "Keep feet aligned to the yellow baseline near y=28.",
+    "Hand-held items must stay within the recorded hand layer bounds.",
+    "No labels, frames, or presentation board layout in runtime sheets."
+  ]
+}
