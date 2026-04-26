@@ -1043,15 +1043,10 @@ func _refresh_paperdoll() -> void:
 	_body_doll_tex = null
 	_hand1_doll_tex = null
 	_hand2_doll_tex = null
-	if DOLL_BODY_MAP.has(equipped_armor_id):
-		var body_path: String = String(DOLL_BODY_MAP[equipped_armor_id])
-		# Use class-specific robe if wearing a plain robe.
-		if equipped_armor_id == "robe":
-			var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id)
-			if cls != null and String(cls.robe_path) != "":
-				body_path = String(cls.robe_path)
-		if ResourceLoader.exists(body_path):
-			_body_doll_tex = load(body_path) as Texture2D
+	# Current generated race bases are full-body sprites, so layering the old
+	# armour body sheets on top hides most of the character. Keep weapon/shield
+	# overlays active, but temporarily disable body overlays until matching
+	# generated armour-only sheets are prepared.
 	if DOLL_HAND1_MAP.has(equipped_weapon_id):
 		var path: String = String(DOLL_HAND1_MAP[equipped_weapon_id])
 		if ResourceLoader.exists(path):
