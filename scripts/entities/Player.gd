@@ -42,6 +42,8 @@ const DOLL_HAND1_MAP: Dictionary = {
 	"long_sword": "res://assets/tiles/individual/player/hand1/long_sword_slant.png",
 	"battle_axe": "res://assets/tiles/individual/player/hand1/battleaxe.png",
 	"spear": "res://assets/tiles/individual/player/hand1/spear.png",
+	"shortbow": "res://assets/tiles/individual/player/hand1/bow.png",
+	"staff": "res://assets/tiles/individual/player/hand1/staff.png",
 	"flaming_sword": "res://assets/tiles/individual/player/hand1/short_sword.png",
 	"frost_dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
 	"venom_dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
