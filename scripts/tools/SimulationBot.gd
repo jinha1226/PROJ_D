@@ -60,7 +60,7 @@ static func _try_use_survival_item(game, class_id: String) -> bool:
 	if class_id == "mage" and player.mp <= 1 and _try_use_named_item(player, "potion_magic"):
 		TurnManager.end_player_turn()
 		return true
-	if class_id == "rogue" and hp_ratio <= 0.45 and _try_use_named_item(player, "scroll_blinking"):
+	if class_id == "rogue" and hp_ratio <= 0.45 and _try_use_named_item(player, "potion_invisible"):
 		TurnManager.end_player_turn()
 		return true
 	return false

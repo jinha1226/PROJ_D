@@ -28,13 +28,17 @@ Older prototype ideas are not the source of truth anymore.
   - `1-3`: fast
   - `4-6`: medium
   - `7-9`: slow
+- Late-run build target:
+  - two core skills can reach `8-9`
+  - one support skill usually lands around `3-5`
+  - remaining skills stay low
 
 ## Live Skill Roles
 
 | Skill | Current role |
 | --- | --- |
 | `melee` | all close-range weapon offense |
-| `ranged` | bows, thrown weapons, future ranged builds |
+| `ranged` | bows, thrown weapons, Rogue support, future ranged builds |
 | `magic` | spell access, spell power, caster progression |
 | `defense` | armor, shields, blocking, attrition |
 | `agility` | EV, awareness pressure, ambush value |
@@ -53,8 +57,8 @@ Older prototype ideas are not the source of truth anymore.
 
 ### Rogue
 
-- Start skills: `melee 1`, `agility 2`
-- Core feel: ambush, awareness control, dagger utility, evasive fighting
+- Start skills: `ranged 1`, `agility 2`
+- Core feel: ranged pressure, awareness control, and tool-based evasive play
 
 ## Magic Rules
 

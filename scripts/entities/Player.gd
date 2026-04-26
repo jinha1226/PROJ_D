@@ -667,8 +667,17 @@ func take_damage(amount: int, source: String = "") -> void:
 		CombatLog.post("You are invulnerable!", Color(1.0, 0.95, 0.5))
 		return
 	hp = max(0, hp - amount)
-	var injury_gain: int = maxi(0, amount / 4)
-	if amount >= 8:
+	var injury_gain: int = maxi(0, amount / 5)
+	var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id) if GameManager != null and ClassRegistry != null else null
+	var class_group: String = String(cls.class_group) if cls != null else ""
+	match class_group:
+		"fighter":
+			injury_gain = maxi(0, injury_gain - 1)
+		"rogue":
+			injury_gain = maxi(0, injury_gain - (1 if amount < 10 else 0))
+	var defense_level: int = get_skill_level("defense")
+	injury_gain = maxi(0, injury_gain - int(defense_level / 3))
+	if amount >= 12:
 		injury_gain += 1
 	injury = min(hp_max - 1, injury + injury_gain)
 	if source != "":
@@ -870,7 +879,7 @@ func _generate_magic_spell_choices(spell_level: int) -> Array:
 func int_required_for_spell(spell: SpellData) -> int:
 	if spell == null:
 		return 99
-	return 8 + max(0, spell.spell_level - 1) * 2
+	return 7 + spell.spell_level * 2
 
 func _chebyshev(a: Vector2i, b: Vector2i) -> int:
 	return max(abs(a.x - b.x), abs(a.y - b.y))

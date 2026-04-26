@@ -16,6 +16,15 @@
     "essence_slots": 3
   },
   "brand_drop_rate_relative": [0.15, 0.25],
+  "floor_loot_weights": {
+    "potion": 0.40,
+    "scroll": 0.36,
+    "throwing": 0.04,
+    "wand": 0.04,
+    "book": 0.03,
+    "gold": 0.06,
+    "equipment": 0.07
+  },
   "enchant_ranges": {
     "early": [0, 2],
     "mid": [1, 4],
@@ -23,7 +32,8 @@
   },
   "xp_progression_expectation": {
     "floor_25_target_xl": [18, 19],
-    "skill_specialist_endgame": [9, 6],
+    "skill_specialist_endgame": [9, 9],
+    "skill_support_endgame": [3, 5],
     "skill_balanced_endgame": [5, 6]
   }
 }

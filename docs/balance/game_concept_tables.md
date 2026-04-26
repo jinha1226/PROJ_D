@@ -10,14 +10,14 @@ This file summarizes the current mainline game loop.
 | --- | --- | --- | --- |
 | Fighter | `defense` | `melee` | stable frontline combat |
 | Mage | `magic` | `agility` | spell choice and MP management |
-| Rogue | `agility` | `melee` | ambush, awareness control, evasive pressure |
+| Rogue | `agility` | `ranged` | ranged pressure, awareness control, and trick tools |
 
 ## Active Skills
 
 | Skill | Meaning now | Notes |
 | --- | --- | --- |
-| `melee` | all close-range weapon combat | shared by Fighter and Rogue |
-| `ranged` | bows, thrown, future ranged archetypes | not a base-class focus right now |
+| `melee` | all close-range weapon combat | Fighter backup and off-build support |
+| `ranged` | bows, thrown, future ranged archetypes | Rogue support axis and future ranged core |
 | `magic` | all spellcasting progression | schools are not growth axes |
 | `defense` | armor, shields, attrition | Fighter anchor |
 | `agility` | EV, detection pressure, ambush | Rogue anchor |
@@ -28,7 +28,7 @@ This file summarizes the current mainline game loop.
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | Fighter | 30 | 2 | 14 | 10 | 6 | `melee 2`, `defense 1` |
 | Mage | 22 | 8 | 7 | 10 | 14 | `magic 2`, `agility 1` |
-| Rogue | 24 | 3 | 10 | 14 | 10 | `melee 1`, `agility 2` |
+| Rogue | 25 | 3 | 10 | 14 | 10 | `ranged 1`, `agility 2` |
 
 ## Magic Structure
 

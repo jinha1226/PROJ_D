@@ -26,11 +26,12 @@
     "late_game_build_targets": {
       "specialist": {
         "primary_skill": 9,
-        "secondary_skill": [6, 7]
+        "secondary_skill": 9,
+        "tertiary_support_skill": [3, 5]
       },
       "balanced": {
         "skills_at_mid_high": [5, 6],
-        "skill_count": [2, 3]
+        "skill_count": 3
       }
     }
   },
@@ -134,10 +135,10 @@
     },
     "rogue": {
       "starting_skills": {
-        "melee": 1,
+        "ranged": 1,
         "agility": 2
       },
-      "active_skills": ["melee", "agility"]
+      "active_skills": ["ranged", "agility"]
     }
   },
   "awareness_and_backstab": {

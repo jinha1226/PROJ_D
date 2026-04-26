@@ -319,7 +319,7 @@ func _apply_class_to_player(class_id: String) -> void:
 	player.refresh_ac_from_equipment()
 	player._refresh_paperdoll()
 	player.known_spells = data.starting_spells.duplicate()
-	if player.known_spells.is_empty():
+	if player.known_spells.is_empty() and data.class_group == "mage":
 		var magic_level: int = player.get_skill_level("magic")
 		for spell_level in range(1, magic_level + 1):
 			player.request_magic_spell_choices(spell_level)
@@ -353,7 +353,7 @@ func _class_starter_items(class_id: String) -> Array:
 		"mage":
 			return ["potion_healing", "potion_magic"]
 		"rogue":
-			return ["potion_healing", "scroll_shrouding", "scroll_blinking"]
+			return ["dagger", "potion_healing", "potion_invisible", "scroll_shrouding"]
 	return []
 
 func _class_default_active_skills(class_id: String, fallback: Array) -> Array:
@@ -363,7 +363,7 @@ func _class_default_active_skills(class_id: String, fallback: Array) -> Array:
 		"mage":
 			return ["magic"]
 		"rogue":
-			return ["melee", "agility"]
+			return ["ranged", "agility"]
 	if not fallback.is_empty():
 		return fallback
 	return ["melee"]
@@ -708,7 +708,7 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 		placed += 1
 
 func _spawn_items_for_floor(depth: int) -> void:
-	var count: int = randi_range(4, 7)
+	var count: int = randi_range(5, 8)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = _floor_seed(depth) ^ 0x3C3C3C3C
 	var placed: int = 0

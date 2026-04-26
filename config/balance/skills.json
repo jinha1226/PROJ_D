@@ -69,10 +69,10 @@
     },
     "rogue": {
       "starting_skills": {
-        "melee": 1,
+        "ranged": 1,
         "agility": 2
       },
-      "active_skills": ["melee", "agility"]
+      "active_skills": ["ranged", "agility"]
     }
   }
 }

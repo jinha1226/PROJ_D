@@ -156,7 +156,7 @@ func _starter_extras(class_id: String) -> Array:
 	match class_id:
 		"warrior": return ["healing ×2"]
 		"mage":    return ["healing", "magic potion"]
-		"rogue":   return ["healing", "shrouding", "blinking"]
+		"rogue":   return ["dagger", "healing", "invisibility", "shrouding"]
 	return []
 
 func _skills_line(data: ClassData) -> String:

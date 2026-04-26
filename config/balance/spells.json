@@ -3,7 +3,8 @@
   "magic_skill_model": {
     "single_skill": "magic",
     "school_identity_source": "spell_lists_only",
-    "spell_learning": "books_and_items_only"
+    "spell_learning": "mage_starts_with_levelup_choices_offclass_starts_from_books_then_levels",
+    "int_requirement_formula": "7 + spell_level * 2"
   },
   "spell_level_budget": {
     "1": {
