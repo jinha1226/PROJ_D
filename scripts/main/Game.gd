@@ -786,37 +786,38 @@ func _spawn_items_for_floor(depth: int) -> void:
 		var d: ItemData = ItemRegistry.pick_kind(depth, "scroll")
 		if d != null: to_place.append(d)
 	for _i in range(rng.randi_range(1, 2)):
-		var d: ItemData = ItemRegistry.pick_equipment(depth)
+		var d: ItemData = ItemRegistry.pick_equipment_weighted(depth)
+		if d != null: to_place.append(d)
+
+	# ~1 book per 2-3 floors (40% chance)
+	if rng.randf() < 0.40:
+		var d: ItemData = ItemRegistry.pick_kind(depth, "book")
 		if d != null: to_place.append(d)
 
 	# ── Sector guaranteed drops (sector = 3-floor block) ───────────────
-	# Distribute so sector total = 2-3 enhance scrolls, 1-2 wands, 2-3 healing potions.
-	const ENHANCE_SCROLLS: Array = [
-		"scroll_enchant_weapon", "scroll_enchant_armor", "scroll_upgrade"
-	]
+	# Sector total: enchant_weapon ×1, enchant_armor ×1, wand 1-2, healing 2-3, essence ×2
 	var floor_in_sector: int = (depth - 1) % 3  # 0, 1, or 2
 	if floor_in_sector == 0:
-		# Floor 1: healing + enhance scroll + wand
+		# Floor 1: healing + enchant_weapon + wand + essence
 		to_place.append(ItemRegistry.get_by_id("potion_healing"))
-		to_place.append(ItemRegistry.get_by_id(ENHANCE_SCROLLS[rng.randi() % 3]))
+		to_place.append(ItemRegistry.get_by_id("scroll_enchant_weapon"))
 		var wd: ItemData = ItemRegistry.pick_kind(depth, "wand")
 		if wd != null: to_place.append(wd)
+		_queue_essence_pickup(EssenceSystem.random_id())
 	elif floor_in_sector == 1:
-		# Floor 2: healing + enhance scroll
+		# Floor 2: healing + enchant_armor + essence
 		to_place.append(ItemRegistry.get_by_id("potion_healing"))
-		to_place.append(ItemRegistry.get_by_id(ENHANCE_SCROLLS[rng.randi() % 3]))
+		to_place.append(ItemRegistry.get_by_id("scroll_enchant_armor"))
+		_queue_essence_pickup(EssenceSystem.random_id())
 	else:
-		# Floor 3: 50% each for extra healing / enhance scroll / wand
+		# Floor 3: 50% extra healing + 50% upgrade scroll + 50% wand
 		if rng.randf() < 0.5:
 			to_place.append(ItemRegistry.get_by_id("potion_healing"))
 		if rng.randf() < 0.5:
-			to_place.append(ItemRegistry.get_by_id(ENHANCE_SCROLLS[rng.randi() % 3]))
+			to_place.append(ItemRegistry.get_by_id("scroll_upgrade"))
 		if rng.randf() < 0.5:
 			var wd: ItemData = ItemRegistry.pick_kind(depth, "wand")
 			if wd != null: to_place.append(wd)
-
-	# ── Guaranteed essence per floor ────────────────────────────────────
-	_queue_essence_pickup(EssenceSystem.random_id())
 
 	# ── Place all items on random floor tiles ───────────────────────────
 	for item in to_place:

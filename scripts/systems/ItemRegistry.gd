@@ -169,6 +169,61 @@ func pick_kind(depth: int, kind: String) -> ItemData:
 func pick_equipment(depth: int) -> ItemData:
 	return _pick_weighted(depth, ["weapon", "armor", "ring", "amulet", "shield"])
 
+func pick_equipment_weighted(depth: int) -> ItemData:
+	var eq_kinds: Array[String] = ["weapon", "armor", "ring", "amulet", "shield"]
+	var candidates: Array = []
+	var weights: Array[int] = []
+	for it in all:
+		if not eq_kinds.has(String(it.kind)):
+			continue
+		var w: int = _tier_weight(it.tier, depth)
+		if w <= 0:
+			continue
+		candidates.append(it)
+		weights.append(w)
+	if candidates.is_empty():
+		return pick_by_depth(depth)
+	var total: int = 0
+	for w in weights:
+		total += w
+	var roll: int = randi() % total
+	var acc: int = 0
+	for i in range(candidates.size()):
+		acc += weights[i]
+		if roll < acc:
+			return candidates[i]
+	return candidates[candidates.size() - 1]
+
+func _tier_weight(tier: int, depth: int) -> int:
+	if depth <= 2:
+		match tier:
+			1: return 70
+			2: return 25
+			3: return 5
+		return 0
+	elif depth <= 5:
+		match tier:
+			1: return 20
+			2: return 50
+			3: return 25
+			4: return 5
+		return 0
+	elif depth <= 8:
+		match tier:
+			1: return 5
+			2: return 20
+			3: return 45
+			4: return 25
+			5: return 5
+		return 0
+	else:
+		match tier:
+			2: return 10
+			3: return 25
+			4: return 40
+			5: return 25
+		return 0
+
 func _pick_weighted(depth: int, kinds: Array[String]) -> ItemData:
 	var candidates: Array = []
 	for it in all:
