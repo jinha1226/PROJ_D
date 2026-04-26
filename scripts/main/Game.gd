@@ -4,11 +4,23 @@ const DungeonMapScene = preload("res://scripts/dungeon/DungeonMap.gd")
 const PlayerScene = preload("res://scripts/entities/Player.gd")
 const MonsterScene = preload("res://scripts/entities/Monster.gd")
 const FloorItemScene = preload("res://scripts/entities/FloorItem.gd")
+const SimulationBotRef = preload("res://scripts/tools/SimulationBot.gd")
 const TopHUDScene = preload("res://scenes/ui/TopHUD.tscn")
 const BottomHUDScene = preload("res://scenes/ui/BottomHUD.tscn")
 const ResultScreenScene = preload("res://scenes/ui/ResultScreen.tscn")
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 const RACE_SELECT_PATH: String = "res://scenes/menu/RaceSelect.tscn"
+
+@onready var GameManager = get_node("/root/GameManager")
+@onready var TurnManager = get_node("/root/TurnManager")
+@onready var CombatLog = get_node("/root/CombatLog")
+@onready var SaveManager = get_node("/root/SaveManager")
+@onready var MonsterRegistry = get_node("/root/MonsterRegistry")
+@onready var ItemRegistry = get_node("/root/ItemRegistry")
+@onready var ClassRegistry = get_node("/root/ClassRegistry")
+@onready var SpellRegistry = get_node("/root/SpellRegistry")
+@onready var RaceRegistry = get_node("/root/RaceRegistry")
+@onready var RacePassiveSystem = get_node("/root/RacePassiveSystem")
 
 var map: DungeonMap
 var player: Player
@@ -41,6 +53,7 @@ var _auto_step_queued: bool = false
 var _watch_simulation: bool = false
 var _watch_sim_step_token: int = 0
 var _watch_sim_step_queued: bool = false
+var _watch_sim_internal_action: bool = false
 
 const AUTO_PATH_PREVIEW_SEC: float = 0.12
 const AUTO_STEP_DELAY_SEC: float = 0.05
@@ -966,7 +979,9 @@ func _defer_watch_simulation_step(token: int, delay_sec: float) -> void:
 		return
 	if player == null or player.hp <= 0:
 		return
-	SimulationBot.take_turn(self, GameManager.selected_class_id)
+	_watch_sim_internal_action = true
+	SimulationBotRef.take_turn(self, GameManager.selected_class_id)
+	_watch_sim_internal_action = false
 
 func _try_respawn_monster() -> void:
 	if map == null or player == null or player.hp <= 0:
@@ -1150,7 +1165,8 @@ func _confirm_targeting() -> void:
 		TurnManager.end_player_turn()
 
 func _on_rest_pressed() -> void:
-	_cancel_watch_simulation("manual")
+	if _watch_simulation and not _watch_sim_internal_action:
+		_cancel_watch_simulation("manual")
 	if player == null or player.hp <= 0 or not TurnManager.is_player_turn:
 		return
 	if _monster_in_sight():
@@ -1294,6 +1310,8 @@ func _item_at(pos: Vector2i) -> FloorItem:
 
 
 func _on_act_pressed() -> void:
+	if _watch_simulation and not _watch_sim_internal_action:
+		_cancel_watch_simulation("manual")
 	if player == null or player.hp <= 0 or not TurnManager.is_player_turn:
 		return
 	if _auto_exploring:
