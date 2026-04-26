@@ -13,3 +13,4 @@ class_name SpellData extends Resource
 @export var element: String = ""
 @export var effect: String = "damage"
 @export var description: String = ""
+@export var icon_path: String = ""

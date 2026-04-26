@@ -78,6 +78,17 @@ static func _make_spell_row(spell: SpellData, player: Player,
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 
+	# Spell icon
+	var icon_rect := TextureRect.new()
+	icon_rect.custom_minimum_size = Vector2(40, 40)
+	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	if spell.icon_path != "" and ResourceLoader.exists(spell.icon_path):
+		icon_rect.texture = load(spell.icon_path)
+	if locked:
+		icon_rect.modulate = Color(0.35, 0.35, 0.4, 1.0)
+	row.add_child(icon_rect)
+
 	# Level badge
 	var lv_lbl := Label.new()
 	lv_lbl.text = "Lv%d" % spell.spell_level

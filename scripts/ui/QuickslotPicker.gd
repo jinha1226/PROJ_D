@@ -91,6 +91,14 @@ static func _make_spell_row(spell: SpellData, player: Player, slot_index: int,
 	row.custom_minimum_size = Vector2(0, 60)
 	row.add_theme_constant_override("separation", 8)
 
+	var icon_rect := TextureRect.new()
+	icon_rect.custom_minimum_size = Vector2(40, 40)
+	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	if spell.icon_path != "" and ResourceLoader.exists(spell.icon_path):
+		icon_rect.texture = load(spell.icon_path)
+	row.add_child(icon_rect)
+
 	var vb := VBoxContainer.new()
 	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(vb)

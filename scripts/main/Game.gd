@@ -1164,8 +1164,12 @@ func _refresh_quickslots() -> void:
 		# Spell slot
 		var spell: SpellData = SpellRegistry.get_by_id(id)
 		if spell != null:
-			bottom_hud.set_quickslot_display(i, spell.display_name.left(3),
-					Color(0.7, 0.5, 1.0))
+			if spell.icon_path != "" and ResourceLoader.exists(spell.icon_path):
+				var tex: Texture2D = load(spell.icon_path)
+				bottom_hud.set_quickslot(i, tex, "")
+			else:
+				bottom_hud.set_quickslot_display(i, spell.display_name.left(3),
+						Color(0.7, 0.5, 1.0))
 			continue
 		# Item slot
 		var data: ItemData = ItemRegistry.get_by_id(id)
