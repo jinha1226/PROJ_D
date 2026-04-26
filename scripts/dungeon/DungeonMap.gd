@@ -11,7 +11,7 @@ enum Tile {
 	DOOR_OPEN = 5,
 }
 
-const GRID_W: int = 26
+const GRID_W: int = 32
 const GRID_H: int = 36
 const CELL_SIZE: int = 32
 
