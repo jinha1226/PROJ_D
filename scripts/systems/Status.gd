@@ -48,6 +48,7 @@ const INFO: Dictionary = {
 	"hasted":       {"name": "Hasted",       "color": Color(0.4, 1.0, 0.65)},
 	"time_stopped": {"name": "Time Stop",    "color": Color(0.9, 0.6, 1.0)},
 	"damage_boost": {"name": "Empowered",    "color": Color(1.0, 0.65, 0.3)},
+	"shrouded":     {"name": "Shrouded",     "color": Color(0.7, 0.82, 1.0)},
 }
 
 # ── Resist scaling ────────────────────────────────────────────────────────

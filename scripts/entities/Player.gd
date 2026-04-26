@@ -125,21 +125,8 @@ func _dir_for_key(k: int) -> Vector2i:
 
 func _try_move(dir: Vector2i) -> void:
 	var target: Vector2i = grid_pos + dir
-	var monster: Monster = _monster_at(target)
-	if monster != null:
-		CombatSystem.player_attack_monster(self, monster)
-		TurnManager.end_player_turn()
+	if try_attack_tile(target):
 		return
-	# Reach: polearm can attack 2 tiles if adjacent tile is clear
-	if monster == null and equipped_weapon_id != "":
-		var _wreach: ItemData = ItemRegistry.get_by_id(equipped_weapon_id)
-		if _wreach != null and _wreach.category == "polearm":
-			var reach_pos: Vector2i = grid_pos + dir * 2
-			var reach_monster: Monster = _monster_at(reach_pos)
-			if reach_monster != null:
-				CombatSystem.player_attack_monster(self, reach_monster)
-				TurnManager.end_player_turn()
-				return
 	if not _map.is_walkable(target):
 		return
 	grid_pos = target
@@ -227,6 +214,43 @@ func try_step(dir: Vector2i) -> void:
 		return
 	_try_move(dir)
 
+func can_attack_tile(target: Vector2i) -> bool:
+	return _attack_target_for_tile(target) != null
+
+func try_attack_tile(target: Vector2i) -> bool:
+	var monster: Monster = _attack_target_for_tile(target)
+	if monster == null:
+		return false
+	CombatSystem.player_attack_monster(self, monster)
+	TurnManager.end_player_turn()
+	return true
+
+func _attack_target_for_tile(target: Vector2i) -> Monster:
+	var direct: Monster = _monster_at(target)
+	if direct != null and _chebyshev(target, grid_pos) <= 1:
+		return direct
+	if equipped_weapon_id == "":
+		return null
+	var weapon: ItemData = ItemRegistry.get_by_id(equipped_weapon_id)
+	if weapon == null or weapon.category != "polearm":
+		return null
+	var delta: Vector2i = target - grid_pos
+	var reach: int = _chebyshev(target, grid_pos)
+	if reach != 2:
+		return null
+	var step := Vector2i(sign(delta.x), sign(delta.y))
+	if step == Vector2i.ZERO:
+		return null
+	if grid_pos + step * 2 != target:
+		return null
+	var middle: Vector2i = grid_pos + step
+	if _monster_at(middle) != null:
+		return null
+	if _map != null and not _map.in_bounds(middle):
+		return null
+	var reach_monster: Monster = _monster_at(target)
+	return reach_monster
+
 func use_item(index: int) -> void:
 	if index < 0 or index >= items.size():
 		return
@@ -273,6 +297,10 @@ func use_item(index: int) -> void:
 				Color(0.5, 0.85, 1.0))
 		"teleport":
 			_teleport_far()
+		"shroud":
+			apply_status("shrouded", max(4, data.effect_value))
+			_break_enemy_awareness(max(2, data.effect_value / 2))
+			CombatLog.post("Shadows gather around you.", Color(0.72, 0.86, 1.0))
 		"enchant_weapon":
 			_enchant_weapon(max(1, data.effect_value))
 		"enchant_armor":
@@ -479,6 +507,19 @@ func _blink(max_dist: int) -> void:
 		return
 	CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
 
+func _break_enemy_awareness(radius: int) -> void:
+	var tree := get_tree()
+	if tree == null:
+		return
+	for n in tree.get_nodes_in_group("monsters"):
+		if not (n is Monster):
+			continue
+		if _chebyshev(n.grid_pos, grid_pos) <= radius:
+			continue
+		n.is_alerted = false
+		n.last_known_player_pos = Vector2i(-1, -1)
+		n.lose_awareness()
+
 func compute_fov() -> Dictionary:
 	if _map == null:
 		return {}
@@ -490,7 +531,10 @@ func take_damage(amount: int, source: String = "") -> void:
 		CombatLog.post("You are invulnerable!", Color(1.0, 0.95, 0.5))
 		return
 	hp = max(0, hp - amount)
-	injury = min(hp_max - 1, injury + (amount + 1) / 2)
+	var injury_gain: int = maxi(0, amount / 4)
+	if amount >= 8:
+		injury_gain += 1
+	injury = min(hp_max - 1, injury + injury_gain)
 	if source != "":
 		last_killer = source
 	emit_signal("damaged", amount)
@@ -575,11 +619,15 @@ func grant_skill_xp(id: String, amount: float) -> void:
 			Color(0.7, 0.95, 0.5))
 		if id == "agility":
 			ev += 1
-		elif id == "magic":
+		elif id == "magic" and int(s["level"]) >= 2 and _can_offer_magic_choices():
 			var spell_choices: Array = _generate_magic_spell_choices(int(s["level"]))
 			if not spell_choices.is_empty():
 				emit_signal("spell_choices_requested", int(s["level"]), spell_choices)
 	skills[id] = s
+
+func _can_offer_magic_choices() -> bool:
+	var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id)
+	return cls != null and cls.class_group == "mage"
 
 func grant_xp(amount: int) -> void:
 	xp += amount
@@ -676,6 +724,9 @@ func _generate_magic_spell_choices(spell_level: int) -> Array:
 			choices.append(String(candidates[0]))
 	choices.shuffle()
 	return choices
+
+func _chebyshev(a: Vector2i, b: Vector2i) -> int:
+	return max(abs(a.x - b.x), abs(a.y - b.y))
 
 func wait_turn() -> void:
 	var hp_cap: int = max(1, hp_max - injury)

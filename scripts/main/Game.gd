@@ -106,6 +106,9 @@ func _handle_tap(screen_pos: Vector2) -> void:
 	var canvas_tf: Transform2D = get_viewport().get_canvas_transform()
 	var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
 	var target: Vector2i = map.world_to_grid(world_pos)
+	if player.can_attack_tile(target):
+		player.try_attack_tile(target)
+		return
 	if target == player.grid_pos:
 		var tile: int = map.tile_at(player.grid_pos)
 		if tile == DungeonMap.Tile.STAIRS_DOWN:
@@ -331,6 +334,8 @@ func _class_starter_items(class_id: String) -> Array:
 			return ["potion_healing", "bandage"]
 		"mage":
 			return ["potion_healing", "potion_magic"]
+		"rogue":
+			return ["potion_healing", "scroll_shrouding", "scroll_blinking"]
 		"archmage":
 			return ["potion_healing", "potion_magic", "scroll_identify"]
 	return []
@@ -689,7 +694,7 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 		placed += 1
 
 func _spawn_items_for_floor(depth: int) -> void:
-	var count: int = randi_range(2, 4)
+	var count: int = randi_range(3, 5)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = _floor_seed(depth) ^ 0x3C3C3C3C
 	var placed: int = 0
@@ -703,7 +708,7 @@ func _spawn_items_for_floor(depth: int) -> void:
 			continue
 		if _item_at(p) != null:
 			continue
-		var data: ItemData = ItemRegistry.pick_by_depth(depth)
+		var data: ItemData = ItemRegistry.pick_floor_loot(depth)
 		if data == null:
 			return
 		_spawn_floor_item(data, p, 0)
@@ -1204,6 +1209,9 @@ func _on_act_pressed() -> void:
 		return
 	var nearest := _nearest_visible_monster()
 	if nearest != null:
+		if player.can_attack_tile(nearest.grid_pos):
+			player.try_attack_tile(nearest.grid_pos)
+			return
 		var dir := _greedy_step_toward(nearest.grid_pos)
 		if dir != Vector2i.ZERO:
 			player.try_step(dir)

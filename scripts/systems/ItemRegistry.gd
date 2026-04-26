@@ -24,6 +24,7 @@ const _VENOM_DAGGER: Resource = preload("res://resources/items/venom_dagger.tres
 const _SHOCK_MACE: Resource = preload("res://resources/items/shock_mace.tres")
 const _POTION_BERSERK: Resource = preload("res://resources/items/potion_berserk.tres")
 const _SCROLL_IDENTIFY: Resource = preload("res://resources/items/scroll_identify.tres")
+const _SCROLL_SHROUDING: Resource = preload("res://resources/items/scroll_shrouding.tres")
 const _BOOK_EVOCATION: Resource = preload("res://resources/items/book_evocation.tres")
 const _BOOK_CONJURATION: Resource = preload("res://resources/items/book_conjuration.tres")
 const _BOOK_TRANSMUTATION: Resource = preload("res://resources/items/book_transmutation.tres")
@@ -49,6 +50,7 @@ const _BUCKLER: Resource = preload("res://resources/items/buckler.tres")
 const _ROUND_SHIELD: Resource = preload("res://resources/items/round_shield.tres")
 const _TOWER_SHIELD: Resource = preload("res://resources/items/tower_shield.tres")
 const _BANDAGE: Resource = preload("res://resources/items/bandage.tres")
+const _STAFF: Resource = preload("res://resources/items/staff.tres")
 
 const _ALL_ITEMS: Array = [
 	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE, _SPEAR,
@@ -60,9 +62,10 @@ const _ALL_ITEMS: Array = [
 	_FLAMING_SWORD, _FROST_DAGGER, _VENOM_DAGGER, _SHOCK_MACE,
 	_LEATHER_ARMOR, _ROBE, _CHAIN_MAIL,
 	_POTION_HEALING, _POTION_MIGHT, _POTION_CURE_POISON, _POTION_MAGIC,
-	_POTION_BERSERK, _BANDAGE,
+	_POTION_BERSERK, _BANDAGE, _STAFF,
 	_SCROLL_BLINKING, _SCROLL_MAGIC_MAPPING, _SCROLL_TELEPORT,
 	_SCROLL_ENCHANT_WEAPON, _SCROLL_ENCHANT_ARMOR, _SCROLL_IDENTIFY,
+	_SCROLL_SHROUDING,
 	_BOOK_EVOCATION, _BOOK_CONJURATION, _BOOK_TRANSMUTATION,
 	_BOOK_NECROMANCY, _BOOK_ABJURATION, _BOOK_ENCHANTMENT,
 	_GOLD_PILE,
@@ -99,4 +102,28 @@ func pick_by_depth(depth: int, kind_filter: String = "") -> ItemData:
 			candidates.append(it)
 	if candidates.is_empty():
 		return null
+	return candidates[randi() % candidates.size()]
+
+func pick_floor_loot(depth: int) -> ItemData:
+	var roll: float = randf()
+	if roll < 0.33:
+		return _pick_weighted(depth, ["potion"])
+	if roll < 0.61:
+		return _pick_weighted(depth, ["scroll"])
+	if roll < 0.73:
+		return _pick_weighted(depth, ["gold"])
+	if roll < 0.83:
+		return _pick_weighted(depth, ["book"])
+	return _pick_weighted(depth, ["weapon", "armor", "ring", "amulet", "shield"])
+
+func _pick_weighted(depth: int, kinds: Array[String]) -> ItemData:
+	var candidates: Array = []
+	for it in all:
+		if depth < it.tier:
+			continue
+		if not kinds.has(String(it.kind)):
+			continue
+		candidates.append(it)
+	if candidates.is_empty():
+		return pick_by_depth(depth)
 	return candidates[randi() % candidates.size()]

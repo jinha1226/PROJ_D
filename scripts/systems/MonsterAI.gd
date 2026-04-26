@@ -102,11 +102,13 @@ static func _effective_sight_range(monster: Monster, player: Player) -> int:
 	var stealth_score: int = player.get_skill_level("agility")
 	var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id)
 	if cls != null and cls.class_group == "rogue":
-		stealth_score += 2
+		stealth_score += 4
 	if player.equipped_weapon_id != "":
 		var weapon: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
 		if weapon != null and weapon.category == "dagger":
-			stealth_score += 1
+			stealth_score += 2
+	if Status.has(player, "shrouded"):
+		stealth_score += 8
 	return maxi(2, radius - int(floor(float(stealth_score) / 3.0)))
 
 static func _step_toward(monster: Monster, map: DungeonMap, target: Vector2i) -> void:
@@ -149,13 +151,20 @@ static func _pack_alert(source: Monster, player_pos: Vector2i) -> void:
 	var tree := Engine.get_main_loop() as SceneTree
 	if tree == null:
 		return
+	var player: Player = _find_player()
+	if player != null and Status.has(player, "shrouded"):
+		return
+	var alert_radius: int = 8
+	var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id)
+	if cls != null and cls.class_group == "rogue":
+		alert_radius = 4
 	for node in tree.get_nodes_in_group("monsters"):
 		if node == source or not (node is Monster):
 			continue
 		var m: Monster = node as Monster
 		if m.is_alerted or m.hp <= 0:
 			continue
-		if _chebyshev(source.grid_pos, m.grid_pos) <= 8:
+		if _chebyshev(source.grid_pos, m.grid_pos) <= alert_radius:
 			m.become_aware(player_pos)
 
 static func _random_step(monster: Monster, map: DungeonMap) -> void:
