@@ -36,8 +36,8 @@ static func generate(width: int, height: int, map_seed: int = -1) -> Dictionary:
 	_add_cross_connections(rooms, tiles, width, rng)
 	# Place doors at narrow room entrances.
 	_place_doors(rooms, tiles, width, height)
-	var spawn := rooms[0].get_center()
-	var stairs_down := _farthest_floor(spawn, tiles, width, height)
+	var spawn: Vector2i = rooms[0].get_center()
+	var stairs_down: Vector2i = _farthest_floor(spawn, tiles, width, height)
 	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
 	tiles[stairs_down.y * width + stairs_down.x] = DungeonMap.Tile.STAIRS_DOWN
 	return {
@@ -51,8 +51,8 @@ static func generate(width: int, height: int, map_seed: int = -1) -> Dictionary:
 # ── BSP split ──────────────────────────────────────────────────────────────
 
 static func _split(rect: Rect2i, depth: int, rng: RandomNumberGenerator,
-		tiles: PackedByteArray, width: int, rooms: Array) -> void:
-	var area := rect.size.x * rect.size.y
+		tiles: PackedByteArray, width: int, rooms: Array[Rect2i]) -> void:
+	var area: int = rect.size.x * rect.size.y
 	if depth >= MAX_SPLIT_DEPTH or area < MIN_LEAF_AREA \
 			or rect.size.x < MIN_ROOM_W + 2 or rect.size.y < MIN_ROOM_H + 2:
 		_carve_room(rect, rng, tiles, width, rooms)
@@ -65,8 +65,8 @@ static func _split(rect: Rect2i, depth: int, rng: RandomNumberGenerator,
 	else:
 		horizontal = rng.randf() < 0.5
 	if horizontal:
-		var raw := int(rect.size.y * rng.randf_range(SPLIT_MIN, SPLIT_MAX))
-		var split_at := clampi(raw, MIN_ROOM_H + 2, rect.size.y - MIN_ROOM_H - 2)
+		var raw: int = int(rect.size.y * rng.randf_range(SPLIT_MIN, SPLIT_MAX))
+		var split_at: int = clampi(raw, MIN_ROOM_H + 2, rect.size.y - MIN_ROOM_H - 2)
 		if split_at <= 0 or split_at >= rect.size.y:
 			_carve_room(rect, rng, tiles, width, rooms)
 			return
@@ -76,8 +76,8 @@ static func _split(rect: Rect2i, depth: int, rng: RandomNumberGenerator,
 				Vector2i(rect.size.x, rect.size.y - split_at)),
 				depth + 1, rng, tiles, width, rooms)
 	else:
-		var raw := int(rect.size.x * rng.randf_range(SPLIT_MIN, SPLIT_MAX))
-		var split_at := clampi(raw, MIN_ROOM_W + 2, rect.size.x - MIN_ROOM_W - 2)
+		var raw: int = int(rect.size.x * rng.randf_range(SPLIT_MIN, SPLIT_MAX))
+		var split_at: int = clampi(raw, MIN_ROOM_W + 2, rect.size.x - MIN_ROOM_W - 2)
 		if split_at <= 0 or split_at >= rect.size.x:
 			_carve_room(rect, rng, tiles, width, rooms)
 			return
@@ -88,15 +88,15 @@ static func _split(rect: Rect2i, depth: int, rng: RandomNumberGenerator,
 				depth + 1, rng, tiles, width, rooms)
 
 static func _carve_room(leaf: Rect2i, rng: RandomNumberGenerator,
-		tiles: PackedByteArray, width: int, rooms: Array) -> void:
-	var max_w := min(MAX_ROOM_W, leaf.size.x - 2)
-	var max_h := min(MAX_ROOM_H, leaf.size.y - 2)
+		tiles: PackedByteArray, width: int, rooms: Array[Rect2i]) -> void:
+	var max_w: int = mini(MAX_ROOM_W, leaf.size.x - 2)
+	var max_h: int = mini(MAX_ROOM_H, leaf.size.y - 2)
 	if max_w < MIN_ROOM_W or max_h < MIN_ROOM_H:
 		return
-	var room_w := rng.randi_range(MIN_ROOM_W, max_w)
-	var room_h := rng.randi_range(MIN_ROOM_H, max_h)
-	var x0 := leaf.position.x + rng.randi_range(1, max(1, leaf.size.x - room_w - 1))
-	var y0 := leaf.position.y + rng.randi_range(1, max(1, leaf.size.y - room_h - 1))
+	var room_w: int = rng.randi_range(MIN_ROOM_W, max_w)
+	var room_h: int = rng.randi_range(MIN_ROOM_H, max_h)
+	var x0: int = leaf.position.x + rng.randi_range(1, maxi(1, leaf.size.x - room_w - 1))
+	var y0: int = leaf.position.y + rng.randi_range(1, maxi(1, leaf.size.y - room_h - 1))
 	var room := Rect2i(x0, y0, room_w, room_h)
 	rooms.append(room)
 	for y in range(y0, y0 + room_h):
@@ -107,27 +107,27 @@ static func _carve_room(leaf: Rect2i, rng: RandomNumberGenerator,
 
 static func _connect_rooms(a: Rect2i, b: Rect2i,
 		tiles: PackedByteArray, width: int, rng: RandomNumberGenerator) -> void:
-	var ax0 := a.position.x; var ax1 := a.position.x + a.size.x - 1
-	var ay0 := a.position.y; var ay1 := a.position.y + a.size.y - 1
-	var bx0 := b.position.x; var bx1 := b.position.x + b.size.x - 1
-	var by0 := b.position.y; var by1 := b.position.y + b.size.y - 1
+	var ax0: int = a.position.x; var ax1: int = a.position.x + a.size.x - 1
+	var ay0: int = a.position.y; var ay1: int = a.position.y + a.size.y - 1
+	var bx0: int = b.position.x; var bx1: int = b.position.x + b.size.x - 1
+	var by0: int = b.position.y; var by1: int = b.position.y + b.size.y - 1
 	# X-ranges overlap → single vertical corridor.
-	var ox0 := max(ax0, bx0); var ox1 := min(ax1, bx1)
+	var ox0: int = maxi(ax0, bx0); var ox1: int = mini(ax1, bx1)
 	if ox1 >= ox0:
-		var cx := rng.randi_range(ox0, ox1)
+		var cx: int = rng.randi_range(ox0, ox1)
 		_carve_v(cx, ay1 if ay1 < by0 else ay0, by0 if ay1 < by0 else by1, tiles, width)
 		return
 	# Y-ranges overlap → single horizontal corridor.
-	var oy0 := max(ay0, by0); var oy1 := min(ay1, by1)
+	var oy0: int = maxi(ay0, by0); var oy1: int = mini(ay1, by1)
 	if oy1 >= oy0:
-		var cy := rng.randi_range(oy0, oy1)
+		var cy: int = rng.randi_range(oy0, oy1)
 		_carve_h(cy, ax1 if ax1 < bx0 else ax0, bx0 if ax1 < bx0 else bx1, tiles, width)
 		return
 	# No overlap → L-shape from nearest corner pair.
-	var px_a := ax1 if ax1 < bx0 else ax0
-	var px_b := bx0 if ax1 < bx0 else bx1
-	var py_a := ay1 if ay1 < by0 else ay0
-	var py_b := by0 if ay1 < by0 else by1
+	var px_a: int = ax1 if ax1 < bx0 else ax0
+	var px_b: int = bx0 if ax1 < bx0 else bx1
+	var py_a: int = ay1 if ay1 < by0 else ay0
+	var py_b: int = by0 if ay1 < by0 else by1
 	if rng.randf() < 0.5:
 		_carve_h(py_a, px_a, px_b, tiles, width)
 		_carve_v(px_b, py_a, py_b, tiles, width)
@@ -135,7 +135,7 @@ static func _connect_rooms(a: Rect2i, b: Rect2i,
 		_carve_v(px_a, py_a, py_b, tiles, width)
 		_carve_h(py_b, px_a, px_b, tiles, width)
 
-static func _add_cross_connections(rooms: Array, tiles: PackedByteArray,
+static func _add_cross_connections(rooms: Array[Rect2i], tiles: PackedByteArray,
 		width: int, rng: RandomNumberGenerator) -> void:
 	for i in range(rooms.size()):
 		for j in range(i + 2, rooms.size()):
@@ -143,20 +143,20 @@ static func _add_cross_connections(rooms: Array, tiles: PackedByteArray,
 				_connect_rooms(rooms[i], rooms[j], tiles, width, rng)
 
 static func _room_gap(a: Rect2i, b: Rect2i) -> int:
-	var ax1 := a.position.x + a.size.x - 1; var ay1 := a.position.y + a.size.y - 1
-	var bx1 := b.position.x + b.size.x - 1; var by1 := b.position.y + b.size.y - 1
-	var dx := max(0, max(b.position.x - ax1, a.position.x - bx1))
-	var dy := max(0, max(b.position.y - ay1, a.position.y - by1))
+	var ax1: int = a.position.x + a.size.x - 1; var ay1: int = a.position.y + a.size.y - 1
+	var bx1: int = b.position.x + b.size.x - 1; var by1: int = b.position.y + b.size.y - 1
+	var dx: int = maxi(0, maxi(b.position.x - ax1, a.position.x - bx1))
+	var dy: int = maxi(0, maxi(b.position.y - ay1, a.position.y - by1))
 	return dx + dy
 
 # ── Door placement ─────────────────────────────────────────────────────────
 
-static func _place_doors(rooms: Array, tiles: PackedByteArray,
+static func _place_doors(rooms: Array[Rect2i], tiles: PackedByteArray,
 		width: int, height: int) -> void:
 	for room in rooms:
-		var rx0 := room.position.x; var ry0 := room.position.y
-		var rx1 := room.position.x + room.size.x - 1
-		var ry1 := room.position.y + room.size.y - 1
+		var rx0: int = room.position.x; var ry0: int = room.position.y
+		var rx1: int = room.position.x + room.size.x - 1
+		var ry1: int = room.position.y + room.size.y - 1
 		# Scan cells just outside each edge of the room.
 		for x in range(rx0, rx1 + 1):
 			_try_place_door(x, ry0 - 1, tiles, width, height)
@@ -173,13 +173,13 @@ static func _try_place_door(x: int, y: int, tiles: PackedByteArray,
 		return
 	# Only place door where walls flank on the perpendicular axis
 	# (ensures it's a 1-tile-wide passage, not an open area).
-	var left  := tiles[y * width + (x - 1)]
-	var right := tiles[y * width + (x + 1)]
-	var up    := tiles[(y - 1) * width + x]
-	var down  := tiles[(y + 1) * width + x]
-	var wall  := DungeonMap.Tile.WALL
-	var h_pass := (left == wall and right == wall)
-	var v_pass := (up  == wall and down  == wall)
+	var left: int  = tiles[y * width + (x - 1)]
+	var right: int = tiles[y * width + (x + 1)]
+	var up: int    = tiles[(y - 1) * width + x]
+	var down: int  = tiles[(y + 1) * width + x]
+	var wall: int  = DungeonMap.Tile.WALL
+	var h_pass: bool = (left == wall and right == wall)
+	var v_pass: bool = (up  == wall and down  == wall)
 	if h_pass or v_pass:
 		tiles[y * width + x] = DungeonMap.Tile.DOOR_CLOSED
 
@@ -187,14 +187,14 @@ static func _try_place_door(x: int, y: int, tiles: PackedByteArray,
 
 static func _carve_h(y: int, x0: int, x1: int,
 		tiles: PackedByteArray, width: int) -> void:
-	var lo := min(x0, x1); var hi := max(x0, x1)
+	var lo: int = mini(x0, x1); var hi: int = maxi(x0, x1)
 	for x in range(lo, hi + 1):
 		if tiles[y * width + x] == DungeonMap.Tile.WALL:
 			tiles[y * width + x] = DungeonMap.Tile.FLOOR
 
 static func _carve_v(x: int, y0: int, y1: int,
 		tiles: PackedByteArray, width: int) -> void:
-	var lo := min(y0, y1); var hi := max(y0, y1)
+	var lo: int = mini(y0, y1); var hi: int = maxi(y0, y1)
 	for y in range(lo, hi + 1):
 		if tiles[y * width + x] == DungeonMap.Tile.WALL:
 			tiles[y * width + x] = DungeonMap.Tile.FLOOR
@@ -205,8 +205,8 @@ static func _farthest_floor(origin: Vector2i, tiles: PackedByteArray,
 		width: int, height: int) -> Vector2i:
 	var dist: Dictionary = {origin: 0}
 	var frontier: Array[Vector2i] = [origin]
-	var farthest := origin
-	var max_d := 0
+	var farthest: Vector2i = origin
+	var max_d: int = 0
 	while not frontier.is_empty():
 		var p: Vector2i = frontier.pop_front()
 		var d: int = int(dist[p])
