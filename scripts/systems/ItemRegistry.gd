@@ -148,10 +148,12 @@ func pick_floor_loot(depth: int) -> ItemData:
 	if roll < 0.68:
 		return _pick_weighted(depth, ["scroll"])
 	if roll < 0.74:
+		return _pick_weighted(depth, ["wand"])
+	if roll < 0.80:
 		return _pick_weighted(depth, ["book"])
-	if roll < 0.82:
-		return _pick_weighted(depth, ["wand", "throwing"])
-	if roll < 0.88:
+	if roll < 0.86:
+		return _pick_weighted(depth, ["throwing"])
+	if roll < 0.90:
 		return _pick_weighted(depth, ["gold"])
 	return _pick_weighted(depth, ["weapon", "armor", "ring", "amulet", "shield"])
 
