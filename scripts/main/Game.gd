@@ -741,7 +741,7 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 		placed += 1
 
 func _spawn_items_for_floor(depth: int) -> void:
-	var count: int = randi_range(3, 5)
+	var count: int = randi_range(4, 7)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = _floor_seed(depth) ^ 0x3C3C3C3C
 	var placed: int = 0

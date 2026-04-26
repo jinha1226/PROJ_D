@@ -143,16 +143,16 @@ func pick_by_depth(depth: int, kind_filter: String = "") -> ItemData:
 
 func pick_floor_loot(depth: int) -> ItemData:
 	var roll: float = randf()
-	if roll < 0.30:
+	if roll < 0.38:
 		return _pick_weighted(depth, ["potion"])
-	if roll < 0.55:
+	if roll < 0.68:
 		return _pick_weighted(depth, ["scroll"])
-	if roll < 0.63:
-		return _pick_weighted(depth, ["gold"])
-	if roll < 0.71:
+	if roll < 0.74:
 		return _pick_weighted(depth, ["book"])
-	if roll < 0.79:
+	if roll < 0.82:
 		return _pick_weighted(depth, ["wand", "throwing"])
+	if roll < 0.88:
+		return _pick_weighted(depth, ["gold"])
 	return _pick_weighted(depth, ["weapon", "armor", "ring", "amulet", "shield"])
 
 func _pick_weighted(depth: int, kinds: Array[String]) -> ItemData:
