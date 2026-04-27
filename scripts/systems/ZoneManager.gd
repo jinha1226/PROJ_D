@@ -24,8 +24,9 @@ const BRANCHES: Dictionary = {
 		"boss_id": "bog_serpent",
 		"essence_reward": "essence_plague",
 		"brand_element": "venom",
-		"wall": "res://assets/tiles/individual/dngn/wall/brick_brown-vines0.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/dirt0.png",
+		"entrance_tile": "res://assets/tiles/individual/dngn/gateways/enter_swamp.png",
+		"wall": "res://assets/tiles/individual/dngn/wall/wall_vines0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/swamp0.png",
 	},
 	"ice_caves": {
 		"display_name": "Ice Caves",
@@ -37,8 +38,9 @@ const BRANCHES: Dictionary = {
 		"boss_id": "glacial_sovereign",
 		"essence_reward": "essence_glacial",
 		"brand_element": "freezing",
-		"wall": "res://assets/tiles/individual/dngn/wall/brick_brown-vines0.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/limestone0.png",
+		"entrance_tile": "res://assets/tiles/individual/dngn/gateways/ice_cave_portal.png",
+		"wall": "res://assets/tiles/individual/dngn/wall/ice_wall0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/ice0.png",
 	},
 	"infernal": {
 		"display_name": "Infernal",
@@ -50,8 +52,9 @@ const BRANCHES: Dictionary = {
 		"boss_id": "ember_tyrant",
 		"essence_reward": "essence_infernal",
 		"brand_element": "flaming",
-		"wall": "res://assets/tiles/individual/dngn/wall/brick_brown-vines0.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/crystal0.png",
+		"entrance_tile": "res://assets/tiles/individual/dngn/gateways/enter_hell1.png",
+		"wall": "res://assets/tiles/individual/dngn/wall/volcanic_wall0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/lava00.png",
 	},
 	"slime_pits": {
 		"display_name": "Slime Pits",
@@ -63,6 +66,7 @@ const BRANCHES: Dictionary = {
 		"boss_id": "sovereign_jelly",
 		"essence_reward": "essence_acid",
 		"brand_element": "acid",
+		"entrance_tile": "res://assets/tiles/individual/dngn/gateways/enter_slime.png",
 		"wall": "res://assets/tiles/individual/dngn/wall/slime0.png",
 		"floor": "res://assets/tiles/individual/dngn/floor/acidic_floor0.png",
 	},
@@ -96,8 +100,9 @@ func branch_env_damage(branch_id: String, branch_floor: int) -> int:
 	var cfg: Dictionary = BRANCHES.get(branch_id, {})
 	if cfg.is_empty():
 		return 0
-	var base: int = int(cfg.get("env_damage", 2))
-	return base if branch_floor > 1 else max(1, base / 2)
+	if branch_floor <= 1:
+		return 0
+	return int(cfg.get("env_damage", 2))
 
 func branch_env_element(branch_id: String) -> String:
 	return String(BRANCHES.get(branch_id, {}).get("env", ""))

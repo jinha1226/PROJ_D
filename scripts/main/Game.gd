@@ -695,10 +695,16 @@ func _generate_floor(depth: int, map_seed: int,
 	else:
 		var has_branch: bool = ZoneManager.branch_entrance_for_depth(depth) != ""
 		var already_cleared: bool = false
+		var bid: String = ZoneManager.branch_entrance_for_depth(depth)
 		if has_branch:
-			var bid: String = ZoneManager.branch_entrance_for_depth(depth)
 			already_cleared = GameManager.branches_cleared.has(bid)
 		map.generate(map_seed, has_branch and not already_cleared)
+		if has_branch and not already_cleared:
+			var ecfg: Dictionary = ZoneManager.branch_config(bid)
+			var etex_path: String = String(ecfg.get("entrance_tile", ""))
+			map._tex_branch_entrance = load(etex_path) as Texture2D if etex_path != "" else null
+		else:
+			map._tex_branch_entrance = null
 		player.bind_map(map, map.spawn_pos)
 		_spawn_items_for_floor(depth)
 		_spawn_monsters_for_floor(depth)
@@ -1111,7 +1117,25 @@ func _on_player_died() -> void:
 	var shards: int = _calc_run_score(false)
 	GameManager.add_rune_shards(shards)
 	GameManager.end_run("death")
-	_show_result_screen(false, shards)
+	_show_death_message(shards)
+
+func _show_death_message(shards: int) -> void:
+	var dlg: GameDialog = GameDialog.create_ratio("", 0.82, 0.52)
+	add_child(dlg)
+	dlg.set_close_text("-more-")
+	var body := dlg.body()
+	if body == null:
+		_show_result_screen(false, shards)
+		return
+	var lbl := Label.new()
+	lbl.text = "악! 이건 정말 아프다!\n\n죽었다... \ㅜ"
+	lbl.add_theme_font_size_override("font_size", 38)
+	lbl.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35))
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.add_child(lbl)
+	dlg.set_on_close(func(): _show_result_screen(false, shards))
 
 func _calc_run_score(cleared: bool) -> int:
 	var score: int = player.kills + player.items_collected + player.xl * 3 + GameManager.depth * 2
@@ -1289,6 +1313,8 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 	else:
 		_spawn_monsters_for_floor(eff_depth)
 		_spawn_items_for_floor(eff_depth)
+		if branch_floor == 1:
+			_spawn_branch_resistance_hint(branch_id)
 	_refresh_fov()
 
 func _spawn_branch_boss(branch_id: String) -> void:
@@ -1314,6 +1340,14 @@ func _spawn_branch_boss(branch_id: String) -> void:
 	m.died.connect(_on_branch_boss_died.bind(m, branch_id))
 	TurnManager.register_actor(m)
 	CombatLog.post("A powerful presence fills the chamber...", Color(1.0, 0.5, 0.2))
+
+func _spawn_branch_resistance_hint(branch_id: String) -> void:
+	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
+	var essence_id: String = String(cfg.get("essence_reward", ""))
+	if essence_id == "":
+		return
+	_queue_essence_pickup(essence_id)
+	CombatLog.post("The environment here is hostile — a protective essence manifests.", Color(0.9, 0.85, 0.4))
 
 func _on_branch_boss_died(monster: Monster, branch_id: String) -> void:
 	_on_monster_died(monster)

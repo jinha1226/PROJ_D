@@ -10,12 +10,12 @@ static var ClassRegistry = Engine.get_main_loop().root.get_node_or_null("/root/C
 ##   Stats        — STR / DEX / INT
 ##   Combat       — AC / EV / WL
 ##   Equipment    — all body slots
-##   Resistances  — fire / cold / poison / will
+##   Resistances  — fire / cold / poison / corr
 ##   Essence      — 3 equipped slots + active effects + inventory swap
 ##   Effects      — active statuses with turns remaining
 ##   Run          — depth / gold / kills / turns
 
-const _ELEMENTS: Array = ["fire", "cold", "poison", "will"]
+const _ELEMENTS: Array = ["fire", "cold", "poison", "corr"]
 
 const _EQUIP_SLOTS: Array = [
 	["⚔ Weapon",  "weapon"],
@@ -179,12 +179,8 @@ static func _build_equipment(body: VBoxContainer, player: Player) -> void:
 
 static func _build_resists(body: VBoxContainer, player: Player) -> void:
 	for elem in _ELEMENTS:
-		if elem == "will":
-			# WL is a numeric stat; display the current value directly
-			body.add_child(_kv_row("Will", "WL %d" % player.wl, Color(0.85, 0.7, 1.0)))
-		else:
-			var lvl: int = Status.resist_level(player.resists, elem)
-			body.add_child(_resist_row(elem, lvl))
+		var lvl: int = Status.resist_level(player.resists, elem)
+		body.add_child(_resist_row(elem, lvl))
 
 static func _build_essence(body: VBoxContainer, player: Player) -> void:
 	# ── Active essence effects summary ────────────────────────────────────────
@@ -471,5 +467,5 @@ static func _element_color(element: String) -> Color:
 		"fire":    return Color(1.0, 0.55, 0.3)
 		"cold":    return Color(0.55, 0.85, 1.0)
 		"poison":  return Color(0.5, 1.0, 0.5)
-		"will":    return Color(0.85, 0.7, 1.0)
+		"corr":    return Color(0.6, 0.85, 0.3)
 	return Color(0.8, 0.8, 0.85)

@@ -50,6 +50,7 @@ const TERRAIN_BANDS: Array = [
 
 var _tex_wall: Texture2D = null
 var _tex_floor: Texture2D = null
+var _tex_branch_entrance: Texture2D = null
 
 var tiles: PackedByteArray = PackedByteArray()
 var visible_tiles: Dictionary = {}
@@ -224,7 +225,7 @@ func _texture_for(t: int) -> Texture2D:
 		Tile.DOOR_OPEN:
 			return _tex_door_open
 		Tile.BRANCH_DOWN:
-			return TEX_STAIRS_DOWN
+			return _tex_branch_entrance if _tex_branch_entrance != null else TEX_STAIRS_DOWN
 	return null
 
 func _glyph_for(t: int) -> String:
