@@ -384,6 +384,8 @@ func use_item(index: int) -> void:
 		"scroll_brand":
 			_enchant_weapon(1)
 			CombatLog.post("Your weapon glows with new power.", Color(1.0, 0.85, 0.3))
+		"branch_brand":
+			_apply_branch_brand(String(data.brand))
 		"scroll_silence":
 			var game_sil: Node = get_tree().current_scene if get_tree() != null else null
 			if game_sil != null and game_sil.has_method("apply_silence_aoe"):
@@ -574,6 +576,33 @@ func refresh_ac_from_equipment() -> void:
 	ev += EssenceSystem.bonus_ev(self)
 	ev = max(0, ev)
 	emit_signal("stats_changed")
+
+func _apply_branch_brand(element: String) -> void:
+	var target: String = "weapon" if randf() < 0.5 else "armor"
+	var target_id: String = equipped_weapon_id if target == "weapon" else equipped_armor_id
+	if target_id == "":
+		# Fallback to the other slot
+		target = "armor" if target == "weapon" else "weapon"
+		target_id = equipped_weapon_id if target == "weapon" else equipped_armor_id
+	if target_id == "":
+		CombatLog.post("You have no equipment to brand.", Color(1.0, 0.7, 0.5))
+		return
+	for i in range(items.size()):
+		var entry: Dictionary = items[i]
+		if entry.get("id", "") == target_id:
+			entry["brand"] = element
+			items[i] = entry
+			var idata: ItemData = ItemRegistry.get_by_id(target_id)
+			var name_: String = idata.display_name if idata != null else target_id
+			var element_colors: Dictionary = {
+				"venom": Color(0.4, 1.0, 0.4),
+				"freezing": Color(0.5, 0.85, 1.0),
+				"flaming": Color(1.0, 0.55, 0.2),
+			}
+			CombatLog.post("Your %s is branded with %s!" % [name_, element],
+				element_colors.get(element, Color.WHITE))
+			emit_signal("stats_changed")
+			return
 
 func _enchant_weapon(amount: int) -> void:
 	if equipped_weapon_id == "":

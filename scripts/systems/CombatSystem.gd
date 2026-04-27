@@ -76,6 +76,9 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		var uw_mult: float = EssenceSystem.unaware_damage_mult(player)
 		if uw_mult > 1.0:
 			final = max(1, int(round(float(final) * uw_mult)))
+	# Plague: +20% damage vs. poisoned targets
+	if player.essence_slots.has("essence_plague") and Status.has(monster, "poison"):
+		final = max(1, int(round(float(final) * 1.2)))
 	var brand: String = _weapon_brand(player)
 	var brand_extra: int = 0
 	if brand != "":
@@ -161,10 +164,43 @@ static func _dagger_swift_strike(player: Player, monster: Monster) -> void:
 static func _weapon_brand(player: Player) -> String:
 	if player.equipped_weapon_id == "":
 		return ""
+	# Runtime brand from item dict takes precedence
+	for entry in player.items:
+		if String(entry.get("id", "")) == player.equipped_weapon_id:
+			var rb: String = String(entry.get("brand", ""))
+			if rb != "":
+				return rb
 	var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
 	if w == null:
 		return ""
 	return String(w.brand)
+
+static func _armor_brand(player: Player) -> String:
+	if player.equipped_armor_id == "":
+		return ""
+	for entry in player.items:
+		if String(entry.get("id", "")) == player.equipped_armor_id:
+			var rb: String = String(entry.get("brand", ""))
+			if rb != "":
+				return rb
+	return ""
+
+static func _apply_armor_brand_retaliation(player: Player, monster: Monster) -> void:
+	var brand: String = _armor_brand(player)
+	if brand == "" or monster.hp <= 0:
+		return
+	if randf() >= 0.20:
+		return
+	match brand:
+		"venom":
+			Status.apply(monster, "poison", 3)
+			CombatLog.post("Your armor's venom lashes back!", Color(0.4, 1.0, 0.4))
+		"freezing":
+			Status.apply(monster, "frozen", 1)
+			CombatLog.post("Your armor freezes the attacker!", Color(0.5, 0.85, 1.0))
+		"flaming":
+			Status.apply(monster, "burning", 2)
+			CombatLog.post("Your armor burns the attacker!", Color(1.0, 0.55, 0.2))
 
 static func brand_element_of(brand: String) -> String:
 	match brand:
@@ -276,6 +312,8 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	CombatLog.damage_taken("The %s %s you for %d." \
 			% [monster.data.display_name, verb, final])
 	player.take_damage(final, monster.data.id)
+	if player.hp > 0:
+		_apply_armor_brand_retaliation(player, monster)
 
 static func monster_attack_player(monster: Monster, player: Player) -> void:
 	if monster.data == null or player.hp <= 0:
@@ -322,6 +360,8 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	final = RacePassiveSystem.on_player_hit(player, final)
 	CombatLog.damage_taken("The %s hits you for %d." % [monster.data.display_name, final])
 	player.take_damage(final, monster.data.id)
+	if player.hp > 0:
+		_apply_armor_brand_retaliation(player, monster)
 	var poison_turns: int = int(attack.get("poison_turns", 0))
 	if poison_turns > 0 and player.hp > 0:
 		player.apply_status("poison", poison_turns)

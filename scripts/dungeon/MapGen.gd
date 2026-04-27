@@ -14,7 +14,8 @@ const MAX_SPLIT_DEPTH: int = 4
 const SPLIT_MIN: float = 0.42
 const SPLIT_MAX: float = 0.58
 
-static func generate(width: int, height: int, map_seed: int = -1) -> Dictionary:
+static func generate(width: int, height: int, map_seed: int = -1,
+		branch_entrance: bool = false) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = map_seed if map_seed >= 0 else randi()
 	var tiles := PackedByteArray()
@@ -40,12 +41,22 @@ static func generate(width: int, height: int, map_seed: int = -1) -> Dictionary:
 	var stairs_down: Vector2i = _farthest_floor(spawn, tiles, width, height)
 	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
 	tiles[stairs_down.y * width + stairs_down.x] = DungeonMap.Tile.STAIRS_DOWN
+	var branch_pos: Vector2i = Vector2i(-1, -1)
+	if branch_entrance and rooms.size() >= 2:
+		# Place branch entrance in a middle room, away from stairs.
+		var mid_idx: int = rooms.size() / 2
+		var mid_room: Rect2i = rooms[mid_idx]
+		var candidate: Vector2i = mid_room.get_center()
+		if tiles[candidate.y * width + candidate.x] == DungeonMap.Tile.FLOOR:
+			tiles[candidate.y * width + candidate.x] = DungeonMap.Tile.BRANCH_DOWN
+			branch_pos = candidate
 	return {
 		"tiles": tiles,
 		"spawn": spawn,
 		"stairs_down": stairs_down,
 		"stairs_up": spawn,
 		"rooms": rooms,
+		"branch_pos": branch_pos,
 	}
 
 # ── BSP split ──────────────────────────────────────────────────────────────

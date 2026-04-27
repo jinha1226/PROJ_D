@@ -92,9 +92,14 @@ const _BLOOD_DUKE: Resource = preload("res://resources/monsters/blood_duke.tres"
 const _STORM_HIEROPHANT: Resource = preload("res://resources/monsters/storm_hierophant.tres")
 const _PALE_SCHOLAR: Resource = preload("res://resources/monsters/pale_scholar.tres")
 
+const _BOG_SERPENT: Resource = preload("res://resources/monsters/bog_serpent.tres")
+const _GLACIAL_SOVEREIGN: Resource = preload("res://resources/monsters/glacial_sovereign.tres")
+const _EMBER_TYRANT: Resource = preload("res://resources/monsters/ember_tyrant.tres")
+
 const _UNIQUE_MONSTERS: Array = [
 	_ASHEN_MAGPIE, _SISTER_CINDER, _VIPER_SAINT, _STONE_WARDEN,
 	_HARROW_KNIGHT, _BLOOD_DUKE, _STORM_HIEROPHANT, _PALE_SCHOLAR,
+	_BOG_SERPENT, _GLACIAL_SOVEREIGN, _EMBER_TYRANT,
 ]
 
 const _ALL_MONSTERS: Array = [

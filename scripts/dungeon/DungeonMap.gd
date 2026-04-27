@@ -9,6 +9,7 @@ enum Tile {
 	STAIRS_DOWN = 3,
 	DOOR_CLOSED = 4,
 	DOOR_OPEN = 5,
+	BRANCH_DOWN = 6,
 }
 
 const GRID_W: int = 32
@@ -75,6 +76,9 @@ func set_tile(p: Vector2i, t: int) -> void:
 	tiles[p.y * GRID_W + p.x] = t
 	queue_redraw()
 
+func is_branch_entrance(p: Vector2i) -> bool:
+	return tile_at(p) == Tile.BRANCH_DOWN
+
 func is_walkable(p: Vector2i) -> bool:
 	var t := tile_at(p)
 	return t != Tile.WALL and t != Tile.DOOR_CLOSED
@@ -112,8 +116,8 @@ func grid_to_world(p: Vector2i) -> Vector2:
 func world_to_grid(w: Vector2) -> Vector2i:
 	return Vector2i(int(floor(w.x / CELL_SIZE)), int(floor(w.y / CELL_SIZE)))
 
-func generate(map_seed: int = -1) -> void:
-	var result: Dictionary = MapGen.generate(GRID_W, GRID_H, map_seed)
+func generate(map_seed: int = -1, branch_entrance: bool = false) -> void:
+	var result: Dictionary = MapGen.generate(GRID_W, GRID_H, map_seed, branch_entrance)
 	tiles = result["tiles"]
 	spawn_pos = result["spawn"]
 	stairs_down_pos = result["stairs_down"]
@@ -219,6 +223,8 @@ func _texture_for(t: int) -> Texture2D:
 			return _tex_door_closed
 		Tile.DOOR_OPEN:
 			return _tex_door_open
+		Tile.BRANCH_DOWN:
+			return TEX_STAIRS_DOWN
 	return null
 
 func _glyph_for(t: int) -> String:
@@ -235,6 +241,8 @@ func _glyph_for(t: int) -> String:
 			return "+"
 		Tile.DOOR_OPEN:
 			return "'"
+		Tile.BRANCH_DOWN:
+			return "B"
 	return "?"
 
 func _glyph_color_for(t: int) -> Color:
@@ -251,4 +259,6 @@ func _glyph_color_for(t: int) -> Color:
 			return Color(0.75, 0.55, 0.3)
 		Tile.DOOR_OPEN:
 			return Color(0.55, 0.4, 0.25)
+		Tile.BRANCH_DOWN:
+			return Color(0.4, 1.0, 0.6)
 	return Color.WHITE

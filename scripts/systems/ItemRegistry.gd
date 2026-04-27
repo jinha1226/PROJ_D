@@ -67,6 +67,9 @@ const _SCROLL_UPGRADE: Resource = preload("res://resources/items/scroll_upgrade.
 const _SCROLL_FOG: Resource = preload("res://resources/items/scroll_fog.tres")
 const _SCROLL_BRAND: Resource = preload("res://resources/items/scroll_brand.tres")
 const _SCROLL_SILENCE: Resource = preload("res://resources/items/scroll_silence.tres")
+const _SCROLL_BRAND_VENOM: Resource = preload("res://resources/items/scroll_brand_venom.tres")
+const _SCROLL_BRAND_FREEZING: Resource = preload("res://resources/items/scroll_brand_freezing.tres")
+const _SCROLL_BRAND_FLAMING: Resource = preload("res://resources/items/scroll_brand_flaming.tres")
 # Wands
 const _WAND_FIRE: Resource = preload("res://resources/items/wand_fire.tres")
 const _WAND_FROST: Resource = preload("res://resources/items/wand_frost.tres")
@@ -112,6 +115,7 @@ const _ALL_ITEMS: Array = [
 	_THROWING_KNIFE, _JAVELIN, _BOMB, _POISON_FLASK, _SMOKE_BOMB,
 	_POTION_RESISTANCE, _POTION_CANCELLATION,
 	_SCROLL_IMMOLATION, _SCROLL_NOISE,
+	_SCROLL_BRAND_VENOM, _SCROLL_BRAND_FREEZING, _SCROLL_BRAND_FLAMING,
 ]
 
 var by_id: Dictionary = {}

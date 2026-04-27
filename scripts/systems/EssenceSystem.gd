@@ -14,6 +14,7 @@ const ESSENCE_ICON_DIR := "res://assets/tiles/individual/item/essence/"
 const UNIQUE_MONSTER_ESSENCE_IDS: Array = [
 	"essence_gloam", "essence_cinder", "essence_serpent", "essence_bastion",
 	"essence_dread", "essence_bloodwake", "essence_tempest", "essence_pale_star",
+	"essence_plague", "essence_glacial", "essence_infernal",
 ]
 
 const RUNE_COSTS: Dictionary = {
@@ -37,6 +38,9 @@ const RUNE_COSTS: Dictionary = {
 	"essence_tempest": 60,
 	"essence_bastion": 60,
 	"essence_pale_star": 60,
+	"essence_plague": 60,
+	"essence_glacial": 60,
+	"essence_infernal": 60,
 }
 
 const ESSENCE_TIER_BY_ID := {
@@ -60,6 +64,9 @@ const ESSENCE_TIER_BY_ID := {
 	"essence_bloodwake": "unique",
 	"essence_tempest": "unique",
 	"essence_pale_star": "unique",
+	"essence_plague": "unique",
+	"essence_glacial": "unique",
+	"essence_infernal": "unique",
 }
 
 const ESSENCES: Dictionary = {
@@ -197,6 +204,39 @@ const ESSENCES: Dictionary = {
 		"effect": "drain",
 		"penalty_effect": "hp_down",
 		"penalty_value": 2,
+	},
+	# ── Branch Boss Essences ──────────────────────────────────────────────────
+	"essence_plague": {
+		"name": "Plague Essence",
+		"desc": "Poison-immune. Attacks against poisoned enemies deal +20% damage.",
+		"passive_desc": "+20% damage vs. poisoned targets. Poison immunity.",
+		"penalty_desc": "WL -1.",
+		"passive_effect": "plague_bonus",
+		"color": Color(0.35, 0.85, 0.35),
+		"effect": "wl_down",
+		"penalty_effect": "wl_down",
+		"penalty_value": 1,
+	},
+	"essence_glacial": {
+		"name": "Glacial Essence",
+		"desc": "Cold resistant. 20% chance to freeze attacker when hit.",
+		"passive_desc": "Reflect freeze on attackers. Cold resistance.",
+		"penalty_desc": "DEX -1.",
+		"passive_effect": "glacial_retaliate",
+		"color": Color(0.5, 0.85, 1.0),
+		"effect": "resist_cold",
+		"penalty_effect": "dex_down",
+		"penalty_value": 1,
+	},
+	"essence_infernal": {
+		"name": "Infernal Essence",
+		"desc": "Fire resistant. Fire attacks and spells deal +25% damage.",
+		"passive_desc": "+25% fire damage output. Fire resistance.",
+		"penalty_desc": "Cold vulnerable.",
+		"passive_effect": "infernal_fire",
+		"color": Color(1.0, 0.4, 0.1),
+		"effect": "resist_fire",
+		"penalty_effect": "vuln_cold",
 	},
 	# ── Unique Monster Essences ────────────────────────────────────────────────
 	"essence_gloam": {
@@ -376,7 +416,8 @@ static func apply(player: Player, essence_id: String) -> void:
 		"hp_max":
 			player.hp_max += value
 			player.hp = mini(player.hp + value, player.hp_max)
-		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch":
+		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch",
+		"plague_bonus", "glacial_retaliate", "infernal_fire":
 			pass
 	if effect == "wl_bonus":
 		player.wl += value
@@ -405,7 +446,8 @@ static func remove(player: Player, essence_id: String) -> void:
 		"hp_max":
 			player.hp_max = maxi(1, player.hp_max - value)
 			player.hp = mini(player.hp, player.hp_max)
-		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch":
+		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch",
+		"plague_bonus", "glacial_retaliate", "infernal_fire":
 			pass
 	if effect == "wl_bonus":
 		player.wl = maxi(0, player.wl - value)
@@ -634,6 +676,13 @@ static func ranged_damage_mult(player: Player) -> float:
 		return 1.0
 	if player.essence_slots.has("essence_tempest"):
 		return 1.15
+	return 1.0
+
+static func fire_damage_mult(player: Player) -> float:
+	if player == null:
+		return 1.0
+	if player.essence_slots.has("essence_infernal"):
+		return 1.25
 	return 1.0
 
 static func unaware_damage_mult(player: Player) -> float:

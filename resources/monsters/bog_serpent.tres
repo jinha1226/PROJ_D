@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://uq_bog_serpent"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "bog_serpent"
+display_name = "Bog Serpent"
+tier = 5
+hp = 78
+hd = 12
+ac = 5
+ev = 8
+speed = 10
+sight_range = 7
+attacks = [{"damage": 10, "flavour": "venomous bite", "poison_turns": 4}, {"damage": 6, "flavour": "constrict"}]
+ranged_attack = {}
+resists = ["poison+"]
+min_depth = 4
+max_depth = 6
+weight = 0
+xp_value = 70
+is_boss = true
+is_unique = true
+drop_chance_override = 1.0
+tile_path = "res://assets/tiles/individual/mon/serpents/anaconda.png"
+glyph = "S"
+glyph_color = Color(0.3, 0.85, 0.3, 1)
+description = "An enormous serpent saturated with swamp venom. Its scales drip poison."
+essence_id = "essence_plague"

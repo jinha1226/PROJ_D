@@ -38,9 +38,17 @@ var pending_player_state: Dictionary = {}
 # is canonical; multi-floor snapshots would bloat saves).
 var floor_cache: Dictionary = {}
 
+# Branch state (per-run, not persisted to disk save).
+var branch_zone: String = ""       # "" = main path; "swamp" | "ice_caves" | "infernal"
+var branch_floor: int = 0          # 1-4 inside a branch; 0 = not in branch
+var branch_entry_depth: int = 0    # main-path depth where branch was entered
+var branch_floor_cache: Dictionary = {}  # branch_zone+floor -> floor state
+var branches_cleared: Array = []   # branch ids cleared this run
+
 # Display / meta state (persisted).
 var use_tiles: bool = true
 var rune_shards: int = 0
+var titles: Array = []  # earned title strings
 
 ## Permanent unlock registry — race / class ids the player has earned
 ## across runs. Keyed by plain id (e.g. "kobold", "rogue"). Written
@@ -62,6 +70,11 @@ func start_new_run(random_seed: int = -1) -> void:
 	gold = 0
 	identified.clear()
 	floor_cache.clear()
+	branch_zone = ""
+	branch_floor = 0
+	branch_entry_depth = 0
+	branch_floor_cache.clear()
+	branches_cleared.clear()
 	_generate_pseudonyms()
 	pending_player_state.clear()
 	run_in_progress = true
@@ -210,6 +223,9 @@ func _load_settings() -> void:
 		return
 	use_tiles = bool(parsed.get("use_tiles", use_tiles))
 	rune_shards = int(parsed.get("rune_shards", rune_shards))
+	var saved_titles = parsed.get("titles", null)
+	if saved_titles is Array:
+		titles = saved_titles
 	var saved_unlocks = parsed.get("unlocks", null)
 	if saved_unlocks is Dictionary:
 		unlocks = saved_unlocks
@@ -217,12 +233,18 @@ func _load_settings() -> void:
 	if saved_kill_counts is Dictionary:
 		kill_counts = saved_kill_counts
 
+func earn_title(title: String) -> void:
+	if title != "" and not titles.has(title):
+		titles.append(title)
+		_save_settings()
+
 func _save_settings() -> void:
 	var data := {
 		"use_tiles": use_tiles,
 		"rune_shards": rune_shards,
 		"unlocks": unlocks,
 		"kill_counts": kill_counts,
+		"titles": titles,
 	}
 	var f := FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
 	if f == null:

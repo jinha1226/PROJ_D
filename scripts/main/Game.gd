@@ -137,6 +137,8 @@ func _handle_tap(screen_pos: Vector2) -> void:
 			_on_stairs_down()
 		elif tile == DungeonMap.Tile.STAIRS_UP:
 			_on_stairs_up()
+		elif tile == DungeonMap.Tile.BRANCH_DOWN:
+			_on_branch_enter()
 		else:
 			player.wait_turn()
 			TurnManager.end_player_turn()
@@ -689,7 +691,12 @@ func _generate_floor(depth: int, map_seed: int,
 	if GameManager.floor_cache.has(depth):
 		_restore_floor_from_cache(depth, arrive_from_above)
 	else:
-		map.generate(map_seed)
+		var has_branch: bool = ZoneManager.branch_entrance_for_depth(depth) != ""
+		var already_cleared: bool = false
+		if has_branch:
+			var bid: String = ZoneManager.branch_entrance_for_depth(depth)
+			already_cleared = GameManager.branches_cleared.has(bid)
+		map.generate(map_seed, has_branch and not already_cleared)
 		player.bind_map(map, map.spawn_pos)
 		_spawn_items_for_floor(depth)
 		_spawn_monsters_for_floor(depth)
@@ -1050,6 +1057,7 @@ func _on_player_turn_started() -> void:
 	if player != null and player.hp > 0:
 		player.tick_statuses()
 		RacePassiveSystem.on_player_turn_end(player)
+		_apply_branch_env_damage()
 	if map != null:
 		map.tick_fog()
 		_refresh_entity_visibility()
@@ -1139,6 +1147,226 @@ func _on_result_meta(res: Node) -> void:
 		res.queue_free()
 	get_tree().change_scene_to_file(MENU_SCENE_PATH)
 
+# ── Branch navigation ────────────────────────────────────────────────────────
+
+func _on_branch_enter() -> void:
+	var branch_id: String = ZoneManager.branch_entrance_for_depth(GameManager.depth)
+	if branch_id == "" or GameManager.branches_cleared.has(branch_id):
+		if GameManager.branches_cleared.has(branch_id):
+			CombatLog.post("You have already cleared the %s." \
+				% ZoneManager.branch_config(branch_id).get("display_name", branch_id),
+				Color(0.7, 0.7, 0.5))
+		return
+	_cancel_auto_walk("branch")
+	_cache_current_floor()
+	GameManager.branch_zone = branch_id
+	GameManager.branch_floor = 1
+	GameManager.branch_entry_depth = GameManager.depth
+	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
+	CombatLog.post("You enter the %s." % cfg.get("display_name", branch_id),
+		Color(0.4, 1.0, 0.6))
+	_generate_branch_floor(branch_id, 1, true)
+	_center_camera_on_player(true)
+	_update_hud()
+	TurnManager.end_player_turn()
+
+func _on_branch_stairs_down() -> void:
+	var branch_id: String = GameManager.branch_zone
+	if branch_id == "":
+		return
+	_cancel_auto_walk("stairs")
+	_cache_branch_floor(branch_id, GameManager.branch_floor)
+	GameManager.branch_floor += 1
+	CombatLog.post("%s B%d." % [ZoneManager.branch_config(branch_id).get("display_name", branch_id),
+		GameManager.branch_floor], Color(0.4, 1.0, 0.6))
+	_generate_branch_floor(branch_id, GameManager.branch_floor, true)
+	_center_camera_on_player(true)
+	_update_hud()
+	SaveManager.save_run(player, GameManager)
+	TurnManager.end_player_turn()
+
+func _on_branch_stairs_up() -> void:
+	var branch_id: String = GameManager.branch_zone
+	if branch_id == "":
+		return
+	_cancel_auto_walk("stairs")
+	if GameManager.branch_floor <= 1:
+		# Exit branch back to main path
+		_cache_branch_floor(branch_id, 1)
+		GameManager.branch_zone = ""
+		GameManager.branch_floor = 0
+		CombatLog.post("You return to the main dungeon.", Color(0.7, 0.9, 1.0))
+		GameManager.depth = GameManager.branch_entry_depth
+		_restore_floor_from_cache(GameManager.depth, false)
+		_refresh_fov()
+	else:
+		_cache_branch_floor(branch_id, GameManager.branch_floor)
+		GameManager.branch_floor -= 1
+		_generate_branch_floor(branch_id, GameManager.branch_floor, false)
+	_center_camera_on_player(true)
+	_update_hud()
+	TurnManager.end_player_turn()
+
+func _on_branch_cleared(branch_id: String) -> void:
+	if GameManager.branches_cleared.has(branch_id):
+		return
+	GameManager.branches_cleared.append(branch_id)
+	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
+	CombatLog.post("%s cleared!" % cfg.get("display_name", branch_id), Color(1.0, 0.9, 0.3))
+	GameManager.add_rune_shards(ZoneManager.BRANCH_CLEAR_RUNES)
+	CombatLog.post("◆ +%d 룬" % ZoneManager.BRANCH_CLEAR_RUNES, Color(0.9, 0.85, 0.4))
+	# Per-branch title
+	match branch_id:
+		"swamp":    GameManager.earn_title("The Poisoner")
+		"ice_caves": GameManager.earn_title("The Frozen")
+		"infernal": GameManager.earn_title("The Infernal")
+	# All-branches bonus
+	if GameManager.branches_cleared.size() >= 3:
+		GameManager.add_rune_shards(ZoneManager.ALL_BRANCHES_BONUS_RUNES)
+		GameManager.earn_title("The Delver")
+		CombatLog.post("All branches cleared! ◆ +%d 룬" % ZoneManager.ALL_BRANCHES_BONUS_RUNES,
+			Color(1.0, 0.9, 0.3))
+
+func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_above: bool) -> void:
+	var cache_key: String = "%s_%d" % [branch_id, branch_floor]
+	if GameManager.branch_floor_cache.has(cache_key):
+		var state: Dictionary = GameManager.branch_floor_cache[cache_key]
+		map.tiles = state["tiles"]
+		map.explored = state["explored"].duplicate(true)
+		map.spawn_pos = state["spawn_pos"]
+		map.stairs_down_pos = state["stairs_down_pos"]
+		map.stairs_up_pos = state["stairs_up_pos"]
+		map.rooms = state["rooms"].duplicate()
+		map.visible_tiles.clear()
+		map.fog_tiles.clear()
+		var cfg: Dictionary = ZoneManager.branch_config(branch_id)
+		map._tex_wall = load(cfg.get("wall", "")) as Texture2D
+		map._tex_floor = load(cfg.get("floor", "")) as Texture2D
+		map.queue_redraw()
+		var arrival: Vector2i = map.spawn_pos if arrive_from_above else map.stairs_down_pos
+		player.bind_map(map, arrival)
+		# Restore monsters
+		_clear_monsters()
+		_clear_floor_items()
+		for entry in state.get("monsters", []):
+			var md: MonsterData = MonsterRegistry.get_by_id(String(entry.get("id", "")))
+			if md == null: continue
+			var p: Vector2i = entry.get("pos", Vector2i.ZERO)
+			if p == player.grid_pos: continue
+			var m: Monster = MonsterScene.new()
+			monsters_layer.add_child(m)
+			m.setup(md, map, p)
+			m.hp = int(entry.get("hp", m.hp))
+			m.hit_taken.connect(_on_monster_hit.bind(m))
+			if m.has_signal("awareness_changed"):
+				m.awareness_changed.connect(_on_monster_awareness_changed)
+			m.died.connect(_on_monster_died.bind(m))
+			TurnManager.register_actor(m)
+		for entry in state.get("items", []):
+			var d: ItemData = ItemRegistry.get_by_id(String(entry.get("id", "")))
+			if d == null: continue
+			_spawn_floor_item(d, entry.get("pos", Vector2i.ZERO), int(entry.get("plus", 0)))
+		_refresh_fov()
+		return
+
+	# Fresh branch floor generation
+	var branch_seed: int = GameManager.seed ^ (branch_id.hash() + branch_floor * 17)
+	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
+	var is_boss_floor: bool = (branch_floor >= int(cfg.get("floors", 4)))
+	map.generate(branch_seed, false, true if not is_boss_floor else false)
+	var eff_depth: int = ZoneManager.branch_effective_depth(branch_id, branch_floor)
+	map._tex_wall = load(cfg.get("wall", "")) as Texture2D
+	map._tex_floor = load(cfg.get("floor", "")) as Texture2D
+	map.queue_redraw()
+	player.bind_map(map, map.spawn_pos)
+	_clear_monsters()
+	_clear_floor_items()
+	if is_boss_floor:
+		_spawn_branch_boss(branch_id)
+	else:
+		_spawn_monsters_for_floor(eff_depth)
+		_spawn_items_for_floor(eff_depth)
+	_refresh_fov()
+
+func _spawn_branch_boss(branch_id: String) -> void:
+	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
+	var boss_id: String = String(cfg.get("boss_id", ""))
+	if boss_id == "":
+		return
+	var boss_data: MonsterData = MonsterRegistry.get_by_id(boss_id)
+	if boss_data == null:
+		push_warning("Branch boss not found: %s" % boss_id)
+		return
+	var spawn_pos: Vector2i = map.stairs_down_pos
+	# Place boss in center of a room far from player
+	if not map.rooms.is_empty():
+		var mid_room: Rect2i = map.rooms[map.rooms.size() / 2]
+		spawn_pos = mid_room.get_center()
+	var m: Monster = MonsterScene.new()
+	monsters_layer.add_child(m)
+	m.setup(boss_data, map, spawn_pos)
+	m.hit_taken.connect(_on_monster_hit.bind(m))
+	if m.has_signal("awareness_changed"):
+		m.awareness_changed.connect(_on_monster_awareness_changed)
+	m.died.connect(_on_branch_boss_died.bind(m, branch_id))
+	TurnManager.register_actor(m)
+	CombatLog.post("A powerful presence fills the chamber...", Color(1.0, 0.5, 0.2))
+
+func _on_branch_boss_died(monster: Monster, branch_id: String) -> void:
+	_on_monster_died(monster)
+	_on_branch_cleared(branch_id)
+	# Place brand scroll reward
+	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
+	var element: String = String(cfg.get("brand_element", ""))
+	var scroll_id: String = "scroll_brand_%s" % element
+	var scroll_data: ItemData = ItemRegistry.get_by_id(scroll_id)
+	if scroll_data != null:
+		_spawn_floor_item(scroll_data, monster.grid_pos, 0)
+	# Place essence reward
+	var essence_id: String = String(cfg.get("essence_reward", ""))
+	if essence_id != "":
+		_queue_essence_pickup(essence_id)
+	# Place stairs back to main
+	map.set_tile(map.stairs_down_pos, DungeonMap.Tile.STAIRS_UP)
+
+func _cache_branch_floor(branch_id: String, branch_floor: int) -> void:
+	var cache_key: String = "%s_%d" % [branch_id, branch_floor]
+	var state: Dictionary = {
+		"tiles": PackedByteArray(map.tiles),
+		"explored": map.explored.duplicate(true),
+		"spawn_pos": map.spawn_pos,
+		"stairs_down_pos": map.stairs_down_pos,
+		"stairs_up_pos": map.stairs_up_pos,
+		"rooms": map.rooms.duplicate(),
+		"items": [],
+		"monsters": [],
+	}
+	for n in get_tree().get_nodes_in_group("floor_items"):
+		if n is FloorItem and n.data != null:
+			state.items.append({"id": n.data.id, "pos": n.grid_pos, "plus": n.plus})
+	for n in get_tree().get_nodes_in_group("monsters"):
+		if n is Monster and n.data != null and n.hp > 0:
+			state.monsters.append({"id": n.data.id, "pos": n.grid_pos, "hp": n.hp,
+				"status": n.status.duplicate()})
+	GameManager.branch_floor_cache[cache_key] = state
+
+func _apply_branch_env_damage() -> void:
+	if player == null or player.hp <= 0:
+		return
+	var branch_id: String = GameManager.branch_zone
+	if branch_id == "":
+		return
+	var resistance: String = ZoneManager.branch_resistance(branch_id)
+	if resistance != "" and player.resists.has(resistance):
+		return
+	var dmg: int = ZoneManager.branch_env_damage(branch_id, GameManager.branch_floor)
+	if dmg <= 0:
+		return
+	var element: String = ZoneManager.branch_env_element(branch_id)
+	CombatLog.damage_taken("The %s environment damages you for %d." \
+		% [ZoneManager.branch_config(branch_id).get("display_name", branch_id), dmg])
+	player.take_damage(dmg, element)
+
 func _on_dungeon_cleared() -> void:
 	CombatLog.post("You have cleared the dungeon!", Color(1.0, 0.9, 0.2))
 	var shards: int = _calc_run_score(true)
@@ -1147,6 +1375,10 @@ func _on_dungeon_cleared() -> void:
 	_show_result_screen(true, shards)
 
 func _on_stairs_down() -> void:
+	# Inside a branch — go deeper in branch
+	if GameManager.branch_zone != "":
+		_on_branch_stairs_down()
+		return
 	_cancel_auto_walk("stairs")
 	_cache_current_floor()
 	GameManager.descend()
@@ -1165,6 +1397,9 @@ func _on_stairs_down() -> void:
 	TurnManager.end_player_turn()
 
 func _on_stairs_up() -> void:
+	if GameManager.branch_zone != "":
+		_on_branch_stairs_up()
+		return
 	if GameManager.depth <= 1:
 		CombatLog.post("The way up is blocked.", Color(0.7, 0.7, 0.7))
 		TurnManager.end_player_turn()
