@@ -190,7 +190,8 @@ func _bfs_path(start: Vector2i, goal: Vector2i) -> Array:
 			var n: Vector2i = p + d
 			if came_from.has(n):
 				continue
-			if not map.in_bounds(n) or not map.is_walkable(n):
+			var nt := map.tile_at(n)
+			if not map.in_bounds(n) or (not map.is_walkable(n) and nt != DungeonMap.Tile.DOOR_CLOSED):
 				continue
 			if not map.explored.has(n) and not map.visible_tiles.has(n):
 				continue
@@ -219,7 +220,13 @@ func _advance_auto_walk() -> void:
 	if _path_overlay != null:
 		_path_overlay.set_path(_auto_path)
 	_auto_prev_hp = player.hp
+	var prev_pos: Vector2i = player.grid_pos
 	player.try_step(dir)
+	# Door was opened but player stayed put — keep next tile in path for next step.
+	if player.grid_pos == prev_pos:
+		_auto_path.push_front(next)
+		if _path_overlay != null:
+			_path_overlay.set_path(_auto_path)
 
 func _begin_auto_walk(path: Array, keep_exploring: bool) -> void:
 	if path.is_empty():
@@ -1435,7 +1442,8 @@ func _find_explore_target() -> Vector2i:
 			var n: Vector2i = p + d
 			if visited.has(n) or not map.in_bounds(n):
 				continue
-			if not map.is_walkable(n) or not map.explored.has(n):
+			var nt2 := map.tile_at(n)
+			if (not map.is_walkable(n) and nt2 != DungeonMap.Tile.DOOR_CLOSED) or not map.explored.has(n):
 				continue
 			visited[n] = true
 			queue.append(n)
