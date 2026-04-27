@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://uq_stone_warden"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "stone_warden"
+display_name = "Stone Warden"
+tier = 4
+hp = 60
+hd = 10
+ac = 9
+ev = 4
+speed = 8
+sight_range = 7
+attacks = [{"damage": 12, "flavour": "crushing blow"}]
+ranged_attack = {}
+resists = []
+min_depth = 10
+max_depth = 12
+weight = 0
+xp_value = 48
+is_boss = true
+is_unique = true
+drop_chance_override = 1.0
+tile_path = "res://assets/tiles/individual/mon/humanoids/humans/vault_warden.png"
+glyph = "U"
+glyph_color = Color(0.7, 0.75, 0.65, 1)
+description = "An armored sentinel of immovable purpose, standing between you and the deep floors."
+essence_id = "essence_bastion"

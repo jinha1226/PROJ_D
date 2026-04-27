@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://uq_viper_saint"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "viper_saint"
+display_name = "Viper Saint"
+tier = 3
+hp = 38
+hd = 7
+ac = 4
+ev = 11
+speed = 12
+sight_range = 8
+attacks = [{"damage": 7, "flavour": "venomous strike", "poison_turns": 4}]
+ranged_attack = {}
+resists = ["poison+"]
+min_depth = 7
+max_depth = 9
+weight = 0
+xp_value = 32
+is_boss = false
+is_unique = true
+drop_chance_override = 0.8
+tile_path = "res://assets/tiles/individual/mon/demihumanoids/naga/naga_mage.png"
+glyph = "U"
+glyph_color = Color(0.35, 0.85, 0.35, 1)
+description = "A serpentine assassin whose fangs carry death before the victim even notices the wound."
+essence_id = "essence_serpent"

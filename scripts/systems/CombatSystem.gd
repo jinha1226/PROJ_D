@@ -63,11 +63,19 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	var soak: int = randi_range(0, monster.data.ac + 1)
 	var base_final: int = max(1, raw - soak)
 	var mult: float = 1.0 + float(skill_level) * 0.04
+	# Tempest: ranged attacks deal +15%
+	if skill_id == "ranged":
+		mult *= EssenceSystem.ranged_damage_mult(player)
 	var final: int = max(1, int(round(float(base_final) * mult)))
 	final += player.get_skill_level("melee") / 2
 	final += RacePassiveSystem.melee_damage_bonus(player)
 	var backstab_bonus: int = _backstab_bonus(player, monster, weapon, weapon_plus)
 	final += backstab_bonus
+	# Gloam: first strike on unaware target deals +35% damage
+	if not monster.is_aware:
+		var uw_mult: float = EssenceSystem.unaware_damage_mult(player)
+		if uw_mult > 1.0:
+			final = max(1, int(round(float(final) * uw_mult)))
 	var brand: String = _weapon_brand(player)
 	var brand_extra: int = 0
 	if brand != "":

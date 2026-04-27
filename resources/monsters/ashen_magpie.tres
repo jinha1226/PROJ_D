@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://uq_ashen_magpie"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "ashen_magpie"
+display_name = "Ashen Magpie"
+tier = 2
+hp = 22
+hd = 4
+ac = 2
+ev = 12
+speed = 12
+sight_range = 8
+attacks = [{"damage": 4, "flavour": "quick strike"}]
+ranged_attack = {}
+resists = []
+min_depth = 2
+max_depth = 3
+weight = 0
+xp_value = 18
+is_boss = false
+is_unique = true
+drop_chance_override = 0.8
+tile_path = "res://assets/tiles/individual/mon/humanoids/spriggans/spriggan.png"
+glyph = "U"
+glyph_color = Color(0.55, 0.5, 0.75, 1)
+description = "A sharp-eyed trickster caster who vanishes into shadows between spells."
+essence_id = "essence_gloam"

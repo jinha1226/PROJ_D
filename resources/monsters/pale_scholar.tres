@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://uq_pale_scholar"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "pale_scholar"
+display_name = "The Pale Scholar"
+tier = 5
+hp = 80
+hd = 14
+ac = 6
+ev = 6
+speed = 9
+sight_range = 10
+attacks = [{"damage": 10, "flavour": "withering touch"}]
+ranged_attack = {"damage": 10, "range": 7, "verb": "invokes", "flavour": "null bolt"}
+resists = ["will+", "cold+"]
+min_depth = 22
+max_depth = 24
+weight = 0
+xp_value = 78
+is_boss = true
+is_unique = true
+drop_chance_override = 1.0
+tile_path = "res://assets/tiles/individual/mon/humanoids/humans/occultist.png"
+glyph = "U"
+glyph_color = Color(0.75, 0.85, 1.0, 1)
+description = "The endgame controller. Its pale gaze unravels the minds of those who seek the deepest floors."
+essence_id = "essence_pale_star"

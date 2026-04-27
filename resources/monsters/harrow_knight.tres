@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://uq_harrow_knight"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "harrow_knight"
+display_name = "Harrow Knight"
+tier = 4
+hp = 52
+hd = 9
+ac = 6
+ev = 6
+speed = 10
+sight_range = 9
+attacks = [{"damage": 10, "flavour": "haunting strike"}]
+ranged_attack = {}
+resists = ["will+"]
+min_depth = 13
+max_depth = 15
+weight = 0
+xp_value = 44
+is_boss = false
+is_unique = true
+drop_chance_override = 0.8
+tile_path = "res://assets/tiles/individual/mon/humanoids/humans/death_knight.png"
+glyph = "U"
+glyph_color = Color(0.5, 0.3, 0.65, 1)
+description = "A knight wreathed in dread, whose presence shatters the will of those who face it."
+essence_id = "essence_dread"

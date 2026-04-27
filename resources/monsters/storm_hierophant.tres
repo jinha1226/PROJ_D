@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://uq_storm_hierophant"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "storm_hierophant"
+display_name = "Storm Hierophant"
+tier = 5
+hp = 64
+hd = 11
+ac = 5
+ev = 8
+speed = 10
+sight_range = 10
+attacks = [{"damage": 8, "flavour": "arcane shock"}]
+ranged_attack = {"damage": 14, "range": 8, "verb": "hurls", "flavour": "lightning bolt"}
+resists = []
+min_depth = 19
+max_depth = 21
+weight = 0
+xp_value = 58
+is_boss = false
+is_unique = true
+drop_chance_override = 0.8
+tile_path = "res://assets/tiles/individual/mon/humanoids/humans/ragged_hierophant.png"
+glyph = "U"
+glyph_color = Color(0.4, 0.65, 1.0, 1)
+description = "An arcane artillery master who obliterates enemies from afar with searing magical bursts."
+essence_id = "essence_tempest"

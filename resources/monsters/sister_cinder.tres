@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://uq_sister_cinder"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "sister_cinder"
+display_name = "Sister Cinder"
+tier = 2
+hp = 30
+hd = 5
+ac = 3
+ev = 8
+speed = 10
+sight_range = 9
+attacks = [{"damage": 6, "flavour": "scorching touch"}]
+ranged_attack = {"damage": 7, "range": 6, "verb": "hurls", "flavour": "fire bolt"}
+resists = ["fire+"]
+min_depth = 4
+max_depth = 6
+weight = 0
+xp_value = 24
+is_boss = false
+is_unique = true
+drop_chance_override = 0.8
+tile_path = "res://assets/tiles/individual/mon/demihumanoids/salamander_mystic.png"
+glyph = "U"
+glyph_color = Color(1.0, 0.5, 0.2, 1)
+description = "A fire-wreathed zealot who presses attackers with relentless scorching pressure."
+essence_id = "essence_cinder"

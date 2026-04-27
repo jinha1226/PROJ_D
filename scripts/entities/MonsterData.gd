@@ -17,6 +17,8 @@ class_name MonsterData extends Resource
 @export var weight: int = 10
 @export var xp_value: int = 1
 @export var is_boss: bool = false
+@export var is_unique: bool = false
+@export var drop_chance_override: float = -1.0
 @export var tile_path: String = ""
 @export var glyph: String = "r"
 @export var glyph_color: Color = Color(0.8, 0.8, 0.8)

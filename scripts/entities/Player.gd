@@ -296,8 +296,10 @@ func use_item(index: int) -> void:
 	match data.effect:
 		"heal":
 			heal_injury(data.effect_value)
-			heal(data.effect_value)
-			CombatLog.post("You feel better. (+%d HP)" % data.effect_value,
+			var heal_amt: int = maxi(1, int(round(float(data.effect_value) * EssenceSystem.potion_heal_mult(self))))
+			heal_amt += EssenceSystem.potion_heal_bonus(self)
+			heal(heal_amt)
+			CombatLog.post("You feel better. (+%d HP)" % heal_amt,
 				Color(0.6, 1.0, 0.6))
 		"bandage":
 			var inj_before: int = injury

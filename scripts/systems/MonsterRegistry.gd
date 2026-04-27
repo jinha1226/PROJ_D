@@ -82,6 +82,21 @@ const _GOLDEN_DRAGON: Resource = preload("res://resources/monsters/golden_dragon
 const _EXECUTIONER: Resource = preload("res://resources/monsters/executioner.tres")
 const _TITAN: Resource = preload("res://resources/monsters/titan.tres")
 
+# ── Unique sector monsters ─────────────────────────────────────────────────────
+const _ASHEN_MAGPIE: Resource = preload("res://resources/monsters/ashen_magpie.tres")
+const _SISTER_CINDER: Resource = preload("res://resources/monsters/sister_cinder.tres")
+const _VIPER_SAINT: Resource = preload("res://resources/monsters/viper_saint.tres")
+const _STONE_WARDEN: Resource = preload("res://resources/monsters/stone_warden.tres")
+const _HARROW_KNIGHT: Resource = preload("res://resources/monsters/harrow_knight.tres")
+const _BLOOD_DUKE: Resource = preload("res://resources/monsters/blood_duke.tres")
+const _STORM_HIEROPHANT: Resource = preload("res://resources/monsters/storm_hierophant.tres")
+const _PALE_SCHOLAR: Resource = preload("res://resources/monsters/pale_scholar.tres")
+
+const _UNIQUE_MONSTERS: Array = [
+	_ASHEN_MAGPIE, _SISTER_CINDER, _VIPER_SAINT, _STONE_WARDEN,
+	_HARROW_KNIGHT, _BLOOD_DUKE, _STORM_HIEROPHANT, _PALE_SCHOLAR,
+]
+
 const _ALL_MONSTERS: Array = [
 	# original 18
 	_RAT, _BAT, _KOBOLD, _GOBLIN, _HOBGOBLIN, _ADDER, _GNOLL,
@@ -108,10 +123,15 @@ const _ALL_MONSTERS: Array = [
 
 var by_id: Dictionary = {}
 var all: Array = []
+var unique_by_id: Dictionary = {}
 
 func _ready() -> void:
 	for res in _ALL_MONSTERS:
 		_register(res)
+	for res in _UNIQUE_MONSTERS:
+		_register(res)
+		if res != null and "id" in res and String(res.id) != "":
+			unique_by_id[String(res.id)] = res
 	if all.is_empty():
 		push_warning("MonsterRegistry: 0 monsters registered.")
 
@@ -132,6 +152,8 @@ func pick_by_depth(depth: int) -> MonsterData:
 	var candidates: Array = []
 	var total_weight: int = 0
 	for m in all:
+		if m.is_unique:
+			continue
 		if depth >= m.min_depth and depth <= m.max_depth:
 			var eff_weight: int = max(1, m.weight)
 			if depth <= 3 and m.xp_value <= 2:
@@ -153,3 +175,9 @@ func pick_by_depth(depth: int) -> MonsterData:
 		if roll <= accum:
 			return entry["data"]
 	return candidates[0]["data"]
+
+func unique_for_depth(depth: int) -> MonsterData:
+	for res in _UNIQUE_MONSTERS:
+		if res != null and depth >= res.min_depth and depth <= res.max_depth:
+			return res as MonsterData
+	return null
