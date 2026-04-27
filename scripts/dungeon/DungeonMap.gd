@@ -130,6 +130,20 @@ func generate(map_seed: int = -1, branch_entrance: bool = false) -> void:
 	_load_atmosphere(GameManager.depth)
 	queue_redraw()
 
+func generate_pantheon() -> void:
+	var result: Dictionary = MapGen.generate_pantheon(GRID_W, GRID_H)
+	tiles = result["tiles"]
+	spawn_pos = result["spawn"]
+	stairs_down_pos = result["stairs_down"]
+	stairs_up_pos = result["stairs_up"]
+	rooms = result["rooms"]
+	visible_tiles.clear()
+	explored.clear()
+	fog_tiles.clear()
+	_tex_wall = load("res://assets/tiles/individual/dngn/wall/brick_brown-vines0.png") as Texture2D
+	_tex_floor = load("res://assets/tiles/individual/dngn/floor/white_marble0.png") as Texture2D
+	queue_redraw()
+
 func _ready() -> void:
 	GameManager = get_node_or_null("/root/GameManager")
 	_tex_door_closed = load("res://assets/tiles/individual/dngn/doors/closed_door.png") as Texture2D

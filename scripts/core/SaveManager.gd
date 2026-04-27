@@ -35,6 +35,7 @@ func save_run(player, game_manager) -> bool:
 	var data: Dictionary = {
 		"version": 1,
 		"depth": game_manager.depth,
+		"in_pantheon": game_manager.in_pantheon,
 		"seed": game_manager.seed,
 		"gold": game_manager.gold,
 		"selected_class_id": game_manager.selected_class_id,

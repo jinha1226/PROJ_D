@@ -14,6 +14,37 @@ const MAX_SPLIT_DEPTH: int = 4
 const SPLIT_MIN: float = 0.42
 const SPLIT_MAX: float = 0.58
 
+## Single large symmetric hall — no monsters, faith choice on entry.
+static func generate_pantheon(width: int, height: int) -> Dictionary:
+	var tiles := PackedByteArray()
+	tiles.resize(width * height)
+	for i in tiles.size():
+		tiles[i] = DungeonMap.Tile.WALL
+
+	var room_w: int = 16
+	var room_h: int = 10
+	var rx: int = (width - room_w) / 2
+	var ry: int = (height - room_h) / 2
+	var room := Rect2i(rx, ry, room_w, room_h)
+
+	for y in range(ry, ry + room_h):
+		for x in range(rx, rx + room_w):
+			tiles[y * width + x] = DungeonMap.Tile.FLOOR
+
+	var spawn := Vector2i(rx + 1, ry + room_h / 2)
+	var stairs_down := Vector2i(rx + room_w - 2, ry + room_h / 2)
+	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
+	tiles[stairs_down.y * width + stairs_down.x] = DungeonMap.Tile.STAIRS_DOWN
+
+	return {
+		"tiles": tiles,
+		"spawn": spawn,
+		"stairs_down": stairs_down,
+		"stairs_up": spawn,
+		"rooms": [room],
+		"branch_pos": Vector2i(-1, -1),
+	}
+
 static func generate(width: int, height: int, map_seed: int = -1,
 		branch_entrance: bool = false) -> Dictionary:
 	var rng := RandomNumberGenerator.new()

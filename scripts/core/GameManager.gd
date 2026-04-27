@@ -41,6 +41,7 @@ var pending_player_state: Dictionary = {}
 var floor_cache: Dictionary = {}
 
 # Branch state (per-run, not persisted to disk save).
+var in_pantheon: bool = false
 var branch_zone: String = ""       # "" = main path; "swamp" | "ice_caves" | "infernal"
 var branch_floor: int = 0          # 1-4 inside a branch; 0 = not in branch
 var branch_entry_depth: int = 0    # main-path depth where branch was entered
@@ -105,6 +106,7 @@ func load_run() -> bool:
 	if data.is_empty() or not data.has("player"):
 		return false
 	depth = int(data.get("depth", 1))
+	in_pantheon = bool(data.get("in_pantheon", false))
 	seed = int(data.get("seed", 0))
 	gold = int(data.get("gold", 0))
 	selected_class_id = String(data.get("selected_class_id", ""))

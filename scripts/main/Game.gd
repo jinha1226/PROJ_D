@@ -66,7 +66,10 @@ func _ready() -> void:
 		GameManager.pending_player_state = {}
 	elif GameManager.depth <= 1:
 		_apply_class_to_player(GameManager.selected_class_id)
-	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth))
+	if GameManager.in_pantheon:
+		map.generate_pantheon()
+	else:
+		_generate_floor(GameManager.depth, _floor_seed(GameManager.depth))
 	_spawn_camera()
 	_spawn_ui()
 	TurnManager.player_turn_started.connect(_on_player_turn_started)
@@ -1024,7 +1027,10 @@ func _update_hud() -> void:
 	top_hud.set_hp(player.hp, player.hp_max, player.injury)
 	top_hud.set_mp(player.mp, player.mp_max)
 	top_hud.set_xp(player.xp, player.xp_to_next(), player.xl)
-	top_hud.set_depth(GameManager.depth)
+	if GameManager.in_pantheon:
+		top_hud.set_branch("만신전")
+	else:
+		top_hud.set_depth(GameManager.depth)
 	top_hud.set_gold(player.gold)
 	top_hud.set_turn(TurnManager.turn_number)
 	top_hud.set_buffs(player.statuses)
@@ -1387,20 +1393,46 @@ func _on_stairs_down() -> void:
 		return
 	_cancel_auto_walk("stairs")
 	_cache_current_floor()
+	# Leaving the pantheon → now descend to B3
+	if GameManager.in_pantheon:
+		GameManager.in_pantheon = false
+		GameManager.descend()  # 2 → 3
+		CombatLog.post("You descend to B%d." % GameManager.depth, Color(0.6, 1.0, 1.0))
+		_clear_monsters()
+		_clear_floor_items()
+		_generate_floor(GameManager.depth, _floor_seed(GameManager.depth), true)
+		RacePassiveSystem.on_floor_changed(player)
+		_center_camera_on_player(true)
+		_update_hud()
+		SaveManager.save_run(player, GameManager)
+		TurnManager.end_player_turn()
+		return
+	# B2 descent with faith not yet chosen → enter pantheon
+	if GameManager.depth == 2 and not player.first_shrine_choice_done:
+		GameManager.in_pantheon = true
+		_clear_monsters()
+		_clear_floor_items()
+		map.generate_pantheon()
+		player.grid_pos = map.find_spawn()
+		player.position = map.grid_to_world(player.grid_pos)
+		RacePassiveSystem.on_floor_changed(player)
+		_center_camera_on_player(true)
+		_update_hud()
+		_trigger_shrine_event()
+		SaveManager.save_run(player, GameManager)
+		TurnManager.end_player_turn()
+		return
 	GameManager.descend()
 	if GameManager.depth >= 25:
 		_on_dungeon_cleared()
 		return
-	CombatLog.post("You descend to B%d." % GameManager.depth,
-		Color(0.6, 1.0, 1.0))
+	CombatLog.post("You descend to B%d." % GameManager.depth, Color(0.6, 1.0, 1.0))
 	_clear_monsters()
 	_clear_floor_items()
 	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth), true)
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
-	if GameManager.depth == 3 and not player.first_shrine_choice_done:
-		_trigger_shrine_event()
 	SaveManager.save_run(player, GameManager)
 	TurnManager.end_player_turn()
 
