@@ -432,8 +432,7 @@ static func apply(player: Player, essence_id: String) -> void:
 		"hp_max":
 			player.hp_max += value
 			player.hp = mini(player.hp + value, player.hp_max)
-		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch",
-		"plague_bonus", "glacial_retaliate", "infernal_fire", "acid_touch":
+		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch", "plague_bonus", "glacial_retaliate", "infernal_fire", "acid_touch":
 			pass
 	if effect == "wl_bonus":
 		player.wl += value
@@ -464,8 +463,7 @@ static func remove(player: Player, essence_id: String) -> void:
 		"hp_max":
 			player.hp_max = maxi(1, player.hp_max - value)
 			player.hp = mini(player.hp, player.hp_max)
-		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch",
-		"plague_bonus", "glacial_retaliate", "infernal_fire", "acid_touch":
+		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch", "plague_bonus", "glacial_retaliate", "infernal_fire", "acid_touch":
 			pass
 	if effect == "wl_bonus":
 		player.wl = maxi(0, player.wl - value)
