@@ -1274,7 +1274,7 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 	var branch_seed: int = GameManager.seed ^ (branch_id.hash() + branch_floor * 17)
 	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
 	var is_boss_floor: bool = (branch_floor >= int(cfg.get("floors", 4)))
-	map.generate(branch_seed, false, true if not is_boss_floor else false)
+	map.generate(branch_seed, not is_boss_floor)
 	var eff_depth: int = ZoneManager.branch_effective_depth(branch_id, branch_floor)
 	map._tex_wall = load(cfg.get("wall", "")) as Texture2D
 	map._tex_floor = load(cfg.get("floor", "")) as Texture2D
