@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/animals/hornet.png"
 glyph = "a"
 glyph_color = Color(0.9, 0.75, 0.1, 1)
+description = "A fast-flying insect that moves unpredictably. Difficult to pin down, and its sting may poison."

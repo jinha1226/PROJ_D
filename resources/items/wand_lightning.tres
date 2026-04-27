@@ -21,4 +21,4 @@ slot = ""
 effect = "wand_lightning"
 effect_value = 2
 plus = 0
-description = "Fires a bolt of lightning. Charges: 2."
+description = "Strikes fast and hard. Best saved for moments when raw impact matters most."

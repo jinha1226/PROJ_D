@@ -21,4 +21,4 @@ slot = ""
 effect = "scroll_fear"
 effect_value = 8
 plus = 0
-description = "Causes nearby enemies to flee in terror for 8 turns."
+description = "Causes nearby enemies to flee in terror for 8 turns. Buys critical time when surrounded or overwhelmed."

@@ -24,3 +24,4 @@ tile_path = "res://assets/tiles/individual/mon/humanoids/troll.png"
 glyph = "T"
 glyph_color = Color(0.35, 0.8, 0.35, 1)
 essence_id = "essence_regeneration"
+description = "A massive brute with frightening endurance. If you cannot kill it cleanly, the fight quickly gets worse."

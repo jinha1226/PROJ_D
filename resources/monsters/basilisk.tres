@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/animals/basilisk.png"
 glyph = "l"
 glyph_color = Color(0.35, 0.6, 0.25, 1)
+description = "A reptile whose gaze can slow and petrify. Do not stand still — movement breaks most of its advantage."

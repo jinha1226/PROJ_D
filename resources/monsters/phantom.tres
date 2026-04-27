@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/undead/phantom.png"
 glyph = "W"
 glyph_color = Color(0.75, 0.8, 0.95, 1)
+description = "A ghost-like undead that resists cold and slips through walls. Spatial awareness matters here."

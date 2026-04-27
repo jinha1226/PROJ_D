@@ -21,4 +21,4 @@ slot = ""
 effect = "wand_digging"
 effect_value = 3
 plus = 0
-description = "Digs through a wall. Charges: 3."
+description = "Digs through a wall. Creates escape routes or alternate paths in a pinch."

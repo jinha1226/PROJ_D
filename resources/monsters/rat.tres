@@ -23,3 +23,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/animals/rat.png"
 glyph = "r"
 glyph_color = Color(0.75, 0.65, 0.55, 1)
+description = "A weak scavenger, dangerous only in numbers. It teaches the first lesson of any dungeon: carelessness still costs blood."

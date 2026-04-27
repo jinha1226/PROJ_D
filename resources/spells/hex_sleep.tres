@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_hexsleep"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "hex_sleep"
+display_name = "Ensorcelled Hibernation"
+school = "hexes"
+spell_level = 4
+xl_required = 12
+mp_cost = 6
+difficulty = 4
+base_damage = 0
+max_range = 7
+targeting = "auto"
+element = ""
+effect = "sleep"
+description = "Casts a deep magical slumber over the target. Removes an enemy from a fight temporarily — harder to resist than fear."
+icon_path = "res://assets/tiles/individual/spell/sleep.png"

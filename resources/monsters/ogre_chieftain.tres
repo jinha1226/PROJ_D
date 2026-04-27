@@ -23,3 +23,4 @@ is_boss = true
 tile_path = "res://assets/tiles/individual/mon/humanoids/ogre.png"
 glyph = "O"
 glyph_color = Color(0.6, 0.4, 0.2, 1)
+description = "A veteran ogre whose blows hit harder than most. Give it space or you will regret it quickly."

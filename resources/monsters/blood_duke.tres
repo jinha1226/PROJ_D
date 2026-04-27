@@ -26,5 +26,5 @@ drop_chance_override = 1.0
 tile_path = "res://assets/tiles/individual/mon/undead/vampire_bloodprince.png"
 glyph = "U"
 glyph_color = Color(0.85, 0.2, 0.25, 1)
-description = "A lord of blood who sustains himself on the vitality of his victims."
+description = "A noble predator that treats battle as harvest. The longer its enemies fall, the stronger its presence feels. Winning quickly is safer than trying to outlast it."
 essence_id = "essence_bloodwake"

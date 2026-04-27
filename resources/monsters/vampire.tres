@@ -25,3 +25,4 @@ tile_path = "res://assets/tiles/individual/mon/undead/vampire.png"
 glyph = "V"
 glyph_color = Color(0.6, 0.35, 0.55, 1)
 essence_id = "essence_drain"
+description = "An undead noble who drains life on every hit. The drain accumulates quickly if you let the fight drag."

@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/giants/frost_giant.png"
 glyph = "C"
 glyph_color = Color(0.75, 0.85, 0.95, 1)
+description = "A cold-immune giant that delivers crushing blows. Fire damage cuts through its defenses."

@@ -1,16 +1,16 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://book_necr0001"]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://book_necromancy"]
 
 [ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
 
 [resource]
 script = ExtResource("1_idata")
 id = "book_necromancy"
-display_name = "tome of necromancy"
+display_name = "tome of Necromancy"
 kind = "book"
 tier = 2
 tile_path = "res://assets/tiles/individual/item/book/purple.png"
 glyph = "+"
-glyph_color = Color(0.75, 0.45, 0.9, 1)
+glyph_color = Color(0.7, 0.35, 0.9, 1)
 damage = 0
 delay = 1.0
 category = ""
@@ -21,8 +21,8 @@ slot = ""
 effect = "study"
 effect_value = 0
 plus = 0
-description = "Study to unlock the full school of Necromancy (use spells as your skill grows)."
+description = "Study to unlock the Necromancy school."
 unlocks_class_id = ""
 grants_spell_id = ""
-grants_spell_ids = ["inflict_wounds", "ray_of_enfeeblement", "vampiric_touch", "blight", "contagion", "harm", "finger_of_death", "horrid_wilting", "astral_projection"]
+grants_spell_ids = ["pain", "vampiric_draining", "animate_dead", "haunt", "deaths_door"]
 identified_tile_path = ""

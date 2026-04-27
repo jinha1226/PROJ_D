@@ -15,7 +15,7 @@ static var ClassRegistry = Engine.get_main_loop().root.get_node_or_null("/root/C
 ##   Effects      — active statuses with turns remaining
 ##   Run          — depth / gold / kills / turns
 
-const _ELEMENTS: Array = ["fire", "cold", "poison", "corr"]
+const _ELEMENTS: Array = ["fire", "cold", "poison", "necro"]
 
 const _EQUIP_SLOTS: Array = [
 	["⚔ Weapon",  "weapon"],
@@ -467,5 +467,5 @@ static func _element_color(element: String) -> Color:
 		"fire":    return Color(1.0, 0.55, 0.3)
 		"cold":    return Color(0.55, 0.85, 1.0)
 		"poison":  return Color(0.5, 1.0, 0.5)
-		"corr":    return Color(0.6, 0.85, 0.3)
+		"necro":   return Color(0.55, 0.35, 0.85)
 	return Color(0.8, 0.8, 0.85)

@@ -23,3 +23,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/ogre.png"
 glyph = "O"
 glyph_color = Color(0.85, 0.55, 0.35, 1)
+description = "A massive brute with crushing melee power. Slow but capable of ending a fight in a single bad turn."

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_maligngateway"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "malign_gateway"
+display_name = "Malign Gateway"
+school = "summoning"
+spell_level = 5
+xl_required = 16
+mp_cost = 10
+difficulty = 5
+base_damage = 0
+max_range = 0
+targeting = "self"
+element = ""
+effect = "summon"
+description = "Opens a gateway to a malign realm, summoning powerful beings. Your strongest summoning spell — fills the room with danger for everyone."
+icon_path = "res://assets/tiles/individual/spell/gate.png"

@@ -26,5 +26,5 @@ drop_chance_override = 1.0
 tile_path = "res://assets/tiles/individual/mon/humanoids/humans/occultist.png"
 glyph = "U"
 glyph_color = Color(0.75, 0.85, 1.0, 1)
-description = "The endgame controller. Its pale gaze unravels the minds of those who seek the deepest floors."
+description = "A final mind turned inward until only terrible clarity remained. It tests not only your strength, but your understanding of what your run has become. The battle should feel like a culmination, not a skirmish."
 essence_id = "essence_pale_star"

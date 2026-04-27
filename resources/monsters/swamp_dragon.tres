@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/dragons/swamp_dragon.png"
 glyph = "D"
 glyph_color = Color(0.45, 0.55, 0.2, 1)
+description = "A poison-breathing dragon that turns the field toxic. Poison resistance converts a dangerous fight into a manageable one."

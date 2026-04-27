@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/animals/warg.png"
 glyph = "d"
 glyph_color = Color(0.4, 0.4, 0.4, 1)
+description = "A massive warwolf ridden by goblinoids. Powerful and aggressive — it does not give ground."

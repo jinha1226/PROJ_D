@@ -25,12 +25,14 @@ const _SHOCK_MACE: Resource = preload("res://resources/items/shock_mace.tres")
 const _POTION_BERSERK: Resource = preload("res://resources/items/potion_berserk.tres")
 const _SCROLL_IDENTIFY: Resource = preload("res://resources/items/scroll_identify.tres")
 const _SCROLL_SHROUDING: Resource = preload("res://resources/items/scroll_shrouding.tres")
-const _BOOK_EVOCATION: Resource = preload("res://resources/items/book_evocation.tres")
-const _BOOK_CONJURATION: Resource = preload("res://resources/items/book_conjuration.tres")
-const _BOOK_TRANSMUTATION: Resource = preload("res://resources/items/book_transmutation.tres")
+const _BOOK_FIRE: Resource = preload("res://resources/items/book_fire.tres")
+const _BOOK_COLD: Resource = preload("res://resources/items/book_cold.tres")
+const _BOOK_AIR: Resource = preload("res://resources/items/book_air.tres")
+const _BOOK_EARTH: Resource = preload("res://resources/items/book_earth.tres")
 const _BOOK_NECROMANCY: Resource = preload("res://resources/items/book_necromancy.tres")
-const _BOOK_ABJURATION: Resource = preload("res://resources/items/book_abjuration.tres")
-const _BOOK_ENCHANTMENT: Resource = preload("res://resources/items/book_enchantment.tres")
+const _BOOK_HEXES: Resource = preload("res://resources/items/book_hexes.tres")
+const _BOOK_TRANSLOCATION: Resource = preload("res://resources/items/book_translocation.tres")
+const _BOOK_SUMMONING: Resource = preload("res://resources/items/book_summoning.tres")
 const _SPEAR: Resource = preload("res://resources/items/spear.tres")
 const _RING_STR: Resource = preload("res://resources/items/ring_str.tres")
 const _RING_INT: Resource = preload("res://resources/items/ring_int.tres")
@@ -70,7 +72,7 @@ const _SCROLL_SILENCE: Resource = preload("res://resources/items/scroll_silence.
 const _SCROLL_BRAND_VENOM: Resource = preload("res://resources/items/scroll_brand_venom.tres")
 const _SCROLL_BRAND_FREEZING: Resource = preload("res://resources/items/scroll_brand_freezing.tres")
 const _SCROLL_BRAND_FLAMING: Resource = preload("res://resources/items/scroll_brand_flaming.tres")
-const _SCROLL_BRAND_ACID: Resource = preload("res://resources/items/scroll_brand_acid.tres")
+const _SCROLL_BRAND_DRAIN: Resource = preload("res://resources/items/scroll_brand_drain.tres")
 # Wands
 const _WAND_FIRE: Resource = preload("res://resources/items/wand_fire.tres")
 const _WAND_FROST: Resource = preload("res://resources/items/wand_frost.tres")
@@ -108,15 +110,15 @@ const _ALL_ITEMS: Array = [
 	_SCROLL_ENCHANT_WEAPON, _SCROLL_ENCHANT_ARMOR, _SCROLL_IDENTIFY,
 	_SCROLL_SHROUDING,
 	_SCROLL_FEAR, _SCROLL_UPGRADE, _SCROLL_FOG, _SCROLL_BRAND, _SCROLL_SILENCE,
-	_BOOK_EVOCATION, _BOOK_CONJURATION, _BOOK_TRANSMUTATION,
-	_BOOK_NECROMANCY, _BOOK_ABJURATION, _BOOK_ENCHANTMENT,
+	_BOOK_FIRE, _BOOK_COLD, _BOOK_AIR, _BOOK_EARTH,
+	_BOOK_NECROMANCY, _BOOK_HEXES, _BOOK_TRANSLOCATION, _BOOK_SUMMONING,
 	_GOLD_PILE,
 	_WAND_FIRE, _WAND_FROST, _WAND_LIGHTNING, _WAND_TELEPORT,
 	_WAND_FEAR, _WAND_HASTE, _WAND_DIGGING,
 	_THROWING_KNIFE, _JAVELIN, _BOMB, _POISON_FLASK, _SMOKE_BOMB,
 	_POTION_RESISTANCE, _POTION_CANCELLATION,
 	_SCROLL_IMMOLATION, _SCROLL_NOISE,
-	_SCROLL_BRAND_VENOM, _SCROLL_BRAND_FREEZING, _SCROLL_BRAND_FLAMING, _SCROLL_BRAND_ACID,
+	_SCROLL_BRAND_VENOM, _SCROLL_BRAND_FREEZING, _SCROLL_BRAND_FLAMING, _SCROLL_BRAND_DRAIN,
 ]
 
 var by_id: Dictionary = {}

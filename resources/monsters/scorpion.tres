@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/animals/scorpion.png"
 glyph = "a"
 glyph_color = Color(0.8, 0.7, 0.3, 1)
+description = "A venomous arachnid whose tail ends fights poorly. Poison resistance reduces its danger sharply."

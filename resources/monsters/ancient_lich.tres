@@ -1,26 +1,30 @@
-[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002046"]
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://mon_ancientlich"]
 
 [ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
 
 [resource]
 script = ExtResource("1_mdata")
 id = "ancient_lich"
-display_name = "ancient lich"
-tier = 6
-hp = 110
+display_name = "Ancient Lich"
+tier = 5
+hp = 90
 hd = 14
 ac = 10
-ev = 8
-speed = 11
-sight_range = 8
-attacks = [{"damage": 18, "flavour": "touch"}]
-ranged_attack = {}
-resists = ["cold"]
-min_depth = 15
-max_depth = 25
-weight = 3
-xp_value = 40
-is_boss = false
+ev = 6
+speed = 10
+sight_range = 9
+attacks = [{"damage": 15, "flavour": "necromantic strike"}, {"damage": 10, "flavour": "life drain"}]
+ranged_attack = {"damage": 20, "range": 7, "flavour": "death bolt", "element": "necro"}
+resists = ["necro+++", "cold++", "poison+"]
+min_depth = 16
+max_depth = 16
+weight = 0
+xp_value = 120
+is_boss = true
+is_unique = true
+drop_chance_override = 1.0
 tile_path = "res://assets/tiles/individual/mon/undead/ancient_lich.png"
 glyph = "L"
-glyph_color = Color(0.6, 0.85, 0.45, 1)
+glyph_color = Color(0.55, 0.35, 0.85, 1)
+description = "An ancient sorcerer who has transcended death. Commands the crypt with absolute authority."
+essence_id = "essence_undeath"

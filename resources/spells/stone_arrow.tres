@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_stonearrow"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "stone_arrow"
+display_name = "Stone Arrow"
+school = "earth"
+spell_level = 1
+xl_required = 1
+mp_cost = 2
+difficulty = 1
+base_damage = 10
+max_range = 6
+targeting = "single"
+element = "earth"
+effect = "damage"
+description = "A sharp shard of stone pierces the target. Cheap and accurate; a solid general-purpose earth spell."
+icon_path = "res://assets/tiles/individual/spell/magic_missile.png"

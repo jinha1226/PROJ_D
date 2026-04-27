@@ -21,4 +21,4 @@ slot = ""
 effect = "throw_poison"
 effect_value = 8
 plus = 0
-description = "Shatters to coat enemies in poison."
+description = "Shatters to coat enemies in poison. Most effective against targets with low health or poison vulnerability."

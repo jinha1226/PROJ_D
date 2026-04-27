@@ -14,35 +14,9 @@ const ESSENCE_ICON_DIR := "res://assets/tiles/individual/item/essence/"
 const UNIQUE_MONSTER_ESSENCE_IDS: Array = [
 	"essence_gloam", "essence_cinder", "essence_serpent", "essence_bastion",
 	"essence_dread", "essence_bloodwake", "essence_tempest", "essence_pale_star",
-	"essence_plague", "essence_glacial", "essence_infernal", "essence_acid",
+	"essence_plague", "essence_glacial", "essence_infernal", "essence_undeath",
 ]
 
-const RUNE_COSTS: Dictionary = {
-	"essence_fire": 10,
-	"essence_cold": 10,
-	"essence_swiftness": 10,
-	"essence_regeneration": 10,
-	"essence_venom": 10,
-	"essence_vitality": 20,
-	"essence_stone": 20,
-	"essence_warding": 20,
-	"essence_might": 20,
-	"essence_arcana": 35,
-	"essence_fury": 35,
-	"essence_drain": 35,
-	"essence_cinder": 35,
-	"essence_serpent": 35,
-	"essence_gloam": 35,
-	"essence_dread": 60,
-	"essence_bloodwake": 60,
-	"essence_tempest": 60,
-	"essence_bastion": 60,
-	"essence_pale_star": 60,
-	"essence_plague": 60,
-	"essence_glacial": 60,
-	"essence_infernal": 60,
-	"essence_acid": 60,
-}
 
 const ESSENCE_TIER_BY_ID := {
 	"essence_fire": "normal",
@@ -68,7 +42,7 @@ const ESSENCE_TIER_BY_ID := {
 	"essence_plague": "unique",
 	"essence_glacial": "unique",
 	"essence_infernal": "unique",
-	"essence_acid": "unique",
+	"essence_undeath": "unique",
 }
 
 const ESSENCES: Dictionary = {
@@ -240,14 +214,14 @@ const ESSENCES: Dictionary = {
 		"effect": "resist_fire",
 		"penalty_effect": "vuln_cold",
 	},
-	"essence_acid": {
-		"name": "Acid Essence",
-		"desc": "Corrosion resistant. Attacks corrode enemies, reducing their AC.",
-		"passive_desc": "Melee hits apply corroded (AC -2, 3 turns). Corrosion immunity.",
+	"essence_undeath": {
+		"name": "Essence of Undeath",
+		"desc": "Necromantic resistance. Melee hits drain 2 HP from enemies to you.",
+		"passive_desc": "Melee hits drain 2 HP (vampiric). Necromantic resistance (necro+).",
 		"penalty_desc": "HP max -4.",
-		"passive_effect": "acid_touch",
-		"color": Color(0.6, 0.85, 0.3),
-		"effect": "resist_corr",
+		"passive_effect": "drain_touch",
+		"color": Color(0.55, 0.35, 0.85),
+		"effect": "resist_necro",
 		"penalty_effect": "hp_down",
 		"penalty_value": 4,
 	},
@@ -344,8 +318,8 @@ const ESSENCES: Dictionary = {
 	},
 }
 
-static func rune_cost(id: String) -> int:
-	return int(RUNE_COSTS.get(id, 20))
+static func is_available(player) -> bool:
+	return FaithSystem.allows_essence(player)
 
 static func all_ids() -> Array:
 	return ESSENCES.keys()
@@ -362,8 +336,8 @@ static func active_slot_count(player: Player) -> int:
 static func slot_is_unlocked(player: Player, slot_index: int) -> bool:
 	return slot_index >= 0 and slot_index < active_slot_count(player)
 
-static func inventory_capacity(_player: Player) -> int:
-	return INVENTORY_CAP
+static func inventory_capacity(player: Player) -> int:
+	return INVENTORY_CAP + FaithSystem.essence_inventory_bonus(player)
 
 static func inventory_is_full(player: Player) -> bool:
 	return player != null and player.essence_inventory.size() >= inventory_capacity(player)
@@ -423,6 +397,9 @@ static func apply(player: Player, essence_id: String) -> void:
 		"resist_corr":
 			if not player.resists.has("corr+"):
 				player.resists.append("corr+")
+		"resist_necro":
+			if not player.resists.has("necro+"):
+				player.resists.append("necro+")
 		"stat_str":
 			player.strength += value
 		"stat_int":
@@ -432,7 +409,7 @@ static func apply(player: Player, essence_id: String) -> void:
 		"hp_max":
 			player.hp_max += value
 			player.hp = mini(player.hp + value, player.hp_max)
-		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch", "plague_bonus", "glacial_retaliate", "infernal_fire", "acid_touch":
+		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch", "plague_bonus", "glacial_retaliate", "infernal_fire", "drain_touch":
 			pass
 	if effect == "wl_bonus":
 		player.wl += value
@@ -454,6 +431,8 @@ static func remove(player: Player, essence_id: String) -> void:
 			player.resists.erase("cold+")
 		"resist_corr":
 			player.resists.erase("corr+")
+		"resist_necro":
+			player.resists.erase("necro+")
 		"stat_str":
 			player.strength = maxi(1, player.strength - value)
 		"stat_int":
@@ -463,7 +442,7 @@ static func remove(player: Player, essence_id: String) -> void:
 		"hp_max":
 			player.hp_max = maxi(1, player.hp_max - value)
 			player.hp = mini(player.hp, player.hp_max)
-		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch", "plague_bonus", "glacial_retaliate", "infernal_fire", "acid_touch":
+		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch", "plague_bonus", "glacial_retaliate", "infernal_fire", "drain_touch":
 			pass
 	if effect == "wl_bonus":
 		player.wl = maxi(0, player.wl - value)
@@ -578,8 +557,8 @@ static func active_synergies(player: Player) -> Array:
 static func has_venom_touch(player: Player) -> bool:
 	return player != null and player.essence_slots.has("essence_venom")
 
-static func has_acid_touch(player: Player) -> bool:
-	return player != null and player.essence_slots.has("essence_acid")
+static func has_drain_touch(player: Player) -> bool:
+	return player != null and player.essence_slots.has("essence_undeath")
 
 static func has_synergy(player: Player, a: String, b: String) -> bool:
 	return player != null and player.essence_slots.has(a) and player.essence_slots.has(b)

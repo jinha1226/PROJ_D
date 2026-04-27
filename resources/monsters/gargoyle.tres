@@ -25,3 +25,4 @@ tile_path = "res://assets/tiles/individual/mon/nonliving/gargoyle.png"
 glyph = "G"
 glyph_color = Color(0.55, 0.55, 0.55, 1)
 essence_id = "essence_stone"
+description = "A living stone guardian with great physical resilience. Strong blows and magic work better than weak repeated attacks."

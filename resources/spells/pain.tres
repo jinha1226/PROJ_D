@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_pain"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "pain"
+display_name = "Pain"
+school = "necromancy"
+spell_level = 1
+xl_required = 1
+mp_cost = 2
+difficulty = 1
+base_damage = 8
+max_range = 5
+targeting = "auto"
+element = ""
+effect = "damage"
+description = "Wracks the target with necrotic pain. Cheap and reliable; your entry point into necromantic damage."
+icon_path = "res://assets/tiles/individual/spell/harm.png"

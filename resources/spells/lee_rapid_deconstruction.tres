@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_leerapiddeconstruction"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "lee_rapid_deconstruction"
+display_name = "Lee's Rapid Deconstruction"
+school = "earth"
+spell_level = 3
+xl_required = 8
+mp_cost = 6
+difficulty = 3
+base_damage = 18
+max_range = 7
+targeting = "aoe"
+element = "earth"
+effect = "aoe_damage"
+description = "Violently deconstructs stone and bone alike. Strong area damage, especially against heavily armored or undead foes."
+icon_path = "res://assets/tiles/individual/spell/earthquake.png"

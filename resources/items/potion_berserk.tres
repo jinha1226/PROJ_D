@@ -22,6 +22,6 @@ slot = ""
 effect = "berserk"
 effect_value = 25
 plus = 0
-description = "Drink to fly into a rage (+4 STR for 25 turns). Unlocks Berserker class."
+description = "Fly into a rage (+4 STR for 25 turns). High risk, high reward — dangerous to use near low HP."
 unlocks_class_id = "berserker"
 grants_spell_id = ""

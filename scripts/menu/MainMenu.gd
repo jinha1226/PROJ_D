@@ -18,8 +18,7 @@ func _ready() -> void:
 	_start_btn.pressed.connect(_on_start)
 	_display_btn.pressed.connect(_on_toggle_display)
 	if _shards_btn != null:
-		_shards_btn.text = "[ ◆ %d 룬 ]" % GameManager.rune_shards
-		_shards_btn.disabled = true
+		_shards_btn.hide()
 	if _help_btn != null:
 		_help_btn.pressed.connect(_on_help)
 	_refresh_display_label()
@@ -42,15 +41,7 @@ func _refresh_display_label() -> void:
 	_display_btn.text = "[ DISPLAY: %s ]" % ("TILES" if GameManager.use_tiles else "ASCII")
 
 func _on_shards() -> void:
-	var dlg: GameDialog = GameDialog.create("Rune Shards")
-	add_child(dlg)
-	var lab := Label.new()
-	lab.text = "You have %d rune shards.\n\nEarn more by descending further before dying.\n(Meta upgrades coming in a future update.)" \
-			% GameManager.rune_shards
-	lab.add_theme_font_size_override("font_size", 32)
-	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	dlg.body().add_child(lab)
+	pass
 
 func _on_help() -> void:
 	var dlg: GameDialog = GameDialog.create("How to Play")
@@ -78,7 +69,7 @@ func _help_lines() -> Array:
 		"MENU: save and return to the title screen.",
 		"",
 		"Display button toggles tile / ASCII rendering.",
-		"Dying earns rune shards (meta upgrades to come).",
+		"Choose a Faith at the start of each run.",
 		"",
 		"ASCII legend:",
 		"@ you  # wall  . floor  < > stairs  + closed door",

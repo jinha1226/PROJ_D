@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_swiftness"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "swiftness"
+display_name = "Swiftness"
+school = "translocation"
+spell_level = 4
+xl_required = 12
+mp_cost = 7
+difficulty = 4
+base_damage = 0
+max_range = 0
+targeting = "self"
+element = ""
+effect = "buff_speed"
+description = "Channels translocation energy for supernatural speed. Lets you control the pace of every fight while it lasts."
+icon_path = "res://assets/tiles/individual/spell/haste.png"

@@ -35,8 +35,6 @@ var _effect_layer: Node2D
 var _targeting_spell: SpellData = null
 var _targeting_tiles: Array = []
 var _targeting_node: SpellTargetOverlay = null
-var _pending_spell_choices: Array = []
-var _spell_choice_popup_open: bool = false
 var _pending_essence_pickups: Array = []
 var _essence_pickup_popup_open: bool = false
 
@@ -330,11 +328,15 @@ func _apply_class_to_player(class_id: String) -> void:
 	player.refresh_ac_from_equipment()
 	player._refresh_paperdoll()
 	player.known_spells = data.starting_spells.duplicate()
-	if player.known_spells.is_empty() and data.class_group == "mage":
-		var magic_level: int = player.get_skill_level("magic")
-		for spell_level in range(1, magic_level + 1):
-			player.request_magic_spell_choices(spell_level)
+	if data.class_group == "mage" or class_id == "archmage":
+		var start_school: String = GameManager.selected_starting_school_id
+		if start_school != "" and class_id != "archmage":
+			player.add_school_spells(start_school)
+		else:
+			for school in Player.MAGIC_SCHOOLS:
+				player.add_school_spells(school)
 	GameManager.selected_starting_weapon_id = ""
+	GameManager.selected_starting_school_id = ""
 	for id in _class_starter_items(class_id):
 		player.items.append({"id": id, "plus": 0})
 		player.auto_bind_quickslot(id)
@@ -342,13 +344,21 @@ func _apply_class_to_player(class_id: String) -> void:
 	var race_name: String = race.display_name if race != null else "adventurer"
 	CombatLog.post("You start as %s %s." % [race_name, data.display_name],
 		Color(0.85, 0.9, 1.0))
-	var start_essence: String = GameManager.selected_starting_essence_id
 	GameManager.selected_starting_essence_id = ""
-	if start_essence != "" and EssenceSystem.ESSENCES.has(start_essence):
-		player.essence_inventory.append(start_essence)
-		player.equip_essence(0, start_essence)
-		CombatLog.post("You begin with %s." % EssenceSystem.display_name(start_essence),
-			EssenceSystem.color_of(start_essence))
+	var start_faith: String = GameManager.selected_faith_id
+	GameManager.selected_faith_id = ""
+	if start_faith != "" and FaithSystem.FAITHS.has(start_faith):
+		player.faith_id = start_faith
+		# Arcana: +4 max MP on start
+		var mp_bonus: int = FaithSystem.max_mp_bonus(player)
+		if mp_bonus > 0:
+			player.mp_max += mp_bonus
+			player.mp = min(player.mp_max, player.mp + mp_bonus)
+		# Death: +1 will
+		if start_faith == "death":
+			player.wl += 1
+		CombatLog.post("You follow the path of %s." % FaithSystem.display_name(start_faith),
+			FaithSystem.color_of(start_faith))
 
 func _apply_race_mods(race_id: String) -> void:
 	var race: RaceData = RaceRegistry.get_by_id(race_id)
@@ -391,7 +401,7 @@ func _class_default_active_skills(class_id: String, fallback: Array) -> Array:
 		"mage":
 			return ["magic"]
 		"rogue":
-			return ["ranged", "agility"]
+			return ["tool", "agility"]
 		"archmage":
 			return ["magic", "agility", "defense"]
 	if not fallback.is_empty():
@@ -431,7 +441,7 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.last_killer = String(data.get("last_killer", ""))
 	player.known_spells = data.get("known_spells", [])
 	# Migrate old spell IDs that no longer exist in SpellRegistry.
-	var _spell_remap: Dictionary = {"magic_dart": "magic_missile", "blink": "", "heal_wounds": ""}
+	var _spell_remap: Dictionary = {"magic_dart": "pain", "heal_wounds": ""}
 	var _migrated: Array = []
 	for _sid: String in player.known_spells:
 		var _resolved: String = _sid
@@ -454,6 +464,7 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	if player.skills.has("stealth") and not player.skills.has("agility"):
 		player.skills["agility"] = player.skills["stealth"]
 	player.skills.erase("stealth")
+	# tool skill migration: old saves may not have "tool" yet (that's fine, will be added below)
 	if player.skills.is_empty():
 		player.init_skills()
 	else:
@@ -491,6 +502,7 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	var saved_ei = data.get("essence_inventory", null)
 	if saved_ei is Array:
 		player.essence_inventory = saved_ei.duplicate()
+	player.faith_id = String(data.get("faith_id", ""))
 	player.refresh_ac_from_equipment()
 	player.set_race_from_id(GameManager.selected_race_id)
 	RacePassiveSystem.register(player)
@@ -529,38 +541,6 @@ func _spawn_player() -> void:
 	player.stats_changed.connect(_update_hud)
 	player.item_dropped.connect(_on_item_dropped)
 	player.damaged.connect(_on_player_damaged)
-	player.spell_choices_requested.connect(_on_spell_choices_requested)
-
-func _on_spell_choices_requested(spell_level: int, spell_ids: Array) -> void:
-	if spell_ids.is_empty():
-		return
-	_pending_spell_choices.append({
-		"level": spell_level,
-		"spell_ids": spell_ids.duplicate(),
-	})
-	_try_open_spell_choice_popup()
-
-func _try_open_spell_choice_popup() -> void:
-	if _spell_choice_popup_open or _essence_pickup_popup_open or _pending_spell_choices.is_empty():
-		return
-	var entry: Dictionary = _pending_spell_choices.pop_front()
-	var spell_level: int = int(entry.get("level", 1))
-	var spell_ids: Array = entry.get("spell_ids", [])
-	if spell_ids.is_empty():
-		_try_open_spell_choice_popup()
-		return
-	_spell_choice_popup_open = true
-	var popup := PopupManager.new()
-	add_child(popup)
-	popup.show_spell_learn_popup(spell_level, spell_ids, func(spell_id: String) -> void:
-		if player != null:
-			player.learn_spell(spell_id)
-		_spell_choice_popup_open = false
-		if is_instance_valid(popup):
-			popup.queue_free()
-		_try_open_spell_choice_popup()
-		_try_open_essence_pickup_popup()
-	)
 
 func _queue_essence_pickup(essence_id: String) -> void:
 	if player == null or essence_id == "":
@@ -573,13 +553,18 @@ func _queue_essence_pickup(essence_id: String) -> void:
 	_try_open_essence_pickup_popup()
 
 func _try_open_essence_pickup_popup() -> void:
-	if _essence_pickup_popup_open or _spell_choice_popup_open or _pending_essence_pickups.is_empty():
+	if _essence_pickup_popup_open or _pending_essence_pickups.is_empty():
 		return
 	if player == null:
 		_pending_essence_pickups.clear()
 		return
 	var essence_id: String = String(_pending_essence_pickups.pop_front())
 	if essence_id == "" or player.essence_slots.has(essence_id) or player.essence_inventory.has(essence_id):
+		_try_open_essence_pickup_popup()
+		return
+	# Essence only available with Essence faith
+	if not FaithSystem.allows_essence(player):
+		CombatLog.post("The essence fades — your faith rejects it.", Color(0.55, 0.55, 0.65))
 		_try_open_essence_pickup_popup()
 		return
 	_essence_pickup_popup_open = true
@@ -616,7 +601,6 @@ func _close_essence_pickup_popup(popup: PopupManager) -> void:
 	_essence_pickup_popup_open = false
 	if is_instance_valid(popup):
 		popup.queue_free()
-	_try_open_spell_choice_popup()
 	_try_open_essence_pickup_popup()
 
 const ZOOM_MIN: float = 0.7
@@ -1114,10 +1098,9 @@ func _try_respawn_monster() -> void:
 
 func _on_player_died() -> void:
 	CombatLog.post("You have died.", Color(1.0, 0.4, 0.4))
-	var shards: int = _calc_run_score(false)
-	GameManager.add_rune_shards(shards)
+	var score: int = _calc_run_score(false)
 	GameManager.end_run("death")
-	_show_death_message(shards)
+	_show_death_message(score)
 
 func _show_death_message(shards: int) -> void:
 	var dlg: GameDialog = GameDialog.create_ratio("", 0.82, 0.52)
@@ -1128,7 +1111,7 @@ func _show_death_message(shards: int) -> void:
 		_show_result_screen(false, shards)
 		return
 	var lbl := Label.new()
-	lbl.text = "악! 이건 정말 아프다!\n\n죽었다... \ㅜ"
+	lbl.text = "악! 이건 정말 아프다!\n\n죽었다... \\ㅜ"
 	lbl.add_theme_font_size_override("font_size", 38)
 	lbl.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35))
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1152,7 +1135,7 @@ func _show_result_screen(victory: bool, shards: int) -> void:
 		"kills": player.kills,
 		"turns": TurnManager.turn_number,
 		"shards_gained": shards,
-		"shards_total": GameManager.rune_shards,
+		"shards_total": 0,
 		"killer": player.last_killer,
 	}
 	res.show_result(data)
@@ -1239,20 +1222,16 @@ func _on_branch_cleared(branch_id: String) -> void:
 	GameManager.branches_cleared.append(branch_id)
 	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
 	CombatLog.post("%s cleared!" % cfg.get("display_name", branch_id), Color(1.0, 0.9, 0.3))
-	GameManager.add_rune_shards(ZoneManager.BRANCH_CLEAR_RUNES)
-	CombatLog.post("◆ +%d 룬" % ZoneManager.BRANCH_CLEAR_RUNES, Color(0.9, 0.85, 0.4))
 	# Per-branch title
 	match branch_id:
 		"swamp":      GameManager.earn_title("The Poisoner")
 		"ice_caves":  GameManager.earn_title("The Frozen")
 		"infernal":   GameManager.earn_title("The Infernal")
-		"slime_pits": GameManager.earn_title("The Corrosive")
+		"crypt": GameManager.earn_title("The Deathless")
 	# All-branches bonus
 	if GameManager.branches_cleared.size() >= 4:
-		GameManager.add_rune_shards(ZoneManager.ALL_BRANCHES_BONUS_RUNES)
 		GameManager.earn_title("The Delver")
-		CombatLog.post("All branches cleared! ◆ +%d 룬" % ZoneManager.ALL_BRANCHES_BONUS_RUNES,
-			Color(1.0, 0.9, 0.3))
+		CombatLog.post("All branches cleared!", Color(1.0, 0.9, 0.3))
 
 func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_above: bool) -> void:
 	var cache_key: String = "%s_%d" % [branch_id, branch_floor]
@@ -1406,10 +1385,9 @@ func _apply_branch_env_damage() -> void:
 
 func _on_dungeon_cleared() -> void:
 	CombatLog.post("You have cleared the dungeon!", Color(1.0, 0.9, 0.2))
-	var shards: int = _calc_run_score(true)
-	GameManager.add_rune_shards(shards)
+	var score: int = _calc_run_score(true)
 	GameManager.end_run("victory")
-	_show_result_screen(true, shards)
+	_show_result_screen(true, score)
 
 func _on_stairs_down() -> void:
 	# Inside a branch — go deeper in branch
@@ -1772,6 +1750,13 @@ func _greedy_step_toward(target: Vector2i) -> Vector2i:
 func _on_monster_died(monster: Monster) -> void:
 	if player == null or player.hp <= 0:
 		return
+	# Death faith: on-kill HP/MP sustain
+	var kill_hp: int = FaithSystem.on_kill_hp(player)
+	var kill_mp: int = FaithSystem.on_kill_mp(player)
+	if kill_hp > 0:
+		player.heal(kill_hp)
+	if kill_mp > 0:
+		player.mp = min(player.mp_max, player.mp + kill_mp)
 	# Unique monsters use dedicated essence and their own drop chance
 	if monster != null and monster.data != null and monster.data.is_unique:
 		var drop_chance: float = monster.data.drop_chance_override if monster.data.drop_chance_override >= 0.0 else 0.8
@@ -2040,7 +2025,7 @@ func _spawn_debug_floor_panel() -> void:
 	# Branch sections
 	var branches: Dictionary = {
 		"swamp": "Swamp", "ice_caves": "Ice Caves",
-		"infernal": "Infernal", "slime_pits": "Slime Pits",
+		"infernal": "Infernal", "crypt": "Crypt",
 	}
 	for branch_id in branches.keys():
 		var bhdr := Label.new()

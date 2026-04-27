@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/demihumanoids/taurs/centaur.png"
 glyph = "c"
 glyph_color = Color(0.72, 0.55, 0.28, 1)
+description = "A horse-bodied archer that punishes flat movement. Closing the gap quickly is the best answer."

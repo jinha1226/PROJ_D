@@ -95,12 +95,13 @@ const _PALE_SCHOLAR: Resource = preload("res://resources/monsters/pale_scholar.t
 const _BOG_SERPENT: Resource = preload("res://resources/monsters/bog_serpent.tres")
 const _GLACIAL_SOVEREIGN: Resource = preload("res://resources/monsters/glacial_sovereign.tres")
 const _EMBER_TYRANT: Resource = preload("res://resources/monsters/ember_tyrant.tres")
-const _SOVEREIGN_JELLY: Resource = preload("res://resources/monsters/sovereign_jelly.tres")
+const _CRYPT_ZOMBIE: Resource = preload("res://resources/monsters/crypt_zombie.tres")
+const _SHADOW_WRAITH: Resource = preload("res://resources/monsters/shadow_wraith.tres")
 
 const _UNIQUE_MONSTERS: Array = [
 	_ASHEN_MAGPIE, _SISTER_CINDER, _VIPER_SAINT, _STONE_WARDEN,
 	_HARROW_KNIGHT, _BLOOD_DUKE, _STORM_HIEROPHANT, _PALE_SCHOLAR,
-	_BOG_SERPENT, _GLACIAL_SOVEREIGN, _EMBER_TYRANT, _SOVEREIGN_JELLY,
+	_BOG_SERPENT, _GLACIAL_SOVEREIGN, _EMBER_TYRANT, _ANCIENT_LICH,
 ]
 
 const _ALL_MONSTERS: Array = [
@@ -125,6 +126,8 @@ const _ALL_MONSTERS: Array = [
 	_DEEP_ELF_DEATH_MAGE,
 	# tier 6
 	_ANCIENT_LICH, _GOLDEN_DRAGON, _EXECUTIONER, _TITAN,
+	# crypt branch
+	_CRYPT_ZOMBIE, _SHADOW_WRAITH,
 ]
 
 var by_id: Dictionary = {}

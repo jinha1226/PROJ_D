@@ -22,4 +22,4 @@ slot = ""
 effect = "restore_mp"
 effect_value = 6
 plus = 0
-description = "Restores MP."
+description = "Restores magical energy. Most valuable when a single spell can still change the fight."

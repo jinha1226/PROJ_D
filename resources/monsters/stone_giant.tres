@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/giants/stone_giant.png"
 glyph = "H"
 glyph_color = Color(0.7, 0.7, 0.6, 1)
+description = "A colossus of living rock that hurls boulders with crushing force. Keep moving and do not stand still."

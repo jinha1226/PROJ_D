@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_airstrike"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "airstrike"
+display_name = "Airstrike"
+school = "air"
+spell_level = 4
+xl_required = 12
+mp_cost = 8
+difficulty = 4
+base_damage = 20
+max_range = 7
+targeting = "aoe"
+element = "lightning"
+effect = "aoe_damage"
+description = "Calls down a thunderous strike from the sky. Ignores cover and walls — effective against evasive or hidden foes."
+icon_path = "res://assets/tiles/individual/spell/disintegrate.png"

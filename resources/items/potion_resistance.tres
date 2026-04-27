@@ -22,4 +22,4 @@ slot = ""
 effect = "resistance"
 effect_value = 20
 plus = 0
-description = "Grants resistance to fire, cold and poison for 20 turns."
+description = "Grants resistance to fire, cold and poison for 20 turns. Most valuable before entering elemental-heavy areas."

@@ -21,4 +21,4 @@ slot = ""
 effect = "scroll_fog"
 effect_value = 12
 plus = 0
-description = "Fills the area with obscuring fog for 12 turns."
+description = "Fills the area with obscuring fog for 12 turns. Blocks ranged attacks and creates space to recover."

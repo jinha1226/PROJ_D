@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/two_headed_ogre.png"
 glyph = "O"
 glyph_color = Color(0.6, 0.55, 0.3, 1)
+description = "Two heads mean two brains and twice the swings. Expect rapid repeated attacks at close range."

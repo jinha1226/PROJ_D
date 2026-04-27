@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_icebolt"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "ice_bolt"
+display_name = "Ice Bolt"
+school = "cold"
+spell_level = 2
+xl_required = 4
+mp_cost = 4
+difficulty = 2
+base_damage = 16
+max_range = 7
+targeting = "single"
+element = "cold"
+effect = "damage"
+description = "A heavy shard of ice impales the target. High single-target cold damage at mid-range."
+icon_path = "res://assets/tiles/individual/spell/ice_storm.png"

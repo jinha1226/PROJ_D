@@ -10,7 +10,6 @@ signal moved(new_pos: Vector2i)
 signal died
 signal item_dropped(item_id: String, at_pos: Vector2i, plus: int)
 signal damaged(amount: int)
-signal spell_choices_requested(spell_level: int, spell_ids: Array)
 
 @export var grid_pos: Vector2i = Vector2i(1, 1)
 
@@ -87,14 +86,15 @@ var equipped_amulet_id: String = ""
 var equipped_shield_id: String = ""
 var essence_slots: Array = ["", "", ""]   # equipped essence ids (max 3)
 var essence_inventory: Array = []         # collected but unequipped essence ids
+var faith_id: String = ""                 # active faith: "war"/"arcana"/"trickery"/"death"/"essence"
 
 const MAX_XL: int = 20
 const MAX_SKILL_LEVEL: int = 9
-const SKILL_IDS: Array = ["melee", "ranged", "magic", "defense", "agility"]
+const SKILL_IDS: Array = ["melee", "ranged", "magic", "defense", "agility", "tool"]
 const SKILL_XP_DELTA: Array = [12, 28, 55, 95, 150, 230, 340, 490, 700]
 const MAGIC_SCHOOLS: Array = [
-	"evocation", "conjuration", "transmutation",
-	"necromancy", "abjuration", "enchantment",
+	"fire", "cold", "air", "earth",
+	"necromancy", "hexes", "translocation", "summoning",
 ]
 
 var _map: DungeonMap
@@ -298,7 +298,7 @@ func use_item(index: int) -> void:
 	match data.effect:
 		"heal":
 			heal_injury(data.effect_value)
-			var heal_amt: int = maxi(1, int(round(float(data.effect_value) * EssenceSystem.potion_heal_mult(self))))
+			var heal_amt: int = maxi(1, int(round(float(data.effect_value) * EssenceSystem.potion_heal_mult(self) * FaithSystem.potion_heal_mult(self))))
 			heal_amt += EssenceSystem.potion_heal_bonus(self)
 			heal(heal_amt)
 			CombatLog.post("You feel better. (+%d HP)" % heal_amt,
@@ -506,7 +506,8 @@ func use_item(index: int) -> void:
 	if data.kind == "wand":
 		var wand_entry: Dictionary = items[index]
 		var charges: int = int(wand_entry.get("charges", data.effect_value))
-		charges -= 1
+		if randf() >= FaithSystem.wand_charge_save_chance(self):
+			charges -= 1
 		if charges <= 0:
 			CombatLog.post("The %s is exhausted." % data.display_name, Color(0.6, 0.6, 0.6))
 			items.remove_at(index)
@@ -809,15 +810,7 @@ func grant_skill_xp(id: String, amount: float) -> void:
 			Color(0.7, 0.95, 0.5))
 		if id == "agility":
 			ev += 1
-		elif id == "magic" and int(s["level"]) >= 2 and _can_offer_magic_choices():
-			var spell_choices: Array = _generate_magic_spell_choices(int(s["level"]))
-			if not spell_choices.is_empty():
-				emit_signal("spell_choices_requested", int(s["level"]), spell_choices)
 	skills[id] = s
-
-func _can_offer_magic_choices() -> bool:
-	var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id)
-	return (cls != null and cls.class_group == "mage") or not known_spells.is_empty()
 
 func grant_xp(amount: int) -> void:
 	xp += amount
@@ -896,30 +889,13 @@ func learn_spell(spell_id: String) -> bool:
 	emit_signal("stats_changed")
 	return true
 
-func request_magic_spell_choices(spell_level: int) -> void:
-	var spell_choices: Array = _generate_magic_spell_choices(spell_level)
-	if not spell_choices.is_empty():
-		emit_signal("spell_choices_requested", spell_level, spell_choices)
-
-func _generate_magic_spell_choices(spell_level: int) -> Array:
-	var choices: Array = []
-	for school in MAGIC_SCHOOLS:
-		var candidates: Array = []
-		for spell in SpellRegistry.get_by_school(school):
-			if spell == null:
-				continue
-			if spell.spell_level != spell_level:
-				continue
-			if known_spells.has(spell.id):
-				continue
-			if intelligence < int_required_for_spell(spell):
-				continue
-			candidates.append(spell.id)
-		if not candidates.is_empty():
-			candidates.shuffle()
-			choices.append(String(candidates[0]))
-	choices.shuffle()
-	return choices
+func add_school_spells(school: String) -> void:
+	for spell in SpellRegistry.get_by_school(school):
+		if spell == null:
+			continue
+		var sid: String = String(spell.id)
+		if not known_spells.has(sid):
+			known_spells.append(sid)
 
 func int_required_for_spell(spell: SpellData) -> int:
 	if spell == null:

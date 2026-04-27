@@ -21,4 +21,4 @@ slot = ""
 effect = "wand_fire"
 effect_value = 3
 plus = 0
-description = "Fires a bolt of flame. Charges: 3."
+description = "Burns enemies from a distance. Strong against soft targets and clustered danger."

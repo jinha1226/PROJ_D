@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/animals/manticore.png"
 glyph = "m"
 glyph_color = Color(0.7, 0.25, 0.2, 1)
+description = "A winged predator that launches spike volleys from range. Do not let it maintain distance."

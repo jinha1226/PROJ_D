@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_ignition"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "ignition"
+display_name = "Ignition"
+school = "fire"
+spell_level = 5
+xl_required = 16
+mp_cost = 10
+difficulty = 5
+base_damage = 30
+max_range = 9
+targeting = "aoe"
+element = "fire"
+effect = "aoe_damage"
+description = "The air itself ignites in a catastrophic conflagration. Your most powerful fire spell — save it for the hardest moments."
+icon_path = "res://assets/tiles/individual/spell/sunburst.png"

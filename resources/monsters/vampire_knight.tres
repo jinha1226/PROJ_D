@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/undead/vampire_knight.png"
 glyph = "V"
 glyph_color = Color(0.3, 0.2, 0.4, 1)
+description = "An armored vampire with high HP and cold resistance. Do not let the drain stack — end it fast or burn an escape."

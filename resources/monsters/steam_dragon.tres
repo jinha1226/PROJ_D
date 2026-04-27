@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/dragons/steam_dragon.png"
 glyph = "D"
 glyph_color = Color(0.8, 0.8, 0.8, 1)
+description = "An early dragon that breathes scalding steam. Stay mobile and do not let it breathe on you twice."

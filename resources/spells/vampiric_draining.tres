@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_vampiricdraining"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "vampiric_draining"
+display_name = "Vampiric Draining"
+school = "necromancy"
+spell_level = 2
+xl_required = 4
+mp_cost = 4
+difficulty = 2
+base_damage = 12
+max_range = 5
+targeting = "auto"
+element = ""
+effect = "drain"
+description = "Drains life from the target to heal yourself. Doubles as offense and recovery — most valuable at low HP."
+icon_path = "res://assets/tiles/individual/spell/vampiric_touch.png"

@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/demons/ice_devil.png"
 glyph = "&"
 glyph_color = Color(0.7, 0.85, 0.95, 1)
+description = "A cold demon with high HP and punishing attacks. Cold resistance dulls its worst output."

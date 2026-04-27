@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_summonvermin"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "summon_vermin"
+display_name = "Summon Vermin"
+school = "summoning"
+spell_level = 3
+xl_required = 8
+mp_cost = 6
+difficulty = 3
+base_damage = 0
+max_range = 0
+targeting = "self"
+element = ""
+effect = "summon"
+description = "Summons a swarm of creatures from the abyss. Creates many bodies to absorb damage and crowd enemies."
+icon_path = "res://assets/tiles/individual/spell/conjure_fey.png"

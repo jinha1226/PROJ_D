@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/animals/hound.png"
 glyph = "d"
 glyph_color = Color(0.75, 0.6, 0.35, 1)
+description = "A swift pack animal bred to chase. Individually harmless, but hard to shake in numbers."

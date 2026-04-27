@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_monstrousmenagerie"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "monstrous_menagerie"
+display_name = "Monstrous Menagerie"
+school = "summoning"
+spell_level = 4
+xl_required = 12
+mp_cost = 8
+difficulty = 4
+base_damage = 0
+max_range = 0
+targeting = "self"
+element = ""
+effect = "summon"
+description = "Calls forth a menagerie of monstrous allies. Summons several strong creatures — powerful but mana-intensive."
+icon_path = "res://assets/tiles/individual/spell/conjure_fey.png"

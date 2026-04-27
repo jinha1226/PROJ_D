@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/gnoll_sergeant.png"
 glyph = "H"
 glyph_color = Color(0.78, 0.62, 0.3, 1)
+description = "A commanding gnoll that drives its kin to fight harder. Eliminating it early breaks a group's momentum."

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://mon_cryptzombie"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "crypt_zombie"
+display_name = "Zombie"
+tier = 2
+hp = 18
+hd = 4
+ac = 3
+ev = 2
+speed = 7
+sight_range = 6
+attacks = [{"damage": 8, "flavour": "rotting slam"}]
+ranged_attack = {}
+resists = ["poison+"]
+min_depth = 13
+max_depth = 16
+weight = 12
+xp_value = 18
+is_boss = false
+is_unique = false
+drop_chance_override = -1.0
+tile_path = "res://assets/tiles/individual/mon/undead/zombies/zombie_bear.png"
+glyph = "z"
+glyph_color = Color(0.4, 0.75, 0.4, 1)
+description = "A shambling corpse animated by dark magic. Slow but relentless."
+essence_id = ""

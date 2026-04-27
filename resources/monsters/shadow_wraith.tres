@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://mon_shadowwraith"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "shadow_wraith"
+display_name = "Shadow Wraith"
+tier = 3
+hp = 20
+hd = 6
+ac = 2
+ev = 9
+speed = 12
+sight_range = 8
+attacks = [{"damage": 8, "flavour": "life drain"}]
+ranged_attack = {}
+resists = ["necro+", "poison+", "cold+"]
+min_depth = 14
+max_depth = 16
+weight = 8
+xp_value = 32
+is_boss = false
+is_unique = false
+drop_chance_override = -1.0
+tile_path = "res://assets/tiles/individual/mon/undead/shadow_wraith.png"
+glyph = "W"
+glyph_color = Color(0.4, 0.35, 0.6, 1)
+description = "A swift shade that phases through darkness, draining life with each pass."
+essence_id = ""

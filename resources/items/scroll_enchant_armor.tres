@@ -22,4 +22,4 @@ slot = ""
 effect = "enchant_armor"
 effect_value = 1
 plus = 0
-description = "Enchants your equipped armor by +1."
+description = "Improves the protection of your armor. Best used on armor that matches your long-term build."

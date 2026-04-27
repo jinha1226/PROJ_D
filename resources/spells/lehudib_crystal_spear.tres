@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_lehudibcrystalspear"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "lehudib_crystal_spear"
+display_name = "Lehudib's Crystal Spear"
+school = "earth"
+spell_level = 4
+xl_required = 12
+mp_cost = 8
+difficulty = 4
+base_damage = 28
+max_range = 7
+targeting = "single"
+element = "earth"
+effect = "damage"
+description = "Hurls a massive crystalline spear of pure force. Deals extreme single-target damage regardless of resistances."
+icon_path = "res://assets/tiles/individual/spell/disintegrate.png"

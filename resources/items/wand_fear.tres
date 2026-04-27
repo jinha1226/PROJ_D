@@ -21,4 +21,4 @@ slot = ""
 effect = "wand_fear"
 effect_value = 4
 plus = 0
-description = "Causes a target to flee. Charges: 4."
+description = "Causes a target to flee. Forces a dangerous enemy out of position — most useful against melee threats."

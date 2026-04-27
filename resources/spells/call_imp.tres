@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_callimp"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "call_imp"
+display_name = "Call Imp"
+school = "summoning"
+spell_level = 1
+xl_required = 1
+mp_cost = 3
+difficulty = 1
+base_damage = 0
+max_range = 0
+targeting = "self"
+element = ""
+effect = "summon"
+description = "Calls a small imp to fight at your side. Early summoning option; the imp is fragile but draws attention."
+icon_path = "res://assets/tiles/individual/spell/conjure_fey.png"

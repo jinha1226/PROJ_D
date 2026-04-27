@@ -1,8 +1,8 @@
 class_name MagicDialog extends RefCounted
 
 const _SCHOOL_ORDER: Array = [
-	"evocation", "conjuration", "transmutation",
-	"necromancy", "abjuration", "enchantment",
+	"fire", "cold", "air", "earth",
+	"necromancy", "hexes", "translocation", "summoning",
 ]
 static var SpellRegistry = Engine.get_main_loop().root.get_node_or_null("/root/SpellRegistry") if Engine.get_main_loop() is SceneTree else null
 static var TurnManager = Engine.get_main_loop().root.get_node_or_null("/root/TurnManager") if Engine.get_main_loop() is SceneTree else null
@@ -72,7 +72,7 @@ static func _populate(dlg: GameDialog, player: Player, game: Node) -> void:
 
 static func _make_spell_row(spell: SpellData, player: Player,
 		dlg: GameDialog, game: Node) -> Control:
-	var locked: bool = spell.spell_level > player.get_skill_level("magic")
+	var locked: bool = spell.xl_required > player.xl
 	var no_mp: bool = player.mp < spell.mp_cost
 
 	var row := HBoxContainer.new()
@@ -119,7 +119,7 @@ static func _make_spell_row(spell: SpellData, player: Player,
 
 	var stat_lbl := Label.new()
 	if locked:
-		stat_lbl.text = "Magic skill %d required" % spell.spell_level
+		stat_lbl.text = "Requires XL %d" % spell.xl_required
 		stat_lbl.add_theme_color_override("font_color", Color(0.55, 0.45, 0.45))
 	else:
 		var effective_range: int = MagicSystem.effective_spell_range(spell)
@@ -227,12 +227,14 @@ static func _compute_power(player: Player, spell: SpellData) -> int:
 
 static func _school_color(school: String) -> Color:
 	match school:
-		"evocation":    return Color(1.0, 0.55, 0.25)
-		"conjuration":  return Color(0.3, 0.9, 0.85)
-		"transmutation": return Color(0.4, 0.95, 0.5)
-		"necromancy":   return Color(0.75, 0.45, 0.9)
-		"abjuration":   return Color(0.5, 0.7, 1.0)
-		"enchantment":  return Color(1.0, 0.65, 0.85)
+		"fire":          return Color(1.0, 0.45, 0.15)
+		"cold":          return Color(0.4, 0.8, 1.0)
+		"air":           return Color(0.75, 0.9, 1.0)
+		"earth":         return Color(0.75, 0.6, 0.35)
+		"necromancy":    return Color(0.75, 0.35, 0.95)
+		"hexes":         return Color(1.0, 0.55, 0.85)
+		"translocation": return Color(0.4, 0.95, 0.55)
+		"summoning":     return Color(0.9, 0.75, 0.35)
 	return Color(0.8, 0.8, 0.85)
 
 

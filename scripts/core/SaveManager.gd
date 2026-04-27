@@ -73,6 +73,7 @@ func save_run(player, game_manager) -> bool:
 			"quickslots": player.quickslots,
 			"essence_slots": player.essence_slots,
 			"essence_inventory": player.essence_inventory,
+			"faith_id": player.faith_id,
 		},
 	}
 	return save(data)

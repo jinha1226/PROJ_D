@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://scroll_brand_drain01"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "scroll_brand_drain"
+display_name = "scroll of drain branding"
+kind = "scroll"
+tier = 4
+tile_path = "res://assets/tiles/individual/item/scroll/scroll.png"
+glyph = "?"
+glyph_color = Color(0.55, 0.35, 0.85, 1)
+damage = 0
+delay = 1.0
+category = ""
+brand = ""
+ac_bonus = 0
+ev_penalty = 0
+slot = ""
+effect = "branch_brand"
+effect_value = 0
+plus = 0
+description = "Brands your weapon with necromantic energy. Melee hits drain life and weaken the target."
+unlocks_class_id = ""
+grants_spell_id = ""
+grants_spell_ids = []
+identified_tile_path = ""

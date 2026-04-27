@@ -2,7 +2,7 @@ class_name SpellData extends Resource
 
 @export var id: String = ""
 @export var display_name: String = ""
-@export var school: String = ""      # evocation / conjuration / transmutation / necromancy / abjuration / enchantment
+@export var school: String = ""      # fire / cold / air / earth / necromancy / hexes / translocation / summoning
 @export var spell_level: int = 1     # 1–9 (SRD spell slot level)
 @export var xl_required: int = 1     # minimum player XL to cast
 @export var mp_cost: int = 2

@@ -23,3 +23,4 @@ is_boss = true
 tile_path = "res://assets/tiles/individual/mon/humanoids/orcs/orc_warlord.png"
 glyph = "O"
 glyph_color = Color(0.9, 0.3, 0.2, 1)
+description = "An elite orc commander backed by loyal troops. Dangerous on its own — worse surrounded by allies."

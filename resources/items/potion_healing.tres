@@ -22,4 +22,4 @@ slot = ""
 effect = "heal"
 effect_value = 15
 plus = 0
-description = "Restores 15 HP."
+description = "Restores health immediately. Reliable, simple, and often worth using sooner rather than later."

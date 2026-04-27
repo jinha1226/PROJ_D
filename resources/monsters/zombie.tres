@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/undead/zombies/zombie_human.png"
 glyph = "z"
 glyph_color = Color(0.55, 0.65, 0.4, 1)
+description = "A slow and mindless undead. Easy to outmaneuver, but its hits still carry weight."

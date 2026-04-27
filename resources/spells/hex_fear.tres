@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_hexfear"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "hex_fear"
+display_name = "Cause Fear"
+school = "hexes"
+spell_level = 3
+xl_required = 8
+mp_cost = 5
+difficulty = 3
+base_damage = 0
+max_range = 7
+targeting = "auto"
+element = ""
+effect = "fear"
+description = "Fills the target with overwhelming magical terror. Sends an enemy fleeing — useful for disengaging or splitting groups."
+icon_path = "res://assets/tiles/individual/spell/fear.png"

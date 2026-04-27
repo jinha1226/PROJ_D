@@ -25,3 +25,4 @@ tile_path = "res://assets/tiles/individual/mon/nonliving/fire_elemental.png"
 glyph = "E"
 glyph_color = Color(0.95, 0.45, 0.1, 1)
 essence_id = "essence_fire"
+description = "A being of living flame. Fire resistance matters, and careless positioning can turn deadly fast."

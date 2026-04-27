@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/dragons/ice_dragon.png"
 glyph = "D"
 glyph_color = Color(0.5, 0.75, 0.95, 1)
+description = "A cold dragon of great power and resilience. Cold resistance reduces the worst of its output."

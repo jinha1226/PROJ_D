@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_conjureflame"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "conjure_flame"
+display_name = "Conjure Flame"
+school = "fire"
+spell_level = 2
+xl_required = 4
+mp_cost = 4
+difficulty = 2
+base_damage = 12
+max_range = 6
+targeting = "aoe"
+element = "fire"
+effect = "aoe_damage"
+description = "Conjures a burst of magical flame around you. Most effective when surrounded or in melee range."
+icon_path = "res://assets/tiles/individual/spell/fireball.png"

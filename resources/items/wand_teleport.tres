@@ -21,4 +21,4 @@ slot = ""
 effect = "wand_teleport"
 effect_value = 3
 plus = 0
-description = "Teleports a target to a random location. Charges: 3."
+description = "Teleports a target to a random location. Separates dangerous enemies or buys breathing room."

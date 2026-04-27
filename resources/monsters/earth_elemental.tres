@@ -25,3 +25,4 @@ tile_path = "res://assets/tiles/individual/mon/nonliving/earth_elemental.png"
 glyph = "E"
 glyph_color = Color(0.6, 0.45, 0.25, 1)
 essence_id = "essence_stone"
+description = "Slow, heavy, and difficult to bring down. Best answered with power or patience, not panic."

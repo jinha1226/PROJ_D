@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_animatedead"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "animate_dead"
+display_name = "Animate Dead"
+school = "necromancy"
+spell_level = 3
+xl_required = 8
+mp_cost = 6
+difficulty = 3
+base_damage = 0
+max_range = 5
+targeting = "self"
+element = ""
+effect = "summon"
+description = "Animates the spirits of the recently fallen. Creates temporary undead allies from recent kills."
+icon_path = "res://assets/tiles/individual/spell/animate_objects.png"

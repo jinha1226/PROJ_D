@@ -21,4 +21,4 @@ slot = ""
 effect = "scroll_noise"
 effect_value = 8
 plus = 0
-description = "Creates a loud noise, alerting all monsters on the floor. Cursed."
+description = "Creates a loud noise, alerting all monsters on the floor. Never use this deliberately."

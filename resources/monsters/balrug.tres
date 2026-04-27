@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/demons/balrug.png"
 glyph = "&"
 glyph_color = Color(0.7, 0.15, 0.05, 1)
+description = "A towering fire demon of enormous power. Fire resistance is not optional — it is the minimum."

@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/animals/giant_cockroach.png"
 glyph = "a"
 glyph_color = Color(0.55, 0.35, 0.1, 1)
+description = "A large, resilient bug with no real threat. Useful early experience and little else."

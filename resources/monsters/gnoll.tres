@@ -23,3 +23,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/gnoll.png"
 glyph = "G"
 glyph_color = Color(0.75, 0.65, 0.4, 1)
+description = "A hyena-headed pack hunter. Dangerous in numbers, manageable alone — but they rarely travel alone."

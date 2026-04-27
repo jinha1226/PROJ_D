@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_massconfusion"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "mass_confusion"
+display_name = "Mass Confusion"
+school = "hexes"
+spell_level = 5
+xl_required = 16
+mp_cost = 8
+difficulty = 5
+base_damage = 0
+max_range = 8
+targeting = "aoe"
+element = ""
+effect = "aoe_status"
+description = "Fills all visible enemies with chaotic confusion. Can neutralize an entire room — requires strong Magic skill."
+icon_path = "res://assets/tiles/individual/spell/mass_suggestion.png"

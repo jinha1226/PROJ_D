@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/animals/jackal.png"
 glyph = "d"
 glyph_color = Color(0.78, 0.65, 0.3, 1)
+description = "A quick scavenger that bites and retreats. More annoying than lethal, but dangerous in a crowd."

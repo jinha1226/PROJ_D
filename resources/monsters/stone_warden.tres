@@ -26,5 +26,5 @@ drop_chance_override = 1.0
 tile_path = "res://assets/tiles/individual/mon/humanoids/humans/vault_warden.png"
 glyph = "U"
 glyph_color = Color(0.7, 0.75, 0.65, 1)
-description = "An armored sentinel of immovable purpose, standing between you and the deep floors."
+description = "An ancient sentinel of weight, order, and refusal. It endures what would break lesser foes and grinds down reckless attackers. This is not a fight to rush without force to back it up."
 essence_id = "essence_bastion"

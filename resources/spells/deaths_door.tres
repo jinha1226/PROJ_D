@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_deathsdoor"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "deaths_door"
+display_name = "Death's Door"
+school = "necromancy"
+spell_level = 5
+xl_required = 16
+mp_cost = 10
+difficulty = 5
+base_damage = 0
+max_range = 0
+targeting = "self"
+element = ""
+effect = "buff_invulnerable"
+description = "Stands at death's threshold — briefly invulnerable. Use it at the last moment to survive a fight you would otherwise lose."
+icon_path = "res://assets/tiles/individual/spell/invulnerability.png"

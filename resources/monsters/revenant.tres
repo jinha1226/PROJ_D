@@ -1,26 +1,30 @@
-[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002031"]
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://mon_revenant"]
 
 [ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
 
 [resource]
 script = ExtResource("1_mdata")
 id = "revenant"
-display_name = "revenant"
+display_name = "Revenant"
 tier = 4
-hp = 50
-hd = 7
-ac = 5
-ev = 9
+hp = 38
+hd = 9
+ac = 7
+ev = 5
 speed = 10
 sight_range = 8
-attacks = [{"damage": 10, "flavour": "touch"}]
+attacks = [{"damage": 14, "flavour": "crushing blow"}, {"damage": 8, "flavour": "soul drain"}]
 ranged_attack = {}
-resists = ["cold"]
-min_depth = 7
-max_depth = 14
-weight = 8
-xp_value = 15
+resists = ["necro+", "cold+", "poison+"]
+min_depth = 14
+max_depth = 16
+weight = 5
+xp_value = 45
 is_boss = false
+is_unique = false
+drop_chance_override = -1.0
 tile_path = "res://assets/tiles/individual/mon/undead/revenant.png"
-glyph = "W"
-glyph_color = Color(0.65, 0.7, 0.85, 1)
+glyph = "R"
+glyph_color = Color(0.7, 0.5, 0.9, 1)
+description = "A powerful undead with draining melee. It recovers from damage and fights on long after you expect it to fall."
+essence_id = ""

@@ -26,5 +26,5 @@ drop_chance_override = 0.8
 tile_path = "res://assets/tiles/individual/mon/demihumanoids/salamander_mystic.png"
 glyph = "U"
 glyph_color = Color(1.0, 0.5, 0.2, 1)
-description = "A fire-wreathed zealot who presses attackers with relentless scorching pressure."
+description = "A wandering zealot wrapped in smoke and sacred heat. Fire is both her weapon and her warning. Prepare for sustained pressure rather than a single burst."
 essence_id = "essence_cinder"

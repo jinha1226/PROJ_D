@@ -21,4 +21,4 @@ slot = ""
 effect = "scroll_silence"
 effect_value = 10
 plus = 0
-description = "Silences nearby enemies, preventing spellcasting for 10 turns."
+description = "Silences nearby enemies, preventing spellcasting for 10 turns. Shuts down casters and priest-type enemies."

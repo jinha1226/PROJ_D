@@ -30,9 +30,11 @@ const INFO: Dictionary = {
 		"random_move": 0.4},
 	"feared":       {"name": "Feared",       "color": Color(0.65, 0.5, 0.9),
 		"flee": true},
-	# Corrosion
+	# Corrosion / Drain
 	"corroded":     {"name": "Corroded",     "color": Color(0.6, 0.85, 0.3),
 		"ac_down": 2},
+	"drained":      {"name": "Drained",      "color": Color(0.55, 0.35, 0.8),
+		"ev_down": 2},
 	# Stat debuffs
 	"berserk":      {"name": "Berserk",      "color": Color(1.0, 0.45, 0.3),
 		"str_bonus": 4},

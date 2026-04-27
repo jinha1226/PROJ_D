@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/nonliving/iron_golem.png"
 glyph = "8"
 glyph_color = Color(0.65, 0.65, 0.68, 1)
+description = "A construct of pure iron that ignores most magic. Physical force is the most reliable answer."

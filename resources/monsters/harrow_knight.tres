@@ -26,5 +26,5 @@ drop_chance_override = 0.8
 tile_path = "res://assets/tiles/individual/mon/humanoids/humans/death_knight.png"
 glyph = "U"
 glyph_color = Color(0.5, 0.3, 0.65, 1)
-description = "A knight wreathed in dread, whose presence shatters the will of those who face it."
+description = "A dark champion who advances with cold discipline. It punishes panic, overextension, and weak resolve. Will and positioning matter as much as raw durability here."
 essence_id = "essence_dread"

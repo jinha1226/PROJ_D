@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_shatter"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "shatter"
+display_name = "Shatter"
+school = "earth"
+spell_level = 5
+xl_required = 16
+mp_cost = 10
+difficulty = 5
+base_damage = 32
+max_range = 8
+targeting = "aoe"
+element = "earth"
+effect = "aoe_damage"
+description = "Shatters the earth itself, dealing massive area damage. Your most powerful earth spell — ends most fights outright."
+icon_path = "res://assets/tiles/individual/spell/earthquake.png"

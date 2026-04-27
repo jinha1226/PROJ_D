@@ -21,4 +21,4 @@ slot = ""
 effect = "gold"
 effect_value = 10
 plus = 0
-description = "Shining coins."
+description = "Dropped coins from slain enemies and forgotten treasure. Spend it at shops or keep it as a run score."

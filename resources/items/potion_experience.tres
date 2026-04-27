@@ -22,4 +22,4 @@ slot = ""
 effect = "grant_xp"
 effect_value = 200
 plus = 0
-description = "Grants a surge of experience."
+description = "Grants a surge of experience. Best used when a level-up would open a key spell or milestone."

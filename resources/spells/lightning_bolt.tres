@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_lightningbolt"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "lightning_bolt"
+display_name = "Lightning Bolt"
+school = "air"
+spell_level = 3
+xl_required = 8
+mp_cost = 6
+difficulty = 3
+base_damage = 16
+max_range = 8
+targeting = "auto"
+element = "lightning"
+effect = "chain_damage"
+description = "A bolt of lightning arcs between enemies. Damages the chain — best with multiple targets in line."
+icon_path = "res://assets/tiles/individual/spell/chain_lightning.png"

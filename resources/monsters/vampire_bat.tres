@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/animals/vampire_bat.png"
 glyph = "b"
 glyph_color = Color(0.5, 0.2, 0.6, 1)
+description = "A small bloodsucking bat — faster than a normal bat and prone to draining HP on a hit."

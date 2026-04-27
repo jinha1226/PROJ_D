@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_freeze"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "freeze"
+display_name = "Freeze"
+school = "cold"
+spell_level = 1
+xl_required = 1
+mp_cost = 2
+difficulty = 1
+base_damage = 8
+max_range = 6
+targeting = "auto"
+element = "cold"
+effect = "damage"
+description = "A bolt of freezing energy chills the target. Fast and cheap; a solid early cold spell."
+icon_path = "res://assets/tiles/individual/spell/cone_of_cold.png"

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_confuse"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "confuse"
+display_name = "Confuse"
+school = "hexes"
+spell_level = 2
+xl_required = 4
+mp_cost = 4
+difficulty = 2
+base_damage = 0
+max_range = 6
+targeting = "auto"
+element = ""
+effect = "confusion"
+description = "Confuses the target, causing random movement. Neutralizes a dangerous enemy without dealing damage."
+icon_path = "res://assets/tiles/individual/spell/confusion.png"

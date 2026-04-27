@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_glaciate"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "glaciate"
+display_name = "Glaciate"
+school = "cold"
+spell_level = 5
+xl_required = 16
+mp_cost = 10
+difficulty = 5
+base_damage = 28
+max_range = 9
+targeting = "aoe"
+element = "cold"
+effect = "aoe_damage"
+description = "Unleashes a glacial torrent that encases all nearby in ice. Your strongest cold spell — clears groups fast."
+icon_path = "res://assets/tiles/individual/spell/meteor_swarm.png"

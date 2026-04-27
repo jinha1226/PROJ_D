@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_tornado"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "tornado"
+display_name = "Tornado"
+school = "air"
+spell_level = 5
+xl_required = 16
+mp_cost = 10
+difficulty = 5
+base_damage = 26
+max_range = 9
+targeting = "aoe"
+element = "lightning"
+effect = "aoe_damage"
+description = "Summons a raging tornado that sweeps through all foes. Your most powerful air spell — enormous area damage."
+icon_path = "res://assets/tiles/individual/spell/earthquake.png"

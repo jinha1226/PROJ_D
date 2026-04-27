@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/undead/skeletal_warrior.png"
 glyph = "z"
 glyph_color = Color(0.9, 0.87, 0.7, 1)
+description = "An undead fighter that shrugs off cold damage. It hits like a soldier and dies hard."

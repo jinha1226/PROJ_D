@@ -22,4 +22,4 @@ slot = ""
 effect = "stat_int"
 effect_value = 1
 plus = 0
-description = "Permanently increases your Intelligence by 1."
+description = "Permanently increases your Intelligence by 1. Raises spell power and helps meet int requirements."

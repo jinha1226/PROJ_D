@@ -23,3 +23,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/animals/wolf_spider.png"
 glyph = "s"
 glyph_color = Color(0.55, 0.35, 0.55, 1)
+description = "A venomous predator with speed and patience. Treat it as both a melee threat and a poison threat."

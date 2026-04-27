@@ -21,4 +21,4 @@ slot = ""
 effect = "wand_frost"
 effect_value = 3
 plus = 0
-description = "Fires a bolt of ice. Charges: 3."
+description = "Chills or slows enemies with focused cold. Useful for control as much as raw damage."

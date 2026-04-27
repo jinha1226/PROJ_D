@@ -22,6 +22,6 @@ slot = ""
 effect = "identify"
 effect_value = 0
 plus = 0
-description = "Reveals the true name of any unidentified item."
+description = "Reveals the true nature of an unknown item. Knowledge is often worth more than greed."
 unlocks_class_id = ""
 grants_spell_id = ""

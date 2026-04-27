@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/animals/wolf.png"
 glyph = "d"
 glyph_color = Color(0.72, 0.55, 0.3, 1)
+description = "A fast hunter that punishes hesitation. Dangerous when it reaches you before you are ready."

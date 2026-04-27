@@ -26,7 +26,9 @@ var run_in_progress: bool = false
 var selected_class_id: String = ""
 var selected_race_id: String = "human"
 var selected_starting_weapon_id: String = ""
+var selected_starting_school_id: String = ""
 var selected_starting_essence_id: String = ""
+var selected_faith_id: String = ""
 
 # Staging slot for loaded player stats. Game.gd consumes this on scene
 # load and writes into the freshly-instantiated Player, then clears it.
@@ -47,7 +49,6 @@ var branches_cleared: Array = []   # branch ids cleared this run
 
 # Display / meta state (persisted).
 var use_tiles: bool = true
-var rune_shards: int = 0
 var titles: Array = []  # earned title strings
 
 ## Permanent unlock registry — race / class ids the player has earned
@@ -161,17 +162,6 @@ func toggle_tiles() -> void:
 	_save_settings()
 	emit_signal("settings_changed")
 
-func add_rune_shards(amount: int) -> void:
-	rune_shards = max(0, rune_shards + amount)
-	_save_settings()
-
-func spend_runes(cost: int) -> bool:
-	if rune_shards < cost:
-		return false
-	rune_shards -= cost
-	_save_settings()
-	return true
-
 func unlock(id: String) -> bool:
 	if id == "":
 		return false
@@ -222,7 +212,6 @@ func _load_settings() -> void:
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return
 	use_tiles = bool(parsed.get("use_tiles", use_tiles))
-	rune_shards = int(parsed.get("rune_shards", rune_shards))
 	var saved_titles = parsed.get("titles", null)
 	if saved_titles is Array:
 		titles = saved_titles
@@ -241,7 +230,6 @@ func earn_title(title: String) -> void:
 func _save_settings() -> void:
 	var data := {
 		"use_tiles": use_tiles,
-		"rune_shards": rune_shards,
 		"unlocks": unlocks,
 		"kill_counts": kill_counts,
 		"titles": titles,

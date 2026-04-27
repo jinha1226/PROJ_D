@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/orcs/orc_warrior.png"
 glyph = "o"
 glyph_color = Color(0.55, 0.42, 0.18, 1)
+description = "A trained front-line brute. Hits hard, survives longer, and forces respect in early melee."

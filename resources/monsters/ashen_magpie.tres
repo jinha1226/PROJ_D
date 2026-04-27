@@ -26,5 +26,5 @@ drop_chance_override = 0.8
 tile_path = "res://assets/tiles/individual/mon/humanoids/spriggans/spriggan.png"
 glyph = "U"
 glyph_color = Color(0.55, 0.5, 0.75, 1)
-description = "A sharp-eyed trickster caster who vanishes into shadows between spells."
+description = "A sly scavenger touched by cinder and greed. Quick hands, quick feet, and a tendency to turn small mistakes into losses. Do not underestimate a foe that survives by picking the field clean."
 essence_id = "essence_gloam"

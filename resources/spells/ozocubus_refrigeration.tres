@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_ozocubusrefrigeration"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "ozocubus_refrigeration"
+display_name = "Ozocubu's Refrigeration"
+school = "cold"
+spell_level = 4
+xl_required = 12
+mp_cost = 8
+difficulty = 4
+base_damage = 20
+max_range = 8
+targeting = "aoe"
+element = "cold"
+effect = "aoe_damage"
+description = "Freezes the air around all visible foes simultaneously. Strong when enemies swarm you."
+icon_path = "res://assets/tiles/individual/spell/ice_storm.png"

@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/dragons/fire_dragon.png"
 glyph = "D"
 glyph_color = Color(0.9, 0.35, 0.1, 1)
+description = "A powerful dragon that bathes everything in flame. Fire resistance is mandatory before engaging."

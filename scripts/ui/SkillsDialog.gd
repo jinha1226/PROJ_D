@@ -1,11 +1,12 @@
 class_name SkillsDialog extends RefCounted
 
 const _DESCRIPTIONS: Dictionary = {
-	"melee": "All melee weapons. Improves close combat damage and accuracy.",
-	"ranged": "Bows and thrown weapons. Improves ranged damage and accuracy.",
-	"magic": "All spells. Unlocks higher spell levels and improves spell power.",
-	"defense": "Armor and shields. Reduces armor penalty and improves blocking.",
-	"agility": "Evasion and ambush. Improves EV, lowers enemy detection, and boosts attacks on unaware targets.",
+	"melee": "Improves accuracy and damage in close combat.\n\nMelee governs fighting at arm's reach. It increases your chance to hit and your damage with melee weapons. Fighters rely on it most, but any build that expects close combat benefits from it.",
+	"ranged": "Improves bows and other dedicated ranged weapons.\n\nRanged improves attacks made from a distance. It rewards spacing and line-of-sight control. Rangers and cautious hybrids benefit from it most.",
+	"tool": "Improves wands, thrown tools, and trick-based combat.\n\nTool governs practical combat devices such as wands and thrown utility items. It rewards timing, resource use, and flexible problem-solving. Trickery-aligned builds make the best use of it.",
+	"magic": "Improves spellcasting and unlocks stronger spells.\n\nMagic governs spell power and determines which spell levels you can use. High Magic makes spells stronger, but Intelligence is still needed to learn advanced magic. Mages depend on it, but hybrids can use it for utility and support.",
+	"defense": "Improves armor, shields, and durable front-line fighting.\n\nDefense strengthens armor use, blocking, and direct survival in melee. It is the core defensive skill for builds that expect to trade hits. Fighters depend on it most.",
+	"agility": "Improves evasion, mobility, and opportunistic fighting.\n\nAgility improves your ability to avoid harm and exploit good positioning. It helps evasive builds survive without heavy armor. Rogues and mobile ranged builds value it most.",
 }
 
 static func open(player: Player, parent: Node) -> void:
@@ -42,6 +43,8 @@ static func _bonus_text(id: String, level: int, player: Player) -> String:
 		"melee":
 			return "+%d to-hit / +%d%% dmg" % [level, level * 4]
 		"ranged":
+			return "+%d to-hit / +%d%% dmg" % [level, level * 4]
+		"tool":
 			return "+%d to-hit / +%d%% dmg" % [level, level * 4]
 		"magic":
 			var power: int = int(float(player.intelligence) * (1.0 + float(level) * 0.06))

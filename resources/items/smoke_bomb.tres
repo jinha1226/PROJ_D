@@ -21,4 +21,4 @@ slot = ""
 effect = "throw_smoke"
 effect_value = 10
 plus = 0
-description = "Creates a cloud of obscuring smoke."
+description = "Creates a cloud of obscuring smoke. Breaks line of sight and buys time to reposition or escape."

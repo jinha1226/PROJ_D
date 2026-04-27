@@ -22,4 +22,4 @@ slot = ""
 effect = "invisible"
 effect_value = 20
 plus = 0
-description = "Renders you invisible for 20 turns."
+description = "Renders you invisible for 20 turns. Powerful for escape, repositioning, or setting up ambushes."

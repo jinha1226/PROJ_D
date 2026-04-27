@@ -26,5 +26,5 @@ drop_chance_override = 0.8
 tile_path = "res://assets/tiles/individual/mon/humanoids/humans/ragged_hierophant.png"
 glyph = "U"
 glyph_color = Color(0.4, 0.65, 1.0, 1)
-description = "An arcane artillery master who obliterates enemies from afar with searing magical bursts."
+description = "A master of wrath from above, chaining pressure into disaster. It turns space into danger and punishes exposed movement. Enter this fight with a plan, not hope."
 essence_id = "essence_tempest"

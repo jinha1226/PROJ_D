@@ -16,17 +16,16 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 	var spell: SpellData = SpellRegistry.get_by_id(spell_id)
 	if spell == null:
 		return false
-	var _skill_id: String = "magic"
-	if spell.spell_level > player.get_skill_level(_skill_id):
-		CombatLog.post("%s requires Magic skill %d." % [
-				spell.display_name, spell.spell_level],
+	if spell.xl_required > player.xl:
+		CombatLog.post("%s requires XL %d." % [spell.display_name, spell.xl_required],
 			Color(1.0, 0.7, 0.5))
 		return false
-	if not RacePassiveSystem.on_spell_cast_mp_check(player, spell.mp_cost):
+	var mp_cost: int = max(1, int(ceil(float(spell.mp_cost) * FaithSystem.spell_cost_mult(player))))
+	if not RacePassiveSystem.on_spell_cast_mp_check(player, mp_cost):
 		CombatLog.post("Not enough MP for %s." % spell.display_name,
 			Color(1.0, 0.7, 0.5))
 		return false
-	player.mp = max(0, player.mp - spell.mp_cost)
+	player.mp = max(0, player.mp - mp_cost)
 	player.emit_signal("stats_changed")
 	var power: int = _compute_power(player, spell)
 	match spell.effect:
@@ -293,7 +292,8 @@ static func _armor_spell_mult(player: Player) -> float:
 static func _compute_power(player: Player, spell: SpellData) -> int:
 	var skill: int = player.get_skill_level("magic")
 	var base: int = int(float(player.intelligence) * (1.0 + float(skill) * 0.06) * _armor_spell_mult(player))
-	return base + EssenceSystem.spell_power_bonus(player, spell)
+	var power: int = base + EssenceSystem.spell_power_bonus(player, spell)
+	return int(float(power) * FaithSystem.spell_damage_mult(player))
 
 
 static func _apply_element_bonus(spell: SpellData, target: Monster, dmg: int) -> int:

@@ -22,4 +22,4 @@ slot = ""
 effect = "might"
 effect_value = 2
 plus = 0
-description = "Permanent +2 STR."
+description = "Permanently increases your Strength by 2. Use it to meet weapon requirements or boost melee damage."

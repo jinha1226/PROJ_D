@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/deep_troll.png"
 glyph = "T"
 glyph_color = Color(0.3, 0.45, 0.3, 1)
+description = "A larger and more savage troll from the deep places. Outlasting it is rarely an option."

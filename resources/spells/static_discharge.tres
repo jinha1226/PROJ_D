@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_staticdischarge"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "static_discharge"
+display_name = "Static Discharge"
+school = "air"
+spell_level = 2
+xl_required = 4
+mp_cost = 4
+difficulty = 2
+base_damage = 10
+max_range = 5
+targeting = "auto"
+element = "lightning"
+effect = "multi_damage"
+description = "Discharges a burst of static through multiple targets. Excellent against tight clusters of enemies."
+icon_path = "res://assets/tiles/individual/spell/chain_lightning.png"

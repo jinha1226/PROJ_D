@@ -5,6 +5,17 @@ const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 const DEFAULT_BASE_PATH: String = "res://assets/tiles/individual/player/base/human_m.png"
 const FIGHTER_START_WEAPONS: Array = ["short_sword", "mace", "battle_axe", "spear"]
 
+const MAGE_START_SCHOOLS: Array = [
+	{"id": "fire",         "display": "Fire",         "desc": "Scorch, Fireball, Fire Storm — burn everything."},
+	{"id": "cold",         "display": "Cold",         "desc": "Freeze, Ice Bolt, Glaciate — chill and shatter."},
+	{"id": "air",          "display": "Air",          "desc": "Shock, Lightning Bolt, Tornado — chain electricity."},
+	{"id": "earth",        "display": "Earth",        "desc": "Stone Arrow, Crystal Spear, Shatter — heavy impact."},
+	{"id": "necromancy",   "display": "Necromancy",   "desc": "Pain, Vampiric Draining, Haunt — drain and corrupt."},
+	{"id": "hexes",        "display": "Hexes",        "desc": "Slow, Confuse, Mass Confusion — disable foes."},
+	{"id": "translocation","display": "Translocation","desc": "Blink, Swiftness, Teleport — movement mastery."},
+	{"id": "summoning",    "display": "Summoning",    "desc": "Call Imp, Animate Dead, Malign Gateway — allies."},
+]
+
 const BASE_CLASSES: Array = ["warrior", "mage", "rogue"]
 const TEST_CLASSES: Array = ["archmage"]
 
@@ -205,7 +216,11 @@ func _on_pick(class_id: String) -> void:
 	if class_id == "warrior":
 		_open_fighter_weapon_choice(class_id)
 		return
+	if class_id == "mage" or class_id == "archmage":
+		_open_mage_school_choice(class_id)
+		return
 	GameManager.selected_starting_weapon_id = ""
+	GameManager.selected_starting_school_id = ""
 	GameManager.selected_class_id = class_id
 	get_tree().change_scene_to_file(ESSENCE_SELECT_PATH)
 
@@ -245,3 +260,34 @@ func _open_fighter_weapon_choice(class_id: String) -> void:
 		desc.add_theme_font_size_override("font_size", 18)
 		desc.add_theme_color_override("font_color", Color(0.72, 0.75, 0.82))
 		body.add_child(desc)
+
+
+func _open_mage_school_choice(class_id: String) -> void:
+	var dlg: GameDialog = GameDialog.create_ratio("Choose Starting School", 0.9, 0.88)
+	add_child(dlg)
+	var body: VBoxContainer = dlg.body()
+	if body == null:
+		return
+	body.add_theme_constant_override("separation", 8)
+	var intro := Label.new()
+	intro.text = "Pick your starting magical school.\nAll spells are visible; higher tiers unlock as you level."
+	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	intro.add_theme_font_size_override("font_size", 24)
+	body.add_child(intro)
+	for entry in MAGE_START_SCHOOLS:
+		var school_id: String = String(entry["id"])
+		var btn := Button.new()
+		btn.text = String(entry["display"])
+		btn.custom_minimum_size = Vector2(0, 58)
+		btn.add_theme_font_size_override("font_size", 26)
+		btn.pressed.connect(func():
+			GameManager.selected_starting_school_id = school_id
+			GameManager.selected_class_id = class_id
+			get_tree().change_scene_to_file(ESSENCE_SELECT_PATH))
+		body.add_child(btn)
+		var desc_lbl := Label.new()
+		desc_lbl.text = String(entry["desc"])
+		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc_lbl.add_theme_font_size_override("font_size", 18)
+		desc_lbl.add_theme_color_override("font_color", Color(0.72, 0.75, 0.82))
+		body.add_child(desc_lbl)

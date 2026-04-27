@@ -21,4 +21,4 @@ slot = ""
 effect = "branch_brand"
 effect_value = 0
 plus = 0
-description = "Brands your weapon or armor with cold. (weapon: freezes on hit / armor: freezes attacker on hit)"
+description = "Brands your weapon with cold. Freezes on hit — slows enemies and synergizes with cold builds."

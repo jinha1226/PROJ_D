@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/dragons/wyvern.png"
 glyph = "D"
 glyph_color = Color(0.35, 0.65, 0.2, 1)
+description = "A lesser dragon with good speed and a venomous tail. Fast enough that evasion alone is not enough."

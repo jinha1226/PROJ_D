@@ -1,25 +1,30 @@
-[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://brhfrgs8liwu"]
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://mon_wight"]
 
 [ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
 
 [resource]
 script = ExtResource("1_mdata")
 id = "wight"
-display_name = "wight"
-tier = 4
-hp = 42
-hd = 8
-ac = 3
-ev = 6
+display_name = "Wight"
+tier = 3
+hp = 25
+hd = 6
+ac = 4
+ev = 5
 speed = 10
-sight_range = 8
-attacks = [{"damage": 9, "flavour": "life drain"}]
-resists = ["cold+"]
-min_depth = 9
+sight_range = 7
+attacks = [{"damage": 10, "flavour": "draining touch"}]
+ranged_attack = {}
+resists = ["cold+", "poison+"]
+min_depth = 13
 max_depth = 16
-weight = 8
-xp_value = 26
+weight = 10
+xp_value = 28
 is_boss = false
+is_unique = false
+drop_chance_override = -1.0
 tile_path = "res://assets/tiles/individual/mon/undead/wight.png"
-glyph = "W"
-glyph_color = Color(0.65, 0.7, 0.85, 1)
+glyph = "w"
+glyph_color = Color(0.6, 0.55, 0.8, 1)
+description = "A malevolent undead warrior with draining melee. Attack it fast before drain stacks up."
+essence_id = ""

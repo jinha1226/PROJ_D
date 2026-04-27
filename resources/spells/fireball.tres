@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://ctrxr85eojv0d"]
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_fireball"]
 
 [ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
 
@@ -6,15 +6,15 @@
 script = ExtResource("1_sdata")
 id = "fireball"
 display_name = "Fireball"
-school = "evocation"
+school = "fire"
 spell_level = 3
-xl_required = 5
-mp_cost = 5
+xl_required = 8
+mp_cost = 6
 difficulty = 3
-base_damage = 17
-max_range = 8
+base_damage = 18
+max_range = 7
 targeting = "aoe"
 element = "fire"
 effect = "aoe_damage"
-description = "A bead of fire explodes dealing 8d6 fire damage in a radius."
+description = "An explosive ball of fire erupts among your enemies. Devastates grouped targets but costs more mana."
 icon_path = "res://assets/tiles/individual/spell/fireball.png"

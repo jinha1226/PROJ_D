@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/animals/yak.png"
 glyph = "Y"
 glyph_color = Color(0.55, 0.4, 0.15, 1)
+description = "A large grazing animal that charges when threatened. The first hit often hurts the most."

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_haunt"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "haunt"
+display_name = "Haunt"
+school = "necromancy"
+spell_level = 4
+xl_required = 12
+mp_cost = 8
+difficulty = 4
+base_damage = 14
+max_range = 6
+targeting = "auto"
+element = ""
+effect = "multi_damage"
+description = "Haunting spirits tear through the target repeatedly. Strong sustained necrotic pressure against a single enemy."
+icon_path = "res://assets/tiles/individual/spell/horrid_wilting.png"

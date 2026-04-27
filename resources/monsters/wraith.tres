@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/undead/wraith.png"
 glyph = "W"
 glyph_color = Color(0.5, 0.5, 0.65, 1)
+description = "A hungry spirit wrapped in malice. It is often more dangerous than its body suggests, and should not be underestimated."

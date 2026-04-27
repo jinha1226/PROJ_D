@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_shock"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "shock"
+display_name = "Shock"
+school = "air"
+spell_level = 1
+xl_required = 1
+mp_cost = 2
+difficulty = 1
+base_damage = 6
+max_range = 6
+targeting = "auto"
+element = "lightning"
+effect = "damage"
+description = "A jolt of electricity zaps a nearby enemy. Very cheap; bridges the gap until better spells unlock."
+icon_path = "res://assets/tiles/individual/spell/magic_missile.png"

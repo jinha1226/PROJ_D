@@ -24,3 +24,4 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/undead/ghoul.png"
 glyph = "z"
 glyph_color = Color(0.6, 0.75, 0.45, 1)
+description = "A paralysis-clawed undead predator. If it lands a paralyze, you may not get to respond."

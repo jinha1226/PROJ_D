@@ -21,4 +21,4 @@ slot = ""
 effect = "scroll_immolation"
 effect_value = 12
 plus = 0
-description = "Causes all nearby enemies to burst into flame."
+description = "Causes all nearby enemies to burst into flame. Strong in groups but dangerous if you are already in melee."

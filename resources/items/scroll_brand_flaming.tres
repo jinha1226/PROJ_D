@@ -21,4 +21,4 @@ slot = ""
 effect = "branch_brand"
 effect_value = 0
 plus = 0
-description = "Brands your weapon or armor with fire. (weapon: burns on hit / armor: burns attacker on hit)"
+description = "Brands your weapon with fire. Burns on hit — strong against cold-vulnerable and organic targets."

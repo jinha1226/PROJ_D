@@ -22,4 +22,4 @@ slot = ""
 effect = "shroud"
 effect_value = 8
 plus = 0
-description = "Wraps you in a dim veil. Distant enemies lose track of you for a few turns."
+description = "Wraps you in a dim veil. Makes distant enemies harder to detect you — useful for escaping pursuit."

@@ -21,4 +21,4 @@ slot = ""
 effect = "throw_fire_aoe"
 effect_value = 10
 plus = 0
-description = "Explodes on impact, dealing fire damage in an area."
+description = "Explodes on impact, dealing fire damage in an area. Useful against groups but risky in tight corridors."

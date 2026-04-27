@@ -22,4 +22,4 @@ slot = ""
 effect = "bandage"
 effect_value = 10
 plus = 0
-description = "Treats wounds. Clears 10 injury, restoring your max recoverable HP."
+description = "Treats wounds. Clears injury and restores your max recoverable HP — do not save it too long."

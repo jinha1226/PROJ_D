@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://bdvw6neac5buv"]
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_firestorm"]
 
 [ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
 
@@ -6,15 +6,15 @@
 script = ExtResource("1_sdata")
 id = "fire_storm"
 display_name = "Fire Storm"
-school = "evocation"
-spell_level = 7
-xl_required = 13
-mp_cost = 9
-difficulty = 7
-base_damage = 23
+school = "fire"
+spell_level = 4
+xl_required = 12
+mp_cost = 8
+difficulty = 4
+base_damage = 24
 max_range = 8
 targeting = "aoe"
 element = "fire"
 effect = "aoe_damage"
-description = "Sheets of roaring flame deal 7d10 fire damage across a wide area."
+description = "A devastating storm of fire consumes everything nearby. Use it to end crowded fights quickly."
 icon_path = "res://assets/tiles/individual/spell/fire_storm.png"
