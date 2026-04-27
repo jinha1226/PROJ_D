@@ -51,6 +51,10 @@ static func _rebuild_body(body: VBoxContainer, player: Player) -> void:
 	_build_vitals(body, player)
 
 	body.add_child(_section_gap())
+	body.add_child(UICards.section_header("FAITH", _HDR))
+	_build_faith(body, player)
+
+	body.add_child(_section_gap())
 	body.add_child(UICards.section_header("STATS", _HDR))
 	_build_stats(body, player)
 
@@ -128,6 +132,68 @@ static func _build_vitals(body: VBoxContainer, player: Player) -> void:
 		Color(1.0, 0.55, 0.55)))
 	body.add_child(_kv_row("MP", "%d / %d" % [player.mp, player.mp_max],
 		Color(0.55, 0.7, 1.0)))
+
+static func _build_faith(body: VBoxContainer, player: Player) -> void:
+	var fid: String = player.faith_id if player.faith_id != "" else "essence"
+	var faith: Dictionary = FaithSystem.get_faith(fid)
+	var fcolor: Color = faith.get("color", Color.WHITE)
+
+	var name_row := HBoxContainer.new()
+	name_row.add_theme_constant_override("separation", 10)
+	var swatch := ColorRect.new()
+	swatch.custom_minimum_size = Vector2(6, 0)
+	swatch.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	swatch.color = fcolor
+	name_row.add_child(swatch)
+	var name_lbl := Label.new()
+	name_lbl.text = String(faith.get("name", fid))
+	name_lbl.add_theme_font_size_override("font_size", 28)
+	name_lbl.add_theme_color_override("font_color", fcolor)
+	name_row.add_child(name_lbl)
+	body.add_child(name_row)
+
+	var short_lbl := Label.new()
+	short_lbl.text = String(faith.get("short", ""))
+	short_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	short_lbl.add_theme_font_size_override("font_size", 20)
+	short_lbl.add_theme_color_override("font_color", Color(0.65, 0.68, 0.75))
+	body.add_child(short_lbl)
+
+	var bonuses: Array[String] = []
+	if faith.get("melee_damage_mult", 1.0) != 1.0:
+		bonuses.append("Melee dmg ×%.2f" % float(faith["melee_damage_mult"]))
+	if faith.get("spell_damage_mult", 1.0) != 1.0:
+		bonuses.append("Spell dmg ×%.2f" % float(faith["spell_damage_mult"]))
+	if faith.get("ranged_damage_mult", 1.0) != 1.0:
+		bonuses.append("Ranged dmg ×%.2f" % float(faith["ranged_damage_mult"]))
+	if faith.get("spell_cost_mult", 1.0) != 1.0:
+		bonuses.append("Spell MP ×%.2f" % float(faith["spell_cost_mult"]))
+	if faith.get("on_kill_hp", 0) != 0:
+		bonuses.append("On kill: +%d HP" % int(faith["on_kill_hp"]))
+	if faith.get("on_kill_mp", 0) != 0:
+		bonuses.append("On kill: +%d MP" % int(faith["on_kill_mp"]))
+	if faith.get("max_mp_bonus", 0) != 0:
+		bonuses.append("Max MP +%d" % int(faith["max_mp_bonus"]))
+	if faith.get("potion_heal_mult", 1.0) != 1.0:
+		bonuses.append("Potion heal ×%.2f" % float(faith["potion_heal_mult"]))
+	if faith.get("wand_charge_save_chance", 0.0) != 0.0:
+		bonuses.append("Wand charge save %d%%" % int(float(faith["wand_charge_save_chance"]) * 100))
+	if faith.get("resonance_mult", 1.0) != 1.0:
+		bonuses.append("Essence resonance ×%.2f" % float(faith["resonance_mult"]))
+	if faith.get("essence_inventory_bonus", 0) != 0:
+		bonuses.append("Essence capacity +%d" % int(faith["essence_inventory_bonus"]))
+	if faith.get("allows_essence", false):
+		bonuses.append("Can use essences")
+	if not faith.get("allows_essence", true):
+		bonuses.append("Cannot use essences")
+
+	if not bonuses.is_empty():
+		var bonus_lbl := Label.new()
+		bonus_lbl.text = " · ".join(bonuses)
+		bonus_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		bonus_lbl.add_theme_font_size_override("font_size", 19)
+		bonus_lbl.add_theme_color_override("font_color", Color(0.55, 0.85, 0.6))
+		body.add_child(bonus_lbl)
 
 static func _build_stats(body: VBoxContainer, player: Player) -> void:
 	var row := HBoxContainer.new()
