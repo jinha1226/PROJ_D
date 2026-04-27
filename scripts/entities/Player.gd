@@ -71,6 +71,7 @@ var xl: int = 1
 var xp: int = 0
 var gold: int = 0
 var kills: int = 0
+var items_collected: int = 0
 var last_killer: String = ""
 var items: Array = []  # [{id: String, plus: int}]
 var known_spells: Array = []  # [String]
@@ -185,6 +186,7 @@ func pickup(floor_item: FloorItem) -> void:
 		if data.kind == "wand":
 			new_entry["charges"] = data.effect_value
 		items.append(new_entry)
+		items_collected += 1
 		CombatLog.pickup("You pick up %s." % GameManager.display_name_of(data.id))
 		auto_bind_quickslot(data.id)
 	emit_signal("stats_changed")

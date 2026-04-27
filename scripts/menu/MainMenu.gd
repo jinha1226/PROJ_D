@@ -17,7 +17,9 @@ func _ready() -> void:
 		_continue_btn.visible = SaveManager.has_save()
 	_start_btn.pressed.connect(_on_start)
 	_display_btn.pressed.connect(_on_toggle_display)
-	_shards_btn.pressed.connect(_on_shards)
+	if _shards_btn != null:
+		_shards_btn.text = "[ ◆ %d 룬 ]" % GameManager.rune_shards
+		_shards_btn.disabled = true
 	if _help_btn != null:
 		_help_btn.pressed.connect(_on_help)
 	_refresh_display_label()

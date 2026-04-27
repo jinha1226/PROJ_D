@@ -45,8 +45,8 @@ func show_result(data: Dictionary) -> void:
 	_depth_label.text = "Depth: B%dF" % depth
 	_kills_label.text = "Kills: %d" % kills
 	_turns_label.text = "Turns: %d" % turns
-	_gain_label.text = "Rune Shards +%d" % shards_gained
-	_total_label.text = "Total: %d" % shards_total
+	_gain_label.text = "◆ 룬 +%d" % shards_gained
+	_total_label.text = "◆ 합계: %d" % shards_total
 	visible = true
 
 

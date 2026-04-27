@@ -340,6 +340,13 @@ func _apply_class_to_player(class_id: String) -> void:
 	var race_name: String = race.display_name if race != null else "adventurer"
 	CombatLog.post("You start as %s %s." % [race_name, data.display_name],
 		Color(0.85, 0.9, 1.0))
+	var start_essence: String = GameManager.selected_starting_essence_id
+	GameManager.selected_starting_essence_id = ""
+	if start_essence != "" and EssenceSystem.ESSENCES.has(start_essence):
+		player.essence_inventory.append(start_essence)
+		player.equip_essence(0, start_essence)
+		CombatLog.post("You begin with %s." % EssenceSystem.display_name(start_essence),
+			EssenceSystem.color_of(start_essence))
 
 func _apply_race_mods(race_id: String) -> void:
 	var race: RaceData = RaceRegistry.get_by_id(race_id)
@@ -1091,10 +1098,16 @@ func _try_respawn_monster() -> void:
 
 func _on_player_died() -> void:
 	CombatLog.post("You have died.", Color(1.0, 0.4, 0.4))
-	var shards: int = max(1, GameManager.depth * 2 + player.xl * 3)
+	var shards: int = _calc_run_score(false)
 	GameManager.add_rune_shards(shards)
 	GameManager.end_run("death")
 	_show_result_screen(false, shards)
+
+func _calc_run_score(cleared: bool) -> int:
+	var score: int = player.kills + player.items_collected + player.xl * 3 + GameManager.depth * 2
+	if cleared:
+		score += 50
+	return max(1, score)
 
 func _show_result_screen(victory: bool, shards: int) -> void:
 	var res = ResultScreenScene.instantiate()
@@ -1126,10 +1139,20 @@ func _on_result_meta(res: Node) -> void:
 		res.queue_free()
 	get_tree().change_scene_to_file(MENU_SCENE_PATH)
 
+func _on_dungeon_cleared() -> void:
+	CombatLog.post("You have cleared the dungeon!", Color(1.0, 0.9, 0.2))
+	var shards: int = _calc_run_score(true)
+	GameManager.add_rune_shards(shards)
+	GameManager.end_run("victory")
+	_show_result_screen(true, shards)
+
 func _on_stairs_down() -> void:
 	_cancel_auto_walk("stairs")
 	_cache_current_floor()
 	GameManager.descend()
+	if GameManager.depth >= 25:
+		_on_dungeon_cleared()
+		return
 	CombatLog.post("You descend to B%d." % GameManager.depth,
 		Color(0.6, 1.0, 1.0))
 	_clear_monsters()

@@ -16,6 +16,29 @@ const UNIQUE_MONSTER_ESSENCE_IDS: Array = [
 	"essence_dread", "essence_bloodwake", "essence_tempest", "essence_pale_star",
 ]
 
+const RUNE_COSTS: Dictionary = {
+	"essence_fire": 10,
+	"essence_cold": 10,
+	"essence_swiftness": 10,
+	"essence_regeneration": 10,
+	"essence_venom": 10,
+	"essence_vitality": 20,
+	"essence_stone": 20,
+	"essence_warding": 20,
+	"essence_might": 20,
+	"essence_arcana": 35,
+	"essence_fury": 35,
+	"essence_drain": 35,
+	"essence_cinder": 35,
+	"essence_serpent": 35,
+	"essence_gloam": 35,
+	"essence_dread": 60,
+	"essence_bloodwake": 60,
+	"essence_tempest": 60,
+	"essence_bastion": 60,
+	"essence_pale_star": 60,
+}
+
 const ESSENCE_TIER_BY_ID := {
 	"essence_fire": "normal",
 	"essence_cold": "normal",
@@ -267,6 +290,9 @@ const ESSENCES: Dictionary = {
 		"penalty_effect": "",
 	},
 }
+
+static func rune_cost(id: String) -> int:
+	return int(RUNE_COSTS.get(id, 20))
 
 static func all_ids() -> Array:
 	return ESSENCES.keys()

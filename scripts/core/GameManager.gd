@@ -26,6 +26,7 @@ var run_in_progress: bool = false
 var selected_class_id: String = ""
 var selected_race_id: String = "human"
 var selected_starting_weapon_id: String = ""
+var selected_starting_essence_id: String = ""
 
 # Staging slot for loaded player stats. Game.gd consumes this on scene
 # load and writes into the freshly-instantiated Player, then clears it.
@@ -150,6 +151,13 @@ func toggle_tiles() -> void:
 func add_rune_shards(amount: int) -> void:
 	rune_shards = max(0, rune_shards + amount)
 	_save_settings()
+
+func spend_runes(cost: int) -> bool:
+	if rune_shards < cost:
+		return false
+	rune_shards -= cost
+	_save_settings()
+	return true
 
 func unlock(id: String) -> bool:
 	if id == "":
