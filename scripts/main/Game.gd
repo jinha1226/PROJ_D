@@ -681,6 +681,8 @@ func _spawn_ui() -> void:
 	_effect_layer.z_index = 5
 	add_child(_effect_layer)
 	_refresh_quickslots()
+	if GameManager.selected_class_id == "archmage":
+		_spawn_debug_floor_panel()
 
 
 func _floor_seed(depth: int) -> int:
@@ -1938,3 +1940,129 @@ func spawn_hit_effect(world_pos: Vector2, element: String) -> void:
 func spawn_aoe_burst(target_positions: Array, element: String) -> void:
 	for pos in target_positions:
 		spawn_hit_effect(pos, element)
+
+# ── Archmage debug floor panel ───────────────────────────────────────────────
+var _debug_panel: PanelContainer = null
+var _debug_panel_visible: bool = false
+
+func _spawn_debug_floor_panel() -> void:
+	# Toggle button in top-left corner
+	var toggle := Button.new()
+	toggle.text = "B?"
+	toggle.add_theme_font_size_override("font_size", 22)
+	toggle.custom_minimum_size = Vector2(64, 48)
+	toggle.anchor_left = 0.0
+	toggle.anchor_top = 0.0
+	toggle.anchor_right = 0.0
+	toggle.anchor_bottom = 0.0
+	toggle.offset_left = 8.0
+	toggle.offset_top = 8.0
+	toggle.offset_right = 72.0
+	toggle.offset_bottom = 56.0
+	ui_layer.add_child(toggle)
+
+	# Panel
+	_debug_panel = PanelContainer.new()
+	_debug_panel.anchor_left = 0.0
+	_debug_panel.anchor_top = 0.0
+	_debug_panel.anchor_right = 0.0
+	_debug_panel.anchor_bottom = 0.0
+	_debug_panel.offset_left = 8.0
+	_debug_panel.offset_top = 62.0
+	_debug_panel.offset_right = 360.0
+	_debug_panel.offset_bottom = 620.0
+	_debug_panel.visible = false
+	ui_layer.add_child(_debug_panel)
+
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(352, 550)
+	_debug_panel.add_child(scroll)
+
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 6)
+	scroll.add_child(vb)
+
+	# Main floors 1-16
+	var hdr := Label.new()
+	hdr.text = "── Main Dungeon ──"
+	hdr.add_theme_font_size_override("font_size", 20)
+	hdr.add_theme_color_override("font_color", Color(0.7, 0.9, 1.0))
+	hdr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vb.add_child(hdr)
+
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 6)
+	grid.add_theme_constant_override("v_separation", 6)
+	vb.add_child(grid)
+	for d in range(1, 17):
+		var btn := Button.new()
+		btn.text = "B%d" % d
+		btn.custom_minimum_size = Vector2(72, 48)
+		btn.add_theme_font_size_override("font_size", 20)
+		btn.pressed.connect(_debug_warp_to.bind(d))
+		grid.add_child(btn)
+
+	# Branch sections
+	var branches: Dictionary = {
+		"swamp": "Swamp", "ice_caves": "Ice Caves",
+		"infernal": "Infernal", "slime_pits": "Slime Pits",
+	}
+	for branch_id in branches.keys():
+		var bhdr := Label.new()
+		bhdr.text = "── %s ──" % branches[branch_id]
+		bhdr.add_theme_font_size_override("font_size", 20)
+		bhdr.add_theme_color_override("font_color", Color(0.8, 1.0, 0.7))
+		bhdr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		vb.add_child(bhdr)
+		var bgrid := GridContainer.new()
+		bgrid.columns = 4
+		bgrid.add_theme_constant_override("h_separation", 6)
+		bgrid.add_theme_constant_override("v_separation", 6)
+		vb.add_child(bgrid)
+		for bf in range(1, 5):
+			var bbtn := Button.new()
+			bbtn.text = "F%d" % bf
+			bbtn.custom_minimum_size = Vector2(72, 48)
+			bbtn.add_theme_font_size_override("font_size", 20)
+			bbtn.pressed.connect(_debug_warp_to_branch.bind(branch_id, bf))
+			bgrid.add_child(bbtn)
+
+	toggle.pressed.connect(func():
+		_debug_panel_visible = not _debug_panel_visible
+		_debug_panel.visible = _debug_panel_visible)
+
+func _debug_warp_to(target_depth: int) -> void:
+	_debug_panel.visible = false
+	_debug_panel_visible = false
+	# Exit branch if inside one
+	if GameManager.branch_zone != "":
+		GameManager.branch_zone = ""
+		GameManager.branch_floor = 0
+	_cache_current_floor()
+	_clear_monsters()
+	_clear_floor_items()
+	GameManager.travel_to(target_depth)
+	CombatLog.post("[DEBUG] Warp to B%d." % target_depth, Color(1.0, 0.85, 0.3))
+	_generate_floor(target_depth, _floor_seed(target_depth), true)
+	RacePassiveSystem.on_floor_changed(player)
+	_center_camera_on_player(true)
+	_update_hud()
+
+func _debug_warp_to_branch(branch_id: String, branch_floor: int) -> void:
+	_debug_panel.visible = false
+	_debug_panel_visible = false
+	_cache_current_floor()
+	_clear_monsters()
+	_clear_floor_items()
+	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
+	var entry_depth: int = int(cfg.get("entrance_range", [1, 1])[1])
+	GameManager.branch_zone = branch_id
+	GameManager.branch_floor = branch_floor
+	GameManager.branch_entry_depth = entry_depth
+	GameManager.branches_cleared.erase(branch_id)
+	CombatLog.post("[DEBUG] Warp to %s F%d." % [branch_id, branch_floor], Color(1.0, 0.85, 0.3))
+	_generate_branch_floor(branch_id, branch_floor, true)
+	RacePassiveSystem.on_floor_changed(player)
+	_center_camera_on_player(true)
+	_update_hud()
