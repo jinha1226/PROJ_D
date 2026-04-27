@@ -1399,6 +1399,8 @@ func _on_stairs_down() -> void:
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
+	if GameManager.depth == 3 and not player.first_shrine_choice_done:
+		_trigger_shrine_event()
 	SaveManager.save_run(player, GameManager)
 	TurnManager.end_player_turn()
 
@@ -1748,11 +1750,6 @@ func _on_monster_died(monster: Monster) -> void:
 		player.heal(kill_hp)
 	if kill_mp > 0:
 		player.mp = min(player.mp_max, player.mp + kill_mp)
-	# First sector boss shrine event (depth 3 unique, faith not yet chosen)
-	if monster != null and monster.data != null and monster.data.is_unique \
-			and GameManager.depth == 3 and not player.first_shrine_choice_done:
-		_trigger_shrine_event()
-		return
 	# Before shrine choice, suppress all essence drops
 	if not player.first_shrine_choice_done:
 		return
