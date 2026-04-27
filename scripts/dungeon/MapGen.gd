@@ -171,6 +171,11 @@ static func _try_place_door(x: int, y: int, tiles: PackedByteArray,
 		return
 	if tiles[y * width + x] != DungeonMap.Tile.FLOOR:
 		return
+	var door: int  = DungeonMap.Tile.DOOR_CLOSED
+	# Skip if an adjacent cell already has a door (avoids double-door between close rooms).
+	for step in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+		if tiles[(y + step.y) * width + (x + step.x)] == door:
+			return
 	# Only place door where walls flank on the perpendicular axis
 	# (ensures it's a 1-tile-wide passage, not an open area).
 	var left: int  = tiles[y * width + (x - 1)]

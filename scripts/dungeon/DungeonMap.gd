@@ -81,7 +81,7 @@ func is_walkable(p: Vector2i) -> bool:
 
 func is_opaque(p: Vector2i) -> bool:
 	var t := tile_at(p)
-	return t == Tile.WALL or fog_tiles.has(p)
+	return t == Tile.WALL or t == Tile.DOOR_CLOSED or fog_tiles.has(p)
 
 
 func add_fog(center: Vector2i, radius: int, turns: int) -> void:
