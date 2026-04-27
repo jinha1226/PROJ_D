@@ -6,11 +6,13 @@ const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 @onready var _scroll: ScrollContainer = $ScrollContainer
 @onready var _container: VBoxContainer = $ScrollContainer/VBox
 @onready var _rune_label: Label = $RuneLabel
+@onready var _skip_btn: Button = $SkipButton
 @onready var _back_btn: Button = $BackButton
 
 
 func _ready() -> void:
 	theme = GameTheme.create()
+	_skip_btn.pressed.connect(_on_skip)
 	_back_btn.pressed.connect(_on_back)
 	TouchScrollHelper.install(_scroll)
 	_refresh_rune_label()
@@ -42,18 +44,6 @@ func _build_list() -> void:
 			_container.add_child(sep)
 		_container.add_child(_make_card(id, cost))
 
-	# Skip / no essence option
-	var spacer := Control.new()
-	spacer.custom_minimum_size = Vector2(0, 12)
-	_container.add_child(spacer)
-
-	var skip_btn := Button.new()
-	skip_btn.text = "에센스 없이 시작"
-	skip_btn.custom_minimum_size = Vector2(0, 72)
-	skip_btn.add_theme_font_size_override("font_size", 30)
-	skip_btn.add_theme_color_override("font_color", Color(0.72, 0.78, 0.72))
-	skip_btn.pressed.connect(_on_skip)
-	_container.add_child(skip_btn)
 
 
 func _make_card(id: String, cost: int) -> Control:
