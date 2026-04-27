@@ -14,7 +14,7 @@ const ESSENCE_ICON_DIR := "res://assets/tiles/individual/item/essence/"
 const UNIQUE_MONSTER_ESSENCE_IDS: Array = [
 	"essence_gloam", "essence_cinder", "essence_serpent", "essence_bastion",
 	"essence_dread", "essence_bloodwake", "essence_tempest", "essence_pale_star",
-	"essence_plague", "essence_glacial", "essence_infernal",
+	"essence_plague", "essence_glacial", "essence_infernal", "essence_acid",
 ]
 
 const RUNE_COSTS: Dictionary = {
@@ -41,6 +41,7 @@ const RUNE_COSTS: Dictionary = {
 	"essence_plague": 60,
 	"essence_glacial": 60,
 	"essence_infernal": 60,
+	"essence_acid": 60,
 }
 
 const ESSENCE_TIER_BY_ID := {
@@ -67,6 +68,7 @@ const ESSENCE_TIER_BY_ID := {
 	"essence_plague": "unique",
 	"essence_glacial": "unique",
 	"essence_infernal": "unique",
+	"essence_acid": "unique",
 }
 
 const ESSENCES: Dictionary = {
@@ -238,6 +240,17 @@ const ESSENCES: Dictionary = {
 		"effect": "resist_fire",
 		"penalty_effect": "vuln_cold",
 	},
+	"essence_acid": {
+		"name": "Acid Essence",
+		"desc": "Corrosion resistant. Attacks corrode enemies, reducing their AC.",
+		"passive_desc": "Melee hits apply corroded (AC -2, 3 turns). Corrosion immunity.",
+		"penalty_desc": "HP max -4.",
+		"passive_effect": "acid_touch",
+		"color": Color(0.6, 0.85, 0.3),
+		"effect": "resist_corr",
+		"penalty_effect": "hp_down",
+		"penalty_value": 4,
+	},
 	# ── Unique Monster Essences ────────────────────────────────────────────────
 	"essence_gloam": {
 		"name": "Gloam Essence",
@@ -407,6 +420,9 @@ static func apply(player: Player, essence_id: String) -> void:
 		"resist_cold":
 			if not player.resists.has("cold+"):
 				player.resists.append("cold+")
+		"resist_corr":
+			if not player.resists.has("corr+"):
+				player.resists.append("corr+")
 		"stat_str":
 			player.strength += value
 		"stat_int":
@@ -417,7 +433,7 @@ static func apply(player: Player, essence_id: String) -> void:
 			player.hp_max += value
 			player.hp = mini(player.hp + value, player.hp_max)
 		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch",
-		"plague_bonus", "glacial_retaliate", "infernal_fire":
+		"plague_bonus", "glacial_retaliate", "infernal_fire", "acid_touch":
 			pass
 	if effect == "wl_bonus":
 		player.wl += value
@@ -437,6 +453,8 @@ static func remove(player: Player, essence_id: String) -> void:
 			player.resists.erase("fire+")
 		"resist_cold":
 			player.resists.erase("cold+")
+		"resist_corr":
+			player.resists.erase("corr+")
 		"stat_str":
 			player.strength = maxi(1, player.strength - value)
 		"stat_int":
@@ -447,7 +465,7 @@ static func remove(player: Player, essence_id: String) -> void:
 			player.hp_max = maxi(1, player.hp_max - value)
 			player.hp = mini(player.hp, player.hp_max)
 		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch",
-		"plague_bonus", "glacial_retaliate", "infernal_fire":
+		"plague_bonus", "glacial_retaliate", "infernal_fire", "acid_touch":
 			pass
 	if effect == "wl_bonus":
 		player.wl = maxi(0, player.wl - value)
@@ -561,6 +579,9 @@ static func active_synergies(player: Player) -> Array:
 
 static func has_venom_touch(player: Player) -> bool:
 	return player != null and player.essence_slots.has("essence_venom")
+
+static func has_acid_touch(player: Player) -> bool:
+	return player != null and player.essence_slots.has("essence_acid")
 
 static func has_synergy(player: Player, a: String, b: String) -> bool:
 	return player != null and player.essence_slots.has(a) and player.essence_slots.has(b)

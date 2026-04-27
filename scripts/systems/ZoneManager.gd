@@ -53,6 +53,19 @@ const BRANCHES: Dictionary = {
 		"wall": "res://assets/tiles/individual/dngn/wall/brick_brown-vines0.png",
 		"floor": "res://assets/tiles/individual/dngn/floor/crystal0.png",
 	},
+	"slime_pits": {
+		"display_name": "Slime Pits",
+		"env": "acid",
+		"entrance_range": [13, 15],
+		"floors": 4,
+		"env_damage": 2,
+		"resistance": "corr+",
+		"boss_id": "sovereign_jelly",
+		"essence_reward": "essence_acid",
+		"brand_element": "acid",
+		"wall": "res://assets/tiles/individual/dngn/wall/slime0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/acidic_floor0.png",
+	},
 }
 
 # ── Main-path zone helpers ───────────────────────────────────────────────────

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://uq_sovereign_jelly"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "sovereign_jelly"
+display_name = "Sovereign Jelly"
+tier = 5
+hp = 90
+hd = 13
+ac = 5
+ev = 4
+speed = 8
+sight_range = 7
+attacks = [{"damage": 13, "flavour": "corrosive slam"}, {"damage": 7, "flavour": "acid spray"}]
+ranged_attack = {}
+resists = ["corr+", "poison+"]
+min_depth = 13
+max_depth = 16
+weight = 0
+xp_value = 85
+is_boss = true
+is_unique = true
+drop_chance_override = 1.0
+tile_path = "res://assets/tiles/individual/mon/amorphous/slime_creature.png"
+glyph = "J"
+glyph_color = Color(0.6, 0.85, 0.3, 1)
+description = "An immense sovereign of living acid, its mass dissolves everything it touches."
+essence_id = "essence_acid"

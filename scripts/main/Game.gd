@@ -1217,11 +1217,12 @@ func _on_branch_cleared(branch_id: String) -> void:
 	CombatLog.post("◆ +%d 룬" % ZoneManager.BRANCH_CLEAR_RUNES, Color(0.9, 0.85, 0.4))
 	# Per-branch title
 	match branch_id:
-		"swamp":    GameManager.earn_title("The Poisoner")
-		"ice_caves": GameManager.earn_title("The Frozen")
-		"infernal": GameManager.earn_title("The Infernal")
+		"swamp":      GameManager.earn_title("The Poisoner")
+		"ice_caves":  GameManager.earn_title("The Frozen")
+		"infernal":   GameManager.earn_title("The Infernal")
+		"slime_pits": GameManager.earn_title("The Corrosive")
 	# All-branches bonus
-	if GameManager.branches_cleared.size() >= 3:
+	if GameManager.branches_cleared.size() >= 4:
 		GameManager.add_rune_shards(ZoneManager.ALL_BRANCHES_BONUS_RUNES)
 		GameManager.earn_title("The Delver")
 		CombatLog.post("All branches cleared! ◆ +%d 룬" % ZoneManager.ALL_BRANCHES_BONUS_RUNES,

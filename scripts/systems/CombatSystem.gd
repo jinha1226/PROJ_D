@@ -60,7 +60,8 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		raw = max(1, int(float(raw) * req_dmg_pct))
 	if Status.has(player, "damage_boost"):
 		raw += randi_range(1, 4)
-	var soak: int = randi_range(0, monster.data.ac + 1)
+	var eff_ac: int = max(0, monster.data.ac - (2 if Status.has(monster, "corroded") else 0))
+	var soak: int = randi_range(0, eff_ac + 1)
 	var base_final: int = max(1, raw - soak)
 	var mult: float = 1.0 + float(skill_level) * 0.04
 	# Tempest: ranged attacks deal +15%
@@ -95,6 +96,8 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		_apply_brand_status(monster, brand)
 	if monster.hp > 0 and EssenceSystem.has_venom_touch(player):
 		Status.apply(monster, "poison", 3)
+	if monster.hp > 0 and EssenceSystem.has_acid_touch(player):
+		Status.apply(monster, "corroded", 3)
 	if monster.hp > 0:
 		EssenceSystem.apply_melee_hit_effects(player, monster)
 	# Cleave: axes hit adjacent monsters as a small splash.
@@ -147,7 +150,8 @@ static func _dagger_swift_strike(player: Player, monster: Monster) -> void:
 			weapon_dmg = max(UNARMED_DAMAGE, w.damage + wplus)
 	var stat_bonus: int = player.dexterity / 3
 	var raw: int = weapon_dmg + randi_range(0, 2)
-	var soak: int = randi_range(0, monster.data.ac + 1)
+	var eff_ac2: int = max(0, monster.data.ac - (2 if Status.has(monster, "corroded") else 0))
+	var soak: int = randi_range(0, eff_ac2 + 1)
 	var final: int = max(1, raw - soak)
 	CombatLog.hit("You hit the %s for %d." % [monster.data.display_name, final])
 	var was_alive: bool = monster.hp > 0
@@ -201,6 +205,9 @@ static func _apply_armor_brand_retaliation(player: Player, monster: Monster) -> 
 		"flaming":
 			Status.apply(monster, "burning", 2)
 			CombatLog.post("Your armor burns the attacker!", Color(1.0, 0.55, 0.2))
+		"acid":
+			Status.apply(monster, "corroded", 3)
+			CombatLog.post("Your armor corrodes the attacker!", Color(0.6, 0.85, 0.3))
 
 static func brand_element_of(brand: String) -> String:
 	match brand:
@@ -209,12 +216,14 @@ static func brand_element_of(brand: String) -> String:
 		"venom":    return "poison"
 		"electric": return "electric"
 		"draining": return "necromancy"
+		"acid":     return "acid"
 	return ""
 
 static func _brand_damage_roll(brand: String) -> int:
 	match brand:
 		"venom":   return randi_range(1, 3)
 		"electric": return randi_range(1, 6)
+		"acid":     return randi_range(1, 4)
 		_:         return randi_range(1, 4)
 
 static func _weapon_req_penalty(player: Player, w: ItemData) -> Dictionary:
@@ -242,6 +251,7 @@ static func _apply_brand_status(target: Monster, brand: String) -> void:
 		"flaming":  Status.apply(target, "burning", 2)
 		"freezing": Status.apply(target, "frozen", 1)
 		"venom":    Status.apply(target, "poison", 3)
+		"acid":     Status.apply(target, "corroded", 3)
 
 static func _hit_log(name: String, brand: String, total: int, extra: int,
 		backstab_bonus: int = 0) -> String:
@@ -261,6 +271,8 @@ static func _hit_log(name: String, brand: String, total: int, extra: int,
 			return "You shock the %s for %d (+%d electric).%s" % [name, total, extra, suffix]
 		"draining":
 			return "You drain the %s for %d (+%d).%s" % [name, total, extra, suffix]
+		"acid":
+			return "You corrode the %s for %d (+%d acid).%s" % [name, total, extra, suffix]
 	return "You hit the %s for %d (+%d).%s" % [name, total, extra, suffix]
 
 static func _backstab_bonus(player: Player, monster: Monster, weapon: ItemData,
