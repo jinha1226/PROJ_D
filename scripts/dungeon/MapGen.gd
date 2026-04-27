@@ -14,15 +14,18 @@ const MAX_SPLIT_DEPTH: int = 4
 const SPLIT_MIN: float = 0.42
 const SPLIT_MAX: float = 0.58
 
-## Single large symmetric hall — no monsters, faith choice on entry.
+## Single large symmetric temple hall with 5 faith altars.
+## Layout (20×12 room, centered):
+##   stairs_up on the left wall, stairs_down on the right wall.
+##   5 altars in two rows across the middle — player walks among them.
 static func generate_pantheon(width: int, height: int) -> Dictionary:
 	var tiles := PackedByteArray()
 	tiles.resize(width * height)
 	for i in tiles.size():
 		tiles[i] = DungeonMap.Tile.WALL
 
-	var room_w: int = 16
-	var room_h: int = 10
+	var room_w: int = 22
+	var room_h: int = 11
 	var rx: int = (width - room_w) / 2
 	var ry: int = (height - room_h) / 2
 	var room := Rect2i(rx, ry, room_w, room_h)
@@ -31,10 +34,23 @@ static func generate_pantheon(width: int, height: int) -> Dictionary:
 		for x in range(rx, rx + room_w):
 			tiles[y * width + x] = DungeonMap.Tile.FLOOR
 
-	var spawn := Vector2i(rx + 1, ry + room_h / 2)
-	var stairs_down := Vector2i(rx + room_w - 2, ry + room_h / 2)
+	var mid_y: int = ry + room_h / 2
+	var spawn := Vector2i(rx + 1, mid_y)
+	var stairs_down := Vector2i(rx + room_w - 2, mid_y)
 	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
 	tiles[stairs_down.y * width + stairs_down.x] = DungeonMap.Tile.STAIRS_DOWN
+
+	# 5 altars: top row (3) and bottom row (2), symmetric around center
+	# Top row y = mid_y - 2, bottom row y = mid_y + 2
+	# Evenly spaced across room width
+	var faith_ids: Array = ["war", "arcana", "trickery", "death", "essence"]
+	var top_ys: Array = [mid_y - 2, mid_y - 2, mid_y, mid_y + 2, mid_y + 2]
+	var cx: int = rx + room_w / 2
+	var altar_xs: Array = [cx - 6, cx - 3, cx, cx + 3, cx + 6]
+	var altar_map: Dictionary = {}
+	for i in range(5):
+		var ap := Vector2i(altar_xs[i], top_ys[i])
+		altar_map[ap] = faith_ids[i]
 
 	return {
 		"tiles": tiles,
@@ -43,6 +59,7 @@ static func generate_pantheon(width: int, height: int) -> Dictionary:
 		"stairs_up": spawn,
 		"rooms": [room],
 		"branch_pos": Vector2i(-1, -1),
+		"altar_map": altar_map,
 	}
 
 static func generate(width: int, height: int, map_seed: int = -1,

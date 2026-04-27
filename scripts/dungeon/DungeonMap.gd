@@ -62,6 +62,16 @@ var spawn_pos: Vector2i = Vector2i(1, 1)
 var stairs_down_pos: Vector2i = Vector2i(1, 1)
 var stairs_up_pos: Vector2i = Vector2i(1, 1)
 var rooms: Array[Rect2i] = []
+## pantheon altar map: Vector2i → faith_id String
+var altar_map: Dictionary = {}
+
+const ALTAR_TEXTURES: Dictionary = {
+	"war":      "res://assets/tiles/individual/dngn/altars/trog.png",
+	"arcana":   "res://assets/tiles/individual/dngn/altars/sif_muna1.png",
+	"trickery": "res://assets/tiles/individual/dngn/altars/dithmenos1.png",
+	"death":    "res://assets/tiles/individual/dngn/altars/yredelemnul.png",
+	"essence":  "res://assets/tiles/individual/dngn/altars/ecumenical.png",
+}
 
 func in_bounds(p: Vector2i) -> bool:
 	return p.x >= 0 and p.y >= 0 and p.x < GRID_W and p.y < GRID_H
@@ -137,10 +147,11 @@ func generate_pantheon() -> void:
 	stairs_down_pos = result["stairs_down"]
 	stairs_up_pos = result["stairs_up"]
 	rooms = result["rooms"]
+	altar_map = result.get("altar_map", {})
 	visible_tiles.clear()
 	explored.clear()
 	fog_tiles.clear()
-	_tex_wall = load("res://assets/tiles/individual/dngn/wall/brick_brown-vines0.png") as Texture2D
+	_tex_wall = load("res://assets/tiles/individual/dngn/wall/shrine_stone_wall0.png") as Texture2D
 	_tex_floor = load("res://assets/tiles/individual/dngn/floor/white_marble0.png") as Texture2D
 	queue_redraw()
 
@@ -216,6 +227,29 @@ func _draw() -> void:
 			draw_string(ThemeDB.fallback_font,
 				Vector2(x * CELL_SIZE + 6, y * CELL_SIZE + CELL_SIZE - 6),
 				glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6, glyph_color)
+
+	# Altar overlays
+	for apos in altar_map.keys():
+		var is_vis: bool = reveal_all or visible_tiles.has(apos)
+		var was_explored: bool = reveal_all or explored.has(apos)
+		if not is_vis and not was_explored:
+			continue
+		var faith_id: String = String(altar_map[apos])
+		var path: String = String(ALTAR_TEXTURES.get(faith_id, ""))
+		if path == "":
+			continue
+		var atex: Texture2D = load(path) as Texture2D
+		if atex == null:
+			continue
+		var mod: Color = Color.WHITE if (reveal_all or visible_tiles.has(apos)) else Color(0.45, 0.45, 0.55)
+		var arect := Rect2(Vector2(apos.x * CELL_SIZE, apos.y * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE))
+		if use_tiles:
+			draw_texture_rect(atex, arect, false, mod)
+		else:
+			draw_string(ThemeDB.fallback_font,
+				Vector2(apos.x * CELL_SIZE + 6, apos.y * CELL_SIZE + CELL_SIZE - 6),
+				"_", HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6,
+				FaithSystem.color_of(faith_id) * mod)
 
 	# Fog overlay on visible fog tiles
 	for fp in fog_tiles.keys():

@@ -533,9 +533,6 @@ func _spawn_player() -> void:
 	player.item_dropped.connect(_on_item_dropped)
 	player.damaged.connect(_on_player_damaged)
 
-func _trigger_shrine_event() -> void:
-	ShrineDialog.open(player, self)
-
 func _queue_essence_pickup(essence_id: String) -> void:
 	if player == null or essence_id == "":
 		return
@@ -1039,6 +1036,10 @@ func _on_player_moved(_new_pos: Vector2i) -> void:
 	_refresh_fov()
 	_center_camera_on_player()
 	_refresh_quickslots()
+	if GameManager.in_pantheon and not player.first_shrine_choice_done \
+			and map.altar_map.has(player.grid_pos):
+		var faith_id: String = String(map.altar_map[player.grid_pos])
+		ShrineDialog.open_single(faith_id, player, self)
 
 const _RESPAWN_INTERVAL: int = 18
 
@@ -1418,7 +1419,6 @@ func _on_stairs_down() -> void:
 		RacePassiveSystem.on_floor_changed(player)
 		_center_camera_on_player(true)
 		_update_hud()
-		_trigger_shrine_event()
 		SaveManager.save_run(player, GameManager)
 		TurnManager.end_player_turn()
 		return

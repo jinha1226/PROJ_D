@@ -23,100 +23,10 @@ const _CONFIRM_TEXT: Dictionary = {
 				 "Forsake divine favor and bind yourself to monster remnants instead."],
 }
 
-static func open(player: Player, parent: Node) -> void:
-	var dlg: GameDialog = GameDialog.create_ratio("신앙 선택", 0.92, 0.92)
-	dlg.set_meta("shrine_blocker", true)
-	parent.add_child(dlg)
+## Called when player steps on a specific altar.
+static func open_single(faith_id: String, player: Player, parent: Node) -> void:
+	_open_confirm(faith_id, player, parent, null)
 
-	var body: VBoxContainer = dlg.body()
-	if body == null:
-		return
-	_build_faith_list(body, player, parent, dlg)
-
-
-static func _build_faith_list(body: VBoxContainer, player: Player, parent: Node, dlg: GameDialog) -> void:
-	for child in body.get_children():
-		child.queue_free()
-	body.add_theme_constant_override("separation", 8)
-
-	var intro := Label.new()
-	intro.text = "이 던전에서 따를 길을 선택하라."
-	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	intro.add_theme_font_size_override("font_size", 22)
-	intro.add_theme_color_override("font_color", Color(0.68, 0.72, 0.78))
-	body.add_child(intro)
-	body.add_child(HSeparator.new())
-
-	for faith_id in FaithSystem.FAITHS.keys():
-		body.add_child(_make_faith_card(faith_id, player, parent, dlg))
-
-
-static func _make_faith_card(faith_id: String, player: Player, parent: Node, dlg: GameDialog) -> Control:
-	var faith: Dictionary = FaithSystem.get_faith(faith_id)
-	var fcolor: Color = faith.get("color", Color.WHITE)
-
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(0, 110)
-
-	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 12)
-	margin.add_theme_constant_override("margin_right", 12)
-	margin.add_theme_constant_override("margin_top", 8)
-	margin.add_theme_constant_override("margin_bottom", 8)
-	panel.add_child(margin)
-
-	var hb := HBoxContainer.new()
-	hb.add_theme_constant_override("separation", 10)
-	margin.add_child(hb)
-
-	var swatch := ColorRect.new()
-	swatch.custom_minimum_size = Vector2(6, 0)
-	swatch.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	swatch.color = fcolor
-	hb.add_child(swatch)
-
-	var vb := VBoxContainer.new()
-	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	vb.add_theme_constant_override("separation", 2)
-	hb.add_child(vb)
-
-	var name_lbl := Label.new()
-	name_lbl.text = String(faith.get("name", faith_id))
-	name_lbl.add_theme_font_size_override("font_size", 28)
-	name_lbl.add_theme_color_override("font_color", fcolor)
-	vb.add_child(name_lbl)
-
-	var short_lbl := Label.new()
-	short_lbl.text = String(faith.get("short", ""))
-	short_lbl.add_theme_font_size_override("font_size", 19)
-	short_lbl.add_theme_color_override("font_color", Color(0.78, 0.8, 0.88))
-	vb.add_child(short_lbl)
-
-	var hint_lbl := Label.new()
-	hint_lbl.text = _build_hint(faith_id)
-	hint_lbl.add_theme_font_size_override("font_size", 17)
-	hint_lbl.add_theme_color_override("font_color", Color(0.55, 0.7, 0.55))
-	vb.add_child(hint_lbl)
-
-	var btn := Button.new()
-	btn.custom_minimum_size = Vector2(110, 50)
-	btn.add_theme_font_size_override("font_size", 22)
-	btn.text = "Choose"
-	var fid: String = faith_id
-	btn.pressed.connect(func(): _open_confirm(fid, player, parent, dlg))
-	hb.add_child(btn)
-
-	return panel
-
-
-static func _build_hint(faith_id: String) -> String:
-	match faith_id:
-		"war":      return "Best for front-line melee and defense."
-		"arcana":   return "Best for spellcasting and magical growth."
-		"trickery": return "Best for agility, ranged utility, and ambushes."
-		"death":    return "Best for kill-chains, sustain, and risky aggression."
-		"essence":  return "Replaces divine favor with essence-based growth."
-	return ""
 
 
 static func _open_confirm(faith_id: String, player: Player, parent: Node, dlg: GameDialog) -> void:
@@ -158,7 +68,8 @@ static func _open_confirm(faith_id: String, player: Player, parent: Node, dlg: G
 	var fid: String = faith_id
 	confirm_btn.pressed.connect(func():
 		conf.close()
-		dlg.close()
+		if dlg != null and is_instance_valid(dlg):
+			dlg.close()
 		_apply_faith(fid, player, parent))
 	btn_row.add_child(confirm_btn)
 
