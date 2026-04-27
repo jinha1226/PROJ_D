@@ -24,10 +24,7 @@ const _CONFIRM_TEXT: Dictionary = {
 }
 
 static func open(player: Player, parent: Node) -> void:
-	CombatLog.post("A greater power stirs.", Color(0.9, 0.82, 0.55))
-	CombatLog.post("The shrine awakens.", Color(0.85, 0.78, 0.5))
-
-	var dlg: GameDialog = GameDialog.create_ratio("A Path Opens Before You", 0.92, 0.92)
+	var dlg: GameDialog = GameDialog.create_ratio("신앙 선택", 0.92, 0.92)
 	dlg.set_meta("shrine_blocker", true)
 	parent.add_child(dlg)
 
@@ -43,7 +40,7 @@ static func _build_faith_list(body: VBoxContainer, player: Player, parent: Node,
 	body.add_theme_constant_override("separation", 8)
 
 	var intro := Label.new()
-	intro.text = "Choose what kind of run this will become."
+	intro.text = "이 던전에서 따를 길을 선택하라."
 	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	intro.add_theme_font_size_override("font_size", 22)
 	intro.add_theme_color_override("font_color", Color(0.68, 0.72, 0.78))
