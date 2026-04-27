@@ -210,7 +210,7 @@ static func _build_essence(body: VBoxContainer, player: Player) -> void:
 			effect_lbl.text = EssenceSystem.description(eid)
 			effect_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			effect_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			effect_lbl.add_theme_font_size_override("font_size", 18)
+			effect_lbl.add_theme_font_size_override("font_size", 22)
 			effect_lbl.add_theme_color_override("font_color",
 				EssenceSystem.color_of(eid).lerp(Color(0.8, 0.82, 0.88), 0.4))
 			effect_row.add_child(effect_lbl)
