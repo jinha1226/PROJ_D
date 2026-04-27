@@ -2,15 +2,16 @@ extends Control
 
 const GAME_SCENE_PATH: String = "res://scenes/main/Game.tscn"
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
-const DEFAULT_BASE_PATH: String = \
-	"res://assets/tiles/individual/player/base/human_m.png"
+const DEFAULT_BASE_PATH: String = "res://assets/tiles/individual/player/base/human_m.png"
 const FIGHTER_START_WEAPONS: Array = ["short_sword", "mace", "battle_axe", "spear"]
 
 const BASE_CLASSES: Array = ["warrior", "mage", "rogue"]
+const TEST_CLASSES: Array = ["archmage"]
 
 @onready var _scroll: ScrollContainer = $ScrollContainer
 @onready var _container: VBoxContainer = $ScrollContainer/VBox
 @onready var _back_btn: Button = $BackButton
+
 
 func _ready() -> void:
 	theme = GameTheme.create()
@@ -22,6 +23,7 @@ func _ready() -> void:
 		ClassRegistry._scan()
 	_build_class_list()
 
+
 func _build_class_list() -> void:
 	for child in _container.get_children():
 		child.queue_free()
@@ -29,6 +31,23 @@ func _build_class_list() -> void:
 		var data: ClassData = ClassRegistry.get_by_id(id)
 		if data != null:
 			_container.add_child(_make_card(data))
+
+	if not TEST_CLASSES.is_empty():
+		var spacer := Control.new()
+		spacer.custom_minimum_size = Vector2(0, 16)
+		_container.add_child(spacer)
+
+		var hdr := Label.new()
+		hdr.text = "TEST CLASSES"
+		hdr.add_theme_font_size_override("font_size", 22)
+		hdr.add_theme_color_override("font_color", Color(0.8, 0.72, 1.0))
+		_container.add_child(hdr)
+
+		for id in TEST_CLASSES:
+			var tdata: ClassData = ClassRegistry.get_by_id(id)
+			if tdata != null:
+				_container.add_child(_make_card(tdata))
+
 
 func _make_card(data: ClassData) -> Control:
 	var panel := PanelContainer.new()
@@ -74,9 +93,10 @@ func _make_card(data: ClassData) -> Control:
 	vb.add_child(skill_lab)
 
 	var stat_lab := Label.new()
-	stat_lab.text = "HP %d  MP %d   STR %d · DEX %d · INT %d" % [
+	stat_lab.text = "HP %d  MP %d   STR %d / DEX %d / INT %d" % [
 		data.starting_hp, data.starting_mp,
-		data.starting_str, data.starting_dex, data.starting_int]
+		data.starting_str, data.starting_dex, data.starting_int
+	]
 	stat_lab.add_theme_font_size_override("font_size", 18)
 	stat_lab.add_theme_color_override("font_color", Color(0.6, 0.62, 0.7))
 	vb.add_child(stat_lab)
@@ -102,14 +122,14 @@ func _make_card(data: ClassData) -> Control:
 
 	return panel
 
+
 func _make_portrait(data: ClassData, dim: bool) -> Control:
 	var cont := Control.new()
 	cont.custom_minimum_size = Vector2(120, 130)
 	cont.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
 	var base_path: String = DEFAULT_BASE_PATH
-	if race != null and race.base_sprite_path != "" \
-			and ResourceLoader.exists(race.base_sprite_path):
+	if race != null and race.base_sprite_path != "" and ResourceLoader.exists(race.base_sprite_path):
 		base_path = race.base_sprite_path
 	_add_layer(cont, base_path, dim)
 	if data != null:
@@ -120,10 +140,10 @@ func _make_portrait(data: ClassData, dim: bool) -> Control:
 			body_path = String(Player.DOLL_BODY_MAP[data.starting_armor])
 		if body_path != "":
 			_add_layer(cont, body_path, dim)
-		if data.starting_weapon != "" \
-				and Player.DOLL_HAND1_MAP.has(data.starting_weapon):
+		if data.starting_weapon != "" and Player.DOLL_HAND1_MAP.has(data.starting_weapon):
 			_add_layer(cont, String(Player.DOLL_HAND1_MAP[data.starting_weapon]), dim)
 	return cont
+
 
 func _add_layer(parent: Control, path: String, dim: bool) -> void:
 	if not ResourceLoader.exists(path):
@@ -138,6 +158,7 @@ func _add_layer(parent: Control, path: String, dim: bool) -> void:
 		rect.modulate = Color(0.4, 0.4, 0.45, 1)
 	parent.add_child(rect)
 
+
 func _gear_line(data: ClassData) -> String:
 	var parts: Array = []
 	if data.starting_weapon != "":
@@ -149,28 +170,36 @@ func _gear_line(data: ClassData) -> String:
 	for extra in _starter_extras(data.id):
 		parts.append(extra)
 	if parts.is_empty():
-		return "Gear: —"
-	return "Gear: " + " · ".join(parts)
+		return "Gear: none"
+	return "Gear: " + " / ".join(parts)
+
 
 func _starter_extras(class_id: String) -> Array:
 	match class_id:
-		"warrior": return ["healing ×2"]
-		"mage":    return ["healing", "magic potion"]
-		"rogue":   return ["dagger", "healing", "invisibility", "shrouding"]
+		"warrior":
+			return ["healing x2"]
+		"mage":
+			return ["healing", "magic potion"]
+		"rogue":
+			return ["dagger", "healing", "invisibility", "shrouding"]
+		"archmage":
+			return ["healing", "magic potion", "identify", "blinking", "fire wand", "frost wand", "lightning wand"]
 	return []
+
 
 func _skills_line(data: ClassData) -> String:
 	if data.starting_skills.is_empty():
-		return "Skills: —"
+		return "Skills: none"
 	var parts: Array = []
 	for key in data.starting_skills.keys():
-		parts.append("%s %d" % [String(key).capitalize(),
-			int(data.starting_skills[key])])
-	return "Skills: " + " · ".join(parts)
+		parts.append("%s %d" % [String(key).capitalize(), int(data.starting_skills[key])])
+	return "Skills: " + " / ".join(parts)
+
 
 func _item_name(id: String) -> String:
 	var it: ItemData = ItemRegistry.get_by_id(id)
 	return it.display_name if it != null else id
+
 
 func _on_pick(class_id: String) -> void:
 	if class_id == "warrior":
@@ -181,8 +210,10 @@ func _on_pick(class_id: String) -> void:
 	GameManager.start_new_run()
 	get_tree().change_scene_to_file(GAME_SCENE_PATH)
 
+
 func _on_back() -> void:
 	get_tree().change_scene_to_file(MENU_SCENE_PATH)
+
 
 func _open_fighter_weapon_choice(class_id: String) -> void:
 	var dlg: GameDialog = GameDialog.create_ratio("Choose Fighter Weapon", 0.86, 0.72)

@@ -10,6 +10,12 @@ const SLOT_COUNT: int = 3
 const SLOT_UNLOCK_LEVELS: Array = [1, 8, 16]
 const INVENTORY_CAP: int = 4
 const ESSENCE_ICON_DIR := "res://assets/tiles/individual/item/essence/"
+
+const UNIQUE_MONSTER_ESSENCE_IDS: Array = [
+	"essence_gloam", "essence_cinder", "essence_serpent", "essence_bastion",
+	"essence_dread", "essence_bloodwake", "essence_tempest", "essence_pale_star",
+]
+
 const ESSENCE_TIER_BY_ID := {
 	"essence_fire": "normal",
 	"essence_cold": "normal",
@@ -23,6 +29,14 @@ const ESSENCE_TIER_BY_ID := {
 	"essence_arcana": "unique",
 	"essence_fury": "unique",
 	"essence_drain": "unique",
+	"essence_gloam": "unique",
+	"essence_cinder": "unique",
+	"essence_serpent": "unique",
+	"essence_bastion": "unique",
+	"essence_dread": "unique",
+	"essence_bloodwake": "unique",
+	"essence_tempest": "unique",
+	"essence_pale_star": "unique",
 }
 
 const ESSENCES: Dictionary = {
@@ -161,6 +175,97 @@ const ESSENCES: Dictionary = {
 		"penalty_effect": "hp_down",
 		"penalty_value": 2,
 	},
+	# ── Unique Monster Essences ────────────────────────────────────────────────
+	"essence_gloam": {
+		"name": "Gloam Essence",
+		"desc": "First hit on unaware targets deals +35% damage. WILL +1.",
+		"passive_desc": "+35% first-hit damage vs. unaware enemies. Stealth bonus.",
+		"penalty_desc": "HP max -3.",
+		"passive_effect": "gloam_unaware",
+		"color": Color(0.35, 0.3, 0.55),
+		"effect": "wl_bonus",
+		"value": 1,
+		"penalty_effect": "hp_down",
+		"penalty_value": 3,
+	},
+	"essence_cinder": {
+		"name": "Cinder Essence",
+		"desc": "Melee and fire spells deal +2 fire damage. Fire resistant. INT +1.",
+		"passive_desc": "+2 fire damage on melee and fire spells.",
+		"penalty_desc": "Cold vulnerable.",
+		"passive_effect": "cinder_fire",
+		"color": Color(1.0, 0.5, 0.15),
+		"effect": "resist_fire",
+		"penalty_effect": "vuln_cold",
+	},
+	"essence_serpent": {
+		"name": "Serpent Essence",
+		"desc": "First unaware hit poisons 5 turns. All hits 25% to poison 3 turns. DEX +1.",
+		"passive_desc": "Poison on hit. Unaware opener poisons for 5 turns.",
+		"penalty_desc": "WILL -1.",
+		"passive_effect": "serpent_poison",
+		"color": Color(0.3, 0.85, 0.3),
+		"effect": "stat_dex",
+		"value": 1,
+		"penalty_effect": "wl_down",
+		"penalty_value": 1,
+	},
+	"essence_bastion": {
+		"name": "Bastion Essence",
+		"desc": "Incoming damage -2. AC +2. WILL +1.",
+		"passive_desc": "Constant damage reduction and bonus armor.",
+		"penalty_desc": "EV -2.",
+		"passive_effect": "",
+		"color": Color(0.7, 0.75, 0.65),
+		"effect": "wl_bonus",
+		"value": 1,
+		"penalty_effect": "ev_down",
+		"penalty_value": 2,
+	},
+	"essence_dread": {
+		"name": "Dread Essence",
+		"desc": "Attacks have 20% chance to inflict fear for 2 turns. WILL +1.",
+		"passive_desc": "20% fear on hit. Bonus will vs. control effects.",
+		"penalty_desc": "STR -1.",
+		"passive_effect": "dread_fear",
+		"color": Color(0.5, 0.3, 0.65),
+		"effect": "wl_bonus",
+		"value": 1,
+		"penalty_effect": "str_down",
+		"penalty_value": 1,
+	},
+	"essence_bloodwake": {
+		"name": "Bloodwake Essence",
+		"desc": "On kill: heal 5 HP and gain +20% damage for 2 turns. HP max +5.",
+		"passive_desc": "5 HP and damage surge on each kill.",
+		"penalty_desc": "Potion healing -20%.",
+		"passive_effect": "bloodwake_kill",
+		"color": Color(0.85, 0.2, 0.25),
+		"effect": "hp_max",
+		"value": 5,
+		"penalty_effect": "",
+	},
+	"essence_tempest": {
+		"name": "Tempest Essence",
+		"desc": "Ranged attacks and spells deal +15% damage. INT +1, DEX +1.",
+		"passive_desc": "+15% damage on ranged attacks and spells.",
+		"penalty_desc": "AC -1.",
+		"passive_effect": "tempest_ranged",
+		"color": Color(0.4, 0.65, 1.0),
+		"effect": "",
+		"penalty_effect": "ac_down",
+		"penalty_value": 1,
+	},
+	"essence_pale_star": {
+		"name": "Pale Star Essence",
+		"desc": "Control effects +1 turn. Spell INT req -2. INT +2, WILL +1.",
+		"passive_desc": "Extended control durations and spell study discount.",
+		"penalty_desc": "HP max -6. Fire vulnerable.",
+		"passive_effect": "pale_star_control",
+		"color": Color(0.75, 0.85, 1.0),
+		"effect": "",
+		"penalty_effect": "",
+	},
 }
 
 static func all_ids() -> Array:
@@ -217,7 +322,10 @@ static func icon_texture_of(id: String) -> Texture2D:
 	return null
 
 static func random_id() -> String:
-	var keys: Array = ESSENCES.keys()
+	var keys: Array = []
+	for k in ESSENCES.keys():
+		if not UNIQUE_MONSTER_ESSENCE_IDS.has(k):
+			keys.append(k)
 	return keys[randi() % keys.size()]
 
 static func apply(player: Player, essence_id: String) -> void:
@@ -247,6 +355,7 @@ static func apply(player: Player, essence_id: String) -> void:
 	if effect == "wl_bonus":
 		player.wl += value
 	_apply_penalty(player, penalty_effect, penalty_value, true)
+	_apply_unique_stats(player, essence_id, true)
 	player.refresh_ac_from_equipment()
 	player.emit_signal("stats_changed")
 
@@ -275,6 +384,7 @@ static func remove(player: Player, essence_id: String) -> void:
 	if effect == "wl_bonus":
 		player.wl = maxi(0, player.wl - value)
 	_apply_penalty(player, penalty_effect, penalty_value, false)
+	_apply_unique_stats(player, essence_id, false)
 	player.refresh_ac_from_equipment()
 	player.emit_signal("stats_changed")
 
@@ -299,6 +409,8 @@ static func _apply_penalty(player: Player, penalty_effect: String, penalty_value
 			player.intelligence = maxi(1, player.intelligence - penalty_value * mult)
 		"dex_down":
 			player.dexterity = maxi(1, player.dexterity - penalty_value * mult)
+		"str_down":
+			player.strength = maxi(1, player.strength - penalty_value * mult)
 		"hp_down":
 			player.hp_max = maxi(1, player.hp_max - penalty_value * mult)
 			player.hp = mini(player.hp, player.hp_max)
@@ -307,6 +419,31 @@ static func _apply_penalty(player: Player, penalty_effect: String, penalty_value
 			player.mp = mini(player.mp, player.mp_max)
 		"wl_down":
 			player.wl = maxi(0, player.wl - penalty_value * mult)
+
+static func _apply_unique_stats(player: Player, essence_id: String, applying: bool) -> void:
+	var mult: int = 1 if applying else -1
+	match essence_id:
+		"essence_cinder":
+			player.intelligence = maxi(1, player.intelligence + mult)
+		"essence_serpent":
+			if applying:
+				if not player.resists.has("poison+"):
+					player.resists.append("poison+")
+			else:
+				player.resists.erase("poison+")
+		"essence_tempest":
+			player.intelligence = maxi(1, player.intelligence + mult)
+			player.dexterity = maxi(1, player.dexterity + mult)
+		"essence_pale_star":
+			player.intelligence = maxi(1, player.intelligence + 2 * mult)
+			player.wl = maxi(0, player.wl + mult)
+			player.hp_max = maxi(1, player.hp_max - 6 * mult)
+			player.hp = mini(player.hp, player.hp_max)
+			if applying:
+				if not player.resists.has("fire-"):
+					player.resists.append("fire-")
+			else:
+				player.resists.erase("fire-")
 
 static func tick(player: Player) -> void:
 	var regen_count: int = 0
@@ -336,6 +473,22 @@ static func active_synergies(player: Player) -> Array:
 		out.append("Bulwark Heart: damage -3 total, injury gain reduced.")
 	if has_synergy(player, "essence_fury", "essence_drain"):
 		out.append("Bloodrush: extra healing on kill.")
+	if has_synergy(player, "essence_gloam", "essence_swiftness"):
+		out.append("Gloam + Swiftness: first unaware hit also weakens for 2 turns.")
+	if has_synergy(player, "essence_cinder", "essence_arcana"):
+		out.append("Cinder + Arcana: fire spells gain +4 bonus power.")
+	if has_synergy(player, "essence_serpent", "essence_swiftness"):
+		out.append("Serpent + Swiftness: unaware opener gains +25% damage.")
+	if has_synergy(player, "essence_bastion", "essence_vitality"):
+		out.append("Bastion + Vitality: potion healing +3 HP.")
+	if has_synergy(player, "essence_dread", "essence_warding"):
+		out.append("Dread + Warding: feared enemies deal -2 damage.")
+	if has_synergy(player, "essence_bloodwake", "essence_fury"):
+		out.append("Bloodwake + Fury: on-kill surge lasts 3 turns.")
+	if has_synergy(player, "essence_tempest", "essence_arcana"):
+		out.append("Tempest + Arcana: spell study INT -3 total.")
+	if has_synergy(player, "essence_pale_star", "essence_arcana"):
+		out.append("Pale Star + Arcana: spell study INT -4 total.")
 	return out
 
 static func has_venom_touch(player: Player) -> bool:
@@ -352,6 +505,8 @@ static func stealth_bonus(player: Player) -> int:
 		bonus += 2
 	if player.essence_slots.has("essence_warding"):
 		bonus += 1
+	if player.essence_slots.has("essence_gloam"):
+		bonus += 2
 	if has_synergy(player, "essence_swiftness", "essence_venom"):
 		bonus += 2
 	return bonus
@@ -362,8 +517,14 @@ static func spell_int_discount(player: Player) -> int:
 	var discount: int = 0
 	if player.essence_slots.has("essence_arcana"):
 		discount += 2
+	if player.essence_slots.has("essence_pale_star"):
+		discount += 2
+	if has_synergy(player, "essence_tempest", "essence_arcana"):
+		discount = maxi(discount, 3)
+	if has_synergy(player, "essence_pale_star", "essence_arcana"):
+		discount = maxi(discount, 4)
 	if has_synergy(player, "essence_arcana", "essence_warding"):
-		discount += 1
+		discount = maxi(discount, 3)
 	return discount
 
 static func spell_power_bonus(player: Player, spell: SpellData) -> int:
@@ -373,6 +534,8 @@ static func spell_power_bonus(player: Player, spell: SpellData) -> int:
 	if has_synergy(player, "essence_fire", "essence_arcana") and spell.element == "fire":
 		bonus += 4
 	if has_synergy(player, "essence_cold", "essence_arcana") and spell.element == "cold":
+		bonus += 4
+	if has_synergy(player, "essence_cinder", "essence_arcana") and spell.element == "fire":
 		bonus += 4
 	if has_synergy(player, "essence_arcana", "essence_warding") and spell.element == "necromancy":
 		bonus += 2
@@ -386,6 +549,8 @@ static func incoming_damage_reduction(player: Player) -> int:
 		reduction += 1
 	if player.essence_slots.has("essence_warding"):
 		reduction += 1
+	if player.essence_slots.has("essence_bastion"):
+		reduction += 2
 	if has_synergy(player, "essence_stone", "essence_vitality"):
 		reduction += 1
 	return reduction
@@ -401,9 +566,13 @@ static func bonus_ac(player: Player) -> int:
 	var total: int = 0
 	if player.essence_slots.has("essence_stone"):
 		total += 2
+	if player.essence_slots.has("essence_bastion"):
+		total += 2
 	if player.essence_slots.has("essence_swiftness"):
 		total -= 1
 	if player.essence_slots.has("essence_fury"):
+		total -= 1
+	if player.essence_slots.has("essence_tempest"):
 		total -= 1
 	return total
 
@@ -415,7 +584,41 @@ static func bonus_ev(player: Player) -> int:
 		total += 1
 	if player.essence_slots.has("essence_vitality"):
 		total -= 1
+	if player.essence_slots.has("essence_bastion"):
+		total -= 2
 	return total
+
+static func potion_heal_bonus(player: Player) -> int:
+	if player == null:
+		return 0
+	var bonus: int = 0
+	if has_synergy(player, "essence_bastion", "essence_vitality"):
+		bonus += 3
+	return bonus
+
+static func potion_heal_mult(player: Player) -> float:
+	if player == null:
+		return 1.0
+	if player.essence_slots.has("essence_bloodwake"):
+		return 0.8
+	return 1.0
+
+static func ranged_damage_mult(player: Player) -> float:
+	if player == null:
+		return 1.0
+	if player.essence_slots.has("essence_tempest"):
+		return 1.15
+	return 1.0
+
+static func unaware_damage_mult(player: Player) -> float:
+	if player == null:
+		return 1.0
+	var mult: float = 1.0
+	if player.essence_slots.has("essence_gloam"):
+		mult *= 1.35
+	if has_synergy(player, "essence_serpent", "essence_swiftness"):
+		mult *= 1.25
+	return mult
 
 static func apply_melee_hit_effects(player: Player, monster: Monster) -> void:
 	for slot in player.essence_slots:
@@ -426,6 +629,10 @@ static func apply_melee_hit_effects(player: Player, monster: Monster) -> void:
 				monster.take_damage(fire_dmg)
 				if randf() < 0.35 and monster.hp > 0:
 					Status.apply(monster, "burning", 2)
+		elif effect_id == "cinder_fire":
+			var fire_dmg: int = Status.resist_scale(2, monster.data.resists, "fire")
+			if fire_dmg > 0:
+				monster.take_damage(fire_dmg)
 		elif effect_id == "melee_chill":
 			if randf() < 0.4:
 				Status.apply(monster, "frozen", 1)
@@ -435,16 +642,33 @@ static func apply_melee_hit_effects(player: Player, monster: Monster) -> void:
 				monster.take_damage(venom_dmg)
 			if not monster.is_aware and has_synergy(player, "essence_swiftness", "essence_venom"):
 				Status.apply(monster, "poison", 5)
+		elif effect_id == "serpent_poison":
+			if not monster.is_aware:
+				Status.apply(monster, "poison", 5)
+			elif randf() < 0.25:
+				Status.apply(monster, "poison", 3)
+		elif effect_id == "dread_fear":
+			if randf() < 0.20 and monster.hp > 0:
+				Status.apply(monster, "feared", 2)
+	# Gloam + Swiftness resonance: first unaware hit also weakens
+	if not monster.is_aware and has_synergy(player, "essence_gloam", "essence_swiftness"):
+		Status.apply(monster, "weak", 2)
 
 static func apply_on_kill_effects(player: Player) -> void:
+	var has_bloodwake_fury: bool = has_synergy(player, "essence_bloodwake", "essence_fury")
 	for slot in player.essence_slots:
 		var effect_id: String = passive_effect(slot)
 		if effect_id == "on_kill_heal":
 			player.heal(3)
 		elif effect_id == "on_kill_fury":
-			Status.apply(player, "damage_boost", 2)
+			var fury_dur: int = 3 if has_bloodwake_fury else 2
+			Status.apply(player, "damage_boost", fury_dur)
 		elif effect_id == "on_kill_drain":
 			player.heal(4)
 			player.heal_injury(1)
+		elif effect_id == "bloodwake_kill":
+			player.heal(5)
+			var wake_dur: int = 3 if has_bloodwake_fury else 2
+			Status.apply(player, "damage_boost", wake_dur)
 	if has_synergy(player, "essence_fury", "essence_drain"):
 		player.heal(2)

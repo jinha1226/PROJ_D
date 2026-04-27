@@ -356,6 +356,16 @@ func _class_starter_items(class_id: String) -> Array:
 			return ["potion_healing", "potion_magic"]
 		"rogue":
 			return ["dagger", "potion_healing", "potion_invisible", "scroll_shrouding"]
+		"archmage":
+			return [
+				"potion_healing",
+				"potion_magic",
+				"scroll_identify",
+				"scroll_blinking",
+				"wand_fire",
+				"wand_frost",
+				"wand_lightning",
+			]
 	return []
 
 func _class_default_active_skills(class_id: String, fallback: Array) -> Array:
@@ -366,6 +376,8 @@ func _class_default_active_skills(class_id: String, fallback: Array) -> Array:
 			return ["magic"]
 		"rogue":
 			return ["ranged", "agility"]
+		"archmage":
+			return ["magic", "agility", "defense"]
 	if not fallback.is_empty():
 		return fallback
 	return ["melee"]
@@ -741,10 +753,43 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
 
+func _spawn_unique_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
+	var unique_data: MonsterData = MonsterRegistry.unique_for_depth(depth)
+	if unique_data == null:
+		return
+	# Only spawn on the last floor of the sector (floor_in_sector == 2) so
+	# the player has a chance to prepare across the first two floors.
+	var floor_in_sector: int = (depth - 1) % 3
+	if floor_in_sector != 2:
+		return
+	var attempts: int = 0
+	while attempts < 200:
+		attempts += 1
+		var p: Vector2i = map.random_floor_tile(rng)
+		if not map.is_walkable(p):
+			continue
+		if p == player.grid_pos:
+			continue
+		if _chebyshev(p, player.grid_pos) < 5:
+			continue
+		if _monster_at(p) != null:
+			continue
+		var m: Monster = MonsterScene.new()
+		monsters_layer.add_child(m)
+		m.setup(unique_data, map, p)
+		m.hit_taken.connect(_on_monster_hit.bind(m))
+		if m.has_signal("awareness_changed"):
+			m.awareness_changed.connect(_on_monster_awareness_changed)
+		m.died.connect(_on_monster_died.bind(m))
+		TurnManager.register_actor(m)
+		CombatLog.post("A dangerous presence lurks on this floor...", Color(1.0, 0.75, 0.3))
+		return
+
 func _spawn_monsters_for_floor(depth: int) -> void:
 	var count: int = _monster_count_for_depth(depth)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = _floor_seed(depth) ^ 0x5A5A5A5A
+	_spawn_unique_for_floor(depth, rng)
 	var placed: int = 0
 	var attempts: int = 0
 	while placed < count and attempts < 800:
@@ -1424,6 +1469,19 @@ func _greedy_step_toward(target: Vector2i) -> Vector2i:
 func _on_monster_died(monster: Monster) -> void:
 	if player == null or player.hp <= 0:
 		return
+	# Unique monsters use dedicated essence and their own drop chance
+	if monster != null and monster.data != null and monster.data.is_unique:
+		var drop_chance: float = monster.data.drop_chance_override if monster.data.drop_chance_override >= 0.0 else 0.8
+		if randf() < drop_chance:
+			var uid: String = String(monster.data.essence_id)
+			if uid == "":
+				uid = EssenceSystem.random_id()
+			CombatLog.post("The %s leaves behind an essence! (%s)" % [
+				monster.data.display_name, EssenceSystem.display_name(uid)],
+				Color(1.0, 0.75, 0.3))
+			_queue_essence_pickup(uid)
+		return
+	# Normal monsters: chance-based random essence
 	var chance: float = 0.22 + GameManager.depth * 0.01
 	chance = min(chance, 0.40)
 	if randf() < chance:
