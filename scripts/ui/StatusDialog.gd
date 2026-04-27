@@ -10,12 +10,12 @@ static var ClassRegistry = Engine.get_main_loop().root.get_node_or_null("/root/C
 ##   Stats        — STR / DEX / INT
 ##   Combat       — AC / EV / WL
 ##   Equipment    — all body slots
-##   Resistances  — every element with +++/--- bar
-##   Essence      — 3 equipped slots + inventory swap
+##   Resistances  — fire / cold / poison / will
+##   Essence      — 3 equipped slots + active effects + inventory swap
 ##   Effects      — active statuses with turns remaining
 ##   Run          — depth / gold / kills / turns
 
-const _ELEMENTS: Array = ["fire", "cold", "electric", "poison", "necromancy"]
+const _ELEMENTS: Array = ["fire", "cold", "poison", "will"]
 
 const _EQUIP_SLOTS: Array = [
 	["⚔ Weapon",  "weapon"],
@@ -39,26 +39,50 @@ static func open(player: Player, parent: Node) -> void:
 		return
 	for child in body.get_children():
 		child.queue_free()
+	_rebuild_body(body, player)
+
+static func _rebuild_body(body: VBoxContainer, player: Player) -> void:
+	for child in body.get_children():
+		child.queue_free()
 	body.add_theme_constant_override("separation", 6)
 
 	_build_header(body, player)
 	body.add_child(HSeparator.new())
 	_build_vitals(body, player)
+
+	body.add_child(_section_gap())
 	body.add_child(UICards.section_header("STATS", _HDR))
 	_build_stats(body, player)
+
+	body.add_child(_section_gap())
 	body.add_child(UICards.section_header("COMBAT", _HDR))
 	_build_combat(body, player)
+
+	body.add_child(_section_gap())
 	body.add_child(UICards.section_header("EQUIPMENT", _HDR))
 	_build_equipment(body, player)
+
+	body.add_child(_section_gap())
 	body.add_child(UICards.section_header("RESISTANCES", _HDR))
 	_build_resists(body, player)
+
+	body.add_child(_section_gap())
 	body.add_child(UICards.section_header("ESSENCE", _HDR))
 	_build_essence(body, player)
+
 	if not player.statuses.is_empty():
+		body.add_child(_section_gap())
 		body.add_child(UICards.section_header("ACTIVE EFFECTS", _HDR))
 		_build_effects(body, player)
+
+	body.add_child(_section_gap())
 	body.add_child(UICards.section_header("RUN", _HDR))
 	_build_meta(body, player)
+
+static func _section_gap() -> Control:
+	var c := Control.new()
+	c.custom_minimum_size = Vector2(0, 10)
+	return c
 
 static func _build_header(body: VBoxContainer, player: Player) -> void:
 	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
@@ -155,10 +179,45 @@ static func _build_equipment(body: VBoxContainer, player: Player) -> void:
 
 static func _build_resists(body: VBoxContainer, player: Player) -> void:
 	for elem in _ELEMENTS:
-		var lvl: int = Status.resist_level(player.resists, elem)
-		body.add_child(_resist_row(elem, lvl))
+		if elem == "will":
+			# WL is a numeric stat; display the current value directly
+			body.add_child(_kv_row("Will", "WL %d" % player.wl, Color(0.85, 0.7, 1.0)))
+		else:
+			var lvl: int = Status.resist_level(player.resists, elem)
+			body.add_child(_resist_row(elem, lvl))
 
 static func _build_essence(body: VBoxContainer, player: Player) -> void:
+	# ── Active essence effects summary ────────────────────────────────────────
+	var has_any: bool = false
+	for slot_id in player.essence_slots:
+		if String(slot_id) != "":
+			has_any = true
+			break
+	if has_any:
+		for slot_id in player.essence_slots:
+			var eid: String = String(slot_id)
+			if eid == "":
+				continue
+			var effect_row := HBoxContainer.new()
+			effect_row.add_theme_constant_override("separation", 8)
+			var dot := Label.new()
+			dot.text = "·"
+			dot.add_theme_font_size_override("font_size", 22)
+			dot.add_theme_color_override("font_color", EssenceSystem.color_of(eid))
+			dot.custom_minimum_size = Vector2(20, 0)
+			effect_row.add_child(dot)
+			var effect_lbl := Label.new()
+			effect_lbl.text = EssenceSystem.description(eid)
+			effect_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			effect_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			effect_lbl.add_theme_font_size_override("font_size", 18)
+			effect_lbl.add_theme_color_override("font_color",
+				EssenceSystem.color_of(eid).lerp(Color(0.8, 0.82, 0.88), 0.4))
+			effect_row.add_child(effect_lbl)
+			body.add_child(effect_row)
+		body.add_child(HSeparator.new())
+
+	# ── Slot rows ─────────────────────────────────────────────────────────────
 	var unlocked_slots: int = EssenceSystem.active_slot_count(player)
 	for i in range(EssenceSystem.SLOT_COUNT):
 		var slot_id: String = String(player.essence_slots[i]) if i < player.essence_slots.size() else ""
@@ -231,6 +290,7 @@ static func _build_essence(body: VBoxContainer, player: Player) -> void:
 		inv_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		inv_lbl.add_theme_color_override("font_color", Color(0.7, 0.75, 0.8))
 		body.add_child(inv_lbl)
+
 	var synergies: Array = EssenceSystem.active_synergies(player)
 	if not synergies.is_empty():
 		var sync_hdr := Label.new()
@@ -277,7 +337,8 @@ static func _open_essence_swap(slot: int, player: Player, body: VBoxContainer) -
 		var eid: String = ess_id
 		btn.pressed.connect(func():
 			player.equip_essence(slot, eid)
-			dlg.close())
+			dlg.close()
+			_rebuild_body(body, player))
 		swap_body.add_child(btn)
 
 	if cur_id != "":
@@ -287,7 +348,8 @@ static func _open_essence_swap(slot: int, player: Player, body: VBoxContainer) -
 		clear_btn.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
 		clear_btn.pressed.connect(func():
 			player.equip_essence(slot, "")
-			dlg.close())
+			dlg.close()
+			_rebuild_body(body, player))
 		swap_body.add_child(clear_btn)
 
 	if player.essence_inventory.is_empty() and cur_id == "":
@@ -406,9 +468,8 @@ static func _resist_bar(level: int) -> String:
 
 static func _element_color(element: String) -> Color:
 	match element:
-		"fire":       return Color(1.0, 0.55, 0.3)
-		"cold":       return Color(0.55, 0.85, 1.0)
-		"electric":   return Color(1.0, 0.95, 0.45)
-		"poison":     return Color(0.5, 1.0, 0.5)
-		"necromancy": return Color(0.75, 0.55, 0.9)
+		"fire":    return Color(1.0, 0.55, 0.3)
+		"cold":    return Color(0.55, 0.85, 1.0)
+		"poison":  return Color(0.5, 1.0, 0.5)
+		"will":    return Color(0.85, 0.7, 1.0)
 	return Color(0.8, 0.8, 0.85)
