@@ -35,7 +35,7 @@ static func generate(width: int, height: int, map_seed: int = -1) -> Dictionary:
 	# Extra cross-connections between close non-adjacent rooms → fewer dead ends.
 	_add_cross_connections(rooms, tiles, width, rng)
 	# Place doors at narrow room entrances.
-	_place_doors(rooms, tiles, width, height)
+	_place_doors(rooms, tiles, width, height, rng)
 	var spawn: Vector2i = rooms[0].get_center()
 	var stairs_down: Vector2i = _farthest_floor(spawn, tiles, width, height)
 	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
@@ -152,29 +152,29 @@ static func _room_gap(a: Rect2i, b: Rect2i) -> int:
 # ── Door placement ─────────────────────────────────────────────────────────
 
 static func _place_doors(rooms: Array[Rect2i], tiles: PackedByteArray,
-		width: int, height: int) -> void:
+		width: int, height: int, rng: RandomNumberGenerator) -> void:
 	for room in rooms:
 		var rx0: int = room.position.x; var ry0: int = room.position.y
 		var rx1: int = room.position.x + room.size.x - 1
 		var ry1: int = room.position.y + room.size.y - 1
 		# Scan cells just outside each edge of the room.
 		for x in range(rx0, rx1 + 1):
-			_try_place_door(x, ry0 - 1, tiles, width, height)
-			_try_place_door(x, ry1 + 1, tiles, width, height)
+			_try_place_door(x, ry0 - 1, tiles, width, height, rng)
+			_try_place_door(x, ry1 + 1, tiles, width, height, rng)
 		for y in range(ry0, ry1 + 1):
-			_try_place_door(rx0 - 1, y, tiles, width, height)
-			_try_place_door(rx1 + 1, y, tiles, width, height)
+			_try_place_door(rx0 - 1, y, tiles, width, height, rng)
+			_try_place_door(rx1 + 1, y, tiles, width, height, rng)
 
 static func _try_place_door(x: int, y: int, tiles: PackedByteArray,
-		width: int, height: int) -> void:
+		width: int, height: int, rng: RandomNumberGenerator) -> void:
 	if x < 1 or y < 1 or x >= width - 1 or y >= height - 1:
 		return
 	if tiles[y * width + x] != DungeonMap.Tile.FLOOR:
 		return
-	var door: int  = DungeonMap.Tile.DOOR_CLOSED
+	var door_closed: int = DungeonMap.Tile.DOOR_CLOSED
 	# Skip if an adjacent cell already has a door (avoids double-door between close rooms).
 	for step in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
-		if tiles[(y + step.y) * width + (x + step.x)] == door:
+		if tiles[(y + step.y) * width + (x + step.x)] == door_closed:
 			return
 	# Only place door where walls flank on the perpendicular axis
 	# (ensures it's a 1-tile-wide passage, not an open area).
@@ -185,8 +185,14 @@ static func _try_place_door(x: int, y: int, tiles: PackedByteArray,
 	var wall: int  = DungeonMap.Tile.WALL
 	var h_pass: bool = (left == wall and right == wall)
 	var v_pass: bool = (up  == wall and down  == wall)
-	if h_pass or v_pass:
+	if not (h_pass or v_pass):
+		return
+	# 45% closed door, 20% open door, 35% no door (plain floor).
+	var roll: float = rng.randf()
+	if roll < 0.45:
 		tiles[y * width + x] = DungeonMap.Tile.DOOR_CLOSED
+	elif roll < 0.65:
+		tiles[y * width + x] = DungeonMap.Tile.DOOR_OPEN
 
 # ── Carve helpers ──────────────────────────────────────────────────────────
 
