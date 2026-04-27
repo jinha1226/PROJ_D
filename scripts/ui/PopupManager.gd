@@ -65,7 +65,8 @@ func show_essence_pickup_popup(essence_id: String, inventory: Array, cap: int, c
 	var icon := TextureRect.new()
 	icon.texture = EssenceSystem.icon_texture_of(essence_id)
 	icon.custom_minimum_size = Vector2(48, 48)
-	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.custom_maximum_size = Vector2(48, 48)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	header.add_child(icon)
 	var desc := Label.new()
