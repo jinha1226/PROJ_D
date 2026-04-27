@@ -170,7 +170,7 @@ func _handle_tap(screen_pos: Vector2) -> void:
 func _bfs_path(start: Vector2i, goal: Vector2i) -> Array:
 	if start == goal:
 		return []
-	if not map.is_walkable(goal):
+	if not map.is_walkable(goal) and map.tile_at(goal) != DungeonMap.Tile.DOOR_CLOSED:
 		return []
 	var came_from: Dictionary = {start: start}
 	var frontier: Array = [start]
