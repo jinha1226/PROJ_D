@@ -1,6 +1,6 @@
 extends Control
 
-const ESSENCE_SELECT_PATH: String = "res://scenes/menu/EssenceSelect.tscn"
+const GAME_SCENE_PATH: String = "res://scenes/main/Game.tscn"
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 const DEFAULT_BASE_PATH: String = "res://assets/tiles/individual/player/base/human_m.png"
 const FIGHTER_START_WEAPONS: Array = ["short_sword", "mace", "battle_axe", "spear"]
@@ -222,7 +222,8 @@ func _on_pick(class_id: String) -> void:
 	GameManager.selected_starting_weapon_id = ""
 	GameManager.selected_starting_school_id = ""
 	GameManager.selected_class_id = class_id
-	get_tree().change_scene_to_file(ESSENCE_SELECT_PATH)
+	GameManager.start_new_run()
+	get_tree().change_scene_to_file(GAME_SCENE_PATH)
 
 
 func _on_back() -> void:
@@ -252,7 +253,8 @@ func _open_fighter_weapon_choice(class_id: String) -> void:
 		btn.pressed.connect(func():
 			GameManager.selected_starting_weapon_id = choice_id
 			GameManager.selected_class_id = class_id
-			get_tree().change_scene_to_file(ESSENCE_SELECT_PATH))
+			GameManager.start_new_run()
+			get_tree().change_scene_to_file(GAME_SCENE_PATH))
 		body.add_child(btn)
 		var desc := Label.new()
 		desc.text = item.description
@@ -283,7 +285,8 @@ func _open_mage_school_choice(class_id: String) -> void:
 		btn.pressed.connect(func():
 			GameManager.selected_starting_school_id = school_id
 			GameManager.selected_class_id = class_id
-			get_tree().change_scene_to_file(ESSENCE_SELECT_PATH))
+			GameManager.start_new_run()
+			get_tree().change_scene_to_file(GAME_SCENE_PATH))
 		body.add_child(btn)
 		var desc_lbl := Label.new()
 		desc_lbl.text = String(entry["desc"])

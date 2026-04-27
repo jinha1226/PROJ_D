@@ -87,6 +87,7 @@ var equipped_shield_id: String = ""
 var essence_slots: Array = ["", "", ""]   # equipped essence ids (max 3)
 var essence_inventory: Array = []         # collected but unequipped essence ids
 var faith_id: String = ""                 # active faith: "war"/"arcana"/"trickery"/"death"/"essence"
+var first_shrine_choice_done: bool = false
 
 const MAX_XL: int = 20
 const MAX_SKILL_LEVEL: int = 9

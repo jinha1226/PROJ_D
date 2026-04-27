@@ -345,20 +345,7 @@ func _apply_class_to_player(class_id: String) -> void:
 	CombatLog.post("You start as %s %s." % [race_name, data.display_name],
 		Color(0.85, 0.9, 1.0))
 	GameManager.selected_starting_essence_id = ""
-	var start_faith: String = GameManager.selected_faith_id
 	GameManager.selected_faith_id = ""
-	if start_faith != "" and FaithSystem.FAITHS.has(start_faith):
-		player.faith_id = start_faith
-		# Arcana: +4 max MP on start
-		var mp_bonus: int = FaithSystem.max_mp_bonus(player)
-		if mp_bonus > 0:
-			player.mp_max += mp_bonus
-			player.mp = min(player.mp_max, player.mp + mp_bonus)
-		# Death: +1 will
-		if start_faith == "death":
-			player.wl += 1
-		CombatLog.post("You follow the path of %s." % FaithSystem.display_name(start_faith),
-			FaithSystem.color_of(start_faith))
 
 func _apply_race_mods(race_id: String) -> void:
 	var race: RaceData = RaceRegistry.get_by_id(race_id)
@@ -503,6 +490,7 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	if saved_ei is Array:
 		player.essence_inventory = saved_ei.duplicate()
 	player.faith_id = String(data.get("faith_id", ""))
+	player.first_shrine_choice_done = bool(data.get("first_shrine_choice_done", false))
 	player.refresh_ac_from_equipment()
 	player.set_race_from_id(GameManager.selected_race_id)
 	RacePassiveSystem.register(player)
@@ -541,6 +529,9 @@ func _spawn_player() -> void:
 	player.stats_changed.connect(_update_hud)
 	player.item_dropped.connect(_on_item_dropped)
 	player.damaged.connect(_on_player_damaged)
+
+func _trigger_shrine_event() -> void:
+	ShrineDialog.open(player, self)
 
 func _queue_essence_pickup(essence_id: String) -> void:
 	if player == null or essence_id == "":
@@ -1757,6 +1748,14 @@ func _on_monster_died(monster: Monster) -> void:
 		player.heal(kill_hp)
 	if kill_mp > 0:
 		player.mp = min(player.mp_max, player.mp + kill_mp)
+	# First sector boss shrine event (depth 3 unique, faith not yet chosen)
+	if monster != null and monster.data != null and monster.data.is_unique \
+			and GameManager.depth == 3 and not player.first_shrine_choice_done:
+		_trigger_shrine_event()
+		return
+	# Before shrine choice, suppress all essence drops
+	if not player.first_shrine_choice_done:
+		return
 	# Unique monsters use dedicated essence and their own drop chance
 	if monster != null and monster.data != null and monster.data.is_unique:
 		var drop_chance: float = monster.data.drop_chance_override if monster.data.drop_chance_override >= 0.0 else 0.8
