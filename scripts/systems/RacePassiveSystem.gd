@@ -22,6 +22,8 @@ func register(player: Node) -> void:
 			player.fov_radius_bonus = 1
 		"fleet":
 			player.ev = max(1, player.ev + 1)
+		"stone_body":
+			player.ac += 4
 
 func clear() -> void:
 	_passive_id = ""
@@ -94,3 +96,31 @@ func essence_duration_mult() -> float:
 	if _passive_id == "adaptable":
 		return 1.5
 	return 1.0
+
+static func passive_display_name(pid: String) -> String:
+	match pid:
+		"adaptable":    return "Adaptable"
+		"regeneration": return "Regeneration"
+		"bloodthirst":  return "Bloodthirst"
+		"blood_drain":  return "Blood Drain"
+		"keen_eyes":    return "Keen Eyes"
+		"fleet":        return "Fleet"
+		"headbutt":     return "Headbutt"
+		"trapfinder":   return "Trapfinder"
+		"stone_body":   return "Stone Body"
+		"stone_sense":  return "Stone Sense"
+	return pid.capitalize()
+
+static func passive_description(pid: String) -> String:
+	match pid:
+		"adaptable":    return "Essence effects last 1.5× longer."
+		"regeneration": return "+1 HP every 3 turns."
+		"bloodthirst":  return "+4 melee damage when below half HP."
+		"blood_drain":  return "Heal 3 HP on each kill."
+		"keen_eyes":    return "+1 vision range. Immune to sleep."
+		"fleet":        return "+1 EV."
+		"headbutt":     return "+2 melee damage at all times."
+		"trapfinder":   return "Automatically reveals nearby traps."
+		"stone_body":   return "+4 AC from natural stone hide. Immune to poison."
+		"stone_sense":  return "Detect secret doors and traps through stone."
+	return ""

@@ -1,6 +1,6 @@
 extends Node
 
-const ACTIVE_RACE_IDS: Array = ["human", "hill_orc", "elf", "kobold", "troll", "dwarf", "minotaur", "spriggan", "vampire"]
+const ACTIVE_RACE_IDS: Array = ["human", "hill_orc", "elf", "kobold", "troll", "dwarf", "minotaur", "spriggan", "vampire", "gargoyle"]
 
 const _HUMAN: Resource = preload("res://resources/races/human.tres")
 const _KOBOLD: Resource = preload("res://resources/races/kobold.tres")
@@ -11,13 +11,14 @@ const _ELF: Resource = preload("res://resources/races/elf.tres")
 const _DWARF: Resource = preload("res://resources/races/dwarf.tres")
 const _SPRIGGAN: Resource = preload("res://resources/races/spriggan.tres")
 const _VAMPIRE: Resource = preload("res://resources/races/vampire.tres")
+const _GARGOYLE: Resource = preload("res://resources/races/gargoyle.tres")
 
 var by_id: Dictionary = {}
 var all: Array = []
 
 func _ready() -> void:
 	for res in [_HUMAN, _KOBOLD, _ORC, _TROLL, _MINOTAUR, _ELF,
-			_DWARF, _SPRIGGAN, _VAMPIRE]:
+			_DWARF, _SPRIGGAN, _VAMPIRE, _GARGOYLE]:
 		_register(res)
 	if all.is_empty():
 		push_warning("RaceRegistry: 0 races registered.")

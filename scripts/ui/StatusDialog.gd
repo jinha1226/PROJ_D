@@ -127,6 +127,17 @@ static func _build_header(body: VBoxContainer, player: Player) -> void:
 	sub.add_theme_font_size_override("font_size", 22)
 	vb.add_child(sub)
 
+	var pid: String = race.passive_id if race != null else ""
+	if pid != "":
+		var trait_name: String = RacePassiveSystem.passive_display_name(pid)
+		var trait_desc: String = RacePassiveSystem.passive_description(pid)
+		var trait_lbl := Label.new()
+		trait_lbl.text = "%s: %s" % [trait_name, trait_desc]
+		trait_lbl.add_theme_font_size_override("font_size", 19)
+		trait_lbl.add_theme_color_override("font_color", Color(0.6, 0.85, 0.72))
+		trait_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		vb.add_child(trait_lbl)
+
 static func _build_vitals(body: VBoxContainer, player: Player) -> void:
 	var hp_regen: int = player.hp_regen_period()
 	var mp_regen: int = player.mp_regen_period()
@@ -248,9 +259,12 @@ static func _build_equipment(body: VBoxContainer, player: Player) -> void:
 		body.add_child(_kv_row(label, value, tint))
 
 static func _build_resists(body: VBoxContainer, player: Player) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
 	for elem in _ELEMENTS:
 		var lvl: int = Status.resist_level(player.resists, elem)
-		body.add_child(_resist_row(elem, lvl))
+		row.add_child(_resist_card(elem, lvl))
+	body.add_child(row)
 
 static func _build_essence(body: VBoxContainer, player: Player) -> void:
 	# ── Active essence effects summary ────────────────────────────────────────
@@ -498,6 +512,40 @@ static func _stat_block(label: String, value: int, tint: Color) -> Control:
 	val.add_theme_color_override("font_color", tint)
 	vb.add_child(val)
 	return vb
+
+static func _resist_card(element: String, level: int) -> Control:
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 10)
+	margin.add_theme_constant_override("margin_right", 10)
+	margin.add_theme_constant_override("margin_top", 8)
+	margin.add_theme_constant_override("margin_bottom", 8)
+	panel.add_child(margin)
+	var vb := VBoxContainer.new()
+	vb.alignment = BoxContainer.ALIGNMENT_CENTER
+	vb.add_theme_constant_override("separation", 2)
+	margin.add_child(vb)
+	var name_lbl := Label.new()
+	name_lbl.text = element.capitalize()
+	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.add_theme_font_size_override("font_size", 18)
+	name_lbl.add_theme_color_override("font_color", _element_color(element))
+	vb.add_child(name_lbl)
+	var val_lbl := Label.new()
+	val_lbl.text = _resist_bar(level)
+	val_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	val_lbl.add_theme_font_size_override("font_size", 22)
+	var tint: Color
+	if level > 0:
+		tint = Color(0.4, 0.95, 0.5)
+	elif level < 0:
+		tint = Color(1.0, 0.4, 0.4)
+	else:
+		tint = Color(0.45, 0.45, 0.5)
+	val_lbl.add_theme_color_override("font_color", tint)
+	vb.add_child(val_lbl)
+	return panel
 
 static func _resist_row(element: String, level: int) -> Control:
 	var row := HBoxContainer.new()

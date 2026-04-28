@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="RaceData" format=3 uid="uid://ctmj0hntx0bjg"]
+
+[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+
+[resource]
+script = ExtResource("1_rdata")
+id = "gargoyle"
+display_name = "Gargoyle"
+description = "Living stone. Natural AC +4, immune to poison. Low HP, but stone body shrugs off punishment. Poor at magic and ranged combat."
+base_sprite_path = "res://assets/tiles/individual/player/base/gargoyle_m.png"
+unlocked = false
+unlock_kind = "kill"
+unlock_trigger_id = "gargoyle"
+str_mod = 1
+dex_mod = -1
+int_mod = -1
+hp_mod = 0
+mp_mod = -1
+resist_mods = ["poison+"]
+skill_aptitudes = {"endurance": 0, "melee": -1, "ranged": -1, "magic": -1, "defense": 1, "agility": -1, "tool": 0}
+passive_id = "stone_body"
