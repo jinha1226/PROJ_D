@@ -87,20 +87,6 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 	var desc: String = String(_DESCRIPTIONS.get(id, ""))
 	hold_timer.timeout.connect(func(): _show_desc(id, desc, parent))
 
-	vb.gui_input.connect(func(ev: InputEvent) -> void:
-		var pressed: bool = false
-		var released: bool = false
-		if ev is InputEventScreenTouch:
-			pressed = ev.pressed
-			released = not ev.pressed
-		elif ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
-			pressed = ev.pressed
-			released = not ev.pressed
-		if pressed:
-			hold_timer.start()
-		elif released:
-			hold_timer.stop())
-
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	vb.add_child(row)
@@ -152,18 +138,34 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 	lv_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(lv_lbl)
 
-	var active_btn := Button.new()
-	active_btn.custom_minimum_size = Vector2(110, 0)
-	active_btn.add_theme_font_size_override("font_size", 18)
+	# 활성 상태 색상 갱신 함수
 	var _refresh_active := func() -> void:
 		var is_active: bool = player.is_skill_active(id)
-		active_btn.text = "ACTIVE" if is_active else "INACTIVE"
-		active_btn.modulate = Color(0.75, 1.0, 0.75) if is_active else Color(0.75, 0.75, 0.78)
+		name_lbl.add_theme_color_override("font_color",
+			Color(0.95, 0.85, 0.35) if is_active else Color(0.45, 0.45, 0.5))
+		vb.modulate = Color(1.0, 1.0, 1.0) if is_active else Color(0.7, 0.7, 0.75)
 	_refresh_active.call()
-	active_btn.pressed.connect(func():
-		if player.toggle_skill_active(id):
-			_refresh_active.call())
-	row.add_child(active_btn)
+
+	var _long_pressed := [false]
+	hold_timer.timeout.connect(func(): _long_pressed[0] = true)
+	vb.gui_input.connect(func(ev: InputEvent) -> void:
+		var pressed: bool = false
+		var released: bool = false
+		if ev is InputEventScreenTouch:
+			pressed = ev.pressed
+			released = not ev.pressed
+		elif ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
+			pressed = ev.pressed
+			released = not ev.pressed
+		if pressed:
+			_long_pressed[0] = false
+			hold_timer.start()
+		elif released:
+			hold_timer.stop()
+			if not _long_pressed[0]:
+				if player.toggle_skill_active(id):
+					_refresh_active.call()
+			_long_pressed[0] = false)
 
 	if level < Player.MAX_SKILL_LEVEL and needed > 0:
 		var xp_row := HBoxContainer.new()

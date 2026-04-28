@@ -20,6 +20,9 @@ var pending_energy: float = 0.0
 ## Telegraphed ability state: {name, tiles, damage, message} — fires next turn
 var _ability_charge: Dictionary = {}
 
+var is_ally: bool = false
+var ally_turns_left: int = 0  # 0 = indefinite; > 0 counts down each player turn
+
 var _map: DungeonMap
 var _tex: Texture2D = null
 var _font: Font
@@ -113,12 +116,14 @@ func _draw() -> void:
 	if data == null:
 		return
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
+	var tint: Color = Color(0.55, 1.0, 0.6) if is_ally else Color.WHITE
 	if GameManager.use_tiles and _tex != null:
-		draw_texture_rect(_tex, rect, false)
+		draw_texture_rect(_tex, rect, false, tint)
 	else:
+		var glyph_col: Color = (tint * data.glyph_color) if is_ally else data.glyph_color
 		draw_string(_font, Vector2(6, DungeonMap.CELL_SIZE - 6),
 			data.glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, DungeonMap.CELL_SIZE - 6,
-			data.glyph_color)
+			glyph_col)
 	if not is_aware and hp > 0:
 		var center := Vector2(DungeonMap.CELL_SIZE * 0.5, 4.0)
 		draw_circle(center, 5.0, Color(0.1, 0.15, 0.2, 0.85))

@@ -73,6 +73,9 @@ var altar_active: bool = false
 ## Warning tiles from telegraphed boss attacks: Vector2i -> Color
 var warning_tiles: Dictionary = {}
 
+## Corpses: Array of {pos:Vector2i, tile_path:String, glyph:String, turns_left:int}
+var corpses: Array = []
+
 func set_warning(pos: Vector2i, color: Color) -> void:
 	warning_tiles[pos] = color
 	queue_redraw()
@@ -169,6 +172,7 @@ func _ready() -> void:
 	GameManager = get_node_or_null("/root/GameManager")
 	_tex_door_closed = load("res://assets/tiles/individual/dngn/doors/closed_door.png") as Texture2D
 	_tex_door_open = load("res://assets/tiles/individual/dngn/doors/open_door.png") as Texture2D
+	add_to_group("dungeon_map")
 
 func _load_atmosphere(depth: int) -> void:
 	# B3 is a ruined temple — distinct marble/mosaic tileset
@@ -275,6 +279,22 @@ func _draw() -> void:
 		var wrect := Rect2(Vector2(wpos.x * CELL_SIZE, wpos.y * CELL_SIZE),
 				Vector2(CELL_SIZE, CELL_SIZE))
 		draw_rect(wrect, warning_tiles[wpos])
+
+	# Corpses — drawn below entities, above floor
+	for c in corpses:
+		var cpos: Vector2i = c.get("pos", Vector2i.ZERO)
+		if not (reveal_all or visible_tiles.has(cpos)):
+			continue
+		var crect := Rect2(Vector2(cpos.x * CELL_SIZE, cpos.y * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE))
+		var ctile: String = c.get("tile_path", "")
+		if use_tiles and ctile != "":
+			var ctex: Texture2D = load(ctile) as Texture2D
+			if ctex != null:
+				draw_texture_rect(ctex, crect, false, Color(0.7, 0.5, 0.5, 0.85))
+				continue
+		draw_string(ThemeDB.fallback_font,
+			Vector2(cpos.x * CELL_SIZE + 6, cpos.y * CELL_SIZE + CELL_SIZE - 6),
+			"%", HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6, Color(0.65, 0.25, 0.25))
 
 	# Faith altars — dim until boss dies, bright once altar_active
 	for apos in altar_map.keys():

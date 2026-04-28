@@ -81,7 +81,7 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 			_apply_status_to_target(spell, player, game, "confused", 6)
 			CombatLog.post("The target's form shifts!", Color(0.5, 1.0, 0.6))
 		"summon":
-			CombatLog.post("A spectral ally answers your call!", Color(0.6, 0.9, 0.75))
+			_cast_summon(spell, player, power, game)
 		"prismatic":
 			_cast_prismatic(spell, player, power, game)
 		"astral":
@@ -491,3 +491,68 @@ static func _find_nearest_visible(player: Player, game: Node,
 			best = n
 			best_d = d
 	return best
+
+# ── Summon ────────────────────────────────────────────────────────────────────
+
+const _SUMMON_TABLE: Dictionary = {
+	"call_imp":        {"monster": "crimson_imp",  "turns": 18, "count": 1},
+	"animate_dead":    {"monster": "",             "turns": 20, "count": 1},
+	"summon_vermin":   {"monster": "rat",          "turns": 12, "count": 3},
+	"animate_skeleton":{"monster": "crypt_zombie", "turns": 20, "count": 1},
+	"animate_objects": {"monster": "crimson_imp",  "turns": 15, "count": 2},
+	"conjure_fey":     {"monster": "crimson_imp",  "turns": 20, "count": 1},
+}
+
+static func _cast_summon(spell: SpellData, player: Player, power: int, game: Node) -> void:
+	if game == null or not game.has_method("spawn_ally"):
+		CombatLog.post("A spectral ally answers your call!", Color(0.6, 0.9, 0.75))
+		return
+	var entry: Dictionary = _SUMMON_TABLE.get(spell.id, {})
+	var turns: int = int(entry.get("turns", 15)) + power / 8
+	var count: int = int(entry.get("count", 1))
+
+	if spell.id == "animate_dead":
+		_animate_dead(player, turns, game)
+		return
+
+	var monster_id: String = entry.get("monster", "crimson_imp")
+	var spawned: int = 0
+	for _i in range(count):
+		if game.spawn_ally(monster_id, player.grid_pos, turns):
+			spawned += 1
+	if spawned > 0:
+		CombatLog.post("You call forth %s!" % spell.display_name, Color(0.6, 0.9, 0.75))
+	else:
+		CombatLog.post("No room to summon!", Color(1.0, 0.7, 0.5))
+
+static func _animate_dead(player: Player, turns: int, game: Node) -> void:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return
+	var gmap = tree.get_nodes_in_group("dungeon_map")
+	if gmap.is_empty():
+		return
+	var dmap = gmap[0]
+	if not dmap.has_method("get") or not "corpses" in dmap:
+		return
+	# Find nearest corpse within range 6
+	var best_idx: int = -1
+	var best_d: int = 999
+	for i in range(dmap.corpses.size()):
+		var cpos: Vector2i = dmap.corpses[i].get("pos", Vector2i(-999, -999))
+		var d: int = max(abs(cpos.x - player.grid_pos.x), abs(cpos.y - player.grid_pos.y))
+		if d <= 6 and d < best_d:
+			best_d = d
+			best_idx = i
+	if best_idx < 0:
+		CombatLog.post("No corpses nearby to animate.", Color(1.0, 0.7, 0.5))
+		return
+	var corpse: Dictionary = dmap.corpses[best_idx]
+	dmap.corpses.remove_at(best_idx)
+	dmap.queue_redraw()
+	# Decide which undead to spawn based on original monster type
+	var zombie_id: String = "zombie"
+	if game.spawn_ally(zombie_id, player.grid_pos, turns):
+		CombatLog.post("A corpse rises to serve you!", Color(0.5, 0.9, 0.6))
+	else:
+		CombatLog.post("No room to animate!", Color(1.0, 0.7, 0.5))

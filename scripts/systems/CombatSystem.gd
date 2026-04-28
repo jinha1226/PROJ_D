@@ -419,3 +419,20 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	if poison_turns > 0 and player.hp > 0:
 		player.apply_status("poison", poison_turns)
 		CombatLog.damage_taken("You are poisoned.")
+
+static func ally_attack_monster(ally: Monster, target: Monster) -> void:
+	if ally.data == null or target.data == null:
+		return
+	var base_dmg: int = 2
+	if not ally.data.attacks.is_empty():
+		base_dmg = int(ally.data.attacks[0].get("damage", 2))
+	var raw: int = randi_range(max(1, base_dmg * 3 / 5), max(1, base_dmg * 3 / 2)) + ally.data.hd / 2
+	var soak: int = randi_range(0, target.data.hd / 2 + 1)
+	var final: int = max(1, raw - soak)
+	CombatLog.post("Your %s hits the %s for %d." % [
+		ally.data.display_name, target.data.display_name, final],
+		Color(0.5, 0.9, 0.55))
+	target.hp -= final
+	target.emit_signal("hit_taken", final)
+	if target.hp <= 0:
+		target.die()

@@ -9,6 +9,9 @@ static var ItemRegistry = Engine.get_main_loop().root.get_node_or_null("/root/It
 ## idle → random step.
 
 static func take_turn(monster: Monster, map: DungeonMap) -> void:
+	if monster.is_ally:
+		_take_ally_turn(monster, map)
+		return
 	var player: Player = _find_player()
 	if player == null or player.hp <= 0:
 		return
@@ -363,6 +366,39 @@ static func _random_step(monster: Monster, map: DungeonMap) -> void:
 		if map.is_walkable(next) and not _occupied(next, monster):
 			monster.try_move(d)
 			return
+
+static func _take_ally_turn(ally: Monster, map: DungeonMap) -> void:
+	if Status.will_skip_turn(ally):
+		return
+	var target: Monster = _find_nearest_enemy(ally)
+	if target == null:
+		# No enemies — follow player
+		var player: Player = _find_player()
+		if player != null and _chebyshev(ally.grid_pos, player.grid_pos) > 2:
+			_step_toward(ally, map, player.grid_pos)
+		return
+	var dist: int = _chebyshev(ally.grid_pos, target.grid_pos)
+	if dist == 1:
+		CombatSystem.ally_attack_monster(ally, target)
+	else:
+		_step_toward(ally, map, target.grid_pos)
+
+static func _find_nearest_enemy(ally: Monster) -> Monster:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return null
+	var best: Monster = null
+	var best_dist: int = 999
+	for n in tree.get_nodes_in_group("monsters"):
+		if n == ally or not (n is Monster):
+			continue
+		if n.is_ally:
+			continue
+		var d: int = _chebyshev(ally.grid_pos, n.grid_pos)
+		if d < best_dist:
+			best_dist = d
+			best = n
+	return best
 
 static func _occupied(pos: Vector2i, self_monster: Monster) -> bool:
 	var tree := Engine.get_main_loop() as SceneTree

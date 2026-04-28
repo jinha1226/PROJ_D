@@ -3,6 +3,7 @@ class_name StatusDialog extends RefCounted
 static var GameManager = Engine.get_main_loop().root.get_node_or_null("/root/GameManager") if Engine.get_main_loop() is SceneTree else null
 static var RaceRegistry = Engine.get_main_loop().root.get_node_or_null("/root/RaceRegistry") if Engine.get_main_loop() is SceneTree else null
 static var ClassRegistry = Engine.get_main_loop().root.get_node_or_null("/root/ClassRegistry") if Engine.get_main_loop() is SceneTree else null
+static var RacePassiveSystem = Engine.get_main_loop().root.get_node_or_null("/root/RacePassiveSystem") if Engine.get_main_loop() is SceneTree else null
 
 ## Full character sheet. Sections:
 ##   Header       — race / class / XL
@@ -139,13 +140,15 @@ static func _build_header(body: VBoxContainer, player: Player) -> void:
 		vb.add_child(trait_lbl)
 
 static func _build_vitals(body: VBoxContainer, player: Player) -> void:
-	var hp_regen: int = player.hp_regen_period()
-	var mp_regen: int = player.mp_regen_period()
+	var hp_rate: float = 1.0 / float(player.hp_regen_period())
+	if RacePassiveSystem != null and RacePassiveSystem.has_passive("regeneration"):
+		hp_rate += 1.0 / 3.0
+	var mp_rate: float = 1.0 / float(player.mp_regen_period())
 	body.add_child(_kv_row("HP",
-		"%d / %d  (+1 / %dt)" % [player.hp, player.hp_max, hp_regen],
+		"%d / %d  (+%.2f/t)" % [player.hp, player.hp_max, hp_rate],
 		Color(1.0, 0.55, 0.55)))
 	body.add_child(_kv_row("MP",
-		"%d / %d  (+1 / %dt)" % [player.mp, player.mp_max, mp_regen],
+		"%d / %d  (+%.2f/t)" % [player.mp, player.mp_max, mp_rate],
 		Color(0.55, 0.7, 1.0)))
 
 static func _build_faith(body: VBoxContainer, player: Player) -> void:

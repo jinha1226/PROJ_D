@@ -271,7 +271,7 @@ func _snapshot_visible_monster_ids() -> Dictionary:
 
 func _new_monster_in_sight() -> bool:
 	for n in get_tree().get_nodes_in_group("monsters"):
-		if not (n is Monster):
+		if not (n is Monster) or n.is_ally:
 			continue
 		if not map.visible_tiles.has(n.grid_pos):
 			continue
@@ -963,6 +963,34 @@ func _spawn_items_for_floor(depth: int) -> void:
 			_spawn_floor_item(item, p, 0)
 			break
 
+func spawn_ally(monster_id: String, near_pos: Vector2i, turns: int) -> bool:
+	if map == null or monsters_layer == null:
+		return false
+	var md: MonsterData = MonsterRegistry.get_by_id(monster_id)
+	if md == null:
+		return false
+	# Find an open adjacent tile
+	var offsets: Array = [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1),
+		Vector2i(1,1), Vector2i(-1,1), Vector2i(1,-1), Vector2i(-1,-1)]
+	var spawn_at: Vector2i = Vector2i(-1, -1)
+	for off in offsets:
+		var p: Vector2i = near_pos + off
+		if map.is_walkable(p) and _monster_at(p) == null and p != player.grid_pos:
+			spawn_at = p
+			break
+	if spawn_at == Vector2i(-1, -1):
+		return false
+	var m: Monster = MonsterScene.new()
+	monsters_layer.add_child(m)
+	m.setup(md, map, spawn_at)
+	m.is_ally = true
+	m.ally_turns_left = turns
+	m.hit_taken.connect(_on_monster_hit.bind(m))
+	m.died.connect(_on_monster_died.bind(m))
+	TurnManager.register_actor(m)
+	map.queue_redraw()
+	return true
+
 func _spawn_floor_item(data: ItemData, pos: Vector2i, plus: int) -> void:
 	if items_layer == null:
 		return
@@ -1128,6 +1156,20 @@ func _on_player_turn_started() -> void:
 	if map != null:
 		map.tick_fog()
 		_refresh_entity_visibility()
+		# Tick corpse lifetimes
+		var i: int = map.corpses.size() - 1
+		while i >= 0:
+			map.corpses[i]["turns_left"] -= 1
+			if map.corpses[i]["turns_left"] <= 0:
+				map.corpses.remove_at(i)
+			i -= 1
+		# Tick ally lifetimes
+		for n in get_tree().get_nodes_in_group("monsters"):
+			if n is Monster and n.is_ally and n.ally_turns_left > 0:
+				n.ally_turns_left -= 1
+				if n.ally_turns_left <= 0:
+					CombatLog.post("Your %s fades away." % n.data.display_name, Color(0.7, 0.7, 0.8))
+					n.die()
 	if TurnManager.turn_number % _RESPAWN_INTERVAL == 0:
 		_try_respawn_monster()
 	if not _auto_path.is_empty():
@@ -1766,7 +1808,7 @@ func _on_rest_pressed() -> void:
 
 func _monster_in_sight() -> bool:
 	for n in get_tree().get_nodes_in_group("monsters"):
-		if n is Monster and map.visible_tiles.has(n.grid_pos):
+		if n is Monster and not n.is_ally and map.visible_tiles.has(n.grid_pos):
 			return true
 	return false
 
@@ -1967,7 +2009,7 @@ func _nearest_visible_monster() -> Monster:
 	var nearest: Monster = null
 	var best: int = 99999
 	for n in get_tree().get_nodes_in_group("monsters"):
-		if n is Monster and map.visible_tiles.has(n.grid_pos):
+		if n is Monster and not n.is_ally and map.visible_tiles.has(n.grid_pos):
 			var d := _chebyshev(player.grid_pos, n.grid_pos)
 			if d < best:
 				best = d
@@ -1990,6 +2032,17 @@ func _greedy_step_toward(target: Vector2i) -> Vector2i:
 func _on_monster_died(monster: Monster) -> void:
 	if player == null or player.hp <= 0:
 		return
+	# Allies don't give XP or drops
+	if monster != null and monster.is_ally:
+		return
+	# Leave a corpse (non-unique only)
+	if monster != null and monster.data != null and not monster.data.is_unique:
+		map.corpses.append({
+			"pos": monster.grid_pos,
+			"tile_path": String(monster.data.tile_path),
+			"turns_left": 40,
+		})
+		map.queue_redraw()
 	# Death faith: on-kill HP/MP sustain
 	var kill_hp: int = FaithSystem.on_kill_hp(player)
 	var kill_mp: int = FaithSystem.on_kill_mp(player)

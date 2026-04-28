@@ -265,6 +265,8 @@ func _weapon_action_cost() -> float:
 
 func _attack_target_for_tile(target: Vector2i) -> Monster:
 	var direct: Monster = _monster_at(target)
+	if direct != null and direct.is_ally:
+		return null  # Never attack allies
 	if direct != null and _chebyshev(target, grid_pos) <= 1:
 		return direct
 	if equipped_weapon_id == "":
@@ -300,6 +302,8 @@ func _attack_target_for_tile(target: Vector2i) -> Monster:
 	if _map != null and not _map.in_bounds(middle):
 		return null
 	var reach_monster: Monster = _monster_at(target)
+	if reach_monster != null and reach_monster.is_ally:
+		return null
 	return reach_monster
 
 func use_item(index: int) -> void:
@@ -771,7 +775,7 @@ func grant_kill_skill_xp(amount: float, preferred_skill: String = "") -> void:
 	var targets: Array = []
 	for id in active_skills:
 		var sid: String = String(id)
-		if SKILL_IDS.has(sid):
+		if SKILL_IDS.has(sid) and get_skill_level(sid) < MAX_SKILL_LEVEL:
 			targets.append(sid)
 	if targets.is_empty():
 		var fallback: String = preferred_skill if SKILL_IDS.has(preferred_skill) else "melee"
