@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://0gxu5quv5cxta"
-path="res://.godot/imported/dimension_door.png-9cd8c195add760865b0c6135f6f460e6.ctex"
+uid="uid://cainmfdeq4pao"
+path="res://.godot/imported/dimension_door.png-8b6ffad1f6e2842db7a3f515884dd4ea.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/dimension_door.png"
-dest_files=["res://.godot/imported/dimension_door.png-9cd8c195add760865b0c6135f6f460e6.ctex"]
+dest_files=["res://.godot/imported/dimension_door.png-8b6ffad1f6e2842db7a3f515884dd4ea.ctex"]
 
 [params]
 

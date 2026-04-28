@@ -21,18 +21,26 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 	if Status.is_fleeing(monster):
 		_flee_step(monster, map, player.grid_pos)
 		return
+	# Fire telegraphed ability from last turn
+	if not monster._ability_charge.is_empty():
+		_fire_charge(monster, player, map)
+		return
 	var confusion: float = Status.confusion_chance(monster)
 	if confusion > 0.0 and randf() < confusion:
 		_random_step(monster, map)
 		return
 	var dist: int = _chebyshev(monster.grid_pos, player.grid_pos)
 	if dist == 1:
+		if _try_special_close(monster, player, map):
+			return
 		CombatSystem.monster_attack_player(monster, player)
 		monster.become_aware(player.grid_pos)
 		return
 	if _can_see(monster, map, player.grid_pos):
 		monster.become_aware(player.grid_pos)
 		_pack_alert(monster, player.grid_pos)
+		if _try_special_ranged(monster, player, map, dist):
+			return
 		if _try_ranged(monster, player, dist):
 			return
 		_step_toward(monster, map, player.grid_pos)
@@ -47,6 +55,176 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 			_step_toward(monster, map, monster.last_known_player_pos)
 	else:
 		_random_step(monster, map)
+
+
+# ── Special abilities ───────────────────────────────────────────────────────
+
+# Boss IDs that use telegraphed attacks instead of instant specials.
+const BOSS_IDS: Array = [
+	"ashen_magpie", "ancient_lich", "blood_duke", "bog_serpent",
+	"ember_tyrant", "glacial_sovereign", "gnoll_warlord", "harrow_knight",
+	"ogre_chieftain", "orc_warchief", "pale_scholar", "sister_cinder",
+	"sovereign_jelly", "stone_warden", "storm_hierophant", "viper_saint",
+]
+
+## Close-range specials (dist == 1). Returns true if ability was used.
+static func _try_special_close(monster: Monster, player: Player, map: DungeonMap) -> bool:
+	var id: String = monster.data.id
+	# Boss telegraphed attacks
+	if id in BOSS_IDS:
+		return _try_boss_telegraph(monster, player, map)
+	# Non-boss instant drain/touch abilities
+	match id:
+		"vampire", "vampire_knight":
+			if randf() < 0.30:
+				_drain_life(monster, player)
+				return true
+		"wraith", "shadow_wraith":
+			if randf() < 0.35:
+				_drain_life(monster, player)
+				return true
+		"wight":
+			if randf() < 0.25:
+				_drain_life(monster, player)
+				return true
+	return false
+
+
+## Ranged specials (dist > 1). Returns true if ability was used.
+static func _try_special_ranged(monster: Monster, player: Player, map: DungeonMap, dist: int) -> bool:
+	var id: String = monster.data.id
+	# Boss telegraphed attacks at range
+	if id in BOSS_IDS and dist <= 5:
+		return _try_boss_telegraph(monster, player, map)
+	# Non-boss instant ranged specials
+	match id:
+		"orc_priest":
+			if dist <= 7 and randf() < 0.40:
+				_smite(monster, player, "The Orc Priest calls down divine wrath!")
+				return true
+		"deep_elf_death_mage":
+			if dist <= 6 and randf() < 0.45:
+				_drain_life(monster, player)
+				return true
+		"mummy":
+			if dist <= 5 and randf() < 0.30:
+				_smite(monster, player, "The Mummy curses you!")
+				return true
+		"balrug":
+			if dist <= 6 and randf() < 0.40:
+				_smite(monster, player, "The Balrug breathes hellfire!")
+				return true
+		"red_devil":
+			if dist <= 5 and randf() < 0.35:
+				_smite(monster, player, "The Red Devil spits fire!")
+				return true
+		"ice_devil":
+			if dist <= 5 and randf() < 0.35:
+				_smite(monster, player, "The Ice Devil blasts you with cold!")
+				return true
+		"earth_elemental":
+			if dist <= 5 and randf() < 0.30:
+				_smite(monster, player, "The Earth Elemental hurls a boulder!")
+				return true
+	return false
+
+
+## Boss telegraphed attack selection.
+static func _try_boss_telegraph(monster: Monster, player: Player, map: DungeonMap) -> bool:
+	if randf() > 0.35:
+		return false
+	match monster.data.id:
+		"ashen_magpie":
+			_telegraph_aoe(monster, map, 2,
+				"The Ashen Magpie spreads its wings — brace for impact!",
+				monster.data.hd * 4)
+		"ancient_lich":
+			_telegraph_aoe(monster, map, 3,
+				"The Ancient Lich channels torment!",
+				monster.data.hd * 3)
+		"gnoll_warlord", "orc_warchief", "ogre_chieftain":
+			_telegraph_aoe(monster, map, 1,
+				"The %s raises its weapon for a mighty cleave!" % monster.data.display_name,
+				monster.data.hd * 5)
+		"storm_hierophant", "ember_tyrant":
+			_telegraph_line(monster, player, map,
+				"The %s charges a devastating bolt!" % monster.data.display_name,
+				monster.data.hd * 6)
+		_:
+			_telegraph_aoe(monster, map, 2,
+				"The %s winds up for a powerful attack!" % monster.data.display_name,
+				monster.data.hd * 4)
+	monster.become_aware(player.grid_pos)
+	return true
+
+
+## Smite: instant non-LOS damage.
+static func _smite(monster: Monster, player: Player, msg: String) -> void:
+	var dmg: int = randi_range(monster.data.hd, monster.data.hd * 2 + 2)
+	CombatLog.post(msg, Color(1.0, 0.65, 0.2))
+	CombatLog.damage_taken("The %s hits you for %d." % [monster.data.display_name, dmg])
+	player.take_damage(dmg, monster.data.id)
+	monster.become_aware(player.grid_pos)
+
+
+## Drain life: deals damage and heals the monster.
+static func _drain_life(monster: Monster, player: Player) -> void:
+	var dmg: int = randi_range(monster.data.hd, monster.data.hd + 4)
+	CombatLog.post("The %s drains your life force!" % monster.data.display_name, Color(0.7, 0.3, 1.0))
+	CombatLog.damage_taken("You lose %d HP." % dmg)
+	player.take_damage(dmg, monster.data.id)
+	monster.hp = min(monster.data.hp, monster.hp + dmg / 2)
+	monster.emit_signal("stats_changed")
+	monster.become_aware(player.grid_pos)
+
+
+## Telegraph an AoE: show warning tiles for 1 turn around the monster.
+static func _telegraph_aoe(monster: Monster, map: DungeonMap,
+		radius: int, msg: String, dmg: int) -> void:
+	var tiles: Array = []
+	for dx in range(-radius, radius + 1):
+		for dy in range(-radius, radius + 1):
+			if dx == 0 and dy == 0:
+				continue
+			var t := monster.grid_pos + Vector2i(dx, dy)
+			if map.tile_at(t) != DungeonMap.Tile.WALL:
+				tiles.append(t)
+				map.set_warning(t, Color(1.0, 0.45, 0.0, 0.45))
+	CombatLog.post(msg, Color(1.0, 0.8, 0.2))
+	monster._ability_charge = {"name": "aoe", "tiles": tiles, "damage": dmg}
+
+
+## Telegraph a line bolt: show warning tiles along direction to player.
+static func _telegraph_line(monster: Monster, player: Player, map: DungeonMap,
+		msg: String, dmg: int) -> void:
+	var dir := Vector2i(sign(player.grid_pos.x - monster.grid_pos.x),
+						sign(player.grid_pos.y - monster.grid_pos.y))
+	var tiles: Array = []
+	var cur := monster.grid_pos + dir
+	for _i in range(6):
+		if map.tile_at(cur) == DungeonMap.Tile.WALL:
+			break
+		tiles.append(cur)
+		map.set_warning(cur, Color(1.0, 0.2, 0.2, 0.5))
+		cur += dir
+	CombatLog.post(msg, Color(1.0, 0.8, 0.2))
+	monster._ability_charge = {"name": "line", "tiles": tiles, "damage": dmg}
+
+
+## Execute a telegraphed ability (called the turn after telegraph).
+static func _fire_charge(monster: Monster, player: Player, map: DungeonMap) -> void:
+	var charge: Dictionary = monster._ability_charge
+	monster._ability_charge = {}
+	for t in charge.get("tiles", []):
+		map.warning_tiles.erase(t)
+	map.queue_redraw()
+	var hit_tiles: Array = charge.get("tiles", [])
+	var dmg: int = int(charge.get("damage", monster.data.hd * 2))
+	if player.grid_pos in hit_tiles:
+		CombatLog.damage_taken("The %s's attack hits you for %d!" % [monster.data.display_name, dmg])
+		player.take_damage(dmg, monster.data.id)
+	else:
+		CombatLog.post("You dodge the %s's attack!" % monster.data.display_name, Color(0.6, 1.0, 0.6))
 
 static func _flee_step(monster: Monster, map: DungeonMap,
 		threat: Vector2i) -> void:

@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://zhzifkvbz6y4b"
-path="res://.godot/imported/gate.png-730cd0a347893ffcb545d9ee9e2dcaa7.ctex"
+uid="uid://cbkau8dsmyqkp"
+path="res://.godot/imported/gate.png-071aab8524193a074fef39d713b10605.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/gate.png"
-dest_files=["res://.godot/imported/gate.png-730cd0a347893ffcb545d9ee9e2dcaa7.ctex"]
+dest_files=["res://.godot/imported/gate.png-071aab8524193a074fef39d713b10605.ctex"]
 
 [params]
 

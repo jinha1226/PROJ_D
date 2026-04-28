@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cx5xvgaak4h3b"
-path="res://.godot/imported/cloudkill.png-a20694908b3244ef58c679ffa48036f1.ctex"
+path="res://.godot/imported/cloudkill.png-9ac9dc578aee3dbe2cfd0e850bc1ed39.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/cloudkill.png"
-dest_files=["res://.godot/imported/cloudkill.png-a20694908b3244ef58c679ffa48036f1.ctex"]
+dest_files=["res://.godot/imported/cloudkill.png-9ac9dc578aee3dbe2cfd0e850bc1ed39.ctex"]
 
 [params]
 

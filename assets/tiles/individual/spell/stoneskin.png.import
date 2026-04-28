@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://60etayvz632za"
-path="res://.godot/imported/stoneskin.png-356d4ffdd5995db35b32a73bc9b94565.ctex"
+uid="uid://24ukjj0oh2w5"
+path="res://.godot/imported/stoneskin.png-dfebabb8463b190ed44f4cb0c35c4a6d.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/stoneskin.png"
-dest_files=["res://.godot/imported/stoneskin.png-356d4ffdd5995db35b32a73bc9b94565.ctex"]
+dest_files=["res://.godot/imported/stoneskin.png-dfebabb8463b190ed44f4cb0c35c4a6d.ctex"]
 
 [params]
 

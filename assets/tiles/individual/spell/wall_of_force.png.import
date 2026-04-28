@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d2iwemh9pzmxb"
-path="res://.godot/imported/wall_of_force.png-4fb057488f7508ed1fa5b5afc569508b.ctex"
+uid="uid://d2iwemiap0mxb"
+path="res://.godot/imported/wall_of_force.png-81b16a530035ef5e06fb2cf29b68e4af.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/wall_of_force.png"
-dest_files=["res://.godot/imported/wall_of_force.png-4fb057488f7508ed1fa5b5afc569508b.ctex"]
+dest_files=["res://.godot/imported/wall_of_force.png-81b16a530035ef5e06fb2cf29b68e4af.ctex"]
 
 [params]
 

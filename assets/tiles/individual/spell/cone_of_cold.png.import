@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8efxkl7fzxdb"
-path="res://.godot/imported/cone_of_cold.png-24ce9adcd98c5444fd1d970530f1dff4.ctex"
+uid="uid://c8efxkl7f0xdb"
+path="res://.godot/imported/cone_of_cold.png-c20cdf37b23610a806e9ad8628ec09ef.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/cone_of_cold.png"
-dest_files=["res://.godot/imported/cone_of_cold.png-24ce9adcd98c5444fd1d970530f1dff4.ctex"]
+dest_files=["res://.godot/imported/cone_of_cold.png-c20cdf37b23610a806e9ad8628ec09ef.ctex"]
 
 [params]
 

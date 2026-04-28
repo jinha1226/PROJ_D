@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://9p9jpft0tkjob"
-path="res://.godot/imported/chain_lightning.png-e8c54b08525fccf6f8699b8808bd20a0.ctex"
+uid="uid://ds0kyyh0bxjl6"
+path="res://.godot/imported/chain_lightning.png-6c84be144b6ab4e881bdb7ef392d4ca1.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/chain_lightning.png"
-dest_files=["res://.godot/imported/chain_lightning.png-e8c54b08525fccf6f8699b8808bd20a0.ctex"]
+dest_files=["res://.godot/imported/chain_lightning.png-6c84be144b6ab4e881bdb7ef392d4ca1.ctex"]
 
 [params]
 

@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://r6ha4enshapza"
-path="res://.godot/imported/sunburst.png-c4163f3827c429c102485ddc93365183.ctex"
+uid="uid://cptsq5yr7g7x7"
+path="res://.godot/imported/sunburst.png-345925271900b07212f5748a26da40df.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/sunburst.png"
-dest_files=["res://.godot/imported/sunburst.png-c4163f3827c429c102485ddc93365183.ctex"]
+dest_files=["res://.godot/imported/sunburst.png-345925271900b07212f5748a26da40df.ctex"]
 
 [params]
 

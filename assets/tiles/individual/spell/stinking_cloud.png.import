@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://oam748vggmxoa"
-path="res://.godot/imported/stinking_cloud.png-bb385ebafca7f21e27d14aecddd0c4e8.ctex"
+uid="uid://cofmd24oq1cey"
+path="res://.godot/imported/stinking_cloud.png-7d1ac92704449f1da184435718865b59.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/stinking_cloud.png"
-dest_files=["res://.godot/imported/stinking_cloud.png-bb385ebafca7f21e27d14aecddd0c4e8.ctex"]
+dest_files=["res://.godot/imported/stinking_cloud.png-7d1ac92704449f1da184435718865b59.ctex"]
 
 [params]
 

@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://gt8bymql1xilb"
-path="res://.godot/imported/power_word_kill.png-d14c622d2446efb1561dd47b7147cadc.ctex"
+uid="uid://cytgektdhqmtj"
+path="res://.godot/imported/power_word_kill.png-5fd52991e71703a697f2c8ab8472c9cd.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/power_word_kill.png"
-dest_files=["res://.godot/imported/power_word_kill.png-d14c622d2446efb1561dd47b7147cadc.ctex"]
+dest_files=["res://.godot/imported/power_word_kill.png-5fd52991e71703a697f2c8ab8472c9cd.ctex"]
 
 [params]
 

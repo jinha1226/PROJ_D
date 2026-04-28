@@ -17,4 +17,5 @@ int_mod = 0
 hp_mod = 0
 mp_mod = 0
 resist_mods = []
+skill_aptitudes = {}
 passive_id = "adaptable"

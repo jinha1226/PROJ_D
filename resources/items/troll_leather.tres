@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://troll_leather_001"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "troll_leather"
+display_name = "troll leather armour"
+kind = "armor"
+tier = 3
+tile_path = "res://assets/tiles/individual/item/armour/troll_leather_armour.png"
+glyph = "["
+glyph_color = Color(0.55, 0.72, 0.45, 1)
+damage = 0
+delay = 1.0
+category = ""
+brand = "regen"
+required_skill = 0
+ac_bonus = 4
+ev_penalty = 0
+encumbrance = 3
+slot = "body"
+effect = ""
+effect_value = 0
+plus = 0
+description = "Thick troll hide with innate regenerative properties. Enhances natural HP recovery."

@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://4g03zcayoozra"
-path="res://.godot/imported/magic_missile.png-8419c9f3bffd0e4585a0b184192296d1.ctex"
+uid="uid://ce50uwt7qavgw"
+path="res://.godot/imported/magic_missile.png-337bdcdbb07fd397bf00c3897854c186.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/magic_missile.png"
-dest_files=["res://.godot/imported/magic_missile.png-8419c9f3bffd0e4585a0b184192296d1.ctex"]
+dest_files=["res://.godot/imported/magic_missile.png-337bdcdbb07fd397bf00c3897854c186.ctex"]
 
 [params]
 

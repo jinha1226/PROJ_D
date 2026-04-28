@@ -4,8 +4,8 @@
 
 [resource]
 script = ExtResource("1_rdata")
-id = "orc"
-display_name = "Orc"
+id = "hill_orc"
+display_name = "Hill Orc"
 description = "Brutal and resilient. +2 STR / +4 HP, -1 INT. Deals bonus melee damage when injured."
 base_sprite_path = "res://assets/tiles/individual/player/base/orc_m.png"
 unlocked = true
@@ -14,7 +14,8 @@ unlock_trigger_id = "orc"
 str_mod = 2
 dex_mod = 0
 int_mod = -1
-hp_mod = 4
+hp_mod = 1
 mp_mod = 0
 resist_mods = []
+skill_aptitudes = {"endurance": 1, "melee": 1, "ranged": -1, "magic": 1, "defense": 1, "agility": -2, "tool": 0}
 passive_id = "bloodthirst"

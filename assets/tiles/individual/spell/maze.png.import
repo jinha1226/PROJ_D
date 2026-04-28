@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://zojvfyeiu8anb"
-path="res://.godot/imported/maze.png-4bef707125ca224f89f4cd92ea1a40ab.ctex"
+uid="uid://ch3nvmu0h003p"
+path="res://.godot/imported/maze.png-d88158b4eba868e8542bbacfb6181bd2.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/maze.png"
-dest_files=["res://.godot/imported/maze.png-4bef707125ca224f89f4cd92ea1a40ab.ctex"]
+dest_files=["res://.godot/imported/maze.png-d88158b4eba868e8542bbacfb6181bd2.ctex"]
 
 [params]
 

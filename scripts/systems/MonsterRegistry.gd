@@ -157,6 +157,33 @@ func _register(res) -> void:
 func get_by_id(id: String) -> MonsterData:
 	return by_id.get(id)
 
+func pick_by_branch(branch_id: String, depth: int) -> MonsterData:
+	var pool: Array = ZoneManager.BRANCH_MONSTER_POOLS.get(branch_id, [])
+	if pool.is_empty():
+		return pick_by_depth(depth)
+	var candidates: Array = []
+	var total_weight: int = 0
+	for m in all:
+		if m.is_unique or not pool.has(m.id):
+			continue
+		# Weight by position in pool — earlier = lighter, later = heavier
+		var pool_idx: int = pool.find(m.id)
+		var base_w: int = max(1, pool_idx + 1)
+		# Bias toward stronger monsters at higher effective depths
+		var depth_factor: int = clamp(depth - m.min_depth, 0, 4)
+		var eff_w: int = max(1, base_w + depth_factor)
+		candidates.append({"data": m, "weight": eff_w})
+		total_weight += eff_w
+	if candidates.is_empty():
+		return pick_by_depth(depth)
+	var roll: int = randi_range(1, total_weight)
+	var accum: int = 0
+	for entry in candidates:
+		accum += int(entry["weight"])
+		if roll <= accum:
+			return entry["data"]
+	return candidates[0]["data"]
+
 func pick_by_depth(depth: int) -> MonsterData:
 	var candidates: Array = []
 	var total_weight: int = 0

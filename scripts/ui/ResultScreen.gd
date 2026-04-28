@@ -10,8 +10,8 @@ signal retry_pressed
 @onready var _kills_label: Label = $Dim/Panel/VBox/Stats/KillsLabel
 @onready var _turns_label: Label = $Dim/Panel/VBox/Stats/TurnsLabel
 @onready var _killer_label: Label = $Dim/Panel/VBox/Stats/KillerLabel
-@onready var _gain_label: Label = $Dim/Panel/VBox/ShardsGained
-@onready var _total_label: Label = $Dim/Panel/VBox/ShardsTotal
+@onready var _runes_label: Label = $Dim/Panel/VBox/ShardsGained
+@onready var _gain_label: Label = $Dim/Panel/VBox/ShardsTotal
 @onready var _meta_btn: Button = $Dim/Panel/VBox/Buttons/MetaButton
 @onready var _retry_btn: Button = $Dim/Panel/VBox/Buttons/RetryButton
 
@@ -27,15 +27,19 @@ func show_result(data: Dictionary) -> void:
 	var depth: int = int(data.get("depth", 1))
 	var kills: int = int(data.get("kills", 0))
 	var turns: int = int(data.get("turns", 0))
-	var shards_gained: int = int(data.get("shards_gained", 0))
-	var shards_total: int = int(data.get("shards_total", 0))
+	var runes: int = int(data.get("runes", 0))
 	var killer: String = String(data.get("killer", ""))
 
 	if victory:
 		_title.text = "Dungeon Cleared!"
 		_killer_label.visible = false
 	else:
-		_title.text = "Defeated on B%dF" % depth
+		_title.text = "YOU DIED"
+		_title.add_theme_color_override("font_color", Color(1.0, 0.2, 0.2))
+		var fv := FontVariation.new()
+		fv.base_font = load("res://assets/fonts/Pretendard-Regular.otf")
+		fv.variation_embolden = 0.8
+		_title.add_theme_font_override("font", fv)
 		if killer != "":
 			_killer_label.text = "Killer: %s" % killer
 			_killer_label.visible = true
@@ -45,8 +49,10 @@ func show_result(data: Dictionary) -> void:
 	_depth_label.text = "Depth: B%dF" % depth
 	_kills_label.text = "Kills: %d" % kills
 	_turns_label.text = "Turns: %d" % turns
-	_gain_label.text = "◆ 룬 +%d" % shards_gained
-	_total_label.text = "◆ 합계: %d" % shards_total
+	if _runes_label != null:
+		_runes_label.text = "Runes: %d / 4" % runes
+	if _gain_label != null:
+		_gain_label.visible = false
 	visible = true
 
 

@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://j6ry6fca7cvja"
-path="res://.godot/imported/ice_storm.png-8f884c5d4066f3cc9f6cf1927b1a3076.ctex"
+uid="uid://cgx80bhr2w40q"
+path="res://.godot/imported/ice_storm.png-5c8a8707bfb9c1d125c2918f45f1b856.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/ice_storm.png"
-dest_files=["res://.godot/imported/ice_storm.png-8f884c5d4066f3cc9f6cf1927b1a3076.ctex"]
+dest_files=["res://.godot/imported/ice_storm.png-5c8a8707bfb9c1d125c2918f45f1b856.ctex"]
 
 [params]
 

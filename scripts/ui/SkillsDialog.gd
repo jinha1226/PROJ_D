@@ -1,7 +1,8 @@
 class_name SkillsDialog extends RefCounted
 
 const _DESCRIPTIONS: Dictionary = {
-	"melee": "Improves accuracy and damage in close combat.\n\nMelee governs fighting at arm's reach. It increases your chance to hit and your damage with melee weapons. Fighters rely on it most, but any build that expects close combat benefits from it.",
+	"endurance": "Increases max HP by 5 each level.\n\nEndurance is the primary way to grow your HP pool. It has no effect on accuracy or damage — just raw survivability. Worth activating for any build that expects to take hits.",
+	"melee": "Improves accuracy, damage, and attack speed in close combat.\n\nMelee covers all weapon types at arm's reach — equivalent to DCSS weapon skills plus Fighting's combat contribution. Higher levels increase hit chance, damage, and reduce attack delay. Core skill for any fighter.",
 	"ranged": "Improves bows and other dedicated ranged weapons.\n\nRanged improves attacks made from a distance. It rewards spacing and line-of-sight control. Rangers and cautious hybrids benefit from it most.",
 	"tool": "Improves wands, thrown tools, and trick-based combat.\n\nTool governs practical combat devices such as wands and thrown utility items. It rewards timing, resource use, and flexible problem-solving. Trickery-aligned builds make the best use of it.",
 	"magic": "Improves spellcasting and unlocks stronger spells.\n\nMagic governs spell power and determines which spell levels you can use. High Magic makes spells stronger, but Intelligence is still needed to learn advanced magic. Mages depend on it, but hybrids can use it for utility and support.",
@@ -40,8 +41,10 @@ static func _bonus_text(id: String, level: int, player: Player) -> String:
 	if level == 0:
 		return "(no bonus yet)"
 	match id:
+		"endurance":
+			return "+%d max HP" % [level * 5]
 		"melee":
-			return "+%d to-hit / +%d%% dmg" % [level, level * 4]
+			return "+%d to-hit / +%d%% dmg / -%d%% delay" % [level * 2, level * 4, level * 3]
 		"ranged":
 			return "+%d to-hit / +%d%% dmg" % [level, level * 4]
 		"tool":
@@ -55,6 +58,16 @@ static func _bonus_text(id: String, level: int, player: Player) -> String:
 		"agility":
 			return "+%d EV / ambush +%d%% / harder to detect" % [level, 50 + level * 5]
 	return ""
+
+static func _apt_for(id: String, player: Player) -> int:
+	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id) \
+			if GameManager != null and RaceRegistry != null else null
+	if race == null:
+		return 0
+	return int(race.skill_aptitudes.get(id, 0))
+
+static func _apt_label(apt: int) -> String:
+	return "%+d" % apt
 
 static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: Node) -> Control:
 	var level: int = int(s.get("level", 0))
@@ -97,10 +110,24 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 	name_col.add_theme_constant_override("separation", 0)
 	row.add_child(name_col)
 
+	var name_row := HBoxContainer.new()
+	name_row.add_theme_constant_override("separation", 6)
+	name_col.add_child(name_row)
+
 	var name_lbl := Label.new()
 	name_lbl.text = id.capitalize()
 	name_lbl.add_theme_font_size_override("font_size", 28)
-	name_col.add_child(name_lbl)
+	name_row.add_child(name_lbl)
+
+	var apt: int = _apt_for(id, player)
+	if apt != 0:
+		var apt_lbl := Label.new()
+		apt_lbl.text = _apt_label(apt)
+		apt_lbl.add_theme_font_size_override("font_size", 20)
+		apt_lbl.add_theme_color_override("font_color",
+			Color(0.45, 0.9, 0.5) if apt > 0 else Color(0.9, 0.45, 0.45))
+		apt_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		name_row.add_child(apt_lbl)
 
 	var bonus_lbl := Label.new()
 	bonus_lbl.text = _bonus_text(id, level, player)

@@ -18,6 +18,7 @@ class_name ItemData extends Resource
 @export_group("Armor")
 @export var ac_bonus: int = 0
 @export var ev_penalty: int = 0
+@export var encumbrance: int = 0  # spell penalty weight; defense skill subtracts before penalty applies
 @export var slot: String = ""
 
 @export_group("Consumable")

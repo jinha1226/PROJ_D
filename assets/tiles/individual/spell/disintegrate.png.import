@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://2cieahgo01zqb"
-path="res://.godot/imported/disintegrate.png-76bdc76de5582cbb0fd4c4eec1f6c5df.ctex"
+uid="uid://na420w2mvfx"
+path="res://.godot/imported/disintegrate.png-308d6c14c0057dc478731f962b5cdf87.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/disintegrate.png"
-dest_files=["res://.godot/imported/disintegrate.png-76bdc76de5582cbb0fd4c4eec1f6c5df.ctex"]
+dest_files=["res://.godot/imported/disintegrate.png-308d6c14c0057dc478731f962b5cdf87.ctex"]
 
 [params]
 

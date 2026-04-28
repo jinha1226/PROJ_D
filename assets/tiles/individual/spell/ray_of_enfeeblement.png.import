@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://365o5p34dwtja"
-path="res://.godot/imported/ray_of_enfeeblement.png-3065c7526ee895c142587e57525d83de.ctex"
+uid="uid://b5bl1codfio7w"
+path="res://.godot/imported/ray_of_enfeeblement.png-5455317a40ac4df00c793d3dc48ad27d.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/ray_of_enfeeblement.png"
-dest_files=["res://.godot/imported/ray_of_enfeeblement.png-3065c7526ee895c142587e57525d83de.ctex"]
+dest_files=["res://.godot/imported/ray_of_enfeeblement.png-5455317a40ac4df00c793d3dc48ad27d.ctex"]
 
 [params]
 

@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://99ajk3z5pmaca"
-path="res://.godot/imported/blight.png-87f6b47f8ac0aeb0e0145161598cb0ac.ctex"
+uid="uid://hlpalqvmseie"
+path="res://.godot/imported/blight.png-93817feda43e548c2120e5ab48f0b5b2.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/blight.png"
-dest_files=["res://.godot/imported/blight.png-87f6b47f8ac0aeb0e0145161598cb0ac.ctex"]
+dest_files=["res://.godot/imported/blight.png-93817feda43e548c2120e5ab48f0b5b2.ctex"]
 
 [params]
 

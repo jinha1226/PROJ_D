@@ -6,17 +6,11 @@ var _passive_id: String = ""
 # Per-turn counter for regeneration (troll).
 var _regen_counter: int = 0
 
-# Floor-scoped single-use flags.
-var _lucky_used: bool = false       # halfling: crit-negation used this floor
-var _hellish_used: bool = false     # tiefling: free MP cast used this floor
-
 # ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 func register(player: Node) -> void:
 	_passive_id = ""
 	_regen_counter = 0
-	_lucky_used = false
-	_hellish_used = false
 	if player != null:
 		player.fov_radius_bonus = 0
 	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
@@ -32,8 +26,6 @@ func register(player: Node) -> void:
 func clear() -> void:
 	_passive_id = ""
 	_regen_counter = 0
-	_lucky_used = false
-	_hellish_used = false
 
 func has_passive(pid: String) -> bool:
 	return _passive_id == pid
@@ -73,33 +65,18 @@ func on_player_killed_monster(player: Node) -> void:
 
 # ── Incoming damage hook (called before player.take_damage) ──────────────────
 
-func on_player_hit(player: Node, damage: int) -> int:
-	if _passive_id == "lucky" and not _lucky_used:
-		_lucky_used = true
-		var halved: int = max(1, damage / 2)
-		CombatLog.post("Lucky! The blow glances off. (%d→%d)" % [damage, halved],
-			Color(1.0, 0.9, 0.4))
-		return halved
+func on_player_hit(_player: Node, damage: int) -> int:
 	return damage
 
 # ── Floor change ──────────────────────────────────────────────────────────────
 
 func on_floor_changed(_player: Node) -> void:
-	_lucky_used = false
-	_hellish_used = false
 	_regen_counter = 0
 
 # ── Spell MP check — returns true if cast is allowed ─────────────────────────
 
 func on_spell_cast_mp_check(player: Node, mp_cost: int) -> bool:
-	if player.mp >= mp_cost:
-		return true
-	if _passive_id == "hellish_legacy" and not _hellish_used:
-		_hellish_used = true
-		CombatLog.post("Hellish Legacy — you cast through sheer will!",
-			Color(0.9, 0.5, 0.9))
-		return true
-	return false
+	return player.mp >= mp_cost
 
 # ── Trap reveal hook — kobold trapfinder ─────────────────────────────────────
 

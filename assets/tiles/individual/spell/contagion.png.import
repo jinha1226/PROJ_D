@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://5remnuchm2ttb"
-path="res://.godot/imported/contagion.png-69a88ff4bda29b3a2ac09904e1716263.ctex"
+uid="uid://dpjjjgvponpix"
+path="res://.godot/imported/contagion.png-24b875f27ad182328d81f16227042f56.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/contagion.png"
-dest_files=["res://.godot/imported/contagion.png-69a88ff4bda29b3a2ac09904e1716263.ctex"]
+dest_files=["res://.godot/imported/contagion.png-24b875f27ad182328d81f16227042f56.ctex"]
 
 [params]
 

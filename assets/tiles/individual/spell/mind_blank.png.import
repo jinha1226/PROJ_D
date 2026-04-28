@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://981frtw2oo5ra"
-path="res://.godot/imported/mind_blank.png-3a7fad035f22b0a7d885701af699fc40.ctex"
+uid="uid://hdlhcnslvaxe"
+path="res://.godot/imported/mind_blank.png-4f18566773d8cd63b4329fe4909d351f.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/mind_blank.png"
-dest_files=["res://.godot/imported/mind_blank.png-3a7fad035f22b0a7d885701af699fc40.ctex"]
+dest_files=["res://.godot/imported/mind_blank.png-4f18566773d8cd63b4329fe4909d351f.ctex"]
 
 [params]
 

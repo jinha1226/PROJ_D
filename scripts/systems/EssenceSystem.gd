@@ -173,7 +173,7 @@ const ESSENCES: Dictionary = {
 	"essence_drain": {
 		"name": "Drain Essence",
 		"desc": "On kill, absorb life and recover slightly.",
-		"passive_desc": "Heal 4 HP and clear 1 injury on kill.",
+		"passive_desc": "Heal 4 HP on kill.",
 		"penalty_desc": "-2 maximum HP.",
 		"passive_effect": "on_kill_drain",
 		"color": Color(0.7, 0.3, 1.0),
@@ -533,7 +533,7 @@ static func active_synergies(player: Player) -> Array:
 	if has_synergy(player, "essence_swiftness", "essence_venom"):
 		out.append("Ghost Venom: stronger stealth and unaware poison setup.")
 	if has_synergy(player, "essence_stone", "essence_vitality"):
-		out.append("Bulwark Heart: damage -3 total, injury gain reduced.")
+		out.append("Bulwark Heart: damage -3 total.")
 	if has_synergy(player, "essence_fury", "essence_drain"):
 		out.append("Bloodrush: extra healing on kill.")
 	if has_synergy(player, "essence_gloam", "essence_swiftness"):
@@ -620,11 +620,6 @@ static func incoming_damage_reduction(player: Player) -> int:
 	if has_synergy(player, "essence_stone", "essence_vitality"):
 		reduction += 1
 	return reduction
-
-static func injury_reduction(player: Player) -> int:
-	if has_synergy(player, "essence_stone", "essence_vitality"):
-		return 1
-	return 0
 
 static func bonus_ac(player: Player) -> int:
 	if player == null:
@@ -738,7 +733,6 @@ static func apply_on_kill_effects(player: Player) -> void:
 			Status.apply(player, "damage_boost", fury_dur)
 		elif effect_id == "on_kill_drain":
 			player.heal(4)
-			player.heal_injury(1)
 		elif effect_id == "bloodwake_kill":
 			player.heal(5)
 			var wake_dur: int = 3 if has_bloodwake_fury else 2

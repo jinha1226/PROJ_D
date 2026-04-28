@@ -22,8 +22,6 @@ signal zoom_out_pressed
 var _pulse_t: float = 0.0
 var _pulsing: bool = false
 var _buff_row: HFlowContainer = null
-var _injury_rect: ColorRect = null
-var _injury: int = 0
 var _hp_max_val: int = 1
 
 
@@ -49,33 +47,16 @@ func _process(delta: float) -> void:
 		hp_bar.modulate = Color(1, a, a, 1)
 	else:
 		hp_bar.modulate = Color.WHITE
-	if _injury_rect != null and _injury > 0 and _hp_max_val > 0:
-		var frac: float = float(_injury) / float(_hp_max_val)
-		_injury_rect.size = Vector2(hp_bar.size.x * frac, hp_bar.size.y)
-		_injury_rect.position = Vector2(hp_bar.size.x * (1.0 - frac), 0.0)
 
 
-func set_hp(cur: int, max_: int, injury: int = 0) -> void:
-	_injury = injury
+func set_hp(cur: int, max_: int) -> void:
 	_hp_max_val = max(1, max_)
 	hp_bar.max_value = _hp_max_val
 	hp_bar.value = cur
 	if hp_label:
-		if injury > 0:
-			hp_label.text = "HP %d/%d  ⚕-%d" % [cur, max_, injury]
-		else:
-			hp_label.text = "HP %d/%d" % [cur, max_]
+		hp_label.text = "HP %d/%d" % [cur, max_]
 	var ratio: float = float(cur) / float(_hp_max_val)
 	_pulsing = ratio < 0.3
-	if injury > 0:
-		if _injury_rect == null:
-			_injury_rect = ColorRect.new()
-			_injury_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			_injury_rect.color = Color(0.38, 0.38, 0.38, 0.82)
-			hp_bar.add_child(_injury_rect)
-		_injury_rect.visible = true
-	elif _injury_rect != null:
-		_injury_rect.visible = false
 
 
 func set_mp(cur: int, max_: int) -> void:

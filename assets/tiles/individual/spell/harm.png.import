@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://u6c76s9z0p0ha"
-path="res://.godot/imported/harm.png-c8b1ff439bbd9cfa602b61160e8b3292.ctex"
+uid="uid://bubu8joq6pmog"
+path="res://.godot/imported/harm.png-c674184c8791990c0eab36d451f4d8c3.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/harm.png"
-dest_files=["res://.godot/imported/harm.png-c8b1ff439bbd9cfa602b61160e8b3292.ctex"]
+dest_files=["res://.godot/imported/harm.png-c674184c8791990c0eab36d451f4d8c3.ctex"]
 
 [params]
 

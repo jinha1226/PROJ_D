@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://2mqau1noyu31a"
-path="res://.godot/imported/meteor_swarm.png-d1ffccec8a5b935ab1ad59c6f23d5764.ctex"
+uid="uid://ku6qm7w1gypw"
+path="res://.godot/imported/meteor_swarm.png-32ded501b566d6de7ebc505b6bb35a3b.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/meteor_swarm.png"
-dest_files=["res://.godot/imported/meteor_swarm.png-d1ffccec8a5b935ab1ad59c6f23d5764.ctex"]
+dest_files=["res://.godot/imported/meteor_swarm.png-32ded501b566d6de7ebc505b6bb35a3b.ctex"]
 
 [params]
 

@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://o968z8x192tbb"
-path="res://.godot/imported/misty_step.png-37e507c48da2cf74552557dddeb4ae65.ctex"
+uid="uid://doym827blg600"
+path="res://.godot/imported/misty_step.png-ef197175841133abd40bcbe9b383c94a.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/misty_step.png"
-dest_files=["res://.godot/imported/misty_step.png-37e507c48da2cf74552557dddeb4ae65.ctex"]
+dest_files=["res://.godot/imported/misty_step.png-ef197175841133abd40bcbe9b383c94a.ctex"]
 
 [params]
 

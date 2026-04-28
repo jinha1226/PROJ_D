@@ -17,15 +17,25 @@ func register_actor(actor) -> void:
 func unregister_actor(actor) -> void:
 	actors.erase(actor)
 
-func end_player_turn(immediate: bool = false) -> void:
+# action_cost: weapon delay in "turns" (dagger=0.8, sword=1.0, crossbow=2.0)
+# Each monster accumulates action_cost * (speed/10.0) energy and acts when >= 1.0
+func end_player_turn(action_cost: float = 1.0, immediate: bool = false) -> void:
 	if _ending_turn or not is_player_turn:
 		return
 	_ending_turn = true
 	is_player_turn = false
 	emit_signal("monster_turn_started")
 	for actor in actors.duplicate():
-		if is_instance_valid(actor) and actor.has_method("take_turn"):
-			actor.take_turn()
+		if not is_instance_valid(actor):
+			continue
+		var spd: float = 10.0
+		if actor.get("data") != null:
+			spd = float(actor.data.speed)
+		actor.pending_energy += action_cost * (spd / 10.0)
+		while actor.pending_energy >= 1.0 and is_instance_valid(actor):
+			actor.pending_energy -= 1.0
+			if actor.has_method("take_turn"):
+				actor.take_turn()
 	emit_signal("turn_ended")
 	_ending_turn = false
 	if immediate:

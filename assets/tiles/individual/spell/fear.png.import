@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://x9o62ds7mq6xb"
-path="res://.godot/imported/fear.png-6deebe0a6ace35feb9af66ffba2e6125.ctex"
+uid="uid://28yi1bo8jxep"
+path="res://.godot/imported/fear.png-3fdb6cb9b6d3935305359e61f6394486.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/fear.png"
-dest_files=["res://.godot/imported/fear.png-6deebe0a6ace35feb9af66ffba2e6125.ctex"]
+dest_files=["res://.godot/imported/fear.png-3fdb6cb9b6d3935305359e61f6394486.ctex"]
 
 [params]
 

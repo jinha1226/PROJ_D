@@ -7,6 +7,10 @@ const _LONG_SWORD: Resource = preload("res://resources/items/long_sword.tres")
 const _LEATHER_ARMOR: Resource = preload("res://resources/items/leather_armor.tres")
 const _ROBE: Resource = preload("res://resources/items/robe.tres")
 const _CHAIN_MAIL: Resource = preload("res://resources/items/chain_mail.tres")
+const _RING_MAIL: Resource = preload("res://resources/items/ring_mail.tres")
+const _SCALE_MAIL: Resource = preload("res://resources/items/scale_mail.tres")
+const _PLATE_MAIL: Resource = preload("res://resources/items/plate_mail.tres")
+const _TROLL_LEATHER: Resource = preload("res://resources/items/troll_leather.tres")
 const _POTION_HEALING: Resource = preload("res://resources/items/potion_healing.tres")
 const _POTION_MIGHT: Resource = preload("res://resources/items/potion_might.tres")
 const _POTION_CURE_POISON: Resource = preload("res://resources/items/potion_cure_poison.tres")
@@ -91,6 +95,21 @@ const _POTION_RESISTANCE: Resource = preload("res://resources/items/potion_resis
 const _POTION_CANCELLATION: Resource = preload("res://resources/items/potion_cancellation.tres")
 const _SCROLL_IMMOLATION: Resource = preload("res://resources/items/scroll_immolation.tres")
 const _SCROLL_NOISE: Resource = preload("res://resources/items/scroll_noise.tres")
+# Resistance rings
+const _RING_POISON_RESIST: Resource = preload("res://resources/items/ring_poison_resist.tres")
+const _RING_COLD_RESIST: Resource = preload("res://resources/items/ring_cold_resist.tres")
+const _RING_FIRE_RESIST: Resource = preload("res://resources/items/ring_fire_resist.tres")
+const _RING_NECRO_RESIST: Resource = preload("res://resources/items/ring_necro_resist.tres")
+# Unique rings
+const _RING_BOG: Resource = preload("res://resources/items/ring_bog.tres")
+const _RING_GLACIER: Resource = preload("res://resources/items/ring_glacier.tres")
+const _RING_EMBER: Resource = preload("res://resources/items/ring_ember.tres")
+const _RING_UNDEATH: Resource = preload("res://resources/items/ring_undeath.tres")
+# Runes
+const _RUNE_SWAMP: Resource = preload("res://resources/items/rune_swamp.tres")
+const _RUNE_ICE: Resource = preload("res://resources/items/rune_ice.tres")
+const _RUNE_INFERNAL: Resource = preload("res://resources/items/rune_infernal.tres")
+const _RUNE_CRYPT: Resource = preload("res://resources/items/rune_crypt.tres")
 
 const _ALL_ITEMS: Array = [
 	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE, _SPEAR,
@@ -101,7 +120,7 @@ const _ALL_ITEMS: Array = [
 	_BUCKLER, _ROUND_SHIELD, _KITE_SHIELD, _TOWER_SHIELD,
 	_SHORTBOW, _LONGBOW, _CROSSBOW,
 	_FLAMING_SWORD, _FROST_DAGGER, _VENOM_DAGGER, _SHOCK_MACE,
-	_LEATHER_ARMOR, _ROBE, _CHAIN_MAIL,
+	_LEATHER_ARMOR, _ROBE, _CHAIN_MAIL, _RING_MAIL, _SCALE_MAIL, _PLATE_MAIL, _TROLL_LEATHER,
 	_POTION_HEALING, _POTION_MIGHT, _POTION_CURE_POISON, _POTION_MAGIC,
 	_POTION_BERSERK, _BANDAGE, _STAFF,
 	_POTION_HASTE, _POTION_INVISIBLE, _POTION_AGILITY,
@@ -119,6 +138,9 @@ const _ALL_ITEMS: Array = [
 	_POTION_RESISTANCE, _POTION_CANCELLATION,
 	_SCROLL_IMMOLATION, _SCROLL_NOISE,
 	_SCROLL_BRAND_VENOM, _SCROLL_BRAND_FREEZING, _SCROLL_BRAND_FLAMING, _SCROLL_BRAND_DRAIN,
+	_RING_POISON_RESIST, _RING_COLD_RESIST, _RING_FIRE_RESIST, _RING_NECRO_RESIST,
+	_RING_BOG, _RING_GLACIER, _RING_EMBER, _RING_UNDEATH,
+	_RUNE_SWAMP, _RUNE_ICE, _RUNE_INFERNAL, _RUNE_CRYPT,
 ]
 
 var by_id: Dictionary = {}

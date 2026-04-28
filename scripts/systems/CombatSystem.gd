@@ -45,14 +45,24 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 			var pen: Dictionary = _weapon_req_penalty(player, weapon)
 			req_hit_pen = pen.hit
 			req_dmg_pct = pen.dmg_pct
-	var stat_bonus: int = stat_source / 3
+	var stat_bonus: int = stat_source / 2
 	var skill_level: int = 0
 	if skill_id != "":
 		skill_level = player.get_skill_level(skill_id)
-	var to_hit_base: int = 20 + stat_bonus + skill_level + weapon_plus + req_hit_pen
-	var to_hit_roll: int = randi_range(0, to_hit_base)
+	# melee absorbs DCSS Fighting's to-hit contribution — single skill covers all weapon types
+	var to_hit_base: int = 15 + stat_bonus + weapon_plus + req_hit_pen
+	to_hit_base += randi_range(0, skill_level * 2) if skill_level > 0 else 0
+	var to_hit_roll: int = randi_range(0, max(1, to_hit_base))
 	var eff_ev: int = max(0, monster.data.ev - (2 if Status.has(monster, "drained") else 0))
-	if to_hit_roll < eff_ev:
+	# DCSS: EV roll is average of two random2(ev*2) — peaks around ev, lower variance
+	var ev_roll: int = (randi_range(0, eff_ev * 2) + randi_range(0, eff_ev * 2)) / 2
+	# 5% auto-hit / auto-miss chance (DCSS MIN_HIT_MISS_PERCENTAGE)
+	var luck: int = randi_range(0, 19)
+	if luck == 0:
+		ev_roll = 0  # forced hit
+	elif luck == 1:
+		ev_roll = 9999  # forced miss
+	if to_hit_roll < ev_roll:
 		monster.become_aware(player.grid_pos)
 		CombatLog.miss("You miss the %s." % monster.data.display_name)
 		return
@@ -73,7 +83,9 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	# Faith melee damage mult (War +10%, Arcana -10%)
 	if skill_id == "melee" or skill_id == "":
 		final = max(1, int(round(float(final) * FaithSystem.melee_damage_mult(player))))
+	# flat bonus: weapon skill lv/2 + fighting's random damage (merged into melee)
 	final += player.get_skill_level("melee") / 2
+	final += randi_range(0, player.get_skill_level("melee") / 3)
 	final += RacePassiveSystem.melee_damage_bonus(player)
 	var backstab_bonus: int = _backstab_bonus(player, monster, weapon, weapon_plus)
 	final += backstab_bonus
@@ -113,6 +125,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		player.heal(drain_hp)
 	if monster.hp > 0:
 		EssenceSystem.apply_melee_hit_effects(player, monster)
+		RingSystem.apply_melee_hit_effects(player, monster)
 	# Cleave: axes hit adjacent monsters as a small splash.
 	if weapon != null and weapon.category == "axe":
 		_cleave_hit(player, monster, final)
@@ -133,6 +146,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		GameManager.try_kill_unlock(monster.data.id)
 		RacePassiveSystem.on_player_killed_monster(player)
 		EssenceSystem.apply_on_kill_effects(player)
+		RingSystem.apply_on_kill_effects(player)
 
 static func _cleave_hit(player: Player, primary: Monster, base_dmg: int) -> void:
 	var tree := Engine.get_main_loop() as SceneTree
@@ -356,9 +370,16 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	var dmg_base: int = int(attack.get("damage", 1))
 
 	var eff_ev: int = player.ev + (3 if Status.has(player, "blur") else 0)
-	var to_hit_base: int = 15 + monster.data.hd
-	var to_hit_roll: int = randi_range(0, to_hit_base)
-	if to_hit_roll < eff_ev:
+	# DCSS monster to-hit: random2(15 + hd + 1)
+	var to_hit_roll: int = randi_range(0, 15 + monster.data.hd)
+	# Player EV roll: average of two random2(ev*2)
+	var ev_roll: int = (randi_range(0, eff_ev * 2) + randi_range(0, eff_ev * 2)) / 2
+	var luck: int = randi_range(0, 19)
+	if luck == 0:
+		ev_roll = 0
+	elif luck == 1:
+		ev_roll = 9999
+	if to_hit_roll < ev_roll:
 		CombatLog.miss("The %s misses you." % monster.data.display_name)
 		return
 	# Shield block

@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://7viv9zznl1wzb"
-path="res://.godot/imported/prismatic_spray.png-0f2578fea6a38fe50518e861b294253c.ctex"
+uid="uid://bx8xkknm3fww6"
+path="res://.godot/imported/prismatic_spray.png-7936f5a54dfad41015ec10fa0085e201.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/prismatic_spray.png"
-dest_files=["res://.godot/imported/prismatic_spray.png-0f2578fea6a38fe50518e861b294253c.ctex"]
+dest_files=["res://.godot/imported/prismatic_spray.png-7936f5a54dfad41015ec10fa0085e201.ctex"]
 
 [params]
 

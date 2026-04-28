@@ -1,9 +1,9 @@
 class_name MapGen extends RefCounted
 
-## DCSS-inspired BSP generator.
-## Corridors connect nearest room edges (not centers) → shorter corridors.
-## Cross-connections added to reduce dead ends.
-## Doors placed at room entrances (narrow passage points).
+## DCSS-inspired map generators.
+## BSP: standard dungeon / Infernal (large rooms)
+## Cave (CA): Swamp, Ice Caves — organic open spaces
+## Crypt: formal rectangular grid chambers
 
 const MIN_LEAF_AREA: int = 55
 const MIN_ROOM_W: int = 4
@@ -14,53 +14,20 @@ const MAX_SPLIT_DEPTH: int = 4
 const SPLIT_MIN: float = 0.42
 const SPLIT_MAX: float = 0.58
 
-## Single large symmetric temple hall with 5 faith altars.
-## Layout (20×12 room, centered):
-##   stairs_up on the left wall, stairs_down on the right wall.
-##   5 altars in two rows across the middle — player walks among them.
-static func generate_pantheon(width: int, height: int) -> Dictionary:
-	var tiles := PackedByteArray()
-	tiles.resize(width * height)
-	for i in tiles.size():
-		tiles[i] = DungeonMap.Tile.WALL
+# ── Entry point ────────────────────────────────────────────────────────────
 
-	var room_w: int = 22
-	var room_h: int = 11
-	var rx: int = (width - room_w) / 2
-	var ry: int = (height - room_h) / 2
-	var room := Rect2i(rx, ry, room_w, room_h)
-
-	for y in range(ry, ry + room_h):
-		for x in range(rx, rx + room_w):
-			tiles[y * width + x] = DungeonMap.Tile.FLOOR
-
-	var mid_y: int = ry + room_h / 2
-	var spawn := Vector2i(rx + 1, mid_y)
-	var stairs_down := Vector2i(rx + room_w - 2, mid_y)
-	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
-	tiles[stairs_down.y * width + stairs_down.x] = DungeonMap.Tile.STAIRS_DOWN
-
-	# 5 altars: top row (3) and bottom row (2), symmetric around center
-	# Top row y = mid_y - 2, bottom row y = mid_y + 2
-	# Evenly spaced across room width
-	var faith_ids: Array = ["war", "arcana", "trickery", "death", "essence"]
-	var top_ys: Array = [mid_y - 2, mid_y - 2, mid_y, mid_y + 2, mid_y + 2]
-	var cx: int = rx + room_w / 2
-	var altar_xs: Array = [cx - 6, cx - 3, cx, cx + 3, cx + 6]
-	var altar_map: Dictionary = {}
-	for i in range(5):
-		var ap := Vector2i(altar_xs[i], top_ys[i])
-		altar_map[ap] = faith_ids[i]
-
-	return {
-		"tiles": tiles,
-		"spawn": spawn,
-		"stairs_down": stairs_down,
-		"stairs_up": spawn,
-		"rooms": [room],
-		"branch_pos": Vector2i(-1, -1),
-		"altar_map": altar_map,
-	}
+## style: "bsp" | "bsp_large" | "cave" | "crypt"
+static func generate_styled(width: int, height: int, map_seed: int,
+		style: String, branch_entrance: bool = false) -> Dictionary:
+	match style:
+		"cave":
+			return generate_cave(width, height, map_seed, branch_entrance)
+		"crypt":
+			return generate_crypt(width, height, map_seed)
+		"bsp_large":
+			return generate_bsp_large(width, height, map_seed, branch_entrance)
+		_:
+			return generate(width, height, map_seed, branch_entrance)
 
 static func generate(width: int, height: int, map_seed: int = -1,
 		branch_entrance: bool = false) -> Dictionary:
@@ -268,6 +235,243 @@ static func _carve_v(x: int, y0: int, y1: int,
 	for y in range(lo, hi + 1):
 		if tiles[y * width + x] == DungeonMap.Tile.WALL:
 			tiles[y * width + x] = DungeonMap.Tile.FLOOR
+
+# ══ Cave generator (Cellular Automata) ════════════════════════════════════
+# DCSS Swamp / Ice Caves: organic open spaces with irregular walls.
+
+static func generate_cave(width: int, height: int, map_seed: int = -1,
+		branch_entrance: bool = false) -> Dictionary:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = map_seed if map_seed >= 0 else randi()
+	var tiles := PackedByteArray()
+	tiles.resize(width * height)
+	# Seed with ~44% floor noise (borders always wall)
+	for y in range(height):
+		for x in range(width):
+			var idx: int = y * width + x
+			if x == 0 or y == 0 or x == width - 1 or y == height - 1:
+				tiles[idx] = DungeonMap.Tile.WALL
+			else:
+				tiles[idx] = DungeonMap.Tile.WALL if rng.randf() < 0.44 else DungeonMap.Tile.FLOOR
+	# CA iterations: standard B5678/S45678 smoothing
+	for _iter in range(5):
+		var next := tiles.duplicate()
+		for y in range(1, height - 1):
+			for x in range(1, width - 1):
+				var walls: int = _count_wall_neighbors(x, y, tiles, width, height)
+				if tiles[y * width + x] == DungeonMap.Tile.WALL:
+					next[y * width + x] = DungeonMap.Tile.FLOOR if walls < 4 else DungeonMap.Tile.WALL
+				else:
+					next[y * width + x] = DungeonMap.Tile.WALL if walls >= 5 else DungeonMap.Tile.FLOOR
+		tiles = next
+	# Pick a spawn in the densest floor region (center-biased BFS probe)
+	var spawn: Vector2i = _cave_spawn(tiles, width, height, rng)
+	# Seal off any floor tiles unreachable from spawn (ensures connectivity)
+	_seal_disconnected(spawn, tiles, width, height)
+	var stairs_down: Vector2i = _farthest_floor(spawn, tiles, width, height)
+	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
+	tiles[stairs_down.y * width + stairs_down.x] = DungeonMap.Tile.STAIRS_DOWN
+	var branch_pos := Vector2i(-1, -1)
+	if branch_entrance:
+		branch_pos = _cave_branch_pos(spawn, stairs_down, tiles, width, height)
+		if branch_pos != Vector2i(-1, -1):
+			tiles[branch_pos.y * width + branch_pos.x] = DungeonMap.Tile.BRANCH_DOWN
+	var empty_rooms: Array[Rect2i] = []
+	return {"tiles": tiles, "spawn": spawn, "stairs_down": stairs_down,
+			"stairs_up": spawn, "rooms": empty_rooms, "branch_pos": branch_pos}
+
+static func _count_wall_neighbors(x: int, y: int, tiles: PackedByteArray,
+		width: int, height: int) -> int:
+	var count: int = 0
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			if dx == 0 and dy == 0:
+				continue
+			var nx: int = x + dx; var ny: int = y + dy
+			if nx < 0 or ny < 0 or nx >= width or ny >= height:
+				count += 1
+			elif tiles[ny * width + nx] == DungeonMap.Tile.WALL:
+				count += 1
+	return count
+
+static func _cave_spawn(tiles: PackedByteArray, width: int, height: int,
+		rng: RandomNumberGenerator) -> Vector2i:
+	# Try center area first, fallback to any floor tile.
+	var cx: int = width / 2; var cy: int = height / 2
+	for radius in range(0, maxi(width, height)):
+		for dy in range(-radius, radius + 1):
+			for dx in range(-radius, radius + 1):
+				var x: int = cx + dx; var y: int = cy + dy
+				if x < 1 or y < 1 or x >= width - 1 or y >= height - 1:
+					continue
+				if tiles[y * width + x] == DungeonMap.Tile.FLOOR:
+					return Vector2i(x, y)
+	return Vector2i(1, 1)
+
+static func _seal_disconnected(origin: Vector2i, tiles: PackedByteArray,
+		width: int, height: int) -> void:
+	var reachable: Dictionary = {origin: true}
+	var frontier: Array[Vector2i] = [origin]
+	while not frontier.is_empty():
+		var p: Vector2i = frontier.pop_back()
+		for step in [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1)]:
+			var n: Vector2i = p + step
+			if n.x < 0 or n.y < 0 or n.x >= width or n.y >= height: continue
+			if reachable.has(n): continue
+			if tiles[n.y * width + n.x] == DungeonMap.Tile.WALL: continue
+			reachable[n] = true
+			frontier.append(n)
+	for y in range(height):
+		for x in range(width):
+			var p := Vector2i(x, y)
+			if tiles[y * width + x] != DungeonMap.Tile.WALL and not reachable.has(p):
+				tiles[y * width + x] = DungeonMap.Tile.WALL
+
+static func _cave_branch_pos(spawn: Vector2i, stairs: Vector2i,
+		tiles: PackedByteArray, width: int, height: int) -> Vector2i:
+	# Mid-distance floor tile, not too close to either staircase.
+	var cx: int = (spawn.x + stairs.x) / 2
+	var cy: int = (spawn.y + stairs.y) / 2
+	for radius in range(0, 8):
+		for dy in range(-radius, radius + 1):
+			for dx in range(-radius, radius + 1):
+				var x: int = cx + dx; var y: int = cy + dy
+				if x < 1 or y < 1 or x >= width - 1 or y >= height - 1: continue
+				var p := Vector2i(x, y)
+				if tiles[y * width + x] == DungeonMap.Tile.FLOOR \
+						and _chebyshev_v(p, spawn) > 4 and _chebyshev_v(p, stairs) > 4:
+					return p
+	return Vector2i(-1, -1)
+
+static func _chebyshev_v(a: Vector2i, b: Vector2i) -> int:
+	return max(abs(a.x - b.x), abs(a.y - b.y))
+
+
+# ══ Crypt generator (Formal grid) ══════════════════════════════════════════
+# DCSS Crypt: regular rectangular mausoleum chambers, narrow corridors.
+
+static func generate_crypt(width: int, height: int, map_seed: int = -1) -> Dictionary:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = map_seed if map_seed >= 0 else randi()
+	var tiles := PackedByteArray()
+	tiles.resize(width * height)
+	for i in tiles.size():
+		tiles[i] = DungeonMap.Tile.WALL
+	# 3 columns × 3 rows = 9 chambers
+	const COLS: int = 3; const ROWS: int = 3
+	var cell_w: int = (width - 2) / COLS
+	var cell_h: int = (height - 2) / ROWS
+	var rooms: Array[Rect2i] = []
+	for row in range(ROWS):
+		for col in range(COLS):
+			var margin: int = 2
+			var x0: int = 1 + col * cell_w + margin
+			var y0: int = 1 + row * cell_h + margin
+			var rw: int = cell_w - margin * 2
+			var rh: int = cell_h - margin * 2
+			if rw < 3 or rh < 3:
+				continue
+			var room := Rect2i(x0, y0, rw, rh)
+			rooms.append(room)
+			for y in range(y0, y0 + rh):
+				for x in range(x0, x0 + rw):
+					tiles[y * width + x] = DungeonMap.Tile.FLOOR
+	# Connect horizontally adjacent rooms via 1-tile corridor
+	for row in range(ROWS):
+		for col in range(COLS - 1):
+			var ri: int = row * COLS + col
+			if ri + 1 >= rooms.size() or ri >= rooms.size():
+				continue
+			var r1: Rect2i = rooms[ri]; var r2: Rect2i = rooms[ri + 1]
+			var cy: int = r1.position.y + r1.size.y / 2
+			_carve_h(cy, r1.position.x + r1.size.x, r2.position.x, tiles, width)
+	# Connect vertically adjacent rooms via 1-tile corridor
+	for row in range(ROWS - 1):
+		for col in range(COLS):
+			var ri: int = row * COLS + col
+			if ri + COLS >= rooms.size() or ri >= rooms.size():
+				continue
+			var r1: Rect2i = rooms[ri]; var r2: Rect2i = rooms[ri + COLS]
+			var cx: int = r1.position.x + r1.size.x / 2
+			_carve_v(cx, r1.position.y + r1.size.y, r2.position.y, tiles, width)
+	if rooms.is_empty():
+		return generate(width, height, map_seed, false)
+	var spawn: Vector2i = rooms[0].get_center()
+	var stairs_down: Vector2i = rooms[rooms.size() - 1].get_center()
+	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
+	tiles[stairs_down.y * width + stairs_down.x] = DungeonMap.Tile.STAIRS_DOWN
+	return {"tiles": tiles, "spawn": spawn, "stairs_down": stairs_down,
+			"stairs_up": spawn, "rooms": rooms, "branch_pos": Vector2i(-1, -1)}
+
+
+# ══ Large-room BSP (Infernal) ══════════════════════════════════════════════
+# Grand halls: fewer splits, larger rooms, minimal cross-connections.
+
+static func generate_bsp_large(width: int, height: int, map_seed: int = -1,
+		branch_entrance: bool = false) -> Dictionary:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = map_seed if map_seed >= 0 else randi()
+	var tiles := PackedByteArray()
+	tiles.resize(width * height)
+	for i in tiles.size():
+		tiles[i] = DungeonMap.Tile.WALL
+	var rooms: Array[Rect2i] = []
+	_split_large(Rect2i(1, 1, width - 2, height - 2), 0, rng, tiles, width, rooms)
+	if rooms.is_empty():
+		return generate(width, height, map_seed, branch_entrance)
+	for i in range(rooms.size() - 1):
+		_connect_rooms(rooms[i], rooms[i + 1], tiles, width, rng)
+	# Fewer cross-connections than standard BSP (more isolated chambers)
+	for i in range(rooms.size()):
+		for j in range(i + 2, rooms.size()):
+			if _room_gap(rooms[i], rooms[j]) <= 3 and rng.randf() < 0.20:
+				_connect_rooms(rooms[i], rooms[j], tiles, width, rng)
+	var spawn: Vector2i = rooms[0].get_center()
+	var stairs_down: Vector2i = _farthest_floor(spawn, tiles, width, height)
+	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
+	tiles[stairs_down.y * width + stairs_down.x] = DungeonMap.Tile.STAIRS_DOWN
+	if branch_entrance and rooms.size() >= 2:
+		var mid: Rect2i = rooms[rooms.size() / 2]
+		var c: Vector2i = mid.get_center()
+		if tiles[c.y * width + c.x] == DungeonMap.Tile.FLOOR:
+			tiles[c.y * width + c.x] = DungeonMap.Tile.BRANCH_DOWN
+	return {"tiles": tiles, "spawn": spawn, "stairs_down": stairs_down,
+			"stairs_up": spawn, "rooms": rooms, "branch_pos": Vector2i(-1, -1)}
+
+static func _split_large(rect: Rect2i, depth: int, rng: RandomNumberGenerator,
+		tiles: PackedByteArray, width: int, rooms: Array[Rect2i]) -> void:
+	const MAX_D: int = 3
+	const MIN_AREA: int = 90
+	const MIN_W: int = 6; const MIN_H: int = 5
+	const MAX_W: int = 14; const MAX_H: int = 10
+	var area: int = rect.size.x * rect.size.y
+	if depth >= MAX_D or area < MIN_AREA or rect.size.x < MIN_W + 2 or rect.size.y < MIN_H + 2:
+		var mw: int = mini(MAX_W, rect.size.x - 2)
+		var mh: int = mini(MAX_H, rect.size.y - 2)
+		if mw < MIN_W or mh < MIN_H:
+			return
+		var rw: int = rng.randi_range(MIN_W, mw)
+		var rh: int = rng.randi_range(MIN_H, mh)
+		var x0: int = rect.position.x + rng.randi_range(1, maxi(1, rect.size.x - rw - 1))
+		var y0: int = rect.position.y + rng.randi_range(1, maxi(1, rect.size.y - rh - 1))
+		var room := Rect2i(x0, y0, rw, rh)
+		rooms.append(room)
+		for y in range(y0, y0 + rh):
+			for x in range(x0, x0 + rw):
+				tiles[y * width + x] = DungeonMap.Tile.FLOOR
+		return
+	var horizontal: bool = rect.size.y > rect.size.x if rect.size.x != rect.size.y else rng.randf() < 0.5
+	if horizontal:
+		var s: int = clampi(int(rect.size.y * rng.randf_range(0.40, 0.60)), MIN_H + 2, rect.size.y - MIN_H - 2)
+		if s <= 0 or s >= rect.size.y: _split_large(rect, MAX_D, rng, tiles, width, rooms); return
+		_split_large(Rect2i(rect.position, Vector2i(rect.size.x, s)), depth + 1, rng, tiles, width, rooms)
+		_split_large(Rect2i(rect.position + Vector2i(0, s), Vector2i(rect.size.x, rect.size.y - s)), depth + 1, rng, tiles, width, rooms)
+	else:
+		var s: int = clampi(int(rect.size.x * rng.randf_range(0.40, 0.60)), MIN_W + 2, rect.size.x - MIN_W - 2)
+		if s <= 0 or s >= rect.size.x: _split_large(rect, MAX_D, rng, tiles, width, rooms); return
+		_split_large(Rect2i(rect.position, Vector2i(s, rect.size.y)), depth + 1, rng, tiles, width, rooms)
+		_split_large(Rect2i(rect.position + Vector2i(s, 0), Vector2i(rect.size.x - s, rect.size.y)), depth + 1, rng, tiles, width, rooms)
+
 
 # ── BFS farthest floor ─────────────────────────────────────────────────────
 

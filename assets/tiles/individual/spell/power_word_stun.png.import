@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://xhu746jofo7mb"
-path="res://.godot/imported/power_word_stun.png-28d74f4458e545a10ac5e144015a4f41.ctex"
+uid="uid://bf0lt051hx2p"
+path="res://.godot/imported/power_word_stun.png-27535381d73ba056393abff1f2be52fc.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/power_word_stun.png"
-dest_files=["res://.godot/imported/power_word_stun.png-28d74f4458e545a10ac5e144015a4f41.ctex"]
+dest_files=["res://.godot/imported/power_word_stun.png-27535381d73ba056393abff1f2be52fc.ctex"]
 
 [params]
 

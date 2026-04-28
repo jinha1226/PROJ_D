@@ -1,6 +1,6 @@
 extends Node
 
-const ACTIVE_RACE_IDS: Array = ["human", "orc", "elf", "kobold", "troll", "tiefling"]
+const ACTIVE_RACE_IDS: Array = ["human", "hill_orc", "elf", "kobold", "troll", "dwarf", "minotaur", "spriggan", "vampire"]
 
 const _HUMAN: Resource = preload("res://resources/races/human.tres")
 const _KOBOLD: Resource = preload("res://resources/races/kobold.tres")
@@ -8,9 +8,7 @@ const _ORC: Resource = preload("res://resources/races/orc.tres")
 const _TROLL: Resource = preload("res://resources/races/troll.tres")
 const _MINOTAUR: Resource = preload("res://resources/races/minotaur.tres")
 const _ELF: Resource = preload("res://resources/races/elf.tres")
-const _HALFLING: Resource = preload("res://resources/races/halfling.tres")
 const _DWARF: Resource = preload("res://resources/races/dwarf.tres")
-const _TIEFLING: Resource = preload("res://resources/races/tiefling.tres")
 const _SPRIGGAN: Resource = preload("res://resources/races/spriggan.tres")
 const _VAMPIRE: Resource = preload("res://resources/races/vampire.tres")
 
@@ -19,7 +17,7 @@ var all: Array = []
 
 func _ready() -> void:
 	for res in [_HUMAN, _KOBOLD, _ORC, _TROLL, _MINOTAUR, _ELF,
-			_HALFLING, _DWARF, _TIEFLING, _SPRIGGAN, _VAMPIRE]:
+			_DWARF, _SPRIGGAN, _VAMPIRE]:
 		_register(res)
 	if all.is_empty():
 		push_warning("RaceRegistry: 0 races registered.")

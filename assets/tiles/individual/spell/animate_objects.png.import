@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://vex61y14356eb"
-path="res://.godot/imported/animate_objects.png-40bdbec68ed1650f5b70f4274ebcb465.ctex"
+uid="uid://b2wt3pgva5slh"
+path="res://.godot/imported/animate_objects.png-496a366a551e6428962c76ad9a4b1107.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/animate_objects.png"
-dest_files=["res://.godot/imported/animate_objects.png-40bdbec68ed1650f5b70f4274ebcb465.ctex"]
+dest_files=["res://.godot/imported/animate_objects.png-496a366a551e6428962c76ad9a4b1107.ctex"]
 
 [params]
 

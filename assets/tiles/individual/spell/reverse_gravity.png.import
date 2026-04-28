@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://2esie7aor72nb"
-path="res://.godot/imported/reverse_gravity.png-f01da75ecefeb6b8f460331f895e8e52.ctex"
+uid="uid://cxfastwtsxcx"
+path="res://.godot/imported/reverse_gravity.png-2dbca128e9595644621a04bb684fa97b.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/reverse_gravity.png"
-dest_files=["res://.godot/imported/reverse_gravity.png-f01da75ecefeb6b8f460331f895e8e52.ctex"]
+dest_files=["res://.godot/imported/reverse_gravity.png-2dbca128e9595644621a04bb684fa97b.ctex"]
 
 [params]
 

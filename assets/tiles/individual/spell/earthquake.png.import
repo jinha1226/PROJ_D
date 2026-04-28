@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://sb4pr55pe76gb"
-path="res://.godot/imported/earthquake.png-6e73d49c192b6bd0f93e29b80cdd7945.ctex"
+uid="uid://cuh8fxho5foe8"
+path="res://.godot/imported/earthquake.png-82261b68c0dcac742f32e8b8a985fc99.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/earthquake.png"
-dest_files=["res://.godot/imported/earthquake.png-6e73d49c192b6bd0f93e29b80cdd7945.ctex"]
+dest_files=["res://.godot/imported/earthquake.png-82261b68c0dcac742f32e8b8a985fc99.ctex"]
 
 [params]
 

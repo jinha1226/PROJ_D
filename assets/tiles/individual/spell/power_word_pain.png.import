@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://h3zryjtkmev6b"
-path="res://.godot/imported/power_word_pain.png-125347533e9192f9523fbaa5d030addc.ctex"
+uid="uid://d61sfy2hy5nr"
+path="res://.godot/imported/power_word_pain.png-2ef169a0f4c4d90597f5c5f2a776c7b2.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/power_word_pain.png"
-dest_files=["res://.godot/imported/power_word_pain.png-125347533e9192f9523fbaa5d030addc.ctex"]
+dest_files=["res://.godot/imported/power_word_pain.png-2ef169a0f4c4d90597f5c5f2a776c7b2.ctex"]
 
 [params]
 

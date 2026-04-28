@@ -56,7 +56,6 @@ var _hand2_doll_tex: Texture2D = null
 
 var hp: int = 22
 var hp_max: int = 22
-var injury: int = 0  # grayed-out HP; only bandages can clear
 var mp: int = 5
 var mp_max: int = 6
 var ac: int = 0
@@ -91,7 +90,7 @@ var first_shrine_choice_done: bool = false
 
 const MAX_XL: int = 20
 const MAX_SKILL_LEVEL: int = 9
-const SKILL_IDS: Array = ["melee", "ranged", "magic", "defense", "agility", "tool"]
+const SKILL_IDS: Array = ["endurance", "melee", "ranged", "magic", "defense", "agility", "tool"]
 const SKILL_XP_DELTA: Array = [12, 28, 55, 95, 150, 230, 340, 490, 700]
 const MAGIC_SCHOOLS: Array = [
 	"fire", "cold", "air", "earth",
@@ -246,8 +245,22 @@ func try_attack_tile(target: Vector2i) -> bool:
 	if monster == null:
 		return false
 	CombatSystem.player_attack_monster(self, monster)
-	TurnManager.end_player_turn()
+	TurnManager.end_player_turn(_weapon_action_cost())
 	return true
+
+func _weapon_action_cost() -> float:
+	var base_delay: float = 1.0
+	var skill_id: String = "melee"
+	if equipped_weapon_id != "":
+		var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id)
+		if w != null and float(w.delay) > 0.0:
+			base_delay = float(w.delay)
+		if w != null and w.category == "ranged":
+			skill_id = "ranged"
+	var skill_lv: int = get_skill_level(skill_id)
+	# Each skill level reduces delay by 2.5%, capped at 25% reduction (lv9 → ×0.775)
+	var mult: float = max(0.75, 1.0 - float(skill_lv) * 0.025)
+	return base_delay * mult
 
 func _attack_target_for_tile(target: Vector2i) -> Monster:
 	var direct: Monster = _monster_at(target)
@@ -298,23 +311,15 @@ func use_item(index: int) -> void:
 	var had_effect: bool = true
 	match data.effect:
 		"heal":
-			heal_injury(data.effect_value)
 			var heal_amt: int = maxi(1, int(round(float(data.effect_value) * EssenceSystem.potion_heal_mult(self) * FaithSystem.potion_heal_mult(self))))
 			heal_amt += EssenceSystem.potion_heal_bonus(self)
 			heal(heal_amt)
 			CombatLog.post("You feel better. (+%d HP)" % heal_amt,
 				Color(0.6, 1.0, 0.6))
 		"bandage":
-			var inj_before: int = injury
-			heal_injury(data.effect_value)
-			var cleared: int = inj_before - injury
-			if cleared > 0:
-				hp = min(hp_max - injury, hp + cleared / 2)
-				CombatLog.post("You bandage your wounds. (-%d injury)" % cleared,
-					Color(0.85, 0.9, 0.65))
-			else:
-				CombatLog.post("You have no injuries to treat.", Color(0.6, 0.6, 0.6))
-				had_effect = false
+			var heal_amt: int = 6
+			heal(heal_amt)
+			CombatLog.post("You bandage your wounds. (+%d HP)" % heal_amt, Color(0.85, 0.9, 0.65))
 		"blink":
 			_blink(data.effect_value)
 		"might":
@@ -713,20 +718,6 @@ func take_damage(amount: int, source: String = "") -> void:
 		CombatLog.post("You are invulnerable!", Color(1.0, 0.95, 0.5))
 		return
 	hp = max(0, hp - amount)
-	var injury_gain: int = maxi(0, amount / 5)
-	var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id) if GameManager != null and ClassRegistry != null else null
-	var class_group: String = String(cls.class_group) if cls != null else ""
-	match class_group:
-		"fighter":
-			injury_gain = maxi(0, injury_gain - 1)
-		"rogue":
-			injury_gain = maxi(0, injury_gain - (1 if amount < 10 else 0))
-	var defense_level: int = get_skill_level("defense")
-	injury_gain = maxi(0, injury_gain - int(defense_level / 3))
-	injury_gain = maxi(0, injury_gain - EssenceSystem.injury_reduction(self))
-	if amount >= 12:
-		injury_gain += 1
-	injury = min(hp_max - 1, injury + injury_gain)
 	if source != "":
 		last_killer = source
 	emit_signal("damaged", amount)
@@ -735,15 +726,11 @@ func take_damage(amount: int, source: String = "") -> void:
 		emit_signal("died")
 
 
-func heal_injury(amount: int) -> void:
-	injury = max(0, injury - amount)
-	emit_signal("stats_changed")
-
 func register_kill() -> void:
 	kills += 1
 
 func heal(amount: int) -> void:
-	hp = min(max(1, hp_max - injury), hp + amount)
+	hp = min(hp_max, hp + amount)
 	emit_signal("stats_changed")
 
 func init_skills() -> void:
@@ -795,13 +782,20 @@ func get_skill_level(id: String) -> int:
 	var s: Dictionary = skills.get(id, {})
 	return int(s.get("level", 0))
 
+func _skill_apt_mult(id: String) -> float:
+	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id) if GameManager != null and RaceRegistry != null else null
+	if race == null:
+		return 1.0
+	var apt: int = int(race.skill_aptitudes.get(id, 0))
+	return pow(1.2, apt)
+
 func grant_skill_xp(id: String, amount: float) -> void:
 	if not SKILL_IDS.has(id):
 		return
 	if not skills.has(id):
 		skills[id] = {"level": 0, "xp": 0.0}
 	var s: Dictionary = skills[id]
-	s["xp"] = float(s.get("xp", 0.0)) + amount
+	s["xp"] = float(s.get("xp", 0.0)) + amount * _skill_apt_mult(id)
 	while int(s.get("level", 0)) < MAX_SKILL_LEVEL \
 			and float(s.get("xp", 0.0)) >= SKILL_XP_DELTA[int(s.get("level", 0))]:
 		s["xp"] = float(s["xp"]) - SKILL_XP_DELTA[int(s["level"])]
@@ -811,6 +805,11 @@ func grant_skill_xp(id: String, amount: float) -> void:
 			Color(0.7, 0.95, 0.5))
 		if id == "agility":
 			ev += 1
+		elif id == "endurance":
+			var hp_gain: int = 5
+			hp_max += hp_gain
+			hp = min(hp_max, hp + hp_gain)
+			CombatLog.post("+%d max HP from Endurance." % hp_gain, Color(0.85, 0.6, 0.6))
 	skills[id] = s
 
 func grant_xp(amount: int) -> void:
@@ -839,17 +838,8 @@ func _level_up() -> void:
 		_auto_stat_bump()
 
 func _level_up_hp_gain() -> int:
-	var base_gain: int = 4
-	var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id)
-	var class_group: String = String(cls.class_group) if cls != null else ""
-	match class_group:
-		"fighter":
-			base_gain = 5
-		"rogue":
-			base_gain = 4
-		"mage":
-			base_gain = 3
-	return max(2, base_gain + strength / 6)
+	# Flat gain for everyone; STR adds a small bonus. Main HP growth is from Fighting skill.
+	return max(1, 1 + strength / 8)
 
 func _auto_stat_bump() -> void:
 	# Pick the lowest stat and +1. Simplification of the classic
@@ -907,9 +897,8 @@ func _chebyshev(a: Vector2i, b: Vector2i) -> int:
 	return max(abs(a.x - b.x), abs(a.y - b.y))
 
 func wait_turn() -> void:
-	var hp_cap: int = max(1, hp_max - injury)
-	if hp < hp_cap:
-		hp = min(hp_cap, hp + 1)
+	if hp < hp_max:
+		hp = min(hp_max, hp + 1)
 	if mp < mp_max:
 		mp = min(mp_max, mp + 1)
 	emit_signal("stats_changed")
@@ -926,18 +915,17 @@ func tick_statuses() -> void:
 	for id in expired:
 		CombatLog.post("Your %s wears off." % Status.display_name(id),
 			Color(0.75, 0.8, 0.9))
-	# Passive regen: 1 HP per 5 turns, 1 MP per 6 turns (out of combat feel)
-	var hp_cap: int = max(1, hp_max - injury)
-	if hp < hp_cap:
+	# Passive regen
+	if hp < hp_max:
 		_regen_hp_ticker += 1
-		if _regen_hp_ticker >= 5:
+		if _regen_hp_ticker >= hp_regen_period():
 			_regen_hp_ticker = 0
-			hp = min(hp_cap, hp + 1)
+			hp = min(hp_max, hp + 1)
 	else:
 		_regen_hp_ticker = 0
 	if mp < mp_max:
 		_regen_mp_ticker += 1
-		if _regen_mp_ticker >= 6:
+		if _regen_mp_ticker >= mp_regen_period():
 			_regen_mp_ticker = 0
 			mp = min(mp_max, mp + 1)
 	else:
@@ -945,6 +933,15 @@ func tick_statuses() -> void:
 	if not statuses.is_empty() or not expired.is_empty():
 		emit_signal("stats_changed")
 	EssenceSystem.tick(self)
+
+func hp_regen_period() -> int:
+	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id)
+	if armor != null and armor.brand == "regen":
+		return 3
+	return 5
+
+func mp_regen_period() -> int:
+	return 6
 
 func equip_essence(slot: int, essence_id: String) -> void:
 	if slot < 0 or slot >= essence_slots.size():
@@ -1059,6 +1056,16 @@ func _apply_accessory_stat(id: String) -> void:
 		"hp_bonus": hp_max += d.effect_value; hp = mini(hp + d.effect_value, hp_max)
 		"ac_bonus": ac += d.effect_value
 		"mp_bonus": mp_max += d.effect_value; mp = mini(mp + d.effect_value, mp_max)
+		"resist_poison":
+			if not resists.has("poison+"): resists.append("poison+")
+			ac += d.effect_value
+		"resist_cold":
+			if not resists.has("cold+"): resists.append("cold+")
+			ev += d.effect_value
+		"resist_fire":
+			if not resists.has("fire+"): resists.append("fire+")
+		"resist_necro":
+			if not resists.has("necro+"): resists.append("necro+")
 
 func _remove_accessory_stat(id: String) -> void:
 	var d: ItemData = ItemRegistry.get_by_id(id)
@@ -1071,6 +1078,16 @@ func _remove_accessory_stat(id: String) -> void:
 		"hp_bonus": hp_max = maxi(1, hp_max - d.effect_value); hp = mini(hp, hp_max)
 		"ac_bonus": ac = maxi(0, ac - d.effect_value)
 		"mp_bonus": mp_max = maxi(1, mp_max - d.effect_value); mp = mini(mp, mp_max)
+		"resist_poison":
+			resists.erase("poison+")
+			ac = maxi(0, ac - d.effect_value)
+		"resist_cold":
+			resists.erase("cold+")
+			ev = maxi(0, ev - d.effect_value)
+		"resist_fire":
+			resists.erase("fire+")
+		"resist_necro":
+			resists.erase("necro+")
 
 func _refresh_paperdoll() -> void:
 	_body_doll_tex = null

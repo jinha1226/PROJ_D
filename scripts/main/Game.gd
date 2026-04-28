@@ -38,6 +38,11 @@ var _targeting_node: SpellTargetOverlay = null
 var _pending_essence_pickups: Array = []
 var _essence_pickup_popup_open: bool = false
 
+# Abyss state
+var _abyss_turn_counter: int = 0
+const _ABYSS_SHIFT_INTERVAL: int = 8  # tiles shift every 8 player turns
+const _ABYSS_SHIFT_COUNT: int = 12    # tiles flipped per shift
+
 # Auto-walk state — when the player taps a distant explored tile,
 # we enqueue a BFS path here and step one tile each player turn
 # until we hit the goal, an enemy enters view, or HP drops.
@@ -66,10 +71,7 @@ func _ready() -> void:
 		GameManager.pending_player_state = {}
 	elif GameManager.depth <= 1:
 		_apply_class_to_player(GameManager.selected_class_id)
-	if GameManager.in_pantheon:
-		map.generate_pantheon()
-	else:
-		_generate_floor(GameManager.depth, _floor_seed(GameManager.depth))
+	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth))
 	_spawn_camera()
 	_spawn_ui()
 	TurnManager.player_turn_started.connect(_on_player_turn_started)
@@ -304,7 +306,8 @@ func _apply_class_to_player(class_id: String) -> void:
 	_apply_race_mods(GameManager.selected_race_id)
 	player.set_race_from_id(GameManager.selected_race_id)
 	var starting_weapon_id: String = data.starting_weapon
-	if class_id == "warrior" and GameManager.selected_starting_weapon_id != "":
+	if (class_id == "warrior" or class_id == "ranger") \
+			and GameManager.selected_starting_weapon_id != "":
 		starting_weapon_id = GameManager.selected_starting_weapon_id
 	if starting_weapon_id != "":
 		player.items.append({"id": starting_weapon_id, "plus": 0})
@@ -372,6 +375,8 @@ func _class_starter_items(class_id: String) -> Array:
 			return ["potion_healing", "potion_magic"]
 		"rogue":
 			return ["dagger", "potion_healing", "potion_invisible", "scroll_shrouding"]
+		"ranger":
+			return ["dagger", "potion_healing", "potion_healing"]
 		"archmage":
 			return [
 				"potion_healing",
@@ -392,6 +397,8 @@ func _class_default_active_skills(class_id: String, fallback: Array) -> Array:
 			return ["magic"]
 		"rogue":
 			return ["tool", "agility"]
+		"ranger":
+			return ["ranged", "agility"]
 		"archmage":
 			return ["magic", "agility", "defense"]
 	if not fallback.is_empty():
@@ -401,7 +408,6 @@ func _class_default_active_skills(class_id: String, fallback: Array) -> Array:
 func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.hp = int(data.get("hp", 22))
 	player.hp_max = int(data.get("hp_max", 22))
-	player.injury = int(data.get("injury", 0))
 	player.mp = int(data.get("mp", 5))
 	player.mp_max = int(data.get("mp_max", 5))
 	player.ac = int(data.get("ac", 0))
@@ -665,6 +671,7 @@ func _floor_seed(depth: int) -> int:
 
 func _generate_floor(depth: int, map_seed: int,
 		arrive_from_above: bool = true) -> void:
+	_abyss_turn_counter = 0
 	if GameManager.floor_cache.has(depth):
 		_restore_floor_from_cache(depth, arrive_from_above)
 	else:
@@ -673,17 +680,82 @@ func _generate_floor(depth: int, map_seed: int,
 		var bid: String = ZoneManager.branch_entrance_for_depth(depth)
 		if has_branch:
 			already_cleared = GameManager.branches_cleared.has(bid)
-		map.generate(map_seed, has_branch and not already_cleared)
+		var zone: Dictionary = ZoneManager.zone_for_depth(depth)
+		var zone_style: String = String(zone.get("map_style", "bsp"))
+		map.generate(map_seed, has_branch and not already_cleared, zone_style)
 		if has_branch and not already_cleared:
 			var ecfg: Dictionary = ZoneManager.branch_config(bid)
 			var etex_path: String = String(ecfg.get("entrance_tile", ""))
 			map._tex_branch_entrance = load(etex_path) as Texture2D if etex_path != "" else null
 		else:
 			map._tex_branch_entrance = null
+		if depth == 3:
+			_place_b3_altars(map_seed)
 		player.bind_map(map, map.spawn_pos)
 		_spawn_items_for_floor(depth)
-		_spawn_monsters_for_floor(depth)
+		if String(zone.get("id", "")) == "abyss":
+			_spawn_abyss_floor(depth)
+		else:
+			_spawn_monsters_for_floor(depth)
 	_refresh_fov()
+
+const _B3_FAITH_IDS: Array = ["war", "arcana", "trickery", "death", "essence"]
+
+func _place_b3_altars(seed: int) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed ^ 0xA17A1234
+	var floor_tiles: Array = []
+	for y in range(DungeonMap.GRID_H):
+		for x in range(DungeonMap.GRID_W):
+			var p := Vector2i(x, y)
+			if map.tile_at(p) == DungeonMap.Tile.FLOOR:
+				floor_tiles.append(p)
+	if floor_tiles.is_empty():
+		return
+
+	var broken: Array = []
+	var picked: Dictionary = {}
+	for p in floor_tiles:
+		picked[p] = false
+	var shuffled: Array = floor_tiles.duplicate()
+	for i in range(shuffled.size() - 1, 0, -1):
+		var j: int = rng.randi_range(0, i)
+		var tmp = shuffled[i]
+		shuffled[i] = shuffled[j]
+		shuffled[j] = tmp
+
+	for p in shuffled:
+		if broken.size() >= 6:
+			break
+		if p == map.spawn_pos or p == map.stairs_down_pos or p == map.stairs_up_pos:
+			continue
+		broken.append(p)
+		picked[p] = true
+	map.broken_altar_positions = broken
+
+	# 5 faith altars, spread far from broken altars and each other
+	var faith_positions: Array = []
+	for fid in _B3_FAITH_IDS:
+		var best: Vector2i = Vector2i(-1, -1)
+		var best_score: float = -1.0
+		for p in shuffled:
+			if picked.get(p, false):
+				continue
+			if p == map.spawn_pos or p == map.stairs_down_pos or p == map.stairs_up_pos:
+				continue
+			var min_dist: float = 999.0
+			for existing in faith_positions:
+				min_dist = min(min_dist, Vector2(p.x - existing.x, p.y - existing.y).length())
+			if faith_positions.is_empty():
+				min_dist = 999.0
+			if min_dist > best_score:
+				best_score = min_dist
+				best = p
+		if best != Vector2i(-1, -1):
+			map.altar_map[best] = fid
+			faith_positions.append(best)
+			picked[best] = true
+	map.queue_redraw()
 
 func _cache_current_floor() -> void:
 	if map == null or GameManager == null:
@@ -695,6 +767,9 @@ func _cache_current_floor() -> void:
 		"stairs_down_pos": map.stairs_down_pos,
 		"stairs_up_pos": map.stairs_up_pos,
 		"rooms": map.rooms.duplicate(),
+		"altar_map": map.altar_map.duplicate(),
+		"broken_altar_positions": map.broken_altar_positions.duplicate(),
+		"altar_active": map.altar_active,
 		"items": [],
 		"monsters": [],
 	}
@@ -723,6 +798,9 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 	map.stairs_down_pos = state.stairs_down_pos
 	map.stairs_up_pos = state.stairs_up_pos
 	map.rooms = state.rooms.duplicate()
+	map.altar_map = state.get("altar_map", {}).duplicate()
+	map.broken_altar_positions = state.get("broken_altar_positions", []).duplicate()
+	map.altar_active = bool(state.get("altar_active", false))
 	map.visible_tiles.clear()
 	map._load_atmosphere(depth)
 	map.queue_redraw()
@@ -1021,13 +1099,10 @@ func _center_camera_on_player(snap: bool = false) -> void:
 func _update_hud() -> void:
 	if top_hud == null or player == null:
 		return
-	top_hud.set_hp(player.hp, player.hp_max, player.injury)
+	top_hud.set_hp(player.hp, player.hp_max)
 	top_hud.set_mp(player.mp, player.mp_max)
 	top_hud.set_xp(player.xp, player.xp_to_next(), player.xl)
-	if GameManager.in_pantheon:
-		top_hud.set_branch("만신전")
-	else:
-		top_hud.set_depth(GameManager.depth)
+	top_hud.set_depth(GameManager.depth)
 	top_hud.set_gold(player.gold)
 	top_hud.set_turn(TurnManager.turn_number)
 	top_hud.set_buffs(player.statuses)
@@ -1036,7 +1111,7 @@ func _on_player_moved(_new_pos: Vector2i) -> void:
 	_refresh_fov()
 	_center_camera_on_player()
 	_refresh_quickslots()
-	if GameManager.in_pantheon and not player.first_shrine_choice_done \
+	if map.altar_active and not player.first_shrine_choice_done \
 			and map.altar_map.has(player.grid_pos):
 		var faith_id: String = String(map.altar_map[player.grid_pos])
 		ShrineDialog.open_single(faith_id, player, self)
@@ -1047,7 +1122,9 @@ func _on_player_turn_started() -> void:
 	if player != null and player.hp > 0:
 		player.tick_statuses()
 		RacePassiveSystem.on_player_turn_end(player)
-		_apply_branch_env_damage()
+		if ZoneManager.zone_id_for_depth(GameManager.depth) == "abyss" \
+				and GameManager.branch_zone == "":
+			_tick_abyss()
 	if map != null:
 		map.tick_fog()
 		_refresh_entity_visibility()
@@ -1095,36 +1172,33 @@ func _try_respawn_monster() -> void:
 		return
 
 func _on_player_died() -> void:
-	CombatLog.post("You have died.", Color(1.0, 0.4, 0.4))
-	var score: int = _calc_run_score(false)
+	CombatLog.post("YOU DIED.", Color(1.0, 0.3, 0.3))
 	GameManager.end_run("death")
-	_show_death_message(score)
+	_show_death_message()
 
-func _show_death_message(shards: int) -> void:
+func _show_death_message() -> void:
 	var dlg: GameDialog = GameDialog.create_ratio("", 0.82, 0.52)
 	add_child(dlg)
 	dlg.set_close_text("-more-")
 	var body := dlg.body()
 	if body == null:
-		_show_result_screen(false, shards)
+		_show_result_screen(false)
 		return
 	var lbl := Label.new()
-	lbl.text = "악! 이건 정말 아프다!\n\n죽었다... \\ㅜ"
+	lbl.text = "YOU DIED"
 	lbl.add_theme_font_size_override("font_size", 38)
-	lbl.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35))
+	lbl.add_theme_color_override("font_color", Color(1.0, 0.2, 0.2))
+	var fv := FontVariation.new()
+	fv.base_font = load("res://assets/fonts/Pretendard-Regular.otf")
+	fv.variation_embolden = 0.8
+	lbl.add_theme_font_override("font", fv)
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(lbl)
-	dlg.set_on_close(func(): _show_result_screen(false, shards))
+	dlg.set_on_close(func(): _show_result_screen(false))
 
-func _calc_run_score(cleared: bool) -> int:
-	var score: int = player.kills + player.items_collected + player.xl * 3 + GameManager.depth * 2
-	if cleared:
-		score += 50
-	return max(1, score)
-
-func _show_result_screen(victory: bool, shards: int) -> void:
+func _show_result_screen(victory: bool) -> void:
 	var res = ResultScreenScene.instantiate()
 	ui_layer.add_child(res)
 	var data: Dictionary = {
@@ -1132,8 +1206,7 @@ func _show_result_screen(victory: bool, shards: int) -> void:
 		"depth": GameManager.depth,
 		"kills": player.kills,
 		"turns": TurnManager.turn_number,
-		"shards_gained": shards,
-		"shards_total": 0,
+		"runes": _count_collected_runes(),
 		"killer": player.last_killer,
 	}
 	res.show_result(data)
@@ -1277,7 +1350,8 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 	var branch_seed: int = GameManager.seed ^ (branch_id.hash() + branch_floor * 17)
 	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
 	var is_boss_floor: bool = (branch_floor >= int(cfg.get("floors", 4)))
-	map.generate(branch_seed, not is_boss_floor)
+	var map_style: String = String(cfg.get("map_style", "bsp"))
+	map.generate(branch_seed, not is_boss_floor, map_style)
 	var eff_depth: int = ZoneManager.branch_effective_depth(branch_id, branch_floor)
 	map._tex_wall = load(cfg.get("wall", "")) as Texture2D
 	map._tex_floor = load(cfg.get("floor", "")) as Texture2D
@@ -1288,11 +1362,149 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 	if is_boss_floor:
 		_spawn_branch_boss(branch_id)
 	else:
-		_spawn_monsters_for_floor(eff_depth)
+		_spawn_branch_monsters(branch_id, eff_depth)
 		_spawn_items_for_floor(eff_depth)
 		if branch_floor == 1:
 			_spawn_branch_resistance_hint(branch_id)
 	_refresh_fov()
+
+func _spawn_abyss_floor(depth: int) -> void:
+	_abyss_turn_counter = 0
+	# Remove up stairs — no escape from the Abyss
+	for y in range(DungeonMap.GRID_H):
+		for x in range(DungeonMap.GRID_W):
+			var p := Vector2i(x, y)
+			if map.tile_at(p) == DungeonMap.Tile.STAIRS_UP:
+				map.set_tile(p, DungeonMap.Tile.FLOOR)
+	CombatLog.post("The Abyss warps around you. There is no way back.", Color(0.6, 0.3, 0.9))
+	# Spawn monsters — all immediately aware
+	var count: int = _monster_count_for_depth(depth) + 2
+	var rng := RandomNumberGenerator.new()
+	rng.seed = _floor_seed(depth) ^ 0xAB155001
+	var placed: int = 0
+	var attempts: int = 0
+	while placed < count and attempts < 800:
+		attempts += 1
+		var p: Vector2i = map.random_floor_tile(rng)
+		if not map.is_walkable(p): continue
+		if p == player.grid_pos: continue
+		if _chebyshev(p, player.grid_pos) < 4: continue
+		if _monster_at(p) != null: continue
+		var data: MonsterData = MonsterRegistry.pick_by_depth(depth)
+		if data == null: return
+		var m: Monster = MonsterScene.new()
+		monsters_layer.add_child(m)
+		m.setup(data, map, p)
+		m.hit_taken.connect(_on_monster_hit.bind(m))
+		if m.has_signal("awareness_changed"):
+			m.awareness_changed.connect(_on_monster_awareness_changed)
+		m.died.connect(_on_monster_died.bind(m))
+		m.become_aware(player.grid_pos)
+		TurnManager.register_actor(m)
+		placed += 1
+
+func _tick_abyss() -> void:
+	if map == null or player == null:
+		return
+	_abyss_turn_counter += 1
+	if _abyss_turn_counter % _ABYSS_SHIFT_INTERVAL != 0:
+		return
+	# Collect shiftable tiles (floor/wall, not player, not stairs, not monsters)
+	var occupied: Dictionary = {}
+	occupied[player.grid_pos] = true
+	for y in range(DungeonMap.GRID_H):
+		for x in range(DungeonMap.GRID_W):
+			var p := Vector2i(x, y)
+			var t: int = map.tile_at(p)
+			if t == DungeonMap.Tile.STAIRS_DOWN or t == DungeonMap.Tile.STAIRS_UP:
+				occupied[p] = true
+	for node in get_tree().get_nodes_in_group("monsters"):
+		if node is Monster:
+			occupied[(node as Monster).grid_pos] = true
+	var visible_candidates: Array = []
+	var distant_candidates: Array = []
+	for y in range(1, DungeonMap.GRID_H - 1):
+		for x in range(1, DungeonMap.GRID_W - 1):
+			var p := Vector2i(x, y)
+			if occupied.has(p):
+				continue
+			var t: int = map.tile_at(p)
+			if t == DungeonMap.Tile.FLOOR or t == DungeonMap.Tile.WALL:
+				if map.visible_tiles.has(p):
+					visible_candidates.append(p)
+				else:
+					distant_candidates.append(p)
+	visible_candidates.shuffle()
+	distant_candidates.shuffle()
+	# Guarantee at least half the shifts are within the player's view
+	var vis_quota: int = _ABYSS_SHIFT_COUNT / 2
+	var all_candidates: Array = visible_candidates.slice(0, vis_quota) \
+			+ distant_candidates + visible_candidates.slice(vis_quota)
+	var flipped: int = 0
+	for p in all_candidates:
+		if flipped >= _ABYSS_SHIFT_COUNT:
+			break
+		var t: int = map.tile_at(p)
+		map.set_tile(p, DungeonMap.Tile.WALL if t == DungeonMap.Tile.FLOOR else DungeonMap.Tile.FLOOR)
+		map.explored.erase(p)
+		flipped += 1
+	# Move the exit to a new reachable floor tile
+	var new_exit: Vector2i = _abyss_find_new_exit()
+	if new_exit != Vector2i(-1, -1):
+		# Clear old exit
+		for y in range(DungeonMap.GRID_H):
+			for x in range(DungeonMap.GRID_W):
+				if map.tile_at(Vector2i(x, y)) == DungeonMap.Tile.STAIRS_DOWN:
+					map.set_tile(Vector2i(x, y), DungeonMap.Tile.FLOOR)
+		map.stairs_down_pos = new_exit
+		map.set_tile(new_exit, DungeonMap.Tile.STAIRS_DOWN)
+		CombatLog.post("The Abyss shifts... the exit has moved.", Color(0.6, 0.3, 0.9))
+	map.queue_redraw()
+
+func _abyss_find_new_exit() -> Vector2i:
+	# BFS from player to find floor tiles, pick one far away
+	var dist: Dictionary = {player.grid_pos: 0}
+	var frontier: Array[Vector2i] = [player.grid_pos]
+	var far_tiles: Array = []
+	while not frontier.is_empty():
+		var p: Vector2i = frontier.pop_front()
+		var d: int = int(dist[p])
+		if d >= 8:
+			far_tiles.append(p)
+		for step in [Vector2i(1,0),Vector2i(-1,0),Vector2i(0,1),Vector2i(0,-1)]:
+			var n: Vector2i = p + step
+			if dist.has(n): continue
+			if not map.is_walkable(n): continue
+			dist[n] = d + 1
+			frontier.append(n)
+	if far_tiles.is_empty():
+		return Vector2i(-1, -1)
+	return far_tiles[randi() % far_tiles.size()]
+
+func _spawn_branch_monsters(branch_id: String, eff_depth: int) -> void:
+	var count: int = _monster_count_for_depth(eff_depth)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = _floor_seed(eff_depth) ^ 0xBBAACC11
+	var placed: int = 0
+	var attempts: int = 0
+	while placed < count and attempts < 800:
+		attempts += 1
+		var p: Vector2i = map.random_floor_tile(rng)
+		if not map.is_walkable(p): continue
+		if p == player.grid_pos: continue
+		if _chebyshev(p, player.grid_pos) < 3: continue
+		if _monster_at(p) != null: continue
+		var data: MonsterData = MonsterRegistry.pick_by_branch(branch_id, eff_depth)
+		if data == null: return
+		var m: Monster = MonsterScene.new()
+		monsters_layer.add_child(m)
+		m.setup(data, map, p)
+		m.hit_taken.connect(_on_monster_hit.bind(m))
+		if m.has_signal("awareness_changed"):
+			m.awareness_changed.connect(_on_monster_awareness_changed)
+		m.died.connect(_on_monster_died.bind(m))
+		TurnManager.register_actor(m)
+		placed += 1
 
 func _spawn_branch_boss(branch_id: String) -> void:
 	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
@@ -1320,26 +1532,48 @@ func _spawn_branch_boss(branch_id: String) -> void:
 
 func _spawn_branch_resistance_hint(branch_id: String) -> void:
 	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
-	var essence_id: String = String(cfg.get("essence_reward", ""))
-	if essence_id == "":
-		return
-	_queue_essence_pickup(essence_id)
-	CombatLog.post("The environment here is hostile — a protective essence manifests.", Color(0.9, 0.85, 0.4))
+	if FaithSystem.allows_essence(player):
+		var essence_id: String = String(cfg.get("essence_reward", ""))
+		if essence_id != "":
+			_queue_essence_pickup(essence_id)
+			CombatLog.post("The environment here is hostile — a protective essence manifests.", Color(0.9, 0.85, 0.4))
+	else:
+		var ring_id: String = String(cfg.get("resist_ring", ""))
+		if ring_id != "":
+			var ring_data: ItemData = ItemRegistry.get_by_id(ring_id)
+			if ring_data != null:
+				_spawn_floor_item(ring_data, map.spawn_pos + Vector2i(1, 0), 0)
+				CombatLog.post("The environment here is hostile — a protective ring lies nearby.", Color(0.9, 0.85, 0.4))
 
 func _on_branch_boss_died(monster: Monster, branch_id: String) -> void:
 	_on_monster_died(monster)
 	_on_branch_cleared(branch_id)
-	# Place brand scroll reward
 	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
+	# Brand scroll reward
 	var element: String = String(cfg.get("brand_element", ""))
 	var scroll_id: String = "scroll_brand_%s" % element
 	var scroll_data: ItemData = ItemRegistry.get_by_id(scroll_id)
 	if scroll_data != null:
 		_spawn_floor_item(scroll_data, monster.grid_pos, 0)
-	# Place essence reward
-	var essence_id: String = String(cfg.get("essence_reward", ""))
-	if essence_id != "":
-		_queue_essence_pickup(essence_id)
+	# Rune — always dropped near the boss
+	var rune_id: String = String(cfg.get("rune_reward", ""))
+	if rune_id != "":
+		var rune_data: ItemData = ItemRegistry.get_by_id(rune_id)
+		if rune_data != null:
+			_spawn_floor_item(rune_data, monster.grid_pos + Vector2i(1, 0), 0)
+			CombatLog.post("A rune materialises!", Color(1.0, 0.9, 0.3))
+	# Essence or ring depending on faith
+	if FaithSystem.allows_essence(player):
+		var essence_id: String = String(cfg.get("essence_reward", ""))
+		if essence_id != "":
+			_queue_essence_pickup(essence_id)
+	else:
+		var ring_id: String = String(cfg.get("ring_reward", ""))
+		if ring_id != "":
+			var ring_data: ItemData = ItemRegistry.get_by_id(ring_id)
+			if ring_data != null:
+				_spawn_floor_item(ring_data, monster.grid_pos, 0)
+				CombatLog.post("A unique ring appears!", Color(0.8, 0.7, 1.0))
 	# Place stairs back to main
 	map.set_tile(map.stairs_down_pos, DungeonMap.Tile.STAIRS_UP)
 
@@ -1383,9 +1617,18 @@ func _apply_branch_env_damage() -> void:
 
 func _on_dungeon_cleared() -> void:
 	CombatLog.post("You have cleared the dungeon!", Color(1.0, 0.9, 0.2))
-	var score: int = _calc_run_score(true)
 	GameManager.end_run("victory")
-	_show_result_screen(true, score)
+	_show_result_screen(true)
+
+func _count_collected_runes() -> int:
+	if player == null:
+		return 0
+	var count: int = 0
+	for entry in player.items:
+		var d: ItemData = ItemRegistry.get_by_id(String(entry.get("id", "")))
+		if d != null and d.kind == "rune":
+			count += 1
+	return count
 
 func _on_stairs_down() -> void:
 	# Inside a branch — go deeper in branch
@@ -1394,36 +1637,8 @@ func _on_stairs_down() -> void:
 		return
 	_cancel_auto_walk("stairs")
 	_cache_current_floor()
-	# Leaving the pantheon → now descend to B3
-	if GameManager.in_pantheon:
-		GameManager.in_pantheon = false
-		GameManager.descend()  # 2 → 3
-		CombatLog.post("You descend to B%d." % GameManager.depth, Color(0.6, 1.0, 1.0))
-		_clear_monsters()
-		_clear_floor_items()
-		_generate_floor(GameManager.depth, _floor_seed(GameManager.depth), true)
-		RacePassiveSystem.on_floor_changed(player)
-		_center_camera_on_player(true)
-		_update_hud()
-		SaveManager.save_run(player, GameManager)
-		TurnManager.end_player_turn()
-		return
-	# B2 descent with faith not yet chosen → enter pantheon
-	if GameManager.depth == 2 and not player.first_shrine_choice_done:
-		GameManager.in_pantheon = true
-		_clear_monsters()
-		_clear_floor_items()
-		map.generate_pantheon()
-		player.grid_pos = map.find_spawn()
-		player.position = map.grid_to_world(player.grid_pos)
-		RacePassiveSystem.on_floor_changed(player)
-		_center_camera_on_player(true)
-		_update_hud()
-		SaveManager.save_run(player, GameManager)
-		TurnManager.end_player_turn()
-		return
 	GameManager.descend()
-	if GameManager.depth >= 25:
+	if GameManager.depth >= 16:
 		_on_dungeon_cleared()
 		return
 	CombatLog.post("You descend to B%d." % GameManager.depth, Color(0.6, 1.0, 1.0))
@@ -1543,7 +1758,7 @@ func _on_rest_pressed() -> void:
 	var ticks: int = 0
 	while ticks < 100 and (player.hp < player.hp_max or player.mp < player.mp_max) and player.hp > 0:
 		player.wait_turn()
-		TurnManager.end_player_turn(true)
+		TurnManager.end_player_turn(1, true)
 		ticks += 1
 		if _monster_in_sight():
 			CombatLog.post("You stop resting — enemy spotted.", Color(1.0, 0.7, 0.5))
@@ -1782,6 +1997,11 @@ func _on_monster_died(monster: Monster) -> void:
 		player.heal(kill_hp)
 	if kill_mp > 0:
 		player.mp = min(player.mp_max, player.mp + kill_mp)
+	# B3 unique boss death activates the faith altars
+	if GameManager.depth == 3 and not map.altar_active \
+			and monster != null and monster.data != null and monster.data.is_unique:
+		map.activate_altars()
+		CombatLog.post("Ancient power stirs. The altars glow.", Color(0.85, 0.75, 1.0))
 	# Before shrine choice, suppress all essence drops
 	if not player.first_shrine_choice_done:
 		return

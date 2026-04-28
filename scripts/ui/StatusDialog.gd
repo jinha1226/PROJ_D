@@ -128,9 +128,13 @@ static func _build_header(body: VBoxContainer, player: Player) -> void:
 	vb.add_child(sub)
 
 static func _build_vitals(body: VBoxContainer, player: Player) -> void:
-	body.add_child(_kv_row("HP", "%d / %d" % [player.hp, player.hp_max],
+	var hp_regen: int = player.hp_regen_period()
+	var mp_regen: int = player.mp_regen_period()
+	body.add_child(_kv_row("HP",
+		"%d / %d  (+1 / %dt)" % [player.hp, player.hp_max, hp_regen],
 		Color(1.0, 0.55, 0.55)))
-	body.add_child(_kv_row("MP", "%d / %d" % [player.mp, player.mp_max],
+	body.add_child(_kv_row("MP",
+		"%d / %d  (+1 / %dt)" % [player.mp, player.mp_max, mp_regen],
 		Color(0.55, 0.7, 1.0)))
 
 static func _build_faith(body: VBoxContainer, player: Player) -> void:

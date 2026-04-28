@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://jqjoq4h1tm8ab"
-path="res://.godot/imported/haste.png-2d24a8ee55aab062cab6c757de554d72.ctex"
+uid="uid://b0pxk0njo8hqr"
+path="res://.godot/imported/haste.png-157b8fc05fea8b07193e6bd16c3c89ad.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/haste.png"
-dest_files=["res://.godot/imported/haste.png-2d24a8ee55aab062cab6c757de554d72.ctex"]
+dest_files=["res://.godot/imported/haste.png-157b8fc05fea8b07193e6bd16c3c89ad.ctex"]
 
 [params]
 

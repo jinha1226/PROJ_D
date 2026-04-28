@@ -16,6 +16,10 @@ var last_known_player_pos: Vector2i = Vector2i(-1, -1)
 var is_alerted: bool = false
 var is_aware: bool = false
 
+var pending_energy: float = 0.0
+## Telegraphed ability state: {name, tiles, damage, message} — fires next turn
+var _ability_charge: Dictionary = {}
+
 var _map: DungeonMap
 var _tex: Texture2D = null
 var _font: Font
@@ -95,6 +99,11 @@ func die() -> void:
 	emit_signal("died", self)
 	TurnManager.unregister_actor(self)
 	remove_from_group("monsters")
+	if not _ability_charge.is_empty() and _map != null:
+		for t in _ability_charge.get("tiles", []):
+			_map.warning_tiles.erase(t)
+		_map.queue_redraw()
+		_ability_charge = {}
 	# Brief fade-out before freeing
 	var tw := create_tween()
 	tw.tween_property(self, "modulate:a", 0.0, 0.12)

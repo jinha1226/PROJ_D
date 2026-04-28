@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ym9xok7784ptb"
-path="res://.godot/imported/teleport.png-0e6908f5c6bf2057559fc531c17bffc0.ctex"
+uid="uid://bgtp48ppuwhap"
+path="res://.godot/imported/teleport.png-983b8bff220a74868534f40e70f9de12.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/teleport.png"
-dest_files=["res://.godot/imported/teleport.png-0e6908f5c6bf2057559fc531c17bffc0.ctex"]
+dest_files=["res://.godot/imported/teleport.png-983b8bff220a74868534f40e70f9de12.ctex"]
 
 [params]
 

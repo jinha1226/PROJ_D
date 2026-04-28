@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://9em4lkul707tb"
-path="res://.godot/imported/hold_person.png-3bc66dff5490a4a336e40cf7a68c011b.ctex"
+uid="uid://dhd5u4ilpe7q6"
+path="res://.godot/imported/hold_person.png-dc0afc4c2ec0eaffccaaa884151ad249.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/hold_person.png"
-dest_files=["res://.godot/imported/hold_person.png-3bc66dff5490a4a336e40cf7a68c011b.ctex"]
+dest_files=["res://.godot/imported/hold_person.png-dc0afc4c2ec0eaffccaaa884151ad249.ctex"]
 
 [params]
 

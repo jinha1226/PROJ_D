@@ -4,6 +4,7 @@ const GAME_SCENE_PATH: String = "res://scenes/main/Game.tscn"
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 const DEFAULT_BASE_PATH: String = "res://assets/tiles/individual/player/base/human_m.png"
 const FIGHTER_START_WEAPONS: Array = ["short_sword", "mace", "battle_axe", "spear"]
+const RANGER_START_WEAPONS: Array = ["shortbow", "longbow", "crossbow"]
 
 const MAGE_START_SCHOOLS: Array = [
 	{"id": "fire",         "display": "Fire",         "desc": "Scorch, Fireball, Fire Storm — burn everything."},
@@ -16,7 +17,7 @@ const MAGE_START_SCHOOLS: Array = [
 	{"id": "summoning",    "display": "Summoning",    "desc": "Call Imp, Animate Dead, Malign Gateway — allies."},
 ]
 
-const BASE_CLASSES: Array = ["warrior", "mage", "rogue"]
+const BASE_CLASSES: Array = ["warrior", "mage", "rogue", "ranger"]
 const TEST_CLASSES: Array = ["archmage"]
 
 @onready var _scroll: ScrollContainer = $ScrollContainer
@@ -105,7 +106,7 @@ func _make_card(data: ClassData) -> Control:
 
 	var stat_lab := Label.new()
 	stat_lab.text = "HP %d  MP %d   STR %d / DEX %d / INT %d" % [
-		data.starting_hp, data.starting_mp,
+		data.starting_hp + data.starting_str / 2, data.starting_mp,
 		data.starting_str, data.starting_dex, data.starting_int
 	]
 	stat_lab.add_theme_font_size_override("font_size", 18)
@@ -193,6 +194,8 @@ func _starter_extras(class_id: String) -> Array:
 			return ["healing", "magic potion"]
 		"rogue":
 			return ["dagger", "healing", "invisibility", "shrouding"]
+		"ranger":
+			return ["dagger", "healing x2"]
 		"archmage":
 			return ["healing", "magic potion", "identify", "blinking", "fire wand", "frost wand", "lightning wand"]
 	return []
@@ -215,6 +218,9 @@ func _item_name(id: String) -> String:
 func _on_pick(class_id: String) -> void:
 	if class_id == "warrior":
 		_open_fighter_weapon_choice(class_id)
+		return
+	if class_id == "ranger":
+		_open_ranger_weapon_choice(class_id)
 		return
 	if class_id == "mage" or class_id == "archmage":
 		_open_mage_school_choice(class_id)
@@ -247,7 +253,41 @@ func _open_fighter_weapon_choice(class_id: String) -> void:
 		if item == null:
 			continue
 		var btn := Button.new()
-		btn.text = "%s  (d%d)" % [item.display_name.capitalize(), item.damage]
+		btn.text = "%s  (d%d  spd %.1f)" % [item.display_name.capitalize(), item.damage, item.delay]
+		btn.custom_minimum_size = Vector2(0, 68)
+		btn.add_theme_font_size_override("font_size", 26)
+		btn.pressed.connect(func():
+			GameManager.selected_starting_weapon_id = choice_id
+			GameManager.selected_class_id = class_id
+			GameManager.start_new_run()
+			get_tree().change_scene_to_file(GAME_SCENE_PATH))
+		body.add_child(btn)
+		var desc := Label.new()
+		desc.text = item.description
+		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc.add_theme_font_size_override("font_size", 18)
+		desc.add_theme_color_override("font_color", Color(0.72, 0.75, 0.82))
+		body.add_child(desc)
+
+
+func _open_ranger_weapon_choice(class_id: String) -> void:
+	var dlg: GameDialog = GameDialog.create_ratio("Choose Ranger Weapon", 0.86, 0.72)
+	add_child(dlg)
+	var body: VBoxContainer = dlg.body()
+	if body == null:
+		return
+	body.add_theme_constant_override("separation", 10)
+	var intro := Label.new()
+	intro.text = "Pick your starting ranged weapon."
+	intro.add_theme_font_size_override("font_size", 28)
+	body.add_child(intro)
+	for item_id in RANGER_START_WEAPONS:
+		var choice_id: String = item_id
+		var item: ItemData = ItemRegistry.get_by_id(choice_id)
+		if item == null:
+			continue
+		var btn := Button.new()
+		btn.text = "%s  (d%d  spd %.1f)" % [item.display_name.capitalize(), item.damage, item.delay]
 		btn.custom_minimum_size = Vector2(0, 68)
 		btn.add_theme_font_size_override("font_size", 26)
 		btn.pressed.connect(func():

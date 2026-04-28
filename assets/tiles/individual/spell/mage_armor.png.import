@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b7u5vmnb3pcra"
-path="res://.godot/imported/mage_armor.png-be394921607c7989e6c5287cd9db7ae7.ctex"
+path="res://.godot/imported/mage_armor.png-8869051b14b710dee232d0a36c61485e.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/mage_armor.png"
-dest_files=["res://.godot/imported/mage_armor.png-be394921607c7989e6c5287cd9db7ae7.ctex"]
+dest_files=["res://.godot/imported/mage_armor.png-8869051b14b710dee232d0a36c61485e.ctex"]
 
 [params]
 

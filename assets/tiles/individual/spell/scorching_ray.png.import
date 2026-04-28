@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://8srle3j8677fa"
-path="res://.godot/imported/scorching_ray.png-b51325eae55f6d693e2a98f948de42fb.ctex"
+uid="uid://cvimom68ol7c5"
+path="res://.godot/imported/scorching_ray.png-c0c6ace0d8d349bc6ada759f3617771d.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/scorching_ray.png"
-dest_files=["res://.godot/imported/scorching_ray.png-b51325eae55f6d693e2a98f948de42fb.ctex"]
+dest_files=["res://.godot/imported/scorching_ray.png-c0c6ace0d8d349bc6ada759f3617771d.ctex"]
 
 [params]
 

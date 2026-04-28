@@ -4,18 +4,18 @@ extends Node
 
 # ── Main path zones ──────────────────────────────────────────────────────────
 const MAIN_ZONES: Array = [
-	{"id": "dungeon",     "from": 1,  "to": 3,  "env": ""},
-	{"id": "lair",        "from": 4,  "to": 6,  "env": ""},
-	{"id": "orc_mines",   "from": 7,  "to": 9,  "env": ""},
-	{"id": "elven_halls", "from": 10, "to": 12, "env": ""},
-	{"id": "depths",      "from": 13, "to": 15, "env": ""},
-	{"id": "boss",        "from": 16, "to": 16, "env": ""},
+	{"id": "dungeon",     "from": 1,  "to": 3,  "env": "",      "map_style": "bsp"},
+	{"id": "lair",        "from": 4,  "to": 6,  "env": "",      "map_style": "cave"},
+	{"id": "orc_mines",   "from": 7,  "to": 9,  "env": "",      "map_style": "bsp"},
+	{"id": "elven_halls", "from": 10, "to": 13, "env": "",      "map_style": "bsp_large"},
+	{"id": "abyss",       "from": 14, "to": 15, "env": "abyss", "map_style": "cave"},
 ]
 
 # ── Branch configs ───────────────────────────────────────────────────────────
 const BRANCHES: Dictionary = {
 	"swamp": {
 		"display_name": "Swamp",
+		"map_style": "cave",
 		"env": "poison",
 		"entrance_range": [4, 6],
 		"floors": 4,
@@ -23,6 +23,9 @@ const BRANCHES: Dictionary = {
 		"resistance": "poison+",
 		"boss_id": "bog_serpent",
 		"essence_reward": "essence_plague",
+		"ring_reward": "ring_bog",
+		"resist_ring": "ring_poison_resist",
+		"rune_reward": "rune_swamp",
 		"brand_element": "venom",
 		"entrance_tile": "res://assets/tiles/individual/dngn/gateways/enter_swamp.png",
 		"wall": "res://assets/tiles/individual/dngn/wall/wall_vines0.png",
@@ -30,13 +33,17 @@ const BRANCHES: Dictionary = {
 	},
 	"ice_caves": {
 		"display_name": "Ice Caves",
+		"map_style": "cave",
 		"env": "cold",
-		"entrance_range": [7, 12],
+		"entrance_range": [7, 9],
 		"floors": 4,
 		"env_damage": 2,
 		"resistance": "cold+",
 		"boss_id": "glacial_sovereign",
 		"essence_reward": "essence_glacial",
+		"ring_reward": "ring_glacier",
+		"resist_ring": "ring_cold_resist",
+		"rune_reward": "rune_ice",
 		"brand_element": "freezing",
 		"entrance_tile": "res://assets/tiles/individual/dngn/gateways/ice_cave_portal.png",
 		"wall": "res://assets/tiles/individual/dngn/wall/ice_wall0.png",
@@ -44,13 +51,17 @@ const BRANCHES: Dictionary = {
 	},
 	"infernal": {
 		"display_name": "Infernal",
+		"map_style": "bsp_large",
 		"env": "fire",
-		"entrance_range": [10, 15],
+		"entrance_range": [10, 12],
 		"floors": 4,
 		"env_damage": 2,
 		"resistance": "fire+",
 		"boss_id": "ember_tyrant",
 		"essence_reward": "essence_infernal",
+		"ring_reward": "ring_ember",
+		"resist_ring": "ring_fire_resist",
+		"rune_reward": "rune_infernal",
 		"brand_element": "flaming",
 		"entrance_tile": "res://assets/tiles/individual/dngn/gateways/enter_hell1.png",
 		"wall": "res://assets/tiles/individual/dngn/wall/volcanic_wall0.png",
@@ -58,6 +69,7 @@ const BRANCHES: Dictionary = {
 	},
 	"crypt": {
 		"display_name": "Crypt",
+		"map_style": "crypt",
 		"env": "necro",
 		"entrance_range": [13, 15],
 		"floors": 4,
@@ -65,6 +77,9 @@ const BRANCHES: Dictionary = {
 		"resistance": "necro+",
 		"boss_id": "ancient_lich",
 		"essence_reward": "essence_undeath",
+		"ring_reward": "ring_undeath",
+		"resist_ring": "ring_necro_resist",
+		"rune_reward": "rune_crypt",
 		"brand_element": "drain",
 		"entrance_tile": "res://assets/tiles/individual/dngn/gateways/necropolis_portal.png",
 		"wall": "res://assets/tiles/individual/dngn/wall/wall_stone_necropolis_1.png",
@@ -117,6 +132,43 @@ func branch_effective_depth(branch_id: String, branch_floor: int) -> int:
 		return 8
 	var mid: int = (int(cfg["entrance_range"][0]) + int(cfg["entrance_range"][1])) / 2
 	return mid + branch_floor
+
+# ── Branch monster pools (DCSS-sourced) ─────────────────────────────────────
+# Monsters are listed roughly weakest-to-strongest within each pool.
+const BRANCH_MONSTER_POOLS: Dictionary = {
+	"swamp": [
+		# weak
+		"adder", "vampire_bat", "giant_wolf_spider", "scorpion",
+		# mid
+		"zombie", "crypt_zombie", "ghoul", "wight", "phantom", "revenant",
+		# strong
+		"vampire", "swamp_dragon", "wyvern",
+	],
+	"ice_caves": [
+		# weak
+		"yak", "wight", "crypt_zombie", "gargoyle",
+		# mid
+		"wraith", "shadow_wraith", "stone_giant",
+		# strong
+		"frost_giant", "ice_devil", "ice_dragon", "titan",
+	],
+	"infernal": [
+		# weak
+		"crimson_imp", "fire_elemental",
+		# mid
+		"red_devil", "iron_golem",
+		# strong
+		"balrug", "fire_giant", "fire_dragon", "executioner",
+	],
+	"crypt": [
+		# weak
+		"zombie", "crypt_zombie", "skeletal_warrior", "mummy", "phantom",
+		# mid
+		"ghoul", "wight", "wraith", "shadow_wraith", "revenant", "skeletal_warrior",
+		# strong
+		"vampire", "vampire_knight", "lich", "deep_elf_death_mage", "bone_dragon",
+	],
+}
 
 # Rune bonus for clearing a branch.
 const BRANCH_CLEAR_RUNES: int = 35

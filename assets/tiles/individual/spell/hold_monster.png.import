@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://tdc6xw2ydg52a"
-path="res://.godot/imported/hold_monster.png-09163dee49df5f99b9e5e7a3a6beb6c8.ctex"
+uid="uid://dvpplpex3nn07"
+path="res://.godot/imported/hold_monster.png-147fa03cfd7a017d04052f4885a75d48.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/hold_monster.png"
-dest_files=["res://.godot/imported/hold_monster.png-09163dee49df5f99b9e5e7a3a6beb6c8.ctex"]
+dest_files=["res://.godot/imported/hold_monster.png-147fa03cfd7a017d04052f4885a75d48.ctex"]
 
 [params]
 

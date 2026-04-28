@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://m7bbed5tvw60b"
-path="res://.godot/imported/sleep.png-844650f2fd513b3efc4d6db973d6b4ec.ctex"
+uid="uid://bl2ol7e27ckp0"
+path="res://.godot/imported/sleep.png-b9aecd09749f0284c539a275cb4366b6.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/sleep.png"
-dest_files=["res://.godot/imported/sleep.png-844650f2fd513b3efc4d6db973d6b4ec.ctex"]
+dest_files=["res://.godot/imported/sleep.png-b9aecd09749f0284c539a275cb4366b6.ctex"]
 
 [params]
 

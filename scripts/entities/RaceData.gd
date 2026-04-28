@@ -26,6 +26,10 @@ class_name RaceData extends Resource
 ## Format: Status.gd — ["fire+", "cold++", "necromancy+"], etc.
 @export var resist_mods: Array = []
 
+## Skill aptitudes: skill_id -> int (-3..+3). Positive = trains faster.
+## XP multiplier: pow(1.2, apt). apt+2 ≈ 1.44x, apt-2 ≈ 0.69x.
+@export var skill_aptitudes: Dictionary = {}
+
 ## Passive ability id. Looked up by RacePassiveSystem on game start.
 @export var passive_id: String = ""
 

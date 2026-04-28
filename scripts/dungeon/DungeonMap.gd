@@ -51,6 +51,7 @@ const TERRAIN_BANDS: Array = [
 var _tex_wall: Texture2D = null
 var _tex_floor: Texture2D = null
 var _tex_branch_entrance: Texture2D = null
+var _tex_stairs_down_override: Texture2D = null
 
 var tiles: PackedByteArray = PackedByteArray()
 var visible_tiles: Dictionary = {}
@@ -62,8 +63,25 @@ var spawn_pos: Vector2i = Vector2i(1, 1)
 var stairs_down_pos: Vector2i = Vector2i(1, 1)
 var stairs_up_pos: Vector2i = Vector2i(1, 1)
 var rooms: Array[Rect2i] = []
-## pantheon altar map: Vector2i → faith_id String
+## faith altar map: Vector2i → faith_id String (B3 ruined temple)
 var altar_map: Dictionary = {}
+## decorative broken DCSS altars on B3 (always dim, never interactive)
+var broken_altar_positions: Array = []
+## true after B3 unique boss dies — faith altars become interactive
+var altar_active: bool = false
+
+## Warning tiles from telegraphed boss attacks: Vector2i -> Color
+var warning_tiles: Dictionary = {}
+
+func set_warning(pos: Vector2i, color: Color) -> void:
+	warning_tiles[pos] = color
+	queue_redraw()
+
+func clear_warnings() -> void:
+	if warning_tiles.is_empty():
+		return
+	warning_tiles.clear()
+	queue_redraw()
 
 const ALTAR_TEXTURES: Dictionary = {
 	"war":      "res://assets/tiles/individual/dngn/altars/trog.png",
@@ -127,32 +145,24 @@ func grid_to_world(p: Vector2i) -> Vector2:
 func world_to_grid(w: Vector2) -> Vector2i:
 	return Vector2i(int(floor(w.x / CELL_SIZE)), int(floor(w.y / CELL_SIZE)))
 
-func generate(map_seed: int = -1, branch_entrance: bool = false) -> void:
-	var result: Dictionary = MapGen.generate(GRID_W, GRID_H, map_seed, branch_entrance)
+func generate(map_seed: int = -1, branch_entrance: bool = false, style: String = "bsp") -> void:
+	var result: Dictionary = MapGen.generate_styled(GRID_W, GRID_H, map_seed, style, branch_entrance)
 	tiles = result["tiles"]
 	spawn_pos = result["spawn"]
 	stairs_down_pos = result["stairs_down"]
 	stairs_up_pos = result["stairs_up"]
 	rooms = result["rooms"]
+	altar_map.clear()
+	broken_altar_positions.clear()
+	altar_active = false
 	visible_tiles.clear()
 	explored.clear()
 	fog_tiles.clear()
 	_load_atmosphere(GameManager.depth)
 	queue_redraw()
 
-func generate_pantheon() -> void:
-	var result: Dictionary = MapGen.generate_pantheon(GRID_W, GRID_H)
-	tiles = result["tiles"]
-	spawn_pos = result["spawn"]
-	stairs_down_pos = result["stairs_down"]
-	stairs_up_pos = result["stairs_up"]
-	rooms = result["rooms"]
-	altar_map = result.get("altar_map", {})
-	visible_tiles.clear()
-	explored.clear()
-	fog_tiles.clear()
-	_tex_wall = load("res://assets/tiles/individual/dngn/wall/shrine_stone_wall0.png") as Texture2D
-	_tex_floor = load("res://assets/tiles/individual/dngn/floor/white_marble0.png") as Texture2D
+func activate_altars() -> void:
+	altar_active = true
 	queue_redraw()
 
 func _ready() -> void:
@@ -161,6 +171,18 @@ func _ready() -> void:
 	_tex_door_open = load("res://assets/tiles/individual/dngn/doors/open_door.png") as Texture2D
 
 func _load_atmosphere(depth: int) -> void:
+	# B3 is a ruined temple — distinct marble/mosaic tileset
+	if depth == 3:
+		_tex_wall = load("res://assets/tiles/individual/dngn/wall/marble_wall1.png") as Texture2D
+		_tex_floor = load("res://assets/tiles/individual/dngn/floor/mosaic0.png") as Texture2D
+		return
+	# Abyss zone (B14-15) — dark cracked stone
+	if ZoneManager.zone_id_for_depth(depth) == "abyss":
+		_tex_wall = load("res://assets/tiles/individual/dngn/wall/abyss/abyss0.png") as Texture2D
+		_tex_floor = load("res://assets/tiles/individual/dngn/floor/depthstone_floor0.png") as Texture2D
+		_tex_stairs_down_override = load("res://assets/tiles/individual/dngn/gateways/exit_abyss.png") as Texture2D
+		return
+	_tex_stairs_down_override = null
 	for band in TERRAIN_BANDS:
 		if depth <= int(band.get("until_depth", 0)):
 			_tex_wall = load(band["wall"]) as Texture2D
@@ -228,7 +250,33 @@ func _draw() -> void:
 				Vector2(x * CELL_SIZE + 6, y * CELL_SIZE + CELL_SIZE - 6),
 				glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6, glyph_color)
 
-	# Altar overlays
+	# Broken decorative altars — always dim regardless of altar_active
+	for bpos in broken_altar_positions:
+		var is_vis: bool = reveal_all or visible_tiles.has(bpos)
+		var was_explored: bool = reveal_all or explored.has(bpos)
+		if not is_vis and not was_explored:
+			continue
+		var btex: Texture2D = _broken_altar_tex_at(bpos)
+		if btex == null:
+			continue
+		var bmod: Color = Color(0.38, 0.35, 0.32) if (reveal_all or visible_tiles.has(bpos)) else Color(0.22, 0.20, 0.18)
+		var brect := Rect2(Vector2(bpos.x * CELL_SIZE, bpos.y * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE))
+		if use_tiles:
+			draw_texture_rect(btex, brect, false, bmod)
+		else:
+			draw_string(ThemeDB.fallback_font,
+				Vector2(bpos.x * CELL_SIZE + 6, bpos.y * CELL_SIZE + CELL_SIZE - 6),
+				"_", HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6, bmod)
+
+	# Warning tiles for telegraphed boss attacks
+	for wpos in warning_tiles:
+		if not (reveal_all or visible_tiles.has(wpos)):
+			continue
+		var wrect := Rect2(Vector2(wpos.x * CELL_SIZE, wpos.y * CELL_SIZE),
+				Vector2(CELL_SIZE, CELL_SIZE))
+		draw_rect(wrect, warning_tiles[wpos])
+
+	# Faith altars — dim until boss dies, bright once altar_active
 	for apos in altar_map.keys():
 		var is_vis: bool = reveal_all or visible_tiles.has(apos)
 		var was_explored: bool = reveal_all or explored.has(apos)
@@ -241,15 +289,24 @@ func _draw() -> void:
 		var atex: Texture2D = load(path) as Texture2D
 		if atex == null:
 			continue
-		var mod: Color = Color.WHITE if (reveal_all or visible_tiles.has(apos)) else Color(0.45, 0.45, 0.55)
+		var bright_vis: bool = altar_active and (reveal_all or visible_tiles.has(apos))
+		var mod: Color
+		if bright_vis:
+			mod = Color.WHITE
+		elif altar_active:
+			mod = Color(0.45, 0.45, 0.55)
+		else:
+			mod = Color(0.30, 0.28, 0.35)  # inactive: very dim
 		var arect := Rect2(Vector2(apos.x * CELL_SIZE, apos.y * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE))
 		if use_tiles:
 			draw_texture_rect(atex, arect, false, mod)
 		else:
+			var glyph_col: Color = FaithSystem.color_of(faith_id)
+			if not altar_active:
+				glyph_col = glyph_col * Color(0.4, 0.4, 0.4)
 			draw_string(ThemeDB.fallback_font,
 				Vector2(apos.x * CELL_SIZE + 6, apos.y * CELL_SIZE + CELL_SIZE - 6),
-				"_", HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6,
-				FaithSystem.color_of(faith_id) * mod)
+				"_", HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6, glyph_col)
 
 	# Fog overlay on visible fog tiles
 	for fp in fog_tiles.keys():
@@ -267,7 +324,7 @@ func _texture_for(t: int) -> Texture2D:
 		Tile.STAIRS_UP:
 			return TEX_STAIRS_UP
 		Tile.STAIRS_DOWN:
-			return TEX_STAIRS_DOWN
+			return _tex_stairs_down_override if _tex_stairs_down_override != null else TEX_STAIRS_DOWN
 		Tile.DOOR_CLOSED:
 			return _tex_door_closed
 		Tile.DOOR_OPEN:
@@ -311,3 +368,28 @@ func _glyph_color_for(t: int) -> Color:
 		Tile.BRANCH_DOWN:
 			return Color(0.4, 1.0, 0.6)
 	return Color.WHITE
+
+const _BROKEN_ALTAR_PATHS: Array = [
+	"res://assets/tiles/individual/dngn/altars/ashenzari.png",
+	"res://assets/tiles/individual/dngn/altars/beogh.png",
+	"res://assets/tiles/individual/dngn/altars/cheibriados.png",
+	"res://assets/tiles/individual/dngn/altars/elyvilon.png",
+	"res://assets/tiles/individual/dngn/altars/fedhas.png",
+	"res://assets/tiles/individual/dngn/altars/gozag0.png",
+	"res://assets/tiles/individual/dngn/altars/ru.png",
+	"res://assets/tiles/individual/dngn/altars/shining_one.png",
+	"res://assets/tiles/individual/dngn/altars/uskayaw.png",
+	"res://assets/tiles/individual/dngn/altars/vehumet1.png",
+	"res://assets/tiles/individual/dngn/altars/xom0.png",
+	"res://assets/tiles/individual/dngn/altars/zin1.png",
+]
+var _broken_altar_tex_cache: Dictionary = {}
+
+func _broken_altar_tex_at(pos: Vector2i) -> Texture2D:
+	if _broken_altar_tex_cache.has(pos):
+		return _broken_altar_tex_cache[pos]
+	var idx: int = (pos.x * 31 + pos.y * 17) % _BROKEN_ALTAR_PATHS.size()
+	var path: String = _BROKEN_ALTAR_PATHS[idx]
+	var tex: Texture2D = load(path) as Texture2D
+	_broken_altar_tex_cache[pos] = tex
+	return tex

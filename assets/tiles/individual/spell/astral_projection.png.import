@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://kv6o3dp09a7ob"
-path="res://.godot/imported/astral_projection.png-59036787565654aac49e9275fd86aa93.ctex"
+uid="uid://c6dxv8vi4vg5r"
+path="res://.godot/imported/astral_projection.png-f47bfad9fd5986e6c9090c60bec7c968.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/astral_projection.png"
-dest_files=["res://.godot/imported/astral_projection.png-59036787565654aac49e9275fd86aa93.ctex"]
+dest_files=["res://.godot/imported/astral_projection.png-f47bfad9fd5986e6c9090c60bec7c968.ctex"]
 
 [params]
 

@@ -10,7 +10,6 @@ const FAITHS: Dictionary = {
 		"melee_damage_mult": 1.10,
 		"defense_effectiveness_mult": 1.20,
 		"shield_block_bonus": 0.08,
-		"injury_mult": 0.80,
 		"magic_xp_mult": 0.75,
 		"spell_cost_mult": 1.20,
 	},

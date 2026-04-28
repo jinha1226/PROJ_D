@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ns0k5be8dkimb"
-path="res://.godot/imported/mass_suggestion.png-2e6004903a9c536abfa9caf7dc8f014a.ctex"
+uid="uid://b7ryd4nhnxvc0"
+path="res://.godot/imported/mass_suggestion.png-55e68d54c75e2dcc69fbbb0ddee6e718.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/mass_suggestion.png"
-dest_files=["res://.godot/imported/mass_suggestion.png-2e6004903a9c536abfa9caf7dc8f014a.ctex"]
+dest_files=["res://.godot/imported/mass_suggestion.png-55e68d54c75e2dcc69fbbb0ddee6e718.ctex"]
 
 [params]
 

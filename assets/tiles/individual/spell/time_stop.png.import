@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://lbxgnfrtao5cb"
-path="res://.godot/imported/time_stop.png-89a0acd4568fc58acefa77cb8a2f774e.ctex"
+uid="uid://dk4phbxb5besr"
+path="res://.godot/imported/time_stop.png-40b5c5820d5f54b8ee85c3070a143f2c.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/time_stop.png"
-dest_files=["res://.godot/imported/time_stop.png-89a0acd4568fc58acefa77cb8a2f774e.ctex"]
+dest_files=["res://.godot/imported/time_stop.png-40b5c5820d5f54b8ee85c3070a143f2c.ctex"]
 
 [params]
 

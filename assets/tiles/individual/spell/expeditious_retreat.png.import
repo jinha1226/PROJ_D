@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://gbveldm21uqaa"
-path="res://.godot/imported/expeditious_retreat.png-5ac29789891a29e8dcda0db5e1a07d29.ctex"
+uid="uid://cghi0bpthnuii"
+path="res://.godot/imported/expeditious_retreat.png-d1ce014a17e374afd6e6ab04ce97eccb.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/expeditious_retreat.png"
-dest_files=["res://.godot/imported/expeditious_retreat.png-5ac29789891a29e8dcda0db5e1a07d29.ctex"]
+dest_files=["res://.godot/imported/expeditious_retreat.png-d1ce014a17e374afd6e6ab04ce97eccb.ctex"]
 
 [params]
 

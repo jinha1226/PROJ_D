@@ -18,6 +18,7 @@ brand = ""
 required_skill = 4
 ac_bonus = 5
 ev_penalty = 2
+encumbrance = 12
 slot = "body"
 effect = ""
 effect_value = 0

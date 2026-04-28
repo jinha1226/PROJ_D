@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://89w6ommnpt0ga"
-path="res://.godot/imported/polymorph.png-53a381dd30191aa79041e9697e56a57c.ctex"
+uid="uid://ddn7x6am670d5"
+path="res://.godot/imported/polymorph.png-43508b68db7cbe781152173e7e87d5d1.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/polymorph.png"
-dest_files=["res://.godot/imported/polymorph.png-53a381dd30191aa79041e9697e56a57c.ctex"]
+dest_files=["res://.godot/imported/polymorph.png-43508b68db7cbe781152173e7e87d5d1.ctex"]
 
 [params]
 

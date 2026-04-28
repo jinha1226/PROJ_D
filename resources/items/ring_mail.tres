@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://ring_mail_001"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "ring_mail"
+display_name = "ring mail"
+kind = "armor"
+tier = 2
+tile_path = "res://assets/tiles/individual/item/armour/ring_mail1.png"
+glyph = "["
+glyph_color = Color(0.7, 0.78, 0.72, 1)
+damage = 0
+delay = 1.0
+category = ""
+brand = ""
+required_skill = 0
+ac_bonus = 4
+ev_penalty = 0
+encumbrance = 8
+slot = "body"
+effect = ""
+effect_value = 0
+plus = 0
+description = "Interlocking metal rings. More protection than leather with minimal spell penalty."

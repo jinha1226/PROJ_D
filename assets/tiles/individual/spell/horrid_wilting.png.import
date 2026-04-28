@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://6gq68ep1vpx1a"
-path="res://.godot/imported/horrid_wilting.png-d07118efda969b384e480c5339ef1a2a.ctex"
+uid="uid://jh8ixd1d3xx5"
+path="res://.godot/imported/horrid_wilting.png-b7bce40e5157ae07d6e82afccbb54f13.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/horrid_wilting.png"
-dest_files=["res://.godot/imported/horrid_wilting.png-d07118efda969b384e480c5339ef1a2a.ctex"]
+dest_files=["res://.godot/imported/horrid_wilting.png-b7bce40e5157ae07d6e82afccbb54f13.ctex"]
 
 [params]
 

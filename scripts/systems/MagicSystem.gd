@@ -282,11 +282,18 @@ static func _cast_prismatic(spell: SpellData, player: Player, power: int, game: 
 
 
 static func _armor_spell_mult(player: Player) -> float:
-	match player.equipped_armor_id:
-		"robe", "": return 1.0
-		"leather_armor": return 0.85
-		"chain_mail": return 0.65
-		_: return 0.5
+	# Robe amplifies spell power slightly; other armors use encumbrance formula.
+	# defense skill reduces effective encumbrance before the penalty is applied.
+	if player.equipped_armor_id == "robe":
+		return 1.1
+	if player.equipped_armor_id == "":
+		return 1.0
+	var item: ItemData = player.ItemRegistry.get_by_id(player.equipped_armor_id)
+	if item == null:
+		return 1.0
+	var enc: int = item.encumbrance
+	var def_skill: int = player.get_skill_level("defense")
+	return maxf(0.5, 1.0 - max(0, enc - def_skill) * 0.03)
 
 
 static func _compute_power(player: Player, spell: SpellData) -> int:

@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://z4kg01gd40osa"
-path="res://.godot/imported/vampiric_touch.png-98c7e40ad3d04587f0a9ad9a0a1de5c0.ctex"
+uid="uid://cw38howuqsf8o"
+path="res://.godot/imported/vampiric_touch.png-c8300defb33687a8d65fb2ddcb7cffcd.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/vampiric_touch.png"
-dest_files=["res://.godot/imported/vampiric_touch.png-98c7e40ad3d04587f0a9ad9a0a1de5c0.ctex"]
+dest_files=["res://.godot/imported/vampiric_touch.png-c8300defb33687a8d65fb2ddcb7cffcd.ctex"]
 
 [params]
 

@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://x7rb215fwjd6a"
-path="res://.godot/imported/finger_of_death.png-c9e4fcf47e54b709830d1c66ac6e1a5b.ctex"
+uid="uid://1b3jpmwjb4mo"
+path="res://.godot/imported/finger_of_death.png-6edcacda14ad669cc59094c2caf64c37.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/tiles/individual/spell/finger_of_death.png"
-dest_files=["res://.godot/imported/finger_of_death.png-c9e4fcf47e54b709830d1c66ac6e1a5b.ctex"]
+dest_files=["res://.godot/imported/finger_of_death.png-6edcacda14ad669cc59094c2caf64c37.ctex"]
 
 [params]
 
