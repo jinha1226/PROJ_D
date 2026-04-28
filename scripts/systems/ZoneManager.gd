@@ -7,8 +7,8 @@ const MAIN_ZONES: Array = [
 	{"id": "dungeon",     "from": 1,  "to": 3,  "env": "",      "map_style": "bsp"},
 	{"id": "lair",        "from": 4,  "to": 6,  "env": "",      "map_style": "cave"},
 	{"id": "orc_mines",   "from": 7,  "to": 9,  "env": "",      "map_style": "bsp"},
-	{"id": "elven_halls", "from": 10, "to": 13, "env": "",      "map_style": "bsp_large"},
-	{"id": "abyss",       "from": 14, "to": 15, "env": "abyss", "map_style": "cave"},
+	{"id": "elven_halls", "from": 10, "to": 12, "env": "",      "map_style": "bsp_large"},
+	{"id": "abyss",       "from": 13, "to": 14, "env": "abyss", "map_style": "cave"},
 ]
 
 # ── Branch configs ───────────────────────────────────────────────────────────

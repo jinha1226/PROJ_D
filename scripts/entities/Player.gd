@@ -56,6 +56,7 @@ var _hand2_doll_tex: Texture2D = null
 
 var hp: int = 22
 var hp_max: int = 22
+var _dead: bool = false
 var mp: int = 5
 var mp_max: int = 6
 var ac: int = 0
@@ -722,7 +723,8 @@ func take_damage(amount: int, source: String = "") -> void:
 		last_killer = source
 	emit_signal("damaged", amount)
 	emit_signal("stats_changed")
-	if hp <= 0:
+	if hp <= 0 and not _dead:
+		_dead = true
 		emit_signal("died")
 
 
