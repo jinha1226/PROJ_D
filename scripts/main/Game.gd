@@ -10,6 +10,28 @@ const ResultScreenScene = preload("res://scenes/ui/ResultScreen.tscn")
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 const RACE_SELECT_PATH: String = "res://scenes/menu/RaceSelect.tscn"
 
+# Monster weapon pools: monster_id -> [normal_weapons], rare_brands (5% chance)
+const _MONSTER_WEAPON_POOLS: Dictionary = {
+	"kobold":          [["dagger", "short_sword"],           ["venom_dagger"]],
+	"hobgoblin":       [["dagger", "short_sword", "mace"],   []],
+	"orc":             [["short_sword", "mace", "spear"],    ["flaming_sword"]],
+	"orc_warrior":     [["short_sword", "long_sword", "mace", "spear"], ["flaming_sword", "shock_mace"]],
+	"orc_priest":      [["mace", "staff"],                   ["shock_mace"]],
+	"orc_wizard":      [["staff"],                           []],
+	"orc_warchief":    [["long_sword", "battle_axe"],        ["flaming_sword"]],
+	"gnoll":           [["short_sword", "spear"],            []],
+	"gnoll_sergeant":  [["long_sword", "spear", "mace"],     ["flaming_sword"]],
+	"gnoll_shaman":    [["staff"],                           []],
+	"gnoll_warlord":   [["battle_axe", "long_sword"],        ["flaming_sword"]],
+	"minotaur":        [["battle_axe"],                      ["flaming_sword"]],
+	"skeletal_warrior":[["long_sword", "mace"],              ["frost_dagger"]],
+	"vampire_knight":  [["long_sword", "arming_sword"],      ["flaming_sword"]],
+	"harrow_knight":   [["long_sword", "arming_sword"],      ["frost_dagger"]],
+	"deep_elf_archer": [["shortbow"],                        ["longbow"]],
+	"cyclops":         [["battle_axe"],                      []],
+	"two_headed_ogre": [["battle_axe", "long_sword"],        []],
+}
+
 @onready var GameManager = get_node("/root/GameManager")
 @onready var TurnManager = get_node("/root/TurnManager")
 @onready var CombatLog = get_node("/root/CombatLog")
@@ -834,6 +856,7 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
+	_roll_monster_weapon(m)
 
 func _spawn_unique_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
 	var unique_data: MonsterData = MonsterRegistry.unique_for_depth(depth)
@@ -864,6 +887,7 @@ func _spawn_unique_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
 			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
+	_roll_monster_weapon(m)
 		CombatLog.post("A dangerous presence lurks on this floor...", Color(1.0, 0.75, 0.3))
 		return
 
@@ -896,6 +920,7 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
+	_roll_monster_weapon(m)
 		placed += 1
 
 func _spawn_items_for_floor(depth: int) -> void:
@@ -990,6 +1015,22 @@ func spawn_ally(monster_id: String, near_pos: Vector2i, turns: int) -> bool:
 	TurnManager.register_actor(m)
 	map.queue_redraw()
 	return true
+
+func _roll_monster_weapon(monster: Monster) -> void:
+	if monster.data == null:
+		return
+	var pool_entry = _MONSTER_WEAPON_POOLS.get(monster.data.id, null)
+	if pool_entry == null:
+		return
+	var normal_pool: Array = pool_entry[0]
+	var rare_pool: Array = pool_entry[1]
+	# 5% chance for branded/rare weapon
+	var weapon_id: String = ""
+	if not rare_pool.is_empty() and randf() < 0.05:
+		weapon_id = rare_pool[randi() % rare_pool.size()]
+	elif not normal_pool.is_empty():
+		weapon_id = normal_pool[randi() % normal_pool.size()]
+	monster.equipped_weapon_id = weapon_id
 
 func _spawn_floor_item(data: ItemData, pos: Vector2i, plus: int) -> void:
 	if items_layer == null:
@@ -1211,6 +1252,7 @@ func _try_respawn_monster() -> void:
 			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
+	_roll_monster_weapon(m)
 		return
 
 func _on_player_died() -> void:
@@ -1381,6 +1423,7 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 				m.awareness_changed.connect(_on_monster_awareness_changed)
 			m.died.connect(_on_monster_died.bind(m))
 			TurnManager.register_actor(m)
+	_roll_monster_weapon(m)
 		for entry in state.get("items", []):
 			var d: ItemData = ItemRegistry.get_by_id(String(entry.get("id", "")))
 			if d == null: continue
@@ -1443,6 +1486,7 @@ func _spawn_abyss_floor(depth: int) -> void:
 		m.died.connect(_on_monster_died.bind(m))
 		m.become_aware(player.grid_pos)
 		TurnManager.register_actor(m)
+	_roll_monster_weapon(m)
 		placed += 1
 
 func _tick_abyss() -> void:
@@ -1546,6 +1590,7 @@ func _spawn_branch_monsters(branch_id: String, eff_depth: int) -> void:
 			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
+	_roll_monster_weapon(m)
 		placed += 1
 
 func _spawn_branch_boss(branch_id: String) -> void:
@@ -1570,6 +1615,7 @@ func _spawn_branch_boss(branch_id: String) -> void:
 		m.awareness_changed.connect(_on_monster_awareness_changed)
 	m.died.connect(_on_branch_boss_died.bind(m, branch_id))
 	TurnManager.register_actor(m)
+	_roll_monster_weapon(m)
 	CombatLog.post("A powerful presence fills the chamber...", Color(1.0, 0.5, 0.2))
 
 func _spawn_branch_resistance_hint(branch_id: String) -> void:
@@ -2035,6 +2081,11 @@ func _on_monster_died(monster: Monster) -> void:
 	# Allies don't give XP or drops
 	if monster != null and monster.is_ally:
 		return
+	# Drop equipped weapon
+	if monster != null and monster.equipped_weapon_id != "":
+		var wdata: ItemData = ItemRegistry.get_by_id(monster.equipped_weapon_id)
+		if wdata != null:
+			_spawn_floor_item(wdata, monster.grid_pos, 0)
 	# Leave a corpse (non-unique only)
 	if monster != null and monster.data != null and not monster.data.is_unique:
 		map.corpses.append({

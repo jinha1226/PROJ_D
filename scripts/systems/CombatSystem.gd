@@ -368,6 +368,11 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	if not monster.data.attacks.is_empty():
 		attack = monster.data.attacks[0]
 	var dmg_base: int = int(attack.get("damage", 1))
+	# Weapon bonus: if monster carries a weapon, add its damage
+	if monster.equipped_weapon_id != "":
+		var witem: ItemData = ItemRegistry.get_by_id(monster.equipped_weapon_id)
+		if witem != null:
+			dmg_base += witem.damage / 2
 
 	var eff_ev: int = player.ev + (3 if Status.has(player, "blur") else 0)
 	# DCSS monster to-hit: random2(15 + hd + 1)

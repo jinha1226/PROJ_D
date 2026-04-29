@@ -1,22 +1,33 @@
 extends Node2D
 class_name PathOverlay
 
-## Draws a translucent trail on the current _auto_path tiles.
+## Draws DCSS-style directional footprint tiles along the auto-travel path.
 
 var path: Array = []
 const CELL := DungeonMap.CELL_SIZE
-const DOT_COLOR := Color(0.85, 0.85, 0.85, 0.10)
-const LINE_COLOR := Color(0.9, 0.9, 0.9, 0.30)
-const HEAD_COLOR := Color(0.8, 0.9, 1.0, 0.55)
-const GOAL_COLOR := Color(0.8, 0.9, 1.0, 0.55)
-const DOT_INSET := 8.0
-const LINE_WIDTH := 2.0
 
-func _tile_center(tile: Vector2i) -> Vector2:
-	return Vector2(
-		tile.x * CELL + CELL * 0.5,
-		tile.y * CELL + CELL * 0.5
-	)
+# DCSS direction index: 1=N 2=NE 3=E 4=SE 5=S 6=SW 7=W 8=NW
+const DIR_TO_IDX: Dictionary = {
+	Vector2i( 0, -1): 1,
+	Vector2i( 1, -1): 2,
+	Vector2i( 1,  0): 3,
+	Vector2i( 1,  1): 4,
+	Vector2i( 0,  1): 5,
+	Vector2i(-1,  1): 6,
+	Vector2i(-1,  0): 7,
+	Vector2i(-1, -1): 8,
+}
+
+const BASE := "res://assets/tiles/individual/dngn/path/"
+const CURSOR_TEX := BASE + "cursor.png"
+
+var _from_texs: Array = []
+var _cursor_tex: Texture2D = null
+
+func _ready() -> void:
+	for i in range(1, 9):
+		_from_texs.append(load(BASE + "travel_path_from%d.png" % i) as Texture2D)
+	_cursor_tex = load(CURSOR_TEX) as Texture2D
 
 func set_path(new_path: Array) -> void:
 	path = new_path
@@ -25,15 +36,21 @@ func set_path(new_path: Array) -> void:
 func _draw() -> void:
 	if path.is_empty():
 		return
-	var centers: PackedVector2Array = PackedVector2Array()
-	for tile in path:
-		var wx: float = tile.x * CELL + DOT_INSET
-		var wy: float = tile.y * CELL + DOT_INSET
-		var sz: float = CELL - DOT_INSET * 2
-		draw_rect(Rect2(wx, wy, sz, sz), DOT_COLOR, true)
-		centers.append(_tile_center(tile))
-	if centers.size() >= 2:
-		draw_polyline(centers, LINE_COLOR, LINE_WIDTH, true)
-	if centers.size() >= 1:
-		draw_circle(centers[0], 5.0, HEAD_COLOR)
-		draw_circle(centers[centers.size() - 1], 6.0, GOAL_COLOR)
+	var rect_size := Vector2(CELL, CELL)
+	for i in range(path.size()):
+		var tile: Vector2i = path[i]
+		var pos := Vector2(tile.x * CELL, tile.y * CELL)
+		var tex: Texture2D = null
+		if i < path.size() - 1:
+			var dir: Vector2i = path[i + 1] - tile
+			var idx: int = DIR_TO_IDX.get(dir, 0)
+			if idx > 0:
+				tex = _from_texs[idx - 1]
+		else:
+			# destination: draw cursor
+			tex = _cursor_tex
+		if tex != null:
+			draw_texture_rect(tex, Rect2(pos, rect_size), false, Color(1.0, 1.0, 1.0, 0.75))
+		else:
+			# fallback dot
+			draw_circle(pos + rect_size * 0.5, 4.0, Color(0.85, 0.85, 0.85, 0.5))
