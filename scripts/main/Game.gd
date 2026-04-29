@@ -856,7 +856,7 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
-	_roll_monster_weapon(m)
+		_roll_monster_weapon(m)
 
 func _spawn_unique_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
 	var unique_data: MonsterData = MonsterRegistry.unique_for_depth(depth)
@@ -887,7 +887,7 @@ func _spawn_unique_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
 			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
-	_roll_monster_weapon(m)
+		_roll_monster_weapon(m)
 		CombatLog.post("A dangerous presence lurks on this floor...", Color(1.0, 0.75, 0.3))
 		return
 
@@ -920,7 +920,7 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
-	_roll_monster_weapon(m)
+		_roll_monster_weapon(m)
 		placed += 1
 
 func _spawn_items_for_floor(depth: int) -> void:
@@ -1252,7 +1252,7 @@ func _try_respawn_monster() -> void:
 			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
-	_roll_monster_weapon(m)
+		_roll_monster_weapon(m)
 		return
 
 func _on_player_died() -> void:
@@ -1423,7 +1423,7 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 				m.awareness_changed.connect(_on_monster_awareness_changed)
 			m.died.connect(_on_monster_died.bind(m))
 			TurnManager.register_actor(m)
-	_roll_monster_weapon(m)
+			_roll_monster_weapon(m)
 		for entry in state.get("items", []):
 			var d: ItemData = ItemRegistry.get_by_id(String(entry.get("id", "")))
 			if d == null: continue
@@ -1486,7 +1486,7 @@ func _spawn_abyss_floor(depth: int) -> void:
 		m.died.connect(_on_monster_died.bind(m))
 		m.become_aware(player.grid_pos)
 		TurnManager.register_actor(m)
-	_roll_monster_weapon(m)
+		_roll_monster_weapon(m)
 		placed += 1
 
 func _tick_abyss() -> void:
@@ -1590,7 +1590,7 @@ func _spawn_branch_monsters(branch_id: String, eff_depth: int) -> void:
 			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died.bind(m))
 		TurnManager.register_actor(m)
-	_roll_monster_weapon(m)
+		_roll_monster_weapon(m)
 		placed += 1
 
 func _spawn_branch_boss(branch_id: String) -> void:
