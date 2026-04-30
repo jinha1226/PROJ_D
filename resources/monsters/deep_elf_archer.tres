@@ -25,4 +25,5 @@ tile_path = "res://assets/tiles/individual/mon/humanoids/elves/deep_elf_archer.p
 glyph = "e"
 glyph_color = Color(0.75, 0.85, 1, 1)
 essence_id = "essence_arcana"
+ai_flags = ["kite"]
 description = "A disciplined ranged attacker. Fragile up close, but dangerous if allowed to keep distance."

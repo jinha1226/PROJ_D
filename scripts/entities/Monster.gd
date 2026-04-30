@@ -24,6 +24,7 @@ var is_ally: bool = false
 var ally_turns_left: int = 0  # 0 = indefinite; > 0 counts down each player turn
 
 var equipped_weapon_id: String = ""  # weapon the monster is carrying; dropped on death
+var _summoned_once: bool = false      # summoner AI: fires only once per encounter
 
 var _map: DungeonMap
 var _tex: Texture2D = null

@@ -33,6 +33,9 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 		_random_step(monster, map)
 		return
 	var dist: int = _chebyshev(monster.grid_pos, player.grid_pos)
+	# Healer: scan for wounded allies before anything else
+	if monster.data.ai_flags.has("healer") and _try_heal_ally(monster):
+		return
 	if dist == 1:
 		if _try_special_close(monster, player, map):
 			return
@@ -42,8 +45,15 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 	if _can_see(monster, map, player.grid_pos):
 		monster.become_aware(player.grid_pos)
 		_pack_alert(monster, player.grid_pos)
+		# Summoner: call reinforcements on first sighting
+		if monster.data.ai_flags.has("summoner") and not monster._summoned_once:
+			_try_summon(monster, map)
 		if _try_special_ranged(monster, player, map, dist):
 			return
+		# Kiter: maintain preferred distance before shooting
+		if monster.data.ai_flags.has("kite") and dist < KITE_PREFERRED_RANGE:
+			if _kite_step(monster, map, player.grid_pos):
+				return
 		if _try_ranged(monster, player, dist):
 			return
 		_step_toward(monster, map, player.grid_pos)
@@ -63,6 +73,8 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 # ── Special abilities ───────────────────────────────────────────────────────
 
 # Boss IDs that use telegraphed attacks instead of instant specials.
+const KITE_PREFERRED_RANGE: int = 3  # kiter backs off until this chebyshev distance
+
 const BOSS_IDS: Array = [
 	"ashen_magpie", "ancient_lich", "blood_duke", "bog_serpent",
 	"ember_tyrant", "glacial_sovereign", "gnoll_warlord", "harrow_knight",
@@ -399,6 +411,93 @@ static func _find_nearest_enemy(ally: Monster) -> Monster:
 			best_dist = d
 			best = n
 	return best
+
+## Kite: try to step away from threat until KITE_PREFERRED_RANGE is reached.
+## Returns true if a step was taken.
+static func _kite_step(monster: Monster, map: DungeonMap, threat: Vector2i) -> bool:
+	var best: Vector2i = Vector2i.ZERO
+	var best_d: int = _chebyshev(monster.grid_pos, threat)
+	for ddx in [-1, 0, 1]:
+		for ddy in [-1, 0, 1]:
+			if ddx == 0 and ddy == 0:
+				continue
+			var next: Vector2i = monster.grid_pos + Vector2i(ddx, ddy)
+			if not map.is_walkable(next) or _occupied(next, monster):
+				continue
+			var d: int = _chebyshev(next, threat)
+			# Only retreat until preferred range — stop once safe enough
+			if d > best_d and d <= KITE_PREFERRED_RANGE + 1:
+				best = Vector2i(ddx, ddy)
+				best_d = d
+	if best != Vector2i.ZERO:
+		monster.try_move(best)
+		return true
+	return false
+
+
+## Healer: heal the most wounded nearby non-ally monster. Returns true if healed.
+static func _try_heal_ally(healer: Monster) -> bool:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return false
+	var best: Monster = null
+	var best_ratio: float = 0.5  # only heal below 50% HP
+	for n in tree.get_nodes_in_group("monsters"):
+		if n == healer or not (n is Monster) or n.is_ally:
+			continue
+		if n.hp <= 0 or n.data == null:
+			continue
+		if _chebyshev(healer.grid_pos, n.grid_pos) > 6:
+			continue
+		var ratio: float = float(n.hp) / float(n.data.hp)
+		if ratio < best_ratio:
+			best_ratio = ratio
+			best = n
+	if best == null:
+		return false
+	var heal: int = healer.data.hd * 3
+	best.hp = min(best.data.hp, best.hp + heal)
+	best.emit_signal("stats_changed")
+	CombatLog.post("The %s calls upon divine power — the %s is healed!" \
+			% [healer.data.display_name, best.data.display_name], Color(0.5, 1.0, 0.6))
+	return true
+
+
+## Summoner: spawn 1-2 monsters from summon_pool into adjacent tiles (once per encounter).
+static func _try_summon(summoner: Monster, map: DungeonMap) -> void:
+	summoner._summoned_once = true
+	if summoner.data.summon_pool.is_empty():
+		return
+	var game := _find_game()
+	if game == null or not game.has_method("spawn_monster_at"):
+		return
+	var count: int = randi_range(1, 2)
+	var spawned: int = 0
+	# Collect empty adjacent tiles
+	var free_tiles: Array = []
+	for ddx in [-1, 0, 1]:
+		for ddy in [-1, 0, 1]:
+			if ddx == 0 and ddy == 0:
+				continue
+			var t: Vector2i = summoner.grid_pos + Vector2i(ddx, ddy)
+			if map.is_walkable(t) and not _occupied(t, summoner):
+				free_tiles.append(t)
+	free_tiles.shuffle()
+	for i in range(mini(count, free_tiles.size())):
+		var mid: String = summoner.data.summon_pool[randi() % summoner.data.summon_pool.size()]
+		if game.spawn_monster_at(mid, free_tiles[i]):
+			spawned += 1
+	if spawned > 0:
+		CombatLog.post("The %s calls for reinforcements!" % summoner.data.display_name,
+				Color(1.0, 0.75, 0.3))
+
+
+static func _find_game() -> Node:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return null
+	return tree.get_first_node_in_group("game")
+
 
 static func _occupied(pos: Vector2i, self_monster: Monster) -> bool:
 	var tree := Engine.get_main_loop() as SceneTree

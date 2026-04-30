@@ -24,3 +24,5 @@ class_name MonsterData extends Resource
 @export var glyph_color: Color = Color(0.8, 0.8, 0.8)
 @export var description: String = ""
 @export var essence_id: String = ""   # specific essence this monster can drop; "" = random
+@export var ai_flags: Array = []      # ["kite", "healer", "summoner"]
+@export var summon_pool: Array = []   # summoner: monster ids to spawn

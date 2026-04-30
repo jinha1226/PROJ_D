@@ -57,6 +57,7 @@ var _effect_layer: Node2D
 var _targeting_spell: SpellData = null
 var _targeting_tiles: Array = []
 var _targeting_node: SpellTargetOverlay = null
+var _targeting_monster: Monster = null
 var _pending_essence_pickups: Array = []
 var _essence_pickup_popup_open: bool = false
 
@@ -81,6 +82,7 @@ const AUTO_PATH_PREVIEW_SEC: float = 0.12
 const AUTO_STEP_DELAY_SEC: float = 0.05
 
 func _ready() -> void:
+	add_to_group("game")
 	if not GameManager.run_in_progress:
 		GameManager.start_new_run()
 	_spawn_map()
@@ -127,7 +129,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		var canvas_tf: Transform2D = get_viewport().get_canvas_transform()
 		var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
 		var tile: Vector2i = map.world_to_grid(world_pos)
-		if _targeting_tiles.has(tile):
+		if _targeting_monster != null and tile == _targeting_monster.grid_pos:
+			_confirm_targeting()
+		elif _targeting_monster == null and _targeting_tiles.has(tile):
 			_confirm_targeting()
 		else:
 			_cancel_targeting()
@@ -1016,6 +1020,28 @@ func spawn_ally(monster_id: String, near_pos: Vector2i, turns: int) -> bool:
 	map.queue_redraw()
 	return true
 
+## Spawn a hostile monster at an exact tile (used by summoner AI).
+func spawn_monster_at(monster_id: String, pos: Vector2i) -> bool:
+	if map == null or monsters_layer == null:
+		return false
+	var md: MonsterData = MonsterRegistry.get_by_id(monster_id)
+	if md == null:
+		return false
+	if not map.is_walkable(pos) or _monster_at(pos) != null or pos == player.grid_pos:
+		return false
+	var m: Monster = MonsterScene.new()
+	monsters_layer.add_child(m)
+	m.setup(md, map, pos)
+	m.become_aware(player.grid_pos)
+	m.hit_taken.connect(_on_monster_hit.bind(m))
+	m.died.connect(_on_monster_died.bind(m))
+	m.awareness_changed.connect(_on_monster_awareness_changed)
+	_roll_monster_weapon(m)
+	TurnManager.register_actor(m)
+	map.queue_redraw()
+	return true
+
+
 func _roll_monster_weapon(monster: Monster) -> void:
 	if monster.data == null:
 		return
@@ -1818,9 +1844,45 @@ func begin_spell_targeting(spell: SpellData, p: Player) -> void:
 	CombatLog.post("Tap highlighted tile to cast %s — tap elsewhere to cancel." \
 			% spell.display_name, Color(0.8, 0.75, 1.0))
 
+## Two-step targeting for single/auto/nearest spells: auto-selects nearest monster,
+## highlights it, requires a second tap on it to confirm the cast.
+func begin_spell_targeting_auto(spell: SpellData, p: Player) -> void:
+	_cancel_targeting()
+	var range_val: int = MagicSystem.effective_spell_range(spell)
+	var visible: Dictionary = p.compute_fov()
+	_targeting_tiles = []
+	for tile: Vector2i in visible.keys():
+		var d: int = max(abs(tile.x - p.grid_pos.x), abs(tile.y - p.grid_pos.y))
+		if d > 0 and d <= range_val:
+			_targeting_tiles.append(tile)
+	# Find nearest non-ally visible monster in range
+	var best: Monster = null
+	var best_d: int = range_val + 1
+	for n in get_tree().get_nodes_in_group("monsters"):
+		if not (n is Monster) or n.is_ally:
+			continue
+		if not visible.has(n.grid_pos):
+			continue
+		var d: int = max(abs(n.grid_pos.x - p.grid_pos.x), abs(n.grid_pos.y - p.grid_pos.y))
+		if d <= range_val and d < best_d:
+			best_d = d
+			best = n
+	if best == null:
+		CombatLog.post("No targets in range.", Color(0.75, 0.75, 0.75))
+		return
+	_targeting_spell = spell
+	_targeting_monster = best
+	_targeting_node = SpellTargetOverlay.new()
+	_effect_layer.add_child(_targeting_node)
+	_targeting_node.init(spell, p, _targeting_tiles)
+	_targeting_node.set_target(best.grid_pos)
+	CombatLog.post("Tap the %s to cast %s — tap elsewhere to cancel." \
+			% [best.data.display_name, spell.display_name], Color(0.8, 0.75, 1.0))
+
 func _cancel_targeting() -> void:
 	_targeting_spell = null
 	_targeting_tiles = []
+	_targeting_monster = null
 	if _targeting_node != null:
 		_targeting_node.queue_free()
 		_targeting_node = null
@@ -1875,12 +1937,14 @@ func _on_quickslot_pressed(index: int) -> void:
 	if spell != null:
 		if not TurnManager.is_player_turn:
 			return
-		if spell.targeting != "single":
+		# single/auto/nearest spells target a specific monster → two-step confirm
+		if spell.targeting in ["single", "auto", "nearest"]:
+			begin_spell_targeting_auto(spell, player)
+		else:
+			# self/aoe: fire immediately
 			var ok: bool = MagicSystem.cast(slot_id, player, self)
 			if ok:
 				TurnManager.end_player_turn()
-		else:
-			begin_spell_targeting(spell, player)
 		return
 	# Item path
 	if player.count_item(slot_id) == 0:

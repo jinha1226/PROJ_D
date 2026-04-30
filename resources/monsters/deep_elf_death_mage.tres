@@ -24,4 +24,6 @@ is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/elves/deep_elf_death_mage.png"
 glyph = "e"
 glyph_color = Color(0.6, 0.25, 0.75, 1)
+ai_flags = ["summoner"]
+summon_pool = ["zombie", "crypt_zombie"]
 description = "An elven necromancer who fields undead and necrotic spells. Kill it before the room fills with its minions."
