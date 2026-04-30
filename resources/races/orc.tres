@@ -6,6 +6,7 @@
 script = ExtResource("1_rdata")
 id = "hill_orc"
 display_name = "Hill Orc"
+hp_per_level = 5
 description = "Brutal and resilient. +2 STR / +4 HP, -1 INT. Deals bonus melee damage when injured."
 base_sprite_path = "res://assets/tiles/individual/player/base/orc_m.png"
 unlocked = true

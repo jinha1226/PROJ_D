@@ -6,6 +6,7 @@
 script = ExtResource("1_rdata")
 id = "minotaur"
 display_name = "Minotaur"
+hp_per_level = 6
 description = "Bullheaded warrior. +2 STR / +1 DEX / +4 HP, -2 INT."
 base_sprite_path = "res://assets/tiles/individual/player/base/minotaur_m.png"
 unlocked = false

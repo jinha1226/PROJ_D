@@ -719,11 +719,61 @@ func _generate_floor(depth: int, map_seed: int,
 			_place_b3_altars(map_seed)
 		player.bind_map(map, map.spawn_pos)
 		_spawn_items_for_floor(depth)
-		if String(zone.get("id", "")) == "abyss":
+		if depth == 15:
+			_spawn_b15_boss_floor()
+		elif String(zone.get("id", "")) == "abyss":
 			_spawn_abyss_floor(depth)
 		else:
 			_spawn_monsters_for_floor(depth)
+		_scatter_hazard_tiles(zone.get("env", ""))
 	_refresh_fov()
+
+func _spawn_b15_boss_floor() -> void:
+	var md: MonsterData = MonsterRegistry.get_by_id("abyssal_sovereign")
+	if md == null:
+		push_error("abyssal_sovereign MonsterData not found!")
+		return
+	# Place boss in center of map, away from spawn
+	var center := Vector2i(DungeonMap.GRID_W / 2, DungeonMap.GRID_H / 2)
+	var best := center
+	var best_d: int = 0
+	for y in range(DungeonMap.GRID_H):
+		for x in range(DungeonMap.GRID_W):
+			var p := Vector2i(x, y)
+			if map.tile_at(p) != DungeonMap.Tile.FLOOR:
+				continue
+			var d: int = max(abs(p.x - map.spawn_pos.x), abs(p.y - map.spawn_pos.y))
+			if d > best_d and d > 6:
+				best_d = d
+				best = p
+	var m: Monster = MonsterScene.new()
+	monsters_layer.add_child(m)
+	m.setup(md, map, best)
+	m.hit_taken.connect(_on_monster_hit.bind(m))
+	m.died.connect(_on_monster_died.bind(m))
+	m.awareness_changed.connect(_on_monster_awareness_changed)
+	TurnManager.register_actor(m)
+	CombatLog.post("A crushing darkness fills the air. Something ancient stirs...",
+			Color(0.6, 0.1, 0.9))
+	map.queue_redraw()
+	# Also spawn a handful of undead guards
+	var guard_ids: Array = ["wraith", "crypt_zombie", "shadow_wraith"]
+	var spawned: int = 0
+	for attempt in range(40):
+		if spawned >= 4:
+			break
+		var rx: int = randi_range(1, DungeonMap.GRID_W - 2)
+		var ry: int = randi_range(1, DungeonMap.GRID_H - 2)
+		var gp := Vector2i(rx, ry)
+		if map.tile_at(gp) != DungeonMap.Tile.FLOOR:
+			continue
+		var dist_player: int = max(abs(gp.x - map.spawn_pos.x), abs(gp.y - map.spawn_pos.y))
+		if dist_player < 5:
+			continue
+		var gid: String = guard_ids[randi() % guard_ids.size()]
+		if spawn_monster_at(gid, gp):
+			spawned += 1
+
 
 const _B3_FAITH_IDS: Array = ["war", "arcana", "trickery", "death", "essence"]
 
@@ -1222,6 +1272,9 @@ func _on_player_turn_started() -> void:
 			_tick_abyss()
 	if map != null:
 		map.tick_fog()
+		map.tick_clouds()
+		_tick_cloud_damage_player()
+		_tick_hazard_damage_player()
 		_refresh_entity_visibility()
 		# Tick corpse lifetimes
 		var i: int = map.corpses.size() - 1
@@ -1249,6 +1302,62 @@ func _on_player_turn_started() -> void:
 			_cancel_auto_walk("new enemy")
 			return
 		_start_auto_explore()
+
+func apply_immolation_aoe(origin: Vector2i, radius: int) -> void:
+	if map == null:
+		return
+	CombatLog.post("The scroll ignites in a blazing inferno!", Color(1.0, 0.55, 0.1))
+	var visible: Dictionary = player.compute_fov() if player != null else {}
+	for dx in range(-radius, radius + 1):
+		for dy in range(-radius, radius + 1):
+			var pos := origin + Vector2i(dx, dy)
+			if not map.in_bounds(pos) or map.tile_at(pos) == map.Tile.WALL:
+				continue
+			map.add_cloud(pos, "fire", 5)
+	# Damage all visible monsters in radius
+	for n in get_tree().get_nodes_in_group("monsters"):
+		if not (n is Monster) or n.is_ally:
+			continue
+		var d: int = max(abs(n.grid_pos.x - origin.x), abs(n.grid_pos.y - origin.y))
+		if d <= radius and visible.has(n.grid_pos):
+			var dmg: int = randi_range(8, 16)
+			n.take_damage(dmg)
+			n.become_aware(origin)
+
+
+func _tick_cloud_damage_player() -> void:
+	if player == null or player.hp <= 0 or map == null:
+		return
+	var cloud: Dictionary = map.cloud_tiles.get(player.grid_pos, {})
+	if cloud.is_empty():
+		return
+	var dmg: int = _cloud_damage(cloud.get("type", "fire"), player, null)
+	if dmg > 0:
+		player.take_damage(dmg, "cloud_%s" % cloud.get("type", ""))
+		CombatLog.damage_taken("The %s cloud burns you for %d." \
+				% [cloud.get("type", ""), dmg])
+
+func _tick_hazard_damage_player() -> void:
+	if player == null or player.hp <= 0 or map == null:
+		return
+	var htype: String = map.hazard_tiles.get(player.grid_pos, "")
+	if htype == "":
+		return
+	match htype:
+		"lava":
+			player.take_damage(8, "lava")
+			CombatLog.damage_taken("The lava scorches you for 8!")
+		"shallow_water":
+			player.apply_wet(3)
+
+static func _cloud_damage(type: String, target_player, target_monster) -> int:
+	match type:
+		"fire":        return randi_range(2, 4)
+		"poison":      return 1
+		"cold":        return randi_range(1, 3)
+		"electricity": return randi_range(1, 3)
+		"lava":        return randi_range(6, 10)
+	return 0
 
 func _try_respawn_monster() -> void:
 	if map == null or player == null or player.hp <= 0:
@@ -1477,7 +1586,38 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 		_spawn_items_for_floor(eff_depth)
 		if branch_floor == 1:
 			_spawn_branch_resistance_hint(branch_id)
+	_scatter_hazard_tiles(cfg.get("env", ""))
 	_refresh_fov()
+
+## Scatter persistent hazard tiles based on branch environment.
+func _scatter_hazard_tiles(env: String) -> void:
+	if map == null or env == "":
+		return
+	map.hazard_tiles.clear()
+	var htype: String = ""
+	var density: float = 0.0
+	match env:
+		"fire":   htype = "lava";          density = 0.06
+		"poison": htype = "shallow_water"; density = 0.08
+		"cold":   htype = "shallow_water"; density = 0.07
+	if htype == "" or density == 0.0:
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = GameManager.seed ^ env.hash()
+	var floor_tiles: Array = []
+	for y in range(DungeonMap.GRID_H):
+		for x in range(DungeonMap.GRID_W):
+			var p := Vector2i(x, y)
+			if map.tile_at(p) == DungeonMap.Tile.FLOOR \
+					and p != map.spawn_pos and p != map.stairs_down_pos \
+					and p != map.stairs_up_pos:
+				floor_tiles.append(p)
+	var count: int = int(floor_tiles.size() * density)
+	for i in range(count):
+		var idx: int = rng.randi_range(0, floor_tiles.size() - 1)
+		map.hazard_tiles[floor_tiles[idx]] = htype
+	map.queue_redraw()
+
 
 func _spawn_abyss_floor(depth: int) -> void:
 	_abyss_turn_counter = 0
@@ -2165,6 +2305,15 @@ func _on_monster_died(monster: Monster) -> void:
 		player.heal(kill_hp)
 	if kill_mp > 0:
 		player.mp = min(player.mp_max, player.mp + kill_mp)
+	# B15 final boss death → victory
+	if monster != null and monster.data != null \
+			and monster.data.id == "abyssal_sovereign":
+		await get_tree().create_timer(1.2).timeout
+		CombatLog.post("The Abyssal Sovereign collapses. The dungeon trembles...",
+				Color(0.85, 0.6, 1.0))
+		await get_tree().create_timer(1.5).timeout
+		_show_result_screen(true)
+		return
 	# B3 unique boss death activates the faith altars
 	if GameManager.depth == 3 and not map.altar_active \
 			and monster != null and monster.data != null and monster.data.is_unique:

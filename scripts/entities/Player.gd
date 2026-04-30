@@ -844,8 +844,12 @@ func _level_up() -> void:
 		_auto_stat_bump()
 
 func _level_up_hp_gain() -> int:
-	# Flat gain for everyone; STR adds a small bonus. Main HP growth is from Fighting skill.
-	return max(1, 1 + strength / 8)
+	var base: int = 5
+	if GameManager != null and RaceRegistry != null:
+		var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
+		if race != null:
+			base = race.hp_per_level
+	return max(1, base + strength / 8)
 
 func _auto_stat_bump() -> void:
 	# Pick the lowest stat and +1. Simplification of the classic

@@ -3,11 +3,16 @@ class_name SpellTargetOverlay extends Node2D
 var _spell: SpellData
 var _valid_tiles: Array  # Array[Vector2i]
 var _hit_tiles: Array    # Array[Vector2i] — tiles that will be visibly affected
+var _target_pos: Vector2i = Vector2i(-1, -1)  # pre-selected confirm target
 
 func init(spell: SpellData, player: Player, valid_tiles: Array) -> void:
 	_spell = spell
 	_valid_tiles = valid_tiles
 	_hit_tiles = _compute_hit_tiles(spell, player, valid_tiles)
+	queue_redraw()
+
+func set_target(pos: Vector2i) -> void:
+	_target_pos = pos
 	queue_redraw()
 
 func _compute_hit_tiles(spell: SpellData, player: Player, valid: Array) -> Array:
@@ -51,6 +56,14 @@ func _draw() -> void:
 				Vector2(cs - 2, cs - 2)), hit_fill)
 		draw_rect(Rect2(Vector2(tile.x * cs + 2, tile.y * cs + 2),
 				Vector2(cs - 4, cs - 4)), hit_border, false, 2.0)
+
+	# Confirmed-target highlight: bright yellow border + glow
+	if _target_pos != Vector2i(-1, -1):
+		var tp := Vector2(_target_pos.x * cs, _target_pos.y * cs)
+		draw_rect(Rect2(tp + Vector2(1, 1), Vector2(cs - 2, cs - 2)),
+				Color(1.0, 0.95, 0.2, 0.35))
+		draw_rect(Rect2(tp + Vector2(2, 2), Vector2(cs - 4, cs - 4)),
+				Color(1.0, 0.95, 0.0, 1.0), false, 2.5)
 
 func _effect_color() -> Color:
 	match _spell.effect:

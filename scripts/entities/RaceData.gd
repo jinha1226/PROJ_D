@@ -33,6 +33,9 @@ class_name RaceData extends Resource
 ## Passive ability id. Looked up by RacePassiveSystem on game start.
 @export var passive_id: String = ""
 
+## HP gained per XL on level-up (DCSS species HD). Default 5 = human baseline.
+@export var hp_per_level: int = 5
+
 func unlock_hint() -> String:
 	if unlocked:
 		return ""

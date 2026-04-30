@@ -6,6 +6,7 @@
 script = ExtResource("1_rdata")
 id = "gargoyle"
 display_name = "Gargoyle"
+hp_per_level = 3
 description = "Living stone. Natural AC +4, immune to poison. Low HP, but stone body shrugs off punishment. Poor at magic and ranged combat."
 base_sprite_path = "res://assets/tiles/individual/player/base/gargoyle_m.png"
 unlocked = false

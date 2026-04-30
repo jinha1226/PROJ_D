@@ -76,6 +76,47 @@ var warning_tiles: Dictionary = {}
 ## Corpses: Array of {pos:Vector2i, tile_path:String, glyph:String, turns_left:int}
 var corpses: Array = []
 
+## Cloud tiles: Vector2i → {type: String, turns: int}
+## type: "fire" | "poison" | "cold" | "electricity" | "lava"
+var cloud_tiles: Dictionary = {}
+
+## Damaging floor tiles that persist forever: Vector2i → type String
+## type: "lava" | "shallow_water"
+var hazard_tiles: Dictionary = {}
+
+const CLOUD_COLORS: Dictionary = {
+	"fire":        Color(1.0,  0.45, 0.1,  0.55),
+	"poison":      Color(0.35, 0.85, 0.25, 0.50),
+	"cold":        Color(0.55, 0.85, 1.0,  0.50),
+	"electricity": Color(1.0,  0.95, 0.3,  0.55),
+	"lava":        Color(1.0,  0.3,  0.0,  0.65),
+}
+
+const HAZARD_COLORS: Dictionary = {
+	"lava":          Color(1.0,  0.25, 0.0,  0.70),
+	"shallow_water": Color(0.3,  0.55, 1.0,  0.45),
+}
+
+func add_cloud(pos: Vector2i, type: String, turns: int) -> void:
+	if not in_bounds(pos) or tile_at(pos) == Tile.WALL:
+		return
+	var existing: Dictionary = cloud_tiles.get(pos, {})
+	# Refresh if same type, else replace only if new type is "stronger"
+	if existing.is_empty() or int(existing.get("turns", 0)) < turns:
+		cloud_tiles[pos] = {"type": type, "turns": turns}
+	queue_redraw()
+
+func tick_clouds() -> void:
+	var expired: Array = []
+	for pos: Vector2i in cloud_tiles.keys():
+		cloud_tiles[pos]["turns"] -= 1
+		if cloud_tiles[pos]["turns"] <= 0:
+			expired.append(pos)
+	for pos in expired:
+		cloud_tiles.erase(pos)
+	if not expired.is_empty():
+		queue_redraw()
+
 func set_warning(pos: Vector2i, color: Color) -> void:
 	warning_tiles[pos] = color
 	queue_redraw()
@@ -279,6 +320,23 @@ func _draw() -> void:
 		var wrect := Rect2(Vector2(wpos.x * CELL_SIZE, wpos.y * CELL_SIZE),
 				Vector2(CELL_SIZE, CELL_SIZE))
 		draw_rect(wrect, warning_tiles[wpos])
+
+	# Hazard tiles (lava, shallow water) — permanent floor overlays
+	for hpos: Vector2i in hazard_tiles.keys():
+		if not (reveal_all or visible_tiles.has(hpos) or explored.has(hpos)):
+			continue
+		var hcol: Color = HAZARD_COLORS.get(hazard_tiles[hpos], Color(1, 0, 0, 0.5))
+		draw_rect(Rect2(Vector2(hpos.x * CELL_SIZE, hpos.y * CELL_SIZE),
+				Vector2(CELL_SIZE, CELL_SIZE)), hcol)
+
+	# Cloud tiles — transient elemental hazards
+	for cpos: Vector2i in cloud_tiles.keys():
+		if not (reveal_all or visible_tiles.has(cpos)):
+			continue
+		var ctype: String = cloud_tiles[cpos].get("type", "fire")
+		var ccol: Color = CLOUD_COLORS.get(ctype, Color(1, 1, 1, 0.4))
+		draw_rect(Rect2(Vector2(cpos.x * CELL_SIZE + 1, cpos.y * CELL_SIZE + 1),
+				Vector2(CELL_SIZE - 2, CELL_SIZE - 2)), ccol)
 
 	# Corpses — drawn below entities, above floor
 	for c in corpses:

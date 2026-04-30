@@ -6,6 +6,7 @@
 script = ExtResource("1_rdata")
 id = "kobold"
 display_name = "Kobold"
+hp_per_level = 3
 description = "Small and sly. +2 DEX, -1 STR, -2 HP. Detects traps automatically."
 base_sprite_path = "res://assets/tiles/individual/player/base/kobold_m.png"
 unlocked = true

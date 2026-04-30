@@ -80,6 +80,7 @@ const BOSS_IDS: Array = [
 	"ember_tyrant", "glacial_sovereign", "gnoll_warlord", "harrow_knight",
 	"ogre_chieftain", "orc_warchief", "pale_scholar", "sister_cinder",
 	"sovereign_jelly", "stone_warden", "storm_hierophant", "viper_saint",
+	"abyssal_sovereign",
 ]
 
 ## Close-range specials (dist == 1). Returns true if ability was used.
@@ -146,6 +147,8 @@ static func _try_special_ranged(monster: Monster, player: Player, map: DungeonMa
 
 ## Boss telegraphed attack selection.
 static func _try_boss_telegraph(monster: Monster, player: Player, map: DungeonMap) -> bool:
+	if monster.data.id == "abyssal_sovereign":
+		return _abyssal_sovereign_turn(monster, player, map)
 	if randf() > 0.35:
 		return false
 	match monster.data.id:
@@ -490,6 +493,67 @@ static func _try_summon(summoner: Monster, map: DungeonMap) -> void:
 	if spawned > 0:
 		CombatLog.post("The %s calls for reinforcements!" % summoner.data.display_name,
 				Color(1.0, 0.75, 0.3))
+
+
+## ── Abyssal Sovereign — final boss AI ────────────────────────────────────────
+##
+## Phase 1 (HP > 50%): telegraph AOE r=2, 30% chance summon zombie each turn
+## Phase 2 (HP ≤ 50%): speed bumped to 15 (once), telegraph AOE r=3 AND line
+##                      simultaneously, 50% chance summon 2 zombies
+static func _abyssal_sovereign_turn(monster: Monster, player: Player, map: DungeonMap) -> bool:
+	var phase2: bool = float(monster.hp) / float(monster.data.hp) <= 0.5
+
+	# Activate phase 2 speed boost once
+	if phase2 and monster.data.speed == 12:
+		monster.data.speed = 15
+		CombatLog.post("The Abyssal Sovereign's power surges — it moves with terrible speed!",
+				Color(0.8, 0.3, 1.0))
+
+	# Always telegraph — boss doesn't "idle"
+	if phase2:
+		# Both AOE and line simultaneously
+		_telegraph_aoe(monster, map, 3,
+			"The Abyssal Sovereign tears open a rift in reality!", monster.data.hd * 5)
+		_telegraph_line(monster, player, map,
+			"A beam of void energy lances toward you!", monster.data.hd * 6)
+		# Summon 1-2 undead
+		if randf() < 0.50:
+			var game: Node = _find_game()
+			if game != null and game.has_method("spawn_monster_at"):
+				for _i in range(randi_range(1, 2)):
+					var offsets := [Vector2i(1,0),Vector2i(-1,0),Vector2i(0,1),Vector2i(0,-1),
+						Vector2i(1,1),Vector2i(-1,-1),Vector2i(1,-1),Vector2i(-1,1)]
+					offsets.shuffle()
+					for off in offsets:
+						var t: Vector2i = monster.grid_pos + off
+						if map.is_walkable(t) and not _occupied(t, monster) and t != player.grid_pos:
+							var mid: String = ["zombie","crypt_zombie","wraith"][randi() % 3]
+							if game.spawn_monster_at(mid, t):
+								break
+		CombatLog.post("The Sovereign's servants heed its call!", Color(0.7, 0.3, 1.0))
+	else:
+		# Phase 1: AOE r=2, 30% summon zombie
+		_telegraph_aoe(monster, map, 2,
+			"The Abyssal Sovereign gathers void energy!", monster.data.hd * 4)
+		if randf() < 0.30:
+			var game: Node = _find_game()
+			if game != null and game.has_method("spawn_monster_at"):
+				var offsets := [Vector2i(1,0),Vector2i(-1,0),Vector2i(0,1),Vector2i(0,-1),
+					Vector2i(1,1),Vector2i(-1,-1),Vector2i(1,-1),Vector2i(-1,1)]
+				offsets.shuffle()
+				for off in offsets:
+					var t: Vector2i = monster.grid_pos + off
+					if map.is_walkable(t) and not _occupied(t, monster) and t != player.grid_pos:
+						var mid: String = ["zombie","crypt_zombie"][randi() % 2]
+						game.spawn_monster_at(mid, t)
+						break
+
+	# Drain attack in parallel (no telegraph)
+	if randf() < 0.40:
+		_drain_life(monster, player)
+
+	monster.become_aware(player.grid_pos)
+	return true
 
 
 static func _find_game() -> Node:

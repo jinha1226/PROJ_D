@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon_abyssal"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "abyssal_sovereign"
+display_name = "Abyssal Sovereign"
+tier = 6
+hp = 300
+hd = 22
+ac = 12
+ev = 8
+speed = 12
+sight_range = 12
+attacks = [{"damage": 45, "flavour": "rend"}]
+ranged_attack = {}
+resists = ["fire+", "cold+", "poison+", "necromancy+"]
+min_depth = 15
+max_depth = 15
+weight = 0
+xp_value = 500
+is_boss = true
+is_unique = true
+tile_path = ""
+glyph = "X"
+glyph_color = Color(0.5, 0.1, 0.9, 1)
+description = "The sovereign of the Abyss. Its very presence warps reality. Defeat it to escape the dungeon."

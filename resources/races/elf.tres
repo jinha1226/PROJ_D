@@ -6,6 +6,7 @@
 script = ExtResource("1_rdata")
 id = "elf"
 display_name = "Elf"
+hp_per_level = 3
 description = "Sharp-minded and perceptive. +2 INT / +3 MP, -1 STR. Immune to sleep."
 base_sprite_path = "res://assets/tiles/individual/player/base/elf_m.png"
 unlocked = true

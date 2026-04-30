@@ -6,6 +6,7 @@
 script = ExtResource("1_rdata")
 id = "dwarf"
 display_name = "Dwarf"
+hp_per_level = 4
 description = "Stout and resilient. +1 STR / +4 HP, -1 DEX. Innate poison resistance."
 base_sprite_path = "res://assets/tiles/individual/player/base/dwarf_m.png"
 unlocked = false

@@ -50,7 +50,30 @@ func take_turn() -> void:
 	if hp <= 0 or data == null or _map == null:
 		return
 	_tick_statuses()
+	_tick_cloud_damage()
+	if hp <= 0:
+		return
 	MonsterAI.take_turn(self, _map)
+
+func _tick_cloud_damage() -> void:
+	var cloud: Dictionary = _map.cloud_tiles.get(grid_pos, {})
+	if not cloud.is_empty():
+		var type: String = cloud.get("type", "fire")
+		var dmg: int = 0
+		match type:
+			"fire":        dmg = randi_range(2, 4)
+			"poison":      dmg = 1; Status.apply(self, "poison", 3)
+			"cold":        dmg = randi_range(1, 3)
+			"electricity": dmg = randi_range(1, 3)
+			"lava":        dmg = randi_range(6, 10)
+		if dmg > 0:
+			take_damage(dmg)
+			return
+	var htype: String = _map.hazard_tiles.get(grid_pos, "")
+	if htype == "lava":
+		take_damage(randi_range(6, 10))
+	elif htype == "shallow_water":
+		apply_wet(3)
 
 func _tick_statuses() -> void:
 	Status.tick_actor(self)

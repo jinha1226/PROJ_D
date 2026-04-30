@@ -358,6 +358,7 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 		_apply_elemental_side_effects(spell, target)
 	if was_alive and target.hp <= 0:
 		_on_kill(target, player)
+	_spawn_impact_cloud(spell, target.grid_pos, game)
 
 
 static func _multi_damage(spell: SpellData, player: Player,
@@ -469,6 +470,14 @@ static func _aoe_damage(spell: SpellData, player: Player,
 		CombatLog.post("The flames find no target.", Color(0.75, 0.75, 0.75))
 	if game != null and game.has_method("spawn_aoe_burst") and not hit_positions.is_empty():
 		game.spawn_aoe_burst(hit_positions, spell.element)
+	# AOE fire/poison spells leave lingering clouds
+	if hits > 0 and game != null and game.get("map") != null:
+		var visible: Dictionary = player.compute_fov()
+		var range_val: int = effective_spell_range(spell)
+		for tile: Vector2i in visible.keys():
+			var d: int = max(abs(tile.x - player.grid_pos.x), abs(tile.y - player.grid_pos.y))
+			if d <= range_val:
+				_spawn_impact_cloud(spell, tile, game)
 
 
 
@@ -556,3 +565,19 @@ static func _animate_dead(player: Player, turns: int, game: Node) -> void:
 		CombatLog.post("A corpse rises to serve you!", Color(0.5, 0.9, 0.6))
 	else:
 		CombatLog.post("No room to animate!", Color(1.0, 0.7, 0.5))
+
+
+## Spawn a lingering cloud at pos if the spell's element warrants it.
+static func _spawn_impact_cloud(spell: SpellData, pos: Vector2i, game: Node) -> void:
+	if game == null or game.get("map") == null:
+		return
+	var cloud_type: String = ""
+	var cloud_turns: int = 0
+	match spell.element:
+		"fire":    cloud_type = "fire";    cloud_turns = 3
+		"poison":  cloud_type = "poison";  cloud_turns = 4
+		"cold":    cloud_type = "cold";    cloud_turns = 2
+		"lightning", "electric":
+			cloud_type = "electricity"; cloud_turns = 2
+	if cloud_type != "" and randf() < 0.5:
+		game.map.add_cloud(pos, cloud_type, cloud_turns)

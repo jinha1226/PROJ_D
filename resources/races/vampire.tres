@@ -6,6 +6,7 @@
 script = ExtResource("1_rdata")
 id = "vampire"
 display_name = "Vampire"
+hp_per_level = 4
 description = "Undead predator. +1 STR / +1 DEX, -2 HP. Negative energy resistant. Melee kills restore 3 HP."
 base_sprite_path = "res://assets/tiles/individual/player/base/vampire_m.png"
 unlocked = false
