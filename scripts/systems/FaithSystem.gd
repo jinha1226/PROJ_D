@@ -1,5 +1,7 @@
 class_name FaithSystem extends RefCounted
 
+const ESSENCE_FAITH_ID: String = "essence"
+
 const FAITHS: Dictionary = {
 	"war": {
 		"name": "War",
@@ -73,73 +75,151 @@ static func display_name(id: String) -> String:
 static func color_of(id: String) -> Color:
 	return get_faith(id).get("color", Color.WHITE)
 
+static func is_valid_faith(id: String) -> bool:
+	return FAITHS.has(id)
+
+static func has_chosen_faith(player) -> bool:
+	return player != null and bool(player.first_shrine_choice_done)
+
+static func current_faith_id(player) -> String:
+	if player == null:
+		return ""
+	var fid: String = String(player.faith_id)
+	if fid != "":
+		return fid
+	# Legacy state: empty faith after shrine choice behaved like the Essence path.
+	if bool(player.first_shrine_choice_done):
+		return ESSENCE_FAITH_ID
+	return ""
+
 static func allows_essence(player) -> bool:
 	if player == null:
 		return false
-	# Empty faith_id = legacy save; treat as essence path so old runs still work
-	return player.faith_id == "essence" or player.faith_id == ""
+	return current_faith_id(player) == ESSENCE_FAITH_ID
+
+static func _remove_faith_bonuses(player, faith_id: String) -> void:
+	if player == null or faith_id == "":
+		return
+	var info: Dictionary = get_faith(faith_id)
+	var mp_bonus: int = int(info.get("max_mp_bonus", 0))
+	if mp_bonus != 0:
+		player._apply_max_mp_gain(-mp_bonus)
+	var will_bonus: int = int(info.get("will_bonus", 0))
+	if will_bonus != 0:
+		player.wl = maxi(0, player.wl - will_bonus)
+
+static func _apply_faith_bonuses(player, faith_id: String) -> void:
+	if player == null or faith_id == "":
+		return
+	var info: Dictionary = get_faith(faith_id)
+	var mp_bonus: int = int(info.get("max_mp_bonus", 0))
+	if mp_bonus != 0:
+		player._apply_max_mp_gain(mp_bonus)
+	var will_bonus: int = int(info.get("will_bonus", 0))
+	if will_bonus != 0:
+		player.wl += will_bonus
+
+static func _clear_equipped_essences(player) -> void:
+	if player == null:
+		return
+	for i in range(player.essence_slots.size()):
+		var old_id: String = String(player.essence_slots[i])
+		if old_id == "":
+			continue
+		EssenceSystem.remove(player, old_id)
+		player.essence_slots[i] = ""
+		if not player.essence_inventory.has(old_id):
+			player.essence_inventory.append(old_id)
+
+static func choose_faith(player, faith_id: String) -> bool:
+	if player == null or not is_valid_faith(faith_id):
+		return false
+	var old_faith: String = current_faith_id(player)
+	if old_faith == faith_id and bool(player.first_shrine_choice_done):
+		return false
+	_remove_faith_bonuses(player, old_faith)
+	player.faith_id = faith_id
+	player.first_shrine_choice_done = true
+	_apply_faith_bonuses(player, faith_id)
+	if faith_id != ESSENCE_FAITH_ID:
+		_clear_equipped_essences(player)
+	player.refresh_ac_from_equipment()
+	player.emit_signal("stats_changed")
+	return true
+
+static func normalize_player_state(player) -> void:
+	if player == null:
+		return
+	var normalized: String = current_faith_id(player)
+	player.faith_id = normalized
+	if normalized == "":
+		return
+	if normalized != ESSENCE_FAITH_ID:
+		_clear_equipped_essences(player)
+	player.refresh_ac_from_equipment()
+	player.emit_signal("stats_changed")
 
 static func melee_damage_mult(player) -> float:
 	if player == null:
 		return 1.0
-	return float(get_faith(player.faith_id).get("melee_damage_mult", 1.0))
+	return float(get_faith(current_faith_id(player)).get("melee_damage_mult", 1.0))
 
 static func spell_damage_mult(player) -> float:
 	if player == null:
 		return 1.0
-	return float(get_faith(player.faith_id).get("spell_damage_mult", 1.0))
+	return float(get_faith(current_faith_id(player)).get("spell_damage_mult", 1.0))
 
 static func ranged_damage_mult(player) -> float:
 	if player == null:
 		return 1.0
-	return float(get_faith(player.faith_id).get("ranged_damage_mult", 1.0))
+	return float(get_faith(current_faith_id(player)).get("ranged_damage_mult", 1.0))
 
 static func necrotic_damage_mult(player) -> float:
 	if player == null:
 		return 1.0
-	return float(get_faith(player.faith_id).get("necrotic_damage_mult", 1.0))
+	return float(get_faith(current_faith_id(player)).get("necrotic_damage_mult", 1.0))
 
 static func spell_cost_mult(player) -> float:
 	if player == null:
 		return 1.0
-	return float(get_faith(player.faith_id).get("spell_cost_mult", 1.0))
+	return float(get_faith(current_faith_id(player)).get("spell_cost_mult", 1.0))
 
 static func potion_heal_mult(player) -> float:
 	if player == null:
 		return 1.0
-	return float(get_faith(player.faith_id).get("potion_heal_mult", 1.0))
+	return float(get_faith(current_faith_id(player)).get("potion_heal_mult", 1.0))
 
 static func shield_block_bonus(player) -> float:
 	if player == null:
 		return 0.0
-	return float(get_faith(player.faith_id).get("shield_block_bonus", 0.0))
+	return float(get_faith(current_faith_id(player)).get("shield_block_bonus", 0.0))
 
 static func wand_charge_save_chance(player) -> float:
 	if player == null:
 		return 0.0
-	return float(get_faith(player.faith_id).get("wand_charge_save_chance", 0.0))
+	return float(get_faith(current_faith_id(player)).get("wand_charge_save_chance", 0.0))
 
 static func on_kill_hp(player) -> int:
 	if player == null:
 		return 0
-	return int(get_faith(player.faith_id).get("on_kill_hp", 0))
+	return int(get_faith(current_faith_id(player)).get("on_kill_hp", 0))
 
 static func on_kill_mp(player) -> int:
 	if player == null:
 		return 0
-	return int(get_faith(player.faith_id).get("on_kill_mp", 0))
+	return int(get_faith(current_faith_id(player)).get("on_kill_mp", 0))
 
 static func max_mp_bonus(player) -> int:
 	if player == null:
 		return 0
-	return int(get_faith(player.faith_id).get("max_mp_bonus", 0))
+	return int(get_faith(current_faith_id(player)).get("max_mp_bonus", 0))
 
 static func essence_inventory_bonus(player) -> int:
 	if player == null:
 		return 0
-	return int(get_faith(player.faith_id).get("essence_inventory_bonus", 0))
+	return int(get_faith(current_faith_id(player)).get("essence_inventory_bonus", 0))
 
 static func resonance_mult(player) -> float:
 	if player == null:
 		return 1.0
-	return float(get_faith(player.faith_id).get("resonance_mult", 1.0))
+	return float(get_faith(current_faith_id(player)).get("resonance_mult", 1.0))

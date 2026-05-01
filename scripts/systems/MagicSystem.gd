@@ -28,12 +28,20 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 	player.mp = max(0, player.mp - mp_cost)
 	player.emit_signal("stats_changed")
 	var power: int = _compute_power(player, spell)
+	_cast_effect(spell, player, game, power)
+	return true
+
+static func _cast_effect(spell: SpellData, player: Player, game: Node, power: int) -> void:
+	if _cast_damage_family(spell, player, game, power):
+		return
+	if _cast_status_family(spell, player, game):
+		return
+	if _cast_utility_family(spell, player, game, power):
+		return
+	_cast_buff_family(spell, player)
+
+static func _cast_damage_family(spell: SpellData, player: Player, game: Node, power: int) -> bool:
 	match spell.effect:
-		"heal":
-			_cast_heal(spell, player, power, game)
-		"blink":
-			player._blink(max(2, effective_spell_range(spell)))
-			CombatLog.post("You cast %s." % spell.display_name, Color(0.7, 0.85, 1.0))
 		"damage":
 			_damage_auto_target(spell, player, power, game)
 		"multi_damage":
@@ -44,6 +52,20 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 			_chain_damage(spell, player, power, game)
 		"drain":
 			_cast_drain(spell, player, power, game)
+		"instant_kill":
+			_cast_instant_kill(spell, player, game, 100)
+		"power_word_pain":
+			_cast_power_word(spell, player, game, 100, "pain")
+		"power_word_stun":
+			_cast_power_word(spell, player, game, 150, "stun")
+		"prismatic":
+			_cast_prismatic(spell, player, power, game)
+		_:
+			return false
+	return true
+
+static func _cast_status_family(spell: SpellData, player: Player, game: Node) -> bool:
+	match spell.effect:
 		"hold":
 			_apply_status_to_target(spell, player, game, "paralyzed", 5)
 		"sleep":
@@ -60,12 +82,22 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 			_aoe_status(spell, player, game, "stunned", 3)
 		"debuff_str":
 			_apply_status_to_target(spell, player, game, "weakened", 8)
-		"instant_kill":
-			_cast_instant_kill(spell, player, game, 100)
-		"power_word_pain":
-			_cast_power_word(spell, player, game, 100, "pain")
-		"power_word_stun":
-			_cast_power_word(spell, player, game, 150, "stun")
+		"disease":
+			_apply_status_to_target(spell, player, game, "diseased", 8)
+		"polymorph":
+			_apply_status_to_target(spell, player, game, "confused", 6)
+			CombatLog.post("The target's form shifts!", Color(0.5, 1.0, 0.6))
+		_:
+			return false
+	return true
+
+static func _cast_utility_family(spell: SpellData, player: Player, game: Node, power: int) -> bool:
+	match spell.effect:
+		"heal":
+			_cast_heal(spell, player, power, game)
+		"blink":
+			player._blink(max(2, effective_spell_range(spell)))
+			CombatLog.post("You cast %s." % spell.display_name, Color(0.7, 0.85, 1.0))
 		"banish":
 			_cast_banish(spell, player, game)
 		"fog":
@@ -75,21 +107,20 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 		"floor_travel":
 			player._teleport_far()
 			CombatLog.post("You vanish in a flash of light.", Color(0.8, 0.7, 1.0))
-		"disease":
-			_apply_status_to_target(spell, player, game, "diseased", 8)
-		"polymorph":
-			_apply_status_to_target(spell, player, game, "confused", 6)
-			CombatLog.post("The target's form shifts!", Color(0.5, 1.0, 0.6))
 		"summon":
 			_cast_summon(spell, player, power, game)
-		"prismatic":
-			_cast_prismatic(spell, player, power, game)
 		"astral":
 			player.apply_status("invulnerable", 4)
 			CombatLog.post("You become ethereal!", Color(0.7, 0.85, 1.0))
 		"time_stop":
 			player.apply_status("time_stopped", 4)
 			CombatLog.post("Time freezes around you!", Color(0.9, 0.6, 1.0))
+		_:
+			return false
+	return true
+
+static func _cast_buff_family(spell: SpellData, player: Player) -> void:
+	match spell.effect:
 		"buff_ac":
 			_cast_buff(player, "mage_armor", 15, spell.display_name,
 				"Magical armor surrounds you. (AC %d)" % (13 + player.dexterity / 2),
@@ -119,7 +150,6 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 		"buff_invulnerable":
 			_cast_buff(player, "invulnerable", 3, spell.display_name,
 				"You are immune to all harm!", Color(1.0, 0.95, 0.5))
-	return true
 
 
 static func _cast_heal(spell: SpellData, player: Player, power: int, game: Node) -> void:

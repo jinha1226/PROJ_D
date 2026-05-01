@@ -93,6 +93,7 @@ const MAX_XL: int = 20
 const MAX_SKILL_LEVEL: int = 9
 const SKILL_IDS: Array = ["endurance", "melee", "ranged", "magic", "defense", "agility", "tool"]
 const SKILL_XP_DELTA: Array = [12, 28, 55, 95, 150, 230, 340, 490, 700]
+const ENDURANCE_HP_PER_LEVEL: int = 5
 const MAGIC_SCHOOLS: Array = [
 	"fire", "cold", "air", "earth",
 	"necromancy", "hexes", "translocation", "summoning",
@@ -735,6 +736,38 @@ func take_damage(amount: int, source: String = "") -> void:
 func register_kill() -> void:
 	kills += 1
 
+func strength_hp_bonus_for_value(value: int) -> int:
+	return value / 2
+
+func compute_starting_hp(base_hp: int, base_str: int) -> int:
+	return max(1, base_hp + strength_hp_bonus_for_value(base_str))
+
+func _apply_max_hp_gain(amount: int, source: String = "") -> void:
+	if amount == 0:
+		return
+	hp_max = max(1, hp_max + amount)
+	if amount > 0:
+		hp = min(hp_max, hp + amount)
+	else:
+		hp = min(hp, hp_max)
+	if source != "" and CombatLog != null:
+		CombatLog.post(source, Color(0.85, 0.6, 0.6))
+
+func _apply_max_mp_gain(amount: int) -> void:
+	if amount == 0:
+		return
+	mp_max = max(1, mp_max + amount)
+	if amount > 0:
+		mp = min(mp_max, mp + amount)
+	else:
+		mp = min(mp, mp_max)
+
+func _endurance_hp_gain() -> int:
+	return ENDURANCE_HP_PER_LEVEL
+
+func _level_up_mp_gain() -> int:
+	return 1 + intelligence / 3
+
 func heal(amount: int) -> void:
 	hp = min(hp_max, hp + amount)
 	emit_signal("stats_changed")
@@ -812,10 +845,8 @@ func grant_skill_xp(id: String, amount: float) -> void:
 		if id == "agility":
 			ev += 1
 		elif id == "endurance":
-			var hp_gain: int = 5
-			hp_max += hp_gain
-			hp = min(hp_max, hp + hp_gain)
-			CombatLog.post("+%d max HP from Endurance." % hp_gain, Color(0.85, 0.6, 0.6))
+			var hp_gain: int = _endurance_hp_gain()
+			_apply_max_hp_gain(hp_gain, "+%d max HP from Endurance." % hp_gain)
 	skills[id] = s
 
 func grant_xp(amount: int) -> void:
@@ -833,11 +864,9 @@ func xp_to_next() -> int:
 func _level_up() -> void:
 	xl += 1
 	var hp_gain: int = _level_up_hp_gain()
-	hp_max += hp_gain
-	hp = min(hp_max, hp + hp_gain)
-	var mp_gain: int = 1 + intelligence / 3
-	mp_max += mp_gain
-	mp = min(mp_max, mp + mp_gain)
+	_apply_max_hp_gain(hp_gain)
+	var mp_gain: int = _level_up_mp_gain()
+	_apply_max_mp_gain(mp_gain)
 	CombatLog.post("Level up! You are now level %d." % xl,
 		Color(1.0, 0.9, 0.3))
 	if xl == 12 or xl == 15 or xl == 18:
@@ -864,12 +893,11 @@ func _auto_stat_bump() -> void:
 		lowest_val = intelligence
 	match lowest_name:
 		"strength":
-			var old_bonus: int = strength / 2
+			var old_bonus: int = strength_hp_bonus_for_value(strength)
 			strength += 1
-			var hp_delta: int = strength / 2 - old_bonus
+			var hp_delta: int = strength_hp_bonus_for_value(strength) - old_bonus
 			if hp_delta > 0:
-				hp_max += hp_delta
-				hp = min(hp_max, hp + hp_delta)
+				_apply_max_hp_gain(hp_delta)
 		"dexterity": dexterity += 1
 		"intelligence": intelligence += 1
 	CombatLog.post("(+1 %s)" % lowest_name.to_upper(), Color(0.75, 0.85, 1))
@@ -1060,12 +1088,16 @@ func _apply_accessory_stat(id: String) -> void:
 	if d == null:
 		return
 	match d.effect:
-		"stat_str": strength += d.effect_value; hp_max += d.effect_value / 2; hp = mini(hp + d.effect_value / 2, hp_max)
+		"stat_str":
+			var old_bonus: int = strength_hp_bonus_for_value(strength)
+			strength += d.effect_value
+			var new_bonus: int = strength_hp_bonus_for_value(strength)
+			_apply_max_hp_gain(new_bonus - old_bonus)
 		"stat_int": intelligence += d.effect_value
 		"stat_dex": dexterity += d.effect_value; ev += 1
-		"hp_bonus": hp_max += d.effect_value; hp = mini(hp + d.effect_value, hp_max)
+		"hp_bonus": _apply_max_hp_gain(d.effect_value)
 		"ac_bonus": ac += d.effect_value
-		"mp_bonus": mp_max += d.effect_value; mp = mini(mp + d.effect_value, mp_max)
+		"mp_bonus": _apply_max_mp_gain(d.effect_value)
 		"resist_poison":
 			if not resists.has("poison+"): resists.append("poison+")
 			ac += d.effect_value
@@ -1082,12 +1114,16 @@ func _remove_accessory_stat(id: String) -> void:
 	if d == null:
 		return
 	match d.effect:
-		"stat_str": strength = maxi(1, strength - d.effect_value); hp_max = maxi(1, hp_max - d.effect_value / 2); hp = mini(hp, hp_max)
+		"stat_str":
+			var old_bonus: int = strength_hp_bonus_for_value(strength)
+			strength = maxi(1, strength - d.effect_value)
+			var new_bonus: int = strength_hp_bonus_for_value(strength)
+			_apply_max_hp_gain(new_bonus - old_bonus)
 		"stat_int": intelligence = maxi(1, intelligence - d.effect_value)
 		"stat_dex": dexterity = maxi(1, dexterity - d.effect_value); ev = maxi(0, ev - 1)
-		"hp_bonus": hp_max = maxi(1, hp_max - d.effect_value); hp = mini(hp, hp_max)
+		"hp_bonus": _apply_max_hp_gain(-d.effect_value)
 		"ac_bonus": ac = maxi(0, ac - d.effect_value)
-		"mp_bonus": mp_max = maxi(1, mp_max - d.effect_value); mp = mini(mp, mp_max)
+		"mp_bonus": _apply_max_mp_gain(-d.effect_value)
 		"resist_poison":
 			resists.erase("poison+")
 			ac = maxi(0, ac - d.effect_value)

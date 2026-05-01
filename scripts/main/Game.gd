@@ -325,7 +325,7 @@ func _apply_class_to_player(class_id: String) -> void:
 	player.strength = data.starting_str
 	player.dexterity = data.starting_dex
 	player.intelligence = data.starting_int
-	player.hp_max = data.starting_hp + data.starting_str / 2
+	player.hp_max = player.compute_starting_hp(data.starting_hp, data.starting_str)
 	player.hp = player.hp_max
 	player.mp_max = data.starting_mp
 	player.mp = data.starting_mp
@@ -386,9 +386,9 @@ func _apply_race_mods(race_id: String) -> void:
 	player.strength = max(1, player.strength + race.str_mod)
 	player.dexterity = max(1, player.dexterity + race.dex_mod)
 	player.intelligence = max(1, player.intelligence + race.int_mod)
-	player.hp_max = max(1, player.hp_max + race.hp_mod)
+	player._apply_max_hp_gain(race.hp_mod)
 	player.hp = player.hp_max
-	player.mp_max = max(0, player.mp_max + race.mp_mod)
+	player._apply_max_mp_gain(race.mp_mod)
 	player.mp = player.mp_max
 	player.resists = race.resist_mods.duplicate()
 	RacePassiveSystem.register(player)
@@ -526,6 +526,7 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 		player.essence_inventory = saved_ei.duplicate()
 	player.faith_id = String(data.get("faith_id", ""))
 	player.first_shrine_choice_done = bool(data.get("first_shrine_choice_done", false))
+	FaithSystem.normalize_player_state(player)
 	player.refresh_ac_from_equipment()
 	player.set_race_from_id(GameManager.selected_race_id)
 	RacePassiveSystem.register(player)
@@ -1256,10 +1257,17 @@ func _on_player_moved(_new_pos: Vector2i) -> void:
 	_refresh_fov()
 	_center_camera_on_player()
 	_refresh_quickslots()
-	if map.altar_active and not player.first_shrine_choice_done \
-			and map.altar_map.has(player.grid_pos):
-		var faith_id: String = String(map.altar_map[player.grid_pos])
-		ShrineDialog.open_single(faith_id, player, self)
+	_try_open_shrine_choice()
+
+func _try_open_shrine_choice() -> void:
+	if map == null or player == null:
+		return
+	if not map.altar_active or FaithSystem.has_chosen_faith(player):
+		return
+	if not map.altar_map.has(player.grid_pos):
+		return
+	var faith_id: String = String(map.altar_map[player.grid_pos])
+	ShrineDialog.open_single(faith_id, player, self)
 
 const _RESPAWN_INTERVAL: int = 18
 
@@ -2311,41 +2319,51 @@ func _on_monster_died(monster: Monster) -> void:
 		await get_tree().create_timer(1.2).timeout
 		CombatLog.post("The Abyssal Sovereign collapses. The dungeon trembles...",
 				Color(0.85, 0.6, 1.0))
-		await get_tree().create_timer(1.5).timeout
-		_show_result_screen(true)
-		return
-	# B3 unique boss death activates the faith altars
-	if GameManager.depth == 3 and not map.altar_active \
-			and monster != null and monster.data != null and monster.data.is_unique:
-		map.activate_altars()
-		CombatLog.post("Ancient power stirs. The altars glow.", Color(0.85, 0.75, 1.0))
+	await get_tree().create_timer(1.5).timeout
+	_show_result_screen(true)
+	return
+	_handle_first_shrine_boss_clear(monster)
 	# Before shrine choice, suppress all essence drops
-	if not player.first_shrine_choice_done:
+	if not FaithSystem.has_chosen_faith(player):
 		return
-	# Unique monsters use dedicated essence and their own drop chance
-	if monster != null and monster.data != null and monster.data.is_unique:
+	_handle_monster_essence_drop(monster)
+
+func _handle_first_shrine_boss_clear(monster: Monster) -> void:
+	if map == null or monster == null or monster.data == null:
+		return
+	if GameManager.depth != 3 or map.altar_active or not monster.data.is_unique:
+		return
+	map.activate_altars()
+	CombatLog.post("Ancient power stirs. The altars glow.", Color(0.85, 0.75, 1.0))
+	if player != null and not FaithSystem.has_chosen_faith(player):
+		ShrineDialog.open_choice(player, self)
+
+func _handle_monster_essence_drop(monster: Monster) -> void:
+	if monster == null or monster.data == null:
+		return
+	if monster.data.is_unique:
 		var drop_chance: float = monster.data.drop_chance_override if monster.data.drop_chance_override >= 0.0 else 0.8
-		if randf() < drop_chance:
-			var uid: String = String(monster.data.essence_id)
-			if uid == "":
-				uid = EssenceSystem.random_id()
-			CombatLog.post("The %s leaves behind an essence! (%s)" % [
-				monster.data.display_name, EssenceSystem.display_name(uid)],
-				Color(1.0, 0.75, 0.3))
-			_queue_essence_pickup(uid)
+		if randf() >= drop_chance:
+			return
+		var uid: String = String(monster.data.essence_id)
+		if uid == "":
+			uid = EssenceSystem.random_id()
+		CombatLog.post("The %s leaves behind an essence! (%s)" % [
+			monster.data.display_name, EssenceSystem.display_name(uid)],
+			Color(1.0, 0.75, 0.3))
+		_queue_essence_pickup(uid)
 		return
-	# Normal monsters: chance-based random essence
-	var chance: float = 0.22 + GameManager.depth * 0.01
-	chance = min(chance, 0.40)
-	if randf() < chance:
-		var essence_id: String
-		if monster != null and monster.data != null and String(monster.data.essence_id) != "":
-			essence_id = String(monster.data.essence_id)
-		else:
-			essence_id = EssenceSystem.random_id()
-		CombatLog.post("An essence materializes! (%s)" % EssenceSystem.display_name(essence_id),
-			Color(0.8, 0.6, 1.0))
-		_queue_essence_pickup(essence_id)
+	var chance: float = min(0.22 + GameManager.depth * 0.01, 0.40)
+	if randf() >= chance:
+		return
+	var essence_id: String
+	if String(monster.data.essence_id) != "":
+		essence_id = String(monster.data.essence_id)
+	else:
+		essence_id = EssenceSystem.random_id()
+	CombatLog.post("An essence materializes! (%s)" % EssenceSystem.display_name(essence_id),
+		Color(0.8, 0.6, 1.0))
+	_queue_essence_pickup(essence_id)
 
 func _on_monster_hit(amount: int, monster: Monster) -> void:
 	if not is_instance_valid(monster):

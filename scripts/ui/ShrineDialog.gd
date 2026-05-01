@@ -27,6 +27,76 @@ const _CONFIRM_TEXT: Dictionary = {
 static func open_single(faith_id: String, player: Player, parent: Node) -> void:
 	_open_confirm(faith_id, player, parent, null)
 
+## Called after the first shrine boss event to choose among all paths.
+static func open_choice(player: Player, parent: Node) -> void:
+	var dlg: GameDialog = GameDialog.create_ratio("Choose Your Path", 0.92, 0.90)
+	parent.add_child(dlg)
+	var body: VBoxContainer = dlg.body()
+	if body == null:
+		return
+	body.add_theme_constant_override("separation", 10)
+
+	var sub_lbl := Label.new()
+	sub_lbl.text = "The first descent leaves a mark upon you. Choose the power that will shape the rest of this run."
+	sub_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	sub_lbl.add_theme_font_size_override("font_size", 20)
+	sub_lbl.add_theme_color_override("font_color", Color(0.68, 0.72, 0.78))
+	body.add_child(sub_lbl)
+	body.add_child(HSeparator.new())
+
+	var order: Array[String] = ["war", "arcana", "trickery", "death", FaithSystem.ESSENCE_FAITH_ID]
+	for faith_id in order:
+		body.add_child(_make_choice_card(faith_id, player, parent, dlg))
+
+static func _make_choice_card(faith_id: String, player: Player, parent: Node, dlg: GameDialog) -> Control:
+	var faith: Dictionary = FaithSystem.get_faith(faith_id)
+	var fcolor: Color = faith.get("color", Color.WHITE)
+
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(0, 92)
+
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 12)
+	margin.add_theme_constant_override("margin_right", 12)
+	margin.add_theme_constant_override("margin_top", 8)
+	margin.add_theme_constant_override("margin_bottom", 8)
+	panel.add_child(margin)
+
+	var hb := HBoxContainer.new()
+	hb.add_theme_constant_override("separation", 10)
+	margin.add_child(hb)
+
+	var vb := VBoxContainer.new()
+	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vb.add_theme_constant_override("separation", 2)
+	hb.add_child(vb)
+
+	var name_lbl := Label.new()
+	name_lbl.text = String(faith.get("name", faith_id))
+	name_lbl.add_theme_font_size_override("font_size", 26)
+	name_lbl.add_theme_color_override("font_color", fcolor)
+	vb.add_child(name_lbl)
+
+	var desc_lbl := Label.new()
+	desc_lbl.text = String(faith.get("short", ""))
+	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	desc_lbl.add_theme_font_size_override("font_size", 19)
+	desc_lbl.add_theme_color_override("font_color", Color(0.65, 0.68, 0.75))
+	vb.add_child(desc_lbl)
+
+	var btn := Button.new()
+	btn.custom_minimum_size = Vector2(110, 52)
+	btn.add_theme_font_size_override("font_size", 22)
+	btn.add_theme_color_override("font_color", fcolor)
+	btn.text = "Choose"
+	var selected_faith: String = faith_id
+	btn.pressed.connect(func():
+		dlg.close()
+		_open_confirm(selected_faith, player, parent, null))
+	hb.add_child(btn)
+
+	return panel
+
 
 
 static func _open_confirm(faith_id: String, player: Player, parent: Node, dlg: GameDialog) -> void:
@@ -82,20 +152,12 @@ static func _open_confirm(faith_id: String, player: Player, parent: Node, dlg: G
 
 
 static func _apply_faith(faith_id: String, player: Player, parent: Node) -> void:
-	player.faith_id = faith_id
-	player.first_shrine_choice_done = true
-
-	var mp_bonus: int = FaithSystem.max_mp_bonus(player)
-	if mp_bonus > 0:
-		player.mp_max += mp_bonus
-		player.mp = min(player.mp_max, player.mp + mp_bonus)
-	if faith_id == "death":
-		player.wl += 1
-
+	if not FaithSystem.choose_faith(player, faith_id):
+		return
 	CombatLog.post("You follow the path of %s." % FaithSystem.display_name(faith_id),
 		FaithSystem.color_of(faith_id))
 
-	if faith_id == "essence":
+	if faith_id == FaithSystem.ESSENCE_FAITH_ID:
 		_open_first_essence_choice(player, parent)
 
 
@@ -184,7 +246,7 @@ static func _grant_first_essence(eid: String, player: Player) -> void:
 		CombatLog.post("You bind %s to your first essence slot." % EssenceSystem.display_name(eid),
 			EssenceSystem.color_of(eid))
 	else:
-		player.add_essence_to_inventory(eid)
+		player.add_essence(eid)
 		CombatLog.post("You hold %s in reserve." % EssenceSystem.display_name(eid),
 			EssenceSystem.color_of(eid))
 
