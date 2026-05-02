@@ -504,38 +504,38 @@ static func generate_temple(width: int, height: int) -> Dictionary:
 
 	var offset_x: int = maxi(0, (width - 32) / 2)
 	var offset_y: int = maxi(0, (height - 36) / 2)
-	func r(x: int, y: int, w: int, h: int) -> Rect2i:
+	var r := func(x: int, y: int, w: int, h: int) -> Rect2i:
 		return Rect2i(x + offset_x, y + offset_y, w, h)
 
 	# Entry spine and vestibule.
-	_carve_rect(r(14, 1, 4, 4), tiles, width)
-	_carve_rect(r(11, 4, 10, 5), tiles, width)
+	_carve_rect(r.call(14, 1, 4, 4), tiles, width)
+	_carve_rect(r.call(11, 4, 10, 5), tiles, width)
 
 	# Symmetric shrine complex with distinct altar rooms.
-	var nw_shrine: Rect2i = r(3, 5, 7, 6)
-	var ne_shrine: Rect2i = r(22, 5, 7, 6)
-	var center_hall: Rect2i = r(10, 10, 12, 7)
-	var sw_shrine: Rect2i = r(3, 23, 7, 6)
-	var se_shrine: Rect2i = r(22, 23, 7, 6)
-	var rear_sanctum: Rect2i = r(11, 28, 10, 4)
-	var west_aisle: Rect2i = r(6, 12, 5, 10)
-	var east_aisle: Rect2i = r(21, 12, 5, 10)
-	var lower_nave: Rect2i = r(10, 18, 12, 6)
-	var exit_corridor: Rect2i = r(14, 32, 4, 3)
+	var nw_shrine: Rect2i = r.call(3, 5, 7, 6)
+	var ne_shrine: Rect2i = r.call(22, 5, 7, 6)
+	var center_hall: Rect2i = r.call(10, 10, 12, 7)
+	var sw_shrine: Rect2i = r.call(3, 23, 7, 6)
+	var se_shrine: Rect2i = r.call(22, 23, 7, 6)
+	var rear_sanctum: Rect2i = r.call(11, 28, 10, 4)
+	var west_aisle: Rect2i = r.call(6, 12, 5, 10)
+	var east_aisle: Rect2i = r.call(21, 12, 5, 10)
+	var lower_nave: Rect2i = r.call(10, 18, 12, 6)
+	var exit_corridor: Rect2i = r.call(14, 32, 4, 3)
 
 	for room in [nw_shrine, ne_shrine, center_hall, sw_shrine, se_shrine, rear_sanctum, west_aisle, east_aisle, lower_nave, exit_corridor]:
 		_carve_rect(room, tiles, width)
 
 	# Narrow connectors keep the temple room-based rather than one open blob.
-	_carve_rect(r(10, 6, 2, 2), tiles, width)
-	_carve_rect(r(20, 6, 2, 2), tiles, width)
-	_carve_rect(r(14, 8, 4, 3), tiles, width)
-	_carve_rect(r(10, 14, 2, 2), tiles, width)
-	_carve_rect(r(20, 14, 2, 2), tiles, width)
-	_carve_rect(r(10, 21, 2, 2), tiles, width)
-	_carve_rect(r(20, 21, 2, 2), tiles, width)
-	_carve_rect(r(14, 24, 4, 5), tiles, width)
-	_carve_rect(r(14, 31, 4, 2), tiles, width)
+	_carve_rect(r.call(10, 6, 2, 2), tiles, width)
+	_carve_rect(r.call(20, 6, 2, 2), tiles, width)
+	_carve_rect(r.call(14, 8, 4, 3), tiles, width)
+	_carve_rect(r.call(10, 14, 2, 2), tiles, width)
+	_carve_rect(r.call(20, 14, 2, 2), tiles, width)
+	_carve_rect(r.call(10, 21, 2, 2), tiles, width)
+	_carve_rect(r.call(20, 21, 2, 2), tiles, width)
+	_carve_rect(r.call(14, 24, 4, 5), tiles, width)
+	_carve_rect(r.call(14, 31, 4, 2), tiles, width)
 
 	var spawn := Vector2i(15 + offset_x, 1 + offset_y)
 	var stairs_dn := Vector2i(15 + offset_x, 34 + offset_y)
