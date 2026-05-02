@@ -71,6 +71,12 @@ const _ABYSS_SHIFT_COUNT: int = 12    # tiles flipped per shift
 # until we hit the goal, an enemy enters view, or HP drops.
 var _auto_path: Array = []
 var _auto_prev_hp: int = 0
+
+const _LONG_PRESS_SEC: float = 0.5
+var _lp_pos: Vector2 = Vector2.ZERO
+var _lp_time: float = 0.0
+var _lp_active: bool = false
+var _lp_fired: bool = false
 var _auto_known_ids: Dictionary = {}
 # Set when ACT triggers continuous auto-explore; cleared on cancel or completion.
 var _auto_exploring: bool = false
@@ -104,44 +110,98 @@ func _ready() -> void:
 	CombatLog.post("B%d — tap a tile (or arrows) to step, bump to attack." \
 			% GameManager.depth, Color(0.7, 0.9, 1.0))
 
+func _process(delta: float) -> void:
+	if _lp_active and not _lp_fired:
+		_lp_time += delta
+		if _lp_time >= _LONG_PRESS_SEC:
+			_lp_fired = true
+			_lp_active = false
+			var canvas_tf: Transform2D = get_viewport().get_canvas_transform()
+			var world_pos: Vector2 = canvas_tf.affine_inverse() * _lp_pos
+			var tile: Vector2i = map.world_to_grid(world_pos)
+			TileTooltip.show_at(tile, self)
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if player == null or map == null or camera == null:
 		return
 	if player.hp <= 0:
 		return
-	var screen_pos: Vector2 = Vector2.ZERO
-	var is_tap: bool = false
-	if event is InputEventScreenTouch and event.pressed:
-		screen_pos = event.position
-		is_tap = true
-	elif event is InputEventMouseButton and event.pressed \
-			and event.button_index == MOUSE_BUTTON_LEFT:
-		screen_pos = event.position
-		is_tap = true
-	if not is_tap:
-		return
-	# Any tap during auto-walk cancels it. The tap itself is then
-	# processed as a fresh action (most commonly the same tile the
-	# user already wanted).
-	if not _auto_path.is_empty() or _auto_exploring:
-		_cancel_auto_walk("tapped")
-	if _targeting_spell != null:
-		var canvas_tf: Transform2D = get_viewport().get_canvas_transform()
-		var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
-		var tile: Vector2i = map.world_to_grid(world_pos)
-		if _targeting_monster != null and tile == _targeting_monster.grid_pos:
-			_confirm_targeting()
-		elif _targeting_monster == null and _targeting_tiles.has(tile):
-			_confirm_targeting()
+
+	# Track touch/mouse for long-press detection. Release commits the tap if
+	# the hold was short; long-press is consumed in _process().
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			_lp_pos = event.position
+			_lp_time = 0.0
+			_lp_active = true
+			_lp_fired = false
 		else:
-			_cancel_targeting()
-			CombatLog.post("Spell cancelled.", Color(0.65, 0.65, 0.65))
-		get_viewport().set_input_as_handled()
+			var was_short: bool = _lp_active and not _lp_fired
+			_lp_active = false
+			if not was_short:
+				return  # already handled as long-press or cancelled
+			# Fall through to handle as normal tap.
+			var screen_pos: Vector2 = event.position
+			if not _auto_path.is_empty() or _auto_exploring:
+				_cancel_auto_walk("tapped")
+			if _targeting_spell != null:
+				var canvas_tf: Transform2D = get_viewport().get_canvas_transform()
+				var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
+				var tile: Vector2i = map.world_to_grid(world_pos)
+				if _targeting_monster != null and tile == _targeting_monster.grid_pos:
+					_confirm_targeting()
+				elif _targeting_monster == null and _targeting_tiles.has(tile):
+					_confirm_targeting()
+				else:
+					_cancel_targeting()
+					CombatLog.post("Spell cancelled.", Color(0.65, 0.65, 0.65))
+				get_viewport().set_input_as_handled()
+				return
+			if not TurnManager.is_player_turn:
+				return
+			_handle_tap(screen_pos)
+			get_viewport().set_input_as_handled()
 		return
-	if not TurnManager.is_player_turn:
+
+	# InputEventScreenDrag: cancel long-press if finger moves significantly.
+	if event is InputEventScreenDrag:
+		if _lp_active and event.position.distance_to(_lp_pos) > 12.0:
+			_lp_active = false
 		return
-	_handle_tap(screen_pos)
-	get_viewport().set_input_as_handled()
+
+	# Mouse fallback (desktop testing).
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			_lp_pos = event.position
+			_lp_time = 0.0
+			_lp_active = true
+			_lp_fired = false
+		else:
+			var was_short: bool = _lp_active and not _lp_fired
+			_lp_active = false
+			if not was_short:
+				return
+			var screen_pos: Vector2 = event.position
+			if not _auto_path.is_empty() or _auto_exploring:
+				_cancel_auto_walk("tapped")
+			if _targeting_spell != null:
+				var canvas_tf: Transform2D = get_viewport().get_canvas_transform()
+				var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
+				var tile: Vector2i = map.world_to_grid(world_pos)
+				if _targeting_monster != null and tile == _targeting_monster.grid_pos:
+					_confirm_targeting()
+				elif _targeting_monster == null and _targeting_tiles.has(tile):
+					_confirm_targeting()
+				else:
+					_cancel_targeting()
+					CombatLog.post("Spell cancelled.", Color(0.65, 0.65, 0.65))
+				get_viewport().set_input_as_handled()
+				return
+			if not TurnManager.is_player_turn:
+				return
+			_handle_tap(screen_pos)
+			get_viewport().set_input_as_handled()
 
 func _handle_tap(screen_pos: Vector2) -> void:
 	# Convert screen → world via canvas transform (camera-aware).

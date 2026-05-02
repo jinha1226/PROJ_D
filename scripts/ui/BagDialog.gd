@@ -246,14 +246,18 @@ static func _build_item_row(data: ItemData, indices: Array, plus: int,
 
 	var first: int = indices[0]
 	row.mouse_filter = Control.MOUSE_FILTER_STOP
+	var touch_start_y: float = -9999.0
 	row.gui_input.connect(func(ev: InputEvent) -> void:
-		var tapped := false
-		if ev is InputEventMouseButton \
+		if ev is InputEventScreenTouch:
+			if ev.pressed:
+				touch_start_y = ev.position.y
+			elif not ev.pressed:
+				var moved: float = abs(ev.position.y - touch_start_y)
+				touch_start_y = -9999.0
+				if moved < TouchScrollHelper.DRAG_THRESHOLD_PX:
+					ItemDetailDialog.open(first, player, dlg, dlg.get_parent())
+		elif ev is InputEventMouseButton \
 				and not ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-			tapped = true
-		elif ev is InputEventScreenTouch and not ev.pressed:
-			tapped = true
-		if tapped:
 			ItemDetailDialog.open(first, player, dlg, dlg.get_parent()))
 
 	return row
