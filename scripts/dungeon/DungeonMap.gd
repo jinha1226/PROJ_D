@@ -94,6 +94,13 @@ const CLOUD_COLORS: Dictionary = {
 	"lava":        Color(1.0,  0.3,  0.0,  0.65),
 }
 
+const CLOUD_TEXTURES: Dictionary = {
+	"fire":        "res://assets/tiles/individual/effect/cloud/cloud_fire.png",
+	"cold":        "res://assets/tiles/individual/effect/cloud/cloud_cold.png",
+	"poison":      "res://assets/tiles/individual/effect/cloud/cloud_poison.png",
+	"electricity": "res://assets/tiles/individual/effect/cloud/cloud_electricity.png",
+}
+
 const HAZARD_COLORS: Dictionary = {
 	"lava":          Color(1.0,  0.25, 0.0,  0.70),
 	"shallow_water": Color(0.3,  0.55, 1.0,  0.45),
@@ -341,6 +348,14 @@ func _draw() -> void:
 		if not (reveal_all or visible_tiles.has(cpos)):
 			continue
 		var ctype: String = cloud_tiles[cpos].get("type", "fire")
+		var crect := Rect2(Vector2(cpos.x * CELL_SIZE, cpos.y * CELL_SIZE),
+				Vector2(CELL_SIZE, CELL_SIZE))
+		var ctex_path: String = CLOUD_TEXTURES.get(ctype, "")
+		if use_tiles and ctex_path != "" and ResourceLoader.exists(ctex_path):
+			var ctex: Texture2D = load(ctex_path)
+			if ctex != null:
+				draw_texture_rect(ctex, crect, false)
+				continue
 		var ccol: Color = CLOUD_COLORS.get(ctype, Color(1, 1, 1, 0.4))
 		draw_rect(Rect2(Vector2(cpos.x * CELL_SIZE + 1, cpos.y * CELL_SIZE + 1),
 				Vector2(CELL_SIZE - 2, CELL_SIZE - 2)), ccol)
