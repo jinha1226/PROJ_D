@@ -1412,7 +1412,6 @@ func _on_player_moved(_new_pos: Vector2i) -> void:
 	_refresh_fov()
 	_center_camera_on_player()
 	_refresh_quickslots()
-	_try_open_shrine_choice()
 
 func _try_open_shrine_choice() -> void:
 	if map == null or player == null:

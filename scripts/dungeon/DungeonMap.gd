@@ -372,8 +372,8 @@ func _draw() -> void:
 		var crect := Rect2(Vector2(cpos.x * CELL_SIZE, cpos.y * CELL_SIZE),
 				Vector2(CELL_SIZE, CELL_SIZE))
 		var ctex_path: String = CLOUD_TEXTURES.get(ctype, "")
-		if use_tiles and ctex_path != "" and ResourceLoader.exists(ctex_path):
-			var ctex: Texture2D = load(ctex_path)
+		if use_tiles and ctex_path != "":
+			var ctex: Texture2D = load(ctex_path) as Texture2D
 			if ctex != null:
 				draw_texture_rect(ctex, crect, false)
 				continue
@@ -408,7 +408,7 @@ func _draw() -> void:
 		var mod: Color = Color.WHITE if in_los else Color(0.45, 0.45, 0.55)
 		var arect := Rect2(Vector2(apos.x * CELL_SIZE, apos.y * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE))
 		var atex: Texture2D = null
-		if use_tiles and path != "" and ResourceLoader.exists(path):
+		if use_tiles and path != "":
 			atex = load(path) as Texture2D
 		if atex != null:
 			draw_texture_rect(atex, arect, false, mod)
