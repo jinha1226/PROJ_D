@@ -71,7 +71,7 @@ static func generate(width: int, height: int, map_seed: int = -1,
 		"tiles": tiles,
 		"spawn": spawn,
 		"stairs_down": stairs_down,
-		"extra_stairs_down": extra_stairs_down,
+		"extra_stairs_down": [],
 		"stairs_up": spawn,
 		"rooms": rooms,
 		"branch_pos": branch_pos,
@@ -281,7 +281,7 @@ static func generate_cave(width: int, height: int, map_seed: int = -1,
 			tiles[branch_pos.y * width + branch_pos.x] = DungeonMap.Tile.BRANCH_DOWN
 	var empty_rooms: Array[Rect2i] = []
 	return {"tiles": tiles, "spawn": spawn, "stairs_down": stairs_down,
-			"extra_stairs_down": extra_stairs_down, "stairs_up": spawn, "rooms": empty_rooms, "branch_pos": branch_pos}
+			"extra_stairs_down": [], "stairs_up": spawn, "rooms": empty_rooms, "branch_pos": branch_pos}
 
 static func _count_wall_neighbors(x: int, y: int, tiles: PackedByteArray,
 		width: int, height: int) -> int:
