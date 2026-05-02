@@ -41,6 +41,7 @@ func save_run(player, game_manager) -> bool:
 		"selected_race_id": game_manager.selected_race_id,
 		"identified": game_manager.identified,
 		"pseudonyms": game_manager.pseudonyms,
+		"potion_colors": game_manager.potion_colors,
 		"kill_counts": game_manager.kill_counts,
 		"player": {
 			"hp": player.hp,

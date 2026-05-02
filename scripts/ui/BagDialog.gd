@@ -178,8 +178,16 @@ static func _make_thumbnail(data: ItemData) -> Control:
 	var container := Control.new()
 	container.custom_minimum_size = Vector2(THUMB_SIZE, THUMB_SIZE)
 	container.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var base_path: String = data.tile_path if data.tile_path != "" else ""
-	var show_identified: bool = GameManager.is_identified(data.id)
+
+	# Potions use per-run random color as the base tile.
+	var base_path: String
+	if data.kind == "potion" and GameManager != null:
+		base_path = GameManager.potion_color_tile(data.id)
+	else:
+		base_path = data.tile_path if data.tile_path != "" else ""
+
+	var show_identified: bool = GameManager != null and GameManager.is_identified(data.id)
+
 	if base_path != "" and ResourceLoader.exists(base_path):
 		var rect := TextureRect.new()
 		rect.texture = load(base_path) as Texture2D
@@ -188,15 +196,37 @@ static func _make_thumbnail(data: ItemData) -> Control:
 		rect.anchor_bottom = 1.0
 		rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		container.add_child(rect)
+
 	if show_identified and data.identified_tile_path != "" \
 			and ResourceLoader.exists(data.identified_tile_path):
-		var overlay := TextureRect.new()
-		overlay.texture = load(data.identified_tile_path) as Texture2D
-		overlay.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		overlay.anchor_right = 1.0
-		overlay.anchor_bottom = 1.0
-		overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		container.add_child(overlay)
+		if data.kind == "potion":
+			# Small corner overlay: identified effect icon at bottom-right.
+			var corner_size: float = THUMB_SIZE * 0.45
+			var corner := TextureRect.new()
+			corner.texture = load(data.identified_tile_path) as Texture2D
+			corner.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			corner.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			corner.custom_minimum_size = Vector2(corner_size, corner_size)
+			corner.anchor_left = 1.0
+			corner.anchor_right = 1.0
+			corner.anchor_top = 1.0
+			corner.anchor_bottom = 1.0
+			corner.offset_left = -corner_size
+			corner.offset_top = -corner_size
+			corner.offset_right = 0.0
+			corner.offset_bottom = 0.0
+			corner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			container.add_child(corner)
+		else:
+			# Full overlay for scrolls/books etc.
+			var overlay := TextureRect.new()
+			overlay.texture = load(data.identified_tile_path) as Texture2D
+			overlay.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			overlay.anchor_right = 1.0
+			overlay.anchor_bottom = 1.0
+			overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			container.add_child(overlay)
+
 	return container
 
 

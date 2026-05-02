@@ -2423,17 +2423,31 @@ func _refresh_quickslots() -> void:
 			bottom_hud.set_quickslot_display(i, data2.glyph, data2.glyph_color)
 
 func _make_item_icon(data: ItemData) -> Texture2D:
-	if data.tile_path == "" or not ResourceLoader.exists(data.tile_path):
+	var base_path: String = data.tile_path
+	if data.kind == "potion":
+		base_path = GameManager.potion_color_tile(data.id)
+	if base_path == "" or not ResourceLoader.exists(base_path):
 		return null
 	if GameManager.is_identified(data.id) and data.identified_tile_path != "" \
 			and ResourceLoader.exists(data.identified_tile_path):
-		var img_base: Image = (load(data.tile_path) as Texture2D).get_image()
+		var img_base: Image = (load(base_path) as Texture2D).get_image()
 		var img_over: Image = (load(data.identified_tile_path) as Texture2D).get_image()
-		if img_base.get_size() == img_over.get_size():
+		if data.kind == "potion":
+			# Small corner overlay (bottom-right ~44% of tile size).
+			var base_w: int = img_base.get_width()
+			var base_h: int = img_base.get_height()
+			var cw: int = int(base_w * 0.44)
+			var ch: int = int(base_h * 0.44)
+			img_over.resize(cw, ch, Image.INTERPOLATE_BILINEAR)
 			img_base.blend_rect(img_over,
-					Rect2i(Vector2i.ZERO, img_over.get_size()), Vector2i.ZERO)
+					Rect2i(Vector2i.ZERO, Vector2i(cw, ch)),
+					Vector2i(base_w - cw, base_h - ch))
+		else:
+			if img_base.get_size() == img_over.get_size():
+				img_base.blend_rect(img_over,
+						Rect2i(Vector2i.ZERO, img_over.get_size()), Vector2i.ZERO)
 		return ImageTexture.create_from_image(img_base)
-	return load(data.tile_path) as Texture2D
+	return load(base_path) as Texture2D
 
 func _on_magic_pressed() -> void:
 	if player == null:

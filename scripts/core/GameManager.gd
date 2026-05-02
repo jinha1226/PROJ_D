@@ -6,9 +6,28 @@ signal settings_changed
 
 const SETTINGS_PATH: String = "user://settings.json"
 
-const _POTION_ADJ: Array = ["bubbling", "fizzy", "cloudy", "smoky",
-	"viscous", "silky", "oily", "murky", "glowing", "still",
-	"opaque", "effervescent"]
+const _POTION_COLORS: Array = [
+	{"file": "brown",        "name": "갈색"},
+	{"file": "ruby",         "name": "루비색"},
+	{"file": "sky_blue",     "name": "하늘색"},
+	{"file": "golden",       "name": "황금색"},
+	{"file": "emerald",      "name": "에메랄드색"},
+	{"file": "purple_red",   "name": "자주색"},
+	{"file": "magenta",      "name": "자홍색"},
+	{"file": "cyan",         "name": "청록색"},
+	{"file": "pink",         "name": "분홍색"},
+	{"file": "silver",       "name": "은색"},
+	{"file": "white",        "name": "흰색"},
+	{"file": "orange",       "name": "주황색"},
+	{"file": "murky",        "name": "탁한"},
+	{"file": "puce",         "name": "적갈색"},
+	{"file": "fizzy",        "name": "탄산"},
+	{"file": "bubbly",       "name": "보글보글"},
+	{"file": "cloudy",       "name": "흐린"},
+	{"file": "dark",         "name": "어두운"},
+	{"file": "black",        "name": "검은"},
+	{"file": "yellow",       "name": "노란"},
+]
 const _SCROLL_WORDS: Array = ["GIB XON", "VEL AMR", "HYAR ZED",
 	"MOR TEX", "ARN BEK", "DUO LIS", "KER NAR", "FAL MIR",
 	"QUA ZEN", "ORA TUM", "BEL TOR", "NIX HAL"]
@@ -18,8 +37,9 @@ const _BOOK_ADJ: Array = ["obsidian", "crimson", "ancient", "gilded",
 var depth: int = 1
 var seed: int = 0
 var gold: int = 0
-var identified: Dictionary = {}  # item_id -> true once identified
-var pseudonyms: Dictionary = {}  # item_id -> "fuzzy potion" for this run
+var identified: Dictionary = {}   # item_id -> true once identified
+var pseudonyms: Dictionary = {}   # item_id -> "갈색 포션" for this run
+var potion_colors: Dictionary = {} # item_id -> "brown" (file base name)
 var run_in_progress: bool = false
 
 # Character selection — set by menus before start_new_run().
@@ -70,6 +90,7 @@ func start_new_run(random_seed: int = -1) -> void:
 	depth = 1
 	gold = 0
 	identified.clear()
+	potion_colors.clear()
 	floor_cache.clear()
 	branch_zone = ""
 	branch_floor = 0
@@ -111,7 +132,8 @@ func load_run() -> bool:
 	selected_race_id = String(data.get("selected_race_id", "human"))
 	identified = data.get("identified", {})
 	pseudonyms = data.get("pseudonyms", {})
-	if pseudonyms.is_empty():
+	potion_colors = data.get("potion_colors", {})
+	if pseudonyms.is_empty() or potion_colors.is_empty():
 		_generate_pseudonyms()
 	var saved_kc = data.get("kill_counts", null)
 	if saved_kc is Dictionary:
@@ -128,23 +150,32 @@ func identify(item_id: String) -> void:
 
 func _generate_pseudonyms() -> void:
 	pseudonyms.clear()
-	var potions: Array = _POTION_ADJ.duplicate()
+	potion_colors.clear()
+	var colors: Array = _POTION_COLORS.duplicate()
 	var scrolls: Array = _SCROLL_WORDS.duplicate()
 	var books: Array = _BOOK_ADJ.duplicate()
-	potions.shuffle()
+	colors.shuffle()
 	scrolls.shuffle()
 	books.shuffle()
+	var ci: int = 0
 	for item in ItemRegistry.all:
 		match item.kind:
 			"potion":
-				if not potions.is_empty():
-					pseudonyms[item.id] = "%s potion" % potions.pop_back()
+				var col: Dictionary = colors[ci % colors.size()]
+				ci += 1
+				potion_colors[item.id] = col.file
+				pseudonyms[item.id] = "%s 포션" % col.name
 			"scroll":
 				if not scrolls.is_empty():
 					pseudonyms[item.id] = "scroll labeled %s" % scrolls.pop_back()
 			"book":
 				if not books.is_empty():
 					pseudonyms[item.id] = "%s tome" % books.pop_back()
+
+
+func potion_color_tile(item_id: String) -> String:
+	var color_file: String = potion_colors.get(item_id, "brown")
+	return "res://assets/tiles/individual/item/potion/%s.png" % color_file
 
 func display_name_of(item_id: String) -> String:
 	var data = ItemRegistry.get_by_id(item_id) if ItemRegistry != null and item_id != "" else null
