@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002014"]
 
-[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+[ext_resource type="Script" uid="uid://dv8ov0nh7jshw" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
 
 [resource]
 script = ExtResource("1_mdata")
@@ -11,16 +11,15 @@ hp = 147
 hd = 14
 ac = 4
 ev = 10
-speed = 10
-sight_range = 8
-attacks = [{"damage": 30, "flavour": "claw"}]
-ranged_attack = {}
+attacks = [{
+"damage": 30,
+"flavour": "claw"
+}]
 resists = ["cold"]
 min_depth = 5
 max_depth = 10
 weight = 15
 xp_value = 5
-is_boss = false
 tile_path = "res://assets/tiles/individual/mon/undead/ghoul.png"
 glyph = "z"
 glyph_color = Color(0.6, 0.75, 0.45, 1)

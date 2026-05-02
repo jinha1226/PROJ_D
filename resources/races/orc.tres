@@ -1,22 +1,36 @@
 [gd_resource type="Resource" script_class="RaceData" format=3 uid="uid://00201eqoem53"]
 
-[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+[ext_resource type="Script" uid="uid://suogob65ee47" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
 
 [resource]
 script = ExtResource("1_rdata")
 id = "hill_orc"
 display_name = "Hill Orc"
-hp_per_level = 6
-description = "Brutal and resilient. +2 STR / +4 HP, -1 INT. Deals bonus melee damage when injured."
+description = "Brutal and resilient. +2 STR, -2 DEX, +1 HP. Deals bonus melee damage when injured."
 base_sprite_path = "res://assets/tiles/individual/player/base/orc_m.png"
 unlocked = true
 unlock_kind = "kill"
 unlock_trigger_id = "orc"
 str_mod = 2
 dex_mod = -2
-int_mod = 0
 hp_mod = 1
-mp_mod = 0
-resist_mods = []
-skill_aptitudes = {"endurance": 1, "melee": 1, "ranged": -1, "magic": 1, "defense": 1, "agility": -2, "tool": 0}
+skill_aptitudes = {
+"agility": -2,
+"arcane": 1,
+"armor": 1,
+"blade": 1,
+"elemental": 1,
+"fighting": 1,
+"hafted": 1,
+"hex": 1,
+"necromancy": 1,
+"polearm": 1,
+"ranged": -1,
+"shield": 0,
+"spellcasting": 1,
+"summoning": 1,
+"tool": 0,
+"unarmed": 1
+}
 passive_id = "bloodthirst"
+hp_per_level = 6

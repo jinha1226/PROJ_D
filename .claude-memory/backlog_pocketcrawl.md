@@ -1,69 +1,72 @@
 ---
 name: PocketCrawl pending backlog
-description: Next-session task list — bugs, features, and major design work confirmed by user
+description: Next-session task list — bugs, features, and balance work. Primary source: docs/balance/claude_code_balance_handoff.md + claude_code_drop_table_handoff.md + claude_code_essence_and_resistance_handoff.md (2026-04-27)
 type: project
-originSessionId: cbad590a-8beb-4eb1-bd29-f361f6be2fd2
+originSessionId: 545aa407-23ef-4b76-ad7b-298f33b869e6
 ---
-## 대규모 작업 완료 이력
+## 현재 방향 (handoff 기준)
 
-### Zone & Monster Expansion ✅ DONE (main에 머지)
-- 8존×3층+보스, 38몬스터, CA맵, 환경피해, EssenceSystem poison/neg
+- 목표: mobile-readable, 빠른 층 페이싱, 압축된 전술 결정
+- 클래스: Fighter(방어/근접), Mage(마법/민첩), Rogue(원거리/민첩)
+- 스킬 5개 — 두 핵심 스킬이 8~9까지, 전문화가 중요
+- Essence = 두 번째 빌드 축 (신 시스템 대체)
+- 저항: fire / cold / poison / will 4종류로 단순화
+- 맵: 32×36, Pixel Dungeon보다 약간 크고 구 DCSS보다 확연히 좁음
 
-### 이전 세션 완료 ✅ (2026-04-24)
-- 스킬, 마법, 종족 패시브, 직업 선택, 에센스, Bestiary 등 다수
+## 완료된 작업 (2026-04-27 세션)
 
-### 이번 세션 완료 ✅ (2026-04-25)
+### 맵 / 던전
+- ✅ 문(Door) 시스템, 맵 압축(32×36), _COR 버그 수정
 
-#### 마법 시스템
-- **아머 마법 패널티**: 로브=×1.0, 가죽=×0.85, 체인=×0.65, 기타=×0.5
-  - MagicSystem._armor_spell_mult() + MagicDialog stat line에 ⚠-X% 표시
-- **스킬 기반 마법 게이팅**: xl_required → spell_level ≤ 학파스킬로 변경
-  - MagicDialog locked 조건, MagicSystem cast 체크 모두 반영
-  - 잠금 메시지: "Evocation skill 3 required"
-- **Fog Cloud 구현**: DungeonMap.fog_tiles, add_fog(), tick_fog(), is_opaque() 연동
-  - 반경 3칸, 8턴 지속, 파란 반투명 오버레이, 층 이동 시 초기화
-  - Game.gd _on_player_turn_started에서 tick_fog() 매 턴 호출
+### 드롭 이코노미
+- ✅ 층당 랜덤 포션/스크롤/장비, 책 40% 확률
+- ✅ 섹터 확정드롭(3층=1섹터): 회복포션, 강화스크롤, 완드
+- ✅ 에센스 섹터당 2개, 장비 티어 가중치, 완드 충전수 하향
 
-#### 밸런스 리워크
-- **플레이어 기본 HP**: 30 → 22, 레벨업 HP 5+str/5 → 3+str/5
-- **몬스터 데미지 공식**: randi(1, base) → randi(base×0.6, base×1.5) (최솟값 대폭 상승)
-- **대기 HP 회복 제거** → 부상 시스템으로 대체
-- **스킬 XP 임계값**: ×0.65 (35% 감소, 레벨업 빠르게)
-- **층 아이템 드롭**: 4~8개 → 2~4개
-- **아크메이지 시작 아이템**: 22개 → 3개 (healing, magic potion, identify scroll)
-- **회복 포션**: 10 → 15 HP (포션이 더 소중해짐)
+### Essence & Resistance 시스템
+- ✅ 저항: necromancy+ 제거 (wight, mummy에서)
+- ✅ EssenceSystem: 8개 고유 몬스터 에센스 추가
+  (gloam, cinder, serpent, bastion, dread, bloodwake, tempest, pale_star)
+- ✅ MonsterData: is_unique, drop_chance_override 필드 추가
+- ✅ 8개 고유 몬스터 .tres 파일 생성 (섹터 1~8 배치)
+- ✅ MonsterRegistry: 고유 몬스터 등록, unique_for_depth(), is_unique 가드
+- ✅ Game.gd: _spawn_unique_for_floor (섹터 3번째 층), _on_monster_died unique 분기
+- ✅ CombatSystem: gloam 비인지 데미지 +35%, tempest 원거리 +15%
+- ✅ Player.gd: bloodwake 포션 회복 -20%, bastion+vitality +3
+- ✅ random_id()에서 고유 에센스 제외 (전용 드롭 채널만)
 
-#### 부상(Injury) 시스템
-- `player.injury: int` — 피해 받을 때 ceil(damage/2) 누적
-- 대기 회복: `hp_max - injury`까지만 회복 (injury 쌓이면 대기 회복 상한 낮아짐)
-- `heal()` (포션): injury도 같이 제거 + HP를 hp_max까지 회복 가능
-- `heal_injury()` (붕대): injury만 제거, cleared/2만큼 HP 소폭 회복
-- HP 바 표시: injury 있으면 `HP 15/22 ⚕-8` 형태
-- SaveManager/Game.gd 저장·로드 연동
-- **붕대 아이템** 신규 추가 (`bandage.tres`, effect="bandage", value=10)
-  - ItemRegistry 등록, 층 드롭 풀 포함
+### 공명(Resonance) 추가
+- ✅ Gloam+Swiftness, Cinder+Arcana, Serpent+Swiftness
+- ✅ Bastion+Vitality, Dread+Warding, Bloodwake+Fury
+- ✅ Tempest+Arcana, Pale Star+Arcana
 
-#### balance JSON 업데이트
-- config/balance/spells.json: power_formula, armor_spell_penalty, magic_missile 수치
-- config/balance/core_rules.json: armor_magic_interaction 규칙
-- config/balance/player_stats.json: base_hp 22, hp_regen wait=0
+### 기타
+- ✅ 자동이동 중 HP/MP 재생 (passive regen)
 
 ---
 
 ## 미완료 / 다음 작업
 
-### 즉시 처리 필요
-- **Bestiary 버튼 연결**: BottomHUD .tscn 씬에서 _on_bestiary_pressed 버튼 wiring (에디터 작업)
-- **Reach 시스템**: Spearman 직업 있지만 polearm 2칸 공격 로직 미구현
-- **Ranger 무기**: 현재 mace 임시 — short_bow 아이템 없음
+### P3: Rogue 정체성 완성
+- 현재 위험: 수치만 다른 약한 Fighter처럼 느껴질 수 있음
+- 탐색: 초반 원거리 데미지 강화, agility 상호작용, 유틸리티 아이템 루프, 인지 조작 아이템
+- 피할 것: 취약한 근접 은신 세금으로 회귀
 
-### 설계 논의 중
-- **디아블로식 affix 아이템**: 노말/매직/레어 등급, 랜덤 접두·접미사
-- **마을 시스템**: 상점 + 동료 영입
+### P4: Injury 공정성 패스
+- 목표: 압박 유지, 좌절감 제거
+- 점검: 피격당 injury 누적률, 방어 기반 injury 경감, 포션/붕대 회복 커브
+- Fighter가 Mage 대비 불합리하게 불리하지 않아야 함
 
-### 기존 버그 (대기)
-1. 몬스터 공격 속도 — MonsterAI.gd, TurnManager.gd
-2. 아이스 마법책 읽기 불가 — Player.gd, ItemRegistry.gd
-3. 계단 올라가기 불가 + 층간 상태 유지 — Game.gd, GameManager.gd
-4. 미감정 포션/스크롤 시스템
-5. 밝힌 맵 터치로 멀리 이동 (auto-walk)
+### P5: Essence 공명 패스
+- 현재 공명 효과 체감 여부 확인
+- 모든 주요 에센스에 명확한 장단점
+- 공명 보너스가 노릴 만한 가치 있는지
+- 인벤 상한이 의미있는 픽업 결정을 만드는지
+
+## 피해야 할 것 (handoff 명시)
+- 많은 약한 적으로 가득 찬 넓은 맵
+- 모든 클래스를 잡식 하이브리드로 만들기
+- 모든 문제를 스탯 인플레로 해결
+- 저항 타입 재증가 (fire/cold/poison/will 4개 유지)
+- 고유 에센스를 단순 스탯 잭팟으로 만들기
+- 에센스 인벤 무제한 완화

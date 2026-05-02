@@ -24,7 +24,7 @@ var _dragged: bool = false
 
 
 func _ready() -> void:
-	add_theme_font_size_override("font_size", 39)
+	add_theme_font_size_override("font_size", 22)
 	button_down.connect(_on_button_down)
 	button_up.connect(_on_button_up)
 	pressed.connect(_on_pressed)
@@ -78,6 +78,7 @@ func set_item(icon: Texture2D, text: String) -> void:
 		icon_rect.visible = icon != null
 	if label:
 		label.text = text
+	self.text = "" if icon != null else "+"
 
 
 ## New API used for consumable quickslots: show a short label tinted with

@@ -1,55 +1,98 @@
 {
-  "version": "balance_v2_mobile",
+  "version": "balance_v3_split_schools",
   "magic_skill_model": {
-    "single_skill": "magic",
-    "school_identity_source": "spell_lists_only",
-    "spell_learning": "mage_starts_with_levelup_choices_offclass_starts_from_books_then_levels",
+    "core_skill": "spellcasting",
+    "schools": [
+      "elemental",
+      "arcane",
+      "hex",
+      "necromancy",
+      "summoning"
+    ],
+    "school_identity_source": "normalized_spell_school_tags",
+    "spell_learning": "mage_starts_with_one_school_then_books_and_levelups_expand",
     "int_requirement_formula": "7 + spell_level * 2"
   },
   "spell_level_budget": {
     "1": {
-      "mp_cost": [2, 3],
+      "mp_cost": [
+        2,
+        3
+      ],
       "role": "basic attack, weak control, short buff",
       "expected_impact": "20-30% of standard enemy hp"
     },
     "2": {
-      "mp_cost": [3, 4],
+      "mp_cost": [
+        3,
+        4
+      ],
       "role": "improved basic, movement, utility"
     },
     "3": {
-      "mp_cost": [4, 5],
+      "mp_cost": [
+        4,
+        5
+      ],
       "role": "first real swing spell",
       "expected_impact": "40-55% of standard enemy hp"
     },
     "4": {
-      "mp_cost": [5, 6],
+      "mp_cost": [
+        5,
+        6
+      ],
       "role": "aoe, strong buff, stronger control"
     },
     "5": {
-      "mp_cost": [6, 7],
+      "mp_cost": [
+        6,
+        7
+      ],
       "role": "mid-late game core spell",
       "expected_impact": "60-80% of standard enemy hp"
     },
     "6": {
-      "mp_cost": [7, 8],
+      "mp_cost": [
+        7,
+        8
+      ],
       "role": "fight-shaping spell"
     },
     "7": {
-      "mp_cost": [8, 10],
+      "mp_cost": [
+        8,
+        10
+      ],
       "role": "high-tier, must have strong constraints"
     },
     "8": {
-      "mp_cost": [10, 12],
+      "mp_cost": [
+        10,
+        12
+      ],
       "role": "boss or crisis spell"
     },
     "9": {
-      "mp_cost": [12, 15],
+      "mp_cost": [
+        12,
+        15
+      ],
       "role": "top-tier finisher or encounter breaker"
     }
   },
   "combat_expectation": {
-    "low_level_spell_casts_per_fight": [2, 4],
-    "mid_level_spell_casts_per_fight": [1, 2],
-    "high_level_spell_casts_per_fight": [0, 1]
+    "low_level_spell_casts_per_fight": [
+      2,
+      4
+    ],
+    "mid_level_spell_casts_per_fight": [
+      1,
+      2
+    ],
+    "high_level_spell_casts_per_fight": [
+      0,
+      1
+    ]
   }
 }

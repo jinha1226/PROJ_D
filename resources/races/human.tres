@@ -1,22 +1,12 @@
-[gd_resource type="Resource" script_class="RaceData" load_steps=2 format=3 uid="uid://bracehuman001"]
+[gd_resource type="Resource" script_class="RaceData" format=3 uid="uid://bracehuman001"]
 
-[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+[ext_resource type="Script" uid="uid://suogob65ee47" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
 
 [resource]
 script = ExtResource("1_rdata")
 id = "human"
 display_name = "Human"
-hp_per_level = 5
-description = "Versatile and adaptable. No bonuses, no penalties — works with any class."
+description = "Versatile and adaptable. No stat bonuses, no stat penalties. Fits any class or faith path."
 base_sprite_path = "res://assets/tiles/individual/player/base/human_m.png"
 unlocked = true
-unlock_kind = ""
-unlock_trigger_id = ""
-str_mod = 0
-dex_mod = 0
-int_mod = 0
-hp_mod = 0
-mp_mod = 0
-resist_mods = []
-skill_aptitudes = {}
 passive_id = "adaptable"

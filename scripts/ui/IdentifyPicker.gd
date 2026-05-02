@@ -21,7 +21,7 @@ static func open(player: Player, parent: Node,
 		var id: String = String(entry.get("id", ""))
 		if id == "" or seen.has(id):
 			continue
-		var data: ItemData = ItemRegistry.get_by_id(id)
+		var data: ItemData = ItemRegistry.get_by_id(id) if ItemRegistry != null and id != "" else null
 		if data == null:
 			continue
 		if data.kind != "potion" and data.kind != "scroll" \

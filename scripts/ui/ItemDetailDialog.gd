@@ -11,7 +11,7 @@ static func open(item_index: int, player: Player,
 	if item_index < 0 or item_index >= player.items.size():
 		return
 	var entry: Dictionary = player.items[item_index]
-	var data: ItemData = ItemRegistry.get_by_id(String(entry.get("id", "")))
+	var data: ItemData = ItemRegistry.get_by_id(String(entry.get("id", ""))) if ItemRegistry != null and String(entry.get("id", "")) != "" else null
 	if data == null:
 		return
 	var plus: int = int(entry.get("plus", 0))
@@ -191,7 +191,7 @@ static func _build_comparison(data: ItemData, plus: int, player: Player) -> Cont
 	if data.kind == "weapon":
 		if player.equipped_weapon_id == "" or player.equipped_weapon_id == data.id:
 			return null
-		var ew: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
+		var ew: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
 		if ew == null:
 			return null
 		var ew_plus: int = int(player.equipped_weapon_entry().get("plus", 0))
@@ -207,7 +207,7 @@ static func _build_comparison(data: ItemData, plus: int, player: Player) -> Cont
 	elif data.kind == "armor":
 		if player.equipped_armor_id == "" or player.equipped_armor_id == data.id:
 			return null
-		var ea: ItemData = ItemRegistry.get_by_id(player.equipped_armor_id)
+		var ea: ItemData = ItemRegistry.get_by_id(player.equipped_armor_id) if ItemRegistry != null and player.equipped_armor_id != "" else null
 		if ea == null:
 			return null
 		var ea_plus: int = int(player.equipped_armor_entry().get("plus", 0))

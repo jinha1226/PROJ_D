@@ -1,22 +1,36 @@
 [gd_resource type="Resource" script_class="RaceData" format=3 uid="uid://ctmj0hntx0bjg"]
 
-[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+[ext_resource type="Script" uid="uid://suogob65ee47" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
 
 [resource]
 script = ExtResource("1_rdata")
 id = "gargoyle"
 display_name = "Gargoyle"
-hp_per_level = 3
-description = "Living stone. Natural AC +4, immune to poison. Low HP, but stone body shrugs off punishment. Poor at magic and ranged combat."
+description = "Living stone. +3 STR, -3 DEX, -2 HP. Natural AC +4 and immune to poison."
 base_sprite_path = "res://assets/tiles/individual/player/base/gargoyle_m.png"
-unlocked = false
 unlock_kind = "kill"
 unlock_trigger_id = "gargoyle"
 str_mod = 3
 dex_mod = -3
-int_mod = 0
 hp_mod = -2
-mp_mod = 0
 resist_mods = ["poison+"]
-skill_aptitudes = {"endurance": 0, "melee": -1, "ranged": -1, "magic": -1, "defense": 1, "agility": -1, "tool": 0}
+skill_aptitudes = {
+"agility": -1,
+"arcane": -1,
+"armor": 1,
+"blade": -1,
+"elemental": -1,
+"fighting": 0,
+"hafted": -1,
+"hex": -1,
+"necromancy": -1,
+"polearm": -1,
+"ranged": -1,
+"shield": 0,
+"spellcasting": -1,
+"summoning": -1,
+"tool": 0,
+"unarmed": -1
+}
 passive_id = "stone_body"
+hp_per_level = 3

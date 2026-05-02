@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://brdq0mdn2rkn"]
 
-[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+[ext_resource type="Script" uid="uid://dv8ov0nh7jshw" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
 
 [resource]
 script = ExtResource("1_mdata")
@@ -11,16 +11,20 @@ hp = 88
 hd = 16
 ac = 12
 ev = 2
-speed = 10
 sight_range = 9
-attacks = [{"damage": 45, "flavour": "club"}]
-ranged_attack = {"damage": 14, "range": 8, "verb": "hurls a boulder at"}
-resists = []
+attacks = [{
+"damage": 45,
+"flavour": "club"
+}]
+ranged_attack = {
+"damage": 14,
+"range": 8,
+"verb": "hurls a boulder at"
+}
 min_depth = 13
 max_depth = 20
 weight = 5
 xp_value = 60
-is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/giants/stone_giant.png"
 glyph = "H"
 glyph_color = Color(0.7, 0.7, 0.6, 1)

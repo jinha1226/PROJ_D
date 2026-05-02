@@ -77,5 +77,8 @@ func get_by_id(id: String) -> SpellData:
 func get_by_school(school: String) -> Array:
 	return all.filter(func(s): return s.school == school)
 
+func get_by_progression_school(school: String) -> Array:
+	return all.filter(func(s): return Player.progression_school_for(String(s.school)) == school)
+
 func get_available_for_xl(xl: int) -> Array:
 	return all.filter(func(s): return s.xl_required <= xl)

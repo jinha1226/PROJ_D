@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002036"]
 
-[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+[ext_resource type="Script" uid="uid://dv8ov0nh7jshw" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
 
 [resource]
 script = ExtResource("1_mdata")
@@ -11,16 +11,15 @@ hp = 71
 hd = 11
 ac = 10
 ev = 10
-speed = 10
-sight_range = 8
-attacks = [{"damage": 33, "flavour": "slash"}]
-ranged_attack = {}
+attacks = [{
+"damage": 33,
+"flavour": "slash"
+}]
 resists = ["cold"]
 min_depth = 10
 max_depth = 18
 weight = 6
 xp_value = 22
-is_boss = false
 tile_path = "res://assets/tiles/individual/mon/undead/vampire_knight.png"
 glyph = "V"
 glyph_color = Color(0.3, 0.2, 0.4, 1)

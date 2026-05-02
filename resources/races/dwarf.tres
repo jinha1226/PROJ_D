@@ -1,22 +1,36 @@
 [gd_resource type="Resource" script_class="RaceData" format=3 uid="uid://bracedwarf001"]
 
-[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+[ext_resource type="Script" uid="uid://suogob65ee47" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
 
 [resource]
 script = ExtResource("1_rdata")
 id = "dwarf"
 display_name = "Dwarf"
-hp_per_level = 6
-description = "Stout and resilient. +1 STR / +4 HP, -1 DEX. Innate poison resistance."
+description = "Stout and resilient. +2 STR, -3 DEX, +1 HP. Innate poison resistance."
 base_sprite_path = "res://assets/tiles/individual/player/base/dwarf_m.png"
-unlocked = false
 unlock_kind = "kill"
 unlock_trigger_id = "deep_dwarf"
 str_mod = 2
 dex_mod = -3
-int_mod = 0
 hp_mod = 1
-mp_mod = 0
 resist_mods = ["poison+"]
-skill_aptitudes = {"endurance": 1, "melee": 1, "ranged": -1, "magic": 0, "defense": 2, "agility": 0, "tool": 1}
+skill_aptitudes = {
+"agility": 0,
+"arcane": 0,
+"armor": 2,
+"blade": 1,
+"elemental": 0,
+"fighting": 1,
+"hafted": 1,
+"hex": 0,
+"necromancy": 0,
+"polearm": 1,
+"ranged": -1,
+"shield": 0,
+"spellcasting": 0,
+"summoning": 0,
+"tool": 1,
+"unarmed": 1
+}
 passive_id = "stone_sense"
+hp_per_level = 6

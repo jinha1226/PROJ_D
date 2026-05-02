@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bqwbpodsyrn5h"]
 
-[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+[ext_resource type="Script" uid="uid://dv8ov0nh7jshw" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
 
 [resource]
 script = ExtResource("1_mdata")
@@ -9,21 +9,23 @@ display_name = "deep elf archer"
 tier = 3
 hp = 50
 hd = 10
-ac = 0
 ev = 15
-speed = 10
 sight_range = 9
-attacks = [{"damage": 21, "flavour": "slash"}]
-ranged_attack = {"damage": 8, "range": 7, "verb": "shoots an arrow at"}
-resists = []
+attacks = [{
+"damage": 21,
+"flavour": "slash"
+}]
+ranged_attack = {
+"damage": 8,
+"range": 7,
+"verb": "shoots an arrow at"
+}
 min_depth = 8
 max_depth = 12
-weight = 10
 xp_value = 18
-is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/elves/deep_elf_archer.png"
 glyph = "e"
 glyph_color = Color(0.75, 0.85, 1, 1)
+description = "A disciplined ranged attacker. Fragile up close, but dangerous if allowed to keep distance."
 essence_id = "essence_arcana"
 ai_flags = ["kite"]
-description = "A disciplined ranged attacker. Fragile up close, but dangerous if allowed to keep distance."

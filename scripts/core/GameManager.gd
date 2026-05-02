@@ -147,7 +147,7 @@ func _generate_pseudonyms() -> void:
 					pseudonyms[item.id] = "%s tome" % books.pop_back()
 
 func display_name_of(item_id: String) -> String:
-	var data = ItemRegistry.get_by_id(item_id)
+	var data = ItemRegistry.get_by_id(item_id) if ItemRegistry != null and item_id != "" else null
 	if data == null:
 		return item_id
 	# Weapons / armor / gold are always recognisable.

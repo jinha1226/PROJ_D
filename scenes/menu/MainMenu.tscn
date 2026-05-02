@@ -1,9 +1,10 @@
-[gd_scene format=3 uid="uid://dbf4b5ldvgiwu" load_steps=3]
+[gd_scene format=3 uid="uid://dbf4b5ldvgiwu"]
 
-[ext_resource type="Script" path="res://scripts/menu/MainMenu.gd" id="1_mainmenu"]
-[ext_resource type="Script" path="res://scripts/menu/MenuIntroBackdrop.gd" id="2_intro"]
+[ext_resource type="Script" uid="uid://bs7nkacyfh5e5" path="res://scripts/menu/MainMenu.gd" id="1_mainmenu"]
+[ext_resource type="Texture2D" uid="uid://cb12f5qe460lh" path="res://assets/ui/title/pocketcrawl_title.png" id="3_titletex"]
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=1677165494]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -11,67 +12,33 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_mainmenu")
 
-[node name="BG" type="ColorRect" parent="."]
-anchors_preset = 15
+[node name="BG" type="ColorRect" parent="." unique_id=1494140402]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0.035, 0.03, 0.045, 1)
-mouse_filter = 2
 
-[node name="IntroBackdrop" type="Control" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-script = ExtResource("2_intro")
-
-[node name="Title" type="Label" parent="."]
-anchors_preset = 8
+[node name="Title" type="TextureRect" parent="." unique_id=156103947]
+layout_mode = 1
+anchors_preset = -1
 anchor_left = 0.5
-anchor_top = 0.115
+anchor_top = 0.11
 anchor_right = 0.5
-anchor_bottom = 0.115
-offset_left = -360.0
-offset_top = -108.0
-offset_right = 360.0
-offset_bottom = 108.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0.96, 0.87, 0.58, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 114
-text = "PocketCrawl"
-horizontal_alignment = 1
-vertical_alignment = 1
+anchor_bottom = 0.11
+offset_left = -496.0
+offset_top = 200.2
+offset_right = 496.0
+offset_bottom = 400.2
+texture = ExtResource("3_titletex")
+expand_mode = 1
+stretch_mode = 6
 
-[node name="Subtitle" type="Label" parent="."]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.215
-anchor_right = 0.5
-anchor_bottom = 0.215
-offset_left = -260.0
-offset_top = -10.0
-offset_right = 260.0
-offset_bottom = 42.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0.78, 0.76, 0.84, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 22
-text = "descend through the dark"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="MenuCard" type="ColorRect" parent="."]
+[node name="MenuCard" type="ColorRect" parent="." unique_id=1291450207]
 visible = false
-anchors_preset = 8
+layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.75
 anchor_right = 0.5
@@ -82,11 +49,11 @@ offset_right = 260.0
 offset_bottom = 246.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.04, 0.04, 0.06, 0.82)
 mouse_filter = 2
+color = Color(0.04, 0.04, 0.06, 0.82)
 
-[node name="VBox" type="VBoxContainer" parent="."]
-anchors_preset = 8
+[node name="VBox" type="VBoxContainer" parent="." unique_id=1881230099]
+layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.76
 anchor_right = 0.5
@@ -99,35 +66,33 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 10
 
-[node name="ContinueButton" type="Button" parent="VBox"]
+[node name="ContinueButton" type="Button" parent="VBox" unique_id=259122675]
 visible = false
 custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.86, 0.66, 1)
 theme_override_colors/font_focus_color = Color(1, 0.95, 0.74, 1)
 theme_override_font_sizes/font_size = 38
 text = "[ CONTINUE ]"
 
-[node name="StartButton" type="Button" parent="VBox"]
+[node name="StartButton" type="Button" parent="VBox" unique_id=1784536838]
 custom_minimum_size = Vector2(0, 82)
+layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.89, 0.66, 1)
 theme_override_colors/font_focus_color = Color(1, 0.96, 0.78, 1)
 theme_override_font_sizes/font_size = 44
 text = "[ NEW GAME ]"
 
-[node name="DisplayButton" type="Button" parent="VBox"]
+[node name="DisplayButton" type="Button" parent="VBox" unique_id=1170180081]
 custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.84, 0.64, 1)
 theme_override_font_sizes/font_size = 34
 text = "[ DISPLAY ]"
 
-[node name="ShardsButton" type="Button" parent="VBox"]
-custom_minimum_size = Vector2(0, 64)
-theme_override_colors/font_color = Color(0.9, 0.84, 0.64, 1)
-theme_override_font_sizes/font_size = 34
-text = "[ RUNE SHARDS ]"
-
-[node name="HelpButton" type="Button" parent="VBox"]
+[node name="HelpButton" type="Button" parent="VBox" unique_id=397651126]
 custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.8, 0.62, 1)
 theme_override_font_sizes/font_size = 28
 text = "[ HOW TO PLAY ]"

@@ -6,7 +6,7 @@ class_name CombatLogStrip extends Control
 
 signal tapped
 
-const MAX_VISIBLE: int = 5
+const MAX_VISIBLE: int = 4
 
 var _label: RichTextLabel
 var _bg: ColorRect

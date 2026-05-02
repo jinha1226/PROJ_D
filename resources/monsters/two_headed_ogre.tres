@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002024"]
 
-[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+[ext_resource type="Script" uid="uid://dv8ov0nh7jshw" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
 
 [resource]
 script = ExtResource("1_mdata")
@@ -11,16 +11,17 @@ hp = 55
 hd = 10
 ac = 3
 ev = 6
-speed = 10
-sight_range = 8
-attacks = [{"damage": 20, "flavour": "hit"}, {"damage": 15, "flavour": "hit"}]
-ranged_attack = {}
-resists = []
+attacks = [{
+"damage": 20,
+"flavour": "hit"
+}, {
+"damage": 15,
+"flavour": "hit"
+}]
 min_depth = 7
 max_depth = 12
 weight = 9
 xp_value = 15
-is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/two_headed_ogre.png"
 glyph = "O"
 glyph_color = Color(0.6, 0.55, 0.3, 1)

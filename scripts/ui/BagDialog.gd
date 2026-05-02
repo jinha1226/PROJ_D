@@ -25,11 +25,11 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 
 	# Equipped section
 	body.add_child(UICards.section_header("EQUIPPED"))
-	var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
-	var a: ItemData = ItemRegistry.get_by_id(player.equipped_armor_id)
-	var r: ItemData = ItemRegistry.get_by_id(player.equipped_ring_id)
-	var am: ItemData = ItemRegistry.get_by_id(player.equipped_amulet_id)
-	var sh: ItemData = ItemRegistry.get_by_id(player.equipped_shield_id)
+	var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
+	var a: ItemData = ItemRegistry.get_by_id(player.equipped_armor_id) if ItemRegistry != null and player.equipped_armor_id != "" else null
+	var r: ItemData = ItemRegistry.get_by_id(player.equipped_ring_id) if ItemRegistry != null and player.equipped_ring_id != "" else null
+	var am: ItemData = ItemRegistry.get_by_id(player.equipped_amulet_id) if ItemRegistry != null and player.equipped_amulet_id != "" else null
+	var sh: ItemData = ItemRegistry.get_by_id(player.equipped_shield_id) if ItemRegistry != null and player.equipped_shield_id != "" else null
 	var w_plus: int = int(player.equipped_weapon_entry().get("plus", 0)) if w != null else 0
 	var a_plus: int = int(player.equipped_armor_entry().get("plus", 0)) if a != null else 0
 	body.add_child(_equipped_row("무기",
@@ -100,7 +100,7 @@ static func _fill_inventory(container: VBoxContainer, player: Player,
 		var entry: Dictionary = player.items[i]
 		var id: String = entry.get("id", "")
 		var plus: int = entry.get("plus", 0)
-		var data: ItemData = ItemRegistry.get_by_id(id)
+		var data: ItemData = ItemRegistry.get_by_id(id) if ItemRegistry != null and id != "" else null
 		if data == null:
 			continue
 		if kind_filter.size() > 0 and not kind_filter.has(data.kind):
@@ -125,7 +125,7 @@ static func _fill_inventory(container: VBoxContainer, player: Player,
 
 	for key in (equipped_keys + other_keys):
 		var stack: Dictionary = stacks[key]
-		var data: ItemData = ItemRegistry.get_by_id(stack.id)
+		var data: ItemData = ItemRegistry.get_by_id(String(stack.id)) if ItemRegistry != null and String(stack.id) != "" else null
 		if data == null:
 			continue
 		container.add_child(_build_item_row(data, stack.indices, stack.plus, player, dlg))

@@ -1,22 +1,35 @@
 [gd_resource type="Resource" script_class="RaceData" format=3 uid="uid://bxldkhsigb077"]
 
-[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+[ext_resource type="Script" uid="uid://suogob65ee47" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
 
 [resource]
 script = ExtResource("1_rdata")
 id = "vampire"
 display_name = "Vampire"
-hp_per_level = 5
-description = "Undead predator. +1 STR / +1 DEX, -2 HP. Negative energy resistant. Melee kills restore 3 HP."
+description = "Undead predator. -1 STR, +1 DEX, +2 INT. Resistant to negative energy; melee kills restore HP."
 base_sprite_path = "res://assets/tiles/individual/player/base/vampire_m.png"
-unlocked = false
 unlock_kind = "kill"
 unlock_trigger_id = "vampire"
 str_mod = -1
 dex_mod = 1
 int_mod = 2
-hp_mod = 0
-mp_mod = 0
 resist_mods = ["neg+"]
-skill_aptitudes = {"endurance": 0, "melee": 1, "ranged": 0, "magic": 0, "defense": 0, "agility": 1, "tool": 0}
+skill_aptitudes = {
+"agility": 1,
+"arcane": 0,
+"armor": 0,
+"blade": 1,
+"elemental": 0,
+"fighting": 0,
+"hafted": 1,
+"hex": 0,
+"necromancy": 0,
+"polearm": 1,
+"ranged": 0,
+"shield": 0,
+"spellcasting": 0,
+"summoning": 0,
+"tool": 0,
+"unarmed": 1
+}
 passive_id = "blood_drain"

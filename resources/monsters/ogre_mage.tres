@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002034"]
 
-[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+[ext_resource type="Script" uid="uid://dv8ov0nh7jshw" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
 
 [resource]
 script = ExtResource("1_mdata")
@@ -11,16 +11,14 @@ hp = 55
 hd = 10
 ac = 1
 ev = 7
-speed = 10
-sight_range = 8
-attacks = [{"damage": 16, "flavour": "hit"}]
-ranged_attack = {}
-resists = []
+attacks = [{
+"damage": 16,
+"flavour": "hit"
+}]
 min_depth = 9
 max_depth = 13
 weight = 7
 xp_value = 18
-is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/ogre_mage.png"
 glyph = "O"
 glyph_color = Color(0.3, 0.55, 0.75, 1)

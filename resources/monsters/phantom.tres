@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002021"]
 
-[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+[ext_resource type="Script" uid="uid://dv8ov0nh7jshw" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
 
 [resource]
 script = ExtResource("1_mdata")
@@ -11,16 +11,14 @@ hp = 27
 hd = 6
 ac = 3
 ev = 13
-speed = 10
-sight_range = 8
-attacks = [{"damage": 8, "flavour": "touch"}]
-ranged_attack = {}
+attacks = [{
+"damage": 8,
+"flavour": "touch"
+}]
 resists = ["cold"]
 min_depth = 5
 max_depth = 12
-weight = 10
 xp_value = 13
-is_boss = false
 tile_path = "res://assets/tiles/individual/mon/undead/phantom.png"
 glyph = "W"
 glyph_color = Color(0.75, 0.8, 0.95, 1)

@@ -1,15 +1,13 @@
 [gd_resource type="Resource" script_class="RaceData" format=3 uid="uid://002xrpfhnhw3"]
 
-[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+[ext_resource type="Script" uid="uid://suogob65ee47" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
 
 [resource]
 script = ExtResource("1_rdata")
 id = "minotaur"
 display_name = "Minotaur"
-hp_per_level = 6
-description = "Bullheaded warrior. +2 STR / +1 DEX / +4 HP, -2 INT."
+description = "Bullheaded warrior. +4 STR, -3 DEX, -3 INT, +1 HP, -1 MP. Gains free headbutts in melee."
 base_sprite_path = "res://assets/tiles/individual/player/base/minotaur_m.png"
-unlocked = false
 unlock_kind = "kill"
 unlock_trigger_id = "minotaur"
 str_mod = 4
@@ -17,6 +15,23 @@ dex_mod = -3
 int_mod = -3
 hp_mod = 1
 mp_mod = -1
-resist_mods = []
-skill_aptitudes = {"endurance": 2, "melee": 3, "ranged": 1, "magic": -3, "defense": 2, "agility": -2, "tool": -1}
+skill_aptitudes = {
+"agility": -2,
+"arcane": -3,
+"armor": 2,
+"blade": 3,
+"elemental": -3,
+"fighting": 2,
+"hafted": 3,
+"hex": -3,
+"necromancy": -3,
+"polearm": 3,
+"ranged": 1,
+"shield": 0,
+"spellcasting": -3,
+"summoning": -3,
+"tool": -1,
+"unarmed": 3
+}
 passive_id = "headbutt"
+hp_per_level = 6

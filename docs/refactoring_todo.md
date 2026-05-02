@@ -47,7 +47,7 @@ Completed in current refactor pass:
   buff families
 
 Still pending:
-- final HP growth model decision (`endurance`, strength scaling, race growth)
+- final HP growth model decision (`fighting`, strength scaling, race growth)
 - removing the remaining fallback-style altar step dependency if direct choice
   becomes the only desired UX
 - deeper `CombatSystem` decomposition
@@ -72,7 +72,7 @@ Problems to solve:
 - starting HP comes from class setup logic
 - per-level HP comes from race growth
 - strength can still affect HP
-- endurance skill adds HP directly
+- fighting skill adds HP directly
 - auto stat bump may also change HP
 
 Target cleanup:
@@ -95,7 +95,7 @@ Recommended changes:
 - document the final HP/MP model in code comments near the implementation
 
 Open design questions:
-- is endurance permanent in the final 6-skill model?
+- is fighting permanent in the final split-skill model?
 - does strength affect HP at all?
 - is HP growth fully XL-based, or partly skill-based?
 
@@ -269,7 +269,7 @@ Recommended changes:
 
 ### [Player.gd](D:\PROJ_D\scripts\entities\Player.gd)
 - unify HP/MP recalculation flow
-- isolate endurance effects from generic skill XP code
+- isolate fighting effects from generic skill XP code
 - reduce direct mutation of derived stats from many places
 - consider extracting:
   - progression helpers

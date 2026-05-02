@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon002027"]
 
-[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+[ext_resource type="Script" uid="uid://dv8ov0nh7jshw" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
 
 [resource]
 script = ExtResource("1_mdata")
@@ -11,18 +11,17 @@ hp = 33
 hd = 6
 ac = 10
 ev = 10
-speed = 10
-sight_range = 8
-attacks = [{"damage": 15, "flavour": "bite"}]
-ranged_attack = {}
+attacks = [{
+"damage": 15,
+"flavour": "bite"
+}]
 resists = ["cold"]
 min_depth = 9
 max_depth = 13
 weight = 8
 xp_value = 17
-is_boss = false
 tile_path = "res://assets/tiles/individual/mon/undead/vampire.png"
 glyph = "V"
 glyph_color = Color(0.6, 0.35, 0.55, 1)
-essence_id = "essence_drain"
 description = "An undead noble who drains life on every hit. The drain accumulates quickly if you let the fight drag."
+essence_id = "essence_drain"

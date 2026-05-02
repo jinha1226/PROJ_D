@@ -53,7 +53,7 @@ static func _populate(dlg: GameDialog, player: Player, slot_index: int,
 		var id: String = String(entry.get("id", ""))
 		if id == "" or seen_ids.has(id):
 			continue
-		var data: ItemData = ItemRegistry.get_by_id(id)
+		var data: ItemData = ItemRegistry.get_by_id(id) if ItemRegistry != null and id != "" else null
 		if data == null:
 			continue
 		if data.kind != "potion" and data.kind != "scroll":

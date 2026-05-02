@@ -195,7 +195,7 @@ take_turn():
 
 ### 3.6 스킬 시스템
 
-**7개 스킬**: endurance, melee, ranged, magic, defense, agility, tool
+**7개 스킬**: fighting, melee, ranged, magic, defense, agility, tool
 
 - 최대 레벨 9, kill XP로 성장
 - active_skills 배열에 등록된 스킬만 XP 수령

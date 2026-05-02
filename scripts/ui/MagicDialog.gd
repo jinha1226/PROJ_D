@@ -1,8 +1,7 @@
 class_name MagicDialog extends RefCounted
 
 const _SCHOOL_ORDER: Array = [
-	"fire", "cold", "air", "earth",
-	"necromancy", "hexes", "translocation", "summoning",
+	"elemental", "arcane", "hex", "necromancy", "summoning",
 ]
 static var SpellRegistry = Engine.get_main_loop().root.get_node_or_null("/root/SpellRegistry") if Engine.get_main_loop() is SceneTree else null
 static var TurnManager = Engine.get_main_loop().root.get_node_or_null("/root/TurnManager") if Engine.get_main_loop() is SceneTree else null
@@ -40,7 +39,7 @@ static func _populate(dlg: GameDialog, player: Player, game: Node) -> void:
 		var spell: SpellData = SpellRegistry.get_by_id(String(spell_id))
 		if spell == null:
 			continue
-		var s: String = spell.school if spell.school != "" else "other"
+		var s: String = Player.progression_school_for(spell.school) if spell.school != "" else "other"
 		if not by_school.has(s):
 			by_school[s] = []
 		by_school[s].append(spell)
@@ -110,10 +109,11 @@ static func _make_spell_row(spell: SpellData, player: Player,
 	name_lbl.text = spell.display_name
 	name_lbl.add_theme_font_size_override("font_size", 26)
 	var name_color: Color
+	var school_key: String = Player.progression_school_for(spell.school) if spell.school != "" else "arcane"
 	if locked:
 		name_color = Color(0.45, 0.45, 0.5)
 	else:
-		name_color = _school_color(spell.school)
+		name_color = _school_color(school_key)
 	name_lbl.add_theme_color_override("font_color", name_color)
 	info.add_child(name_lbl)
 
@@ -221,8 +221,10 @@ static func _armor_spell_mult(player: Player) -> float:
 
 
 static func _compute_power(player: Player, spell: SpellData) -> int:
-	var skill: int = player.get_skill_level("magic")
-	return int(float(player.intelligence) * (1.0 + float(skill) * 0.06) * _armor_spell_mult(player))
+	var spellcasting: int = player.get_skill_level("spellcasting")
+	var school_skill: int = player.get_skill_level(player.spell_skill_for(spell))
+	var total_skill: float = float(spellcasting) * 0.5 + float(school_skill)
+	return int(float(player.intelligence) * (1.0 + total_skill * 0.06) * _armor_spell_mult(player))
 
 
 static func _school_color(school: String) -> Color:
@@ -231,9 +233,10 @@ static func _school_color(school: String) -> Color:
 		"cold":          return Color(0.4, 0.8, 1.0)
 		"air":           return Color(0.75, 0.9, 1.0)
 		"earth":         return Color(0.75, 0.6, 0.35)
+		"elemental":     return Color(0.9, 0.55, 0.25)
+		"arcane":        return Color(0.45, 0.75, 1.0)
+		"hex":           return Color(1.0, 0.55, 0.85)
 		"necromancy":    return Color(0.75, 0.35, 0.95)
-		"hexes":         return Color(1.0, 0.55, 0.85)
-		"translocation": return Color(0.4, 0.95, 0.55)
 		"summoning":     return Color(0.9, 0.75, 0.35)
 	return Color(0.8, 0.8, 0.85)
 

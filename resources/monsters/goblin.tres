@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmongoblin001"]
 
-[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+[ext_resource type="Script" uid="uid://dv8ov0nh7jshw" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
 
 [resource]
 script = ExtResource("1_mdata")
@@ -8,18 +8,14 @@ id = "goblin"
 display_name = "goblin"
 tier = 2
 hp = 4
-hd = 1
-ac = 0
 ev = 12
-speed = 10
-sight_range = 8
-attacks = [{"damage": 1, "flavour": "hit"}]
-resists = []
-min_depth = 1
+attacks = [{
+"damage": 1,
+"flavour": "hit"
+}]
 max_depth = 5
 weight = 20
 xp_value = 4
-is_boss = false
 tile_path = "res://assets/tiles/individual/mon/humanoids/goblin.png"
 glyph = "g"
 glyph_color = Color(0.35, 0.7, 0.4, 1)

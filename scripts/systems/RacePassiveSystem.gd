@@ -13,7 +13,8 @@ func register(player: Node) -> void:
 	_regen_counter = 0
 	if player != null:
 		player.fov_radius_bonus = 0
-	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
+	var race_id: String = GameManager.selected_race_id if GameManager != null else ""
+	var race: RaceData = RaceRegistry.get_by_id(race_id)
 	if race == null:
 		return
 	_passive_id = race.passive_id

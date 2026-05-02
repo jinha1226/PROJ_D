@@ -16,7 +16,7 @@ static func _player_attack_profile(player: Player) -> Dictionary:
 		"weapon_dmg": UNARMED_DAMAGE,
 		"stat_source": player.strength,
 		"stat_scale": 0.35,
-		"skill_id": "melee",
+		"skill_id": "unarmed",
 		"weapon": null,
 		"weapon_plus": 0,
 		"req_hit_pen": 0,
@@ -24,7 +24,7 @@ static func _player_attack_profile(player: Player) -> Dictionary:
 		"skill_level": 0,
 	}
 	if player.equipped_weapon_id != "":
-		var weapon: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
+		var weapon: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
 		if weapon != null:
 			var entry: Dictionary = player.equipped_weapon_entry()
 			profile.weapon = weapon
@@ -35,15 +35,15 @@ static func _player_attack_profile(player: Player) -> Dictionary:
 				profile.stat_source = player.dexterity
 				profile.stat_scale = 0.25
 			elif weapon.category == "staff":
-				profile.skill_id = "magic"
+				profile.skill_id = "spellcasting"
 				profile.stat_source = player.intelligence
 				profile.stat_scale = 0.25
 			elif weapon.category == "dagger":
-				profile.skill_id = "melee"
+				profile.skill_id = "blade"
 				profile.stat_source = player.dexterity
 				profile.stat_scale = 0.25
 			else:
-				profile.skill_id = "melee"
+				profile.skill_id = Player.weapon_skill_for_item(weapon)
 			var pen: Dictionary = _weapon_req_penalty(player, weapon)
 			profile.req_hit_pen = pen.hit
 			profile.req_dmg_pct = pen.dmg_pct
@@ -92,72 +92,27 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	var weapon_plus: int = int(profile.weapon_plus)
 	var skill_id: String = String(profile.skill_id)
 	var skill_level: int = int(profile.skill_level)
-	var weapon_dmg: int = int(profile.weapon_dmg)
-	var stat_source: int = int(profile.stat_source)
-	var stat_scale: float = float(profile.stat_scale)
-	var req_hit_pen: int = int(profile.req_hit_pen)
-	var req_dmg_pct: float = float(profile.req_dmg_pct)
-	if player.equipped_weapon_id != "":
-		weapon = ItemRegistry.get_by_id(player.equipped_weapon_id)
-		if weapon != null:
-			var entry: Dictionary = player.equipped_weapon_entry()
-			weapon_plus = int(entry.get("plus", 0))
-			weapon_dmg = max(UNARMED_DAMAGE, weapon.damage + weapon_plus)
-			if weapon.category == "ranged":
-				skill_id = "ranged"
-				stat_source = player.dexterity
-				stat_scale = 0.25
-			elif weapon.category == "staff":
-				skill_id = "magic"
-				stat_source = player.intelligence
-				stat_scale = 0.25
-			elif weapon.category == "dagger":
-				skill_id = "melee"
-				stat_source = player.dexterity
-				stat_scale = 0.25
-			else:
-				skill_id = "melee"
-			var pen: Dictionary = _weapon_req_penalty(player, weapon)
-			req_hit_pen = pen.hit
-			req_dmg_pct = pen.dmg_pct
-	var stat_bonus: int = stat_source / 2
-	skill_level = 0
-	if skill_id != "":
-		skill_level = player.get_skill_level(skill_id)
-	# melee absorbs DCSS Fighting's to-hit contribution — single skill covers all weapon types
-	var to_hit_base: int = 15 + stat_bonus + weapon_plus + req_hit_pen
-	to_hit_base += randi_range(0, skill_level * 2) if skill_level > 0 else 0
-	var to_hit_roll: int = randi_range(0, max(1, to_hit_base))
-	var eff_ev: int = max(0, monster.data.ev - (2 if Status.has(monster, "drained") else 0))
-	# DCSS: EV roll is average of two random2(ev*2) — peaks around ev, lower variance
-	var ev_roll: int = (randi_range(0, eff_ev * 2) + randi_range(0, eff_ev * 2)) / 2
-	# 5% auto-hit / auto-miss chance (DCSS MIN_HIT_MISS_PERCENTAGE)
 	if not _player_attack_hits(monster, profile):
 		monster.become_aware(player.grid_pos)
 		CombatLog.miss("You miss the %s." % monster.data.display_name)
 		return
 	var base_final: int = _player_attack_base_damage(player, monster, profile)
 	var mult: float = 1.0 + float(skill_level) * 0.04
-	# Tempest: ranged attacks deal +15%
 	if skill_id == "ranged":
 		mult *= EssenceSystem.ranged_damage_mult(player)
 		mult *= FaithSystem.ranged_damage_mult(player)
 	var final: int = max(1, int(round(float(base_final) * mult)))
-	# Faith melee damage mult (War +10%, Arcana -10%)
-	if skill_id == "melee" or skill_id == "":
+	if skill_id in ["unarmed", "blade", "hafted", "polearm", ""]:
 		final = max(1, int(round(float(final) * FaithSystem.melee_damage_mult(player))))
-	# flat bonus: weapon skill lv/2 + fighting's random damage (merged into melee)
-	final += player.get_skill_level("melee") / 2
-	final += randi_range(0, player.get_skill_level("melee") / 3)
+	final += skill_level / 2
+	final += randi_range(0, skill_level / 3)
 	final += RacePassiveSystem.melee_damage_bonus(player)
 	var backstab_bonus: int = _backstab_bonus(player, monster, weapon, weapon_plus)
 	final += backstab_bonus
-	# Gloam: first strike on unaware target deals +35% damage
 	if not monster.is_aware:
 		var uw_mult: float = EssenceSystem.unaware_damage_mult(player)
 		if uw_mult > 1.0:
 			final = max(1, int(round(float(final) * uw_mult)))
-	# Plague: +20% damage vs. poisoned targets
 	if player.essence_slots.has("essence_plague") and Status.has(monster, "poison"):
 		final = max(1, int(round(float(final) * 1.2)))
 	var brand: String = _weapon_brand(player)
@@ -165,9 +120,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	if brand != "":
 		var brand_element: String = brand_element_of(brand)
 		var roll: int = _brand_damage_roll(brand)
-		brand_extra = Status.resist_scale(roll, monster.data.resists,
-			brand_element)
-		# Death faith: necro damage +15%
+		brand_extra = Status.resist_scale(roll, monster.data.resists, brand_element)
 		if brand_element == "necro":
 			brand_extra = max(1, int(round(float(brand_extra) * FaithSystem.necrotic_damage_mult(player))))
 		final += brand_extra
@@ -189,14 +142,12 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	if monster.hp > 0:
 		EssenceSystem.apply_melee_hit_effects(player, monster)
 		RingSystem.apply_melee_hit_effects(player, monster)
-	# Cleave: axes hit adjacent monsters as a small splash.
 	if weapon != null and weapon.category == "axe":
 		_cleave_hit(player, monster, final)
-	# Swift Strike: dagger gives chance to attack again (melee skill drives chance)
-	if skill_id == "melee" and monster.hp > 0:
-		var w_check: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
+	if skill_id == "blade" and monster.hp > 0:
+		var w_check: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
 		if w_check != null and w_check.category == "dagger":
-			var swift_chance: float = player.get_skill_level("melee") * 0.05
+			var swift_chance: float = player.get_skill_level("blade") * 0.05
 			if swift_chance > 0.0 and randf() < swift_chance:
 				CombatLog.hit("Swift strike!")
 				_dagger_swift_strike(player, monster)
@@ -226,7 +177,7 @@ static func _dagger_swift_strike(player: Player, monster: Monster) -> void:
 		return
 	var weapon_dmg: int = UNARMED_DAMAGE
 	if player.equipped_weapon_id != "":
-		var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
+		var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
 		if w != null:
 			var entry: Dictionary = player.equipped_weapon_entry()
 			var wplus: int = int(entry.get("plus", 0))
@@ -242,7 +193,7 @@ static func _dagger_swift_strike(player: Player, monster: Monster) -> void:
 	monster.become_aware(player.grid_pos)
 	if was_alive and monster.hp <= 0:
 		CombatLog.hit("You kill the %s." % monster.data.display_name)
-		_apply_player_kill_rewards(player, monster, "melee")
+		_apply_player_kill_rewards(player, monster, "blade")
 
 static func _apply_player_kill_rewards(player: Player, monster: Monster, skill_id: String) -> void:
 	var xp_award: int = max(1, int(round(float(monster.data.xp_value) * XP_PACE_MULTIPLIER)))
@@ -263,7 +214,7 @@ static func _weapon_brand(player: Player) -> String:
 			var rb: String = String(entry.get("brand", ""))
 			if rb != "":
 				return rb
-	var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
+	var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
 	if w == null:
 		return ""
 	return String(w.brand)
@@ -323,13 +274,7 @@ static func _weapon_req_penalty(player: Player, w: ItemData) -> Dictionary:
 	var req: int = w.required_skill
 	if req == 0:
 		return {"hit": 0, "dmg_pct": 1.0}
-	var mapped_skill: String
-	if w.category == "ranged":
-		mapped_skill = "ranged"
-	elif w.category == "staff":
-		mapped_skill = "magic"
-	else:
-		mapped_skill = "melee"
+	var mapped_skill: String = Player.weapon_skill_for_item(w)
 	var skill_lv: int = player.get_skill_level(mapped_skill)
 	var missing: int = max(0, req - skill_lv)
 	if missing == 0:
@@ -377,7 +322,8 @@ static func _backstab_bonus(player: Player, monster: Monster, weapon: ItemData,
 		return 0
 	var bonus_mult: float = BACKSTAB_BASE_BONUS
 	bonus_mult += float(player.get_skill_level("agility")) * BACKSTAB_PER_AGILITY
-	var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id)
+	var class_id: String = GameManager.selected_class_id if GameManager != null else ""
+	var cls: ClassData = ClassRegistry.get_by_id(class_id) if ClassRegistry != null and class_id != "" else null
 	if cls != null and cls.class_group == "rogue":
 		bonus_mult += BACKSTAB_ROGUE_BONUS
 	if weapon != null and weapon.category == "dagger":
@@ -422,7 +368,7 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	var dmg_base: int = int(attack.get("damage", 1))
 	# Weapon bonus: if monster carries a weapon, add its damage
 	if monster.equipped_weapon_id != "":
-		var witem: ItemData = ItemRegistry.get_by_id(monster.equipped_weapon_id)
+		var witem: ItemData = ItemRegistry.get_by_id(monster.equipped_weapon_id) if ItemRegistry != null else null
 		if witem != null:
 			dmg_base += witem.damage / 2
 
@@ -443,9 +389,9 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 		return
 	# Parry: blade weapon skill gives chance to halve damage
 	if player.equipped_weapon_id != "":
-		var _wp: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id)
+		var _wp: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
 		if _wp != null and _wp.category == "blade":
-			var parry_chance: float = player.get_skill_level("melee") * 0.03
+			var parry_chance: float = player.get_skill_level("blade") * 0.03
 			if parry_chance > 0.0 and randf() < parry_chance:
 				CombatLog.miss("You parry the %s's attack!" % monster.data.display_name)
 				return
@@ -487,10 +433,10 @@ static func ally_attack_monster(ally: Monster, target: Monster) -> void:
 static func _try_player_shield_block(player: Player, monster: Monster) -> bool:
 	if player.equipped_shield_id == "" or player.has_two_handed_weapon():
 		return false
-	var shield: ItemData = ItemRegistry.get_by_id(player.equipped_shield_id)
+	var shield: ItemData = ItemRegistry.get_by_id(player.equipped_shield_id) if ItemRegistry != null and player.equipped_shield_id != "" else null
 	if shield == null:
 		return false
-	var shield_skill: int = player.get_skill_level("defense")
+	var shield_skill: int = player.get_skill_level("shield")
 	var missing: int = max(0, shield.required_skill - shield_skill)
 	var block_pct: float = float(shield.effect_value) / 100.0 \
 		+ shield_skill * 0.03 \

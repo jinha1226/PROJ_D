@@ -1,5 +1,5 @@
 {
-  "version": "balance_v2_mobile",
+  "version": "balance_v3_split_core",
   "xp_distribution": {
     "source": "kill_xp",
     "active_only": true,
@@ -13,35 +13,96 @@
     "level_7_to_9": "slow"
   },
   "skills": {
-    "melee": {
+    "fighting": {
+      "effects": {
+        "max_hp_per_level": 5
+      },
+      "scope": "general combat fitness and survivability"
+    },
+    "unarmed": {
+      "effects": {
+        "hit_per_level": 1,
+        "damage_per_level_pct": 5
+      },
+      "scope": "bare-handed combat and beastly fighting"
+    },
+    "blade": {
       "effects": {
         "hit_per_level": 1,
         "damage_per_level_pct": 6
       },
-      "scope": "all melee weapon families"
+      "scope": "daggers, swords, and light arcane staves"
+    },
+    "hafted": {
+      "effects": {
+        "hit_per_level": 1,
+        "damage_per_level_pct": 7
+      },
+      "scope": "maces, clubs, and axes"
+    },
+    "polearm": {
+      "effects": {
+        "hit_per_level": 1,
+        "damage_per_level_pct": 6
+      },
+      "scope": "spears and other reach weapons"
     },
     "ranged": {
       "effects": {
         "hit_per_level": 1,
         "damage_per_level_pct": 6
       },
-      "scope": "bows, thrown, and ranged weapon systems"
+      "scope": "bows, crossbows, and dedicated ranged weapons"
     },
-    "magic": {
+    "spellcasting": {
       "effects": {
-        "spell_output_per_level_pct": 8,
-        "mp_efficiency_per_level_pct": 3
+        "spell_output_per_level_pct": 4,
+        "mp_efficiency_per_level_pct": 4
       },
-      "scope": "all schools share one progression axis",
-      "spell_learning": "magic_level_up_offers_one_random_spell_per_school_plus_books"
+      "scope": "all spellcasting fundamentals and mana control"
     },
-    "defense": {
+    "elemental": {
+      "effects": {
+        "spell_output_per_level_pct": 7
+      },
+      "scope": "fire, cold, air, earth, and alchemical elemental magic"
+    },
+    "arcane": {
+      "effects": {
+        "spell_output_per_level_pct": 7
+      },
+      "scope": "conjurations, translocation, transmutation, abjuration, evocation, and forgecraft"
+    },
+    "hex": {
+      "effects": {
+        "spell_output_per_level_pct": 7
+      },
+      "scope": "mental manipulation, control, and disabling magic"
+    },
+    "necromancy": {
+      "effects": {
+        "spell_output_per_level_pct": 7
+      },
+      "scope": "death, drain, pain, and undead magic"
+    },
+    "summoning": {
+      "effects": {
+        "spell_output_per_level_pct": 7
+      },
+      "scope": "creature and gateway summoning"
+    },
+    "armor": {
       "effects": {
         "armor_ev_penalty_reduction_per_level_pct": 10,
-        "block_per_level_pct": 3,
         "injury_reduction_per_level_pct": 4
       },
-      "scope": "armor, shields, attrition tolerance"
+      "scope": "armor handling, encumbrance control, and attrition tolerance"
+    },
+    "shield": {
+      "effects": {
+        "block_per_level_pct": 3
+      },
+      "scope": "shield handling, blocking, and off-hand defense"
     },
     "agility": {
       "effects": {
@@ -49,30 +110,50 @@
         "detect_range_reduction_every_3_levels": 1,
         "backstab_bonus_per_level_pct": 5
       },
-      "scope": "evasion, awareness control, ambush, mobility"
+      "scope": "evasion, awareness control, ambush, and mobility"
+    },
+    "tool": {
+      "effects": {
+        "hit_per_level": 1,
+        "damage_per_level_pct": 4
+      },
+      "scope": "wands, thrown tools, and trick-based combat support"
     }
   },
   "class_starts": {
     "warrior": {
       "starting_skills": {
-        "melee": 2,
-        "defense": 1
+        "blade": 2,
+        "armor": 1,
+        "shield": 1
       },
-      "active_skills": ["melee", "defense"]
+      "active_skills": [
+        "blade",
+        "armor",
+        "shield"
+      ]
     },
     "mage": {
       "starting_skills": {
-        "magic": 2,
-        "agility": 1
+        "spellcasting": 2,
+        "arcane": 1
       },
-      "active_skills": ["magic"]
+      "active_skills": [
+        "spellcasting",
+        "arcane"
+      ]
     },
     "rogue": {
       "starting_skills": {
         "ranged": 1,
-        "agility": 2
+        "agility": 2,
+        "tool": 1
       },
-      "active_skills": ["ranged", "agility"]
+      "active_skills": [
+        "ranged",
+        "agility",
+        "tool"
+      ]
     }
   }
 }

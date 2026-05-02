@@ -187,7 +187,7 @@ static func _cast_drain(spell: SpellData, player: Player, power: int, game: Node
 	player.heal(heal_amt)
 	CombatLog.post("You absorb %d HP." % heal_amt, Color(0.6, 0.9, 0.6))
 	if was_alive and target.hp <= 0:
-		_on_kill(target, player)
+		_on_kill(target, player, spell)
 
 
 static func _apply_status_to_target(spell: SpellData, player: Player,
@@ -266,7 +266,7 @@ static func _cast_instant_kill(spell: SpellData, player: Player,
 	var was_alive: bool = target.hp > 0
 	target.take_damage(99999)
 	if was_alive and target.hp <= 0:
-		_on_kill(target, player)
+		_on_kill(target, player, spell)
 
 
 static func _cast_power_word(spell: SpellData, player: Player, game: Node,
@@ -318,17 +318,19 @@ static func _armor_spell_mult(player: Player) -> float:
 		return 1.1
 	if player.equipped_armor_id == "":
 		return 1.0
-	var item: ItemData = player.ItemRegistry.get_by_id(player.equipped_armor_id)
+	var item: ItemData = player.ItemRegistry.get_by_id(player.equipped_armor_id) if player.ItemRegistry != null and player.equipped_armor_id != "" else null
 	if item == null:
 		return 1.0
 	var enc: int = item.encumbrance
-	var def_skill: int = player.get_skill_level("defense")
+	var def_skill: int = player.get_skill_level("armor")
 	return maxf(0.5, 1.0 - max(0, enc - def_skill) * 0.03)
 
 
 static func _compute_power(player: Player, spell: SpellData) -> int:
-	var skill: int = player.get_skill_level("magic")
-	var base: int = int(float(player.intelligence) * (1.0 + float(skill) * 0.06) * _armor_spell_mult(player))
+	var spellcasting: int = player.get_skill_level("spellcasting")
+	var school_skill: int = player.get_skill_level(player.spell_skill_for(spell))
+	var total_skill: float = float(spellcasting) * 0.5 + float(school_skill)
+	var base: int = int(float(player.intelligence) * (1.0 + total_skill * 0.06) * _armor_spell_mult(player))
 	var power: int = base + EssenceSystem.spell_power_bonus(player, spell)
 	return int(float(power) * FaithSystem.spell_damage_mult(player))
 
@@ -354,10 +356,10 @@ static func _apply_elemental_side_effects(spell: SpellData, target: Monster) -> 
 		Status.apply(target, String(pair[0]), int(pair[1]))
 
 
-static func _on_kill(target: Monster, player: Player) -> void:
+static func _on_kill(target: Monster, player: Player, spell: SpellData) -> void:
 	CombatLog.hit("You kill the %s." % target.data.display_name)
 	player.grant_xp(target.data.xp_value)
-	player.grant_kill_skill_xp(float(target.data.xp_value), "magic")
+	player.grant_kill_skill_xp(float(target.data.xp_value), player.spell_skill_for(spell))
 	player.register_kill()
 	GameManager.try_kill_unlock(target.data.id)
 
@@ -387,7 +389,7 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 	if was_alive and target.hp > 0:
 		_apply_elemental_side_effects(spell, target)
 	if was_alive and target.hp <= 0:
-		_on_kill(target, player)
+		_on_kill(target, player, spell)
 	_spawn_impact_cloud(spell, target.grid_pos, game)
 
 
@@ -412,7 +414,7 @@ static func _multi_damage(spell: SpellData, player: Player,
 		if was_alive and target.hp > 0:
 			_apply_elemental_side_effects(spell, target)
 		if was_alive and target.hp <= 0:
-			_on_kill(target, player)
+			_on_kill(target, player, spell)
 		fired += 1
 	if fired == 0:
 		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
@@ -458,7 +460,7 @@ static func _chain_damage(spell: SpellData, player: Player,
 		if was_alive and t.hp > 0:
 			_apply_elemental_side_effects(spell, t)
 		if was_alive and t.hp <= 0:
-			_on_kill(t, player)
+			_on_kill(t, player, spell)
 
 
 static func _aoe_damage(spell: SpellData, player: Player,
@@ -494,7 +496,7 @@ static func _aoe_damage(spell: SpellData, player: Player,
 		if was_alive and n.hp > 0:
 			_apply_elemental_side_effects(spell, n)
 		if was_alive and n.hp <= 0:
-			_on_kill(n, player)
+			_on_kill(n, player, spell)
 		hits += 1
 	if hits == 0:
 		CombatLog.post("The flames find no target.", Color(0.75, 0.75, 0.75))

@@ -65,7 +65,7 @@ static func _header_card(player: Player) -> Control:
 
 	var class_id: String = GameManager.selected_class_id if GameManager != null else ""
 	var race_id: String = GameManager.selected_race_id if GameManager != null else ""
-	var class_data: ClassData = ClassRegistry.get_by_id(class_id) if class_id != "" else null
+	var class_data: ClassData = ClassRegistry.get_by_id(class_id) if ClassRegistry != null and class_id != "" else null
 	var race_data: RaceData = RaceRegistry.get_by_id(race_id) if race_id != "" else null
 	var cls_name := class_data.display_name if class_data != null else class_id.capitalize()
 	var race_name := race_data.display_name if race_data != null else race_id.capitalize()
@@ -181,10 +181,10 @@ static func _combat_card(player: Player) -> Control:
 	row.add_child(_kv_row("Will", str(player.wl)))
 	row.add_child(_kv_row("Sight", str(Player.SIGHT_RADIUS + player.fov_radius_bonus)))
 	row.add_child(_kv_row("Endurance", str(player.get_skill_level("endurance"))))
-	row.add_child(_kv_row("Magic", str(player.get_skill_level("magic"))))
+	row.add_child(_kv_row("Spellcasting", str(player.get_skill_level("spellcasting"))))
 
 	var notes := Label.new()
-	notes.text = "Defense reduces armor penalties and supports blocking. Agility improves evasion. Endurance grows your maximum HP."
+	notes.text = "Armor reduces gear penalties, Shield improves blocking, Agility improves evasion, and Endurance grows your maximum HP."
 	notes.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	notes.add_theme_font_size_override("font_size", 18)
 	notes.add_theme_color_override("font_color", Color(0.78, 0.76, 0.7))

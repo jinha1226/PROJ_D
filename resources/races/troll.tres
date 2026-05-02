@@ -1,13 +1,12 @@
 [gd_resource type="Resource" script_class="RaceData" format=3 uid="uid://00251qcaem53"]
 
-[ext_resource type="Script" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+[ext_resource type="Script" uid="uid://suogob65ee47" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
 
 [resource]
 script = ExtResource("1_rdata")
 id = "troll"
 display_name = "Troll"
-hp_per_level = 8
-description = "Huge and regenerating. +2 STR / +6 HP, -2 INT / -2 MP. Vulnerable to fire."
+description = "Huge and regenerating. +7 STR, -3 DEX, -4 INT, +3 HP, -1 MP. Vulnerable to fire."
 base_sprite_path = "res://assets/tiles/individual/player/base/troll_m.png"
 unlocked = true
 unlock_kind = "kill"
@@ -18,5 +17,23 @@ int_mod = -4
 hp_mod = 3
 mp_mod = -1
 resist_mods = ["fire-"]
-skill_aptitudes = {"endurance": 2, "melee": 2, "ranged": 0, "magic": -3, "defense": 0, "agility": -3, "tool": -2}
+skill_aptitudes = {
+"agility": -3,
+"arcane": -3,
+"armor": 0,
+"blade": 2,
+"elemental": -3,
+"fighting": 2,
+"hafted": 2,
+"hex": -3,
+"necromancy": -3,
+"polearm": 2,
+"ranged": 0,
+"shield": 0,
+"spellcasting": -3,
+"summoning": -3,
+"tool": -2,
+"unarmed": 2
+}
 passive_id = "regeneration"
+hp_per_level = 8

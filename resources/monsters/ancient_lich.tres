@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://mon_ancientlich"]
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://b2pikjt5sikl8"]
 
-[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+[ext_resource type="Script" uid="uid://dv8ov0nh7jshw" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
 
 [resource]
 script = ExtResource("1_mdata")
@@ -11,10 +11,20 @@ hp = 108
 hd = 27
 ac = 20
 ev = 10
-speed = 10
 sight_range = 9
-attacks = [{"damage": 20, "flavour": "necromantic strike"}, {"damage": 10, "flavour": "life drain"}]
-ranged_attack = {"damage": 20, "range": 7, "flavour": "death bolt", "element": "necro"}
+attacks = [{
+"damage": 20,
+"flavour": "necromantic strike"
+}, {
+"damage": 10,
+"flavour": "life drain"
+}]
+ranged_attack = {
+"damage": 20,
+"element": "necro",
+"flavour": "death bolt",
+"range": 7
+}
 resists = ["necro+++", "cold++", "poison+"]
 min_depth = 13
 max_depth = 15
