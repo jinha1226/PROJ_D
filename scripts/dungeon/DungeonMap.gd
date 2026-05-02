@@ -69,6 +69,8 @@ var altar_map: Dictionary = {}
 var broken_altar_positions: Array = []
 ## true after B3 unique boss dies — faith altars become interactive
 var altar_active: bool = false
+## preset faith altar positions from temple generator (used by Game._place_b3_altars)
+var preset_faith_altar_positions: Array = []
 
 ## Warning tiles from telegraphed boss attacks: Vector2i -> Color
 var warning_tiles: Dictionary = {}
@@ -198,7 +200,12 @@ func generate(map_seed: int = -1, branch_entrance: bool = false, style: String =
 	rooms = result["rooms"]
 	altar_map.clear()
 	broken_altar_positions.clear()
+	preset_faith_altar_positions.clear()
 	altar_active = false
+	if result.has("preset_broken_altars"):
+		broken_altar_positions = Array(result["preset_broken_altars"])
+	if result.has("preset_faith_altars"):
+		preset_faith_altar_positions = Array(result["preset_faith_altars"])
 	visible_tiles.clear()
 	explored.clear()
 	fog_tiles.clear()
@@ -341,7 +348,7 @@ func _draw() -> void:
 	# Corpses — drawn below entities, above floor
 	for c in corpses:
 		var cpos: Vector2i = c.get("pos", Vector2i.ZERO)
-		if not (reveal_all or visible_tiles.has(cpos)):
+		if not (reveal_all or visible_tiles.has(cpos) or explored.has(cpos)):
 			continue
 		var crect := Rect2(Vector2(cpos.x * CELL_SIZE, cpos.y * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE))
 		var ctile: String = c.get("tile_path", "")
@@ -354,11 +361,11 @@ func _draw() -> void:
 			Vector2(cpos.x * CELL_SIZE + 6, cpos.y * CELL_SIZE + CELL_SIZE - 6),
 			"%", HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6, Color(0.65, 0.25, 0.25))
 
-	# Faith altars — dim until boss dies, bright once altar_active
+	# Faith altars — always shown as active (our custom shrines, not DCSS broken altars)
 	for apos in altar_map.keys():
-		var is_vis: bool = reveal_all or visible_tiles.has(apos)
+		var in_los: bool = reveal_all or visible_tiles.has(apos)
 		var was_explored: bool = reveal_all or explored.has(apos)
-		if not is_vis and not was_explored:
+		if not in_los and not was_explored:
 			continue
 		var faith_id: String = String(altar_map[apos])
 		var path: String = String(ALTAR_TEXTURES.get(faith_id, ""))
@@ -367,21 +374,14 @@ func _draw() -> void:
 		var atex: Texture2D = load(path) as Texture2D
 		if atex == null:
 			continue
-		var bright_vis: bool = altar_active and (reveal_all or visible_tiles.has(apos))
-		var mod: Color
-		if bright_vis:
-			mod = Color.WHITE
-		elif altar_active:
-			mod = Color(0.45, 0.45, 0.55)
-		else:
-			mod = Color(0.30, 0.28, 0.35)  # inactive: very dim
+		var mod: Color = Color.WHITE if in_los else Color(0.45, 0.45, 0.55)
 		var arect := Rect2(Vector2(apos.x * CELL_SIZE, apos.y * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE))
 		if use_tiles:
 			draw_texture_rect(atex, arect, false, mod)
 		else:
 			var glyph_col: Color = FaithSystem.color_of(faith_id)
-			if not altar_active:
-				glyph_col = glyph_col * Color(0.4, 0.4, 0.4)
+			if not in_los:
+				glyph_col = glyph_col * Color(0.5, 0.5, 0.5)
 			draw_string(ThemeDB.fallback_font,
 				Vector2(apos.x * CELL_SIZE + 6, apos.y * CELL_SIZE + CELL_SIZE - 6),
 				"_", HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6, glyph_col)

@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://bslyiae6rk465"]
 
-[ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
+[ext_resource type="Script" uid="uid://u2ro1a0v2yg6" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
 
 [resource]
 script = ExtResource("1_cdata")
@@ -14,10 +14,10 @@ starting_dex = 14
 starting_int = 10
 starting_weapon = "shortbow"
 starting_armor = "leather_armor"
-starting_skills = {"tool": 1, "agility": 2}
-starting_spells = []
-passive = ""
-unlocked = true
-unlock_kind = ""
-unlock_trigger_id = ""
+starting_skills = {
+"agility": 3,
+"fighting": 2,
+"ranged": 2,
+"tool": 2
+}
 class_group = "rogue"

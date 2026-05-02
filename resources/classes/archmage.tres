@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://class_archmage01"]
+[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://dpjbx2sbhb0ia"]
 
-[ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
+[ext_resource type="Script" uid="uid://u2ro1a0v2yg6" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
 
 [resource]
 script = ExtResource("1_cdata")
 id = "archmage"
-display_name = "Archmage [TEST]"
+display_name = "Archmage"
 description = "Test character. Knows all spells, max skills, full stats."
 starting_hp = 60
 starting_mp = 99
@@ -16,17 +16,22 @@ starting_weapon = "dagger"
 starting_armor = "robe"
 robe_path = "res://assets/tiles/individual/player/body/robe_black_gold.png"
 starting_skills = {
-"melee": 9,
-"ranged": 9,
-"magic": 9,
-"defense": 9,
 "agility": 9,
-"tool": 9
+"arcane": 9,
+"armor": 9,
+"blade": 9,
+"elemental": 9,
+"fighting": 9,
+"hafted": 9,
+"hex": 9,
+"necromancy": 9,
+"polearm": 9,
+"ranged": 9,
+"shield": 9,
+"spellcasting": 9,
+"summoning": 9,
+"tool": 9,
+"unarmed": 9
 }
 starting_xl = 20
-starting_spells = []
-passive = ""
-unlocked = true
-unlock_kind = ""
-unlock_trigger_id = ""
-class_group = "test"
+class_group = "mage"

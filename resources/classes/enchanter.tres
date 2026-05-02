@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://class_enchant01"]
+[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://r85k2vq2goau"]
 
-[ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
+[ext_resource type="Script" uid="uid://u2ro1a0v2yg6" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
 
 [resource]
 script = ExtResource("1_cdata")
@@ -15,11 +15,14 @@ starting_int = 15
 starting_weapon = "dagger"
 starting_armor = "robe"
 robe_path = "res://assets/tiles/individual/player/body/robe_purple.png"
-starting_skills = {"magic": 3, "agility": 2}
-starting_xl = 0
+starting_skills = {
+"agility": 2,
+"blade": 1,
+"hex": 4,
+"spellcasting": 2
+}
 starting_spells = ["sleep", "hold_person", "fear"]
-passive = ""
+class_group = "mage"
 unlocked = false
 unlock_kind = "use_item"
 unlock_trigger_id = "book_enchantment"
-class_group = "mage"

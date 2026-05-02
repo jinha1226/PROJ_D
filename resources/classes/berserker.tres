@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://bslyhr4ipkvq5"]
 
-[ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
+[ext_resource type="Script" uid="uid://u2ro1a0v2yg6" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
 
 [resource]
 script = ExtResource("1_cdata")
@@ -14,11 +14,13 @@ starting_dex = 9
 starting_int = 5
 starting_weapon = "battle_axe"
 starting_armor = "leather_armor"
-starting_skills = {"melee": 3, "defense": 2}
-starting_spells = []
+starting_skills = {
+"agility": 2,
+"fighting": 3,
+"hafted": 3
+}
 passive = "warrior_regen"
+class_group = "fighter"
 unlocked = false
 unlock_kind = "use_item"
 unlock_trigger_id = "potion_berserk"
-unlocked = false
-class_group = "fighter"

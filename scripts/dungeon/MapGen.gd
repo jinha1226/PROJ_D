@@ -16,7 +16,7 @@ const SPLIT_MAX: float = 0.58
 
 # ── Entry point ────────────────────────────────────────────────────────────
 
-## style: "bsp" | "bsp_large" | "cave" | "crypt"
+## style: "bsp" | "bsp_large" | "cave" | "crypt" | "temple"
 static func generate_styled(width: int, height: int, map_seed: int,
 		style: String, branch_entrance: bool = false) -> Dictionary:
 	match style:
@@ -26,6 +26,8 @@ static func generate_styled(width: int, height: int, map_seed: int,
 			return generate_crypt(width, height, map_seed)
 		"bsp_large":
 			return generate_bsp_large(width, height, map_seed, branch_entrance)
+		"temple":
+			return generate_temple(width, height)
 		_:
 			return generate(width, height, map_seed, branch_entrance)
 
@@ -472,6 +474,88 @@ static func _split_large(rect: Rect2i, depth: int, rng: RandomNumberGenerator,
 		_split_large(Rect2i(rect.position, Vector2i(s, rect.size.y)), depth + 1, rng, tiles, width, rooms)
 		_split_large(Rect2i(rect.position + Vector2i(s, 0), Vector2i(rect.size.x - s, rect.size.y)), depth + 1, rng, tiles, width, rooms)
 
+
+# ══ Temple generator (B3 symmetric Pantheon) ══════════════════════════════
+# DCSS-Temple-inspired: bilaterally symmetric, formal halls and side wings,
+# fixed stair positions top/bottom, preset altar slots.
+#
+# Layout  (width=32, height=36):
+#   Entry corridor      x:14–17  y:1–5      (stairs_up  at 15,1)
+#   Upper antechamber   x:11–20  y:4–10
+#   Upper side wings    x:2–11 / x:20–29    y:4–9   (mirrored)
+#   Central grand hall  x:6–25              y:10–25
+#   Mid side wings      x:2–6  / x:25–29   y:13–21  (mirrored)
+#   Lower antechamber   x:11–20             y:24–30
+#   Lower side wings    x:2–11 / x:20–29   y:25–30  (mirrored)
+#   Exit corridor       x:14–17             y:29–34  (stairs_down at 15,34)
+
+static func generate_temple(width: int, height: int) -> Dictionary:
+	var tiles := PackedByteArray()
+	tiles.resize(width * height)
+	for i in tiles.size():
+		tiles[i] = DungeonMap.Tile.WALL
+
+	# Top entry corridor
+	_carve_rect(Rect2i(14, 1, 4, 5), tiles, width)
+	# Upper antechamber
+	_carve_rect(Rect2i(11, 4, 10, 7), tiles, width)
+	# Upper side wings (symmetric)
+	_carve_symmetric(Rect2i(2, 4, 10, 6), tiles, width)
+	# Central grand hall
+	_carve_rect(Rect2i(6, 10, 20, 16), tiles, width)
+	# Mid side wings (symmetric)
+	_carve_symmetric(Rect2i(2, 13, 5, 9), tiles, width)
+	# Lower antechamber
+	_carve_rect(Rect2i(11, 24, 10, 7), tiles, width)
+	# Lower side wings (symmetric)
+	_carve_symmetric(Rect2i(2, 25, 10, 6), tiles, width)
+	# Bottom exit corridor
+	_carve_rect(Rect2i(14, 29, 4, 6), tiles, width)
+
+	var spawn     := Vector2i(15, 1)
+	var stairs_dn := Vector2i(15, 34)
+	tiles[spawn.y * width + spawn.x]     = DungeonMap.Tile.STAIRS_UP
+	tiles[stairs_dn.y * width + stairs_dn.x] = DungeonMap.Tile.STAIRS_DOWN
+
+	# Five faith altars — 1 centre + 2 symmetric upper + 2 symmetric lower
+	var faith_altars: Array[Vector2i] = [
+		Vector2i(15, 17),   # centre
+		Vector2i(9,  13), Vector2i(22, 13),   # upper pair
+		Vector2i(9,  22), Vector2i(22, 22),   # lower pair
+	]
+
+	# Six broken (DCSS decorative) altars — one per wing, mirrored
+	var broken_altars: Array[Vector2i] = [
+		Vector2i(4,  6), Vector2i(27,  6),   # upper wings
+		Vector2i(3, 17), Vector2i(28, 17),   # mid wings
+		Vector2i(4, 27), Vector2i(27, 27),   # lower wings
+	]
+
+	var rooms: Array[Rect2i] = []
+	return {
+		"tiles":                  tiles,
+		"spawn":                  spawn,
+		"stairs_down":            stairs_dn,
+		"stairs_up":              spawn,
+		"rooms":                  rooms,
+		"branch_pos":             Vector2i(-1, -1),
+		"preset_faith_altars":    faith_altars,
+		"preset_broken_altars":   broken_altars,
+	}
+
+# ── Rect helpers ───────────────────────────────────────────────────────────
+
+static func _carve_rect(rect: Rect2i, tiles: PackedByteArray, width: int) -> void:
+	for y in range(rect.position.y, rect.position.y + rect.size.y):
+		for x in range(rect.position.x, rect.position.x + rect.size.x):
+			tiles[y * width + x] = DungeonMap.Tile.FLOOR
+
+## Carve left_rect and its horizontal mirror (x_right = width - x_left - size.x).
+static func _carve_symmetric(left_rect: Rect2i, tiles: PackedByteArray, width: int) -> void:
+	_carve_rect(left_rect, tiles, width)
+	var rx: int = width - left_rect.position.x - left_rect.size.x
+	_carve_rect(Rect2i(rx, left_rect.position.y, left_rect.size.x, left_rect.size.y),
+			tiles, width)
 
 # ── BFS farthest floor ─────────────────────────────────────────────────────
 

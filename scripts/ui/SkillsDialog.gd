@@ -90,16 +90,11 @@ static func open(player: Player, parent: Node) -> void:
 	tab_bar.add_theme_constant_override("separation", 4)
 	body.add_child(tab_bar)
 
-	# ── content area (scroll + inner vbox) ───────────────────────────────────
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	body.add_child(scroll)
-
+	# ── content area ─────────────────────────────────────────────────────────
 	var content := VBoxContainer.new()
 	content.add_theme_constant_override("separation", 6)
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(content)
+	body.add_child(content)
 
 	# ── tab button refs for highlight swap ───────────────────────────────────
 	var tab_btns: Array = []
@@ -256,12 +251,26 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 	lv_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(lv_lbl)
 
+	var xp_pct_lbl := Label.new()
+	xp_pct_lbl.add_theme_font_size_override("font_size", 20)
+	xp_pct_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	xp_pct_lbl.custom_minimum_size = Vector2(52, 0)
+	xp_pct_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	row.add_child(xp_pct_lbl)
+
 	# 활성 상태 색상 갱신 함수
 	var _refresh_active := func() -> void:
 		var is_active: bool = player.is_skill_active(id)
 		name_lbl.add_theme_color_override("font_color",
 			Color(0.95, 0.85, 0.35) if is_active else Color(0.45, 0.45, 0.5))
 		vb.modulate = Color(1.0, 1.0, 1.0) if is_active else Color(0.7, 0.7, 0.75)
+		var active_count: int = player.active_skills.size()
+		if is_active and active_count > 0:
+			var pct: int = int(round(100.0 / float(active_count)))
+			xp_pct_lbl.text = "%d%%" % pct
+			xp_pct_lbl.add_theme_color_override("font_color", Color(0.7, 0.95, 0.7))
+		else:
+			xp_pct_lbl.text = ""
 	_refresh_active.call()
 
 	var _long_pressed := [false]

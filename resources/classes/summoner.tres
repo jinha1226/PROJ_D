@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://class_summoner1"]
+
+[ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
+
+[resource]
+script = ExtResource("1_cdata")
+id = "summoner"
+display_name = "Summoner"
+description = "Calls creatures to fight. Wins through allies and battlefield pressure."
+starting_hp = 11
+starting_mp = 8
+starting_str = 7
+starting_dex = 9
+starting_int = 16
+starting_weapon = "dagger"
+starting_armor = "robe"
+robe_path = "res://assets/tiles/individual/player/body/robe_green.png"
+starting_skills = {"agility": 2, "spellcasting": 2, "summoning": 4}
+starting_spells = ["call_imp", "summon_vermin"]
+passive = ""
+unlocked = false
+unlock_kind = "use_item"
+unlock_trigger_id = "book_summoning"
+class_group = "mage"

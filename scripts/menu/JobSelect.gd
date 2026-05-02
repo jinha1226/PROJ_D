@@ -3,22 +3,11 @@ extends Control
 const GAME_SCENE_PATH: String = "res://scenes/main/Game.tscn"
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 const DEFAULT_BASE_PATH: String = "res://assets/tiles/individual/player/base/human_m.png"
-const FIGHTER_START_WEAPONS: Array = ["short_sword", "mace", "battle_axe", "spear"]
-const RANGER_START_WEAPONS: Array = ["shortbow", "longbow", "crossbow"]
-
-const MAGE_START_SCHOOLS: Array = [
-	{"id": "fire",         "display": "Fire",         "desc": "Scorch, Fireball, Fire Storm — burn everything."},
-	{"id": "cold",         "display": "Cold",         "desc": "Freeze, Ice Bolt, Glaciate — chill and shatter."},
-	{"id": "air",          "display": "Air",          "desc": "Shock, Lightning Bolt, Tornado — chain electricity."},
-	{"id": "earth",        "display": "Earth",        "desc": "Stone Arrow, Crystal Spear, Shatter — heavy impact."},
-	{"id": "necromancy",   "display": "Necromancy",   "desc": "Pain, Vampiric Draining, Haunt — drain and corrupt."},
-	{"id": "hexes",        "display": "Hexes",        "desc": "Slow, Confuse, Mass Confusion — disable foes."},
-	{"id": "translocation","display": "Translocation","desc": "Blink, Swiftness, Teleport — movement mastery."},
-	{"id": "summoning",    "display": "Summoning",    "desc": "Call Imp, Animate Dead, Malign Gateway — allies."},
+const GROUP_ORDER: Array = [
+	{"id": "fighter", "label": "FIGHTER"},
+	{"id": "rogue",   "label": "ROGUE"},
+	{"id": "mage",    "label": "MAGE"},
 ]
-
-const BASE_CLASSES: Array = ["warrior", "mage", "rogue", "ranger"]
-const TEST_CLASSES: Array = ["archmage"]
 
 @onready var _scroll: ScrollContainer = $ScrollContainer
 @onready var _container: VBoxContainer = $ScrollContainer/VBox
@@ -39,26 +28,36 @@ func _ready() -> void:
 func _build_class_list() -> void:
 	for child in _container.get_children():
 		child.queue_free()
-	for id in BASE_CLASSES:
-		var data: ClassData = ClassRegistry.get_by_id(id)
-		if data != null:
-			_container.add_child(_make_card(data))
 
-	if not TEST_CLASSES.is_empty():
-		var spacer := Control.new()
-		spacer.custom_minimum_size = Vector2(0, 16)
-		_container.add_child(spacer)
+	# Bucket classes by group
+	var by_group: Dictionary = {}
+	for entry in GROUP_ORDER:
+		by_group[entry["id"]] = []
+	for data in ClassRegistry.all:
+		var g: String = String(data.class_group)
+		if by_group.has(g):
+			by_group[g].append(data)
+
+	var first_group := true
+	for entry in GROUP_ORDER:
+		var group_id: String = entry["id"]
+		var classes: Array = by_group.get(group_id, [])
+		if classes.is_empty():
+			continue
+		if not first_group:
+			var spacer := Control.new()
+			spacer.custom_minimum_size = Vector2(0, 8)
+			_container.add_child(spacer)
+		first_group = false
 
 		var hdr := Label.new()
-		hdr.text = "TEST CLASSES"
-		hdr.add_theme_font_size_override("font_size", 22)
-		hdr.add_theme_color_override("font_color", Color(0.8, 0.72, 1.0))
+		hdr.text = entry["label"]
+		hdr.add_theme_font_size_override("font_size", 20)
+		hdr.add_theme_color_override("font_color", Color(0.65, 0.72, 0.85))
 		_container.add_child(hdr)
 
-		for id in TEST_CLASSES:
-			var tdata: ClassData = ClassRegistry.get_by_id(id)
-			if tdata != null:
-				_container.add_child(_make_card(tdata))
+		for data in classes:
+			_container.add_child(_make_card(data))
 
 
 func _make_card(data: ClassData) -> Control:
@@ -211,20 +210,11 @@ func _skills_line(data: ClassData) -> String:
 
 
 func _item_name(id: String) -> String:
-	var it: ItemData = ItemRegistry.get_by_id(id)
+	var it: ItemData = ItemRegistry.get_by_id(id) if ItemRegistry != null and id != "" else null
 	return it.display_name if it != null else id
 
 
 func _on_pick(class_id: String) -> void:
-	if class_id == "warrior":
-		_open_fighter_weapon_choice(class_id)
-		return
-	if class_id == "ranger":
-		_open_ranger_weapon_choice(class_id)
-		return
-	if class_id == "mage" or class_id == "archmage":
-		_open_mage_school_choice(class_id)
-		return
 	GameManager.selected_starting_weapon_id = ""
 	GameManager.selected_starting_school_id = ""
 	GameManager.selected_class_id = class_id
@@ -236,101 +226,3 @@ func _on_back() -> void:
 	get_tree().change_scene_to_file(MENU_SCENE_PATH)
 
 
-func _open_fighter_weapon_choice(class_id: String) -> void:
-	var dlg: GameDialog = GameDialog.create_ratio("Choose Fighter Weapon", 0.86, 0.72)
-	add_child(dlg)
-	var body: VBoxContainer = dlg.body()
-	if body == null:
-		return
-	body.add_theme_constant_override("separation", 10)
-	var intro := Label.new()
-	intro.text = "Pick your starting weapon."
-	intro.add_theme_font_size_override("font_size", 28)
-	body.add_child(intro)
-	for item_id in FIGHTER_START_WEAPONS:
-		var choice_id: String = item_id
-		var item: ItemData = ItemRegistry.get_by_id(choice_id)
-		if item == null:
-			continue
-		var btn := Button.new()
-		btn.text = "%s  (d%d  spd %.1f)" % [item.display_name.capitalize(), item.damage, item.delay]
-		btn.custom_minimum_size = Vector2(0, 68)
-		btn.add_theme_font_size_override("font_size", 26)
-		btn.pressed.connect(func():
-			GameManager.selected_starting_weapon_id = choice_id
-			GameManager.selected_class_id = class_id
-			GameManager.start_new_run()
-			get_tree().change_scene_to_file(GAME_SCENE_PATH))
-		body.add_child(btn)
-		var desc := Label.new()
-		desc.text = item.description
-		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		desc.add_theme_font_size_override("font_size", 18)
-		desc.add_theme_color_override("font_color", Color(0.72, 0.75, 0.82))
-		body.add_child(desc)
-
-
-func _open_ranger_weapon_choice(class_id: String) -> void:
-	var dlg: GameDialog = GameDialog.create_ratio("Choose Ranger Weapon", 0.86, 0.72)
-	add_child(dlg)
-	var body: VBoxContainer = dlg.body()
-	if body == null:
-		return
-	body.add_theme_constant_override("separation", 10)
-	var intro := Label.new()
-	intro.text = "Pick your starting ranged weapon."
-	intro.add_theme_font_size_override("font_size", 28)
-	body.add_child(intro)
-	for item_id in RANGER_START_WEAPONS:
-		var choice_id: String = item_id
-		var item: ItemData = ItemRegistry.get_by_id(choice_id)
-		if item == null:
-			continue
-		var btn := Button.new()
-		btn.text = "%s  (d%d  spd %.1f)" % [item.display_name.capitalize(), item.damage, item.delay]
-		btn.custom_minimum_size = Vector2(0, 68)
-		btn.add_theme_font_size_override("font_size", 26)
-		btn.pressed.connect(func():
-			GameManager.selected_starting_weapon_id = choice_id
-			GameManager.selected_class_id = class_id
-			GameManager.start_new_run()
-			get_tree().change_scene_to_file(GAME_SCENE_PATH))
-		body.add_child(btn)
-		var desc := Label.new()
-		desc.text = item.description
-		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		desc.add_theme_font_size_override("font_size", 18)
-		desc.add_theme_color_override("font_color", Color(0.72, 0.75, 0.82))
-		body.add_child(desc)
-
-
-func _open_mage_school_choice(class_id: String) -> void:
-	var dlg: GameDialog = GameDialog.create_ratio("Choose Starting School", 0.9, 0.88)
-	add_child(dlg)
-	var body: VBoxContainer = dlg.body()
-	if body == null:
-		return
-	body.add_theme_constant_override("separation", 8)
-	var intro := Label.new()
-	intro.text = "Pick your starting magical school.\nAll spells are visible; higher tiers unlock as you level."
-	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	intro.add_theme_font_size_override("font_size", 24)
-	body.add_child(intro)
-	for entry in MAGE_START_SCHOOLS:
-		var school_id: String = String(entry["id"])
-		var btn := Button.new()
-		btn.text = String(entry["display"])
-		btn.custom_minimum_size = Vector2(0, 58)
-		btn.add_theme_font_size_override("font_size", 26)
-		btn.pressed.connect(func():
-			GameManager.selected_starting_school_id = school_id
-			GameManager.selected_class_id = class_id
-			GameManager.start_new_run()
-			get_tree().change_scene_to_file(GAME_SCENE_PATH))
-		body.add_child(btn)
-		var desc_lbl := Label.new()
-		desc_lbl.text = String(entry["desc"])
-		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		desc_lbl.add_theme_font_size_override("font_size", 18)
-		desc_lbl.add_theme_color_override("font_color", Color(0.72, 0.75, 0.82))
-		body.add_child(desc_lbl)

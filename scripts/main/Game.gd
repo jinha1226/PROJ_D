@@ -378,7 +378,6 @@ func _apply_class_to_player(class_id: String) -> void:
 	GameManager.selected_starting_school_id = ""
 	for id in _class_starter_items(class_id):
 		player.items.append({"id": id, "plus": 0})
-		player.auto_bind_quickslot(id)
 	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
 	var race_name: String = race.display_name if race != null else "adventurer"
 	CombatLog.post("You start as %s %s." % [race_name, data.display_name],
@@ -722,6 +721,8 @@ func _spawn_ui() -> void:
 	bottom_hud.quickslot_pressed.connect(_on_quickslot_pressed)
 	bottom_hud.quickslot_long_pressed.connect(_on_quickslot_long_pressed)
 	bottom_hud.quickslot_swap_requested.connect(_on_quickslot_swap_requested)
+	if bottom_hud.has_signal("menu_pressed"):
+		bottom_hud.menu_pressed.connect(_on_menu_button_pressed)
 	top_hud.item_slot_pressed.connect(_on_item_slot_pressed)
 	if top_hud.has_signal("zoom_in_pressed"):
 		top_hud.zoom_in_pressed.connect(func(): _zoom_by(ZOOM_STEP))
@@ -754,7 +755,7 @@ func _generate_floor(depth: int, map_seed: int,
 		if has_branch:
 			already_cleared = GameManager.branches_cleared.has(bid)
 		var zone: Dictionary = ZoneManager.zone_for_depth(depth)
-		var zone_style: String = String(zone.get("map_style", "bsp"))
+		var zone_style: String = "temple" if depth == 3 else String(zone.get("map_style", "bsp"))
 		map.generate(map_seed, has_branch and not already_cleared, zone_style)
 		if has_branch and not already_cleared:
 			var ecfg: Dictionary = ZoneManager.branch_config(bid)
@@ -824,9 +825,17 @@ func _spawn_b15_boss_floor() -> void:
 
 const _B3_FAITH_IDS: Array = ["war", "arcana", "trickery", "death", "essence"]
 
-func _place_b3_altars(seed: int) -> void:
+func _place_b3_altars(_seed: int) -> void:
+	# Temple generator pre-populates broken_altar_positions and preset_faith_altar_positions.
+	if map.preset_faith_altar_positions.size() == _B3_FAITH_IDS.size():
+		for i in _B3_FAITH_IDS.size():
+			map.altar_map[map.preset_faith_altar_positions[i]] = _B3_FAITH_IDS[i]
+		map.queue_redraw()
+		return
+
+	# Fallback: random placement for non-temple layouts.
 	var rng := RandomNumberGenerator.new()
-	rng.seed = seed ^ 0xA17A1234
+	rng.seed = _seed ^ 0xA17A1234
 	var floor_tiles: Array = []
 	for y in range(DungeonMap.GRID_H):
 		for x in range(DungeonMap.GRID_W):
@@ -836,10 +845,7 @@ func _place_b3_altars(seed: int) -> void:
 	if floor_tiles.is_empty():
 		return
 
-	var broken: Array = []
 	var picked: Dictionary = {}
-	for p in floor_tiles:
-		picked[p] = false
 	var shuffled: Array = floor_tiles.duplicate()
 	for i in range(shuffled.size() - 1, 0, -1):
 		var j: int = rng.randi_range(0, i)
@@ -847,16 +853,20 @@ func _place_b3_altars(seed: int) -> void:
 		shuffled[i] = shuffled[j]
 		shuffled[j] = tmp
 
-	for p in shuffled:
-		if broken.size() >= 6:
-			break
-		if p == map.spawn_pos or p == map.stairs_down_pos or p == map.stairs_up_pos:
-			continue
-		broken.append(p)
-		picked[p] = true
-	map.broken_altar_positions = broken
+	if map.broken_altar_positions.is_empty():
+		var broken: Array = []
+		for p in shuffled:
+			if broken.size() >= 6:
+				break
+			if p == map.spawn_pos or p == map.stairs_down_pos or p == map.stairs_up_pos:
+				continue
+			broken.append(p)
+			picked[p] = true
+		map.broken_altar_positions = broken
+	else:
+		for p in map.broken_altar_positions:
+			picked[p] = true
 
-	# 5 faith altars, spread far from broken altars and each other
 	var faith_positions: Array = []
 	for fid in _B3_FAITH_IDS:
 		var best: Vector2i = Vector2i(-1, -1)
@@ -1989,6 +1999,42 @@ func _on_item_dropped(item_id: String, at_pos: Vector2i, plus: int) -> void:
 	_spawn_floor_item(data, at_pos, plus)
 	CombatLog.post("You drop %s." % GameManager.display_name_of(item_id))
 
+func _on_menu_button_pressed() -> void:
+	var dlg: GameDialog = GameDialog.create("Menu")
+	add_child(dlg)
+	var body: VBoxContainer = dlg.body()
+	if body == null:
+		return
+	body.add_theme_constant_override("separation", 10)
+
+	var save_btn := Button.new()
+	save_btn.text = "Save"
+	save_btn.custom_minimum_size = Vector2(0, 56)
+	save_btn.add_theme_font_size_override("font_size", 24)
+	save_btn.pressed.connect(func():
+		SaveManager.save_run(player, GameManager)
+		CombatLog.post("Game saved.", Color(0.6, 0.9, 0.6))
+		dlg.queue_free())
+	body.add_child(save_btn)
+
+	var bestiary_btn := Button.new()
+	bestiary_btn.text = "Bestiary"
+	bestiary_btn.custom_minimum_size = Vector2(0, 56)
+	bestiary_btn.add_theme_font_size_override("font_size", 24)
+	bestiary_btn.pressed.connect(func():
+		dlg.queue_free()
+		BestiaryDialog.open(self))
+	body.add_child(bestiary_btn)
+
+	var quit_btn := Button.new()
+	quit_btn.text = "Save & Main Menu"
+	quit_btn.custom_minimum_size = Vector2(0, 56)
+	quit_btn.add_theme_font_size_override("font_size", 24)
+	quit_btn.pressed.connect(func():
+		SaveManager.save_run(player, GameManager)
+		get_tree().change_scene_to_file(MENU_SCENE_PATH))
+	body.add_child(quit_btn)
+
 func _on_bag_pressed() -> void:
 	if player == null:
 		return
@@ -2108,21 +2154,17 @@ func _on_quickslot_pressed(index: int) -> void:
 	if slot_id == "":
 		QuickslotPicker.open(player, self, index, _refresh_quickslots)
 		return
-	# Check if it's a spell
 	var spell: SpellData = SpellRegistry.get_by_id(slot_id)
 	if spell != null:
 		if not TurnManager.is_player_turn:
 			return
-		# single/auto/nearest spells target a specific monster → two-step confirm
 		if spell.targeting in ["single", "auto", "nearest"]:
 			begin_spell_targeting_auto(spell, player)
 		else:
-			# self/aoe: fire immediately
 			var ok: bool = MagicSystem.cast(slot_id, player, self)
 			if ok:
 				TurnManager.end_player_turn()
 		return
-	# Item path
 	if player.count_item(slot_id) == 0:
 		QuickslotPicker.open(player, self, index, _refresh_quickslots)
 		return
@@ -2414,9 +2456,9 @@ func _on_monster_died(monster: Monster) -> void:
 		await get_tree().create_timer(1.2).timeout
 		CombatLog.post("The Abyssal Sovereign collapses. The dungeon trembles...",
 				Color(0.85, 0.6, 1.0))
-	await get_tree().create_timer(1.5).timeout
-	_show_result_screen(true)
-	return
+		await get_tree().create_timer(1.5).timeout
+		_show_result_screen(true)
+		return
 	_handle_first_shrine_boss_clear(monster)
 	# Before shrine choice, suppress all essence drops
 	if not FaithSystem.has_chosen_faith(player):

@@ -1,9 +1,6 @@
 extends Control
 class_name BottomHUD
 
-signal quickslot_pressed(index: int)
-signal quickslot_long_pressed(index: int)
-signal quickslot_swap_requested(from_index: int, to_index: int)
 signal rest_pressed
 signal bag_pressed
 signal skills_pressed
@@ -11,25 +8,35 @@ signal magic_pressed
 signal status_pressed
 signal act_pressed
 signal menu_pressed
+signal quickslot_pressed(index: int)
+signal quickslot_long_pressed(index: int)
+signal quickslot_swap_requested(from_index: int, to_index: int)
 
+@onready var rest_button: Button = $BottomMargin/MainVBox/MainRow/RestButton
+@onready var act_button: Button = $BottomMargin/MainVBox/MainRow/ActButton
+@onready var bag_button: Button = $BottomMargin/MainVBox/MenuRow/BagButton
+@onready var skills_button: Button = $BottomMargin/MainVBox/MenuRow/SkillsButton
+@onready var magic_button: Button = $BottomMargin/MainVBox/MenuRow/MagicButton
+@onready var status_button: Button = $BottomMargin/MainVBox/MenuRow/StatusButton
+@onready var menu_button: Button = $BottomMargin/MainVBox/MenuRow/MenuButton
 @onready var quick_slots: Array = [
-	$Margin/VBox/Row1/QuickSlot0,
-	$Margin/VBox/Row1/QuickSlot1,
-	$Margin/VBox/Row1/QuickSlot2,
-	$Margin/VBox/Row1/QuickSlot3,
-	$Margin/VBox/Row1/QuickSlot4,
+	$BottomMargin/MainVBox/MainRow/QuickSlot0,
+	$BottomMargin/MainVBox/MainRow/QuickSlot1,
+	$BottomMargin/MainVBox/MainRow/QuickSlot2,
+	$BottomMargin/MainVBox/MainRow/QuickSlot3,
 ]
-@onready var rest_button: Button = $Margin/VBox/Row1/RestButton
-@onready var bag_button: Button = $Margin/VBox/Row2/BagButton
-@onready var skills_button: Button = $Margin/VBox/Row2/SkillsButton
-@onready var magic_button: Button = $Margin/VBox/Row2/MagicButton
-@onready var status_button: Button = $Margin/VBox/Row2/StatusButton
-@onready var act_button: Button = $Margin/VBox/Row2/ActButton
-@onready var menu_button: Button = $Margin/VBox/Row2/MenuButton
 
 
 func _ready() -> void:
 	theme = GameTheme.create()
+	rest_button.pressed.connect(func(): rest_pressed.emit())
+	act_button.pressed.connect(func(): act_pressed.emit())
+	bag_button.pressed.connect(func(): bag_pressed.emit())
+	skills_button.pressed.connect(func(): skills_pressed.emit())
+	magic_button.pressed.connect(func(): magic_pressed.emit())
+	status_button.pressed.connect(func(): status_pressed.emit())
+	if menu_button != null:
+		menu_button.pressed.connect(func(): menu_pressed.emit())
 	for i in quick_slots.size():
 		var qs = quick_slots[i]
 		qs.slot_index = i
@@ -39,19 +46,16 @@ func _ready() -> void:
 			qs.long_pressed_slot.connect(func(idx): quickslot_long_pressed.emit(idx))
 		if qs.has_signal("drag_released"):
 			qs.drag_released.connect(_on_quickslot_drag_released)
-	rest_button.pressed.connect(func(): rest_pressed.emit())
-	bag_button.pressed.connect(func(): bag_pressed.emit())
-	skills_button.pressed.connect(func(): skills_pressed.emit())
-	magic_button.pressed.connect(func(): magic_pressed.emit())
-	status_button.pressed.connect(func(): status_pressed.emit())
-	act_button.pressed.connect(func(): act_pressed.emit())
-	menu_button.pressed.connect(func(): menu_pressed.emit())
 
 
-## Update REST button label to hint at current mode.
 func set_rest_label(monster_in_sight: bool) -> void:
 	if rest_button != null:
 		rest_button.text = "WAIT" if monster_in_sight else "REST"
+
+
+func set_act_label(monster_in_sight: bool) -> void:
+	if act_button != null:
+		act_button.text = "ATK" if monster_in_sight else "AUTO"
 
 
 func set_quickslot(i: int, icon: Texture2D, text: String) -> void:

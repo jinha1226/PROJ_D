@@ -2,7 +2,6 @@ extends CanvasLayer
 ## Run-end result screen. Shown on player death or dungeon clear.
 ## M1: no meta-upgrade UI yet; the [메타 업그레이드] button just logs.
 
-signal meta_pressed
 signal retry_pressed
 
 @onready var _title: Label = $Dim/Panel/VBox/Title
@@ -12,13 +11,11 @@ signal retry_pressed
 @onready var _killer_label: Label = $Dim/Panel/VBox/Stats/KillerLabel
 @onready var _runes_label: Label = $Dim/Panel/VBox/ShardsGained
 @onready var _gain_label: Label = $Dim/Panel/VBox/ShardsTotal
-@onready var _meta_btn: Button = $Dim/Panel/VBox/Buttons/MetaButton
 @onready var _retry_btn: Button = $Dim/Panel/VBox/Buttons/RetryButton
 
 
 func _ready() -> void:
 	layer = 100
-	_meta_btn.pressed.connect(_on_meta_pressed)
 	_retry_btn.pressed.connect(_on_retry_pressed)
 
 
@@ -54,11 +51,6 @@ func show_result(data: Dictionary) -> void:
 	if _gain_label != null:
 		_gain_label.visible = false
 	visible = true
-
-
-func _on_meta_pressed() -> void:
-	print("meta TODO")
-	meta_pressed.emit()
 
 
 func _on_retry_pressed() -> void:

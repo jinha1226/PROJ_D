@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://bslyie0ioosx5"]
 
-[ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
+[ext_resource type="Script" uid="uid://u2ro1a0v2yg6" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
 
 [resource]
 script = ExtResource("1_cdata")
@@ -15,10 +15,10 @@ starting_int = 6
 starting_weapon = "short_sword"
 starting_armor = "chain_mail"
 starting_shield = "buckler"
-starting_skills = {"melee": 2, "defense": 1}
-starting_spells = []
-passive = ""
-unlocked = true
-unlock_kind = ""
-unlock_trigger_id = ""
+starting_skills = {
+"armor": 3,
+"blade": 2,
+"fighting": 3,
+"shield": 3
+}
 class_group = "fighter"
