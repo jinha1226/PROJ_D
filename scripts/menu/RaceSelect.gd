@@ -118,17 +118,25 @@ func _add_layer(parent: Control, path: String, dim: bool) -> void:
 		rect.modulate = Color(0.4, 0.4, 0.45, 1)
 	parent.add_child(rect)
 
-const _APT_ORDER: Array = ["endurance", "melee", "ranged", "magic", "defense", "agility", "tool"]
+const _APT_ORDER: Array = [
+	"fighting", "unarmed", "blade", "hafted", "polearm", "ranged",
+	"spellcasting", "elemental", "arcane", "hex", "necromancy", "summoning",
+	"armor", "shield", "agility", "tool"
+]
 const _APT_LABELS: Dictionary = {
-	"endurance": "End", "melee": "Melee", "ranged": "Ranged",
-	"magic": "Magic", "defense": "Def", "agility": "Agi", "tool": "Tool"
+	"fighting": "Fight", "unarmed": "Unarm", "blade": "Blade", "hafted": "Haft",
+	"polearm": "Pole", "ranged": "Rng", "spellcasting": "Spell", "elemental": "Elem",
+	"arcane": "Arc", "hex": "Hex", "necromancy": "Nec", "summoning": "Sum",
+	"armor": "Arm", "shield": "Shd", "agility": "Agi", "tool": "Tool"
 }
 
 func _make_apt_row(data: RaceData) -> Control:
 	if data.skill_aptitudes.is_empty():
 		return null
-	var hb := HBoxContainer.new()
-	hb.add_theme_constant_override("separation", 10)
+	var flow := HFlowContainer.new()
+	flow.add_theme_constant_override("h_separation", 10)
+	flow.add_theme_constant_override("v_separation", 4)
+	flow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var any := false
 	for sid in _APT_ORDER:
 		var apt: int = int(data.skill_aptitudes.get(sid, 0))
@@ -140,8 +148,8 @@ func _make_apt_row(data: RaceData) -> Control:
 		lbl.add_theme_font_size_override("font_size", 18)
 		lbl.add_theme_color_override("font_color",
 			Color(0.45, 0.9, 0.5) if apt > 0 else Color(0.9, 0.45, 0.45))
-		hb.add_child(lbl)
-	return hb if any else null
+		flow.add_child(lbl)
+	return flow if any else null
 
 func _on_pick(race_id: String) -> void:
 	GameManager.selected_race_id = race_id
