@@ -999,6 +999,7 @@ func _cache_current_floor() -> void:
 				"id": n.data.id,
 				"pos": n.grid_pos,
 				"plus": n.plus,
+				"entry": n.entry.duplicate(true) if not n.entry.is_empty() else {"id": n.data.id, "plus": n.plus},
 			})
 	for n in get_tree().get_nodes_in_group("monsters"):
 		if n is Monster and n.data != null and n.hp > 0:
@@ -1029,13 +1030,14 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 			else map.stairs_down_pos
 	player.bind_map(map, arrival)
 	for entry in state.items:
-		var d: ItemData = ItemRegistry.get_by_id(String(entry.get("id", ""))) if ItemRegistry != null else null
+		var item_entry: Dictionary = entry.get("entry", {"id": String(entry.get("id", "")), "plus": int(entry.get("plus", 0))})
+		var d: ItemData = ItemRegistry.get_by_id(String(item_entry.get("id", ""))) if ItemRegistry != null else null
 		if d == null:
 			continue
 		var p: Vector2i = entry.get("pos", Vector2i.ZERO)
 		if p == player.grid_pos:
 			continue  # Don't spawn item under player on arrival.
-		_spawn_floor_item(d, p, int(entry.get("plus", 0)))
+		_spawn_floor_item(d, p, int(item_entry.get("plus", 0)), item_entry)
 	for entry in state.monsters:
 		var md: MonsterData = MonsterRegistry.get_by_id(
 				String(entry.get("id", "")))
@@ -1184,7 +1186,8 @@ func _spawn_items_for_floor(depth: int) -> void:
 				continue
 			if _item_at(p) != null:
 				continue
-			_spawn_floor_item(item, p, 0)
+			var entry_override: Dictionary = ItemRegistry.make_entry(item.id, depth, 0) if ItemRegistry != null else {"id": item.id, "plus": 0}
+			_spawn_floor_item(item, p, 0, entry_override)
 			break
 
 func spawn_ally(monster_id: String, near_pos: Vector2i, turns: int) -> bool:
@@ -1253,12 +1256,12 @@ func _roll_monster_weapon(monster: Monster) -> void:
 		weapon_id = normal_pool[randi() % normal_pool.size()]
 	monster.equipped_weapon_id = weapon_id
 
-func _spawn_floor_item(data: ItemData, pos: Vector2i, plus: int) -> void:
+func _spawn_floor_item(data: ItemData, pos: Vector2i, plus: int, entry_override: Dictionary = {}) -> void:
 	if items_layer == null:
 		return
 	var fi: FloorItem = FloorItemScene.new()
 	items_layer.add_child(fi)
-	fi.setup(data, map, pos, plus)
+	fi.setup(data, map, pos, plus, entry_override)
 
 func _monster_count_for_depth(d: int) -> int:
 	if d <= 5:
@@ -1697,9 +1700,10 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 			TurnManager.register_actor(m)
 			_roll_monster_weapon(m)
 		for entry in state.get("items", []):
-			var d: ItemData = ItemRegistry.get_by_id(String(entry.get("id", ""))) if ItemRegistry != null else null
+			var item_entry: Dictionary = entry.get("entry", {"id": String(entry.get("id", "")), "plus": int(entry.get("plus", 0))})
+			var d: ItemData = ItemRegistry.get_by_id(String(item_entry.get("id", ""))) if ItemRegistry != null else null
 			if d == null: continue
-			_spawn_floor_item(d, entry.get("pos", Vector2i.ZERO), int(entry.get("plus", 0)))
+			_spawn_floor_item(d, entry.get("pos", Vector2i.ZERO), int(item_entry.get("plus", 0)), item_entry)
 		_refresh_fov()
 		return
 
@@ -1986,7 +1990,7 @@ func _cache_branch_floor(branch_id: String, branch_floor: int) -> void:
 	}
 	for n in get_tree().get_nodes_in_group("floor_items"):
 		if n is FloorItem and n.data != null:
-			state.items.append({"id": n.data.id, "pos": n.grid_pos, "plus": n.plus})
+			state.items.append({"id": n.data.id, "pos": n.grid_pos, "plus": n.plus, "entry": n.entry.duplicate(true) if not n.entry.is_empty() else {"id": n.data.id, "plus": n.plus}})
 	for n in get_tree().get_nodes_in_group("monsters"):
 		if n is Monster and n.data != null and n.hp > 0:
 			state.monsters.append({"id": n.data.id, "pos": n.grid_pos, "hp": n.hp,
@@ -2087,12 +2091,14 @@ func _travel_to_floor(target_depth: int) -> void:
 	SaveManager.save_run(player, GameManager)
 	TurnManager.end_player_turn()
 
-func _on_item_dropped(item_id: String, at_pos: Vector2i, plus: int) -> void:
+func _on_item_dropped(entry: Dictionary, at_pos: Vector2i) -> void:
+	var item_id: String = String(entry.get("id", ""))
 	var data: ItemData = ItemRegistry.get_by_id(item_id) if ItemRegistry != null and item_id != "" else null
 	if data == null:
 		return
-	_spawn_floor_item(data, at_pos, plus)
-	CombatLog.post("You drop %s." % GameManager.display_name_of(item_id))
+	_spawn_floor_item(data, at_pos, int(entry.get("plus", 0)), entry)
+	var item_name: String = ItemRegistry.entry_display_name(entry) if ItemRegistry != null else GameManager.display_name_of(item_id)
+	CombatLog.post("You drop %s." % item_name)
 
 func _on_menu_button_pressed() -> void:
 	var dlg: GameDialog = GameDialog.create("Menu")
