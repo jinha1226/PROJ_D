@@ -55,7 +55,7 @@ static func generate(width: int, height: int, map_seed: int = -1,
 	# Place doors at narrow room entrances.
 	_place_doors(rooms, tiles, width, height, rng)
 	var spawn: Vector2i = rooms[0].get_center()
-	var stairs_down: Vector2i = _farthest_floor(spawn, tiles, width, height)
+	var stairs_down: Vector2i = _pick_primary_down_stairs(spawn, tiles, width, height, rng)
 	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
 	tiles[stairs_down.y * width + stairs_down.x] = DungeonMap.Tile.STAIRS_DOWN
 	var branch_pos: Vector2i = Vector2i(-1, -1)
@@ -71,6 +71,7 @@ static func generate(width: int, height: int, map_seed: int = -1,
 		"tiles": tiles,
 		"spawn": spawn,
 		"stairs_down": stairs_down,
+		"extra_stairs_down": extra_stairs_down,
 		"stairs_up": spawn,
 		"rooms": rooms,
 		"branch_pos": branch_pos,
@@ -270,7 +271,7 @@ static func generate_cave(width: int, height: int, map_seed: int = -1,
 	var spawn: Vector2i = _cave_spawn(tiles, width, height, rng)
 	# Seal off any floor tiles unreachable from spawn (ensures connectivity)
 	_seal_disconnected(spawn, tiles, width, height)
-	var stairs_down: Vector2i = _farthest_floor(spawn, tiles, width, height)
+	var stairs_down: Vector2i = _pick_primary_down_stairs(spawn, tiles, width, height, rng)
 	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
 	tiles[stairs_down.y * width + stairs_down.x] = DungeonMap.Tile.STAIRS_DOWN
 	var branch_pos := Vector2i(-1, -1)
@@ -280,7 +281,7 @@ static func generate_cave(width: int, height: int, map_seed: int = -1,
 			tiles[branch_pos.y * width + branch_pos.x] = DungeonMap.Tile.BRANCH_DOWN
 	var empty_rooms: Array[Rect2i] = []
 	return {"tiles": tiles, "spawn": spawn, "stairs_down": stairs_down,
-			"stairs_up": spawn, "rooms": empty_rooms, "branch_pos": branch_pos}
+			"extra_stairs_down": extra_stairs_down, "stairs_up": spawn, "rooms": empty_rooms, "branch_pos": branch_pos}
 
 static func _count_wall_neighbors(x: int, y: int, tiles: PackedByteArray,
 		width: int, height: int) -> int:
@@ -400,10 +401,13 @@ static func generate_crypt(width: int, height: int, map_seed: int = -1) -> Dicti
 		return generate(width, height, map_seed, false)
 	var spawn: Vector2i = rooms[0].get_center()
 	var stairs_down: Vector2i = rooms[rooms.size() - 1].get_center()
+	var extra_stairs_down: Array[Vector2i] = _pick_extra_down_stairs(spawn, stairs_down, tiles, width, height, 1)
 	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
 	tiles[stairs_down.y * width + stairs_down.x] = DungeonMap.Tile.STAIRS_DOWN
+	for p in extra_stairs_down:
+		tiles[p.y * width + p.x] = DungeonMap.Tile.STAIRS_DOWN
 	return {"tiles": tiles, "spawn": spawn, "stairs_down": stairs_down,
-			"stairs_up": spawn, "rooms": rooms, "branch_pos": Vector2i(-1, -1)}
+			"extra_stairs_down": extra_stairs_down, "stairs_up": spawn, "rooms": rooms, "branch_pos": Vector2i(-1, -1)}
 
 
 # ══ Large-room BSP (Infernal) ══════════════════════════════════════════════
@@ -429,16 +433,19 @@ static func generate_bsp_large(width: int, height: int, map_seed: int = -1,
 			if _room_gap(rooms[i], rooms[j]) <= 3 and rng.randf() < 0.20:
 				_connect_rooms(rooms[i], rooms[j], tiles, width, rng)
 	var spawn: Vector2i = rooms[0].get_center()
-	var stairs_down: Vector2i = _farthest_floor(spawn, tiles, width, height)
+	var stairs_down: Vector2i = _pick_primary_down_stairs(spawn, tiles, width, height, rng)
+	var extra_stairs_down: Array[Vector2i] = _pick_extra_down_stairs(spawn, stairs_down, tiles, width, height, 1)
 	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
 	tiles[stairs_down.y * width + stairs_down.x] = DungeonMap.Tile.STAIRS_DOWN
+	for p in extra_stairs_down:
+		tiles[p.y * width + p.x] = DungeonMap.Tile.STAIRS_DOWN
 	if branch_entrance and rooms.size() >= 2:
 		var mid: Rect2i = rooms[rooms.size() / 2]
 		var c: Vector2i = mid.get_center()
 		if tiles[c.y * width + c.x] == DungeonMap.Tile.FLOOR:
 			tiles[c.y * width + c.x] = DungeonMap.Tile.BRANCH_DOWN
 	return {"tiles": tiles, "spawn": spawn, "stairs_down": stairs_down,
-			"stairs_up": spawn, "rooms": rooms, "branch_pos": Vector2i(-1, -1)}
+			"extra_stairs_down": extra_stairs_down, "stairs_up": spawn, "rooms": rooms, "branch_pos": Vector2i(-1, -1)}
 
 static func _split_large(rect: Rect2i, depth: int, rng: RandomNumberGenerator,
 		tiles: PackedByteArray, width: int, rooms: Array[Rect2i]) -> void:
@@ -495,55 +502,80 @@ static func generate_temple(width: int, height: int) -> Dictionary:
 	for i in tiles.size():
 		tiles[i] = DungeonMap.Tile.WALL
 
-	# Top entry corridor
-	_carve_rect(Rect2i(14, 1, 4, 5), tiles, width)
-	# Upper antechamber
-	_carve_rect(Rect2i(11, 4, 10, 7), tiles, width)
-	# Upper side wings (symmetric)
-	_carve_symmetric(Rect2i(2, 4, 10, 6), tiles, width)
-	# Central grand hall
-	_carve_rect(Rect2i(6, 10, 20, 16), tiles, width)
-	# Mid side wings (symmetric)
-	_carve_symmetric(Rect2i(2, 13, 5, 9), tiles, width)
-	# Lower antechamber
-	_carve_rect(Rect2i(11, 24, 10, 7), tiles, width)
-	# Lower side wings (symmetric)
-	_carve_symmetric(Rect2i(2, 25, 10, 6), tiles, width)
-	# Bottom exit corridor
-	_carve_rect(Rect2i(14, 29, 4, 6), tiles, width)
+	var offset_x: int = maxi(0, (width - 32) / 2)
+	var offset_y: int = maxi(0, (height - 36) / 2)
+	func r(x: int, y: int, w: int, h: int) -> Rect2i:
+		return Rect2i(x + offset_x, y + offset_y, w, h)
 
-	var spawn     := Vector2i(15, 1)
-	var stairs_dn := Vector2i(15, 34)
-	tiles[spawn.y * width + spawn.x]     = DungeonMap.Tile.STAIRS_UP
+	# Entry spine and vestibule.
+	_carve_rect(r(14, 1, 4, 4), tiles, width)
+	_carve_rect(r(11, 4, 10, 5), tiles, width)
+
+	# Symmetric shrine complex with distinct altar rooms.
+	var nw_shrine: Rect2i = r(3, 5, 7, 6)
+	var ne_shrine: Rect2i = r(22, 5, 7, 6)
+	var center_hall: Rect2i = r(10, 10, 12, 7)
+	var sw_shrine: Rect2i = r(3, 23, 7, 6)
+	var se_shrine: Rect2i = r(22, 23, 7, 6)
+	var rear_sanctum: Rect2i = r(11, 28, 10, 4)
+	var west_aisle: Rect2i = r(6, 12, 5, 10)
+	var east_aisle: Rect2i = r(21, 12, 5, 10)
+	var lower_nave: Rect2i = r(10, 18, 12, 6)
+	var exit_corridor: Rect2i = r(14, 32, 4, 3)
+
+	for room in [nw_shrine, ne_shrine, center_hall, sw_shrine, se_shrine, rear_sanctum, west_aisle, east_aisle, lower_nave, exit_corridor]:
+		_carve_rect(room, tiles, width)
+
+	# Narrow connectors keep the temple room-based rather than one open blob.
+	_carve_rect(r(10, 6, 2, 2), tiles, width)
+	_carve_rect(r(20, 6, 2, 2), tiles, width)
+	_carve_rect(r(14, 8, 4, 3), tiles, width)
+	_carve_rect(r(10, 14, 2, 2), tiles, width)
+	_carve_rect(r(20, 14, 2, 2), tiles, width)
+	_carve_rect(r(10, 21, 2, 2), tiles, width)
+	_carve_rect(r(20, 21, 2, 2), tiles, width)
+	_carve_rect(r(14, 24, 4, 5), tiles, width)
+	_carve_rect(r(14, 31, 4, 2), tiles, width)
+
+	var spawn := Vector2i(15 + offset_x, 1 + offset_y)
+	var stairs_dn := Vector2i(15 + offset_x, 34 + offset_y)
+	var extra_stairs_down: Array[Vector2i] = [Vector2i(16 + offset_x, 34 + offset_y)]
+	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
 	tiles[stairs_dn.y * width + stairs_dn.x] = DungeonMap.Tile.STAIRS_DOWN
+	for p in extra_stairs_down:
+		tiles[p.y * width + p.x] = DungeonMap.Tile.STAIRS_DOWN
 
-	# Five faith altars — 1 centre + 2 symmetric upper + 2 symmetric lower
+	# One altar per shrine room.
 	var faith_altars: Array[Vector2i] = [
-		Vector2i(15, 17),   # centre
-		Vector2i(9,  13), Vector2i(22, 13),   # upper pair
-		Vector2i(9,  22), Vector2i(22, 22),   # lower pair
+		nw_shrine.get_center(),
+		ne_shrine.get_center(),
+		rear_sanctum.get_center(),
+		sw_shrine.get_center(),
+		se_shrine.get_center(),
 	]
 
-	# Six broken (DCSS decorative) altars — one per wing, mirrored
+	# Decorative broken altars in secondary aisles and vestibule.
 	var broken_altars: Array[Vector2i] = [
-		Vector2i(4,  6), Vector2i(27,  6),   # upper wings
-		Vector2i(3, 17), Vector2i(28, 17),   # mid wings
-		Vector2i(4, 27), Vector2i(27, 27),   # lower wings
+		west_aisle.get_center(),
+		east_aisle.get_center(),
+		Vector2i(15 + offset_x, 6 + offset_y),
+		Vector2i(15 + offset_x, 20 + offset_y),
+		Vector2i(8 + offset_x, 17 + offset_y),
+		Vector2i(23 + offset_x, 17 + offset_y),
 	]
 
-	var rooms: Array[Rect2i] = []
+	var rooms: Array[Rect2i] = [nw_shrine, ne_shrine, center_hall, sw_shrine, se_shrine, rear_sanctum, west_aisle, east_aisle, lower_nave]
 	return {
 		"tiles":                  tiles,
 		"spawn":                  spawn,
 		"stairs_down":            stairs_dn,
+		"extra_stairs_down":      extra_stairs_down,
 		"stairs_up":              spawn,
 		"rooms":                  rooms,
 		"branch_pos":             Vector2i(-1, -1),
 		"preset_faith_altars":    faith_altars,
 		"preset_broken_altars":   broken_altars,
 	}
-
-# ── Rect helpers ───────────────────────────────────────────────────────────
 
 static func _carve_rect(rect: Rect2i, tiles: PackedByteArray, width: int) -> void:
 	for y in range(rect.position.y, rect.position.y + rect.size.y):
@@ -558,6 +590,70 @@ static func _carve_symmetric(left_rect: Rect2i, tiles: PackedByteArray, width: i
 			tiles, width)
 
 # ── BFS farthest floor ─────────────────────────────────────────────────────
+
+
+static func _pick_primary_down_stairs(origin: Vector2i, tiles: PackedByteArray,
+		width: int, height: int, rng: RandomNumberGenerator) -> Vector2i:
+	var dist: Dictionary = {origin: 0}
+	var frontier: Array[Vector2i] = [origin]
+	var floors: Array[Vector2i] = []
+	while not frontier.is_empty():
+		var p: Vector2i = frontier.pop_front()
+		if p != origin and tiles[p.y * width + p.x] == DungeonMap.Tile.FLOOR:
+			floors.append(p)
+		for step in [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1)]:
+			var n: Vector2i = p + step
+			if n.x < 0 or n.y < 0 or n.x >= width or n.y >= height:
+				continue
+			if dist.has(n):
+				continue
+			var t: int = tiles[n.y * width + n.x]
+			if t == DungeonMap.Tile.WALL:
+				continue
+			dist[n] = int(dist[p]) + 1
+			frontier.append(n)
+	if floors.is_empty():
+		return origin
+	floors.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+		return int(dist[a]) > int(dist[b]))
+	var candidate_count: int = maxi(1, mini(6, floors.size()))
+	return floors[rng.randi_range(0, candidate_count - 1)]
+
+static func _pick_extra_down_stairs(origin: Vector2i, primary: Vector2i,
+		tiles: PackedByteArray, width: int, height: int, count: int = 1) -> Array[Vector2i]:
+	var dist: Dictionary = {origin: 0}
+	var frontier: Array[Vector2i] = [origin]
+	var floors: Array[Vector2i] = []
+	while not frontier.is_empty():
+		var p: Vector2i = frontier.pop_front()
+		if p != origin and p != primary and tiles[p.y * width + p.x] == DungeonMap.Tile.FLOOR:
+			floors.append(p)
+		for step in [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1)]:
+			var n: Vector2i = p + step
+			if n.x < 0 or n.y < 0 or n.x >= width or n.y >= height:
+				continue
+			if dist.has(n):
+				continue
+			var t: int = tiles[n.y * width + n.x]
+			if t == DungeonMap.Tile.WALL:
+				continue
+			dist[n] = int(dist[p]) + 1
+			frontier.append(n)
+	floors.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+		return int(dist[a]) > int(dist[b]))
+	var picked: Array[Vector2i] = []
+	for p in floors:
+		if _chebyshev_v(p, primary) <= 4:
+			continue
+		picked.append(p)
+		if picked.size() >= count:
+			break
+	if picked.is_empty():
+		for p in floors:
+			if not picked.has(p):
+				picked.append(p)
+				break
+	return picked
 
 static func _farthest_floor(origin: Vector2i, tiles: PackedByteArray,
 		width: int, height: int) -> Vector2i:

@@ -767,7 +767,9 @@ func _generate_floor(depth: int, map_seed: int,
 			_place_b3_altars(map_seed)
 		player.bind_map(map, map.spawn_pos)
 		_spawn_items_for_floor(depth)
-		if depth == 15:
+		if depth == 3:
+			_spawn_b3_temple_boss()
+		elif depth == 15:
 			_spawn_b15_boss_floor()
 		elif String(zone.get("id", "")) == "abyss":
 			_spawn_abyss_floor(depth)
@@ -775,6 +777,27 @@ func _generate_floor(depth: int, map_seed: int,
 			_spawn_monsters_for_floor(depth)
 		_scatter_hazard_tiles(zone.get("env", ""))
 	_refresh_fov()
+
+func _spawn_b3_temple_boss() -> void:
+	var md: MonsterData = MonsterRegistry.unique_for_depth(3)
+	if md == null:
+		md = MonsterRegistry.get_by_id("orc_warchief")
+	if md == null:
+		push_error("B3 temple boss not found!")
+		return
+	var boss_pos: Vector2i = Vector2i(DungeonMap.GRID_W / 2, DungeonMap.GRID_H / 2)
+	if map != null and map.rooms.size() >= 3:
+		boss_pos = map.rooms[2].get_center()
+	var m: Monster = MonsterScene.new()
+	monsters_layer.add_child(m)
+	m.setup(md, map, boss_pos)
+	m.hit_taken.connect(_on_monster_hit.bind(m))
+	if m.has_signal("awareness_changed"):
+		m.awareness_changed.connect(_on_monster_awareness_changed)
+	m.died.connect(_on_monster_died.bind(m))
+	TurnManager.register_actor(m)
+	_roll_monster_weapon(m)
+	CombatLog.post("A lone guardian watches over the ruined pantheon...", Color(1.0, 0.78, 0.35))
 
 func _spawn_b15_boss_floor() -> void:
 	var md: MonsterData = MonsterRegistry.get_by_id("abyssal_sovereign")
@@ -858,7 +881,7 @@ func _place_b3_altars(_seed: int) -> void:
 		for p in shuffled:
 			if broken.size() >= 6:
 				break
-			if p == map.spawn_pos or p == map.stairs_down_pos or p == map.stairs_up_pos:
+			if _is_reserved_map_feature(p):
 				continue
 			broken.append(p)
 			picked[p] = true
@@ -874,7 +897,7 @@ func _place_b3_altars(_seed: int) -> void:
 		for p in shuffled:
 			if picked.get(p, false):
 				continue
-			if p == map.spawn_pos or p == map.stairs_down_pos or p == map.stairs_up_pos:
+			if _is_reserved_map_feature(p):
 				continue
 			var min_dist: float = 999.0
 			for existing in faith_positions:
@@ -898,6 +921,7 @@ func _cache_current_floor() -> void:
 		"explored": map.explored.duplicate(true),
 		"spawn_pos": map.spawn_pos,
 		"stairs_down_pos": map.stairs_down_pos,
+		"extra_stairs_down_positions": map.extra_stairs_down_positions.duplicate(),
 		"stairs_up_pos": map.stairs_up_pos,
 		"rooms": map.rooms.duplicate(),
 		"altar_map": map.altar_map.duplicate(),
@@ -929,6 +953,7 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 	map.explored = state.explored.duplicate(true)
 	map.spawn_pos = state.spawn_pos
 	map.stairs_down_pos = state.stairs_down_pos
+	map.extra_stairs_down_positions = state.get("extra_stairs_down_positions", []).duplicate()
 	map.stairs_up_pos = state.stairs_up_pos
 	map.rooms = state.rooms.duplicate()
 	map.altar_map = state.get("altar_map", {}).duplicate()
@@ -1581,6 +1606,7 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 		map.explored = state["explored"].duplicate(true)
 		map.spawn_pos = state["spawn_pos"]
 		map.stairs_down_pos = state["stairs_down_pos"]
+		map.extra_stairs_down_positions = state.get("extra_stairs_down_positions", []).duplicate()
 		map.stairs_up_pos = state["stairs_up_pos"]
 		map.rooms = state["rooms"].duplicate()
 		map.visible_tiles.clear()
@@ -1659,8 +1685,7 @@ func _scatter_hazard_tiles(env: String) -> void:
 		for x in range(DungeonMap.GRID_W):
 			var p := Vector2i(x, y)
 			if map.tile_at(p) == DungeonMap.Tile.FLOOR \
-					and p != map.spawn_pos and p != map.stairs_down_pos \
-					and p != map.stairs_up_pos:
+					and not _is_reserved_map_feature(p):
 				floor_tiles.append(p)
 	var count: int = int(floor_tiles.size() * density)
 	for i in range(count):
@@ -1753,12 +1778,13 @@ func _tick_abyss() -> void:
 	# Move the exit to a new reachable floor tile
 	var new_exit: Vector2i = _abyss_find_new_exit()
 	if new_exit != Vector2i(-1, -1):
-		# Clear old exit
+		# Clear old exits
 		for y in range(DungeonMap.GRID_H):
 			for x in range(DungeonMap.GRID_W):
 				if map.tile_at(Vector2i(x, y)) == DungeonMap.Tile.STAIRS_DOWN:
 					map.set_tile(Vector2i(x, y), DungeonMap.Tile.FLOOR)
 		map.stairs_down_pos = new_exit
+		map.extra_stairs_down_positions.clear()
 		map.set_tile(new_exit, DungeonMap.Tile.STAIRS_DOWN)
 		CombatLog.post("The Abyss shifts... the exit has moved.", Color(0.6, 0.3, 0.9))
 	map.queue_redraw()
@@ -1818,7 +1844,8 @@ func _spawn_branch_boss(branch_id: String) -> void:
 	if boss_data == null:
 		push_warning("Branch boss not found: %s" % boss_id)
 		return
-	var spawn_pos: Vector2i = map.stairs_down_pos
+	var stair_candidates: Array[Vector2i] = _all_down_stairs_positions()
+	var spawn_pos: Vector2i = stair_candidates[0] if not stair_candidates.is_empty() else map.stairs_down_pos
 	# Place boss in center of a room far from player
 	if not map.rooms.is_empty():
 		var mid_room: Rect2i = map.rooms[map.rooms.size() / 2]
@@ -1879,7 +1906,9 @@ func _on_branch_boss_died(monster: Monster, branch_id: String) -> void:
 				_spawn_floor_item(ring_data, monster.grid_pos, 0)
 				CombatLog.post("A unique ring appears!", Color(0.8, 0.7, 1.0))
 	# Place stairs back to main
-	map.set_tile(map.stairs_down_pos, DungeonMap.Tile.STAIRS_UP)
+	for p in _all_down_stairs_positions():
+		map.set_tile(p, DungeonMap.Tile.STAIRS_UP)
+	map.extra_stairs_down_positions.clear()
 
 func _cache_branch_floor(branch_id: String, branch_floor: int) -> void:
 	var cache_key: String = "%s_%d" % [branch_id, branch_floor]
@@ -1888,6 +1917,7 @@ func _cache_branch_floor(branch_id: String, branch_floor: int) -> void:
 		"explored": map.explored.duplicate(true),
 		"spawn_pos": map.spawn_pos,
 		"stairs_down_pos": map.stairs_down_pos,
+		"extra_stairs_down_positions": map.extra_stairs_down_positions.duplicate(),
 		"stairs_up_pos": map.stairs_up_pos,
 		"rooms": map.rooms.duplicate(),
 		"items": [],
@@ -2360,6 +2390,14 @@ func _monster_at(pos: Vector2i) -> Monster:
 		if n is Monster and n.grid_pos == pos:
 			return n
 	return null
+
+func _all_down_stairs_positions() -> Array[Vector2i]:
+	if map == null:
+		return []
+	return map.all_stairs_down_positions()
+
+func _is_reserved_map_feature(p: Vector2i) -> bool:
+	return map != null and map.is_reserved_feature_tile(p)
 
 func _item_at(pos: Vector2i) -> FloorItem:
 	for n in get_tree().get_nodes_in_group("floor_items"):

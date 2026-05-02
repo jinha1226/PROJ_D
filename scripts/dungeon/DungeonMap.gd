@@ -12,8 +12,8 @@ enum Tile {
 	BRANCH_DOWN = 6,
 }
 
-const GRID_W: int = 32
-const GRID_H: int = 36
+const GRID_W: int = 42
+const GRID_H: int = 47
 const CELL_SIZE: int = 32
 
 const TEX_STAIRS_UP: Texture2D = preload(
@@ -61,6 +61,7 @@ var fog_tiles: Dictionary = {}  # Vector2i -> turns_remaining
 
 var spawn_pos: Vector2i = Vector2i(1, 1)
 var stairs_down_pos: Vector2i = Vector2i(1, 1)
+var extra_stairs_down_positions: Array[Vector2i] = []
 var stairs_up_pos: Vector2i = Vector2i(1, 1)
 var rooms: Array[Rect2i] = []
 ## faith altar map: Vector2i → faith_id String (B3 ruined temple)
@@ -141,7 +142,7 @@ const ALTAR_TEXTURES: Dictionary = {
 	"arcana":   "res://assets/tiles/individual/dngn/altars/sif_muna1.png",
 	"trickery": "res://assets/tiles/individual/dngn/altars/dithmenos1.png",
 	"death":    "res://assets/tiles/individual/dngn/altars/yredelemnul.png",
-	"essence":  "res://assets/tiles/individual/dngn/altars/ecumenical.png",
+	"essence":  "res://assets/tiles/individual/dngn/altars/gozag0.png",
 }
 
 func in_bounds(p: Vector2i) -> bool:
@@ -160,6 +161,25 @@ func set_tile(p: Vector2i, t: int) -> void:
 
 func is_branch_entrance(p: Vector2i) -> bool:
 	return tile_at(p) == Tile.BRANCH_DOWN
+
+func all_stairs_down_positions() -> Array[Vector2i]:
+	var out: Array[Vector2i] = [stairs_down_pos]
+	for p in extra_stairs_down_positions:
+		if not out.has(p):
+			out.append(p)
+	return out
+
+func is_any_down_stairs(p: Vector2i) -> bool:
+	return tile_at(p) == Tile.STAIRS_DOWN
+
+func is_any_stairs(p: Vector2i) -> bool:
+	var t: int = tile_at(p)
+	return t == Tile.STAIRS_DOWN or t == Tile.STAIRS_UP
+
+func is_reserved_feature_tile(p: Vector2i) -> bool:
+	if p == spawn_pos or p == stairs_up_pos:
+		return true
+	return is_any_down_stairs(p)
 
 func is_walkable(p: Vector2i) -> bool:
 	var t := tile_at(p)
@@ -203,6 +223,7 @@ func generate(map_seed: int = -1, branch_entrance: bool = false, style: String =
 	tiles = result["tiles"]
 	spawn_pos = result["spawn"]
 	stairs_down_pos = result["stairs_down"]
+	extra_stairs_down_positions = Array(result.get("extra_stairs_down", []))
 	stairs_up_pos = result["stairs_up"]
 	rooms = result["rooms"]
 	altar_map.clear()
