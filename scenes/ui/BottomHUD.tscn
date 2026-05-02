@@ -82,31 +82,31 @@ size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="BagButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
-custom_minimum_size = Vector2(0, 42)
+custom_minimum_size = Vector2(0, 50)
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "BAG"
 
 [node name="SkillsButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
-custom_minimum_size = Vector2(0, 42)
+custom_minimum_size = Vector2(0, 50)
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "SKILL"
 
 [node name="MagicButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
-custom_minimum_size = Vector2(0, 42)
+custom_minimum_size = Vector2(0, 50)
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "SPELL"
 
 [node name="StatusButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
-custom_minimum_size = Vector2(0, 42)
+custom_minimum_size = Vector2(0, 50)
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "STATUS"
 
 [node name="MenuButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
-custom_minimum_size = Vector2(0, 42)
+custom_minimum_size = Vector2(0, 50)
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "MENU"

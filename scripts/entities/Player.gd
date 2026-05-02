@@ -456,9 +456,10 @@ func use_item(index: int) -> void:
 			if game_wd != null and game_wd.has_method("dig_toward"):
 				game_wd.dig_toward(grid_pos)
 			CombatLog.post("The wand pulses with digging energy.", Color(0.8, 0.7, 0.5))
-		"wand_fire", "wand_frost", "wand_lightning", "wand_teleport":
-			CombatLog.post("This wand requires a target. (not yet implemented)", Color(0.7, 0.7, 0.7))
-			had_effect = false
+		"wand_teleport":
+			_teleport_far()
+		"wand_fire", "wand_frost", "wand_lightning":
+			pass  # effect and log handled by Game.gd before use_quickslot
 		# --- Throwing effects ---
 		"throw_pierce", "throw_heavy", "throw_fire_aoe", "throw_poison", "throw_smoke":
 			CombatLog.post("You throw the %s." % data.display_name, Color(0.85, 0.85, 0.7))

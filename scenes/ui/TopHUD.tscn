@@ -35,7 +35,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 4
+theme_override_constants/separation = 10
 
 [node name="TopRow" type="HBoxContainer" parent="MainMargin/MainVBox"]
 size_flags_horizontal = 3

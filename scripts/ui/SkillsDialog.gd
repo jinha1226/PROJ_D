@@ -3,7 +3,7 @@ class_name SkillsDialog extends RefCounted
 const _DESCRIPTIONS: Dictionary = {
 	"fighting": "Increases max HP by 5 each level.
 
-Fighting is the primary way to grow your HP pool. It has no effect on accuracy or damage, only survivability.",
+Fighting is the primary way to grow your HP pool. It also gives a small bonus to melee accuracy and melee damage, but weapon skills remain the main offensive growth path.",
 	"unarmed": "Improves bare-handed combat and bestial melee.
 
 Use this if you plan to fight without a weapon or rely on natural attacks.",

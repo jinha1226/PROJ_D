@@ -2169,6 +2169,15 @@ func _on_quickslot_pressed(index: int) -> void:
 			if ok:
 				TurnManager.end_player_turn()
 		return
+	const _WAND_ELEMENTS := {"wand_fire": "fire", "wand_frost": "cold", "wand_lightning": "lightning"}
+	if _WAND_ELEMENTS.has(slot_id):
+		if player.count_item(slot_id) == 0:
+			QuickslotPicker.open(player, self, index, _refresh_quickslots)
+			return
+		if not TurnManager.is_player_turn:
+			return
+		_use_targeting_wand(slot_id, _WAND_ELEMENTS[slot_id], index)
+		return
 	if player.count_item(slot_id) == 0:
 		QuickslotPicker.open(player, self, index, _refresh_quickslots)
 		return
@@ -2178,6 +2187,36 @@ func _on_quickslot_pressed(index: int) -> void:
 	_refresh_quickslots()
 	if used:
 		TurnManager.end_player_turn()
+
+func _use_targeting_wand(item_id: String, element: String, slot_index: int) -> void:
+	var visible: Dictionary = player.compute_fov()
+	var best: Monster = null
+	var best_d: int = 999
+	for n in get_tree().get_nodes_in_group("monsters"):
+		if not (n is Monster) or n.is_ally:
+			continue
+		if not visible.has(n.grid_pos):
+			continue
+		var d: int = max(abs(n.grid_pos.x - player.grid_pos.x), abs(n.grid_pos.y - player.grid_pos.y))
+		if d < best_d:
+			best_d = d
+			best = n
+	if best == null:
+		CombatLog.post("No targets in range.", Color(0.75, 0.75, 0.75))
+		return
+	var dmg: int = 8 + randi_range(0, 8)
+	var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
+	var ws: Vector2 = map.grid_to_world(player.grid_pos) + half
+	var we: Vector2 = map.grid_to_world(best.grid_pos) + half
+	var target_ref := best
+	spawn_spell_bolt(ws, we, element, func():
+		if is_instance_valid(target_ref) and target_ref.hp > 0:
+			target_ref.take_damage(dmg)
+	)
+	CombatLog.post("The wand fires at the %s." % best.data.display_name, Color(1.0, 0.85, 0.4))
+	player.use_quickslot(slot_index)
+	_refresh_quickslots()
+	TurnManager.end_player_turn()
 
 func _on_quickslot_long_pressed(index: int) -> void:
 	if player == null:

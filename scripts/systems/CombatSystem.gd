@@ -52,7 +52,7 @@ static func _player_attack_profile(player: Player) -> Dictionary:
 		profile.skill_level = player.get_skill_level(skill_id)
 	return profile
 
-static func _player_attack_hits(monster: Monster, profile: Dictionary) -> bool:
+static func _player_attack_hits(player: Player, monster: Monster, profile: Dictionary) -> bool:
 	var stat_source: int = int(profile.stat_source)
 	var weapon_plus: int = int(profile.weapon_plus)
 	var req_hit_pen: int = int(profile.req_hit_pen)
@@ -60,6 +60,9 @@ static func _player_attack_hits(monster: Monster, profile: Dictionary) -> bool:
 	var stat_bonus: int = stat_source / 2
 	var to_hit_base: int = 15 + stat_bonus + weapon_plus + req_hit_pen
 	to_hit_base += randi_range(0, skill_level * 2) if skill_level > 0 else 0
+	var skill_id: String = String(profile.skill_id)
+	if skill_id in ["unarmed", "blade", "hafted", "polearm"]:
+		to_hit_base += player.get_skill_level("fighting") / 2
 	var to_hit_roll: int = randi_range(0, max(1, to_hit_base))
 	var eff_ev: int = max(0, monster.data.ev - (2 if Status.has(monster, "drained") else 0))
 	var ev_roll: int = (randi_range(0, eff_ev * 2) + randi_range(0, eff_ev * 2)) / 2
@@ -76,6 +79,9 @@ static func _player_attack_base_damage(player: Player, monster: Monster, profile
 	var stat_scale: float = float(profile.stat_scale)
 	var req_dmg_pct: float = float(profile.req_dmg_pct)
 	var raw: int = weapon_dmg + int(float(stat_source) * stat_scale) + randi_range(0, 3)
+	var skill_id: String = String(profile.skill_id)
+	if skill_id in ["unarmed", "blade", "hafted", "polearm"]:
+		raw += player.get_skill_level("fighting") / 4
 	if req_dmg_pct < 1.0:
 		raw = max(1, int(float(raw) * req_dmg_pct))
 	if Status.has(player, "damage_boost"):
@@ -92,7 +98,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	var weapon_plus: int = int(profile.weapon_plus)
 	var skill_id: String = String(profile.skill_id)
 	var skill_level: int = int(profile.skill_level)
-	if not _player_attack_hits(monster, profile):
+	if not _player_attack_hits(player, monster, profile):
 		monster.become_aware(player.grid_pos)
 		CombatLog.miss("You miss the %s." % monster.data.display_name)
 		return
