@@ -6,7 +6,7 @@
 script = ExtResource("1_rdata")
 id = "troll"
 display_name = "Troll"
-hp_per_level = 7
+hp_per_level = 8
 description = "Huge and regenerating. +2 STR / +6 HP, -2 INT / -2 MP. Vulnerable to fire."
 base_sprite_path = "res://assets/tiles/individual/player/base/troll_m.png"
 unlocked = true

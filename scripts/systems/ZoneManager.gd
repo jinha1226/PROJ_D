@@ -140,7 +140,7 @@ const BRANCH_MONSTER_POOLS: Dictionary = {
 		# weak
 		"adder", "vampire_bat", "giant_wolf_spider", "scorpion",
 		# mid
-		"zombie", "crypt_zombie", "ghoul", "wight", "phantom", "revenant",
+		"zombie", "ghoul", "phantom",
 		# strong
 		"vampire", "swamp_dragon", "wyvern",
 	],
@@ -164,7 +164,7 @@ const BRANCH_MONSTER_POOLS: Dictionary = {
 		# weak
 		"zombie", "crypt_zombie", "skeletal_warrior", "mummy", "phantom",
 		# mid
-		"ghoul", "wight", "wraith", "shadow_wraith", "revenant", "skeletal_warrior",
+		"ghoul", "wight", "wraith", "shadow_wraith", "revenant",
 		# strong
 		"vampire", "vampire_knight", "lich", "deep_elf_death_mage", "bone_dragon",
 	],

@@ -1401,29 +1401,7 @@ func _try_respawn_monster() -> void:
 func _on_player_died() -> void:
 	CombatLog.post("YOU DIED.", Color(1.0, 0.3, 0.3))
 	GameManager.end_run("death")
-	_show_death_message()
-
-func _show_death_message() -> void:
-	var dlg: GameDialog = GameDialog.create_ratio("", 0.82, 0.52)
-	add_child(dlg)
-	dlg.set_close_text("-more-")
-	var body := dlg.body()
-	if body == null:
-		_show_result_screen(false)
-		return
-	var lbl := Label.new()
-	lbl.text = "YOU DIED"
-	lbl.add_theme_font_size_override("font_size", 38)
-	lbl.add_theme_color_override("font_color", Color(1.0, 0.2, 0.2))
-	var fv := FontVariation.new()
-	fv.base_font = load("res://assets/fonts/Pretendard-Regular.otf")
-	fv.variation_embolden = 0.8
-	lbl.add_theme_font_override("font", fv)
-	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	body.add_child(lbl)
-	dlg.set_on_close(func(): _show_result_screen(false))
+	_show_result_screen(false)
 
 func _show_result_screen(victory: bool) -> void:
 	var res = ResultScreenScene.instantiate()

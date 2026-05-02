@@ -502,8 +502,6 @@ static func _aoe_damage(spell: SpellData, player: Player,
 		game.spawn_aoe_burst(hit_positions, spell.element)
 	# AOE fire/poison spells leave lingering clouds
 	if hits > 0 and game != null and game.get("map") != null:
-		var visible: Dictionary = player.compute_fov()
-		var range_val: int = effective_spell_range(spell)
 		for tile: Vector2i in visible.keys():
 			var d: int = max(abs(tile.x - player.grid_pos.x), abs(tile.y - player.grid_pos.y))
 			if d <= range_val:
