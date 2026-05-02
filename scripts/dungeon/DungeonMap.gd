@@ -223,7 +223,7 @@ func generate(map_seed: int = -1, branch_entrance: bool = false, style: String =
 	tiles = result["tiles"]
 	spawn_pos = result["spawn"]
 	stairs_down_pos = result["stairs_down"]
-	extra_stairs_down_positions = Array(result.get("extra_stairs_down", []))
+	extra_stairs_down_positions.assign(result.get("extra_stairs_down", []))
 	stairs_up_pos = result["stairs_up"]
 	rooms = result["rooms"]
 	altar_map.clear()
