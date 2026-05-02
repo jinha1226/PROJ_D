@@ -1,6 +1,7 @@
-[gd_scene format=3 uid="uid://btophudroot1"]
+[gd_scene format=3 uid="uid://btophudroot1" load_steps=5]
 
 [ext_resource type="Script" path="res://scripts/ui/TopHUD.gd" id="1_tophud"]
+[ext_resource type="PackedScene" uid="uid://bquickslot01" path="res://scenes/ui/QuickSlot.tscn" id="2_qs"]
 
 [sub_resource type="StyleBoxFlat" id="SB_HP"]
 bg_color = Color(0.752941, 0.188235, 0.188235, 1)
@@ -13,121 +14,158 @@ bg_color = Color(0.870588, 0.690196, 0.133333, 1)
 
 [node name="TopHUD" type="Control"]
 anchor_right = 1.0
-offset_bottom = 170.0
+offset_bottom = 128.0
 script = ExtResource("1_tophud")
 
 [node name="BG" type="ColorRect" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.08, 0.08, 0.1, 0.90)
+color = Color(0.08, 0.08, 0.1, 0.9)
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="MainMargin" type="MarginContainer" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 6
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
 
-[node name="HBox" type="HBoxContainer" parent="Margin"]
+[node name="MainVBox" type="VBoxContainer" parent="MainMargin"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="TopRow" type="HBoxContainer" parent="MainMargin/MainVBox"]
+size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="MinimapCol" type="VBoxContainer" parent="Margin/HBox"]
-custom_minimum_size = Vector2(130, 0)
-theme_override_constants/separation = 2
+[node name="MinimapCol" type="VBoxContainer" parent="MainMargin/MainVBox/TopRow"]
+custom_minimum_size = Vector2(102, 0)
+theme_override_constants/separation = 1
 
-[node name="MinimapButton" type="Button" parent="Margin/HBox/MinimapCol"]
+[node name="MinimapButton" type="Button" parent="MainMargin/MainVBox/TopRow/MinimapCol"]
+custom_minimum_size = Vector2(0, 46)
 size_flags_horizontal = 3
 size_flags_vertical = 3
 expand_icon = true
 
-[node name="DepthLabel" type="Label" parent="Margin/HBox/MinimapCol"]
+[node name="DepthLabel" type="Label" parent="MainMargin/MainVBox/TopRow/MinimapCol"]
 size_flags_horizontal = 3
 horizontal_alignment = 1
 text = "Dungeon:1"
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.75, 0.78, 0.9, 1)
 
-[node name="Bars" type="VBoxContainer" parent="Margin/HBox"]
+[node name="Bars" type="VBoxContainer" parent="MainMargin/MainVBox/TopRow"]
 size_flags_horizontal = 3
-theme_override_constants/separation = 3
+theme_override_constants/separation = 2
 
-[node name="HPRow" type="HBoxContainer" parent="Margin/HBox/Bars"]
+[node name="HPRow" type="HBoxContainer" parent="MainMargin/MainVBox/TopRow/Bars"]
 theme_override_constants/separation = 6
 
-[node name="HPLabel" type="Label" parent="Margin/HBox/Bars/HPRow"]
-custom_minimum_size = Vector2(150, 36)
+[node name="HPLabel" type="Label" parent="MainMargin/MainVBox/TopRow/Bars/HPRow"]
+custom_minimum_size = Vector2(108, 24)
 text = "HP 0/0"
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 16
 vertical_alignment = 1
 
-[node name="HPBar" type="ProgressBar" parent="Margin/HBox/Bars/HPRow"]
-custom_minimum_size = Vector2(0, 36)
+[node name="HPBar" type="ProgressBar" parent="MainMargin/MainVBox/TopRow/Bars/HPRow"]
+custom_minimum_size = Vector2(0, 24)
 size_flags_horizontal = 3
 max_value = 100.0
 value = 100.0
 show_percentage = false
 theme_override_styles/fill = SubResource("SB_HP")
 
-[node name="MPRow" type="HBoxContainer" parent="Margin/HBox/Bars"]
+[node name="MPRow" type="HBoxContainer" parent="MainMargin/MainVBox/TopRow/Bars"]
 theme_override_constants/separation = 6
 
-[node name="MPLabel" type="Label" parent="Margin/HBox/Bars/MPRow"]
-custom_minimum_size = Vector2(150, 36)
+[node name="MPLabel" type="Label" parent="MainMargin/MainVBox/TopRow/Bars/MPRow"]
+custom_minimum_size = Vector2(108, 24)
 text = "MP 0/0"
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 16
 vertical_alignment = 1
 
-[node name="MPBar" type="ProgressBar" parent="Margin/HBox/Bars/MPRow"]
-custom_minimum_size = Vector2(0, 36)
+[node name="MPBar" type="ProgressBar" parent="MainMargin/MainVBox/TopRow/Bars/MPRow"]
+custom_minimum_size = Vector2(0, 24)
 size_flags_horizontal = 3
 max_value = 100.0
 value = 100.0
 show_percentage = false
 theme_override_styles/fill = SubResource("SB_MP")
 
-[node name="XPRow" type="HBoxContainer" parent="Margin/HBox/Bars"]
+[node name="XPRow" type="HBoxContainer" parent="MainMargin/MainVBox/TopRow/Bars"]
 theme_override_constants/separation = 6
 
-[node name="XPLabel" type="Label" parent="Margin/HBox/Bars/XPRow"]
-custom_minimum_size = Vector2(150, 36)
+[node name="XPLabel" type="Label" parent="MainMargin/MainVBox/TopRow/Bars/XPRow"]
+custom_minimum_size = Vector2(108, 24)
 text = "XP 0/10"
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 16
 vertical_alignment = 1
 
-[node name="XPBar" type="ProgressBar" parent="Margin/HBox/Bars/XPRow"]
-custom_minimum_size = Vector2(0, 36)
+[node name="XPBar" type="ProgressBar" parent="MainMargin/MainVBox/TopRow/Bars/XPRow"]
+custom_minimum_size = Vector2(0, 24)
 size_flags_horizontal = 3
 max_value = 100.0
 value = 0.0
 show_percentage = false
 theme_override_styles/fill = SubResource("SB_XP")
 
-[node name="StatsRow" type="HBoxContainer" parent="Margin/HBox/Bars"]
+[node name="StatsRow" type="HBoxContainer" parent="MainMargin/MainVBox/TopRow/Bars"]
 theme_override_constants/separation = 8
 
-[node name="LevelLabel" type="Label" parent="Margin/HBox/Bars/StatsRow"]
+[node name="LevelLabel" type="Label" parent="MainMargin/MainVBox/TopRow/Bars/StatsRow"]
 text = "Lv.1"
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(1.0, 0.88, 0.3, 1)
 
-[node name="GoldLabel" type="Label" parent="Margin/HBox/Bars/StatsRow"]
+[node name="GoldLabel" type="Label" parent="MainMargin/MainVBox/TopRow/Bars/StatsRow"]
 size_flags_horizontal = 3
 text = "0g"
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(1.0, 0.85, 0.2, 1)
 
-[node name="TurnLabel" type="Label" parent="Margin/HBox/Bars/StatsRow"]
+[node name="TurnLabel" type="Label" parent="MainMargin/MainVBox/TopRow/Bars/StatsRow"]
 text = "T:0"
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.65, 0.75, 0.65, 1)
 
-[node name="ZoomInButton" type="Button" parent="Margin/HBox/Bars/StatsRow"]
-custom_minimum_size = Vector2(56, 40)
-theme_override_font_sizes/font_size = 26
-text = "＋"
+[node name="ZoomInButton" type="Button" parent="MainMargin/MainVBox/TopRow/Bars/StatsRow"]
+custom_minimum_size = Vector2(36, 24)
+theme_override_font_sizes/font_size = 18
+text = "+"
 
-[node name="ZoomOutButton" type="Button" parent="Margin/HBox/Bars/StatsRow"]
-custom_minimum_size = Vector2(56, 40)
-theme_override_font_sizes/font_size = 26
-text = "－"
+[node name="ZoomOutButton" type="Button" parent="MainMargin/MainVBox/TopRow/Bars/StatsRow"]
+custom_minimum_size = Vector2(36, 24)
+theme_override_font_sizes/font_size = 18
+text = "-"
+
+[node name="ItemRow" type="HBoxContainer" parent="MainMargin/MainVBox"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="ItemSlot0" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
+custom_minimum_size = Vector2(56, 38)
+size_flags_horizontal = 3
+
+[node name="ItemSlot1" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
+custom_minimum_size = Vector2(56, 38)
+size_flags_horizontal = 3
+
+[node name="ItemSlot2" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
+custom_minimum_size = Vector2(56, 38)
+size_flags_horizontal = 3
+
+[node name="ItemSlot3" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
+custom_minimum_size = Vector2(56, 38)
+size_flags_horizontal = 3
+
+[node name="ItemSlot4" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
+custom_minimum_size = Vector2(56, 38)
+size_flags_horizontal = 3
+
+[node name="ItemSlot5" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
+custom_minimum_size = Vector2(56, 38)
+size_flags_horizontal = 3

@@ -78,7 +78,7 @@ var statuses: Dictionary = {}  # id -> turns_remaining (Status.gd manages)
 var resists: Array = []  # ["fire", "cold-2", "poison+"] scaled by Status.resist_scale
 var skills: Dictionary = {}  # skill_id -> {"level": int, "xp": float}
 var active_skills: Array = []  # active skill ids receiving kill XP
-var quickslots: Array = ["", "", "", "", ""]  # item ids, index = slot
+var quickslots: Array = ["", "", "", "", "", ""]  # item/spell ids, index = slot
 var equipped_weapon_id: String = ""
 var equipped_armor_id: String = ""
 var equipped_ring_id: String = ""
@@ -91,12 +91,11 @@ var first_shrine_choice_done: bool = false
 
 const MAX_XL: int = 20
 const MAX_SKILL_LEVEL: int = 9
-const SKILL_IDS: Array = ["endurance", "melee", "ranged", "magic", "defense", "agility", "tool"]
+const SKILL_IDS: Array = ["fighting", "unarmed", "blade", "hafted", "polearm", "ranged", "spellcasting", "elemental", "arcane", "hex", "necromancy", "summoning", "armor", "shield", "agility", "tool"]
 const SKILL_XP_DELTA: Array = [12, 28, 55, 95, 150, 230, 340, 490, 700]
-const ENDURANCE_HP_PER_LEVEL: int = 5
+const FIGHTING_HP_PER_LEVEL: int = 5
 const MAGIC_SCHOOLS: Array = [
-	"fire", "cold", "air", "earth",
-	"necromancy", "hexes", "translocation", "summoning",
+	"elemental", "arcane", "hex", "necromancy", "summoning",
 ]
 
 var _map: DungeonMap
@@ -197,7 +196,7 @@ func pickup(floor_item: FloorItem) -> void:
 func auto_bind_quickslot(item_id: String) -> void:
 	if item_id == "":
 		return
-	var data: ItemData = ItemRegistry.get_by_id(item_id)
+	var data: ItemData = ItemRegistry.get_by_id(item_id) if ItemRegistry != null and item_id != "" else null
 	if data == null:
 		return
 	if data.kind != "potion" and data.kind != "scroll":
@@ -252,13 +251,13 @@ func try_attack_tile(target: Vector2i) -> bool:
 
 func _weapon_action_cost() -> float:
 	var base_delay: float = 1.0
-	var skill_id: String = "melee"
+	var skill_id: String = "unarmed"
 	if equipped_weapon_id != "":
-		var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id)
+		var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null else null
 		if w != null and float(w.delay) > 0.0:
 			base_delay = float(w.delay)
-		if w != null and w.category == "ranged":
-			skill_id = "ranged"
+		if w != null:
+			skill_id = weapon_skill_for_item(w)
 	var skill_lv: int = get_skill_level(skill_id)
 	# Each skill level reduces delay by 2.5%, capped at 25% reduction (lv9 → ×0.775)
 	var mult: float = max(0.75, 1.0 - float(skill_lv) * 0.025)
@@ -272,7 +271,7 @@ func _attack_target_for_tile(target: Vector2i) -> Monster:
 		return direct
 	if equipped_weapon_id == "":
 		return null
-	var weapon: ItemData = ItemRegistry.get_by_id(equipped_weapon_id)
+	var weapon: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null else null
 	if weapon == null:
 		return null
 	# Ranged weapon: attack any visible monster within range
@@ -311,7 +310,8 @@ func use_item(index: int) -> void:
 	if index < 0 or index >= items.size():
 		return
 	var entry: Dictionary = items[index]
-	var data: ItemData = ItemRegistry.get_by_id(entry.get("id", ""))
+	var entry_id: String = String(entry.get("id", ""))
+	var data: ItemData = ItemRegistry.get_by_id(entry_id) if ItemRegistry != null and entry_id != "" else null
 	if data == null:
 		return
 	var had_effect: bool = true
@@ -571,18 +571,21 @@ func equipped_armor_entry() -> Dictionary:
 func refresh_ac_from_equipment() -> void:
 	ac = 0
 	ev = 1 + dexterity / 2 + get_skill_level("agility")
-	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id)
+	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id) if ItemRegistry != null and equipped_armor_id != "" else null
 	if armor != null:
 		var armor_plus: int = int(equipped_armor_entry().get("plus", 0))
 		ac += armor.ac_bonus + armor_plus
-		var armor_skill: int = get_skill_level("defense")
+		var armor_skill: int = get_skill_level("armor")
 		var penalty_mult: float = max(0.0, 1.0 - float(armor_skill) * 0.1)
 		ev -= int(round(float(armor.ev_penalty) * penalty_mult))
 		var armor_missing: int = max(0, armor.required_skill - armor_skill)
 		ev -= armor_missing
-	var shield: ItemData = ItemRegistry.get_by_id(equipped_shield_id)
+	var shield: ItemData = ItemRegistry.get_by_id(equipped_shield_id) if ItemRegistry != null and equipped_shield_id != "" else null
 	if shield != null:
 		ev -= shield.ev_penalty
+		var shield_skill: int = get_skill_level("shield")
+		var shield_missing: int = max(0, shield.required_skill - shield_skill)
+		ev -= shield_missing
 	if has_status("mage_armor"):
 		ac = max(ac, 13 + dexterity / 2)
 	ac += EssenceSystem.bonus_ac(self)
@@ -605,7 +608,7 @@ func _apply_branch_brand(element: String) -> void:
 		if entry.get("id", "") == target_id:
 			entry["brand"] = element
 			items[i] = entry
-			var idata: ItemData = ItemRegistry.get_by_id(target_id)
+			var idata: ItemData = ItemRegistry.get_by_id(target_id) if ItemRegistry != null and target_id != "" else null
 			var name_: String = idata.display_name if idata != null else target_id
 			var element_colors: Dictionary = {
 				"venom": Color(0.4, 1.0, 0.4),
@@ -626,7 +629,7 @@ func _enchant_weapon(amount: int) -> void:
 		if entry.get("id", "") == equipped_weapon_id:
 			entry["plus"] = int(entry.get("plus", 0)) + amount
 			items[i] = entry
-			var data: ItemData = ItemRegistry.get_by_id(equipped_weapon_id)
+			var data: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null else null
 			var name_: String = data.display_name if data != null else "weapon"
 			CombatLog.post("Your %s glows. (+%d)" % [name_, amount],
 				Color(1.0, 0.9, 0.5))
@@ -641,7 +644,7 @@ func _enchant_armor(amount: int) -> void:
 		if entry.get("id", "") == equipped_armor_id:
 			entry["plus"] = int(entry.get("plus", 0)) + amount
 			items[i] = entry
-			var data: ItemData = ItemRegistry.get_by_id(equipped_armor_id)
+			var data: ItemData = ItemRegistry.get_by_id(equipped_armor_id) if ItemRegistry != null and equipped_armor_id != "" else null
 			var name_: String = data.display_name if data != null else "armor"
 			CombatLog.post("Your %s glows. (+%d)" % [name_, amount],
 				Color(0.85, 1.0, 0.7))
@@ -762,8 +765,8 @@ func _apply_max_mp_gain(amount: int) -> void:
 	else:
 		mp = min(mp, mp_max)
 
-func _endurance_hp_gain() -> int:
-	return ENDURANCE_HP_PER_LEVEL
+func _fighting_hp_gain() -> int:
+	return FIGHTING_HP_PER_LEVEL
 
 func _level_up_mp_gain() -> int:
 	return 1 + intelligence / 3
@@ -777,7 +780,7 @@ func init_skills() -> void:
 		if not skills.has(id):
 			skills[id] = {"level": 0, "xp": 0.0}
 	if active_skills.is_empty():
-		active_skills = ["melee"]
+		active_skills = ["blade"]
 
 func is_skill_active(id: String) -> bool:
 	return active_skills.has(id)
@@ -789,7 +792,7 @@ func set_active_skills(ids: Array) -> void:
 		if SKILL_IDS.has(sid) and not active_skills.has(sid):
 			active_skills.append(sid)
 	if active_skills.is_empty():
-		active_skills = ["melee"]
+		active_skills = ["blade"]
 	emit_signal("stats_changed")
 
 func toggle_skill_active(id: String) -> bool:
@@ -811,7 +814,7 @@ func grant_kill_skill_xp(amount: float, preferred_skill: String = "") -> void:
 		if SKILL_IDS.has(sid) and get_skill_level(sid) < MAX_SKILL_LEVEL:
 			targets.append(sid)
 	if targets.is_empty():
-		var fallback: String = preferred_skill if SKILL_IDS.has(preferred_skill) else "melee"
+		var fallback: String = preferred_skill if SKILL_IDS.has(preferred_skill) else "blade"
 		targets = [fallback]
 	var share: float = amount / float(targets.size())
 	for sid in targets:
@@ -820,6 +823,41 @@ func grant_kill_skill_xp(amount: float, preferred_skill: String = "") -> void:
 func get_skill_level(id: String) -> int:
 	var s: Dictionary = skills.get(id, {})
 	return int(s.get("level", 0))
+
+static func progression_school_for(raw_school: String) -> String:
+	match raw_school:
+		"fire", "cold", "air", "earth", "alchemy":
+			return "elemental"
+		"conjuration", "conjurations", "translocation", "transmutation", "abjuration", "evocation", "forgecraft":
+			return "arcane"
+		"hexes", "enchantment":
+			return "hex"
+		"necromancy":
+			return "necromancy"
+		"summoning":
+			return "summoning"
+	return raw_school
+
+static func weapon_skill_for_item(item: ItemData) -> String:
+	if item == null:
+		return "unarmed"
+	match String(item.category):
+		"dagger", "blade":
+			return "blade"
+		"axe", "blunt":
+			return "hafted"
+		"polearm":
+			return "polearm"
+		"ranged":
+			return "ranged"
+		"staff":
+			return "spellcasting"
+	return "unarmed"
+
+func spell_skill_for(spell: SpellData) -> String:
+	if spell == null:
+		return "spellcasting"
+	return progression_school_for(String(spell.school))
 
 func _skill_apt_mult(id: String) -> float:
 	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id) if GameManager != null and RaceRegistry != null else null
@@ -844,9 +882,9 @@ func grant_skill_xp(id: String, amount: float) -> void:
 			Color(0.7, 0.95, 0.5))
 		if id == "agility":
 			ev += 1
-		elif id == "endurance":
-			var hp_gain: int = _endurance_hp_gain()
-			_apply_max_hp_gain(hp_gain, "+%d max HP from Endurance." % hp_gain)
+		elif id == "fighting":
+			var hp_gain: int = _fighting_hp_gain()
+			_apply_max_hp_gain(hp_gain, "+%d max HP from Fighting." % hp_gain)
 	skills[id] = s
 
 func grant_xp(amount: int) -> void:
@@ -919,7 +957,7 @@ func learn_spell(spell_id: String) -> bool:
 	return true
 
 func add_school_spells(school: String) -> void:
-	for spell in SpellRegistry.get_by_school(school):
+	for spell in SpellRegistry.get_by_progression_school(school):
 		if spell == null:
 			continue
 		var sid: String = String(spell.id)
@@ -948,6 +986,14 @@ func apply_status(id: String, turns: int) -> void:
 func has_status(id: String) -> bool:
 	return Status.has(self, id)
 
+func is_wet() -> bool:
+	return has_status("wet")
+
+func apply_wet(turns: int = 4) -> void:
+	apply_status("wet", turns)
+	if CombatLog != null:
+		CombatLog.post("Water soaks you.", Color(0.55, 0.8, 1.0))
+
 func tick_statuses() -> void:
 	var expired: Array = Status.tick_actor(self)
 	for id in expired:
@@ -973,7 +1019,7 @@ func tick_statuses() -> void:
 	EssenceSystem.tick(self)
 
 func hp_regen_period() -> int:
-	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id)
+	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id) if ItemRegistry != null and equipped_armor_id != "" else null
 	if armor != null and armor.brand == "regen":
 		return 3
 	return 5
@@ -1080,11 +1126,11 @@ func set_equipped_shield(id: String) -> void:
 func has_two_handed_weapon() -> bool:
 	if equipped_weapon_id == "":
 		return false
-	var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id)
+	var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null else null
 	return w != null and (w.category == "axe" or w.category == "polearm")
 
 func _apply_accessory_stat(id: String) -> void:
-	var d: ItemData = ItemRegistry.get_by_id(id)
+	var d: ItemData = ItemRegistry.get_by_id(id) if ItemRegistry != null else null
 	if d == null:
 		return
 	match d.effect:
@@ -1110,7 +1156,7 @@ func _apply_accessory_stat(id: String) -> void:
 			if not resists.has("necro+"): resists.append("necro+")
 
 func _remove_accessory_stat(id: String) -> void:
-	var d: ItemData = ItemRegistry.get_by_id(id)
+	var d: ItemData = ItemRegistry.get_by_id(id) if ItemRegistry != null else null
 	if d == null:
 		return
 	match d.effect:

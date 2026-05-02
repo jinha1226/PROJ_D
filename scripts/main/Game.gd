@@ -150,7 +150,7 @@ func _handle_tap(screen_pos: Vector2) -> void:
 	var target: Vector2i = map.world_to_grid(world_pos)
 	if player.can_attack_tile(target):
 		var w_id: String = player.equipped_weapon_id
-		var w: ItemData = ItemRegistry.get_by_id(w_id) if w_id != "" else null
+		var w: ItemData = ItemRegistry.get_by_id(w_id) if ItemRegistry != null and w_id != "" else null
 		var dist: int = max(abs(target.x - player.grid_pos.x), abs(target.y - player.grid_pos.y))
 		if w != null and w.category == "ranged" and dist > 1:
 			var cs: float = DungeonMap.CELL_SIZE
@@ -319,7 +319,7 @@ func _cancel_auto_walk(reason: String) -> void:
 		CombatLog.post("You stop — enemy approaches.", Color(1.0, 0.7, 0.5))
 
 func _apply_class_to_player(class_id: String) -> void:
-	var data: ClassData = ClassRegistry.get_by_id(class_id)
+	var data: ClassData = ClassRegistry.get_by_id(class_id) if ClassRegistry != null and class_id != "" else null
 	if data == null:
 		return
 	player.strength = data.starting_str
@@ -350,6 +350,13 @@ func _apply_class_to_player(class_id: String) -> void:
 		var mapped_skill: String = skill_id
 		if mapped_skill == "stealth" or mapped_skill == "dodge":
 			mapped_skill = "agility"
+		elif mapped_skill == "melee":
+			var starter_weapon: ItemData = ItemRegistry.get_by_id(String(data.starting_weapon)) if ItemRegistry != null and String(data.starting_weapon) != "" else null
+			mapped_skill = Player.weapon_skill_for_item(starter_weapon)
+		elif mapped_skill == "magic":
+			mapped_skill = "spellcasting"
+		elif mapped_skill == "defense":
+			mapped_skill = "armor"
 		if player.skills.has(mapped_skill):
 			player.skills[mapped_skill]["level"] = clampi(int(data.starting_skills[skill_id]), 0, Player.MAX_SKILL_LEVEL)
 			if not default_active.has(mapped_skill):
@@ -418,18 +425,18 @@ func _class_starter_items(class_id: String) -> Array:
 func _class_default_active_skills(class_id: String, fallback: Array) -> Array:
 	match class_id:
 		"warrior":
-			return ["melee", "defense"]
+			return ["blade", "armor", "shield"]
 		"mage":
-			return ["magic"]
+			return ["spellcasting", "arcane"]
 		"rogue":
-			return ["tool", "agility"]
+			return ["ranged", "agility", "tool"]
 		"ranger":
 			return ["ranged", "agility"]
 		"archmage":
-			return ["magic", "agility", "defense"]
+			return ["spellcasting", "elemental", "arcane", "hex", "necromancy", "summoning", "armor", "shield", "agility", "tool", "ranged", "blade", "hafted", "polearm", "unarmed"]
 	if not fallback.is_empty():
 		return fallback
-	return ["melee"]
+	return ["blade"]
 
 func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.hp = int(data.get("hp", 22))
@@ -473,7 +480,7 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 			_migrated.append(_resolved)
 	player.known_spells = _migrated
 	if player.known_spells.is_empty():
-		var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id)
+		var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id) if ClassRegistry != null and GameManager != null and GameManager.selected_class_id != "" else null
 		if cls != null:
 			player.known_spells = cls.starting_spells.duplicate()
 	player.statuses = data.get("statuses", {})
@@ -483,9 +490,33 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	if player.skills.has("dodge") and not player.skills.has("agility"):
 		player.skills["agility"] = player.skills["dodge"]
 	player.skills.erase("dodge")
+	if player.skills.has("melee"):
+		var _melee_level: int = int(player.skills["melee"].get("level", 0))
+		var _melee_xp: float = float(player.skills["melee"].get("xp", 0.0))
+		for _sid in ["unarmed", "blade", "hafted", "polearm"]:
+			if not player.skills.has(_sid) or int(player.skills[_sid].get("level", 0)) == 0:
+				player.skills[_sid] = {"level": _melee_level, "xp": _melee_xp}
+		player.skills.erase("melee")
 	if player.skills.has("stealth") and not player.skills.has("agility"):
 		player.skills["agility"] = player.skills["stealth"]
 	player.skills.erase("stealth")
+	if player.skills.has("magic"):
+		var _magic_level: int = int(player.skills["magic"].get("level", 0))
+		var _magic_xp: float = float(player.skills["magic"].get("xp", 0.0))
+		if not player.skills.has("spellcasting"):
+			player.skills["spellcasting"] = {"level": _magic_level, "xp": _magic_xp}
+		for _sid in ["elemental", "arcane", "hex", "necromancy", "summoning"]:
+			if not player.skills.has(_sid):
+				player.skills[_sid] = {"level": max(0, _magic_level - 1), "xp": 0.0}
+		player.skills.erase("magic")
+	if player.skills.has("defense"):
+		var _def_level: int = int(player.skills["defense"].get("level", 0))
+		var _def_xp: float = float(player.skills["defense"].get("xp", 0.0))
+		if not player.skills.has("armor"):
+			player.skills["armor"] = {"level": _def_level, "xp": _def_xp}
+		if not player.skills.has("shield"):
+			player.skills["shield"] = {"level": max(0, _def_level - 1), "xp": 0.0}
+		player.skills.erase("defense")
 	# tool skill migration: old saves may not have "tool" yet (that's fine, will be added below)
 	if player.skills.is_empty():
 		player.init_skills()
@@ -499,9 +530,23 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	if player.active_skills.has("dodge") and not player.active_skills.has("agility"):
 		player.active_skills.append("agility")
 	player.active_skills.erase("dodge")
+	if player.active_skills.has("melee"):
+		player.active_skills.erase("melee")
+		if not player.active_skills.has("blade"):
+			player.active_skills.append("blade")
 	if player.active_skills.has("stealth") and not player.active_skills.has("agility"):
 		player.active_skills.append("agility")
 	player.active_skills.erase("stealth")
+	if player.active_skills.has("magic"):
+		player.active_skills.erase("magic")
+		for _sid in ["spellcasting", "arcane"]:
+			if not player.active_skills.has(_sid):
+				player.active_skills.append(_sid)
+	if player.active_skills.has("defense"):
+		player.active_skills.erase("defense")
+		for _sid in ["armor", "shield"]:
+			if not player.active_skills.has(_sid):
+				player.active_skills.append(_sid)
 	if player.active_skills.is_empty():
 		player.set_active_skills(_class_default_active_skills(GameManager.selected_class_id, []))
 	else:
@@ -663,8 +708,8 @@ func _spawn_ui() -> void:
 	log_strip.anchor_right = 1.0
 	log_strip.anchor_top = 1.0
 	log_strip.anchor_bottom = 1.0
-	log_strip.offset_top = -380.0
-	log_strip.offset_bottom = -240.0
+	log_strip.offset_top = -268.0
+	log_strip.offset_bottom = -132.0
 	log_strip.grow_horizontal = 2
 	log_strip.grow_vertical = 0
 	ui_layer.add_child(log_strip)
@@ -672,11 +717,12 @@ func _spawn_ui() -> void:
 	bottom_hud.status_pressed.connect(_on_status_pressed)
 	bottom_hud.rest_pressed.connect(_on_rest_pressed)
 	bottom_hud.act_pressed.connect(_on_act_pressed)
-	bottom_hud.menu_pressed.connect(_on_menu_pressed)
 	bottom_hud.skills_pressed.connect(_on_skills_pressed)
 	bottom_hud.magic_pressed.connect(_on_magic_pressed)
 	bottom_hud.quickslot_pressed.connect(_on_quickslot_pressed)
 	bottom_hud.quickslot_long_pressed.connect(_on_quickslot_long_pressed)
+	bottom_hud.quickslot_swap_requested.connect(_on_quickslot_swap_requested)
+	top_hud.item_slot_pressed.connect(_on_item_slot_pressed)
 	if top_hud.has_signal("zoom_in_pressed"):
 		top_hud.zoom_in_pressed.connect(func(): _zoom_by(ZOOM_STEP))
 	if top_hud.has_signal("zoom_out_pressed"):
@@ -885,7 +931,7 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 			else map.stairs_down_pos
 	player.bind_map(map, arrival)
 	for entry in state.items:
-		var d: ItemData = ItemRegistry.get_by_id(String(entry.get("id", "")))
+		var d: ItemData = ItemRegistry.get_by_id(String(entry.get("id", ""))) if ItemRegistry != null else null
 		if d == null:
 			continue
 		var p: Vector2i = entry.get("pos", Vector2i.ZERO)
@@ -1006,24 +1052,24 @@ func _spawn_items_for_floor(depth: int) -> void:
 	var floor_in_sector: int = (depth - 1) % 3  # 0, 1, or 2
 	if floor_in_sector == 0:
 		# Floor 1: healing + enchant_weapon + wand + essence
-		to_place.append(ItemRegistry.get_by_id("potion_healing"))
-		to_place.append(ItemRegistry.get_by_id("scroll_enchant_weapon"))
-		var wd: ItemData = ItemRegistry.pick_kind(depth, "wand")
+		to_place.append(ItemRegistry.get_by_id("potion_healing") if ItemRegistry != null else null)
+		to_place.append(ItemRegistry.get_by_id("scroll_enchant_weapon") if ItemRegistry != null else null)
+		var wd: ItemData = ItemRegistry.pick_kind(depth, "wand") if ItemRegistry != null else null
 		if wd != null: to_place.append(wd)
 		_queue_essence_pickup(EssenceSystem.random_id())
 	elif floor_in_sector == 1:
 		# Floor 2: healing + enchant_armor + essence
-		to_place.append(ItemRegistry.get_by_id("potion_healing"))
-		to_place.append(ItemRegistry.get_by_id("scroll_enchant_armor"))
+		to_place.append(ItemRegistry.get_by_id("potion_healing") if ItemRegistry != null else null)
+		to_place.append(ItemRegistry.get_by_id("scroll_enchant_armor") if ItemRegistry != null else null)
 		_queue_essence_pickup(EssenceSystem.random_id())
 	else:
 		# Floor 3: 50% extra healing + 50% upgrade scroll + 50% wand
 		if rng.randf() < 0.5:
-			to_place.append(ItemRegistry.get_by_id("potion_healing"))
+			to_place.append(ItemRegistry.get_by_id("potion_healing") if ItemRegistry != null else null)
 		if rng.randf() < 0.5:
-			to_place.append(ItemRegistry.get_by_id("scroll_upgrade"))
+			to_place.append(ItemRegistry.get_by_id("scroll_upgrade") if ItemRegistry != null else null)
 		if rng.randf() < 0.5:
-			var wd: ItemData = ItemRegistry.pick_kind(depth, "wand")
+			var wd: ItemData = ItemRegistry.pick_kind(depth, "wand") if ItemRegistry != null else null
 			if wd != null: to_place.append(wd)
 
 	# ── Place all items on random floor tiles ───────────────────────────
@@ -1252,6 +1298,10 @@ func _update_hud() -> void:
 	top_hud.set_gold(player.gold)
 	top_hud.set_turn(TurnManager.turn_number)
 	top_hud.set_buffs(player.statuses)
+	if bottom_hud != null:
+		var hostile_visible: bool = _monster_in_sight()
+		bottom_hud.set_rest_label(hostile_visible)
+		bottom_hud.set_act_label(hostile_visible)
 
 func _on_player_moved(_new_pos: Vector2i) -> void:
 	_refresh_fov()
@@ -1546,7 +1596,7 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 			TurnManager.register_actor(m)
 			_roll_monster_weapon(m)
 		for entry in state.get("items", []):
-			var d: ItemData = ItemRegistry.get_by_id(String(entry.get("id", "")))
+			var d: ItemData = ItemRegistry.get_by_id(String(entry.get("id", ""))) if ItemRegistry != null else null
 			if d == null: continue
 			_spawn_floor_item(d, entry.get("pos", Vector2i.ZERO), int(entry.get("plus", 0)))
 		_refresh_fov()
@@ -1780,7 +1830,7 @@ func _spawn_branch_resistance_hint(branch_id: String) -> void:
 	else:
 		var ring_id: String = String(cfg.get("resist_ring", ""))
 		if ring_id != "":
-			var ring_data: ItemData = ItemRegistry.get_by_id(ring_id)
+			var ring_data: ItemData = ItemRegistry.get_by_id(ring_id) if ItemRegistry != null and ring_id != "" else null
 			if ring_data != null:
 				_spawn_floor_item(ring_data, map.spawn_pos + Vector2i(1, 0), 0)
 				CombatLog.post("The environment here is hostile — a protective ring lies nearby.", Color(0.9, 0.85, 0.4))
@@ -1792,13 +1842,13 @@ func _on_branch_boss_died(monster: Monster, branch_id: String) -> void:
 	# Brand scroll reward
 	var element: String = String(cfg.get("brand_element", ""))
 	var scroll_id: String = "scroll_brand_%s" % element
-	var scroll_data: ItemData = ItemRegistry.get_by_id(scroll_id)
+	var scroll_data: ItemData = ItemRegistry.get_by_id(scroll_id) if ItemRegistry != null and scroll_id != "" else null
 	if scroll_data != null:
 		_spawn_floor_item(scroll_data, monster.grid_pos, 0)
 	# Rune — always dropped near the boss
 	var rune_id: String = String(cfg.get("rune_reward", ""))
 	if rune_id != "":
-		var rune_data: ItemData = ItemRegistry.get_by_id(rune_id)
+		var rune_data: ItemData = ItemRegistry.get_by_id(rune_id) if ItemRegistry != null and rune_id != "" else null
 		if rune_data != null:
 			_spawn_floor_item(rune_data, monster.grid_pos + Vector2i(1, 0), 0)
 			CombatLog.post("A rune materialises!", Color(1.0, 0.9, 0.3))
@@ -1810,7 +1860,7 @@ func _on_branch_boss_died(monster: Monster, branch_id: String) -> void:
 	else:
 		var ring_id: String = String(cfg.get("ring_reward", ""))
 		if ring_id != "":
-			var ring_data: ItemData = ItemRegistry.get_by_id(ring_id)
+			var ring_data: ItemData = ItemRegistry.get_by_id(ring_id) if ItemRegistry != null and ring_id != "" else null
 			if ring_data != null:
 				_spawn_floor_item(ring_data, monster.grid_pos, 0)
 				CombatLog.post("A unique ring appears!", Color(0.8, 0.7, 1.0))
@@ -1865,7 +1915,7 @@ func _count_collected_runes() -> int:
 		return 0
 	var count: int = 0
 	for entry in player.items:
-		var d: ItemData = ItemRegistry.get_by_id(String(entry.get("id", "")))
+		var d: ItemData = ItemRegistry.get_by_id(String(entry.get("id", ""))) if ItemRegistry != null else null
 		if d != null and d.kind == "rune":
 			count += 1
 	return count
@@ -1933,7 +1983,7 @@ func _travel_to_floor(target_depth: int) -> void:
 	TurnManager.end_player_turn()
 
 func _on_item_dropped(item_id: String, at_pos: Vector2i, plus: int) -> void:
-	var data: ItemData = ItemRegistry.get_by_id(item_id)
+	var data: ItemData = ItemRegistry.get_by_id(item_id) if ItemRegistry != null and item_id != "" else null
 	if data == null:
 		return
 	_spawn_floor_item(data, at_pos, plus)
@@ -2088,43 +2138,110 @@ func _on_quickslot_long_pressed(index: int) -> void:
 		return
 	QuickslotPicker.open(player, self, index, _refresh_quickslots)
 
+func _on_quickslot_swap_requested(from_index: int, to_index: int) -> void:
+	if player == null:
+		return
+	if from_index < 0 or to_index < 0:
+		return
+	if from_index >= player.quickslots.size() or to_index >= player.quickslots.size():
+		return
+	var tmp: String = String(player.quickslots[from_index])
+	player.quickslots[from_index] = String(player.quickslots[to_index])
+	player.quickslots[to_index] = tmp
+	_refresh_quickslots()
+
 func _on_log_tapped() -> void:
 	LogDialog.open(self)
 
+func _on_item_slot_pressed(index: int) -> void:
+	if player == null or player.hp <= 0:
+		return
+	if not TurnManager.is_player_turn:
+		return
+	var item_ids: Array[String] = _top_item_bar_ids()
+	if index < 0 or index >= item_ids.size():
+		return
+	var target_id: String = item_ids[index]
+	if target_id == "":
+		return
+	for i in range(player.items.size()):
+		if String(player.items[i].get("id", "")) == target_id:
+			player.use_item(i)
+			_refresh_quickslots()
+			TurnManager.end_player_turn()
+			return
+
+func _top_item_bar_ids() -> Array[String]:
+	var result: Array[String] = []
+	if player == null:
+		return result
+	var seen: Dictionary = {}
+	for entry in player.items:
+		var id: String = String(entry.get("id", ""))
+		if id == "" or seen.has(id):
+			continue
+		var data: ItemData = ItemRegistry.get_by_id(id) if ItemRegistry != null else null
+		if data == null:
+			continue
+		if data.kind in ["weapon", "armor", "shield", "ring", "amulet", "gold", "essence"]:
+			continue
+		seen[id] = true
+		result.append(id)
+		if result.size() >= 6:
+			break
+	return result
+
 func _refresh_quickslots() -> void:
-	if bottom_hud == null or player == null:
+	if player == null:
+		return
+	if top_hud != null:
+		var item_ids: Array[String] = _top_item_bar_ids()
+		for i in range(6):
+			if i >= item_ids.size():
+				top_hud.set_item_slot(i, null, "")
+				continue
+			var item_id: String = item_ids[i]
+			var data: ItemData = ItemRegistry.get_by_id(item_id) if ItemRegistry != null else null
+			if data == null:
+				top_hud.set_item_slot(i, null, "")
+				continue
+			var count: int = player.count_item(item_id)
+			var count_text: String = ("x%d" % count) if count > 1 else ""
+			if GameManager.use_tiles and data.tile_path != "":
+				var top_tex: Texture2D = _make_item_icon(data)
+				top_hud.set_item_slot(i, top_tex, count_text)
+			else:
+				top_hud.set_item_slot_display(i, data.glyph, data.glyph_color)
+	if bottom_hud == null:
 		return
 	for i in range(player.quickslots.size()):
 		var id: String = String(player.quickslots[i])
 		if id == "":
 			bottom_hud.set_quickslot(i, null, "")
 			continue
-		# Spell slot
 		var spell: SpellData = SpellRegistry.get_by_id(id)
 		if spell != null:
 			if spell.icon_path != "" and ResourceLoader.exists(spell.icon_path):
 				var tex: Texture2D = load(spell.icon_path)
 				bottom_hud.set_quickslot(i, tex, "")
 			else:
-				bottom_hud.set_quickslot_display(i, spell.display_name.left(3),
-						Color(0.7, 0.5, 1.0))
+				bottom_hud.set_quickslot_display(i, spell.display_name.left(3), Color(0.7, 0.5, 1.0))
 			continue
-		# Item slot
-		var data: ItemData = ItemRegistry.get_by_id(id)
-		if data == null:
+		var data2: ItemData = ItemRegistry.get_by_id(id) if ItemRegistry != null else null
+		if data2 == null:
 			bottom_hud.set_quickslot(i, null, "")
 			continue
-		var count: int = player.count_item(id)
-		if count <= 0:
+		var count2: int = player.count_item(id)
+		if count2 <= 0:
 			player.quickslots[i] = ""
 			bottom_hud.set_quickslot(i, null, "")
 			continue
-		var text: String = ("x%d" % count) if count > 1 else ""
-		if GameManager.use_tiles and data.tile_path != "":
-			var tex: Texture2D = _make_item_icon(data)
-			bottom_hud.set_quickslot(i, tex, text)
+		var text2: String = ("x%d" % count2) if count2 > 1 else ""
+		if GameManager.use_tiles and data2.tile_path != "":
+			var tex2: Texture2D = _make_item_icon(data2)
+			bottom_hud.set_quickslot(i, tex2, text2)
 		else:
-			bottom_hud.set_quickslot_display(i, data.glyph, data.glyph_color)
+			bottom_hud.set_quickslot_display(i, data2.glyph, data2.glyph_color)
 
 func _make_item_icon(data: ItemData) -> Texture2D:
 	if data.tile_path == "" or not ResourceLoader.exists(data.tile_path):
@@ -2273,7 +2390,7 @@ func _on_monster_died(monster: Monster) -> void:
 		return
 	# Drop equipped weapon
 	if monster != null and monster.equipped_weapon_id != "":
-		var wdata: ItemData = ItemRegistry.get_by_id(monster.equipped_weapon_id)
+		var wdata: ItemData = ItemRegistry.get_by_id(monster.equipped_weapon_id) if ItemRegistry != null else null
 		if wdata != null:
 			_spawn_floor_item(wdata, monster.grid_pos, 0)
 	# Leave a corpse (non-unique only)

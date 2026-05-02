@@ -1,13 +1,67 @@
 class_name SkillsDialog extends RefCounted
 
 const _DESCRIPTIONS: Dictionary = {
-	"endurance": "Increases max HP by 5 each level.\n\nEndurance is the primary way to grow your HP pool. It has no effect on accuracy or damage — just raw survivability. Worth activating for any build that expects to take hits.",
-	"melee": "Improves accuracy, damage, and attack speed in close combat.\n\nMelee covers all weapon types at arm's reach — equivalent to DCSS weapon skills plus Fighting's combat contribution. Higher levels increase hit chance, damage, and reduce attack delay. Core skill for any fighter.",
-	"ranged": "Improves bows and other dedicated ranged weapons.\n\nRanged improves attacks made from a distance. It rewards spacing and line-of-sight control. Rangers and cautious hybrids benefit from it most.",
-	"tool": "Improves wands, thrown tools, and trick-based combat.\n\nTool governs practical combat devices such as wands and thrown utility items. It rewards timing, resource use, and flexible problem-solving. Trickery-aligned builds make the best use of it.",
-	"magic": "Improves spellcasting and unlocks stronger spells.\n\nMagic governs spell power and determines which spell levels you can use. High Magic makes spells stronger, but Intelligence is still needed to learn advanced magic. Mages depend on it, but hybrids can use it for utility and support.",
-	"defense": "Improves armor, shields, and durable front-line fighting.\n\nDefense strengthens armor use, blocking, and direct survival in melee. It is the core defensive skill for builds that expect to trade hits. Fighters depend on it most.",
-	"agility": "Improves evasion, mobility, and opportunistic fighting.\n\nAgility improves your ability to avoid harm and exploit good positioning. It helps evasive builds survive without heavy armor. Rogues and mobile ranged builds value it most.",
+	"fighting": "Increases max HP by 5 each level.
+
+Fighting is the primary way to grow your HP pool. It has no effect on accuracy or damage, only survivability.",
+	"unarmed": "Improves bare-handed combat and bestial melee.
+
+Use this if you plan to fight without a weapon or rely on natural attacks.",
+	"blade": "Improves daggers, swords, and light arcane staves.
+
+Blade covers precise close combat, fast weapons, and most finesse-driven melee builds.",
+	"hafted": "Improves maces, clubs, and axes.
+
+Hafted weapons are heavier and hit harder, favoring sturdy front-line fighters.",
+	"polearm": "Improves spears and other reach weapons.
+
+Polearms reward spacing and safer melee positioning.",
+	"ranged": "Improves bows and other dedicated ranged weapons.
+
+Ranged improves attacks made from a distance and rewards line-of-sight control.",
+	"spellcasting": "Improves MP efficiency, magical fundamentals, and universal spell power.
+
+Every serious caster benefits from Spellcasting, regardless of school.",
+	"elemental": "Improves fire, cold, air, earth, and alchemical elemental spells.
+
+This is the main school for direct elemental offense.",
+	"arcane": "Improves conjurations, movement magic, wards, evocations, and pure arcane utility.
+
+Arcane covers force, control of space, and general magical technique.",
+	"hex": "Improves disabling, confusion, fear, sleep, and other hostile control magic.
+
+Hexes are about making enemies fail rather than killing them outright.",
+	"necromancy": "Improves pain, drain, death, and undead magic.
+
+Necromancy is the school of life theft, corruption, and dark momentum.",
+	"summoning": "Improves creature-calling and gateway magic.
+
+Summoning builds win by creating allies and battlefield pressure.",
+	"armor": "Improves armor handling and reduces armor penalties.
+
+Armor is the main defensive skill for heavy gear and long attrition fights.",
+	"shield": "Improves blocking with shields.
+
+Shield is the dedicated skill for off-hand defense and reliable protection.",
+	"agility": "Improves evasion, mobility, and opportunistic fighting.
+
+Agility helps evasive builds survive without heavy armor.",
+	"tool": "Improves wands, thrown tools, and trick-based combat.
+
+Tool governs practical combat devices and flexible problem-solving.",
+}
+
+const TABS: Array = [
+	{"id": "active",  "label": "ACTIVE"},
+	{"id": "weapon",  "label": "WEAPON"},
+	{"id": "magic",   "label": "MAGIC"},
+	{"id": "defense", "label": "DEFENSE"},
+]
+
+const TAB_SKILLS: Dictionary = {
+	"weapon":  ["fighting", "unarmed", "blade", "hafted", "polearm", "ranged", "tool"],
+	"magic":   ["spellcasting", "elemental", "arcane", "hex", "necromancy", "summoning"],
+	"defense": ["armor", "shield", "agility"],
 }
 
 static func open(player: Player, parent: Node) -> void:
@@ -23,38 +77,102 @@ static func open(player: Player, parent: Node) -> void:
 	if player.skills.is_empty():
 		player.init_skills()
 
+	# ── tip ──────────────────────────────────────────────────────────────────
 	var tip := Label.new()
-	tip.text = "Kill XP is split between ACTIVE skills. At least one skill must stay active."
+	tip.text = "Kill XP is split between ACTIVE skills. Tap to toggle. Long-press for details."
 	tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	tip.add_theme_font_size_override("font_size", 18)
 	tip.add_theme_color_override("font_color", Color(0.7, 0.78, 0.85))
 	body.add_child(tip)
-	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 6)
-	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	body.add_child(vb)
-	for id in Player.SKILL_IDS:
-		var s: Dictionary = player.skills.get(id, {"level": 0, "xp": 0.0})
-		vb.add_child(_make_skill_row(id, s, player, parent))
+
+	# ── tab bar ───────────────────────────────────────────────────────────────
+	var tab_bar := HBoxContainer.new()
+	tab_bar.add_theme_constant_override("separation", 4)
+	body.add_child(tab_bar)
+
+	# ── content area (scroll + inner vbox) ───────────────────────────────────
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(scroll)
+
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 6)
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(content)
+
+	# ── tab button refs for highlight swap ───────────────────────────────────
+	var tab_btns: Array = []
+
+	var _switch_tab := func(tab_id: String) -> void:
+		for child in content.get_children():
+			child.queue_free()
+		var ids: Array = []
+		if tab_id == "active":
+			for id in Player.SKILL_IDS:
+				var s: Dictionary = player.skills.get(id, {"level": 0, "xp": 0.0})
+				if player.is_skill_active(id) or int(s.get("level", 0)) > 0:
+					ids.append(id)
+			if ids.is_empty():
+				var empty := Label.new()
+				empty.text = "No active or learned skills yet."
+				empty.add_theme_font_size_override("font_size", 22)
+				empty.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
+				content.add_child(empty)
+		else:
+			ids = Array(TAB_SKILLS.get(tab_id, []))
+		for id in ids:
+			var s: Dictionary = player.skills.get(id, {"level": 0, "xp": 0.0})
+			content.add_child(_make_skill_row(id, s, player, parent))
+		# highlight active tab button
+		for i in tab_btns.size():
+			var btn: Button = tab_btns[i]
+			var is_sel: bool = (TABS[i]["id"] == tab_id)
+			btn.modulate = Color(1.0, 1.0, 1.0) if is_sel else Color(0.55, 0.55, 0.6)
+
+	# build tab buttons
+	for tab in TABS:
+		var btn := Button.new()
+		btn.text = tab["label"]
+		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		btn.add_theme_font_size_override("font_size", 22)
+		btn.custom_minimum_size = Vector2(0, 48)
+		var tid: String = tab["id"]
+		btn.pressed.connect(func(): _switch_tab.call(tid))
+		tab_bar.add_child(btn)
+		tab_btns.append(btn)
+
+	_switch_tab.call("active")
 
 static func _bonus_text(id: String, level: int, player: Player) -> String:
 	if level == 0:
 		return "(no bonus yet)"
 	match id:
-		"endurance":
+		"fighting":
 			return "+%d max HP" % [level * 5]
-		"melee":
-			return "+%d to-hit / +%d%% dmg / -%d%% delay" % [level * 2, level * 4, level * 3]
+		"unarmed":
+			return "+%d to-hit / +%d%% dmg" % [level, level * 5]
+		"blade":
+			return "+%d to-hit / +%d%% dmg / +%d%% finesse" % [level, level * 4, level * 3]
+		"hafted":
+			return "+%d to-hit / +%d%% dmg" % [level, level * 5]
+		"polearm":
+			return "+%d to-hit / +%d%% dmg / safer reach" % [level, level * 4]
 		"ranged":
 			return "+%d to-hit / +%d%% dmg" % [level, level * 4]
 		"tool":
 			return "+%d to-hit / +%d%% dmg" % [level, level * 4]
-		"magic":
-			var power: int = int(float(player.intelligence) * (1.0 + float(level) * 0.06))
-			return "spell power %d / up to spell level %d" % [power, level]
-		"defense":
+		"spellcasting":
+			var power: int = int(float(player.intelligence) * (1.0 + float(level) * 0.04))
+			return "core spell power %d / mana efficiency" % [power]
+		"elemental", "arcane", "hex", "necromancy", "summoning":
+			var power: int = int(float(player.intelligence) * (1.0 + float(level) * 0.07))
+			return "school power %d" % [power]
+		"armor":
 			var pct: int = min(level * 10, 90)
-			return "armor penalty -%d%% / block +%d%%" % [pct, level * 3]
+			return "armor penalty -%d%% / attrition resist" % [pct]
+		"shield":
+			return "block +%d%%" % [level * 3]
 		"agility":
 			return "+%d EV / ambush +%d%% / harder to detect" % [level, 50 + level * 5]
 	return ""
