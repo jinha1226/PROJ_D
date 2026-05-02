@@ -397,7 +397,7 @@ func _draw() -> void:
 			Vector2(cpos.x * CELL_SIZE + 6, cpos.y * CELL_SIZE + CELL_SIZE - 6),
 			"%", HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6, Color(0.65, 0.25, 0.25))
 
-	# Faith altars — always shown as active (our custom shrines, not DCSS broken altars)
+	# Faith altars
 	for apos in altar_map.keys():
 		var in_los: bool = reveal_all or visible_tiles.has(apos)
 		var was_explored: bool = reveal_all or explored.has(apos)
@@ -405,22 +405,21 @@ func _draw() -> void:
 			continue
 		var faith_id: String = String(altar_map[apos])
 		var path: String = String(ALTAR_TEXTURES.get(faith_id, ""))
-		if path == "":
-			continue
-		var atex: Texture2D = load(path) as Texture2D
-		if atex == null:
-			continue
 		var mod: Color = Color.WHITE if in_los else Color(0.45, 0.45, 0.55)
 		var arect := Rect2(Vector2(apos.x * CELL_SIZE, apos.y * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE))
-		if use_tiles:
+		var atex: Texture2D = null
+		if use_tiles and path != "" and ResourceLoader.exists(path):
+			atex = load(path) as Texture2D
+		if atex != null:
 			draw_texture_rect(atex, arect, false, mod)
 		else:
 			var glyph_col: Color = FaithSystem.color_of(faith_id)
 			if not in_los:
 				glyph_col = glyph_col * Color(0.5, 0.5, 0.5)
+			draw_rect(arect, glyph_col * Color(1, 1, 1, 0.35))
 			draw_string(ThemeDB.fallback_font,
-				Vector2(apos.x * CELL_SIZE + 6, apos.y * CELL_SIZE + CELL_SIZE - 6),
-				"_", HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6, glyph_col)
+				Vector2(apos.x * CELL_SIZE + 4, apos.y * CELL_SIZE + CELL_SIZE - 4),
+				"Ω", HORIZONTAL_ALIGNMENT_CENTER, CELL_SIZE - 8, CELL_SIZE - 6, glyph_col)
 
 	# Fog overlay on visible fog tiles
 	for fp in fog_tiles.keys():

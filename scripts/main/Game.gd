@@ -168,6 +168,9 @@ func _handle_tap(screen_pos: Vector2) -> void:
 			_on_stairs_up()
 		elif tile == DungeonMap.Tile.BRANCH_DOWN:
 			_on_branch_enter()
+		elif map.altar_map.has(player.grid_pos):
+			var faith_id: String = String(map.altar_map[player.grid_pos])
+			ShrineDialog.open_altar_info(faith_id, map.altar_active, player, self)
 		else:
 			player.wait_turn()
 			TurnManager.end_player_turn()
@@ -1351,12 +1354,10 @@ func _on_player_moved(_new_pos: Vector2i) -> void:
 func _try_open_shrine_choice() -> void:
 	if map == null or player == null:
 		return
-	if not map.altar_active or FaithSystem.has_chosen_faith(player):
-		return
 	if not map.altar_map.has(player.grid_pos):
 		return
 	var faith_id: String = String(map.altar_map[player.grid_pos])
-	ShrineDialog.open_single(faith_id, player, self)
+	ShrineDialog.open_altar_info(faith_id, map.altar_active, player, self)
 
 const _RESPAWN_INTERVAL: int = 18
 

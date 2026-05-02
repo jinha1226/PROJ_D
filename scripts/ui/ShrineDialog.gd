@@ -23,6 +23,82 @@ const _CONFIRM_TEXT: Dictionary = {
 				 "Forsake divine favor and bind yourself to monster remnants instead."],
 }
 
+## Called when player steps on or re-examines an altar tile.
+## Shows faith description first; offers "Choose" only when altar is active and faith not yet chosen.
+static func open_altar_info(faith_id: String, altar_active: bool, player: Player, parent: Node) -> void:
+	var faith: Dictionary = FaithSystem.get_faith(faith_id)
+	var fcolor: Color = faith.get("color", Color.WHITE)
+	var already_chosen: bool = FaithSystem.has_chosen_faith(player)
+	var current_faith: String = FaithSystem.current_faith_id(player) if already_chosen else ""
+
+	var dlg: GameDialog = GameDialog.create_ratio(String(faith.get("name", faith_id)), 0.92, 0.88)
+	parent.add_child(dlg)
+	var body: VBoxContainer = dlg.body()
+	if body == null:
+		return
+	body.add_theme_constant_override("separation", 12)
+
+	# Altar icon row
+	var icon_path: String = String(DungeonMap.ALTAR_TEXTURES.get(faith_id, ""))
+	if icon_path != "" and ResourceLoader.exists(icon_path):
+		var icon_tex: Texture2D = load(icon_path) as Texture2D
+		if icon_tex != null:
+			var icon_rect := TextureRect.new()
+			icon_rect.texture = icon_tex
+			icon_rect.custom_minimum_size = Vector2(48, 48)
+			icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon_rect.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			body.add_child(icon_rect)
+
+	# Short description
+	var short_lbl := Label.new()
+	short_lbl.text = String(faith.get("short", ""))
+	short_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	short_lbl.add_theme_font_size_override("font_size", 22)
+	short_lbl.add_theme_color_override("font_color", Color(0.75, 0.78, 0.85))
+	body.add_child(short_lbl)
+
+	body.add_child(HSeparator.new())
+
+	var lines: Array = _CONFIRM_TEXT.get(faith_id, ["", ""])
+	var effect_lbl := Label.new()
+	effect_lbl.text = String(lines[1]) if lines.size() > 1 else ""
+	effect_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	effect_lbl.add_theme_font_size_override("font_size", 20)
+	effect_lbl.add_theme_color_override("font_color", Color(0.68, 0.72, 0.78))
+	body.add_child(effect_lbl)
+
+	# Status / action area
+	if already_chosen:
+		var status_lbl := Label.new()
+		if current_faith == faith_id:
+			status_lbl.text = "You already follow this path."
+			status_lbl.add_theme_color_override("font_color", fcolor)
+		else:
+			status_lbl.text = "You have already sworn to another path."
+			status_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
+		status_lbl.add_theme_font_size_override("font_size", 22)
+		body.add_child(status_lbl)
+	elif not altar_active:
+		var guard_lbl := Label.new()
+		guard_lbl.text = "The guardian still lives. Defeat it to unlock the altars."
+		guard_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		guard_lbl.add_theme_font_size_override("font_size", 22)
+		guard_lbl.add_theme_color_override("font_color", Color(0.8, 0.65, 0.35))
+		body.add_child(guard_lbl)
+	else:
+		var choose_btn := Button.new()
+		choose_btn.text = "Choose this path"
+		choose_btn.custom_minimum_size = Vector2(0, 56)
+		choose_btn.add_theme_font_size_override("font_size", 24)
+		choose_btn.add_theme_color_override("font_color", fcolor)
+		var fid: String = faith_id
+		choose_btn.pressed.connect(func():
+			dlg.close()
+			_open_confirm(fid, player, parent, null))
+		body.add_child(choose_btn)
+
 ## Called when player steps on a specific altar.
 static func open_single(faith_id: String, player: Player, parent: Node) -> void:
 	_open_confirm(faith_id, player, parent, null)
