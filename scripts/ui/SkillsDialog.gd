@@ -193,12 +193,16 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 	vb.add_theme_constant_override("separation", 2)
 	vb.mouse_filter = Control.MOUSE_FILTER_STOP
 
+	var _long_pressed := [false]
 	var hold_timer := Timer.new()
-	hold_timer.wait_time = 0.5
+	hold_timer.wait_time = 0.6
 	hold_timer.one_shot = true
 	vb.add_child(hold_timer)
 	var desc: String = String(_DESCRIPTIONS.get(id, ""))
-	hold_timer.timeout.connect(func(): _show_desc(id, desc, parent))
+	hold_timer.timeout.connect(func():
+		_long_pressed[0] = true
+		_show_desc(id, desc, parent)
+	)
 
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
@@ -273,8 +277,6 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 			xp_pct_lbl.text = ""
 	_refresh_active.call()
 
-	var _long_pressed := [false]
-	hold_timer.timeout.connect(func(): _long_pressed[0] = true)
 	vb.gui_input.connect(func(ev: InputEvent) -> void:
 		var pressed: bool = false
 		var released: bool = false
@@ -297,6 +299,7 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 	if level < Player.MAX_SKILL_LEVEL and needed > 0:
 		var xp_row := HBoxContainer.new()
 		xp_row.add_theme_constant_override("separation", 6)
+		xp_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		vb.add_child(xp_row)
 
 		var xp_bar := ProgressBar.new()
@@ -305,12 +308,14 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 		xp_bar.show_percentage = false
 		xp_bar.custom_minimum_size = Vector2(0, 10)
 		xp_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		xp_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		xp_row.add_child(xp_bar)
 
 		var xp_lbl := Label.new()
 		xp_lbl.text = "%d/%d" % [int(xp), needed]
 		xp_lbl.add_theme_font_size_override("font_size", 18)
 		xp_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
+		xp_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		xp_row.add_child(xp_lbl)
 
 	return vb

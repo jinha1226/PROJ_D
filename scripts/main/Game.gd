@@ -1196,6 +1196,10 @@ func _refresh_fov() -> void:
 	map.set_fov(player.compute_fov())
 	_update_minimap()
 	_refresh_entity_visibility()
+	if bottom_hud != null:
+		var hostile: bool = _monster_in_sight()
+		bottom_hud.set_rest_label(hostile)
+		bottom_hud.set_act_label(hostile)
 
 func _refresh_entity_visibility() -> void:
 	for n in get_tree().get_nodes_in_group("monsters"):
@@ -2281,7 +2285,10 @@ func _refresh_quickslots() -> void:
 		var text2: String = ("x%d" % count2) if count2 > 1 else ""
 		if GameManager.use_tiles and data2.tile_path != "":
 			var tex2: Texture2D = _make_item_icon(data2)
-			bottom_hud.set_quickslot(i, tex2, text2)
+			if tex2 != null:
+				bottom_hud.set_quickslot(i, tex2, text2)
+			else:
+				bottom_hud.set_quickslot_display(i, data2.glyph, data2.glyph_color)
 		else:
 			bottom_hud.set_quickslot_display(i, data2.glyph, data2.glyph_color)
 
