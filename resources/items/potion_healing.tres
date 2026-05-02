@@ -22,4 +22,4 @@ slot = ""
 effect = "heal"
 effect_value = 15
 plus = 0
-description = "Restores health immediately. Reliable, simple, and often worth using sooner rather than later."
+description = "The classic mercy of the dungeon. It restores health immediately and rarely grows better with waiting."

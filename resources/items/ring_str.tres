@@ -21,4 +21,4 @@ slot = "ring"
 effect = "stat_str"
 effect_value = 2
 plus = 0
-description = "+2 Strength while worn."
+description = "A thick ring cast for warriors who prefer certainty. It grants +2 Strength while worn."

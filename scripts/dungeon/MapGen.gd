@@ -539,11 +539,8 @@ static func generate_temple(width: int, height: int) -> Dictionary:
 
 	var spawn := Vector2i(15 + offset_x, 1 + offset_y)
 	var stairs_dn := Vector2i(15 + offset_x, 34 + offset_y)
-	var extra_stairs_down: Array[Vector2i] = [Vector2i(16 + offset_x, 34 + offset_y)]
 	tiles[spawn.y * width + spawn.x] = DungeonMap.Tile.STAIRS_UP
 	tiles[stairs_dn.y * width + stairs_dn.x] = DungeonMap.Tile.STAIRS_DOWN
-	for p in extra_stairs_down:
-		tiles[p.y * width + p.x] = DungeonMap.Tile.STAIRS_DOWN
 
 	# One altar per shrine room.
 	var faith_altars: Array[Vector2i] = [
@@ -569,7 +566,7 @@ static func generate_temple(width: int, height: int) -> Dictionary:
 		"tiles":                  tiles,
 		"spawn":                  spawn,
 		"stairs_down":            stairs_dn,
-		"extra_stairs_down":      extra_stairs_down,
+		"extra_stairs_down":      [],
 		"stairs_up":              spawn,
 		"rooms":                  rooms,
 		"branch_pos":             Vector2i(-1, -1),

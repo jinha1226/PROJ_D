@@ -21,6 +21,6 @@ slot = ""
 effect = ""
 effect_value = 0
 plus = 0
-description = "Heavy two-handed axe. Slow but hits hard."
+description = "A broad-bitted axe built to end shield walls and narrow corridors alike. Heavy, slow, and brutally convincing."
 unlocks_class_id = ""
 grants_spell_id = ""

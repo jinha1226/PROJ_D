@@ -13,5 +13,5 @@ glyph = "="
 glyph_color = Color(0.45, 1, 0.4, 1)
 slot = "ring"
 effect = "resist_poison"
-description = "Grants poison immunity while worn."
+description = "An emerald ring favoured by delvers who expect fangs, fumes, and bad air. It grants poison immunity while worn."
 identified_tile_path = "res://assets/tiles/individual/item/ring/i-r-poison.png"

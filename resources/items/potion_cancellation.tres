@@ -22,4 +22,4 @@ slot = ""
 effect = "cancellation"
 effect_value = 0
 plus = 0
-description = "Removes all negative status effects. Best used when multiple debuffs are compounding the danger."
+description = "Flat and bitter, but invaluable. It strips away hostile enchantments and worsening conditions alike."

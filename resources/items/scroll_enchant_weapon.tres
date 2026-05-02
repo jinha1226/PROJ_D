@@ -22,4 +22,4 @@ slot = ""
 effect = "enchant_weapon"
 effect_value = 1
 plus = 0
-description = "Improves the weapon you carry. Best used on weapons you expect to keep for a meaningful stretch of the dungeon."
+description = "A tried and dangerous promise to better steel. It improves your current weapon by 1."

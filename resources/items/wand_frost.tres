@@ -22,4 +22,4 @@ slot = ""
 effect = "wand_frost"
 effect_value = 3
 plus = 0
-description = "Chills or slows enemies with focused cold. Useful for control as much as raw damage."
+description = "A focused lance of cold that doubles as control. It slows as often as it harms."

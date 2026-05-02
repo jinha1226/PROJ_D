@@ -21,4 +21,4 @@ slot = ""
 effect = "block"
 effect_value = 10
 plus = 0
-description = "Small shield. 10% base block + Shield skill. No EV penalty."
+description = "A small shield meant for fast hands and changing angles. Grants a modest block chance with no EV penalty."

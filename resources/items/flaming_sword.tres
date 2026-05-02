@@ -21,6 +21,6 @@ slot = ""
 effect = ""
 effect_value = 0
 plus = 0
-description = "Short sword wreathed in flame. +1d6 fire damage and sets foes alight."
+description = "A blade branded with disciplined flame. Its edge burns on contact and leaves fire where steel alone would not suffice."
 unlocks_class_id = ""
 grants_spell_id = ""

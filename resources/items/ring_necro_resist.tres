@@ -13,5 +13,5 @@ glyph = "="
 glyph_color = Color(0.55, 0.35, 0.85, 1)
 slot = "ring"
 effect = "resist_necro"
-description = "Grants necromantic immunity while worn."
+description = "A blackened ring that deadens hostile gravecraft. It grants necromantic immunity while worn."
 identified_tile_path = "res://assets/tiles/individual/item/ring/i-positive-energy.png"

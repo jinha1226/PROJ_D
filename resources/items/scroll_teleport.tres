@@ -22,4 +22,4 @@ slot = ""
 effect = "teleport"
 effect_value = 0
 plus = 0
-description = "Teleports you to a random spot on the level. Escape tool — random destination means it is not always safe."
+description = "A desperate classic. It hurls you elsewhere on the level, which is often better than here."

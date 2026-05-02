@@ -21,6 +21,6 @@ slot = ""
 effect = ""
 effect_value = 0
 plus = 0
-description = "Crackling mace. +1d6 electric damage; extra damage to wet targets."
+description = "A mace alive with bottled storm. It deals extra electric damage and bites harder against wet targets."
 unlocks_class_id = ""
 grants_spell_id = ""

@@ -21,4 +21,4 @@ slot = "ring"
 effect = "ac_bonus"
 effect_value = 3
 plus = 0
-description = "+3 Armor Class while worn."
+description = "A plain ring with an expensive secret. It grants +3 AC while worn."

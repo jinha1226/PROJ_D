@@ -21,4 +21,4 @@ slot = ""
 effect = "scroll_upgrade"
 effect_value = 1
 plus = 0
-description = "Permanently upgrades a weapon or armor by +1. Best used on gear you intend to keep for several floors."
+description = "A rarer, blunter improvement than a mere enchantment. It permanently upgrades a weapon or armour by +1."

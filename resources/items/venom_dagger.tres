@@ -21,6 +21,6 @@ slot = ""
 effect = ""
 effect_value = 0
 plus = 0
-description = "Envenomed blade. +1d6 poison damage and poisons foes on hit."
+description = "An envenomed blade for those who prefer their victories to worsen over time. It deals extra poison damage and poisons on hit."
 unlocks_class_id = ""
 grants_spell_id = ""

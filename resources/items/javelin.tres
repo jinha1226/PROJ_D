@@ -21,4 +21,4 @@ slot = ""
 effect = "throw_heavy"
 effect_value = 0
 plus = 0
-description = "A heavy spear for throwing. High single-hit damage — save it for large or durable targets."
+description = "A heavy throwing spear balanced for one committed cast. Best saved for targets worth the throw."

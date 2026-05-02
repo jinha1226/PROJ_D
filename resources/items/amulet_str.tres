@@ -21,4 +21,4 @@ slot = "amulet"
 effect = "stat_str"
 effect_value = 3
 plus = 0
-description = "+3 Strength while worn."
+description = "A war charm once worn by front-line killers. While worn, it grants +3 Strength."

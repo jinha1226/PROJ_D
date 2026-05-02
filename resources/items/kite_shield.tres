@@ -22,4 +22,4 @@ effect = "block"
 effect_value = 20
 required_skill = 3
 plus = 0
-description = "Large shield. 20% base block + Shield skill. +2 AC, -2 EV. Req Defense 3."
+description = "A broad shield that turns more than it dodges. Better block, better AC, and enough weight to trouble the unwary."

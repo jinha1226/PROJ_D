@@ -21,4 +21,4 @@ slot = "amulet"
 effect = "hp_bonus"
 effect_value = 20
 plus = 0
-description = "+20 maximum HP while worn."
+description = "A survivor's charm from a harsher age. While worn, it steadies the body and grants +20 maximum HP."

@@ -21,4 +21,4 @@ slot = "ring"
 effect = "stat_int"
 effect_value = 2
 plus = 0
-description = "+2 Intelligence while worn."
+description = "An austere ring prized by scholars and dangerous people alike. It grants +2 Intelligence while worn."

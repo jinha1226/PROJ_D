@@ -21,4 +21,4 @@ slot = ""
 effect = "throw_fire_aoe"
 effect_value = 10
 plus = 0
-description = "Explodes on impact, dealing fire damage in an area. Useful against groups but risky in tight corridors."
+description = "A clay shell packed with unstable fire. It bursts on impact and is best used where the blast can catch more than one foe."

@@ -13,5 +13,5 @@ glyph = "="
 glyph_color = Color(1, 0.55, 0.2, 1)
 slot = "ring"
 effect = "resist_fire"
-description = "Grants fire immunity while worn."
+description = "A ruby ring meant for hotter places than sanity recommends. It grants fire immunity while worn."
 identified_tile_path = "res://assets/tiles/individual/item/ring/i-r-fire.png"

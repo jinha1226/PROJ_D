@@ -2303,7 +2303,7 @@ func _top_item_bar_ids() -> Array[String]:
 			continue
 		seen[id] = true
 		result.append(id)
-		if result.size() >= 6:
+		if result.size() >= 8:
 			break
 	return result
 
@@ -2312,7 +2312,7 @@ func _refresh_quickslots() -> void:
 		return
 	if top_hud != null:
 		var item_ids: Array[String] = _top_item_bar_ids()
-		for i in range(6):
+		for i in range(8):
 			if i >= item_ids.size():
 				top_hud.set_item_slot(i, null, "")
 				continue

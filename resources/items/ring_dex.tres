@@ -21,4 +21,4 @@ slot = "ring"
 effect = "stat_dex"
 effect_value = 2
 plus = 0
-description = "+2 Dexterity and +1 Evasion while worn."
+description = "A slender ring for careful hands. It grants +2 Dexterity and +1 EV while worn."

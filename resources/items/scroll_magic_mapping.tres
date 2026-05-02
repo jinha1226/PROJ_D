@@ -22,4 +22,4 @@ slot = ""
 effect = "map_reveal"
 effect_value = 0
 plus = 0
-description = "Reveals the floor layout. Helps plan a route and find stairs before descending."
+description = "A cartographer's cheat and a delver's relief. It reveals the floor layout."

@@ -21,4 +21,4 @@ slot = ""
 effect = "branch_brand"
 effect_value = 0
 plus = 0
-description = "Brands your weapon or armor with acid. (weapon: corrodes enemy AC on hit / armor: corrodes attacker on hit)"
+description = "A corrosive inscription. On weapons it strips enemy armour; on armour it punishes those who strike you."

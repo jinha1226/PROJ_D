@@ -21,4 +21,4 @@ slot = "amulet"
 effect = "mp_bonus"
 effect_value = 8
 plus = 0
-description = "+8 maximum MP while worn."
+description = "A cool blue pendant that hums with old formulae. While worn, it grants +8 maximum MP."

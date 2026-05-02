@@ -21,4 +21,4 @@ slot = ""
 effect = "branch_brand"
 effect_value = 0
 plus = 0
-description = "Brands your weapon with venom. Poisons on hit — strong against anything not immune to poison."
+description = "The script smells faintly medicinal and deeply untrustworthy. It brands a weapon with venom."

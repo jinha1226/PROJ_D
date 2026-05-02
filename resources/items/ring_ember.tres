@@ -13,5 +13,5 @@ glyph = "="
 glyph_color = Color(1, 0.4, 0.1, 1)
 slot = "ring"
 effect = "resist_fire"
-description = "Fire immunity. Melee attacks deal +3 fire damage with a chance to ignite."
+description = "A warm band that never cools. It grants fire immunity and lends your melee strikes a chance to ignite."
 identified_tile_path = "res://assets/tiles/individual/item/ring/i-fire.png"

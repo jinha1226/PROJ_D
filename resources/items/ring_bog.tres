@@ -14,5 +14,5 @@ glyph_color = Color(0.35, 0.85, 0.35, 1)
 slot = "ring"
 effect = "resist_poison"
 effect_value = 2
-description = "Poison immunity. AC +2. Heals 1 HP on kill."
+description = "A murky signet that stinks faintly of reeds and rot. It grants poison immunity, +2 AC, and a little life on each kill."
 identified_tile_path = "res://assets/tiles/individual/item/ring/i-poison.png"

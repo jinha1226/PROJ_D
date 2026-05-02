@@ -24,6 +24,8 @@ signal quickslot_swap_requested(from_index: int, to_index: int)
 	$BottomMargin/MainVBox/MainRow/QuickSlot1,
 	$BottomMargin/MainVBox/MainRow/QuickSlot2,
 	$BottomMargin/MainVBox/MainRow/QuickSlot3,
+	$BottomMargin/MainVBox/MainRow/QuickSlot4,
+	$BottomMargin/MainVBox/MainRow/QuickSlot5,
 ]
 
 

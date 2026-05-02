@@ -13,5 +13,5 @@ glyph = "="
 glyph_color = Color(0.55, 0.35, 0.85, 1)
 slot = "ring"
 effect = "resist_necro"
-description = "Necromantic immunity. Heals 3 HP on kill."
+description = "A pale ring cold as a crypt door. It grants necromantic immunity and restores 3 HP on kill."
 identified_tile_path = "res://assets/tiles/individual/item/ring/i-positive-energy.png"

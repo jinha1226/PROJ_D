@@ -21,6 +21,6 @@ slot = ""
 effect = ""
 effect_value = 0
 plus = 0
-description = "Rimed dagger. +1d6 cold damage; chance to freeze targets on hit."
+description = "Rimed steel that bites cold before it bites flesh. It deals extra cold damage and may freeze a wavering foe in place."
 unlocks_class_id = ""
 grants_spell_id = ""

@@ -14,5 +14,5 @@ glyph_color = Color(0.5, 0.85, 1, 1)
 slot = "ring"
 effect = "resist_cold"
 effect_value = 3
-description = "Cold immunity. EV +3. 20% chance to freeze enemies on hit."
+description = "A pale ring that gathers frost around the knuckle. It grants cold immunity, +3 EV, and a chance to freeze on hit."
 identified_tile_path = "res://assets/tiles/individual/item/ring/i-ice.png"

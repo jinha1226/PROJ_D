@@ -224,5 +224,3 @@ func _on_pick(class_id: String) -> void:
 
 func _on_back() -> void:
 	get_tree().change_scene_to_file(MENU_SCENE_PATH)
-
-

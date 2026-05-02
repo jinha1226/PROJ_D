@@ -22,6 +22,6 @@ slot = ""
 effect = "berserk"
 effect_value = 25
 plus = 0
-description = "Fly into a rage (+4 STR for 25 turns). High risk, high reward — dangerous to use near low HP."
+description = "A red surge that turns fear into appetite. Grants a brief rage and should not be trusted near an empty life bar."
 unlocks_class_id = "berserker"
 grants_spell_id = ""

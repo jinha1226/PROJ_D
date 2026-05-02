@@ -13,5 +13,5 @@ glyph = "="
 glyph_color = Color(0.5, 0.85, 1, 1)
 slot = "ring"
 effect = "resist_cold"
-description = "Grants cold immunity while worn."
+description = "A chill stone set in a plain band. It grants cold immunity while worn."
 identified_tile_path = "res://assets/tiles/individual/item/ring/i-r-cold.png"

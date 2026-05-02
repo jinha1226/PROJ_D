@@ -22,4 +22,4 @@ slot = ""
 effect = "wand_teleport"
 effect_value = 3
 plus = 0
-description = "Teleports a target to a random location. Separates dangerous enemies or buys breathing room."
+description = "A wand for making problems become someone else's geography. It teleports a target to a random location."
