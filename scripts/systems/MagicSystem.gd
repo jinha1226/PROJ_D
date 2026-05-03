@@ -20,7 +20,8 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 		CombatLog.post("%s requires XL %d." % [spell.display_name, spell.xl_required],
 			Color(1.0, 0.7, 0.5))
 		return false
-	var mp_cost: int = max(1, int(ceil(float(spell.mp_cost) * FaithSystem.spell_cost_mult(player))))
+	var wizardry_scale: float = max(0.6, 1.0 - float(player.wizardry_bonus) * 0.08)
+	var mp_cost: int = max(1, int(ceil(float(spell.mp_cost) * FaithSystem.spell_cost_mult(player) * wizardry_scale)))
 	if not RacePassiveSystem.on_spell_cast_mp_check(player, mp_cost):
 		CombatLog.post("Not enough MP for %s." % spell.display_name,
 			Color(1.0, 0.7, 0.5))
@@ -331,7 +332,7 @@ static func _compute_power(player: Player, spell: SpellData) -> int:
 	var school_skill: int = player.get_skill_level(player.spell_skill_for(spell))
 	var total_skill: float = float(spellcasting) * 0.5 + float(school_skill)
 	var base: int = int(float(player.intelligence) * (1.0 + total_skill * 0.06) * _armor_spell_mult(player))
-	var power: int = base + EssenceSystem.spell_power_bonus(player, spell)
+	var power: int = base + EssenceSystem.spell_power_bonus(player, spell) + player.wizardry_bonus * 4
 	return int(float(power) * FaithSystem.spell_damage_mult(player))
 
 

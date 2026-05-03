@@ -58,7 +58,7 @@ static func _player_attack_hits(player: Player, monster: Monster, profile: Dicti
 	var req_hit_pen: int = int(profile.req_hit_pen)
 	var skill_level: int = int(profile.skill_level)
 	var stat_bonus: int = stat_source / 2
-	var to_hit_base: int = 15 + stat_bonus + weapon_plus + req_hit_pen
+	var to_hit_base: int = 15 + stat_bonus + weapon_plus + req_hit_pen + player.slay_bonus
 	to_hit_base += randi_range(0, skill_level * 2) if skill_level > 0 else 0
 	var skill_id: String = String(profile.skill_id)
 	if skill_id in ["unarmed", "blade", "hafted", "polearm"]:
@@ -78,7 +78,7 @@ static func _player_attack_base_damage(player: Player, monster: Monster, profile
 	var stat_source: int = int(profile.stat_source)
 	var stat_scale: float = float(profile.stat_scale)
 	var req_dmg_pct: float = float(profile.req_dmg_pct)
-	var raw: int = weapon_dmg + int(float(stat_source) * stat_scale) + randi_range(0, 3)
+	var raw: int = weapon_dmg + int(float(stat_source) * stat_scale) + randi_range(0, 3) + player.slay_bonus
 	var skill_id: String = String(profile.skill_id)
 	if skill_id in ["unarmed", "blade", "hafted", "polearm"]:
 		raw += player.get_skill_level("fighting") / 4

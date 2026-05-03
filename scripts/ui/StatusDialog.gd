@@ -325,6 +325,29 @@ static func _run_card(player: Player) -> Control:
 	grid.add_child(_kv_row("Gold", str(player.gold)))
 	grid.add_child(_kv_row("Kills", str(player.kills)))
 	grid.add_child(_kv_row("Items", str(player.items_collected)))
+
+	# Rune section
+	var collected_runes: Array = []
+	for entry in player.items:
+		var d: ItemData = ItemRegistry.get_by_id(String(entry.get("id", ""))) if ItemRegistry != null else null
+		if d != null and d.kind == "rune":
+			collected_runes.append(d.display_name)
+
+	vb.add_child(UICards.section_header("Runes  %d / 4" % collected_runes.size(), 24))
+	if collected_runes.is_empty():
+		var none_lbl := Label.new()
+		none_lbl.text = "(none collected)"
+		none_lbl.add_theme_font_size_override("font_size", 20)
+		none_lbl.add_theme_color_override("font_color", Color(0.5, 0.5, 0.55))
+		vb.add_child(none_lbl)
+	else:
+		for rname in collected_runes:
+			var r_lbl := Label.new()
+			r_lbl.text = "✦ %s" % rname
+			r_lbl.add_theme_font_size_override("font_size", 22)
+			r_lbl.add_theme_color_override("font_color", Color(1.0, 0.9, 0.35))
+			vb.add_child(r_lbl)
+
 	return card
 
 static func _portrait_stack(player: Player) -> Control:

@@ -178,15 +178,16 @@ func potion_color_tile(item_id: String) -> String:
 	return "res://assets/tiles/individual/item/potion/%s.png" % color_file
 
 func display_name_of(item_id: String) -> String:
-	var data = ItemRegistry.get_by_id(item_id) if ItemRegistry != null and item_id != "" else null
+	var lookup_id: String = ItemRegistry.base_id_of(item_id) if ItemRegistry != null else item_id
+	var data = ItemRegistry.get_by_id(lookup_id) if ItemRegistry != null and lookup_id != "" else null
 	if data == null:
 		return item_id
 	# Weapons / armor / gold are always recognisable.
 	if data.kind != "potion" and data.kind != "scroll" and data.kind != "book":
 		return data.display_name
-	if is_identified(item_id):
+	if is_identified(lookup_id):
 		return data.display_name
-	return pseudonyms.get(item_id, data.display_name)
+	return pseudonyms.get(lookup_id, data.display_name)
 
 func toggle_tiles() -> void:
 	use_tiles = not use_tiles

@@ -19,6 +19,7 @@ signal item_slot_pressed(index: int)
 @onready var turn_label: Label = $MainMargin/MainVBox/TopRow/Bars/StatsRow/TurnLabel
 @onready var zoom_in_button: Button = $MainMargin/MainVBox/TopRow/Bars/StatsRow/ZoomInButton
 @onready var zoom_out_button: Button = $MainMargin/MainVBox/TopRow/Bars/StatsRow/ZoomOutButton
+@onready var rune_row: HBoxContainer = $MainMargin/MainVBox/RuneRow
 @onready var item_slots: Array = [
     $MainMargin/MainVBox/ItemRow/ItemSlot0,
     $MainMargin/MainVBox/ItemRow/ItemSlot1,
@@ -144,6 +145,36 @@ func set_buffs(statuses: Dictionary) -> void:
         var label_text: String = info.get("name", sid.capitalize())
         var badge := _make_buff_badge(label_text, turns, col)
         _buff_row.add_child(badge)
+
+
+func set_runes(player_items: Array) -> void:
+    if rune_row == null:
+        return
+    for c in rune_row.get_children():
+        c.queue_free()
+    var rune_entries: Array = []
+    for entry in player_items:
+        var d = ItemRegistry.get_by_id(String(entry.get("id", ""))) if ItemRegistry != null else null
+        if d != null and d.kind == "rune":
+            rune_entries.append(d)
+    rune_row.visible = not rune_entries.is_empty()
+    for d in rune_entries:
+        var container := Control.new()
+        container.custom_minimum_size = Vector2(32, 32)
+        if d.tile_path != "" and ResourceLoader.exists(d.tile_path):
+            var rect := TextureRect.new()
+            rect.texture = load(d.tile_path) as Texture2D
+            rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+            rect.anchor_right = 1.0
+            rect.anchor_bottom = 1.0
+            rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+            container.add_child(rect)
+        var tooltip_lbl := Label.new()
+        tooltip_lbl.text = d.display_name
+        tooltip_lbl.tooltip_text = d.display_name
+        tooltip_lbl.visible = false
+        container.add_child(tooltip_lbl)
+        rune_row.add_child(container)
 
 
 func set_item_slot(i: int, icon: Texture2D, text: String) -> void:

@@ -32,6 +32,25 @@ const _MONSTER_WEAPON_POOLS: Dictionary = {
 	"two_headed_ogre": [["battle_axe", "long_sword"],        []],
 }
 
+const _CORPSE_TILE_ROOT: String = "res://oldproject/crawl/crawl-ref/source/rltiles/UNUSED/monsters/skeletons/"
+const _CORPSE_TILE_BY_SHAPE: Dictionary = {
+	"bat": _CORPSE_TILE_ROOT + "skeleton_bat.png",
+	"bird": _CORPSE_TILE_ROOT + "skeleton_bird.png",
+	"centaur": _CORPSE_TILE_ROOT + "skeleton_centaur.png",
+	"dragon": _CORPSE_TILE_ROOT + "skeleton_dragon.png",
+	"drake": _CORPSE_TILE_ROOT + "skeleton_drake.png",
+	"humanoid_small": _CORPSE_TILE_ROOT + "skeleton_humanoid_small.png",
+	"humanoid_medium": _CORPSE_TILE_ROOT + "skeleton_humanoid_medium.png",
+	"humanoid_large": _CORPSE_TILE_ROOT + "skeleton_humanoid_large.png",
+	"lizard": _CORPSE_TILE_ROOT + "skeleton_lizard.png",
+	"naga": _CORPSE_TILE_ROOT + "skeleton_naga.png",
+	"quadruped_small": _CORPSE_TILE_ROOT + "skeleton_quadruped_small.png",
+	"quadruped_large": _CORPSE_TILE_ROOT + "skeleton_quadruped_large.png",
+	"quadruped_winged": _CORPSE_TILE_ROOT + "skeleton_quadruped_winged.png",
+	"snake": _CORPSE_TILE_ROOT + "skeleton_snake.png",
+	"troll": _CORPSE_TILE_ROOT + "skeleton_troll.png",
+}
+
 @onready var GameManager = get_node("/root/GameManager")
 @onready var TurnManager = get_node("/root/TurnManager")
 @onready var CombatLog = get_node("/root/CombatLog")
@@ -296,7 +315,7 @@ func _bfs_path(start: Vector2i, goal: Vector2i) -> Array:
 func _advance_auto_walk() -> void:
 	if _auto_path.is_empty():
 		return
-	if _monster_in_sight():
+	if _new_monster_in_sight():
 		_cancel_auto_walk("new enemy")
 		return
 	if player.hp < _auto_prev_hp:
@@ -673,14 +692,19 @@ func _spawn_player() -> void:
 	player.item_dropped.connect(_on_item_dropped)
 	player.damaged.connect(_on_player_damaged)
 
-func _queue_essence_pickup(essence_id: String) -> void:
+func _queue_essence_pickup(essence_id: String, floor_item: FloorItem = null) -> void:
 	if player == null or essence_id == "":
 		return
 	if player.essence_slots.has(essence_id) or player.essence_inventory.has(essence_id):
 		CombatLog.post("An essence fades away. (%s)" % EssenceSystem.display_name(essence_id),
 			Color(0.6, 0.55, 0.7))
+		if floor_item != null and is_instance_valid(floor_item):
+			floor_item.queue_free()
 		return
-	_pending_essence_pickups.append(essence_id)
+	_pending_essence_pickups.append({
+		"essence_id": essence_id,
+		"floor_item": floor_item,
+	})
 	_try_open_essence_pickup_popup()
 
 func _try_open_essence_pickup_popup() -> void:
@@ -689,13 +713,12 @@ func _try_open_essence_pickup_popup() -> void:
 	if player == null:
 		_pending_essence_pickups.clear()
 		return
-	var essence_id: String = String(_pending_essence_pickups.pop_front())
+	var queued: Dictionary = _pending_essence_pickups.pop_front()
+	var essence_id: String = String(queued.get("essence_id", ""))
+	var floor_item: FloorItem = queued.get("floor_item", null)
 	if essence_id == "" or player.essence_slots.has(essence_id) or player.essence_inventory.has(essence_id):
-		_try_open_essence_pickup_popup()
-		return
-	# Essence only available with Essence faith
-	if not FaithSystem.allows_essence(player):
-		CombatLog.post("The essence fades — your faith rejects it.", Color(0.55, 0.55, 0.65))
+		if floor_item != null and is_instance_valid(floor_item):
+			floor_item.queue_free()
 		_try_open_essence_pickup_popup()
 		return
 	_essence_pickup_popup_open = true
@@ -705,6 +728,8 @@ func _try_open_essence_pickup_popup() -> void:
 		if player != null and player.add_essence(essence_id):
 			CombatLog.post("You claim %s." % EssenceSystem.display_name(essence_id),
 				Color(0.82, 0.64, 1.0))
+			if floor_item != null and is_instance_valid(floor_item):
+				floor_item.queue_free()
 		_close_essence_pickup_popup(popup)
 	var replace_cb := func(replaced_id: String) -> void:
 		if player != null and player.replace_inventory_essence(replaced_id, essence_id):
@@ -712,6 +737,8 @@ func _try_open_essence_pickup_popup() -> void:
 				EssenceSystem.display_name(replaced_id),
 				EssenceSystem.display_name(essence_id),
 			], Color(0.82, 0.64, 1.0))
+			if floor_item != null and is_instance_valid(floor_item):
+				floor_item.queue_free()
 		_close_essence_pickup_popup(popup)
 	var leave_cb := func() -> void:
 		CombatLog.post("You leave %s behind." % EssenceSystem.display_name(essence_id),
@@ -779,6 +806,8 @@ func _spawn_ui() -> void:
 	bottom_hud.status_pressed.connect(_on_status_pressed)
 	bottom_hud.rest_pressed.connect(_on_rest_pressed)
 	bottom_hud.act_pressed.connect(_on_act_pressed)
+	if bottom_hud.has_signal("pickup_pressed"):
+		bottom_hud.pickup_pressed.connect(_on_pickup_pressed)
 	bottom_hud.skills_pressed.connect(_on_skills_pressed)
 	bottom_hud.magic_pressed.connect(_on_magic_pressed)
 	bottom_hud.quickslot_pressed.connect(_on_quickslot_pressed)
@@ -857,7 +886,7 @@ func _spawn_b3_temple_boss() -> void:
 	m.hit_taken.connect(_on_monster_hit.bind(m))
 	if m.has_signal("awareness_changed"):
 		m.awareness_changed.connect(_on_monster_awareness_changed)
-	m.died.connect(_on_monster_died.bind(m))
+	m.died.connect(_on_monster_died)
 	TurnManager.register_actor(m)
 	_roll_monster_weapon(m)
 	CombatLog.post("A lone guardian watches over the ruined pantheon...", Color(1.0, 0.78, 0.35))
@@ -884,7 +913,7 @@ func _spawn_b15_boss_floor() -> void:
 	monsters_layer.add_child(m)
 	m.setup(md, map, best)
 	m.hit_taken.connect(_on_monster_hit.bind(m))
-	m.died.connect(_on_monster_died.bind(m))
+	m.died.connect(_on_monster_died)
 	m.awareness_changed.connect(_on_monster_awareness_changed)
 	TurnManager.register_actor(m)
 	CombatLog.post("A crushing darkness fills the air. Something ancient stirs...",
@@ -1055,7 +1084,7 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 			m.hit_taken.connect(_on_monster_hit.bind(m))
 		if m.has_signal("awareness_changed"):
 			m.awareness_changed.connect(_on_monster_awareness_changed)
-		m.died.connect(_on_monster_died.bind(m))
+		m.died.connect(_on_monster_died)
 		TurnManager.register_actor(m)
 		_roll_monster_weapon(m)
 
@@ -1086,7 +1115,7 @@ func _spawn_unique_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
 		m.hit_taken.connect(_on_monster_hit.bind(m))
 		if m.has_signal("awareness_changed"):
 			m.awareness_changed.connect(_on_monster_awareness_changed)
-		m.died.connect(_on_monster_died.bind(m))
+		m.died.connect(_on_monster_died)
 		TurnManager.register_actor(m)
 		_roll_monster_weapon(m)
 		CombatLog.post("A dangerous presence lurks on this floor...", Color(1.0, 0.75, 0.3))
@@ -1119,7 +1148,7 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 		m.hit_taken.connect(_on_monster_hit.bind(m))
 		if m.has_signal("awareness_changed"):
 			m.awareness_changed.connect(_on_monster_awareness_changed)
-		m.died.connect(_on_monster_died.bind(m))
+		m.died.connect(_on_monster_died)
 		TurnManager.register_actor(m)
 		_roll_monster_weapon(m)
 		placed += 1
@@ -1130,6 +1159,7 @@ func _spawn_items_for_floor(depth: int) -> void:
 
 	# Build the item list to place this floor.
 	var to_place: Array[ItemData] = []
+	var essence_to_place: Array[String] = []
 
 	# ── Per-floor random drops ──────────────────────────────────────────
 	for _i in range(rng.randi_range(1, 3)):
@@ -1156,12 +1186,12 @@ func _spawn_items_for_floor(depth: int) -> void:
 		to_place.append(ItemRegistry.get_by_id("scroll_enchant_weapon") if ItemRegistry != null else null)
 		var wd: ItemData = ItemRegistry.pick_kind(depth, "wand") if ItemRegistry != null else null
 		if wd != null: to_place.append(wd)
-		_queue_essence_pickup(EssenceSystem.random_id())
+		essence_to_place.append(EssenceSystem.random_id())
 	elif floor_in_sector == 1:
 		# Floor 2: healing + enchant_armor + essence
 		to_place.append(ItemRegistry.get_by_id("potion_healing") if ItemRegistry != null else null)
 		to_place.append(ItemRegistry.get_by_id("scroll_enchant_armor") if ItemRegistry != null else null)
-		_queue_essence_pickup(EssenceSystem.random_id())
+		essence_to_place.append(EssenceSystem.random_id())
 	else:
 		# Floor 3: 50% extra healing + 50% upgrade scroll + 50% wand
 		if rng.randf() < 0.5:
@@ -1189,6 +1219,19 @@ func _spawn_items_for_floor(depth: int) -> void:
 			var entry_override: Dictionary = ItemRegistry.make_entry(item.id, depth, 0) if ItemRegistry != null else {"id": item.id, "plus": 0}
 			_spawn_floor_item(item, p, 0, entry_override)
 			break
+	for essence_id in essence_to_place:
+		var attempts: int = 0
+		while attempts < 40:
+			attempts += 1
+			var p: Vector2i = map.random_floor_tile(rng)
+			if not map.is_walkable(p):
+				continue
+			if p == player.grid_pos:
+				continue
+			if _item_at(p) != null:
+				continue
+			_spawn_essence_floor_item(String(essence_id), p)
+			break
 
 func spawn_ally(monster_id: String, near_pos: Vector2i, turns: int) -> bool:
 	if map == null or monsters_layer == null:
@@ -1213,7 +1256,7 @@ func spawn_ally(monster_id: String, near_pos: Vector2i, turns: int) -> bool:
 	m.is_ally = true
 	m.ally_turns_left = turns
 	m.hit_taken.connect(_on_monster_hit.bind(m))
-	m.died.connect(_on_monster_died.bind(m))
+	m.died.connect(_on_monster_died)
 	TurnManager.register_actor(m)
 	map.queue_redraw()
 	return true
@@ -1232,7 +1275,7 @@ func spawn_monster_at(monster_id: String, pos: Vector2i) -> bool:
 	m.setup(md, map, pos)
 	m.become_aware(player.grid_pos)
 	m.hit_taken.connect(_on_monster_hit.bind(m))
-	m.died.connect(_on_monster_died.bind(m))
+	m.died.connect(_on_monster_died)
 	m.awareness_changed.connect(_on_monster_awareness_changed)
 	_roll_monster_weapon(m)
 	TurnManager.register_actor(m)
@@ -1262,6 +1305,69 @@ func _spawn_floor_item(data: ItemData, pos: Vector2i, plus: int, entry_override:
 	var fi: FloorItem = FloorItemScene.new()
 	items_layer.add_child(fi)
 	fi.setup(data, map, pos, plus, entry_override)
+
+func _spawn_essence_floor_item(essence_id: String, pos: Vector2i) -> void:
+	if ItemRegistry == null or essence_id == "":
+		return
+	var data: ItemData = ItemRegistry.get_by_id("essence_shard")
+	if data == null:
+		return
+	_spawn_floor_item(data, pos, 0, {"id": "essence_shard", "plus": 0, "essence_id": essence_id})
+
+func _find_item_drop_pos(origin: Vector2i) -> Vector2i:
+	if map == null:
+		return origin
+	if map.is_walkable(origin) and _monster_at(origin) == null and origin != player.grid_pos:
+		return origin
+	var offsets: Array = [
+		Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1),
+		Vector2i(1, 1), Vector2i(-1, 1), Vector2i(1, -1), Vector2i(-1, -1),
+	]
+	for off in offsets:
+		var p: Vector2i = origin + off
+		if map.is_walkable(p) and _monster_at(p) == null and p != player.grid_pos:
+			return p
+	return origin
+
+func _corpse_shape_for_monster(monster_id: String) -> String:
+	match monster_id:
+		"bat", "vampire_bat":
+			return "bat"
+		"ashen_magpie":
+			return "bird"
+		"centaur":
+			return "centaur"
+		"fire_dragon", "ice_dragon", "swamp_dragon", "steam_dragon", "golden_dragon", "bone_dragon":
+			return "dragon"
+		"wyvern":
+			return "drake"
+		"kobold", "goblin", "rat", "crimson_imp", "red_devil":
+			return "humanoid_small"
+		"orc", "orc_priest", "orc_warrior", "orc_wizard", "orc_warchief", "gnoll", "gnoll_sergeant", "gnoll_shaman", "gnoll_warlord", "deep_elf_archer", "deep_elf_death_mage", "harrow_knight", "vampire", "vampire_knight", "mummy", "zombie", "crypt_zombie", "ghoul", "wight", "wraith", "shadow_wraith", "revenant", "lich", "ancient_lich", "pale_scholar", "stone_warden", "storm_hierophant":
+			return "humanoid_medium"
+		"ogre", "ogre_mage", "ogre_chieftain", "two_headed_ogre", "cyclops", "fire_giant", "frost_giant", "stone_giant", "minotaur", "executioner", "balrug", "ice_devil", "iron_golem", "earth_elemental", "fire_elemental", "gargoyle":
+			return "humanoid_large"
+		"basilisk", "giant_cockroach", "hornet", "scorpion":
+			return "lizard"
+		"bog_serpent":
+			return "naga"
+		"jackal", "hound", "warg", "wolf", "black_bear":
+			return "quadruped_small"
+		"yak", "manticore", "giant_wolf_spider":
+			return "quadruped_large"
+		"adder", "viper_saint":
+			return "snake"
+		"troll", "deep_troll":
+			return "troll"
+	return "humanoid_medium"
+
+func _corpse_tile_for_monster(monster: Monster) -> String:
+	if monster == null or monster.data == null:
+		return ""
+	var path: String = String(_CORPSE_TILE_BY_SHAPE.get(_corpse_shape_for_monster(String(monster.data.id)), ""))
+	if path != "" and ResourceLoader.exists(path):
+		return path
+	return String(monster.data.tile_path)
 
 func _monster_count_for_depth(d: int) -> int:
 	if d <= 5:
@@ -1399,10 +1505,16 @@ func _update_hud() -> void:
 	top_hud.set_hp(player.hp, player.hp_max)
 	top_hud.set_mp(player.mp, player.mp_max)
 	top_hud.set_xp(player.xp, player.xp_to_next(), player.xl)
-	top_hud.set_depth(GameManager.depth)
+	if GameManager.branch_zone != "":
+		var bcfg: Dictionary = ZoneManager.branch_config(GameManager.branch_zone)
+		var bname: String = bcfg.get("display_name", GameManager.branch_zone)
+		top_hud.set_location(bname, GameManager.branch_floor)
+	else:
+		top_hud.set_depth(GameManager.depth)
 	top_hud.set_gold(player.gold)
 	top_hud.set_turn(TurnManager.turn_number)
 	top_hud.set_buffs(player.statuses)
+	top_hud.set_runes(player.items)
 	if bottom_hud != null:
 		var hostile_visible: bool = _monster_in_sight()
 		bottom_hud.set_rest_label(hostile_visible)
@@ -1453,12 +1565,12 @@ func _on_player_turn_started() -> void:
 	if TurnManager.turn_number % _RESPAWN_INTERVAL == 0:
 		_try_respawn_monster()
 	if not _auto_path.is_empty():
-		if _monster_in_sight():
+		if _new_monster_in_sight():
 			_cancel_auto_walk("new enemy")
 			return
 		_queue_auto_walk_step()
 	elif _auto_exploring:
-		if _monster_in_sight():
+		if _new_monster_in_sight():
 			_cancel_auto_walk("new enemy")
 			return
 		_start_auto_explore()
@@ -1545,7 +1657,7 @@ func _try_respawn_monster() -> void:
 		m.hit_taken.connect(_on_monster_hit.bind(m))
 		if m.has_signal("awareness_changed"):
 			m.awareness_changed.connect(_on_monster_awareness_changed)
-		m.died.connect(_on_monster_died.bind(m))
+		m.died.connect(_on_monster_died)
 		TurnManager.register_actor(m)
 		_roll_monster_weapon(m)
 		return
@@ -1610,6 +1722,10 @@ func _on_branch_enter() -> void:
 func _on_branch_stairs_down() -> void:
 	var branch_id: String = GameManager.branch_zone
 	if branch_id == "":
+		return
+	var _floors: int = int(ZoneManager.branch_config(branch_id).get("floors", 4))
+	if GameManager.branch_floor >= _floors:
+		TurnManager.end_player_turn()
 		return
 	_cancel_auto_walk("stairs")
 	_cache_branch_floor(branch_id, GameManager.branch_floor)
@@ -1695,7 +1811,11 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 			m.hit_taken.connect(_on_monster_hit.bind(m))
 			if m.has_signal("awareness_changed"):
 				m.awareness_changed.connect(_on_monster_awareness_changed)
-			m.died.connect(_on_monster_died.bind(m))
+			var boss_id: String = String(ZoneManager.branch_config(branch_id).get("boss_id", ""))
+			if boss_id != "" and String(md.id) == boss_id:
+				m.died.connect(_on_branch_boss_died.bind(branch_id))
+			else:
+				m.died.connect(_on_monster_died)
 			TurnManager.register_actor(m)
 			_roll_monster_weapon(m)
 		for entry in state.get("items", []):
@@ -1712,11 +1832,17 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 	var is_boss_floor: bool = (branch_floor >= int(cfg.get("floors", 4)))
 	var map_style: String = String(cfg.get("map_style", "bsp"))
 	map.generate(branch_seed, not is_boss_floor, map_style)
+	# Boss floor: remove down stairs so player can't descend further.
+	# _on_branch_boss_died will later convert stairs_down_pos → STAIRS_UP.
+	if is_boss_floor:
+		map.set_tile(map.stairs_down_pos, DungeonMap.Tile.FLOOR)
+		map.extra_stairs_down_positions.clear()
 	var eff_depth: int = ZoneManager.branch_effective_depth(branch_id, branch_floor)
 	map._tex_wall = load(cfg.get("wall", "")) as Texture2D
 	map._tex_floor = load(cfg.get("floor", "")) as Texture2D
 	map.queue_redraw()
-	player.bind_map(map, map.spawn_pos)
+	var arrival_pos: Vector2i = map.spawn_pos if arrive_from_above else map.stairs_down_pos
+	player.bind_map(map, arrival_pos)
 	_clear_monsters()
 	_clear_floor_items()
 	if is_boss_floor:
@@ -1788,7 +1914,7 @@ func _spawn_abyss_floor(depth: int) -> void:
 		m.hit_taken.connect(_on_monster_hit.bind(m))
 		if m.has_signal("awareness_changed"):
 			m.awareness_changed.connect(_on_monster_awareness_changed)
-		m.died.connect(_on_monster_died.bind(m))
+		m.died.connect(_on_monster_died)
 		m.become_aware(player.grid_pos)
 		TurnManager.register_actor(m)
 		_roll_monster_weapon(m)
@@ -1894,7 +2020,7 @@ func _spawn_branch_monsters(branch_id: String, eff_depth: int) -> void:
 		m.hit_taken.connect(_on_monster_hit.bind(m))
 		if m.has_signal("awareness_changed"):
 			m.awareness_changed.connect(_on_monster_awareness_changed)
-		m.died.connect(_on_monster_died.bind(m))
+		m.died.connect(_on_monster_died)
 		TurnManager.register_actor(m)
 		_roll_monster_weapon(m)
 		placed += 1
@@ -1920,7 +2046,7 @@ func _spawn_branch_boss(branch_id: String) -> void:
 	m.hit_taken.connect(_on_monster_hit.bind(m))
 	if m.has_signal("awareness_changed"):
 		m.awareness_changed.connect(_on_monster_awareness_changed)
-	m.died.connect(_on_branch_boss_died.bind(m, branch_id))
+	m.died.connect(_on_branch_boss_died.bind(branch_id))
 	TurnManager.register_actor(m)
 	_roll_monster_weapon(m)
 	CombatLog.post("A powerful presence fills the chamber...", Color(1.0, 0.5, 0.2))
@@ -1930,7 +2056,7 @@ func _spawn_branch_resistance_hint(branch_id: String) -> void:
 	if FaithSystem.allows_essence(player):
 		var essence_id: String = String(cfg.get("essence_reward", ""))
 		if essence_id != "":
-			_queue_essence_pickup(essence_id)
+			_spawn_essence_floor_item(essence_id, map.spawn_pos + Vector2i(1, 0))
 			CombatLog.post("The environment here is hostile — a protective essence manifests.", Color(0.9, 0.85, 0.4))
 	else:
 		var ring_id: String = String(cfg.get("resist_ring", ""))
@@ -1955,13 +2081,13 @@ func _on_branch_boss_died(monster: Monster, branch_id: String) -> void:
 	if rune_id != "":
 		var rune_data: ItemData = ItemRegistry.get_by_id(rune_id) if ItemRegistry != null and rune_id != "" else null
 		if rune_data != null:
-			_spawn_floor_item(rune_data, monster.grid_pos + Vector2i(1, 0), 0)
+			_spawn_floor_item(rune_data, monster.grid_pos, 0)
 			CombatLog.post("A rune materialises!", Color(1.0, 0.9, 0.3))
 	# Essence or ring depending on faith
 	if FaithSystem.allows_essence(player):
 		var essence_id: String = String(cfg.get("essence_reward", ""))
 		if essence_id != "":
-			_queue_essence_pickup(essence_id)
+			_spawn_essence_floor_item(essence_id, monster.grid_pos)
 	else:
 		var ring_id: String = String(cfg.get("ring_reward", ""))
 		if ring_id != "":
@@ -2507,6 +2633,25 @@ func _on_act_pressed() -> void:
 		_start_auto_explore()
 
 
+func _on_pickup_pressed() -> void:
+	if player == null or player.hp <= 0 or not TurnManager.is_player_turn:
+		return
+	var item: FloorItem = _item_at(player.grid_pos)
+	if item == null:
+		CombatLog.post("Nothing here to pick up.", Color(0.6, 0.6, 0.6))
+		return
+	player.pickup(item)
+	TurnManager.end_player_turn()
+
+func _pickup_essence_floor_item(floor_item: FloorItem) -> void:
+	if floor_item == null or floor_item.data == null:
+		return
+	var essence_id: String = String(floor_item.entry.get("essence_id", ""))
+	if essence_id == "":
+		return
+	_queue_essence_pickup(essence_id, floor_item)
+
+
 func _start_auto_explore() -> void:
 	# Route to nearest reachable floor item first.
 	var item_target := _find_item_target()
@@ -2603,7 +2748,7 @@ func _on_monster_died(monster: Monster) -> void:
 	if monster != null and monster.data != null and not monster.data.is_unique:
 		map.corpses.append({
 			"pos": monster.grid_pos,
-			"tile_path": String(monster.data.tile_path),
+			"tile_path": _corpse_tile_for_monster(monster),
 			"turns_left": 40,
 		})
 		map.queue_redraw()
@@ -2624,9 +2769,6 @@ func _on_monster_died(monster: Monster) -> void:
 		_show_result_screen(true)
 		return
 	_handle_first_shrine_boss_clear(monster)
-	# Before shrine choice, suppress all essence drops
-	if not FaithSystem.has_chosen_faith(player):
-		return
 	_handle_monster_essence_drop(monster)
 
 func _handle_first_shrine_boss_clear(monster: Monster) -> void:
@@ -2635,9 +2777,7 @@ func _handle_first_shrine_boss_clear(monster: Monster) -> void:
 	if GameManager.depth != 3 or map.altar_active or not monster.data.is_unique:
 		return
 	map.activate_altars()
-	CombatLog.post("Ancient power stirs. The altars glow.", Color(0.85, 0.75, 1.0))
-	if player != null and not FaithSystem.has_chosen_faith(player):
-		ShrineDialog.open_choice(player, self)
+	CombatLog.post("Ancient power stirs. The altars glow with dormant faith.", Color(0.85, 0.75, 1.0))
 
 func _handle_monster_essence_drop(monster: Monster) -> void:
 	if monster == null or monster.data == null:
@@ -2652,7 +2792,7 @@ func _handle_monster_essence_drop(monster: Monster) -> void:
 		CombatLog.post("The %s leaves behind an essence! (%s)" % [
 			monster.data.display_name, EssenceSystem.display_name(uid)],
 			Color(1.0, 0.75, 0.3))
-		_queue_essence_pickup(uid)
+		_spawn_essence_floor_item(uid, monster.grid_pos)
 		return
 	var chance: float = min(0.22 + GameManager.depth * 0.01, 0.40)
 	if randf() >= chance:
@@ -2664,7 +2804,7 @@ func _handle_monster_essence_drop(monster: Monster) -> void:
 		essence_id = EssenceSystem.random_id()
 	CombatLog.post("An essence materializes! (%s)" % EssenceSystem.display_name(essence_id),
 		Color(0.8, 0.6, 1.0))
-	_queue_essence_pickup(essence_id)
+	_spawn_essence_floor_item(essence_id, monster.grid_pos)
 
 func _on_monster_hit(amount: int, monster: Monster) -> void:
 	if not is_instance_valid(monster):
@@ -2964,6 +3104,7 @@ func _debug_warp_to_branch(branch_id: String, branch_floor: int) -> void:
 	GameManager.branch_floor = branch_floor
 	GameManager.branch_entry_depth = entry_depth
 	GameManager.branches_cleared.erase(branch_id)
+	GameManager.branch_floor_cache.erase("%s_%d" % [branch_id, branch_floor])
 	CombatLog.post("[DEBUG] Warp to %s F%d." % [branch_id, branch_floor], Color(1.0, 0.85, 0.3))
 	_generate_branch_floor(branch_id, branch_floor, true)
 	RacePassiveSystem.on_floor_changed(player)

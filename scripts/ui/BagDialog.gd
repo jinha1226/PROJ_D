@@ -107,7 +107,7 @@ static func _fill_inventory(container: VBoxContainer, player: Player,
 			continue
 		var key: String = "%s|%d" % [id, plus]
 		if not stacks.has(key):
-			stacks[key] = {"id": id, "plus": plus, "indices": []}
+			stacks[key] = {"id": id, "plus": plus, "indices": [], "entry": entry.duplicate(true)}
 		stacks[key].indices.append(i)
 
 	# Sort: equipped first, then rest
@@ -128,7 +128,7 @@ static func _fill_inventory(container: VBoxContainer, player: Player,
 		var data: ItemData = ItemRegistry.get_by_id(String(stack.id)) if ItemRegistry != null and String(stack.id) != "" else null
 		if data == null:
 			continue
-		container.add_child(_build_item_row(data, stack.indices, stack.plus, player, dlg))
+		container.add_child(_build_item_row(data, stack.indices, stack.plus, player, dlg, stack.entry))
 
 	if stacks.is_empty():
 		var empty := Label.new()
@@ -148,6 +148,8 @@ static func _accessory_stat_text(data: ItemData) -> String:
 		"hp_bonus": return "+%d HP" % data.effect_value
 		"ac_bonus": return "+%d AC" % data.effect_value
 		"mp_bonus": return "+%d MP" % data.effect_value
+		"slay_bonus": return "Slay +%d" % data.effect_value
+		"wizardry": return "Wizardry +%d" % data.effect_value
 	return ""
 
 
@@ -231,20 +233,23 @@ static func _make_thumbnail(data: ItemData) -> Control:
 
 
 static func _build_item_row(data: ItemData, indices: Array, plus: int,
-		player: Player, dlg: GameDialog) -> Control:
+		player: Player, dlg: GameDialog, entry_data: Dictionary) -> Control:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 
 	row.add_child(_make_thumbnail(data))
 
 	var name_lbl := Label.new()
-	var label_text: String = GameManager.display_name_of(data.id)
+	var label_text: String = ItemRegistry.entry_display_name(entry_data) if ItemRegistry != null else GameManager.display_name_of(data.id)
 	if plus > 0:
 		label_text += " +%d" % plus
 	if data.kind == "weapon" and data.damage > 0:
 		label_text += "  (d%d)" % (data.damage + plus)
 	elif data.kind == "armor" and data.ac_bonus > 0:
 		label_text += "  (+%d AC)" % (data.ac_bonus + plus)
+	var bonus_summary: String = ItemRegistry.entry_bonus_summary(entry_data) if ItemRegistry != null else ""
+	if bonus_summary != "":
+		label_text += bonus_summary
 	if indices.size() > 1:
 		label_text += "  x%d" % indices.size()
 	name_lbl.text = label_text

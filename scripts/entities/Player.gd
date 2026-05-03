@@ -8,7 +8,7 @@ var ItemRegistry = null
 signal stats_changed
 signal moved(new_pos: Vector2i)
 signal died
-signal item_dropped(item_id: String, at_pos: Vector2i, plus: int)
+signal item_dropped(entry: Dictionary, at_pos: Vector2i)
 signal damaged(amount: int)
 
 @export var grid_pos: Vector2i = Vector2i(1, 1)
@@ -62,6 +62,8 @@ var mp_max: int = 6
 var ac: int = 0
 var ev: int = 5
 var wl: int = 0
+var slay_bonus: int = 0
+var wizardry_bonus: int = 0
 var fov_radius_bonus: int = 0
 var strength: int = 10
 var dexterity: int = 10
@@ -182,16 +184,22 @@ func pickup(floor_item: FloorItem) -> void:
 		var amount: int = max(1, data.effect_value)
 		gold += amount
 		CombatLog.pickup("You pick up %d gold." % amount)
+	elif data.kind == "essence":
+		var game_node: Node = get_tree().current_scene if get_tree() != null else null
+		if game_node != null and game_node.has_method("_pickup_essence_floor_item"):
+			game_node._pickup_essence_floor_item(floor_item)
 	else:
-		var new_entry: Dictionary = {"id": data.id, "plus": floor_item.plus}
-		if data.kind == "wand":
+		var new_entry: Dictionary = floor_item.entry.duplicate(true) if not floor_item.entry.is_empty() else {"id": data.id, "plus": floor_item.plus}
+		if data.kind == "wand" and not new_entry.has("charges"):
 			new_entry["charges"] = data.effect_value
 		items.append(new_entry)
+		var pickup_name: String = ItemRegistry.entry_display_name(new_entry) if ItemRegistry != null else GameManager.display_name_of(data.id)
 		items_collected += 1
-		CombatLog.pickup("You pick up %s." % GameManager.display_name_of(data.id))
+		CombatLog.pickup("You pick up %s." % pickup_name)
 		auto_bind_quickslot(data.id)
 	emit_signal("stats_changed")
-	floor_item.queue_free()
+	if data.kind != "essence":
+		floor_item.queue_free()
 
 func auto_bind_quickslot(item_id: String) -> void:
 	if item_id == "":
@@ -539,11 +547,10 @@ func use_item(index: int) -> void:
 func drop_item(index: int) -> void:
 	if index < 0 or index >= items.size():
 		return
-	var entry: Dictionary = items[index]
+	var entry: Dictionary = items[index].duplicate(true)
 	var id: String = String(entry.get("id", ""))
-	var plus_val: int = int(entry.get("plus", 0))
 	if id == equipped_weapon_id:
-		equipped_weapon_id = ""
+		set_equipped_weapon("")
 	if id == equipped_armor_id:
 		equipped_armor_id = ""
 		refresh_ac_from_equipment()
@@ -554,7 +561,7 @@ func drop_item(index: int) -> void:
 	if id == equipped_shield_id:
 		set_equipped_shield("")
 	items.remove_at(index)
-	emit_signal("item_dropped", id, grid_pos, plus_val)
+	emit_signal("item_dropped", entry, grid_pos)
 	emit_signal("stats_changed")
 
 func equipped_weapon_entry() -> Dictionary:
@@ -566,6 +573,19 @@ func equipped_weapon_entry() -> Dictionary:
 func equipped_armor_entry() -> Dictionary:
 	for entry in items:
 		if entry.get("id", "") == equipped_armor_id:
+			return entry
+	return {}
+
+
+func equipped_ring_entry() -> Dictionary:
+	for entry in items:
+		if entry.get("id", "") == equipped_ring_id:
+			return entry
+	return {}
+
+func equipped_amulet_entry() -> Dictionary:
+	for entry in items:
+		if entry.get("id", "") == equipped_amulet_id:
 			return entry
 	return {}
 
@@ -968,7 +988,7 @@ func add_school_spells(school: String) -> void:
 func int_required_for_spell(spell: SpellData) -> int:
 	if spell == null:
 		return 99
-	return max(7, 7 + spell.spell_level * 2 - EssenceSystem.spell_int_discount(self))
+	return max(5, 7 + spell.spell_level * 2 - EssenceSystem.spell_int_discount(self) - wizardry_bonus)
 
 func _chebyshev(a: Vector2i, b: Vector2i) -> int:
 	return max(abs(a.x - b.x), abs(a.y - b.y))
@@ -1033,6 +1053,13 @@ func equip_essence(slot: int, essence_id: String) -> void:
 		return
 	if not EssenceSystem.slot_is_unlocked(self, slot):
 		return
+	if essence_id != "" and not FaithSystem.allows_essence(self):
+		if CombatLog != null:
+			if not FaithSystem.has_chosen_faith(self):
+				CombatLog.post("Choose a faith before attuning essences.", Color(1.0, 0.72, 0.5))
+			else:
+				CombatLog.post("Your current faith does not allow essence attunement.", Color(1.0, 0.72, 0.5))
+		return
 	var old: String = String(essence_slots[slot])
 	if old == essence_id:
 		return
@@ -1094,7 +1121,11 @@ func set_race_from_id(race_id: String) -> void:
 	queue_redraw()
 
 func set_equipped_weapon(id: String) -> void:
+	if equipped_weapon_id != "":
+		_remove_entry_affixes(equipped_weapon_entry())
 	equipped_weapon_id = id
+	if id != "":
+		_apply_entry_affixes(equipped_weapon_entry())
 	_refresh_paperdoll()
 	emit_signal("stats_changed")
 
@@ -1106,17 +1137,21 @@ func set_equipped_armor(id: String) -> void:
 func set_equipped_ring(id: String) -> void:
 	if equipped_ring_id != "":
 		_remove_accessory_stat(equipped_ring_id)
+		_remove_entry_affixes(equipped_ring_entry())
 	equipped_ring_id = id
 	if id != "":
 		_apply_accessory_stat(id)
+		_apply_entry_affixes(equipped_ring_entry())
 	emit_signal("stats_changed")
 
 func set_equipped_amulet(id: String) -> void:
 	if equipped_amulet_id != "":
 		_remove_accessory_stat(equipped_amulet_id)
+		_remove_entry_affixes(equipped_amulet_entry())
 	equipped_amulet_id = id
 	if id != "":
 		_apply_accessory_stat(id)
+		_apply_entry_affixes(equipped_amulet_entry())
 	emit_signal("stats_changed")
 
 func set_equipped_shield(id: String) -> void:
@@ -1141,7 +1176,7 @@ func _apply_accessory_stat(id: String) -> void:
 			var new_bonus: int = strength_hp_bonus_for_value(strength)
 			_apply_max_hp_gain(new_bonus - old_bonus)
 		"stat_int": intelligence += d.effect_value
-		"stat_dex": dexterity += d.effect_value; ev += 1
+		"stat_dex": dexterity += d.effect_value; ev += d.effect_value
 		"hp_bonus": _apply_max_hp_gain(d.effect_value)
 		"ac_bonus": ac += d.effect_value
 		"mp_bonus": _apply_max_mp_gain(d.effect_value)
@@ -1155,6 +1190,10 @@ func _apply_accessory_stat(id: String) -> void:
 			if not resists.has("fire+"): resists.append("fire+")
 		"resist_necro":
 			if not resists.has("necro+"): resists.append("necro+")
+		"slay_bonus":
+			slay_bonus += d.effect_value
+		"wizardry":
+			wizardry_bonus += d.effect_value
 
 func _remove_accessory_stat(id: String) -> void:
 	var d: ItemData = ItemRegistry.get_by_id(id) if ItemRegistry != null else null
@@ -1167,7 +1206,7 @@ func _remove_accessory_stat(id: String) -> void:
 			var new_bonus: int = strength_hp_bonus_for_value(strength)
 			_apply_max_hp_gain(new_bonus - old_bonus)
 		"stat_int": intelligence = maxi(1, intelligence - d.effect_value)
-		"stat_dex": dexterity = maxi(1, dexterity - d.effect_value); ev = maxi(0, ev - 1)
+		"stat_dex": dexterity = maxi(1, dexterity - d.effect_value); ev = maxi(0, ev - d.effect_value)
 		"hp_bonus": _apply_max_hp_gain(-d.effect_value)
 		"ac_bonus": ac = maxi(0, ac - d.effect_value)
 		"mp_bonus": _apply_max_mp_gain(-d.effect_value)
@@ -1181,21 +1220,83 @@ func _remove_accessory_stat(id: String) -> void:
 			resists.erase("fire+")
 		"resist_necro":
 			resists.erase("necro+")
+		"slay_bonus":
+			slay_bonus -= d.effect_value
+		"wizardry":
+			wizardry_bonus -= d.effect_value
+
+
+func _apply_entry_affixes(entry: Dictionary) -> void:
+	for mod in entry.get("mods", []):
+		var m: Dictionary = mod
+		var mod_type: String = String(m.get("type", ""))
+		var value: int = int(m.get("value", 0))
+		_apply_affix_value(mod_type, value)
+
+func _remove_entry_affixes(entry: Dictionary) -> void:
+	for mod in entry.get("mods", []):
+		var m: Dictionary = mod
+		var mod_type: String = String(m.get("type", ""))
+		var value: int = int(m.get("value", 0))
+		_apply_affix_value(mod_type, -value)
+
+func _apply_affix_value(mod_type: String, value: int) -> void:
+	match mod_type:
+		"slay":
+			slay_bonus += value
+		"wizardry":
+			wizardry_bonus += value
+		"stat_str":
+			var old_bonus: int = strength_hp_bonus_for_value(strength)
+			strength = maxi(1, strength + value)
+			var new_bonus: int = strength_hp_bonus_for_value(strength)
+			_apply_max_hp_gain(new_bonus - old_bonus)
+		"stat_dex":
+			dexterity = maxi(1, dexterity + value)
+			ev = maxi(0, ev + value)
+		"stat_int":
+			intelligence = maxi(1, intelligence + value)
+		"hp_bonus":
+			_apply_max_hp_gain(value)
+		"mp_bonus":
+			_apply_max_mp_gain(value)
+		"will_bonus":
+			wl += value
+		"resist_fire":
+			_apply_resist_mod("fire", value)
+		"resist_cold":
+			_apply_resist_mod("cold", value)
+		"resist_poison":
+			_apply_resist_mod("poison", value)
+		"resist_necro":
+			_apply_resist_mod("necro", value)
+
+func _apply_resist_mod(kind: String, value: int) -> void:
+	if value == 0:
+		return
+	var tag: String = "%s%s" % [kind, "+" if value > 0 else "-"]
+	if value > 0:
+		resists.append(tag)
+	else:
+		resists.append(tag)
 
 func _refresh_paperdoll() -> void:
 	_body_doll_tex = null
 	_hand1_doll_tex = null
 	_hand2_doll_tex = null
-	if DOLL_BODY_MAP.has(equipped_armor_id):
-		var body_path: String = String(DOLL_BODY_MAP[equipped_armor_id])
+	var armor_base_id: String = ItemRegistry.base_id_of(equipped_armor_id) if ItemRegistry != null else equipped_armor_id
+	if DOLL_BODY_MAP.has(armor_base_id):
+		var body_path: String = String(DOLL_BODY_MAP[armor_base_id])
 		if ResourceLoader.exists(body_path):
 			_body_doll_tex = load(body_path) as Texture2D
-	if DOLL_HAND1_MAP.has(equipped_weapon_id):
-		var path: String = String(DOLL_HAND1_MAP[equipped_weapon_id])
+	var weapon_base_id: String = ItemRegistry.base_id_of(equipped_weapon_id) if ItemRegistry != null else equipped_weapon_id
+	if DOLL_HAND1_MAP.has(weapon_base_id):
+		var path: String = String(DOLL_HAND1_MAP[weapon_base_id])
 		if ResourceLoader.exists(path):
 			_hand1_doll_tex = load(path) as Texture2D
-	if DOLL_HAND2_MAP.has(equipped_shield_id):
-		var path: String = String(DOLL_HAND2_MAP[equipped_shield_id])
+	var shield_base_id: String = ItemRegistry.base_id_of(equipped_shield_id) if ItemRegistry != null else equipped_shield_id
+	if DOLL_HAND2_MAP.has(shield_base_id):
+		var path: String = String(DOLL_HAND2_MAP[shield_base_id])
 		if ResourceLoader.exists(path):
 			_hand2_doll_tex = load(path) as Texture2D
 	queue_redraw()

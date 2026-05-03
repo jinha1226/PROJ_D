@@ -96,10 +96,10 @@ const CLOUD_COLORS: Dictionary = {
 }
 
 const CLOUD_TEXTURES: Dictionary = {
-	"fire":        "res://assets/tiles/individual/effect/cloud/cloud_fire.png",
-	"cold":        "res://assets/tiles/individual/effect/cloud/cloud_cold.png",
-	"poison":      "res://assets/tiles/individual/effect/cloud/cloud_poison.png",
-	"electricity": "res://assets/tiles/individual/effect/cloud/cloud_electricity.png",
+	"fire":        preload("res://assets/tiles/individual/effect/cloud/cloud_fire.png"),
+	"cold":        preload("res://assets/tiles/individual/effect/cloud/cloud_cold.png"),
+	"poison":      preload("res://assets/tiles/individual/effect/cloud/cloud_poison.png"),
+	"electricity": preload("res://assets/tiles/individual/effect/cloud/cloud_electricity.png"),
 }
 
 const HAZARD_COLORS: Dictionary = {
@@ -144,6 +144,26 @@ const ALTAR_TEXTURES: Dictionary = {
 	"death":    "res://assets/tiles/individual/dngn/altars/yredelemnul.png",
 	"essence":  "res://assets/tiles/individual/dngn/altars/gozag0.png",
 }
+
+var _cloud_tex_cache: Dictionary = {}
+var _altar_tex_cache: Dictionary = {}
+
+func _cloud_tex(type: String) -> Texture2D:
+	if _cloud_tex_cache.has(type):
+		return _cloud_tex_cache[type]
+	var tex: Texture2D = CLOUD_TEXTURES.get(type, null)
+	_cloud_tex_cache[type] = tex
+	return tex
+
+func _altar_tex(faith_id: String) -> Texture2D:
+	if _altar_tex_cache.has(faith_id):
+		return _altar_tex_cache[faith_id]
+	var path: String = String(ALTAR_TEXTURES.get(faith_id, ""))
+	var tex: Texture2D = null
+	if path != "":
+		tex = load(path) as Texture2D
+	_altar_tex_cache[faith_id] = tex
+	return tex
 
 func in_bounds(p: Vector2i) -> bool:
 	return p.x >= 0 and p.y >= 0 and p.x < GRID_W and p.y < GRID_H
@@ -237,6 +257,7 @@ func generate(map_seed: int = -1, branch_entrance: bool = false, style: String =
 	visible_tiles.clear()
 	explored.clear()
 	fog_tiles.clear()
+	corpses.clear()
 	_load_atmosphere(GameManager.depth)
 	queue_redraw()
 
@@ -371,12 +392,10 @@ func _draw() -> void:
 		var ctype: String = cloud_tiles[cpos].get("type", "fire")
 		var crect := Rect2(Vector2(cpos.x * CELL_SIZE, cpos.y * CELL_SIZE),
 				Vector2(CELL_SIZE, CELL_SIZE))
-		var ctex_path: String = CLOUD_TEXTURES.get(ctype, "")
-		if use_tiles and ctex_path != "":
-			var ctex: Texture2D = load(ctex_path) as Texture2D
-			if ctex != null:
-				draw_texture_rect(ctex, crect, false)
-				continue
+		var ctex: Texture2D = _cloud_tex(ctype)
+		if use_tiles and ctex != null:
+			draw_texture_rect(ctex, crect, false)
+			continue
 		var ccol: Color = CLOUD_COLORS.get(ctype, Color(1, 1, 1, 0.4))
 		draw_rect(Rect2(Vector2(cpos.x * CELL_SIZE + 1, cpos.y * CELL_SIZE + 1),
 				Vector2(CELL_SIZE - 2, CELL_SIZE - 2)), ccol)
@@ -384,18 +403,22 @@ func _draw() -> void:
 	# Corpses — drawn below entities, above floor
 	for c in corpses:
 		var cpos: Vector2i = c.get("pos", Vector2i.ZERO)
-		if not (reveal_all or visible_tiles.has(cpos) or explored.has(cpos)):
+		var corpse_visible: bool = reveal_all or visible_tiles.has(cpos)
+		var corpse_seen: bool = reveal_all or explored.has(cpos)
+		if not (corpse_visible or corpse_seen):
 			continue
 		var crect := Rect2(Vector2(cpos.x * CELL_SIZE, cpos.y * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE))
 		var ctile: String = c.get("tile_path", "")
 		if use_tiles and ctile != "":
 			var ctex: Texture2D = load(ctile) as Texture2D
 			if ctex != null:
-				draw_texture_rect(ctex, crect, false, Color(0.7, 0.5, 0.5, 0.85))
+				var corpse_mod: Color = Color.WHITE if corpse_visible else Color(0.6, 0.6, 0.68, 0.92)
+				draw_texture_rect(ctex, crect, false, corpse_mod)
 				continue
 		draw_string(ThemeDB.fallback_font,
 			Vector2(cpos.x * CELL_SIZE + 6, cpos.y * CELL_SIZE + CELL_SIZE - 6),
-			"%", HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6, Color(0.65, 0.25, 0.25))
+			"%", HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6,
+			Color(0.82, 0.82, 0.88) if corpse_visible else Color(0.52, 0.52, 0.6))
 
 	# Faith altars
 	for apos in altar_map.keys():
@@ -404,13 +427,10 @@ func _draw() -> void:
 		if not in_los and not was_explored:
 			continue
 		var faith_id: String = String(altar_map[apos])
-		var path: String = String(ALTAR_TEXTURES.get(faith_id, ""))
 		var mod: Color = Color.WHITE if in_los else Color(0.45, 0.45, 0.55)
 		var arect := Rect2(Vector2(apos.x * CELL_SIZE, apos.y * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE))
-		var atex: Texture2D = null
-		if use_tiles and path != "":
-			atex = load(path) as Texture2D
-		if atex != null:
+		var atex: Texture2D = _altar_tex(faith_id)
+		if use_tiles and atex != null:
 			draw_texture_rect(atex, arect, false, mod)
 		else:
 			var glyph_col: Color = FaithSystem.color_of(faith_id)

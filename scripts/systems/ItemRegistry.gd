@@ -42,6 +42,8 @@ const _RING_STR: Resource = preload("res://resources/items/ring_str.tres")
 const _RING_INT: Resource = preload("res://resources/items/ring_int.tres")
 const _RING_DEX: Resource = preload("res://resources/items/ring_dex.tres")
 const _RING_PROTECTION: Resource = preload("res://resources/items/ring_protection.tres")
+const _RING_SLAYING: Resource = preload("res://resources/items/ring_slaying.tres")
+const _RING_WIZARDRY: Resource = preload("res://resources/items/ring_wizardry.tres")
 const _AMULET_LIFE: Resource = preload("res://resources/items/amulet_life.tres")
 const _AMULET_MAGIC: Resource = preload("res://resources/items/amulet_magic.tres")
 const _AMULET_STR: Resource = preload("res://resources/items/amulet_str.tres")
@@ -105,6 +107,7 @@ const _RING_BOG: Resource = preload("res://resources/items/ring_bog.tres")
 const _RING_GLACIER: Resource = preload("res://resources/items/ring_glacier.tres")
 const _RING_EMBER: Resource = preload("res://resources/items/ring_ember.tres")
 const _RING_UNDEATH: Resource = preload("res://resources/items/ring_undeath.tres")
+const _ESSENCE_SHARD: Resource = preload("res://resources/items/essence_shard.tres")
 # Runes
 const _RUNE_SWAMP: Resource = preload("res://resources/items/rune_swamp.tres")
 const _RUNE_ICE: Resource = preload("res://resources/items/rune_ice.tres")
@@ -115,7 +118,7 @@ const _ALL_ITEMS: Array = [
 	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE, _SPEAR,
 	_STILETTO, _DIRK, _ASSASSIN_BLADE, _QUICK_BLADE,
 	_ARMING_SWORD, _BASTARD_SWORD, _GREAT_BLADE,
-	_RING_STR, _RING_INT, _RING_DEX, _RING_PROTECTION,
+	_RING_STR, _RING_INT, _RING_DEX, _RING_PROTECTION, _RING_SLAYING, _RING_WIZARDRY,
 	_AMULET_LIFE, _AMULET_MAGIC, _AMULET_STR,
 	_BUCKLER, _ROUND_SHIELD, _KITE_SHIELD, _TOWER_SHIELD,
 	_SHORTBOW, _LONGBOW, _CROSSBOW,
@@ -140,6 +143,7 @@ const _ALL_ITEMS: Array = [
 	_SCROLL_BRAND_VENOM, _SCROLL_BRAND_FREEZING, _SCROLL_BRAND_FLAMING, _SCROLL_BRAND_DRAIN,
 	_RING_POISON_RESIST, _RING_COLD_RESIST, _RING_FIRE_RESIST, _RING_NECRO_RESIST,
 	_RING_BOG, _RING_GLACIER, _RING_EMBER, _RING_UNDEATH,
+	_ESSENCE_SHARD,
 	_RUNE_SWAMP, _RUNE_ICE, _RUNE_INFERNAL, _RUNE_CRYPT,
 ]
 
@@ -163,7 +167,185 @@ func _register(res) -> void:
 	all.append(res)
 
 func get_by_id(id: String) -> ItemData:
-	return by_id.get(id)
+	if by_id.has(id):
+		return by_id[id]
+	var base_id: String = base_id_of(id)
+	return by_id.get(base_id)
+
+func base_id_of(id: String) -> String:
+	var idx: int = id.find("#")
+	return id.substr(0, idx) if idx >= 0 else id
+
+func entry_display_name(entry: Dictionary) -> String:
+	var id: String = String(entry.get("id", ""))
+	if base_id_of(id) == "essence_shard":
+		var essence_id: String = String(entry.get("essence_id", ""))
+		if essence_id != "":
+			return EssenceSystem.display_name(essence_id)
+	var data: ItemData = get_by_id(id)
+	if data == null:
+		return id
+	var gm = Engine.get_main_loop().root.get_node_or_null("/root/GameManager") if Engine.get_main_loop() is SceneTree else null
+	var base_name: String = gm.display_name_of(base_id_of(id)) if gm != null else data.display_name
+	var artifact_name: String = String(entry.get("artifact_name", ""))
+	if artifact_name != "":
+		return 'the %s "%s"' % [data.display_name, artifact_name]
+	return base_name
+
+func entry_bonus_lines(entry: Dictionary) -> PackedStringArray:
+	var lines := PackedStringArray()
+	for mod in entry.get("mods", []):
+		var m: Dictionary = mod
+		var mod_type: String = String(m.get("type", ""))
+		var value: int = int(m.get("value", 0))
+		match mod_type:
+			"slay":
+				lines.append("Slay %+d" % value)
+			"wizardry":
+				lines.append("Wizardry %+d" % value)
+			"stat_str":
+				lines.append("Str %+d" % value)
+			"stat_dex":
+				lines.append("Dex %+d" % value)
+			"stat_int":
+				lines.append("Int %+d" % value)
+			"hp_bonus":
+				lines.append("HP %+d" % value)
+			"mp_bonus":
+				lines.append("MP %+d" % value)
+			"will_bonus":
+				lines.append("Will %+d" % value)
+			"resist_fire":
+				lines.append("rFire%s" % ("+" if value >= 0 else "-"))
+			"resist_cold":
+				lines.append("rCold%s" % ("+" if value >= 0 else "-"))
+			"resist_poison":
+				lines.append("rPois%s" % ("+" if value >= 0 else "-"))
+			"resist_necro":
+				lines.append("rNcr%s" % ("+" if value >= 0 else "-"))
+	return lines
+
+func entry_bonus_summary(entry: Dictionary) -> String:
+	var lines: PackedStringArray = entry_bonus_lines(entry)
+	return " {" + ", ".join(lines) + "}" if not lines.is_empty() else ""
+
+func make_entry(id: String, depth: int, plus_override: int = 0) -> Dictionary:
+	var data: ItemData = get_by_id(id)
+	var entry: Dictionary = {"id": id, "plus": plus_override}
+	if data == null:
+		return entry
+	if data.kind == "wand":
+		entry["charges"] = data.effect_value
+	if data.kind not in ["weapon", "ring", "amulet"]:
+		return entry
+	var chance: float = 0.05 + float(depth) * 0.012
+	if data.kind in ["ring", "amulet"]:
+		chance += 0.08
+	if randf() >= min(chance, 0.33):
+		return entry
+	var rolled: Array = _roll_randart_mods(data.kind)
+	if rolled.is_empty():
+		return entry
+	entry["id"] = "%s#%06d" % [id, randi() % 1000000]
+	entry["base_id"] = id
+	entry["artifact_name"] = _randart_name()
+	entry["mods"] = rolled
+	return entry
+
+func _roll_randart_mods(kind: String) -> Array:
+	var positives: Array = [
+		{"type":"slay","value":randi_range(2, 4)},
+		{"type":"stat_str","value":randi_range(1, 3)},
+		{"type":"stat_dex","value":randi_range(1, 3)},
+		{"type":"stat_int","value":randi_range(1, 3)},
+		{"type":"hp_bonus","value":randi_range(4, 12)},
+		{"type":"mp_bonus","value":randi_range(3, 8)},
+		{"type":"will_bonus","value":1},
+		{"type":"resist_fire","value":randi_range(1, 3)},
+		{"type":"resist_cold","value":randi_range(1, 3)},
+		{"type":"resist_poison","value":randi_range(1, 3)},
+		{"type":"resist_necro","value":randi_range(1, 3)},
+	]
+	var negatives: Array = [
+		{"type":"stat_str","value":-randi_range(1, 3)},
+		{"type":"stat_dex","value":-randi_range(1, 3)},
+		{"type":"stat_int","value":-randi_range(1, 3)},
+		{"type":"hp_bonus","value":-randi_range(3, 10)},
+		{"type":"mp_bonus","value":-randi_range(2, 6)},
+		{"type":"will_bonus","value":-1},
+		{"type":"resist_fire","value":-1},
+		{"type":"resist_cold","value":-1},
+		{"type":"resist_poison","value":-1},
+		{"type":"resist_necro","value":-1},
+	]
+	if kind == "weapon":
+		positives = positives.filter(func(m): return String(m.get("type", "")) not in ["mp_bonus"])
+		negatives = negatives.filter(func(m): return String(m.get("type", "")) not in ["mp_bonus"])
+	var rolled: Array = []
+	var by_type: Dictionary = {}
+	var positive_rolls: int = 1
+	var quality_roll: float = randf()
+	if quality_roll >= 0.22:
+		positive_rolls += 1
+	if quality_roll >= 0.62:
+		positive_rolls += 1
+	if quality_roll >= 0.9:
+		positive_rolls += 1
+	var negative_rolls: int = 0
+	var bad_roll: float = randf()
+	if bad_roll < 0.18:
+		negative_rolls = 1
+		if randf() < 0.12:
+			negative_rolls = 2
+	for _i in range(positive_rolls):
+		var picked_pos := _pick_randart_mod(positives, rolled, by_type, true)
+		if picked_pos.is_empty():
+			continue
+		_apply_randart_mod_roll(rolled, by_type, picked_pos)
+	for _i in range(negative_rolls):
+		var picked_neg := _pick_randart_mod(negatives, rolled, by_type, false)
+		if picked_neg.is_empty():
+			continue
+		_apply_randart_mod_roll(rolled, by_type, picked_neg)
+	return rolled
+
+func _pick_randart_mod(pool: Array, rolled: Array, by_type: Dictionary, positive: bool) -> Dictionary:
+	for _attempt in range(32):
+		var candidate: Dictionary = pool[randi() % pool.size()].duplicate(true)
+		var mod_type: String = String(candidate.get("type", ""))
+		if mod_type == "":
+			continue
+		if by_type.has(mod_type):
+			var idx: int = int(by_type[mod_type])
+			var existing: Dictionary = rolled_entry_at(rolled, idx)
+			var existing_value: int = int(existing.get("value", 0))
+			if (existing_value >= 0) != positive:
+				continue
+		return candidate
+	return {}
+
+func _apply_randart_mod_roll(rolled: Array, by_type: Dictionary, mod: Dictionary) -> void:
+	var mod_type: String = String(mod.get("type", ""))
+	if mod_type == "":
+		return
+	if by_type.has(mod_type):
+		var idx: int = int(by_type[mod_type])
+		var existing: Dictionary = rolled[idx]
+		existing["value"] = int(existing.get("value", 0)) + int(mod.get("value", 0))
+		rolled[idx] = existing
+	else:
+		by_type[mod_type] = rolled.size()
+		rolled.append(mod.duplicate(true))
+
+func rolled_entry_at(arr: Array, idx: int) -> Dictionary:
+	if idx < 0 or idx >= arr.size():
+		return {}
+	return Dictionary(arr[idx])
+
+func _randart_name() -> String:
+	var left: Array[String] = ["Ash", "Winter", "Widow", "Hollow", "Saint", "Mire", "Cinder", "Glass", "Black", "Storm"]
+	var right: Array[String] = ["Choir", "Answer", "Tithe", "Promise", "Wake", "Vigil", "Crown", "Ladder", "Engine", "Oath"]
+	return "%s %s" % [left[randi() % left.size()], right[randi() % right.size()]]
 
 func pick_by_depth(depth: int, kind_filter: String = "") -> ItemData:
 	var candidates: Array = []

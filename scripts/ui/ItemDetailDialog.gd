@@ -16,7 +16,7 @@ static func open(item_index: int, player: Player,
 		return
 	var plus: int = int(entry.get("plus", 0))
 
-	var title: String = GameManager.display_name_of(data.id)
+	var title: String = ItemRegistry.entry_display_name(entry) if ItemRegistry != null else GameManager.display_name_of(data.id)
 	if plus > 0:
 		title += "  +%d" % plus
 	var dlg: GameDialog = GameDialog.create(title)
@@ -30,6 +30,9 @@ static func open(item_index: int, player: Player,
 	body.add_child(_build_header(data, plus))
 	body.add_child(_build_description(data))
 	body.add_child(_build_stats_card(data, plus))
+	var artifact_card := _build_artifact_card(entry)
+	if artifact_card != null:
+		body.add_child(artifact_card)
 
 	var cmp := _build_comparison(data, plus, player)
 	if cmp != null:
@@ -186,6 +189,22 @@ static func _stat_label(text: String) -> Label:
 
 
 # ── Comparison card ───────────────────────────────────────────────────────────
+
+
+static func _build_artifact_card(entry: Dictionary) -> Control:
+	if ItemRegistry == null:
+		return null
+	var lines: PackedStringArray = ItemRegistry.entry_bonus_lines(entry)
+	if lines.is_empty():
+		return null
+	var card := UICards.card(Color(0.75, 0.55, 0.2))
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 4)
+	card.add_child(vbox)
+	vbox.add_child(UICards.dim_hint("ARTIFACT", 22))
+	for line in lines:
+		vbox.add_child(UICards.accent_value(line, 26))
+	return card
 
 static func _build_comparison(data: ItemData, plus: int, player: Player) -> Control:
 	if data.kind == "weapon":

@@ -3,6 +3,7 @@ class_name FloorItem extends Node2D
 var GameManager = null
 
 var data: ItemData
+var entry: Dictionary = {}
 var grid_pos: Vector2i = Vector2i.ZERO
 var plus: int = 0
 
@@ -16,13 +17,18 @@ func _ready() -> void:
 	_font = ThemeDB.fallback_font
 	add_to_group("floor_items")
 
-func setup(item_data: ItemData, map: DungeonMap, pos: Vector2i, plus_val: int = 0) -> void:
+func setup(item_data: ItemData, map: DungeonMap, pos: Vector2i, plus_val: int = 0, entry_dict: Dictionary = {}) -> void:
 	data = item_data
+	entry = entry_dict.duplicate(true) if not entry_dict.is_empty() else {"id": item_data.id, "plus": plus_val}
 	_map = map
 	grid_pos = pos
 	plus = plus_val
 	position = map.grid_to_world(pos)
-	if data.tile_path != "":
+	if data.kind == "essence":
+		var essence_id: String = String(entry.get("essence_id", ""))
+		if essence_id != "":
+			_base_tex = EssenceSystem.icon_texture_of(essence_id)
+	elif data.tile_path != "":
 		_base_tex = load(data.tile_path) as Texture2D
 	if data.identified_tile_path != "":
 		_overlay_tex = load(data.identified_tile_path) as Texture2D

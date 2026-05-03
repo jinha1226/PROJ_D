@@ -7,6 +7,7 @@ signal skills_pressed
 signal magic_pressed
 signal status_pressed
 signal act_pressed
+signal pickup_pressed
 signal menu_pressed
 signal quickslot_pressed(index: int)
 signal quickslot_long_pressed(index: int)
@@ -15,6 +16,7 @@ signal quickslot_swap_requested(from_index: int, to_index: int)
 @onready var rest_button: Button = $BottomMargin/MainVBox/MainRow/RestButton
 @onready var act_button: Button = $BottomMargin/MainVBox/MainRow/ActButton
 @onready var bag_button: Button = $BottomMargin/MainVBox/MenuRow/BagButton
+@onready var pickup_button: Button = $BottomMargin/MainVBox/MenuRow/PickupButton
 @onready var skills_button: Button = $BottomMargin/MainVBox/MenuRow/SkillsButton
 @onready var magic_button: Button = $BottomMargin/MainVBox/MenuRow/MagicButton
 @onready var status_button: Button = $BottomMargin/MainVBox/MenuRow/StatusButton
@@ -34,6 +36,8 @@ func _ready() -> void:
 	rest_button.pressed.connect(func(): rest_pressed.emit())
 	act_button.pressed.connect(func(): act_pressed.emit())
 	bag_button.pressed.connect(func(): bag_pressed.emit())
+	if pickup_button != null:
+		pickup_button.pressed.connect(func(): pickup_pressed.emit())
 	skills_button.pressed.connect(func(): skills_pressed.emit())
 	magic_button.pressed.connect(func(): magic_pressed.emit())
 	status_button.pressed.connect(func(): status_pressed.emit())
