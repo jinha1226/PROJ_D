@@ -16,7 +16,7 @@ anchor_left = 0.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -132.0
+offset_top = -148.0
 offset_bottom = 0.0
 color = Color(0.08, 0.08, 0.1, 0.92)
 mouse_filter = 2
@@ -26,7 +26,7 @@ anchor_left = 0.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -132.0
+offset_top = -148.0
 offset_bottom = 0.0
 grow_horizontal = 2
 theme_override_constants/margin_left = 10
@@ -90,37 +90,37 @@ size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="BagButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
-custom_minimum_size = Vector2(0, 50)
+custom_minimum_size = Vector2(0, 64)
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "BAG"
 
 [node name="PickupButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
-custom_minimum_size = Vector2(0, 50)
+custom_minimum_size = Vector2(0, 64)
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "PICK"
 
 [node name="SkillsButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
-custom_minimum_size = Vector2(0, 50)
+custom_minimum_size = Vector2(0, 64)
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "SKILL"
 
 [node name="MagicButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
-custom_minimum_size = Vector2(0, 50)
+custom_minimum_size = Vector2(0, 64)
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "SPELL"
 
 [node name="StatusButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
-custom_minimum_size = Vector2(0, 50)
+custom_minimum_size = Vector2(0, 64)
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "STATUS"
 
 [node name="MenuButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
-custom_minimum_size = Vector2(0, 50)
+custom_minimum_size = Vector2(0, 64)
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "MENU"
