@@ -1,9 +1,15 @@
 ---
 name: PocketCrawl pending backlog
-description: Next-session task list — bugs, features, and balance work. Primary source: docs/balance/claude_code_balance_handoff.md + claude_code_drop_table_handoff.md + claude_code_essence_and_resistance_handoff.md (2026-04-27)
+description: Next-session task list — bugs, features, and balance work. Primary source: docs/balance/claude_code_*_handoff.md (2026-04-27). NOTE 2026-05-05: superseded by audit baseline for Critical/High items.
 type: project
 originSessionId: 545aa407-23ef-4b76-ad7b-298f33b869e6
 ---
+
+> **2026-05-05 우선순위 변경 안내**: 이 백로그는 4-27 시점 기준. 5-05 전체 감사에서 Critical 4·High 9건이 추가 발견됨.
+> 새 세션 시작 시 `audit_2026_05_05_baseline.md` 와 `docs/audits/2026-05-05-codebase-audit.md` 먼저 확인.
+> Phase 0(시체) → Phase 1(Critical) 미완료 상태에서 아래 백로그 진입 금지.
+> 밸런스 핸드오프 문서는 밸런스 작업 시 여전히 authoritative.
+
 ## 현재 방향 (handoff 기준)
 
 - 목표: mobile-readable, 빠른 층 페이싱, 압축된 전술 결정

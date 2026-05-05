@@ -389,17 +389,13 @@ static func apply(player: Player, essence_id: String) -> void:
 	var penalty_value: int = int(info.get("penalty_value", 0))
 	match effect:
 		"resist_fire":
-			if not player.resists.has("fire+"):
-				player.resists.append("fire+")
+			player.add_resist("fire", 1)
 		"resist_cold":
-			if not player.resists.has("cold+"):
-				player.resists.append("cold+")
+			player.add_resist("cold", 1)
 		"resist_corr":
-			if not player.resists.has("corr+"):
-				player.resists.append("corr+")
+			player.add_resist("corr", 1)
 		"resist_necro":
-			if not player.resists.has("necro+"):
-				player.resists.append("necro+")
+			player.add_resist("necro", 1)
 		"stat_str":
 			player.strength += value
 		"stat_int":
@@ -426,13 +422,13 @@ static func remove(player: Player, essence_id: String) -> void:
 	var penalty_value: int = int(info.get("penalty_value", 0))
 	match effect:
 		"resist_fire":
-			player.resists.erase("fire+")
+			player.add_resist("fire", -1)
 		"resist_cold":
-			player.resists.erase("cold+")
+			player.add_resist("cold", -1)
 		"resist_corr":
-			player.resists.erase("corr+")
+			player.add_resist("corr", -1)
 		"resist_necro":
-			player.resists.erase("necro+")
+			player.add_resist("necro", -1)
 		"stat_str":
 			player.strength = maxi(1, player.strength - value)
 		"stat_int":
@@ -457,17 +453,9 @@ static func _apply_penalty(player: Player, penalty_effect: String, penalty_value
 	var mult: int = 1 if applying else -1
 	match penalty_effect:
 		"vuln_fire":
-			if applying:
-				if not player.resists.has("fire-"):
-					player.resists.append("fire-")
-			else:
-				player.resists.erase("fire-")
+			player.add_resist("fire", -1 if applying else 1)
 		"vuln_cold":
-			if applying:
-				if not player.resists.has("cold-"):
-					player.resists.append("cold-")
-			else:
-				player.resists.erase("cold-")
+			player.add_resist("cold", -1 if applying else 1)
 		"int_down":
 			player.intelligence = maxi(1, player.intelligence - penalty_value * mult)
 		"dex_down":
@@ -489,11 +477,7 @@ static func _apply_unique_stats(player: Player, essence_id: String, applying: bo
 		"essence_cinder":
 			player.intelligence = maxi(1, player.intelligence + mult)
 		"essence_serpent":
-			if applying:
-				if not player.resists.has("poison+"):
-					player.resists.append("poison+")
-			else:
-				player.resists.erase("poison+")
+			player.add_resist("poison", 1 if applying else -1)
 		"essence_tempest":
 			player.intelligence = maxi(1, player.intelligence + mult)
 			player.dexterity = maxi(1, player.dexterity + mult)
@@ -502,11 +486,7 @@ static func _apply_unique_stats(player: Player, essence_id: String, applying: bo
 			player.wl = maxi(0, player.wl + mult)
 			player.hp_max = maxi(1, player.hp_max - 6 * mult)
 			player.hp = mini(player.hp, player.hp_max)
-			if applying:
-				if not player.resists.has("fire-"):
-					player.resists.append("fire-")
-			else:
-				player.resists.erase("fire-")
+			player.add_resist("fire", -1 if applying else 1)
 
 static func tick(player: Player) -> void:
 	var regen_count: int = 0

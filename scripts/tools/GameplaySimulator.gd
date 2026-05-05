@@ -2,7 +2,7 @@ extends SceneTree
 
 const GAME_SCENE: PackedScene = preload("res://scenes/main/Game.tscn")
 const SimulationBotRef = preload("res://scripts/tools/SimulationBot.gd")
-const CLASS_IDS: Array[String] = ["warrior", "rogue", "mage"]
+const CLASS_IDS: Array[String] = ["melee", "magic", "ranged"]
 const DEFAULT_RACE: String = "human"
 
 var _runs_per_class: int = 10
@@ -59,7 +59,7 @@ func _simulate_run(class_id: String, race_id: String, seed: int) -> Dictionary:
 	_reset_globals()
 	GameManager.selected_class_id = class_id
 	GameManager.selected_race_id = race_id
-	GameManager.selected_starting_weapon_id = "short_sword" if class_id == "warrior" else ""
+	GameManager.selected_starting_weapon_id = "short_sword" if class_id == "melee" else ""
 	GameManager.start_new_run(seed)
 	var game: Node = GAME_SCENE.instantiate()
 	root.add_child(game)

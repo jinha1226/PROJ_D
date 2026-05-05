@@ -2,9 +2,9 @@ extends SceneTree
 
 const SPELL_DIR := "res://resources/spells"
 const CLASS_FILES := {
-	"fighter": "res://resources/classes/warrior.tres",
-	"rogue": "res://resources/classes/rogue.tres",
-	"mage": "res://resources/classes/mage.tres",
+	"fighter": "res://resources/classes/fighter.tres",
+	"rogue": "res://resources/classes/brigand.tres",
+	"mage": "res://resources/classes/wizard.tres",
 }
 
 func _init() -> void:

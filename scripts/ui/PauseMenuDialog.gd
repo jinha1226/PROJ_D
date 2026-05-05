@@ -27,7 +27,10 @@ static func open(game: Node) -> void:
 	_add_btn(body, "저장 후 종료", func() -> void:
 		dlg.close()
 		if game.get("player") != null and (game.player as Object).get("hp") > 0:
-			SaveManager.save_run(game.player, GameManager)
+			if game.has_method("save_with_cache"):
+				game.save_with_cache()
+			else:
+				SaveManager.save_run(game.player, GameManager)
 		GameManager.run_in_progress = false
 		game.get_tree().change_scene_to_file("res://scenes/menu/MainMenu.tscn")
 	)

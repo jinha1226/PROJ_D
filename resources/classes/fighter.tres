@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_cdata")
-id = "warrior"
+id = "fighter"
 display_name = "Fighter"
 description = "Tough melee warrior. High STR and HP. Grows into any weapon style."
 starting_hp = 18
@@ -24,3 +24,5 @@ starting_skills = {
 default_active_skills = ["blade", "armor", "shield", "fighting"]
 starter_items = ["potion_healing", "potion_healing"]
 class_group = "fighter"
+category = "Melee"
+is_starter = false

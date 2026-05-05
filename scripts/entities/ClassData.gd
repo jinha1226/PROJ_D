@@ -22,6 +22,13 @@ class_name ClassData extends Resource
 @export var starting_xl: int = 0
 @export var passive: String = ""
 @export var class_group: String = ""  # "fighter" | "wizard" | "rogue" — empty = archetype/test
+## UI category for two-step class selection (Melee / Magic / Ranged / Other).
+## Maps to skill category surface.
+@export var category: String = ""
+## True = visible in default class selection list. False = advanced, must be unlocked.
+@export var is_starter: bool = false
+## True = developer/debug class, hidden from normal selection regardless of unlock.
+@export var is_debug: bool = false
 
 ## Unlock gating. See RaceData for field contract. Default-true for the
 ## 3 core classes (warrior / mage / rogue) that ship unlocked.

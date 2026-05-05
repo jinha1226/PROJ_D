@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://pocketcrawl_ring_slaying"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "ring_slaying"
+display_name = "Ring of Slaying"
+kind = "ring"
+tier = 3
+tile_path = "res://assets/tiles/individual/item/ring/gold.png"
+glyph = "="
+glyph_color = Color(0.95, 0.78, 0.35, 1)
+damage = 0
+delay = 1.0
+category = ""
+brand = ""
+ac_bonus = 0
+ev_penalty = 0
+slot = "ring"
+effect = "slay_bonus"
+effect_value = 3
+plus = 0
+description = "A bright ring cut with old victory marks. While worn, it lends +3 slaying to your attacks."

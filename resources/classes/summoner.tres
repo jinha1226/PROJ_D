@@ -24,3 +24,5 @@ unlocked = false
 unlock_kind = "use_item"
 unlock_trigger_id = "book_summoning"
 class_group = "mage"
+category = "Magic"
+is_starter = false

@@ -16,7 +16,7 @@ static func take_turn(game, class_id: String) -> void:
 		return
 	var visible: Array = _visible_monsters(game)
 	if not visible.is_empty():
-		if class_id == "rogue" and _try_use_named_item(player, "scroll_shrouding"):
+		if class_id == "brigand" and _try_use_named_item(player, "scroll_shrouding"):
 			TurnManager.end_player_turn()
 			return
 		if _try_cast_spell(game, visible):
@@ -57,10 +57,10 @@ static func _try_use_survival_item(game, class_id: String) -> bool:
 	if player.statuses.has("poison") and _try_use_named_item(player, "potion_cure_poison"):
 		TurnManager.end_player_turn()
 		return true
-	if class_id == "mage" and player.mp <= 1 and _try_use_named_item(player, "potion_magic"):
+	if class_id == "magic" and player.mp <= 1 and _try_use_named_item(player, "potion_magic"):
 		TurnManager.end_player_turn()
 		return true
-	if class_id == "rogue" and hp_ratio <= 0.45 and _try_use_named_item(player, "potion_invisible"):
+	if class_id == "brigand" and hp_ratio <= 0.45 and _try_use_named_item(player, "potion_invisible"):
 		TurnManager.end_player_turn()
 		return true
 	return false

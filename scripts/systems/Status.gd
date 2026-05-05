@@ -76,6 +76,9 @@ const _RESIST_MULT: Dictionary = {
 static func resist_level(resists, element: String) -> int:
 	if element == "" or resists == null:
 		return 0
+	# Player.resists is Dictionary[element → int]; MonsterData.resists is Array of tag strings.
+	if typeof(resists) == TYPE_DICTIONARY:
+		return clampi(int(resists.get(element, 0)), -3, 3)
 	if typeof(resists) != TYPE_ARRAY or resists.is_empty():
 		return 0
 	var level: int = 0
@@ -210,7 +213,9 @@ static func _on_remove(actor, id: String) -> void:
 	if d != 0 and "strength" in actor:
 		actor.strength = max(1, int(actor.strength) - d)
 
-static func _resists_of(actor) -> Array:
+## Returns Player's Dict[element → int] or Monster's Array[tag] — both shapes are
+## accepted by resist_level/resist_scale.
+static func _resists_of(actor):
 	if "resists" in actor:
 		return actor.resists
 	if "data" in actor and actor.data != null and "resists" in actor.data:

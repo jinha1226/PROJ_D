@@ -37,3 +37,6 @@ starting_xl = 20
 default_active_skills = ["spellcasting", "elemental", "arcane", "hex", "necromancy", "summoning", "armor", "shield", "agility", "tool", "ranged", "blade", "hafted", "polearm", "unarmed", "fighting"]
 starter_items = ["potion_healing", "potion_magic", "scroll_identify", "scroll_blinking", "wand_fire", "wand_frost", "wand_lightning"]
 class_group = "mage"
+category = "Magic"
+is_starter = false
+is_debug = true

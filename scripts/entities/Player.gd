@@ -77,7 +77,9 @@ var last_killer: String = ""
 var items: Array = []  # [{id: String, plus: int}]
 var known_spells: Array = []  # [String]
 var statuses: Dictionary = {}  # id -> turns_remaining (Status.gd manages)
-var resists: Array = []  # ["fire", "cold-2", "poison+"] scaled by Status.resist_scale
+## Resists: element → signed magnitude (positive = resist tier, negative = vulnerability tier).
+## Status.resist_scale clamps net level to [-3, +3]. Add via add_resist(element, delta).
+var resists: Dictionary = {}
 var skills: Dictionary = {}  # skill_id -> {"level": int, "xp": float}
 var active_skills: Array = []  # active skill ids receiving kill XP
 var quickslots: Array = ["", "", "", "", "", ""]  # item/spell ids, index = slot
@@ -1229,15 +1231,15 @@ func _apply_accessory_stat(id: String) -> void:
 		"ac_bonus": ac += d.effect_value
 		"mp_bonus": _apply_max_mp_gain(d.effect_value)
 		"resist_poison":
-			if not resists.has("poison+"): resists.append("poison+")
+			add_resist("poison", 1)
 			ac += d.effect_value
 		"resist_cold":
-			if not resists.has("cold+"): resists.append("cold+")
+			add_resist("cold", 1)
 			ev += d.effect_value
 		"resist_fire":
-			if not resists.has("fire+"): resists.append("fire+")
+			add_resist("fire", 1)
 		"resist_necro":
-			if not resists.has("necro+"): resists.append("necro+")
+			add_resist("necro", 1)
 		"slay_bonus":
 			slay_bonus += d.effect_value
 		"wizardry":
@@ -1259,15 +1261,15 @@ func _remove_accessory_stat(id: String) -> void:
 		"ac_bonus": ac = maxi(0, ac - d.effect_value)
 		"mp_bonus": _apply_max_mp_gain(-d.effect_value)
 		"resist_poison":
-			resists.erase("poison+")
+			add_resist("poison", -1)
 			ac = maxi(0, ac - d.effect_value)
 		"resist_cold":
-			resists.erase("cold+")
+			add_resist("cold", -1)
 			ev = maxi(0, ev - d.effect_value)
 		"resist_fire":
-			resists.erase("fire+")
+			add_resist("fire", -1)
 		"resist_necro":
-			resists.erase("necro+")
+			add_resist("necro", -1)
 		"slay_bonus":
 			slay_bonus -= d.effect_value
 		"wizardry":
@@ -1320,11 +1322,57 @@ func _apply_affix_value(mod_type: String, value: int) -> void:
 			_apply_resist_mod("necro", value)
 
 func _apply_resist_mod(kind: String, value: int) -> void:
-	if value == 0:
+	add_resist(kind, value)
+
+## Parse legacy tag-array resists ("poison+", "fire-", "cold-2") into the
+## current Dict[element → int] form. Used at race init and when loading old saves.
+static func resists_from_tags(tags: Array) -> Dictionary:
+	var out: Dictionary = {}
+	for entry in tags:
+		var s: String = String(entry)
+		if s.is_empty():
+			continue
+		# Find first +/- to split element prefix from suffix.
+		var idx: int = s.length()
+		for i in s.length():
+			var ch: String = s[i]
+			if ch == "+" or ch == "-":
+				idx = i
+				break
+		var element: String = s.substr(0, idx)
+		var suffix: String = s.substr(idx)
+		if element == "":
+			continue
+		var delta: int = 0
+		if suffix == "":
+			delta = 1
+		elif suffix.is_valid_int():
+			delta = int(suffix)
+		else:
+			# "+", "-", "++", "--", etc.
+			for ch in suffix:
+				if ch == "+":
+					delta += 1
+				elif ch == "-":
+					delta -= 1
+		if delta != 0:
+			out[element] = int(out.get(element, 0)) + delta
+	# Drop zero-net entries.
+	for k in out.keys():
+		if int(out[k]) == 0:
+			out.erase(k)
+	return out
+
+## Signed-magnitude resist mutator. delta > 0 raises resist tier, delta < 0 lowers it
+## (or adds vulnerability tier). Erases the key when net is 0 to keep the dict tidy.
+func add_resist(element: String, delta: int) -> void:
+	if element == "" or delta == 0:
 		return
-	var tag: String = "%s%s" % [kind, "+" if value > 0 else "-"]
-	for _i in absi(value):
-		resists.append(tag)
+	var net: int = int(resists.get(element, 0)) + delta
+	if net == 0:
+		resists.erase(element)
+	else:
+		resists[element] = net
 
 func _refresh_paperdoll() -> void:
 	_body_doll_tex = null

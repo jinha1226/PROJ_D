@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://class_monk01"]
+
+[ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
+
+[resource]
+script = ExtResource("1_cdata")
+id = "monk"
+display_name = "Monk"
+description = "Unarmed master. No weapon needed. Trades equipment for body discipline."
+starting_hp = 18
+starting_mp = 2
+starting_str = 10
+starting_dex = 13
+starting_int = 7
+starting_weapon = ""
+starting_armor = "robe"
+starting_skills = {"agility": 3, "fighting": 2, "unarmed": 3}
+default_active_skills = ["unarmed", "agility", "fighting"]
+starter_items = ["potion_healing", "potion_healing"]
+class_group = "fighter"
+category = "Melee"
+is_starter = false
+unlocked = false
+unlock_kind = "kill"
+unlock_trigger_id = "ogre"

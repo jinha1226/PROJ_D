@@ -411,7 +411,7 @@ func _apply_class_to_player(class_id: String) -> void:
 	_apply_race_mods(GameManager.selected_race_id)
 	player.set_race_from_id(GameManager.selected_race_id)
 	var starting_weapon_id: String = data.starting_weapon
-	if (class_id == "warrior" or class_id == "ranger") \
+	if (class_id == "fighter" or class_id == "hunter" or class_id == "melee" or class_id == "ranged") \
 			and GameManager.selected_starting_weapon_id != "":
 		starting_weapon_id = GameManager.selected_starting_weapon_id
 	if starting_weapon_id != "":
@@ -475,7 +475,7 @@ func _apply_race_mods(race_id: String) -> void:
 	player.hp = player.hp_max
 	player._apply_max_mp_gain(race.mp_mod)
 	player.mp = player.mp_max
-	player.resists = race.resist_mods.duplicate()
+	player.resists = Player.resists_from_tags(race.resist_mods)
 	RacePassiveSystem.register(player)
 
 func _class_starter_items(class_id: String) -> Array:
@@ -546,7 +546,17 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 		if cls != null:
 			player.known_spells = cls.starting_spells.duplicate()
 	player.statuses = data.get("statuses", {})
-	player.resists = data.get("resists", [])
+	# Resists were Array[tag] pre-2026-05; now Dict[element → int]. Migrate either.
+	var loaded_resists = data.get("resists", {})
+	if typeof(loaded_resists) == TYPE_DICTIONARY:
+		var migrated: Dictionary = {}
+		for k in loaded_resists.keys():
+			migrated[String(k)] = int(loaded_resists[k])
+		player.resists = migrated
+	elif typeof(loaded_resists) == TYPE_ARRAY:
+		player.resists = Player.resists_from_tags(loaded_resists)
+	else:
+		player.resists = {}
 	player.skills = data.get("skills", {})
 	player.active_skills = data.get("active_skills", [])
 	if player.skills.has("dodge") and not player.skills.has("agility"):
@@ -822,6 +832,11 @@ func _generate_floor(depth: int, map_seed: int,
 	if GameManager.floor_cache.has(depth):
 		_restore_floor_from_cache(depth, arrive_from_above)
 	else:
+		# Defensive clear protects all entry paths (audit C4). Branch-up exit
+		# falls through here when the main-path floor was never cached;
+		# without this, the just-vacated branch's monsters/items leak in.
+		_clear_monsters()
+		_clear_floor_items()
 		var has_branch: bool = ZoneManager.branch_entrance_for_depth(depth) != ""
 		var already_cleared: bool = false
 		var bid: String = ZoneManager.branch_entrance_for_depth(depth)
@@ -1902,7 +1917,7 @@ func _on_branch_stairs_down() -> void:
 	_generate_branch_floor(branch_id, GameManager.branch_floor, true)
 	_center_camera_on_player(true)
 	_update_hud()
-	SaveManager.save_run(player, GameManager)
+	save_with_cache()
 	TurnManager.end_player_turn()
 
 func _on_branch_stairs_up() -> void:
@@ -1931,6 +1946,7 @@ func _on_branch_stairs_up() -> void:
 		_generate_branch_floor(branch_id, GameManager.branch_floor, false)
 	_center_camera_on_player(true)
 	_update_hud()
+	save_with_cache()
 	TurnManager.end_player_turn()
 
 func _on_branch_cleared(branch_id: String) -> void:
@@ -2332,6 +2348,18 @@ func _cache_branch_floor(branch_id: String, branch_floor: int) -> void:
 			state.monsters.append(msnap)
 	GameManager.branch_floor_cache[cache_key] = state
 
+# Single source of truth for persisting a run — caches the current floor
+# (main or branch) before writing the save, so mid-floor saves include
+# alive monsters, dropped items, fog, hazards, corpses, and awareness flags.
+func save_with_cache() -> void:
+	if map == null or player == null:
+		return
+	if GameManager.branch_zone != "" and GameManager.branch_floor > 0:
+		_cache_branch_floor(GameManager.branch_zone, GameManager.branch_floor)
+	else:
+		_cache_current_floor()
+	SaveManager.save_run(player, GameManager)
+
 func _apply_branch_env_damage() -> void:
 	if player == null or player.hp <= 0:
 		return
@@ -2339,7 +2367,7 @@ func _apply_branch_env_damage() -> void:
 	if branch_id == "":
 		return
 	var resistance: String = ZoneManager.branch_resistance(branch_id)
-	if resistance != "" and player.resists.has(resistance):
+	if resistance != "" and Status.resist_level(player.resists, resistance) >= 1:
 		return
 	var dmg: int = ZoneManager.branch_env_damage(branch_id, GameManager.branch_floor)
 	if dmg <= 0:
@@ -2382,7 +2410,7 @@ func _on_stairs_down() -> void:
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
-	SaveManager.save_run(player, GameManager)
+	save_with_cache()
 	TurnManager.end_player_turn()
 
 func _on_stairs_up() -> void:
@@ -2404,7 +2432,7 @@ func _on_stairs_up() -> void:
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
-	SaveManager.save_run(player, GameManager)
+	save_with_cache()
 	TurnManager.end_player_turn()
 
 func _travel_to_floor(target_depth: int) -> void:
@@ -2423,7 +2451,7 @@ func _travel_to_floor(target_depth: int) -> void:
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
-	SaveManager.save_run(player, GameManager)
+	save_with_cache()
 	TurnManager.end_player_turn()
 
 func _on_item_dropped(entry: Dictionary, at_pos: Vector2i) -> void:
@@ -2448,7 +2476,7 @@ func _on_menu_button_pressed() -> void:
 	save_btn.custom_minimum_size = Vector2(0, 56)
 	save_btn.add_theme_font_size_override("font_size", 24)
 	save_btn.pressed.connect(func():
-		SaveManager.save_run(player, GameManager)
+		save_with_cache()
 		CombatLog.post("Game saved.", Color(0.6, 0.9, 0.6))
 		dlg.queue_free())
 	body.add_child(save_btn)
@@ -2467,7 +2495,7 @@ func _on_menu_button_pressed() -> void:
 	quit_btn.custom_minimum_size = Vector2(0, 56)
 	quit_btn.add_theme_font_size_override("font_size", 24)
 	quit_btn.pressed.connect(func():
-		SaveManager.save_run(player, GameManager)
+		save_with_cache()
 		get_tree().change_scene_to_file(MENU_SCENE_PATH))
 	body.add_child(quit_btn)
 

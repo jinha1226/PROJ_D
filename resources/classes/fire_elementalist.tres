@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://class_element01"]
+[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://class_fire_elem01"]
 
 [ext_resource type="Script" path="res://scripts/entities/ClassData.gd" id="1_cdata"]
 
 [resource]
 script = ExtResource("1_cdata")
-id = "elementalist"
-display_name = "Elementalist"
-description = "Commands fire, cold, air, and earth. High INT, fragile body."
+id = "fire_elementalist"
+display_name = "Fire Elementalist"
+description = "Fire specialist. Hurls flame and explodes foes. Fragile body, high INT."
 starting_hp = 11
 starting_mp = 8
 starting_str = 7
@@ -16,11 +16,12 @@ starting_weapon = "dagger"
 starting_armor = "robe"
 robe_path = "res://assets/tiles/individual/player/body/robe_red.png"
 starting_skills = {"agility": 2, "spellcasting": 2, "elemental": 4}
-starting_spells = []
-passive = ""
+starting_spells = ["conjure_flame"]
 default_active_skills = ["spellcasting", "elemental", "fighting"]
 starter_items = ["potion_healing", "potion_magic"]
+class_group = "mage"
+category = "Magic"
+is_starter = false
 unlocked = false
 unlock_kind = "use_item"
 unlock_trigger_id = "book_fire"
-class_group = "mage"

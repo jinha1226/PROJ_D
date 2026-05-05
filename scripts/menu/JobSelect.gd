@@ -186,18 +186,17 @@ func _gear_line(data: ClassData) -> String:
 
 
 func _starter_extras(class_id: String) -> Array:
-	match class_id:
-		"warrior":
-			return ["healing x2"]
-		"mage":
-			return ["healing", "magic potion"]
-		"rogue":
-			return ["dagger", "healing", "invisibility", "shrouding"]
-		"ranger":
-			return ["dagger", "healing x2"]
-		"archmage":
-			return ["healing", "magic potion", "identify", "blinking", "fire wand", "frost wand", "lightning wand"]
-	return []
+	# Read directly from ClassData.starter_items for display.
+	# TODO: this could be moved to a shared formatter; left here as it formats item ids → display strings.
+	if ClassRegistry == null or class_id == "":
+		return []
+	var data: ClassData = ClassRegistry.get_by_id(class_id)
+	if data == null:
+		return []
+	var out: Array = []
+	for item_id in data.starter_items:
+		out.append(_item_name(String(item_id)))
+	return out
 
 
 func _skills_line(data: ClassData) -> String:

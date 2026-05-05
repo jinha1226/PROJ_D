@@ -2,10 +2,14 @@ class_name ShrineDialog extends RefCounted
 
 # Class-weighted first essence pools (Essence path only)
 const _FIRST_ESSENCE_POOLS: Dictionary = {
-	"warrior":  ["essence_stone", "essence_vitality", "essence_fury"],
-	"mage":     ["essence_arcana", "essence_fire", "essence_cold"],
-	"rogue":    ["essence_swiftness", "essence_venom", "essence_warding"],
-	"ranger":   ["essence_swiftness", "essence_venom", "essence_arcana"],
+	# Starter classes
+	"melee":    ["essence_stone", "essence_vitality", "essence_fury"],
+	"magic":    ["essence_arcana", "essence_fire", "essence_cold"],
+	"ranged":   ["essence_swiftness", "essence_venom", "essence_arcana"],
+	# Advanced classes (others fall through to _FALLBACK_POOL)
+	"fighter":  ["essence_stone", "essence_vitality", "essence_fury"],
+	"brigand":  ["essence_swiftness", "essence_venom", "essence_warding"],
+	"hunter":   ["essence_swiftness", "essence_venom", "essence_arcana"],
 	"archmage": ["essence_arcana", "essence_cold", "essence_warding"],
 }
 const _FALLBACK_POOL: Array = ["essence_vitality", "essence_swiftness", "essence_warding"]

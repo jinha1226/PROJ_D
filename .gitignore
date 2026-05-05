@@ -52,3 +52,7 @@ assets/32rogues/
 assets/kenney/
 .worktrees/
 oldproject/crawl
+oldproject/assets/
+
+# Superpowers harness runtime state (brainstorm session state, server logs, pids)
+.superpowers/

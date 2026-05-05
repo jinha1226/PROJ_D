@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1_cdata")
-id = "ranger"
-display_name = "Ranger"
-description = "Agile archer. High DEX. Fights from range but holds a blade in close."
+id = "hunter"
+display_name = "Hunter"
+description = "Agile archer. High DEX. Kites from range, falls back to blade up close."
 starting_hp = 15
 starting_mp = 3
 starting_str = 10
@@ -23,3 +23,5 @@ starting_skills = {
 default_active_skills = ["ranged", "agility", "blade", "fighting"]
 starter_items = ["dagger", "potion_healing", "potion_healing", "scroll_blinking"]
 class_group = "rogue"
+category = "Ranged"
+is_starter = false
