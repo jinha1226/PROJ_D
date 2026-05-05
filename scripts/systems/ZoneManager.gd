@@ -3,12 +3,24 @@ extends Node
 ## Autoloaded singleton — exposes zone/branch configs by depth.
 
 # ── Main path zones ──────────────────────────────────────────────────────────
+# wall/floor: zone-themed tiles (override depth-based selection)
+# Note: depth 3 (B3 ruined temple) is overridden in DungeonMap._load_atmosphere
 const MAIN_ZONES: Array = [
-	{"id": "dungeon",     "from": 1,  "to": 3,  "env": "",      "map_style": "bsp"},
-	{"id": "lair",        "from": 4,  "to": 6,  "env": "",      "map_style": "cave"},
-	{"id": "orc_mines",   "from": 7,  "to": 9,  "env": "",      "map_style": "bsp"},
-	{"id": "elven_halls", "from": 10, "to": 12, "env": "",      "map_style": "bsp_large"},
-	{"id": "abyss",       "from": 13, "to": 14, "env": "abyss", "map_style": "cave"},
+	{"id": "dungeon",     "from": 1,  "to": 3,  "env": "",      "map_style": "bsp",
+		"wall":  "res://assets/tiles/individual/dngn/wall/catacombs0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/dirt0.png"},
+	{"id": "lair",        "from": 4,  "to": 6,  "env": "",      "map_style": "cave",
+		"wall":  "res://assets/tiles/individual/dngn/wall/lair0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/lair0.png"},
+	{"id": "orc_mines",   "from": 7,  "to": 9,  "env": "",      "map_style": "bsp",
+		"wall":  "res://assets/tiles/individual/dngn/wall/orc0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/orc0.png"},
+	{"id": "elven_halls", "from": 10, "to": 12, "env": "",      "map_style": "bsp_large",
+		"wall":  "res://assets/tiles/individual/dngn/wall/elf-stone0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/marble_floor1.png"},
+	{"id": "abyss",       "from": 13, "to": 14, "env": "abyss", "map_style": "cave",
+		"wall":  "res://assets/tiles/individual/dngn/wall/abyss/abyss0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/depthstone_floor0.png"},
 ]
 
 # ── Branch configs ───────────────────────────────────────────────────────────

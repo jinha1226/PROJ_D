@@ -32,23 +32,14 @@ const _MONSTER_WEAPON_POOLS: Dictionary = {
 	"two_headed_ogre": [["battle_axe", "long_sword"],        []],
 }
 
-const _CORPSE_TILE_ROOT: String = "res://oldproject/crawl/crawl-ref/source/rltiles/UNUSED/monsters/skeletons/"
-const _CORPSE_TILE_BY_SHAPE: Dictionary = {
-	"bat": _CORPSE_TILE_ROOT + "skeleton_bat.png",
-	"bird": _CORPSE_TILE_ROOT + "skeleton_bird.png",
-	"centaur": _CORPSE_TILE_ROOT + "skeleton_centaur.png",
-	"dragon": _CORPSE_TILE_ROOT + "skeleton_dragon.png",
-	"drake": _CORPSE_TILE_ROOT + "skeleton_drake.png",
-	"humanoid_small": _CORPSE_TILE_ROOT + "skeleton_humanoid_small.png",
-	"humanoid_medium": _CORPSE_TILE_ROOT + "skeleton_humanoid_medium.png",
-	"humanoid_large": _CORPSE_TILE_ROOT + "skeleton_humanoid_large.png",
-	"lizard": _CORPSE_TILE_ROOT + "skeleton_lizard.png",
-	"naga": _CORPSE_TILE_ROOT + "skeleton_naga.png",
-	"quadruped_small": _CORPSE_TILE_ROOT + "skeleton_quadruped_small.png",
-	"quadruped_large": _CORPSE_TILE_ROOT + "skeleton_quadruped_large.png",
-	"quadruped_winged": _CORPSE_TILE_ROOT + "skeleton_quadruped_winged.png",
-	"snake": _CORPSE_TILE_ROOT + "skeleton_snake.png",
-	"troll": _CORPSE_TILE_ROOT + "skeleton_troll.png",
+const _CORPSE_BLOOD_RED: String = "res://assets/tiles/corpses/blood_puddle_red.png"
+const _CORPSE_BLOOD_GREEN: String = "res://assets/tiles/corpses/blood_green.png"
+# Monsters with green ichor (insects, plants, jelly) per DCSS convention.
+const _CORPSE_GREEN_BLOOD: Dictionary = {
+	"giant_cockroach": true,
+	"hornet": true,
+	"scorpion": true,
+	"giant_wolf_spider": true,
 }
 
 @onready var GameManager = get_node("/root/GameManager")
@@ -120,7 +111,13 @@ func _ready() -> void:
 		GameManager.pending_player_state = {}
 	elif GameManager.depth <= 1:
 		_apply_class_to_player(GameManager.selected_class_id)
-	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth))
+	# Resume into branch: the cache-hit path inside _generate_branch_floor
+	# restores tiles/items/monsters/atmosphere. Falls back to fresh generation
+	# if the loaded save predates branch_floor_cache persistence.
+	if GameManager.branch_zone != "" and GameManager.branch_floor > 0:
+		_generate_branch_floor(GameManager.branch_zone, GameManager.branch_floor, true)
+	else:
+		_generate_floor(GameManager.depth, _floor_seed(GameManager.depth))
 	_spawn_camera()
 	_spawn_ui()
 	TurnManager.player_turn_started.connect(_on_player_turn_started)
@@ -1021,6 +1018,10 @@ func _cache_current_floor() -> void:
 		"altar_active": map.altar_active,
 		"items": [],
 		"monsters": [],
+		"corpses": map.corpses.duplicate(true),
+		"cloud_tiles": map.cloud_tiles.duplicate(true),
+		"hazard_tiles": map.hazard_tiles.duplicate(true),
+		"fog_tiles": map.fog_tiles.duplicate(true),
 	}
 	for n in get_tree().get_nodes_in_group("floor_items"):
 		if n is FloorItem and n.data != null:
@@ -1032,15 +1033,26 @@ func _cache_current_floor() -> void:
 			})
 	for n in get_tree().get_nodes_in_group("monsters"):
 		if n is Monster and n.data != null and n.hp > 0:
-			state.monsters.append({
+			var msnap: Dictionary = {
 				"id": n.data.id,
 				"pos": n.grid_pos,
 				"hp": n.hp,
 				"status": n.status.duplicate(),
-			})
+			}
+			# Awareness state (audit H9) — preserved across save/load.
+			if "is_aware" in n: msnap["is_aware"] = n.is_aware
+			if "is_alerted" in n: msnap["is_alerted"] = n.is_alerted
+			if "last_known_player_pos" in n: msnap["last_known_player_pos"] = n.last_known_player_pos
+			if "pending_energy" in n: msnap["pending_energy"] = n.pending_energy
+			if "_ability_charge" in n: msnap["_ability_charge"] = n._ability_charge
+			state.monsters.append(msnap)
 	GameManager.floor_cache[GameManager.depth] = state
 
 func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
+	# Defensive clear protects all entry paths. Idempotent — empty groups are fine.
+	# Fixes audit C4 (branch 1F-up exit was leaking branch monsters/items into main dungeon).
+	_clear_monsters()
+	_clear_floor_items()
 	var state: Dictionary = GameManager.floor_cache[depth]
 	map.tiles = state.tiles
 	map.explored = state.explored.duplicate(true)
@@ -1053,6 +1065,28 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 	map.broken_altar_positions = state.get("broken_altar_positions", []).duplicate()
 	map.altar_active = bool(state.get("altar_active", false))
 	map.visible_tiles.clear()
+	map.corpses = state.get("corpses", []).duplicate(true)
+	# Disk-loaded corpses lack the runtime Texture2D (not JSON-safe).
+	# Rebuild from monster_id; fallback to glyph if id is missing or unknown.
+	for corpse in map.corpses:
+		if not (corpse is Dictionary):
+			continue
+		if corpse.get("tile", null) != null:
+			continue
+		var mid: String = String(corpse.get("monster_id", ""))
+		if mid == "":
+			continue
+		if _corpse_tex_cache.has(mid):
+			corpse["tile"] = _corpse_tex_cache[mid]
+			continue
+		var mdata: MonsterData = MonsterRegistry.get_by_id(mid) if MonsterRegistry != null else null
+		if mdata != null:
+			var tex: Texture2D = _build_corpse_texture(mdata)
+			_corpse_tex_cache[mid] = tex
+			corpse["tile"] = tex
+	map.cloud_tiles = state.get("cloud_tiles", {}).duplicate(true)
+	map.hazard_tiles = state.get("hazard_tiles", {}).duplicate(true)
+	map.fog_tiles = state.get("fog_tiles", {}).duplicate(true)
 	map._load_atmosphere(depth)
 	map.queue_redraw()
 	var arrival: Vector2i = map.stairs_up_pos if arrive_from_above \
@@ -1080,6 +1114,15 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 		m.setup(md, map, p)
 		m.hp = int(entry.get("hp", md.hp))
 		m.status = entry.get("status", {}).duplicate()
+		# Restore awareness state if present (audit H9). Old caches lack these
+		# keys; .has() guards keep behavior unchanged for in-memory restores.
+		if entry.has("is_aware"): m.is_aware = bool(entry["is_aware"])
+		if entry.has("is_alerted"): m.is_alerted = bool(entry["is_alerted"])
+		if entry.has("last_known_player_pos"):
+			var lkp = entry["last_known_player_pos"]
+			if lkp is Vector2i: m.last_known_player_pos = lkp
+		if entry.has("pending_energy"): m.pending_energy = float(entry["pending_energy"])
+		if entry.has("_ability_charge"): m._ability_charge = (entry["_ability_charge"] as Dictionary).duplicate(true) if entry["_ability_charge"] is Dictionary else {}
 		if m.has_signal("hit_taken"):
 			m.hit_taken.connect(_on_monster_hit.bind(m))
 		if m.has_signal("awareness_changed"):
@@ -1087,6 +1130,44 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 		m.died.connect(_on_monster_died)
 		TurnManager.register_actor(m)
 		_roll_monster_weapon(m)
+	# Top up to full population on revisit so a previously-cleared floor isn't
+	# empty for ~18 turns waiting on _try_respawn_monster's drip-feed.
+	_top_up_monsters_to_target(depth)
+
+func _top_up_monsters_to_target(depth: int) -> void:
+	if map == null or player == null:
+		return
+	var target: int = _monster_count_for_depth(depth)
+	var current: int = get_tree().get_nodes_in_group("monsters").size()
+	if current >= target:
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	var attempts: int = 0
+	while current < target and attempts < 400:
+		attempts += 1
+		var p: Vector2i = map.random_floor_tile(rng)
+		if not map.is_walkable(p):
+			continue
+		if p == player.grid_pos:
+			continue
+		if _chebyshev(p, player.grid_pos) < 6:
+			continue
+		if _monster_at(p) != null:
+			continue
+		var data: MonsterData = MonsterRegistry.pick_by_depth(depth)
+		if data == null:
+			return
+		var m: Monster = MonsterScene.new()
+		monsters_layer.add_child(m)
+		m.setup(data, map, p)
+		m.hit_taken.connect(_on_monster_hit.bind(m))
+		if m.has_signal("awareness_changed"):
+			m.awareness_changed.connect(_on_monster_awareness_changed)
+		m.died.connect(_on_monster_died)
+		TurnManager.register_actor(m)
+		_roll_monster_weapon(m)
+		current += 1
 
 func _spawn_unique_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
 	var unique_data: MonsterData = MonsterRegistry.unique_for_depth(depth)
@@ -1329,45 +1410,120 @@ func _find_item_drop_pos(origin: Vector2i) -> Vector2i:
 			return p
 	return origin
 
-func _corpse_shape_for_monster(monster_id: String) -> String:
-	match monster_id:
-		"bat", "vampire_bat":
-			return "bat"
-		"ashen_magpie":
-			return "bird"
-		"centaur":
-			return "centaur"
-		"fire_dragon", "ice_dragon", "swamp_dragon", "steam_dragon", "golden_dragon", "bone_dragon":
-			return "dragon"
-		"wyvern":
-			return "drake"
-		"kobold", "goblin", "rat", "crimson_imp", "red_devil":
-			return "humanoid_small"
-		"orc", "orc_priest", "orc_warrior", "orc_wizard", "orc_warchief", "gnoll", "gnoll_sergeant", "gnoll_shaman", "gnoll_warlord", "deep_elf_archer", "deep_elf_death_mage", "harrow_knight", "vampire", "vampire_knight", "mummy", "zombie", "crypt_zombie", "ghoul", "wight", "wraith", "shadow_wraith", "revenant", "lich", "ancient_lich", "pale_scholar", "stone_warden", "storm_hierophant":
-			return "humanoid_medium"
-		"ogre", "ogre_mage", "ogre_chieftain", "two_headed_ogre", "cyclops", "fire_giant", "frost_giant", "stone_giant", "minotaur", "executioner", "balrug", "ice_devil", "iron_golem", "earth_elemental", "fire_elemental", "gargoyle":
-			return "humanoid_large"
-		"basilisk", "giant_cockroach", "hornet", "scorpion":
-			return "lizard"
-		"bog_serpent":
-			return "naga"
-		"jackal", "hound", "warg", "wolf", "black_bear":
-			return "quadruped_small"
-		"yak", "manticore", "giant_wolf_spider":
-			return "quadruped_large"
-		"adder", "viper_saint":
-			return "snake"
-		"troll", "deep_troll":
-			return "troll"
-	return "humanoid_medium"
+## DCSS-style corpse composition: monster body tile, darkened, blitted onto a
+## blood puddle background. Result is cached per monster id so each monster
+## type composes only once per session.
+var _corpse_tex_cache: Dictionary = {}
 
-func _corpse_tile_for_monster(monster: Monster) -> String:
+func _corpse_tile_for_monster(monster: Monster) -> Texture2D:
 	if monster == null or monster.data == null:
-		return ""
-	var path: String = String(_CORPSE_TILE_BY_SHAPE.get(_corpse_shape_for_monster(String(monster.data.id)), ""))
-	if path != "" and ResourceLoader.exists(path):
-		return path
-	return String(monster.data.tile_path)
+		return null
+	var mid: String = String(monster.data.id)
+	if _corpse_tex_cache.has(mid):
+		return _corpse_tex_cache[mid]
+	var tex: Texture2D = _build_corpse_texture(monster.data)
+	_corpse_tex_cache[mid] = tex
+	return tex
+
+func _build_corpse_texture(data: MonsterData) -> Texture2D:
+	var body_path: String = String(data.tile_path)
+	if body_path == "" or not ResourceLoader.exists(body_path):
+		return null
+	var body_tex: Texture2D = load(body_path) as Texture2D
+	if body_tex == null:
+		return null
+	var body_img: Image = body_tex.get_image()
+	if body_img == null:
+		return null
+	body_img.convert(Image.FORMAT_RGBA8)
+	# Port of DCSS rltiles tile::corpsify (tile.cc:160-273): vertical 2x squash,
+	# curved horizontal cut, top/bottom halves offset apart → "torn in half" look.
+	var corpsified: Image = _corpsify_image(body_img, 32, 32, 3, 4)
+	var blood_path: String = _CORPSE_BLOOD_GREEN if _CORPSE_GREEN_BLOOD.get(String(data.id), false) else _CORPSE_BLOOD_RED
+	var out_img: Image = null
+	if ResourceLoader.exists(blood_path):
+		var blood_tex: Texture2D = load(blood_path) as Texture2D
+		if blood_tex != null:
+			var blood_img: Image = blood_tex.get_image()
+			if blood_img != null:
+				out_img = blood_img.duplicate() as Image
+				out_img.convert(Image.FORMAT_RGBA8)
+				var ox: int = (out_img.get_width() - corpsified.get_width()) / 2
+				var oy: int = (out_img.get_height() - corpsified.get_height()) / 2
+				out_img.blend_rect(corpsified, Rect2i(0, 0, corpsified.get_width(), corpsified.get_height()), Vector2i(ox, oy))
+	if out_img == null:
+		out_img = corpsified
+	return ImageTexture.create_from_image(out_img)
+
+func _corpsify_cut_y(x: int, w: int, h: int) -> int:
+	var cy: int = h / 2 + 2
+	var lim1: int = w / 8
+	var lim2: int = w / 3
+	if x < lim1 or x >= w - lim1:
+		cy += 2
+	elif x < lim2 or x >= w - lim2:
+		cy += 1
+	return cy
+
+func _corpsify_image(orig: Image, cw: int, ch: int, cut_separate: int, cut_height: int) -> Image:
+	var out: Image = Image.create(cw, ch, false, Image.FORMAT_RGBA8)
+	out.fill(Color(0, 0, 0, 0))
+	var ow: int = orig.get_width()
+	var oh: int = orig.get_height()
+	# Bounding box of non-transparent pixels
+	var xmin: int = ow
+	var ymin: int = oh
+	var xmax: int = -1
+	var ymax: int = -1
+	for y in oh:
+		for x in ow:
+			if orig.get_pixel(x, y).a > 0.0:
+				if x < xmin: xmin = x
+				if y < ymin: ymin = y
+				if x > xmax: xmax = x
+				if y > ymax: ymax = y
+	if xmax < 0:
+		return out
+	var centerx: int = (xmax + xmin) / 2
+	var centery: int = (ymax + ymin) / 2
+	var image_scale: float = max(float(ow) / float(cw), float(oh) / float(ch))
+	var height_proj: float = 2.0
+	var written: PackedByteArray = PackedByteArray()
+	written.resize(cw * ch)
+	for y in ch:
+		for x in cw:
+			var cy: int = _corpsify_cut_y(x, cw, ch)
+			if y > cy - cut_height and y <= cy:
+				continue
+			var x1: int = int(float(x - cw / 2.0) * image_scale) + centerx
+			var y1: int = int(float(y - ch / 2.0) * height_proj * image_scale) + centery
+			if y >= cy:
+				x1 -= cut_separate
+				y1 -= cut_height / 2
+			else:
+				x1 += cut_separate
+				y1 += cut_height / 2 + cut_height % 2
+			if x1 < 0 or x1 >= ow or y1 < 0 or y1 >= oh:
+				continue
+			var p: Color = orig.get_pixel(x1, y1)
+			if p.a <= 0.0:
+				continue
+			# Skip pure black rim/shadow pixels (DCSS convention)
+			if p.r == 0.0 and p.g == 0.0 and p.b == 0.0:
+				continue
+			out.set_pixel(x, y, p)
+			written[x + y * cw] = 1
+	# Wound color along the cut edge (dark red gash)
+	var wound: Color = Color8(140, 16, 16)
+	var wound_height: int = min(2, cut_height)
+	for x in cw:
+		var cy2: int = _corpsify_cut_y(x, cw, ch)
+		var top_y: int = cy2 - cut_height
+		if top_y >= 0 and top_y < ch and written[x + top_y * cw] == 1:
+			var start: int = top_y + 1
+			for yy in range(start, min(start + wound_height, ch)):
+				out.set_pixel(x, yy, wound)
+	return out
 
 func _monster_count_for_depth(d: int) -> int:
 	if d <= 5:
@@ -1750,7 +1906,13 @@ func _on_branch_stairs_up() -> void:
 		GameManager.branch_floor = 0
 		CombatLog.post("You return to the main dungeon.", Color(0.7, 0.9, 1.0))
 		GameManager.depth = GameManager.branch_entry_depth
-		_restore_floor_from_cache(GameManager.depth, false)
+		# If the main-path floor was never cached (e.g. old save from before
+		# floor_cache persistence, or branch entered on depth 1 fresh), fall
+		# back to fresh generation rather than crashing on missing key.
+		if GameManager.floor_cache.has(GameManager.depth):
+			_restore_floor_from_cache(GameManager.depth, false)
+		else:
+			_generate_floor(GameManager.depth, _floor_seed(GameManager.depth), false)
 		_refresh_fov()
 	else:
 		_cache_branch_floor(branch_id, GameManager.branch_floor)
@@ -1789,7 +1951,26 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 		map.stairs_up_pos = state["stairs_up_pos"]
 		map.rooms = state["rooms"].duplicate()
 		map.visible_tiles.clear()
-		map.fog_tiles.clear()
+		map.corpses = state.get("corpses", []).duplicate(true)
+		for corpse in map.corpses:
+			if not (corpse is Dictionary):
+				continue
+			if corpse.get("tile", null) != null:
+				continue
+			var mid: String = String(corpse.get("monster_id", ""))
+			if mid == "":
+				continue
+			if _corpse_tex_cache.has(mid):
+				corpse["tile"] = _corpse_tex_cache[mid]
+				continue
+			var mdata: MonsterData = MonsterRegistry.get_by_id(mid) if MonsterRegistry != null else null
+			if mdata != null:
+				var tex: Texture2D = _build_corpse_texture(mdata)
+				_corpse_tex_cache[mid] = tex
+				corpse["tile"] = tex
+		map.cloud_tiles = state.get("cloud_tiles", {}).duplicate(true)
+		map.hazard_tiles = state.get("hazard_tiles", {}).duplicate(true)
+		map.fog_tiles = state.get("fog_tiles", {}).duplicate(true)
 		var cfg: Dictionary = ZoneManager.branch_config(branch_id)
 		map._tex_wall = load(cfg.get("wall", "")) as Texture2D
 		map._tex_floor = load(cfg.get("floor", "")) as Texture2D
@@ -1808,6 +1989,14 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 			monsters_layer.add_child(m)
 			m.setup(md, map, p)
 			m.hp = int(entry.get("hp", m.hp))
+			m.status = entry.get("status", {}).duplicate()
+			if entry.has("is_aware"): m.is_aware = bool(entry["is_aware"])
+			if entry.has("is_alerted"): m.is_alerted = bool(entry["is_alerted"])
+			if entry.has("last_known_player_pos"):
+				var lkp = entry["last_known_player_pos"]
+				if lkp is Vector2i: m.last_known_player_pos = lkp
+			if entry.has("pending_energy"): m.pending_energy = float(entry["pending_energy"])
+			if entry.has("_ability_charge"): m._ability_charge = (entry["_ability_charge"] as Dictionary).duplicate(true) if entry["_ability_charge"] is Dictionary else {}
 			m.hit_taken.connect(_on_monster_hit.bind(m))
 			if m.has_signal("awareness_changed"):
 				m.awareness_changed.connect(_on_monster_awareness_changed)
@@ -2112,14 +2301,24 @@ func _cache_branch_floor(branch_id: String, branch_floor: int) -> void:
 		"rooms": map.rooms.duplicate(),
 		"items": [],
 		"monsters": [],
+		"corpses": map.corpses.duplicate(true),
+		"cloud_tiles": map.cloud_tiles.duplicate(true),
+		"hazard_tiles": map.hazard_tiles.duplicate(true),
+		"fog_tiles": map.fog_tiles.duplicate(true),
 	}
 	for n in get_tree().get_nodes_in_group("floor_items"):
 		if n is FloorItem and n.data != null:
 			state.items.append({"id": n.data.id, "pos": n.grid_pos, "plus": n.plus, "entry": n.entry.duplicate(true) if not n.entry.is_empty() else {"id": n.data.id, "plus": n.plus}})
 	for n in get_tree().get_nodes_in_group("monsters"):
 		if n is Monster and n.data != null and n.hp > 0:
-			state.monsters.append({"id": n.data.id, "pos": n.grid_pos, "hp": n.hp,
-				"status": n.status.duplicate()})
+			var msnap: Dictionary = {"id": n.data.id, "pos": n.grid_pos, "hp": n.hp,
+				"status": n.status.duplicate()}
+			if "is_aware" in n: msnap["is_aware"] = n.is_aware
+			if "is_alerted" in n: msnap["is_alerted"] = n.is_alerted
+			if "last_known_player_pos" in n: msnap["last_known_player_pos"] = n.last_known_player_pos
+			if "pending_energy" in n: msnap["pending_energy"] = n.pending_energy
+			if "_ability_charge" in n: msnap["_ability_charge"] = n._ability_charge
+			state.monsters.append(msnap)
 	GameManager.branch_floor_cache[cache_key] = state
 
 func _apply_branch_env_damage() -> void:
@@ -2748,7 +2947,8 @@ func _on_monster_died(monster: Monster) -> void:
 	if monster != null and monster.data != null and not monster.data.is_unique:
 		map.corpses.append({
 			"pos": monster.grid_pos,
-			"tile_path": _corpse_tile_for_monster(monster),
+			"monster_id": String(monster.data.id),
+			"tile": _corpse_tile_for_monster(monster),
 			"turns_left": 40,
 		})
 		map.queue_redraw()

@@ -25,28 +25,9 @@ var _tex_door_open: Texture2D = null
 
 ## Depth-banded terrain art. Each band declares its wall + floor tile
 ## paths; picked by pick_atmosphere_for_depth() on generate().
-const TERRAIN_BANDS: Array = [
-	{
-		"until_depth": 3,
-		"wall": "res://assets/tiles/individual/dngn/wall/catacombs0.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/dirt0.png",
-	},
-	{
-		"until_depth": 7,
-		"wall": "res://assets/tiles/individual/dngn/wall/catacombs0.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/limestone0.png",
-	},
-	{
-		"until_depth": 12,
-		"wall": "res://assets/tiles/individual/dngn/wall/brick_brown-vines0.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/cobble_blood3.png",
-	},
-	{
-		"until_depth": 99,
-		"wall": "res://assets/tiles/individual/dngn/wall/brick_brown-vines0.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/crystal0.png",
-	},
-]
+# Fallback tiles when ZoneManager lookup fails (should not happen with well-formed zones)
+const _FALLBACK_WALL: String = "res://assets/tiles/individual/dngn/wall/catacombs0.png"
+const _FALLBACK_FLOOR: String = "res://assets/tiles/individual/dngn/floor/dirt0.png"
 
 var _tex_wall: Texture2D = null
 var _tex_floor: Texture2D = null
@@ -76,7 +57,8 @@ var preset_faith_altar_positions: Array = []
 ## Warning tiles from telegraphed boss attacks: Vector2i -> Color
 var warning_tiles: Dictionary = {}
 
-## Corpses: Array of {pos:Vector2i, tile_path:String, glyph:String, turns_left:int}
+## Corpses: Array of {pos:Vector2i, tile:Texture2D, turns_left:int}
+## tile is resolved at spawn time (Game.gd _corpse_tile_for_monster); null → glyph fallback.
 var corpses: Array = []
 
 ## Cloud tiles: Vector2i → {type: String, turns: int}
@@ -272,26 +254,25 @@ func _ready() -> void:
 	add_to_group("dungeon_map")
 
 func _load_atmosphere(depth: int) -> void:
+	_tex_stairs_down_override = null
 	# B3 is a ruined temple — distinct marble/mosaic tileset
 	if depth == 3:
 		_tex_wall = load("res://assets/tiles/individual/dngn/wall/marble_wall1.png") as Texture2D
 		_tex_floor = load("res://assets/tiles/individual/dngn/floor/mosaic0.png") as Texture2D
 		return
-	# Abyss zone (B14-15) — dark cracked stone
-	if ZoneManager.zone_id_for_depth(depth) == "abyss":
-		_tex_wall = load("res://assets/tiles/individual/dngn/wall/abyss/abyss0.png") as Texture2D
-		_tex_floor = load("res://assets/tiles/individual/dngn/floor/depthstone_floor0.png") as Texture2D
+	var zone: Dictionary = ZoneManager.zone_for_depth(depth)
+	# Abyss exit-stairs override (theme tiles come from MAIN_ZONES like other zones)
+	if String(zone.get("id", "")) == "abyss":
 		_tex_stairs_down_override = load("res://assets/tiles/individual/dngn/gateways/exit_abyss.png") as Texture2D
+	var wall_path: String = String(zone.get("wall", ""))
+	var floor_path: String = String(zone.get("floor", ""))
+	if wall_path != "" and floor_path != "":
+		_tex_wall = load(wall_path) as Texture2D
+		_tex_floor = load(floor_path) as Texture2D
 		return
-	_tex_stairs_down_override = null
-	for band in TERRAIN_BANDS:
-		if depth <= int(band.get("until_depth", 0)):
-			_tex_wall = load(band["wall"]) as Texture2D
-			_tex_floor = load(band["floor"]) as Texture2D
-			return
-	var last: Dictionary = TERRAIN_BANDS[TERRAIN_BANDS.size() - 1]
-	_tex_wall = load(last["wall"]) as Texture2D
-	_tex_floor = load(last["floor"]) as Texture2D
+	# Fallback (should not trigger if MAIN_ZONES is well-formed)
+	_tex_wall = load(_FALLBACK_WALL) as Texture2D
+	_tex_floor = load(_FALLBACK_FLOOR) as Texture2D
 
 func find_spawn() -> Vector2i:
 	return spawn_pos
@@ -408,13 +389,11 @@ func _draw() -> void:
 		if not (corpse_visible or corpse_seen):
 			continue
 		var crect := Rect2(Vector2(cpos.x * CELL_SIZE, cpos.y * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE))
-		var ctile: String = c.get("tile_path", "")
-		if use_tiles and ctile != "":
-			var ctex: Texture2D = load(ctile) as Texture2D
-			if ctex != null:
-				var corpse_mod: Color = Color.WHITE if corpse_visible else Color(0.6, 0.6, 0.68, 0.92)
-				draw_texture_rect(ctex, crect, false, corpse_mod)
-				continue
+		var ctex: Texture2D = c.get("tile", null) as Texture2D
+		if use_tiles and ctex != null:
+			var corpse_mod: Color = Color.WHITE if corpse_visible else Color(0.6, 0.6, 0.68, 0.92)
+			draw_texture_rect(ctex, crect, false, corpse_mod)
+			continue
 		draw_string(ThemeDB.fallback_font,
 			Vector2(cpos.x * CELL_SIZE + 6, cpos.y * CELL_SIZE + CELL_SIZE - 6),
 			"%", HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6,

@@ -139,6 +139,23 @@ func load_run() -> bool:
 	if saved_kc is Dictionary:
 		kill_counts = saved_kc
 	pending_player_state = data.get("player", {})
+	# Branch state (save_version >= 2).
+	branch_zone = String(data.get("branch_zone", ""))
+	branch_floor = int(data.get("branch_floor", 0))
+	branch_entry_depth = int(data.get("branch_entry_depth", 0))
+	var saved_bc = data.get("branches_cleared", null)
+	branches_cleared = saved_bc.duplicate() if saved_bc is Array else []
+	# Floor caches.
+	var fc_raw = data.get("floor_cache", null)
+	if fc_raw is Dictionary:
+		floor_cache = SaveCodec.decode_cache_dict(fc_raw, true)
+	else:
+		floor_cache.clear()
+	var bfc_raw = data.get("branch_floor_cache", null)
+	if bfc_raw is Dictionary:
+		branch_floor_cache = SaveCodec.decode_cache_dict(bfc_raw, false)
+	else:
+		branch_floor_cache.clear()
 	run_in_progress = true
 	return true
 

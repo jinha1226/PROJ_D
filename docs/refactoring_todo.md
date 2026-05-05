@@ -1,10 +1,68 @@
 # PocketCrawl Refactoring TODO
 
-This document tracks the highest-priority refactoring work after the recent
-skill, faith, essence, shrine, and balance-system additions.
+> **2026-05-05 우선순위 갱신**: 전체 감사(`docs/audits/2026-05-05-codebase-audit.md`)에서 Critical 4 / High 9 / Medium 11 / Low 5 발견.
+> 아래 Phase 1~6은 *밸런스/구조 리팩토링* 로드맵이며, 그 *이전에* 출시 차단 버그를 먼저 처리해야 함.
+> 현재 활성 우선순위는 Phase 0 → Phase 1 (Critical) → Phase 2 (사용자 통증) → 기존 Phase 1~6.
 
-The goal is not to redesign everything at once. The goal is to reduce
-regression risk, centralize game rules, and make future balance work easier.
+## Phase 0 — 시체 시스템 정리 (완료 2026-05-05)
+
+- [x] DCSS 정통 방식으로 변경: `tile::corpsify` 알고리즘 GDScript 포팅 (세로 2x 압축 + 곡선 컷 + 양쪽 어긋나기 + 상처색) + 핏자국 배경 합성
+- [x] `assets/tiles/corpses/`에 `blood_puddle_red.png`, `blood_green.png` 추가 (DCSS rltiles)
+- [x] `_CORPSE_TILE_BY_SHAPE` 매핑 + `_corpse_shape_for_monster` 거대 match 제거 → audit L1 동시 해결
+- [x] `_build_corpse_texture` + `_corpse_tex_cache` 신설 (몬스터당 1회 합성, 세션 캐시)
+- [x] `DungeonMap.gd:413` per-frame `load()` 제거, 시체 dict에 `tile: Texture2D` spawn 시 저장
+- [ ] (선택) `scripts/systems/CorpseService.gd` 추출 — `_build_corpse_texture` + cache 이전
+
+> 런타임 확인: Godot 에디터에서 `assets/tiles/corpses/`의 두 PNG import 후 F5 스모크 — 몬스터 처치 시 핏자국 위에 어둡게 누운 몬스터 그래픽 확인. 스파이더/스콜피온/곤충은 녹색 핏자국.
+
+## Phase 1 — Critical 4건 (출시 절대 차단)
+
+- [ ] **C1**: `SaveManager.save_run` 스키마 확장 — 가지 상태, floor_cache, 맵 동적 상태(altar/corpse/cloud/hazard/fog/explored/visible/monster/item) 직렬화. `save_version` 키 추가. 로드는 `_restore_floor_from_cache` 경로 재사용.
+- [x] **C2** (2026-05-05): `set_equipped_armor`/`set_equipped_shield`에 weapon과 동일한 affix 제거/적용 패턴 추가. `equipped_shield_entry()` 헬퍼 신설. `drop_item` armor 분기를 `set_equipped_armor("")` 호출로 통일.
+- [ ] **C3**: `Player._apply_resist_mod` 정수 누적 모델로 재작성. `resists`를 `{element: int}`로 마이그레이션 또는 `for _ in abs(value): append/erase` 정확 횟수.
+- [x] **C4** (2026-05-05): `_restore_floor_from_cache` 진입부에 `_clear_monsters()` / `_clear_floor_items()` 추가 (idempotent, 모든 호출 경로 보호).
+
+## 추가 수정 (2026-05-05)
+
+- [x] **포션 이미지 매치**: `ItemDetailDialog`도 `GameManager.potion_color_tile()` 사용 (BagDialog와 동일). 미식별 포션이 인벤·상세창에서 같은 색.
+- [x] **층 복귀 시 몬스터 즉시 채우기**: `_restore_floor_from_cache`가 `_top_up_monsters_to_target(depth)` 호출. 캐시된 몬스터(살아남은 적)는 유지하면서 부족분만 채움. 18턴×N 드립피드 대기 제거. 플레이어 6칸 이내엔 스폰 안 함.
+
+## Phase 2 — 사용자 통증 직접 해소
+
+- [ ] **H3**: `BagDialog._tab_filters` 데이터화 + shield/wand/throwing/essence 포함, "기타" 탭 추가
+- [ ] **H4**: `Player.use_item_by_entry(entry)` entry-기반 API 추가, `ItemDetailDialog` 콜백을 entry 캡처로 전환
+- [ ] **H5**: `MagicSystem._damage_auto_target` 로그를 scaled 값으로 정렬, immune 분기 정리. CombatSystem brand 로그도 검증
+
+## Phase 3 — 기능 정상화
+
+- [ ] **H1**: `scripts/systems/AoeEffects.gd` static helper 신설, `apply_fear_aoe` / `apply_fog_aoe` / `apply_silence_aoe` / `alert_all_monsters` / `dig_toward` 구현, `Player.use_item`이 helper 호출
+- [ ] **H2**: Faith 데이터의 8개 dead 키 — 사용 site에 wire-up 또는 데이터에서 제거 + 플레이어 텍스트 정렬
+- [ ] **H9**: monster awareness state(`is_aware`, `is_alerted`, `last_known_player_pos`, `pending_energy`, `_ability_charge`) cache 직렬화 추가
+- [ ] **H7**: `compute_damage_pipeline`을 base / flat add / multiplicative chain / brand extra 4단계로 분리
+- [ ] **H8**: TurnManager에 abort flag, `Game._on_player_died`에서 세팅
+- [ ] **H6**: 19파일의 `static var X = ...get_node_or_null(/root/X)` 패턴 일괄 제거 (autoload 자동 글로벌)
+
+## Phase 4 — 구조 부채 (출시 후 또는 병행)
+
+- [ ] **M1**: Game.gd 분해 — `FloorLifecycle.gd`, `BranchManager.gd`, `SaveMigration.gd`, `EffectsLayer.gd`, `MonsterFactory.gd`
+- [ ] **M2**: `_apply_loaded_player_state`의 인-라인 마이그레이션 → `SaveMigration.gd` 데이터 테이블
+- [ ] **M3**: 클래스 starter/active skill을 `ClassData` 필드로 이전
+- [ ] **M5**: `_armor_brand` 두 단계 fallback (weapon과 동일)
+- [ ] **M7**: DungeonMap rendering — 시체 텍스처 캐시, TileMap/MultiMeshInstance2D 검토
+- [ ] **M8**: BagDialog `_thumb_cache`, 변경된 entry만 갱신
+- [ ] **M11**: UI → 시스템 역호출 정리 — `Player.equip(slot, item_id)`가 turn 비용 책임, `IdentifyPicker`는 시그널 패턴
+
+## Phase 5 — Low
+
+- [x] **L1**: ~~`MonsterData.corpse_shape` 필드 추가, Game.gd 거대 match 제거~~ — Phase 0 옵션 B(런타임 합성)로 shape 매핑 자체가 불필요해져 자연 해결
+- [ ] **L2**: autoload redundant `@onready var = get_node` 라인 정리
+- [ ] **L4**: archmage 디버그 클래스 출시 빌드 게이팅
+
+---
+
+## 기존 Phase 1~6 (밸런스/구조 로드맵 — 이름 충돌 주의: 위 Phase 1과 다름)
+
+> 위 Critical 처리 후 진행. 이름 충돌 피하려면 향후 위 표기를 `Audit-P1` / `Audit-P2` 등으로 리네이밍 검토.
 
 ## Current Risk Summary
 

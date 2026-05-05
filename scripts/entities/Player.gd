@@ -552,8 +552,7 @@ func drop_item(index: int) -> void:
 	if id == equipped_weapon_id:
 		set_equipped_weapon("")
 	if id == equipped_armor_id:
-		equipped_armor_id = ""
-		refresh_ac_from_equipment()
+		set_equipped_armor("")
 	if id == equipped_ring_id:
 		set_equipped_ring("")
 	if id == equipped_amulet_id:
@@ -573,6 +572,12 @@ func equipped_weapon_entry() -> Dictionary:
 func equipped_armor_entry() -> Dictionary:
 	for entry in items:
 		if entry.get("id", "") == equipped_armor_id:
+			return entry
+	return {}
+
+func equipped_shield_entry() -> Dictionary:
+	for entry in items:
+		if entry.get("id", "") == equipped_shield_id:
 			return entry
 	return {}
 
@@ -1130,7 +1135,11 @@ func set_equipped_weapon(id: String) -> void:
 	emit_signal("stats_changed")
 
 func set_equipped_armor(id: String) -> void:
+	if equipped_armor_id != "":
+		_remove_entry_affixes(equipped_armor_entry())
 	equipped_armor_id = id
+	if id != "":
+		_apply_entry_affixes(equipped_armor_entry())
 	_refresh_paperdoll()
 	refresh_ac_from_equipment()  # emits stats_changed
 
@@ -1155,7 +1164,11 @@ func set_equipped_amulet(id: String) -> void:
 	emit_signal("stats_changed")
 
 func set_equipped_shield(id: String) -> void:
+	if equipped_shield_id != "":
+		_remove_entry_affixes(equipped_shield_entry())
 	equipped_shield_id = id
+	if id != "":
+		_apply_entry_affixes(equipped_shield_entry())
 	_refresh_paperdoll()
 	refresh_ac_from_equipment()
 
@@ -1275,9 +1288,7 @@ func _apply_resist_mod(kind: String, value: int) -> void:
 	if value == 0:
 		return
 	var tag: String = "%s%s" % [kind, "+" if value > 0 else "-"]
-	if value > 0:
-		resists.append(tag)
-	else:
+	for _i in absi(value):
 		resists.append(tag)
 
 func _refresh_paperdoll() -> void:
