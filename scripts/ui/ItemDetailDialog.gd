@@ -38,7 +38,7 @@ static func open(item_index: int, player: Player,
 	if cmp != null:
 		body.add_child(cmp)
 
-	body.add_child(_build_buttons(item_index, data, player, dlg, bag_dlg))
+	body.add_child(_build_buttons(entry, data, player, dlg, bag_dlg))
 
 
 # ── Header ────────────────────────────────────────────────────────────────────
@@ -291,7 +291,12 @@ static func _delta_row(stat: String, old_val: int, new_val: int,
 
 # ── Action + Drop buttons ─────────────────────────────────────────────────────
 
-static func _build_buttons(item_index: int, data: ItemData, player: Player,
+## Action/drop buttons. Capture the entry dict (not the items[] index): the
+## inventory mutates between dialog-open and button-press (auto-use,
+## identification cascades, drops, stack consumption), so an index would point
+## to a different stack or out of bounds. Player.*_by_entry locates the
+## current slot at action time. Audit H4 fix.
+static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 		detail_dlg: GameDialog, bag_dlg: GameDialog) -> Control:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
@@ -314,8 +319,7 @@ static func _build_buttons(item_index: int, data: ItemData, player: Player,
 			else:
 				action_btn.text = "장착"
 				action_btn.pressed.connect(func():
-					player.set_equipped_weapon(
-							String(player.items[item_index].get("id", "")))
+					player.set_equipped_weapon(String(entry.get("id", "")))
 					CombatLog.post("You equip %s." % data.display_name)
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
@@ -332,8 +336,7 @@ static func _build_buttons(item_index: int, data: ItemData, player: Player,
 			else:
 				action_btn.text = "장착"
 				action_btn.pressed.connect(func():
-					player.set_equipped_armor(
-							String(player.items[item_index].get("id", "")))
+					player.set_equipped_armor(String(entry.get("id", "")))
 					CombatLog.post("You don %s." % data.display_name)
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
@@ -355,7 +358,7 @@ static func _build_buttons(item_index: int, data: ItemData, player: Player,
 							Color(1.0, 0.6, 0.4))
 						detail_dlg.close()
 						return
-					player.set_equipped_shield(data.id)
+					player.set_equipped_shield(String(entry.get("id", "")))
 					CombatLog.post("You raise %s." % data.display_name)
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
@@ -372,7 +375,7 @@ static func _build_buttons(item_index: int, data: ItemData, player: Player,
 			else:
 				action_btn.text = "장착"
 				action_btn.pressed.connect(func():
-					player.set_equipped_ring(data.id)
+					player.set_equipped_ring(String(entry.get("id", "")))
 					CombatLog.post("You put on %s." % data.display_name)
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
@@ -389,7 +392,7 @@ static func _build_buttons(item_index: int, data: ItemData, player: Player,
 			else:
 				action_btn.text = "장착"
 				action_btn.pressed.connect(func():
-					player.set_equipped_amulet(data.id)
+					player.set_equipped_amulet(String(entry.get("id", "")))
 					CombatLog.post("You put on %s." % data.display_name)
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
@@ -397,14 +400,16 @@ static func _build_buttons(item_index: int, data: ItemData, player: Player,
 		"book":
 			action_btn.text = "읽기"
 			action_btn.pressed.connect(func():
-				player.use_item(item_index)
+				if not player.use_item_by_entry(entry):
+					CombatLog.post("그 아이템은 더 이상 없습니다.", Color(0.7, 0.7, 0.7))
 				detail_dlg.close()
 				bag_dlg.close()
 				TurnManager.end_player_turn())
 		_:
 			action_btn.text = "사용"
 			action_btn.pressed.connect(func():
-				player.use_item(item_index)
+				if not player.use_item_by_entry(entry):
+					CombatLog.post("그 아이템은 더 이상 없습니다.", Color(0.7, 0.7, 0.7))
 				detail_dlg.close()
 				bag_dlg.close()
 				TurnManager.end_player_turn())
@@ -417,7 +422,7 @@ static func _build_buttons(item_index: int, data: ItemData, player: Player,
 	drop_btn.text = "버리기"
 	drop_btn.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
 	drop_btn.pressed.connect(func():
-		player.drop_item(item_index)
+		player.drop_item_by_entry(entry)
 		detail_dlg.close()
 		BagDialog._populate(bag_dlg, player))
 	row.add_child(drop_btn)

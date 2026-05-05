@@ -314,6 +314,41 @@ func _attack_target_for_tile(target: Vector2i) -> Monster:
 		return null
 	return reach_monster
 
+## Locate the current index of `entry` in items[]. UI callbacks captured an
+## entry dict at dialog-open time but items[] mutates between then and the
+## button press (auto-use, identification, drop, stack consumption). Searching
+## by content equality (Dictionary `==`) keeps the action targeting the right
+## slot — or returns -1 if the stack was already consumed.
+## Audit H4 fix: replaces stale-index closures in ItemDetailDialog.
+func _find_entry_index(entry: Dictionary) -> int:
+	if entry == null or entry.is_empty():
+		return -1
+	for i in range(items.size()):
+		if items[i] == entry:
+			return i
+	# Fallback: id+plus match (entry contents may have been mutated in place).
+	var id: String = String(entry.get("id", ""))
+	var plus: int = int(entry.get("plus", 0))
+	for i in range(items.size()):
+		var it: Dictionary = items[i]
+		if String(it.get("id", "")) == id and int(it.get("plus", 0)) == plus:
+			return i
+	return -1
+
+func use_item_by_entry(entry: Dictionary) -> bool:
+	var idx: int = _find_entry_index(entry)
+	if idx < 0:
+		return false
+	use_item(idx)
+	return true
+
+func drop_item_by_entry(entry: Dictionary) -> bool:
+	var idx: int = _find_entry_index(entry)
+	if idx < 0:
+		return false
+	drop_item(idx)
+	return true
+
 func use_item(index: int) -> void:
 	if index < 0 or index >= items.size():
 		return
