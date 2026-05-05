@@ -12,12 +12,14 @@ starting_mp = 3
 starting_str = 10
 starting_dex = 14
 starting_int = 10
-starting_weapon = "shortbow"
+starting_weapon = "dagger"
 starting_armor = "leather_armor"
 starting_skills = {
 "agility": 3,
-"fighting": 2,
-"ranged": 2,
-"tool": 2
+"blade": 2,
+"fighting": 1,
+"tool": 3
 }
+default_active_skills = ["blade", "agility", "tool", "fighting"]
+starter_items = ["potion_healing", "potion_invisible", "scroll_blinking", "scroll_shrouding"]
 class_group = "rogue"

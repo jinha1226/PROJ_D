@@ -19,5 +19,7 @@ starting_skills = {
 "fighting": 2,
 "hafted": 3
 }
+default_active_skills = ["hafted", "armor", "shield", "fighting"]
+starter_items = ["potion_healing", "potion_healing"]
 class_group = "fighter"
 unlocked = false

@@ -21,4 +21,6 @@ starting_skills = {
 "fighting": 3,
 "shield": 3
 }
+default_active_skills = ["blade", "armor", "shield", "fighting"]
+starter_items = ["potion_healing", "potion_healing"]
 class_group = "fighter"

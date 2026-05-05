@@ -14,6 +14,11 @@ class_name ClassData extends Resource
 @export var robe_path: String = ""  # overrides DOLL_BODY_MAP for portrait and paperdoll
 @export var starting_skills: Dictionary = {}
 @export var starting_spells: Array = []
+## Skills that begin in the "active/training" set on run start.
+## Empty → Game.gd falls back to ["fighting"] (universal HP skill).
+@export var default_active_skills: Array = []
+## Items granted at run start (item ids, e.g. "potion_healing").
+@export var starter_items: Array = []
 @export var starting_xl: int = 0
 @export var passive: String = ""
 @export var class_group: String = ""  # "fighter" | "wizard" | "rogue" — empty = archetype/test
