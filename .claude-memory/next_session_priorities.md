@@ -2,28 +2,33 @@
 name: Next session priorities (post 2026-05-05 curation)
 description: Roadmap for the next PROJ_D sessions after the 2026-05-05 environment curation. Read alongside audit_2026_05_05_baseline.md.
 type: project
+originSessionId: cfaf6ab0-f8e3-4cfe-9656-25c538ea3e05
 ---
-
 ## 컨텍스트
 
 2026-05-05 PROJ_SS 세션에서 환경 큐레이션 완료. PROJ_D는 깨끗한 baseline(새 CLAUDE.md, 모듈 CLAUDE.md 5개, 감사 리포트, 갱신된 refactoring_todo.md)에서 출발할 수 있는 상태. 같은 날 다른 창에서 Phase 0(시체 시스템)도 완료됨 — `tile::corpsify` GDScript 포팅 + 핏자국 합성. audit L1도 부수적으로 해결.
 
 ## 다음 세션 진입 순서
 
-### 1. Phase 1 — Critical 4건 (출시 절대 차단)
+### 1. Phase 1 ✅ 완료 (2026-05-06, commit e476e94f)
 
-순서: C1 → C2 → C3 → C4. 각각 별도 작업으로 끊어 회귀 위험 격리.
+C1/C2/C3/C4 코드 fix 완료. 스모크 검증만 남음 — `docs/checklists/phase1_smoke_verification.md`.
+검증 실패 시 회귀 fix 우선, 통과 시 Phase 2 진입.
 
-- **C1**: `SaveManager.save_run` 스키마 확장. `Game._cache_current_floor()` dict와 동일 스키마로 직렬화, `save_version` 키 추가, 로드는 `_restore_floor_from_cache` 경로 재사용. 가장 큰 단독 작업.
-- **C2**: `set_equipped_armor`에 affix 제거 호출. `drop_item` armor 분기를 `set_equipped_armor("")` 호출로 통일. shield도 같은 패턴 검증/추가. 통합 `_equip_slot` helper 권장.
-- **C3**: `Player._apply_resist_mod` 정수 누적 모델로 재작성.
-- **C4**: 가지(branch) 1F 위로 이탈 시 `_clear_monsters()`/`_clear_floor_items()` 호출 추가. 모든 가지 진입/탈출 4경로 검증.
+세션 발견: C2는 prior commit b31ec598 시점에 이미 fix되어 있었고 audit 문서·메모리가 stale였음.
+교훈: audit 항목 진입 전 **실제 코드부터 확인** (CLAUDE.md "behavior contradicts docs → read code first").
 
-상세: `docs/refactoring_todo.md` Phase 1 + `docs/audits/2026-05-05-codebase-audit.md`.
+C3 구현 결정: `Player.resists`를 Array[tag]에서 **Dictionary[element → int]** 로 전환.
+이전 stack-tag 모델은 EssenceSystem의 set-semantics(.has/.append/.erase)와 affix의 stack-semantics가 충돌.
+Dict 모델이 단일 진실 소스 — 다음 세션에서 다시 Array로 되돌리지 말 것.
 
-### 2. Phase 2 — 사용자 통증 직접 해소
+### 2. Phase 2 ✅ 완료 (2026-05-06, commit 99d2f4a2)
 
-H3 (인벤토리 탭) → H4 (item_index stale) → H5 (로그 정렬). 사용자가 명시적으로 호소한 영역.
+- H3 BagDialog 탭 필터: 6개 탭 + `__other__` catch-all (미래 kind 자동 처리)
+- H4 ItemDetailDialog: 이전 commit e911eecb에서 이미 closed (entry-based)
+- H5 `_damage_auto_target` 로그 raw→scaled 정정
+
+다른 스펠 경로(drain/multi-darts/lightning/AOE)는 이미 scaled 로그였음.
 
 ### 3. 추가 감사 한 사이클 (Phase 1 끝나면 권장)
 

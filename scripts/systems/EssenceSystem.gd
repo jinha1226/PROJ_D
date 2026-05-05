@@ -4,7 +4,6 @@ class_name EssenceSystem extends RefCounted
 ## Each essence grants a strong identity, a conditional passive,
 ## and a drawback. Some pairings also unlock resonance bonuses.
 
-static var TurnManager = Engine.get_main_loop().root.get_node_or_null("/root/TurnManager") if Engine.get_main_loop() is SceneTree else null
 
 const SLOT_COUNT: int = 3
 const SLOT_UNLOCK_LEVELS: Array = [1, 8, 16]

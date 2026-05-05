@@ -16,8 +16,6 @@ const _RESIST_LABELS: Dictionary = {
 	"necro": "Necro",
 }
 
-static var GameManager = Engine.get_main_loop().root.get_node_or_null("/root/GameManager") if Engine.get_main_loop() is SceneTree else null
-static var ItemRegistry = Engine.get_main_loop().root.get_node_or_null("/root/ItemRegistry") if Engine.get_main_loop() is SceneTree else null
 
 static func open(player: Player, parent: Node) -> void:
 	if player == null or parent == null:

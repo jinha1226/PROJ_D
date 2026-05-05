@@ -1,8 +1,5 @@
 class_name MagicSystem extends RefCounted
 
-static var SpellRegistry = Engine.get_main_loop().root.get_node_or_null("/root/SpellRegistry") if Engine.get_main_loop() is SceneTree else null
-static var CombatLog = Engine.get_main_loop().root.get_node_or_null("/root/CombatLog") if Engine.get_main_loop() is SceneTree else null
-static var RacePassiveSystem = Engine.get_main_loop().root.get_node_or_null("/root/RacePassiveSystem") if Engine.get_main_loop() is SceneTree else null
 const GLOBAL_RANGE_REDUCTION: int = 1
 
 static func effective_spell_range(spell: SpellData) -> int:

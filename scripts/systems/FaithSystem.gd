@@ -10,9 +10,6 @@ const FAITHS: Dictionary = {
 		"color": Color(0.9, 0.35, 0.3),
 		"allows_essence": false,
 		"melee_damage_mult": 1.10,
-		"defense_effectiveness_mult": 1.20,
-		"shield_block_bonus": 0.08,
-		"magic_xp_mult": 0.75,
 		"spell_cost_mult": 1.20,
 	},
 	"arcana": {
@@ -23,9 +20,7 @@ const FAITHS: Dictionary = {
 		"allows_essence": false,
 		"spell_damage_mult": 1.12,
 		"max_mp_bonus": 4,
-		"magic_xp_mult": 1.20,
 		"melee_damage_mult": 0.90,
-		"defense_xp_mult": 0.85,
 	},
 	"trickery": {
 		"name": "Trickery",
@@ -33,12 +28,8 @@ const FAITHS: Dictionary = {
 		"desc": "Trickery favors agility, tools, ranged combat, and ambushes.\nIt rewards clever positioning and flexible resources.\nIt offers little help in a straight brawl.",
 		"color": Color(0.4, 0.85, 0.5),
 		"allows_essence": false,
-		"agility_effectiveness_mult": 1.20,
-		"tool_effectiveness_mult": 1.25,
 		"ranged_damage_mult": 1.10,
 		"wand_charge_save_chance": 0.20,
-		"detect_range_mod": -1,
-		"shield_block_bonus": -0.06,
 	},
 	"death": {
 		"name": "Death",
@@ -49,7 +40,6 @@ const FAITHS: Dictionary = {
 		"on_kill_hp": 3,
 		"on_kill_mp": 1,
 		"necrotic_damage_mult": 1.15,
-		"undead_damage_mult": 1.10,
 		"will_bonus": 1,
 		"potion_heal_mult": 0.80,
 	},
@@ -61,7 +51,6 @@ const FAITHS: Dictionary = {
 		"allows_essence": true,
 		"essence_inventory_bonus": 1,
 		"resonance_mult": 1.25,
-		"essence_penalty_reduction": 0.20,
 		"unique_essence_drop_bonus": 0.15,
 	},
 }
@@ -188,11 +177,6 @@ static func potion_heal_mult(player) -> float:
 	if player == null:
 		return 1.0
 	return float(get_faith(current_faith_id(player)).get("potion_heal_mult", 1.0))
-
-static func shield_block_bonus(player) -> float:
-	if player == null:
-		return 0.0
-	return float(get_faith(current_faith_id(player)).get("shield_block_bonus", 0.0))
 
 static func wand_charge_save_chance(player) -> float:
 	if player == null:

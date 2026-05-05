@@ -332,6 +332,5 @@ static func _grant_first_essence(eid: String, player: Player) -> void:
 
 
 static func _first_essence_pool_for(_player: Player) -> Array:
-	var gm = Engine.get_main_loop().root.get_node_or_null("/root/GameManager")
-	var class_id: String = String(gm.selected_class_id) if gm != null else ""
+	var class_id: String = String(GameManager.selected_class_id) if GameManager != null else ""
 	return _FIRST_ESSENCE_POOLS.get(class_id, _FALLBACK_POOL)

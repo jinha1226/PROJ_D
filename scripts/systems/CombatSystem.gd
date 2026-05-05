@@ -103,24 +103,28 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		CombatLog.miss("You miss the %s." % monster.data.display_name)
 		return
 	var base_final: int = _player_attack_base_damage(player, monster, profile)
+	var backstab_bonus: int = _backstab_bonus(player, monster, weapon, weapon_plus)
+	# Pipeline order (audit H7): base → flat additions → multiplicative chain → brand.
+	# All flats sum into one accumulator; all mults compose into one factor; brand
+	# is applied last because it is already resist-scaled and not subject to player mults.
+	var flat_bonus: int = 0
+	flat_bonus += skill_level / 2
+	flat_bonus += randi_range(0, skill_level / 3)
+	flat_bonus += RacePassiveSystem.melee_damage_bonus(player)
+	flat_bonus += backstab_bonus
 	var mult: float = 1.0 + float(skill_level) * 0.04
 	if skill_id == "ranged":
 		mult *= EssenceSystem.ranged_damage_mult(player)
 		mult *= FaithSystem.ranged_damage_mult(player)
-	var final: int = max(1, int(round(float(base_final) * mult)))
 	if skill_id in ["unarmed", "blade", "hafted", "polearm", ""]:
-		final = max(1, int(round(float(final) * FaithSystem.melee_damage_mult(player))))
-	final += skill_level / 2
-	final += randi_range(0, skill_level / 3)
-	final += RacePassiveSystem.melee_damage_bonus(player)
-	var backstab_bonus: int = _backstab_bonus(player, monster, weapon, weapon_plus)
-	final += backstab_bonus
+		mult *= FaithSystem.melee_damage_mult(player)
 	if not monster.is_aware:
 		var uw_mult: float = EssenceSystem.unaware_damage_mult(player)
 		if uw_mult > 1.0:
-			final = max(1, int(round(float(final) * uw_mult)))
+			mult *= uw_mult
 	if player.essence_slots.has("essence_plague") and Status.has(monster, "poison"):
-		final = max(1, int(round(float(final) * 1.2)))
+		mult *= 1.2
+	var final: int = max(1, int(round(float(base_final + flat_bonus) * mult)))
 	var brand: String = _weapon_brand(player)
 	var brand_extra: int = 0
 	if brand != "":

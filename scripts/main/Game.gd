@@ -1845,6 +1845,9 @@ func _try_respawn_monster() -> void:
 		return
 
 func _on_player_died() -> void:
+	# Stop the in-flight monster loop (audit H8) so subsequent actors don't
+	# keep spamming damage against a corpse.
+	TurnManager.abort_actor_loop()
 	CombatLog.post("YOU DIED.", Color(1.0, 0.3, 0.3))
 	GameManager.end_run("death")
 	_show_result_screen(false)

@@ -3,8 +3,8 @@
 PocketCrawl is a Godot/GDScript mobile-leaning roguelike. **Post-reboot (2026-04-25), clean of GPL DCSS sources** — current code is original, data borrows DCSS numerical balance only, tiles are CC0. Commercial release path open.
 
 ## Read first in new session
-- [Next session priorities](next_session_priorities.md) — roadmap after 2026-05-05 curation: Phase 1 Critical 4 → Phase 2 → audits → Phase 3/4. Phase 0 (corpse) already done.
-- [Audit baseline 2026-05-05](audit_2026_05_05_baseline.md) — 4 Critical / 9 High issues + 7 recurring debt patterns.
+- [Next session priorities](next_session_priorities.md) — Phase 1 ✅ done (commit e476e94f, 2026-05-06). Now on Phase 2 (user-pain: H3 inventory tab → H4 → H5).
+- [Audit baseline 2026-05-05](audit_2026_05_05_baseline.md) — Critical 4 closed; 9 High / 11 Medium / 5 Low remain. 7 recurring debt patterns.
 - [Current state snapshot](pocketcrawl_state.md) — built systems, architecture decisions, file map. Predates 2026-05-05 audit.
 - [Pending backlog (4-27)](backlog_pocketcrawl.md) — task list with header note pointing to audit baseline.
 

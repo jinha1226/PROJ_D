@@ -2,20 +2,22 @@
 name: PocketCrawl 2026-05-05 codebase audit baseline
 description: Full-codebase audit found 4 Critical / 9 High / 11 Medium / 5 Low issues. Read before picking next task — Phase 1 Critical bugs override prior backlog priorities. Full report in docs/audits/.
 type: project
+originSessionId: cfaf6ab0-f8e3-4cfe-9656-25c538ea3e05
 ---
-
 ## 요약
 
 2026-05-05 세션에서 PROJ_D 전체 감사 수행. **현 상태로 출시 시 플레이어 진행 누적 손상 거의 확정.** 시체 렌더링 버그는 빙산의 일각이었고, save 누수·스탯 영구 누수·전투 결과 좌우 버그 다수.
 
 전체 리포트: `D:/PROJ_D/docs/audits/2026-05-05-codebase-audit.md`
 
-## Critical 4건 (출시 차단)
+## Critical 4건 (출시 차단) — **2026-05-06 모두 commit e476e94f 에서 해결**
 
-- **C1**: `SaveManager.save_run`이 GameManager의 가지/층 캐시·맵 동적 상태(신단·시체·구름·몬스터·아이템) 전혀 직렬화 안 함. 모바일 백그라운드→복귀 시 진행 손실. 위치: `scripts/core/SaveManager.gd:34-80`
-- **C2**: `Player.drop_item` 의 armor 분기가 `set_equipped_armor("")` 안 부르고 직접 대입 → randart 어픽스 보너스 영구 잔존. weapon/ring/amulet은 정상, armor·shield만 비대칭. 위치: `Player.gd:547-565, 1132-1135`
-- **C3**: `_apply_resist_mod` 의 +/- 분기가 동일 동작 → rFire+++ 가 +1, equip/unequip 반복 시 마이너스 저항 누적. 위치: `Player.gd:1274-1281`
-- **C4**: 가지(branch) 1층에서 위로 빠져나갈 때 `_clear_monsters()` 안 부름 → 가지 몬스터 메인 던전에 누수. 위치: `Game.gd:1741-1761`
+- **C1 ✅**: 이전 b31ec598 commit이 SaveManager 스키마 v2 + SaveCodec 도입. 2026-05-06 세션이 마무리: `Game.save_with_cache()` 헬퍼로 8개 save 사이트 통일, 메뉴 Save·Save & Main Menu 누락된 floor cache 추가, branch-up autosave 추가.
+- **C2 ✅**: b31ec598 commit이 `set_equipped_armor`/`set_equipped_shield` 에 affix 제거 호출 추가, drop_item armor/shield 분기 setter 경유. 2026-05-06 검증 시 audit 문서가 stale인 게 드러남 — 코드는 이미 정상.
+- **C3 ✅**: b31ec598이 magnitude 누적 부분 fix. 2026-05-06이 더 큰 redo: `Player.resists` Array→Dict[element→int]로 전환, `add_resist(element, delta)` 헬퍼, `resists_from_tags()` legacy 파서. EssenceSystem 16 사이트와 Player accessory equip 모두 add_resist 경유. Status.resist_level Dict+Array 둘 다 처리. 구 세이브 자동 마이그.
+- **C4 ✅**: 2026-05-06 fix — `_generate_floor` fresh-generate 진입부에 `_clear_monsters/_clear_floor_items` 방어 호출 추가. branch-up 1F 이탈 시 가지 몬스터 누수 차단. `_restore_floor_from_cache`는 이미 같은 방어 호출이 있어 대칭.
+
+검증: `docs/checklists/phase1_smoke_verification.md` 체크리스트로 F5 스모크 필요. 통과 전까지 Phase 1은 *코드만 완료*, *기능 검증 미완료*.
 
 ## High 9건 (요약)
 
@@ -47,8 +49,8 @@ Phase 0 — 시체 시스템 정리 (이미 진단 완료)
   - _corpse_shape_for_monster 폴백 humanoid_medium → null + 글리프 폴백
   - (선택) CorpseService 추출
 
-Phase 1 — Critical 4건 (출시 절대 차단)
-  C1 → C2 → C3 → C4
+Phase 1 — Critical 4건 (출시 절대 차단) ✅ 2026-05-06 e476e94f
+  C1 → C2 → C3 → C4 모두 코드 fix. 스모크 검증만 남음.
 
 Phase 2 — 사용자 통증 직접 해소
   H3 (인벤토리 탭) → H4 (item_index) → H5 (로그 정렬)

@@ -185,8 +185,7 @@ func entry_display_name(entry: Dictionary) -> String:
 	var data: ItemData = get_by_id(id)
 	if data == null:
 		return id
-	var gm = Engine.get_main_loop().root.get_node_or_null("/root/GameManager") if Engine.get_main_loop() is SceneTree else null
-	var base_name: String = gm.display_name_of(base_id_of(id)) if gm != null else data.display_name
+	var base_name: String = GameManager.display_name_of(base_id_of(id)) if GameManager != null else data.display_name
 	var artifact_name: String = String(entry.get("artifact_name", ""))
 	if artifact_name != "":
 		return 'the %s "%s"' % [data.display_name, artifact_name]

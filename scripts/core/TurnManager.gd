@@ -9,6 +9,15 @@ var is_player_turn: bool = true
 var actors: Array = []
 
 var _ending_turn: bool = false
+# Set by Game._on_player_died to break out of the in-flight monster loop.
+# Without this, monsters keep taking turns against a corpse — extra
+# damage logs, wasted ability charges, and noisy timing on the death screen.
+var _abort_actor_loop: bool = false
+
+## Called by Game on player death so the current end_player_turn() unwinds
+## immediately instead of finishing the remaining monster turns.
+func abort_actor_loop() -> void:
+	_abort_actor_loop = true
 
 func register_actor(actor) -> void:
 	if actor and not actors.has(actor):
@@ -26,6 +35,8 @@ func end_player_turn(action_cost: float = 1.0, immediate: bool = false) -> void:
 	is_player_turn = false
 	emit_signal("monster_turn_started")
 	for actor in actors.duplicate():
+		if _abort_actor_loop:
+			break
 		if not is_instance_valid(actor):
 			continue
 		var spd: float = 10.0
@@ -36,8 +47,11 @@ func end_player_turn(action_cost: float = 1.0, immediate: bool = false) -> void:
 			actor.pending_energy -= 1.0
 			if actor.has_method("take_turn"):
 				actor.take_turn()
+			if _abort_actor_loop:
+				break
 	emit_signal("turn_ended")
 	_ending_turn = false
+	_abort_actor_loop = false
 	if immediate:
 		_start_player_turn()
 	else:
