@@ -30,6 +30,7 @@ const INFO: Dictionary = {
 		"random_move": 0.4},
 	"feared":       {"name": "Feared",       "color": Color(0.65, 0.5, 0.9),
 		"flee": true},
+	"silence":      {"name": "Silenced",     "color": Color(0.7, 0.85, 1.0)},
 	# Corrosion / Drain
 	"corroded":     {"name": "Corroded",     "color": Color(0.6, 0.85, 0.3),
 		"ac_down": 2},

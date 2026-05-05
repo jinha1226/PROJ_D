@@ -479,42 +479,26 @@ func _apply_race_mods(race_id: String) -> void:
 	RacePassiveSystem.register(player)
 
 func _class_starter_items(class_id: String) -> Array:
-	match class_id:
-		"warrior":
-			return ["potion_healing", "potion_healing"]
-		"mage":
-			return ["potion_healing", "potion_magic"]
-		"rogue":
-			return ["dagger", "potion_healing", "potion_invisible", "scroll_shrouding"]
-		"ranger":
-			return ["dagger", "potion_healing", "potion_healing"]
-		"archmage":
-			return [
-				"potion_healing",
-				"potion_magic",
-				"scroll_identify",
-				"scroll_blinking",
-				"wand_fire",
-				"wand_frost",
-				"wand_lightning",
-			]
+	# Data-first: read from ClassData.starter_items.
+	# All 12 classes ship populated; if ClassRegistry is missing or the class
+	# is unknown, return [] (caller still gets a playable run via class equipment).
+	if ClassRegistry == null or class_id == "":
+		return []
+	var data: ClassData = ClassRegistry.get_by_id(class_id)
+	if data != null:
+		return data.starter_items.duplicate()
 	return []
 
 func _class_default_active_skills(class_id: String, fallback: Array) -> Array:
-	match class_id:
-		"warrior":
-			return ["blade", "armor", "shield"]
-		"mage":
-			return ["spellcasting", "arcane"]
-		"rogue":
-			return ["ranged", "agility", "tool"]
-		"ranger":
-			return ["ranged", "agility"]
-		"archmage":
-			return ["spellcasting", "elemental", "arcane", "hex", "necromancy", "summoning", "armor", "shield", "agility", "tool", "ranged", "blade", "hafted", "polearm", "unarmed"]
+	# Data-first: read from ClassData.default_active_skills.
+	# Empty data → caller's fallback → ["fighting"] (universal HP skill).
+	if ClassRegistry != null and class_id != "":
+		var data: ClassData = ClassRegistry.get_by_id(class_id)
+		if data != null and not data.default_active_skills.is_empty():
+			return data.default_active_skills.duplicate()
 	if not fallback.is_empty():
 		return fallback
-	return ["blade"]
+	return ["fighting"]
 
 func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.hp = int(data.get("hp", 22))
@@ -1730,6 +1714,33 @@ func _on_player_turn_started() -> void:
 			_cancel_auto_walk("new enemy")
 			return
 		_start_auto_explore()
+
+## AOE bridges — Player.use_item duck-types these on the current scene.
+## Real logic lives in AoeEffects so Game.gd doesn't grow further (audit M1).
+func apply_fear_aoe(origin: Vector2i, radius: int, turns: int) -> void:
+	var n: int = AoeEffects.apply_fear(self, origin, radius, turns)
+	if n == 0:
+		CombatLog.post("Nothing nearby to frighten.", Color(0.7, 0.7, 0.75))
+
+func apply_fog_aoe(origin: Vector2i, radius: int, turns: int) -> void:
+	AoeEffects.apply_fog(self, origin, radius, turns)
+
+func apply_silence_aoe(origin: Vector2i, radius: int, turns: int) -> void:
+	var n: int = AoeEffects.apply_silence(self, origin, radius, turns)
+	if n == 0:
+		CombatLog.post("The silence finds no voices nearby.", Color(0.7, 0.75, 0.85))
+
+func alert_all_monsters() -> void:
+	var origin: Vector2i = player.grid_pos if player != null else Vector2i.ZERO
+	AoeEffects.alert_all(self, origin)
+
+func dig_toward(target: Vector2i) -> void:
+	var carved: int = AoeEffects.dig_line(self, target, 4)
+	if carved == 0:
+		CombatLog.post("The wand finds no wall to dig.", Color(0.7, 0.7, 0.7))
+	else:
+		CombatLog.post("The wand carves through %d tile%s of stone." \
+				% [carved, "" if carved == 1 else "s"], Color(0.85, 0.75, 0.5))
 
 func apply_immolation_aoe(origin: Vector2i, radius: int) -> void:
 	if map == null:
