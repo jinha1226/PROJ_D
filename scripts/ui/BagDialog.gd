@@ -66,9 +66,18 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 	content_container.add_theme_constant_override("separation", GameTheme.PAD_S)
 	body.add_child(content_container)
 
-	var tab_labels: Array = ["전체", "무기", "방어구", "장신구", "소모품"]
-	var tab_filters: Array = [[], ["weapon"], ["armor"], ["ring", "amulet"],
-		["potion", "scroll", "book"]]
+	# Tab layout — each entry: [label, kinds]. Empty kinds = "전체" (all).
+	# Special kind "__other__" = catch-all for kinds not in any other tab,
+	# so newly-added item kinds stay visible until explicitly placed.
+	var tab_labels: Array = ["전체", "무기", "방어구", "장신구", "소모품", "기타"]
+	var tab_filters: Array = [
+		[],                                   # 전체
+		["weapon", "throwing"],               # 무기 — throwing은 던지는 무기
+		["armor", "shield"],                  # 방어구
+		["ring", "amulet", "essence"],        # 장신구 — essence는 정수 슬롯
+		["potion", "scroll", "book", "wand"], # 소모품 — wand는 충전식
+		["__other__"],                        # 기타 — rune 등 카테고리 외
+	]
 	var tab_btns: Array = []
 
 	for i in range(tab_labels.size()):
@@ -90,6 +99,21 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 	_fill_inventory(content_container, player, dlg, [])
 
 
+## Kinds claimed by any non-"전체"/non-"기타" tab — single source of truth so
+## the "기타" tab's catch-all stays in sync when a new tab is added above.
+const _ALL_TAB_KINDS: Array = [
+	"weapon", "throwing", "armor", "shield",
+	"ring", "amulet", "essence",
+	"potion", "scroll", "book", "wand",
+]
+
+static func _kind_matches_filter(kind: String, kind_filter: Array) -> bool:
+	if kind_filter.is_empty():
+		return true
+	if kind_filter.has("__other__"):
+		return not _ALL_TAB_KINDS.has(kind)
+	return kind_filter.has(kind)
+
 static func _fill_inventory(container: VBoxContainer, player: Player,
 		dlg: GameDialog, kind_filter: Array) -> void:
 	# Build stacks, equipped items first
@@ -104,7 +128,7 @@ static func _fill_inventory(container: VBoxContainer, player: Player,
 		var data: ItemData = ItemRegistry.get_by_id(id) if ItemRegistry != null and id != "" else null
 		if data == null:
 			continue
-		if kind_filter.size() > 0 and not kind_filter.has(data.kind):
+		if not _kind_matches_filter(data.kind, kind_filter):
 			continue
 		var key: String = "%s|%d" % [id, plus]
 		if not stacks.has(key):

@@ -373,17 +373,17 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 		return
 	var dmg: int = spell.base_damage + randi_range(0, 2) + power / 4
 	dmg = _apply_element_bonus(spell, target, dmg)
-	CombatLog.hit("You hit the %s with %s for %d." \
-			% [target.data.display_name, spell.display_name, dmg])
+	var scaled: int = Status.resist_scale(dmg, target.data.resists, spell.element)
 	if game != null and game.has_method("spawn_spell_bolt"):
 		var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
 		game.spawn_spell_bolt(player.position + half, target.position + half, spell.element)
-	var scaled: int = Status.resist_scale(dmg, target.data.resists, spell.element)
 	if scaled <= 0 and dmg > 0:
 		CombatLog.post("The %s is immune to %s."
 				% [target.data.display_name, spell.display_name],
 			Color(0.65, 0.75, 0.85))
 		return
+	CombatLog.hit("You hit the %s with %s for %d." \
+			% [target.data.display_name, spell.display_name, scaled])
 	var was_alive: bool = target.hp > 0
 	target.take_damage(scaled)
 	target.become_aware(player.grid_pos)
