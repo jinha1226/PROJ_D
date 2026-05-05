@@ -72,20 +72,20 @@ static func _header_card(player: Player) -> Control:
 
 	var title := Label.new()
 	title.text = "%s %s" % [race_name, cls_name]
-	title.add_theme_font_size_override("font_size", 32)
+	title.add_theme_font_size_override("font_size", GameTheme.TYPO_HEADER)
 	title.add_theme_color_override("font_color", Color(0.95, 0.88, 0.55))
 	vb.add_child(title)
 
 	var sub := Label.new()
 	sub.text = "XL %d   XP %d / %d" % [player.xl, player.xp, player.xp_to_next()]
-	sub.add_theme_font_size_override("font_size", 20)
+	sub.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	sub.add_theme_color_override("font_color", Color(0.7, 0.74, 0.84))
 	vb.add_child(sub)
 
 	var tip := Label.new()
 	tip.text = "A compact summary of your build, defenses, faith, and active essence path."
 	tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	tip.add_theme_font_size_override("font_size", 18)
+	tip.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	tip.add_theme_color_override("font_color", Color(0.76, 0.76, 0.82))
 	vb.add_child(tip)
 
@@ -96,7 +96,7 @@ static func _vitals_card(player: Player) -> Control:
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 8)
 	card.add_child(vb)
-	vb.add_child(UICards.section_header("Vitals", 28))
+	vb.add_child(UICards.section_header("Vitals", GameTheme.TYPO_SUBTITLE))
 
 	vb.add_child(_resource_bar("HP", player.hp, player.hp_max, Color(0.85, 0.28, 0.28)))
 	vb.add_child(_resource_bar("MP", player.mp, player.mp_max, Color(0.35, 0.55, 1.0)))
@@ -104,7 +104,7 @@ static func _vitals_card(player: Player) -> Control:
 	var hint := Label.new()
 	hint.text = "Max HP rises from level growth, race, endurance, and gear. Max MP rises from magic growth and intellect."
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.add_theme_font_size_override("font_size", 18)
+	hint.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	hint.add_theme_color_override("font_color", Color(0.75, 0.78, 0.82))
 	vb.add_child(hint)
 	return card
@@ -116,7 +116,7 @@ static func _faith_card(player: Player) -> Control:
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 8)
 	card.add_child(vb)
-	vb.add_child(UICards.section_header("Faith", 28))
+	vb.add_child(UICards.section_header("Faith", GameTheme.TYPO_SUBTITLE))
 
 	var faith_name := "None"
 	var faith_desc := "No path chosen yet."
@@ -127,20 +127,20 @@ static func _faith_card(player: Player) -> Control:
 
 	var name_lbl := Label.new()
 	name_lbl.text = faith_name
-	name_lbl.add_theme_font_size_override("font_size", 30)
+	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_TITLE)
 	name_lbl.add_theme_color_override("font_color", tint)
 	vb.add_child(name_lbl)
 
 	var desc_lbl := Label.new()
 	desc_lbl.text = faith_desc
 	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_lbl.add_theme_font_size_override("font_size", 20)
+	desc_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	desc_lbl.add_theme_color_override("font_color", Color(0.78, 0.78, 0.85))
 	vb.add_child(desc_lbl)
 
 	var mode_lbl := Label.new()
 	mode_lbl.text = "Essences: enabled" if FaithSystem.allows_essence(player) else "Essences: disabled by current faith"
-	mode_lbl.add_theme_font_size_override("font_size", 18)
+	mode_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	mode_lbl.add_theme_color_override("font_color", Color(0.8, 0.85, 0.92) if FaithSystem.allows_essence(player) else Color(0.72, 0.62, 0.62))
 	vb.add_child(mode_lbl)
 	return card
@@ -150,7 +150,7 @@ static func _stats_card(player: Player) -> Control:
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 8)
 	card.add_child(vb)
-	vb.add_child(UICards.section_header("Stats", 28))
+	vb.add_child(UICards.section_header("Stats", GameTheme.TYPO_SUBTITLE))
 
 	var grid := GridContainer.new()
 	grid.columns = 3
@@ -168,7 +168,7 @@ static func _combat_card(player: Player) -> Control:
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 8)
 	card.add_child(vb)
-	vb.add_child(UICards.section_header("Combat", 28))
+	vb.add_child(UICards.section_header("Combat", GameTheme.TYPO_SUBTITLE))
 
 	var row := GridContainer.new()
 	row.columns = 2
@@ -186,7 +186,7 @@ static func _combat_card(player: Player) -> Control:
 	var notes := Label.new()
 	notes.text = "Armor reduces gear penalties, Shield improves blocking, Agility improves evasion, and Endurance grows your maximum HP."
 	notes.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	notes.add_theme_font_size_override("font_size", 18)
+	notes.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	notes.add_theme_color_override("font_color", Color(0.78, 0.76, 0.7))
 	vb.add_child(notes)
 	return card
@@ -196,7 +196,7 @@ static func _equipment_card(player: Player) -> Control:
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 8)
 	card.add_child(vb)
-	vb.add_child(UICards.section_header("Equipment", 28))
+	vb.add_child(UICards.section_header("Equipment", GameTheme.TYPO_SUBTITLE))
 
 	for pair in _VISIBLE_EQUIP_SLOTS:
 		var label: String = String(pair[0])
@@ -209,7 +209,7 @@ static func _resists_card(player: Player) -> Control:
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 8)
 	card.add_child(vb)
-	vb.add_child(UICards.section_header("Resistances", 28))
+	vb.add_child(UICards.section_header("Resistances", GameTheme.TYPO_SUBTITLE))
 
 	var flow := FlowContainer.new()
 	flow.add_theme_constant_override("h_separation", 8)
@@ -227,14 +227,14 @@ static func _essence_card(dlg: GameDialog, player: Player, parent: Node) -> Cont
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 8)
 	card.add_child(vb)
-	vb.add_child(UICards.section_header("Essence", 28))
+	vb.add_child(UICards.section_header("Essence", GameTheme.TYPO_SUBTITLE))
 
 	var cap: int = EssenceSystem.inventory_capacity(player)
 	var slots_open: int = EssenceSystem.active_slot_count(player)
 
 	var summary := Label.new()
 	summary.text = "Slots open: %d / %d   Carried: %d / %d" % [slots_open, EssenceSystem.SLOT_COUNT, player.essence_inventory.size(), cap]
-	summary.add_theme_font_size_override("font_size", 20)
+	summary.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	summary.add_theme_color_override("font_color", Color(0.78, 0.78, 0.85))
 	vb.add_child(summary)
 
@@ -242,7 +242,7 @@ static func _essence_card(dlg: GameDialog, player: Player, parent: Node) -> Cont
 		var disabled := Label.new()
 		disabled.text = "Your current faith does not allow essence attunement."
 		disabled.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		disabled.add_theme_font_size_override("font_size", 18)
+		disabled.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 		disabled.add_theme_color_override("font_color", Color(0.88, 0.7, 0.7))
 		vb.add_child(disabled)
 		return card
@@ -252,14 +252,14 @@ static func _essence_card(dlg: GameDialog, player: Player, parent: Node) -> Cont
 
 	var inv_header := Label.new()
 	inv_header.text = "Carried Essences"
-	inv_header.add_theme_font_size_override("font_size", 22)
+	inv_header.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	inv_header.add_theme_color_override("font_color", Color(0.92, 0.88, 0.65))
 	vb.add_child(inv_header)
 
 	if player.essence_inventory.is_empty():
 		var empty := Label.new()
 		empty.text = "No spare essences carried."
-		empty.add_theme_font_size_override("font_size", 18)
+		empty.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 		empty.add_theme_color_override("font_color", Color(0.65, 0.65, 0.72))
 		vb.add_child(empty)
 	else:
@@ -270,14 +270,14 @@ static func _essence_card(dlg: GameDialog, player: Player, parent: Node) -> Cont
 	if not synergies.is_empty():
 		var sync_header := Label.new()
 		sync_header.text = "Active Resonance"
-		sync_header.add_theme_font_size_override("font_size", 22)
+		sync_header.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		sync_header.add_theme_color_override("font_color", Color(0.92, 0.88, 0.65))
 		vb.add_child(sync_header)
 		for line in synergies:
 			var lbl := Label.new()
 			lbl.text = "- %s" % String(line)
 			lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			lbl.add_theme_font_size_override("font_size", 18)
+			lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 			lbl.add_theme_color_override("font_color", Color(0.8, 0.78, 0.92))
 			vb.add_child(lbl)
 
@@ -288,12 +288,12 @@ static func _effects_card(player: Player) -> Control:
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 8)
 	card.add_child(vb)
-	vb.add_child(UICards.section_header("Effects", 28))
+	vb.add_child(UICards.section_header("Effects", GameTheme.TYPO_SUBTITLE))
 
 	if player.statuses.is_empty():
 		var none := Label.new()
 		none.text = "No active statuses."
-		none.add_theme_font_size_override("font_size", 18)
+		none.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 		none.add_theme_color_override("font_color", Color(0.7, 0.7, 0.75))
 		vb.add_child(none)
 		return card
@@ -302,7 +302,7 @@ static func _effects_card(player: Player) -> Control:
 		var turns: int = int(player.statuses.get(id, 0))
 		var line := Label.new()
 		line.text = "%s (%d)" % [Status.display_name(String(id)), turns]
-		line.add_theme_font_size_override("font_size", 18)
+		line.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 		line.add_theme_color_override("font_color", Status.color_of(String(id)))
 		vb.add_child(line)
 	return card
@@ -312,7 +312,7 @@ static func _run_card(player: Player) -> Control:
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 8)
 	card.add_child(vb)
-	vb.add_child(UICards.section_header("Run", 28))
+	vb.add_child(UICards.section_header("Run", GameTheme.TYPO_SUBTITLE))
 
 	var grid := GridContainer.new()
 	grid.columns = 2
@@ -333,18 +333,18 @@ static func _run_card(player: Player) -> Control:
 		if d != null and d.kind == "rune":
 			collected_runes.append(d.display_name)
 
-	vb.add_child(UICards.section_header("Runes  %d / 4" % collected_runes.size(), 24))
+	vb.add_child(UICards.section_header("Runes  %d / 4" % collected_runes.size(), GameTheme.TYPO_BODY_LARGE))
 	if collected_runes.is_empty():
 		var none_lbl := Label.new()
 		none_lbl.text = "(none collected)"
-		none_lbl.add_theme_font_size_override("font_size", 20)
+		none_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		none_lbl.add_theme_color_override("font_color", Color(0.5, 0.5, 0.55))
 		vb.add_child(none_lbl)
 	else:
 		for rname in collected_runes:
 			var r_lbl := Label.new()
 			r_lbl.text = "✦ %s" % rname
-			r_lbl.add_theme_font_size_override("font_size", 22)
+			r_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 			r_lbl.add_theme_color_override("font_color", Color(1.0, 0.9, 0.35))
 			vb.add_child(r_lbl)
 
@@ -384,12 +384,12 @@ static func _resource_bar(label_text: String, value: int, max_value: int, tint: 
 
 	var label := Label.new()
 	label.text = label_text
-	label.add_theme_font_size_override("font_size", 22)
+	label.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	row.add_child(label)
 
 	var num := Label.new()
 	num.text = "%d / %d" % [value, max_value]
-	num.add_theme_font_size_override("font_size", 22)
+	num.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	num.add_theme_color_override("font_color", tint)
 	row.add_child(num)
 
@@ -418,20 +418,20 @@ static func _stat_block(label_text: String, value: int, help: String) -> Control
 
 	var name := Label.new()
 	name.text = label_text
-	name.add_theme_font_size_override("font_size", 22)
+	name.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	name.add_theme_color_override("font_color", Color(0.92, 0.88, 0.65))
 	vb.add_child(name)
 
 	var val := Label.new()
 	val.text = str(value)
-	val.add_theme_font_size_override("font_size", 28)
+	val.add_theme_font_size_override("font_size", GameTheme.TYPO_SUBTITLE)
 	val.add_theme_color_override("font_color", Color(0.95, 0.95, 0.98))
 	vb.add_child(val)
 
 	var desc := Label.new()
 	desc.text = help
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc.add_theme_font_size_override("font_size", 16)
+	desc.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	desc.add_theme_color_override("font_color", Color(0.72, 0.75, 0.8))
 	vb.add_child(desc)
 	return card
@@ -441,12 +441,12 @@ static func _kv_row(label_text: String, value_text: String) -> Control:
 	row.add_theme_constant_override("separation", 10)
 	var label := Label.new()
 	label.text = "%s:" % label_text
-	label.add_theme_font_size_override("font_size", 20)
+	label.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	label.add_theme_color_override("font_color", Color(0.82, 0.82, 0.88))
 	row.add_child(label)
 	var value := Label.new()
 	value.text = value_text
-	value.add_theme_font_size_override("font_size", 20)
+	value.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	value.add_theme_color_override("font_color", Color(0.95, 0.88, 0.6))
 	row.add_child(value)
 	return row
@@ -471,13 +471,13 @@ static func _equipment_row(label_text: String, slot: String, player: Player) -> 
 
 	var label := Label.new()
 	label.text = "%s:" % label_text
-	label.add_theme_font_size_override("font_size", 20)
+	label.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	label.add_theme_color_override("font_color", Color(0.8, 0.82, 0.88))
 	top.add_child(label)
 
 	var value := Label.new()
 	value.text = name_text
-	value.add_theme_font_size_override("font_size", 20)
+	value.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	value.add_theme_color_override("font_color", Color(0.95, 0.88, 0.6) if data != null else Color(0.6, 0.6, 0.68))
 	top.add_child(value)
 
@@ -485,7 +485,7 @@ static func _equipment_row(label_text: String, slot: String, player: Player) -> 
 		var desc := Label.new()
 		desc.text = data.description
 		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		desc.add_theme_font_size_override("font_size", 16)
+		desc.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 		desc.add_theme_color_override("font_color", Color(0.72, 0.74, 0.8))
 		row.add_child(desc)
 	return row
@@ -500,13 +500,13 @@ static func _resist_card(element: String, level: int) -> Control:
 
 	var title := Label.new()
 	title.text = String(_RESIST_LABELS.get(element, element.capitalize()))
-	title.add_theme_font_size_override("font_size", 18)
+	title.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	title.add_theme_color_override("font_color", tint)
 	vb.add_child(title)
 
 	var value := Label.new()
 	value.text = _resist_bar(level)
-	value.add_theme_font_size_override("font_size", 24)
+	value.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
 	value.add_theme_color_override("font_color", Color(0.95, 0.92, 0.85))
 	vb.add_child(value)
 	return card
@@ -542,14 +542,14 @@ static func _essence_slot_row(dlg: GameDialog, player: Player, parent: Node, slo
 
 	var title := Label.new()
 	title.text = "Slot %d" % (slot_index + 1)
-	title.add_theme_font_size_override("font_size", 20)
+	title.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	title.add_theme_color_override("font_color", Color(0.9, 0.86, 0.65))
 	top.add_child(title)
 
 	if not unlocked:
 		var locked := Label.new()
 		locked.text = "(locked)"
-		locked.add_theme_font_size_override("font_size", 18)
+		locked.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 		locked.add_theme_color_override("font_color", Color(0.76, 0.55, 0.55))
 		top.add_child(locked)
 		return row
@@ -564,7 +564,7 @@ static func _essence_slot_row(dlg: GameDialog, player: Player, parent: Node, slo
 
 	var name := Label.new()
 	name.text = EssenceSystem.display_name(current_id) if current_id != "" else "(empty)"
-	name.add_theme_font_size_override("font_size", 20)
+	name.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	name.add_theme_color_override("font_color", EssenceSystem.color_of(current_id) if current_id != "" else Color(0.62, 0.62, 0.68))
 	top.add_child(name)
 
@@ -579,7 +579,7 @@ static func _essence_slot_row(dlg: GameDialog, player: Player, parent: Node, slo
 		var desc := Label.new()
 		desc.text = EssenceSystem.description(current_id)
 		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		desc.add_theme_font_size_override("font_size", 16)
+		desc.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 		desc.add_theme_color_override("font_color", Color(0.74, 0.74, 0.8))
 		row.add_child(desc)
 	return row
@@ -597,7 +597,7 @@ static func _essence_inventory_row(essence_id: String) -> Control:
 	var label := Label.new()
 	label.text = "%s - %s" % [EssenceSystem.display_name(essence_id), EssenceSystem.description(essence_id)]
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_font_size_override("font_size", 18)
+	label.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	label.add_theme_color_override("font_color", EssenceSystem.color_of(essence_id))
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(label)
@@ -614,13 +614,13 @@ static func _open_essence_slot_picker(dlg: GameDialog, player: Player, parent: N
 	var current_id := String(player.essence_slots[slot_index])
 	var current := Label.new()
 	current.text = "Current: %s" % (EssenceSystem.display_name(current_id) if current_id != "" else "(empty)")
-	current.add_theme_font_size_override("font_size", 22)
+	current.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	body.add_child(current)
 
 	if player.essence_inventory.is_empty():
 		var empty := Label.new()
 		empty.text = "No carried essences available."
-		empty.add_theme_font_size_override("font_size", 18)
+		empty.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 		empty.add_theme_color_override("font_color", Color(0.72, 0.72, 0.78))
 		body.add_child(empty)
 	else:

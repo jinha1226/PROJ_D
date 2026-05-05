@@ -24,7 +24,7 @@ var _dragged: bool = false
 
 
 func _ready() -> void:
-	add_theme_font_size_override("font_size", 22)
+	add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	button_down.connect(_on_button_down)
 	button_up.connect(_on_button_up)
 	pressed.connect(_on_pressed)

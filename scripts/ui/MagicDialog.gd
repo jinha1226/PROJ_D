@@ -22,7 +22,7 @@ static func _populate(dlg: GameDialog, player: Player, game: Node) -> void:
 
 	var mp_lbl := Label.new()
 	mp_lbl.text = "MP  %d / %d" % [player.mp, player.mp_max]
-	mp_lbl.add_theme_font_size_override("font_size", 30)
+	mp_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_TITLE)
 	mp_lbl.add_theme_color_override("font_color", Color(0.5, 0.75, 1.0))
 	body.add_child(mp_lbl)
 
@@ -92,7 +92,7 @@ static func _make_spell_row(spell: SpellData, player: Player,
 	var lv_lbl := Label.new()
 	lv_lbl.text = "Lv%d" % spell.spell_level
 	lv_lbl.custom_minimum_size = Vector2(44, 0)
-	lv_lbl.add_theme_font_size_override("font_size", 18)
+	lv_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	lv_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	lv_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lv_lbl.add_theme_color_override("font_color",
@@ -107,7 +107,7 @@ static func _make_spell_row(spell: SpellData, player: Player,
 
 	var name_lbl := Label.new()
 	name_lbl.text = spell.display_name
-	name_lbl.add_theme_font_size_override("font_size", 26)
+	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	var name_color: Color
 	var school_key: String = Player.progression_school_for(spell.school) if spell.school != "" else "arcane"
 	if locked:
@@ -140,14 +140,14 @@ static func _make_spell_row(spell: SpellData, player: Player,
 		var desc_lbl := Label.new()
 		desc_lbl.text = spell.description
 		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		desc_lbl.add_theme_font_size_override("font_size", 18)
+		desc_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 		desc_lbl.add_theme_color_override("font_color", Color(0.65, 0.68, 0.78))
 		info.add_child(desc_lbl)
 
 	# Cast button
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(110, 52)
-	btn.add_theme_font_size_override("font_size", 22)
+	btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	if locked:
 		btn.text = "Locked"
 		btn.disabled = true

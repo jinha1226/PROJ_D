@@ -41,7 +41,7 @@ static func open(player: Player, parent: Node,
 		var close_btn := Button.new()
 		close_btn.text = "OK"
 		close_btn.custom_minimum_size = Vector2(0, 56)
-		close_btn.add_theme_font_size_override("font_size", 24)
+		close_btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
 		close_btn.pressed.connect(func(): dlg.close())
 		body.add_child(close_btn)
 
@@ -55,11 +55,11 @@ static func _make_row(data: ItemData, id: String, player: Player,
 	name_lab.text = "%s ×%d" % [GameManager.display_name_of(id), count]
 	name_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_lab.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	name_lab.add_theme_font_size_override("font_size", 24)
+	name_lab.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
 	row.add_child(name_lab)
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(140, 54)
-	btn.add_theme_font_size_override("font_size", 22)
+	btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	btn.text = "Reveal"
 	btn.pressed.connect(func(): _on_pick(id, data, dlg, on_picked))
 	row.add_child(btn)

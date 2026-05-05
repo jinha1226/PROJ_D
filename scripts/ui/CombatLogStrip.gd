@@ -34,7 +34,7 @@ func _ready() -> void:
 	_label.offset_right = -10
 	_label.offset_top = 6
 	_label.offset_bottom = -6
-	_label.add_theme_font_size_override("normal_font_size", 22)
+	_label.add_theme_font_size_override("normal_font_size", GameTheme.TYPO_BODY)
 	add_child(_label)
 
 	CombatLog.message_added.connect(_on_message)

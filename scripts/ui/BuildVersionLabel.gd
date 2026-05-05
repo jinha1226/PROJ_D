@@ -12,7 +12,7 @@ func _ready() -> void:
 	_label = Label.new()
 	_label.text = _load_version()
 	_label.modulate = Color(0.7, 0.7, 0.7, 0.8)
-	_label.add_theme_font_size_override("font_size", 22)
+	_label.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
 	_label.offset_left = -320

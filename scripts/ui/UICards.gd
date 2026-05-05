@@ -6,7 +6,7 @@ const HINT := Color(0.78, 0.78, 0.85)
 const ACCENT_GOLD := Color(0.85, 0.72, 0.30)
 
 
-static func section_header(text: String, font_size: int = 44) -> Label:
+static func section_header(text: String, font_size: int = GameTheme.TYPO_DISPLAY) -> Label:
 	var lbl := Label.new()
 	lbl.text = text
 	lbl.add_theme_font_size_override("font_size", font_size)
@@ -72,7 +72,7 @@ static func pill(text: String, tint: Color) -> Control:
 	panel.add_theme_stylebox_override("panel", sb)
 	var lbl := Label.new()
 	lbl.text = text
-	lbl.add_theme_font_size_override("font_size", 26)
+	lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	lbl.add_theme_color_override("font_color", tint)
 	panel.add_child(lbl)
 	return panel

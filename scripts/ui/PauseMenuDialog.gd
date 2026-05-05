@@ -44,7 +44,7 @@ static func _make_btn(label: String) -> Button:
 	btn.text = label
 	btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	btn.custom_minimum_size = Vector2(0, 72)
-	btn.add_theme_font_size_override("font_size", 30)
+	btn.add_theme_font_size_override("font_size", GameTheme.TYPO_TITLE)
 	return btn
 
 

@@ -18,7 +18,7 @@ static func show_at(grid_pos: Vector2i, parent: Node) -> void:
 		var lbl := Label.new()
 		lbl.text = String(line)
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		lbl.add_theme_font_size_override("font_size", 22)
+		lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		lbl.add_theme_color_override("font_color", Color(0.78, 0.82, 0.88))
 		body.add_child(lbl)
 

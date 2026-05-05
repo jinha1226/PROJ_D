@@ -34,7 +34,7 @@ static func open(parent: Node) -> void:
 
 	var summary := Label.new()
 	summary.text = "Slain: %d / %d species" % [killed_count, total]
-	summary.add_theme_font_size_override("font_size", 26)
+	summary.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	summary.add_theme_color_override("font_color", Color(0.75, 0.9, 0.75))
 	body.add_child(summary)
 	body.move_child(summary, 0)
@@ -56,7 +56,7 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 	if kills == 0:
 		var name_lbl := Label.new()
 		name_lbl.text = "%s ???   (B%d-B%d)" % [data.glyph, data.min_depth, data.max_depth]
-		name_lbl.add_theme_font_size_override("font_size", 26)
+		name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 		name_lbl.add_theme_color_override("font_color", Color(0.4, 0.4, 0.45))
 		vb.add_child(name_lbl)
 		return panel
@@ -67,7 +67,7 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 
 	var glyph_lbl := Label.new()
 	glyph_lbl.text = data.glyph
-	glyph_lbl.add_theme_font_size_override("font_size", 36)
+	glyph_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_DISPLAY)
 	glyph_lbl.add_theme_color_override("font_color", data.glyph_color)
 	glyph_lbl.custom_minimum_size = Vector2(36, 0)
 	header_row.add_child(glyph_lbl)
@@ -78,26 +78,26 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 
 	var name_lbl := Label.new()
 	name_lbl.text = data.display_name
-	name_lbl.add_theme_font_size_override("font_size", 30)
+	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_TITLE)
 	name_lbl.add_theme_color_override("font_color", Color(0.95, 0.85, 0.55))
 	name_col.add_child(name_lbl)
 
 	var depth_lbl := Label.new()
 	depth_lbl.text = "B%d-B%d" % [data.min_depth, data.max_depth]
-	depth_lbl.add_theme_font_size_override("font_size", 20)
+	depth_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	depth_lbl.add_theme_color_override("font_color", Color(0.6, 0.65, 0.75))
 	name_col.add_child(depth_lbl)
 
 	var kills_lbl := Label.new()
 	kills_lbl.text = "x%d" % kills
-	kills_lbl.add_theme_font_size_override("font_size", 28)
+	kills_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_SUBTITLE)
 	kills_lbl.add_theme_color_override("font_color", Color(0.65, 1.0, 0.65))
 	kills_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	header_row.add_child(kills_lbl)
 
 	var stat_lbl := Label.new()
 	stat_lbl.text = "HP %d  HD %d  AC %d  EV %d" % [data.hp, data.hd, data.ac, data.ev]
-	stat_lbl.add_theme_font_size_override("font_size", 20)
+	stat_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	stat_lbl.add_theme_color_override("font_color", Color(0.65, 0.65, 0.75))
 	vb.add_child(stat_lbl)
 
@@ -105,7 +105,7 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 		var desc_lbl := Label.new()
 		desc_lbl.text = data.description
 		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		desc_lbl.add_theme_font_size_override("font_size", 22)
+		desc_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		desc_lbl.add_theme_color_override("font_color", Color(0.78, 0.78, 0.85))
 		vb.add_child(desc_lbl)
 
@@ -124,7 +124,7 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 		ess_lbl.text = "Essence: %s - %s" % [
 			EssenceSystem.display_name(eid), EssenceSystem.description(eid)]
 		ess_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		ess_lbl.add_theme_font_size_override("font_size", 20)
+		ess_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		ess_lbl.add_theme_color_override("font_color", EssenceSystem.color_of(eid))
 		ess_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		ess_row.add_child(ess_lbl)
@@ -132,7 +132,7 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 	elif kills > 0:
 		var ess_lbl := Label.new()
 		ess_lbl.text = "Essence: random drop"
-		ess_lbl.add_theme_font_size_override("font_size", 20)
+		ess_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		ess_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
 		vb.add_child(ess_lbl)
 

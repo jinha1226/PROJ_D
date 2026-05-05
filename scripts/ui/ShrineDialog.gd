@@ -55,7 +55,7 @@ static func open_altar_info(faith_id: String, altar_active: bool, player: Player
 	var short_lbl := Label.new()
 	short_lbl.text = String(faith.get("short", ""))
 	short_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	short_lbl.add_theme_font_size_override("font_size", 22)
+	short_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	short_lbl.add_theme_color_override("font_color", Color(0.75, 0.78, 0.85))
 	body.add_child(short_lbl)
 
@@ -65,7 +65,7 @@ static func open_altar_info(faith_id: String, altar_active: bool, player: Player
 	var effect_lbl := Label.new()
 	effect_lbl.text = String(lines[1]) if lines.size() > 1 else ""
 	effect_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	effect_lbl.add_theme_font_size_override("font_size", 20)
+	effect_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	effect_lbl.add_theme_color_override("font_color", Color(0.68, 0.72, 0.78))
 	body.add_child(effect_lbl)
 
@@ -78,20 +78,20 @@ static func open_altar_info(faith_id: String, altar_active: bool, player: Player
 		else:
 			status_lbl.text = "You have already sworn to another path."
 			status_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
-		status_lbl.add_theme_font_size_override("font_size", 22)
+		status_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		body.add_child(status_lbl)
 	elif not altar_active:
 		var guard_lbl := Label.new()
 		guard_lbl.text = "The guardian still lives. Defeat it to unlock the altars."
 		guard_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		guard_lbl.add_theme_font_size_override("font_size", 22)
+		guard_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		guard_lbl.add_theme_color_override("font_color", Color(0.8, 0.65, 0.35))
 		body.add_child(guard_lbl)
 	else:
 		var choose_btn := Button.new()
 		choose_btn.text = "Choose this path"
 		choose_btn.custom_minimum_size = Vector2(0, 56)
-		choose_btn.add_theme_font_size_override("font_size", 24)
+		choose_btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
 		choose_btn.add_theme_color_override("font_color", fcolor)
 		var fid: String = faith_id
 		choose_btn.pressed.connect(func():
@@ -115,7 +115,7 @@ static func open_choice(player: Player, parent: Node) -> void:
 	var sub_lbl := Label.new()
 	sub_lbl.text = "The first descent leaves a mark upon you. Choose the power that will shape the rest of this run."
 	sub_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	sub_lbl.add_theme_font_size_override("font_size", 20)
+	sub_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	sub_lbl.add_theme_color_override("font_color", Color(0.68, 0.72, 0.78))
 	body.add_child(sub_lbl)
 	body.add_child(HSeparator.new())
@@ -149,7 +149,7 @@ static func _make_choice_card(faith_id: String, player: Player, parent: Node, dl
 
 	var name_lbl := Label.new()
 	name_lbl.text = String(faith.get("name", faith_id))
-	name_lbl.add_theme_font_size_override("font_size", 26)
+	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	name_lbl.add_theme_color_override("font_color", fcolor)
 	vb.add_child(name_lbl)
 
@@ -162,7 +162,7 @@ static func _make_choice_card(faith_id: String, player: Player, parent: Node, dl
 
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(110, 52)
-	btn.add_theme_font_size_override("font_size", 22)
+	btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	btn.add_theme_color_override("font_color", fcolor)
 	btn.text = "Choose"
 	var selected_faith: String = faith_id
@@ -189,14 +189,14 @@ static func _open_confirm(faith_id: String, player: Player, parent: Node, dlg: G
 
 	var q_lbl := Label.new()
 	q_lbl.text = String(lines[0])
-	q_lbl.add_theme_font_size_override("font_size", 28)
+	q_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_SUBTITLE)
 	q_lbl.add_theme_color_override("font_color", fcolor)
 	q_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(q_lbl)
 
 	var sub_lbl := Label.new()
 	sub_lbl.text = String(lines[1]) if lines.size() > 1 else ""
-	sub_lbl.add_theme_font_size_override("font_size", 22)
+	sub_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	sub_lbl.add_theme_color_override("font_color", Color(0.72, 0.75, 0.82))
 	sub_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(sub_lbl)
@@ -209,7 +209,7 @@ static func _open_confirm(faith_id: String, player: Player, parent: Node, dlg: G
 	var confirm_btn := Button.new()
 	confirm_btn.text = "Confirm"
 	confirm_btn.custom_minimum_size = Vector2(160, 56)
-	confirm_btn.add_theme_font_size_override("font_size", 24)
+	confirm_btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
 	confirm_btn.add_theme_color_override("font_color", fcolor)
 	var fid: String = faith_id
 	confirm_btn.pressed.connect(func():
@@ -222,7 +222,7 @@ static func _open_confirm(faith_id: String, player: Player, parent: Node, dlg: G
 	var back_btn := Button.new()
 	back_btn.text = "Back"
 	back_btn.custom_minimum_size = Vector2(120, 56)
-	back_btn.add_theme_font_size_override("font_size", 22)
+	back_btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	back_btn.pressed.connect(func(): conf.close())
 	btn_row.add_child(back_btn)
 
@@ -250,7 +250,7 @@ static func _open_first_essence_choice(player: Player, parent: Node) -> void:
 	var sub_lbl := Label.new()
 	sub_lbl.text = "Monster remnants answer your call. Choose what form your path will take."
 	sub_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	sub_lbl.add_theme_font_size_override("font_size", 20)
+	sub_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	sub_lbl.add_theme_color_override("font_color", Color(0.68, 0.72, 0.78))
 	body.add_child(sub_lbl)
 	body.add_child(HSeparator.new())
@@ -291,7 +291,7 @@ static func _make_essence_card(eid: String, player: Player, parent: Node, dlg: G
 
 	var name_lbl := Label.new()
 	name_lbl.text = EssenceSystem.display_name(eid)
-	name_lbl.add_theme_font_size_override("font_size", 26)
+	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	name_lbl.add_theme_color_override("font_color", ecolor)
 	vb.add_child(name_lbl)
 
@@ -304,7 +304,7 @@ static func _make_essence_card(eid: String, player: Player, parent: Node, dlg: G
 
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(100, 50)
-	btn.add_theme_font_size_override("font_size", 22)
+	btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	btn.text = "Take"
 	var essence_id: String = eid
 	btn.pressed.connect(func():

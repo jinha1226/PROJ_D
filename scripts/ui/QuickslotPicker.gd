@@ -28,7 +28,7 @@ static func _populate(dlg: GameDialog, player: Player, slot_index: int,
 		header.text = "Currently: %s" % _name_of(current_id)
 	else:
 		header.text = "Slot %d is empty." % (slot_index + 1)
-	header.add_theme_font_size_override("font_size", 26)
+	header.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	header.add_theme_color_override("font_color", Color(0.7, 0.75, 0.9))
 	body.add_child(header)
 	body.add_child(HSeparator.new())
@@ -37,7 +37,7 @@ static func _populate(dlg: GameDialog, player: Player, slot_index: int,
 	if not player.known_spells.is_empty():
 		var spell_hdr := Label.new()
 		spell_hdr.text = "SPELLS"
-		spell_hdr.add_theme_font_size_override("font_size", 28)
+		spell_hdr.add_theme_font_size_override("font_size", GameTheme.TYPO_SUBTITLE)
 		spell_hdr.add_theme_color_override("font_color", Color(0.7, 0.6, 1.0))
 		body.add_child(spell_hdr)
 		for spell_id in player.known_spells:
@@ -62,7 +62,7 @@ static func _populate(dlg: GameDialog, player: Player, slot_index: int,
 		if not found_items:
 			var item_hdr := Label.new()
 			item_hdr.text = "CONSUMABLES"
-			item_hdr.add_theme_font_size_override("font_size", 28)
+			item_hdr.add_theme_font_size_override("font_size", GameTheme.TYPO_SUBTITLE)
 			item_hdr.add_theme_color_override("font_color", Color(0.8, 0.75, 0.4))
 			body.add_child(item_hdr)
 			found_items = true
@@ -78,7 +78,7 @@ static func _populate(dlg: GameDialog, player: Player, slot_index: int,
 		body.add_child(HSeparator.new())
 		var clear_btn := Button.new()
 		clear_btn.custom_minimum_size = Vector2(0, 60)
-		clear_btn.add_theme_font_size_override("font_size", 24)
+		clear_btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
 		clear_btn.text = "Clear slot %d" % (slot_index + 1)
 		clear_btn.pressed.connect(
 			func(): _set_binding(player, slot_index, "", dlg, on_change))
@@ -104,18 +104,18 @@ static func _make_spell_row(spell: SpellData, player: Player, slot_index: int,
 	row.add_child(vb)
 	var name_lab := Label.new()
 	name_lab.text = spell.display_name
-	name_lab.add_theme_font_size_override("font_size", 26)
+	name_lab.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	name_lab.add_theme_color_override("font_color", Color(0.8, 0.7, 1.0))
 	vb.add_child(name_lab)
 	var cost_lab := Label.new()
 	cost_lab.text = "%d MP" % spell.mp_cost
-	cost_lab.add_theme_font_size_override("font_size", 20)
+	cost_lab.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	cost_lab.modulate = Color(0.7, 0.7, 0.9)
 	vb.add_child(cost_lab)
 
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(130, 52)
-	btn.add_theme_font_size_override("font_size", 22)
+	btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	btn.text = "Bind"
 	btn.pressed.connect(
 		func(): _set_binding(player, slot_index, spell.id, dlg, on_change))
@@ -134,12 +134,12 @@ static func _make_item_row(data: ItemData, player: Player, slot_index: int,
 	name_lab.text = "%s  ×%d" % [GameManager.display_name_of(data.id), count]
 	name_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_lab.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	name_lab.add_theme_font_size_override("font_size", 24)
+	name_lab.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
 	row.add_child(name_lab)
 
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(130, 50)
-	btn.add_theme_font_size_override("font_size", 22)
+	btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	btn.text = "Bind"
 	btn.pressed.connect(
 		func(): _set_binding(player, slot_index, data.id, dlg, on_change))

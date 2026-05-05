@@ -51,9 +51,12 @@ static func _build_header(data: ItemData, plus: int) -> Control:
 	var thumb := Control.new()
 	thumb.custom_minimum_size = Vector2(THUMB_SIZE, THUMB_SIZE)
 	thumb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	if data.tile_path != "" and ResourceLoader.exists(data.tile_path):
+	var base_path: String = data.tile_path
+	if data.kind == "potion" and GameManager != null:
+		base_path = GameManager.potion_color_tile(data.id)
+	if base_path != "" and ResourceLoader.exists(base_path):
 		var rect := TextureRect.new()
-		rect.texture = load(data.tile_path) as Texture2D
+		rect.texture = load(base_path) as Texture2D
 		rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		rect.anchor_right = 1.0
 		rect.anchor_bottom = 1.0
@@ -103,7 +106,7 @@ static func _build_description(data: ItemData) -> Control:
 	var lbl := Label.new()
 	lbl.text = text
 	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	lbl.add_theme_font_size_override("font_size", 26)
+	lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	lbl.add_theme_color_override("font_color", Color(0.78, 0.78, 0.85))
 	return lbl
 
@@ -183,7 +186,7 @@ static func _stat_label(text: String) -> Label:
 	var lbl := Label.new()
 	lbl.text = text
 	lbl.custom_minimum_size = Vector2(160, 0)
-	lbl.add_theme_font_size_override("font_size", 26)
+	lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	lbl.add_theme_color_override("font_color", Color(0.65, 0.65, 0.75))
 	return lbl
 
@@ -252,19 +255,19 @@ static func _delta_row(stat: String, old_val: int, new_val: int,
 	var key_lbl := Label.new()
 	key_lbl.text = stat
 	key_lbl.custom_minimum_size = Vector2(140, 0)
-	key_lbl.add_theme_font_size_override("font_size", 26)
+	key_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	key_lbl.add_theme_color_override("font_color", Color(0.65, 0.65, 0.75))
 	row.add_child(key_lbl)
 
 	var old_lbl := Label.new()
 	old_lbl.text = old_fmt % old_val
-	old_lbl.add_theme_font_size_override("font_size", 26)
+	old_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	old_lbl.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
 	row.add_child(old_lbl)
 
 	var arrow := Label.new()
 	arrow.text = " → "
-	arrow.add_theme_font_size_override("font_size", 26)
+	arrow.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	arrow.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
 	row.add_child(arrow)
 
@@ -278,7 +281,7 @@ static func _delta_row(stat: String, old_val: int, new_val: int,
 		suffix = "  (=)"
 	var new_lbl := Label.new()
 	new_lbl.text = (new_fmt % new_val) + suffix
-	new_lbl.add_theme_font_size_override("font_size", 26)
+	new_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	new_lbl.add_theme_color_override("font_color",
 			Color(0.4, 1.0, 0.5) if delta > 0
 			else (Color(1.0, 0.4, 0.4) if delta < 0 else Color(0.7, 0.7, 0.7)))
@@ -296,7 +299,7 @@ static func _build_buttons(item_index: int, data: ItemData, player: Player,
 	var action_btn := Button.new()
 	action_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	action_btn.custom_minimum_size = Vector2(0, 72)
-	action_btn.add_theme_font_size_override("font_size", 28)
+	action_btn.add_theme_font_size_override("font_size", GameTheme.TYPO_SUBTITLE)
 
 	match data.kind:
 		"weapon":
@@ -410,7 +413,7 @@ static func _build_buttons(item_index: int, data: ItemData, player: Player,
 	var drop_btn := Button.new()
 	drop_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	drop_btn.custom_minimum_size = Vector2(0, 72)
-	drop_btn.add_theme_font_size_override("font_size", 28)
+	drop_btn.add_theme_font_size_override("font_size", GameTheme.TYPO_SUBTITLE)
 	drop_btn.text = "버리기"
 	drop_btn.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
 	drop_btn.pressed.connect(func():

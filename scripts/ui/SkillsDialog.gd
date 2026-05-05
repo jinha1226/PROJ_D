@@ -72,7 +72,7 @@ static func open(player: Player, parent: Node) -> void:
 		return
 	for child in body.get_children():
 		child.queue_free()
-	body.add_theme_constant_override("separation", 6)
+	body.add_theme_constant_override("separation", GameTheme.PAD_M)
 
 	if player.skills.is_empty():
 		player.init_skills()
@@ -81,18 +81,18 @@ static func open(player: Player, parent: Node) -> void:
 	var tip := Label.new()
 	tip.text = "Kill XP is split between ACTIVE skills. Tap to toggle. Long-press for details."
 	tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	tip.add_theme_font_size_override("font_size", 18)
+	tip.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	tip.add_theme_color_override("font_color", Color(0.7, 0.78, 0.85))
 	body.add_child(tip)
 
 	# ── tab bar ───────────────────────────────────────────────────────────────
 	var tab_bar := HBoxContainer.new()
-	tab_bar.add_theme_constant_override("separation", 4)
+	tab_bar.add_theme_constant_override("separation", GameTheme.PAD_S)
 	body.add_child(tab_bar)
 
 	# ── content area ─────────────────────────────────────────────────────────
 	var content := VBoxContainer.new()
-	content.add_theme_constant_override("separation", 6)
+	content.add_theme_constant_override("separation", GameTheme.PAD_M)
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	body.add_child(content)
 
@@ -111,7 +111,7 @@ static func open(player: Player, parent: Node) -> void:
 			if ids.is_empty():
 				var empty := Label.new()
 				empty.text = "No active or learned skills yet."
-				empty.add_theme_font_size_override("font_size", 22)
+				empty.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 				empty.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
 				content.add_child(empty)
 		else:
@@ -130,8 +130,8 @@ static func open(player: Player, parent: Node) -> void:
 		var btn := Button.new()
 		btn.text = tab["label"]
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		btn.add_theme_font_size_override("font_size", 22)
-		btn.custom_minimum_size = Vector2(0, 48)
+		btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+		btn.custom_minimum_size = Vector2(0, GameTheme.TAP_MIN_HEIGHT)
 		var tid: String = tab["id"]
 		btn.pressed.connect(func(): _switch_tab.call(tid))
 		tab_bar.add_child(btn)
@@ -205,7 +205,8 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 	)
 
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", GameTheme.PAD_M)
+	row.custom_minimum_size = Vector2(0, GameTheme.ROW_MIN_HEIGHT)
 	vb.add_child(row)
 
 	var name_col := VBoxContainer.new()
@@ -214,19 +215,19 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 	row.add_child(name_col)
 
 	var name_row := HBoxContainer.new()
-	name_row.add_theme_constant_override("separation", 6)
+	name_row.add_theme_constant_override("separation", GameTheme.PAD_S)
 	name_col.add_child(name_row)
 
 	var name_lbl := Label.new()
 	name_lbl.text = id.capitalize()
-	name_lbl.add_theme_font_size_override("font_size", 28)
+	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_SUBTITLE)
 	name_row.add_child(name_lbl)
 
 	var apt: int = _apt_for(id, player)
 	if apt != 0:
 		var apt_lbl := Label.new()
 		apt_lbl.text = _apt_label(apt)
-		apt_lbl.add_theme_font_size_override("font_size", 20)
+		apt_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		apt_lbl.add_theme_color_override("font_color",
 			Color(0.45, 0.9, 0.5) if apt > 0 else Color(0.9, 0.45, 0.45))
 		apt_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -234,7 +235,7 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 
 	var bonus_lbl := Label.new()
 	bonus_lbl.text = _bonus_text(id, level, player)
-	bonus_lbl.add_theme_font_size_override("font_size", 18)
+	bonus_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	bonus_lbl.add_theme_color_override("font_color", Color(0.6, 0.75, 0.6))
 	name_col.add_child(bonus_lbl)
 
@@ -250,13 +251,13 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 
 	var lv_lbl := Label.new()
 	lv_lbl.text = "MAX" if level >= Player.MAX_SKILL_LEVEL else "Lv.%d" % level
-	lv_lbl.add_theme_font_size_override("font_size", 24)
+	lv_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
 	lv_lbl.add_theme_color_override("font_color", lv_color)
 	lv_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(lv_lbl)
 
 	var xp_pct_lbl := Label.new()
-	xp_pct_lbl.add_theme_font_size_override("font_size", 20)
+	xp_pct_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	xp_pct_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	xp_pct_lbl.custom_minimum_size = Vector2(52, 0)
 	xp_pct_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -298,7 +299,7 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 
 	if level < Player.MAX_SKILL_LEVEL and needed > 0:
 		var xp_row := HBoxContainer.new()
-		xp_row.add_theme_constant_override("separation", 6)
+		xp_row.add_theme_constant_override("separation", GameTheme.PAD_S)
 		xp_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		vb.add_child(xp_row)
 
@@ -313,7 +314,7 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 
 		var xp_lbl := Label.new()
 		xp_lbl.text = "%d/%d" % [int(xp), needed]
-		xp_lbl.add_theme_font_size_override("font_size", 18)
+		xp_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 		xp_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
 		xp_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		xp_row.add_child(xp_lbl)
@@ -330,7 +331,7 @@ static func _show_desc(skill_id: String, desc: String, parent: Node) -> void:
 		return
 	var lbl := Label.new()
 	lbl.text = desc
-	lbl.add_theme_font_size_override("font_size", 26)
+	lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	body.add_child(lbl)

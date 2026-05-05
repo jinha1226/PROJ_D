@@ -22,7 +22,7 @@ static func open(parent: Node) -> void:
 	rtl.fit_content = true
 	rtl.custom_minimum_size = Vector2(0, 1200)
 	rtl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	rtl.add_theme_font_size_override("normal_font_size", 22)
+	rtl.add_theme_font_size_override("normal_font_size", GameTheme.TYPO_BODY)
 	var out: String = ""
 	var entries: Array = CombatLog.history
 	if entries.is_empty():

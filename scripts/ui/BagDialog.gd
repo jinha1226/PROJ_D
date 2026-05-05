@@ -14,12 +14,12 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 		return
 	for child in body.get_children():
 		child.queue_free()
-	body.add_theme_constant_override("separation", 6)
+	body.add_theme_constant_override("separation", GameTheme.PAD_M)
 
 	# Gold
 	var gold_lbl := Label.new()
 	gold_lbl.text = "%d Gold" % player.gold
-	gold_lbl.add_theme_font_size_override("font_size", 30)
+	gold_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_TITLE)
 	gold_lbl.add_theme_color_override("font_color", Color(1.0, 0.88, 0.3))
 	body.add_child(gold_lbl)
 
@@ -59,11 +59,11 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 
 	# Tab bar
 	var tab_bar := HBoxContainer.new()
-	tab_bar.add_theme_constant_override("separation", 4)
+	tab_bar.add_theme_constant_override("separation", GameTheme.PAD_S)
 	body.add_child(tab_bar)
 
 	var content_container := VBoxContainer.new()
-	content_container.add_theme_constant_override("separation", 4)
+	content_container.add_theme_constant_override("separation", GameTheme.PAD_S)
 	body.add_child(content_container)
 
 	var tab_labels: Array = ["전체", "무기", "방어구", "장신구", "소모품"]
@@ -75,7 +75,8 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 		var btn := Button.new()
 		btn.text = tab_labels[i]
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		btn.add_theme_font_size_override("font_size", 20)
+		btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+		btn.custom_minimum_size = Vector2(0, GameTheme.TAP_MIN_HEIGHT)
 		var idx: int = i
 		btn.pressed.connect(func():
 			for child in content_container.get_children():
@@ -134,7 +135,7 @@ static func _fill_inventory(container: VBoxContainer, player: Player,
 		var empty := Label.new()
 		empty.text = "(없음)"
 		empty.add_theme_color_override("font_color", Color(0.55, 0.55, 0.6))
-		empty.add_theme_font_size_override("font_size", 24)
+		empty.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
 		container.add_child(empty)
 
 
@@ -155,22 +156,22 @@ static func _accessory_stat_text(data: ItemData) -> String:
 
 static func _equipped_row(slot: String, name_s: String, stat: String) -> Control:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", GameTheme.PAD_M)
 	var slot_lbl := Label.new()
 	slot_lbl.text = slot
 	slot_lbl.custom_minimum_size = Vector2(72, 0)
-	slot_lbl.add_theme_font_size_override("font_size", 22)
+	slot_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	slot_lbl.add_theme_color_override("font_color", Color(0.65, 0.7, 0.65))
 	row.add_child(slot_lbl)
 	var name_lbl := Label.new()
 	name_lbl.text = name_s
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_lbl.add_theme_font_size_override("font_size", 24)
+	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
 	row.add_child(name_lbl)
 	if stat != "":
 		var stat_lbl := Label.new()
 		stat_lbl.text = stat
-		stat_lbl.add_theme_font_size_override("font_size", 22)
+		stat_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		stat_lbl.add_theme_color_override("font_color", Color(1.0, 0.88, 0.3))
 		row.add_child(stat_lbl)
 	return row
@@ -235,7 +236,8 @@ static func _make_thumbnail(data: ItemData) -> Control:
 static func _build_item_row(data: ItemData, indices: Array, plus: int,
 		player: Player, dlg: GameDialog, entry_data: Dictionary) -> Control:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", GameTheme.PAD_M)
+	row.custom_minimum_size = Vector2(0, GameTheme.ROW_MIN_HEIGHT)
 
 	row.add_child(_make_thumbnail(data))
 
@@ -255,7 +257,7 @@ static func _build_item_row(data: ItemData, indices: Array, plus: int,
 	name_lbl.text = label_text
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	name_lbl.add_theme_font_size_override("font_size", 26)
+	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	name_lbl.add_theme_color_override("font_color", _item_color(data.kind))
 	row.add_child(name_lbl)
 
@@ -267,14 +269,14 @@ static func _build_item_row(data: ItemData, indices: Array, plus: int,
 	if is_equipped:
 		var eq_lbl := Label.new()
 		eq_lbl.text = "장착중"
-		eq_lbl.add_theme_font_size_override("font_size", 20)
+		eq_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		eq_lbl.add_theme_color_override("font_color", Color(0.4, 0.9, 0.55))
 		eq_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		row.add_child(eq_lbl)
 	else:
 		var hint := Label.new()
 		hint.text = "›"
-		hint.add_theme_font_size_override("font_size", 36)
+		hint.add_theme_font_size_override("font_size", GameTheme.TYPO_DISPLAY)
 		hint.add_theme_color_override("font_color", Color(0.5, 0.5, 0.55))
 		hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		row.add_child(hint)
