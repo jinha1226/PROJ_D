@@ -95,12 +95,65 @@ var first_shrine_choice_done: bool = false
 
 const MAX_XL: int = 20
 const MAX_SKILL_LEVEL: int = 9
-const SKILL_IDS: Array = ["fighting", "unarmed", "blade", "hafted", "polearm", "ranged", "spellcasting", "elemental", "arcane", "hex", "necromancy", "summoning", "armor", "shield", "agility", "tool"]
+# DCSS-style 30 sub-skill list. Surface UI groups into 5+1 categories
+# (Melee/Ranged/Defense/Magic/Utility) via SKILL_CATEGORIES below.
+const SKILL_IDS: Array = [
+	# Melee (8)
+	"fighting", "unarmed",
+	"short_blades", "long_blades",
+	"maces", "axes", "staves", "polearms",
+	# Ranged (4)
+	"bows", "crossbows", "slings", "throwing",
+	# Defense (4)
+	"armor", "dodging", "stealth", "shields",
+	# Magic (13): spellcasting umbrella + 7 schools + 5 elements
+	"spellcasting",
+	"conjurations", "hexes", "charms", "summonings",
+	"necromancy", "translocations", "transmutation",
+	"fire", "ice", "air", "earth", "poison",
+	# Utility (2)
+	"invocations", "evocations",
+]
 const SKILL_XP_DELTA: Array = [12, 28, 55, 95, 150, 230, 340, 490, 700]
 const FIGHTING_HP_PER_LEVEL: int = 5
 const MAGIC_SCHOOLS: Array = [
-	"elemental", "arcane", "hex", "necromancy", "summoning",
+	"conjurations", "hexes", "charms", "summonings", "necromancy",
+	"translocations", "transmutation",
+	"fire", "ice", "air", "earth", "poison",
 ]
+# Surface category for SkillsDialog tab grouping. Stable mapping —
+# adding a new sub-skill = add SKILL_IDS line + SKILL_CATEGORIES line.
+const SKILL_CATEGORIES: Dictionary = {
+	"fighting": "Melee", "unarmed": "Melee",
+	"short_blades": "Melee", "long_blades": "Melee",
+	"maces": "Melee", "axes": "Melee", "staves": "Melee", "polearms": "Melee",
+	"bows": "Ranged", "crossbows": "Ranged", "slings": "Ranged", "throwing": "Ranged",
+	"armor": "Defense", "shields": "Defense", "dodging": "Defense", "stealth": "Defense",
+	"spellcasting": "Magic",
+	"conjurations": "Magic", "hexes": "Magic", "charms": "Magic", "summonings": "Magic",
+	"necromancy": "Magic", "translocations": "Magic", "transmutation": "Magic",
+	"fire": "Magic", "ice": "Magic", "air": "Magic", "earth": "Magic", "poison": "Magic",
+	"invocations": "Utility", "evocations": "Utility",
+}
+# Legacy skill ID → array of new sub-skills. Used by:
+#   1. Game.gd starting_skills remap (level applied to each sub-skill)
+#   2. get_skill_level legacy fallback (returns max of sub-skills)
+#   3. progression_school_for legacy school routing
+# Data files (.tres) gradually migrating; remap layer keeps old keys working
+# during transition. Eventually all .tres should use new keys directly.
+const LEGACY_SKILL_SPLIT: Dictionary = {
+	"blade":      ["short_blades", "long_blades"],
+	"hafted":     ["maces", "axes", "staves"],
+	"polearm":    ["polearms"],
+	"ranged":     ["bows", "crossbows", "slings", "throwing"],
+	"elemental":  ["fire", "ice", "air", "earth", "poison"],
+	"arcane":     ["conjurations", "translocations", "transmutation", "charms"],
+	"hex":        ["hexes"],
+	"summoning":  ["summonings"],
+	"shield":     ["shields"],
+	"agility":    ["dodging", "stealth"],
+	"tool":       ["invocations", "evocations"],
+}
 
 var _map: DungeonMap
 var _regen_hp_ticker: int = 0
@@ -885,36 +938,68 @@ func grant_kill_skill_xp(amount: float, preferred_skill: String = "") -> void:
 
 func get_skill_level(id: String) -> int:
 	var s: Dictionary = skills.get(id, {})
-	return int(s.get("level", 0))
+	if not s.is_empty():
+		return int(s.get("level", 0))
+	# Legacy alias fallback — return max of mapped sub-skills.
+	# Lets old code paths (MagicSystem element lookup, legacy callers) still
+	# function while sub-skills become the canonical source of truth.
+	if LEGACY_SKILL_SPLIT.has(id):
+		var max_lv: int = 0
+		for new_id in LEGACY_SKILL_SPLIT[id]:
+			var lv: int = int(skills.get(new_id, {}).get("level", 0))
+			if lv > max_lv:
+				max_lv = lv
+		return max_lv
+	return 0
 
 static func progression_school_for(raw_school: String) -> String:
 	match raw_school:
-		"fire", "cold", "air", "earth", "alchemy":
-			return "elemental"
-		"conjuration", "conjurations", "translocation", "transmutation", "abjuration", "evocation", "forgecraft":
-			return "arcane"
-		"hexes", "enchantment":
-			return "hex"
+		"fire":
+			return "fire"
+		"cold", "ice":
+			return "ice"
+		"air":
+			return "air"
+		"earth":
+			return "earth"
+		"alchemy", "poison":
+			return "poison"
+		"conjuration", "conjurations":
+			return "conjurations"
+		"translocation", "translocations":
+			return "translocations"
+		"transmutation":
+			return "transmutation"
+		"charm", "charms":
+			return "charms"
+		"abjuration", "evocation", "forgecraft":
+			return "conjurations"
+		"hex", "hexes", "enchantment":
+			return "hexes"
 		"necromancy":
 			return "necromancy"
-		"summoning":
-			return "summoning"
+		"summoning", "summonings":
+			return "summonings"
 	return raw_school
 
 static func weapon_skill_for_item(item: ItemData) -> String:
 	if item == null:
 		return "unarmed"
 	match String(item.category):
-		"dagger", "blade":
-			return "blade"
-		"axe", "blunt":
-			return "hafted"
+		"dagger":
+			return "short_blades"
+		"blade":
+			return "long_blades"
+		"axe":
+			return "axes"
+		"blunt":
+			return "maces"
 		"polearm":
-			return "polearm"
+			return "polearms"
 		"ranged":
-			return "ranged"
+			return "bows"  # TODO: split bows/crossbows/slings/throwing once item.category distinguishes
 		"staff":
-			return "spellcasting"
+			return "spellcasting"  # TODO: route to "staves" once items mark combat staff vs magical staff
 	return "unarmed"
 
 func spell_skill_for(spell: SpellData) -> String:

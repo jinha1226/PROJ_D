@@ -425,21 +425,41 @@ func _apply_class_to_player(class_id: String) -> void:
 		player.equipped_shield_id = data.starting_shield
 	player.init_skills()
 	var default_active: Array = []
+	var starter_weapon: ItemData = ItemRegistry.get_by_id(String(data.starting_weapon)) if ItemRegistry != null and String(data.starting_weapon) != "" else null
 	for skill_id in data.starting_skills.keys():
-		var mapped_skill: String = skill_id
-		if mapped_skill == "stealth" or mapped_skill == "dodge":
-			mapped_skill = "agility"
-		elif mapped_skill == "melee":
-			var starter_weapon: ItemData = ItemRegistry.get_by_id(String(data.starting_weapon)) if ItemRegistry != null and String(data.starting_weapon) != "" else null
-			mapped_skill = Player.weapon_skill_for_item(starter_weapon)
-		elif mapped_skill == "magic":
-			mapped_skill = "spellcasting"
-		elif mapped_skill == "defense":
-			mapped_skill = "armor"
-		if player.skills.has(mapped_skill):
-			player.skills[mapped_skill]["level"] = clampi(int(data.starting_skills[skill_id]), 0, Player.MAX_SKILL_LEVEL)
-			if not default_active.has(mapped_skill):
-				default_active.append(mapped_skill)
+		var lvl: int = clampi(int(data.starting_skills[skill_id]), 0, Player.MAX_SKILL_LEVEL)
+		# Resolve legacy / generic skill keys to one or more new sub-skill IDs.
+		var targets: Array = []
+		match String(skill_id):
+			"melee":
+				targets.append(Player.weapon_skill_for_item(starter_weapon))
+			"magic":
+				targets.append("spellcasting")
+			"defense":
+				targets.append("armor")
+			"dodge":
+				targets.append("dodging")
+			"blade", "hafted", "ranged":
+				# Use weapon to disambiguate when starter_weapon matches the family;
+				# otherwise distribute to all sub-skills (legacy umbrella behavior).
+				var weapon_skill: String = Player.weapon_skill_for_item(starter_weapon) if starter_weapon != null else ""
+				if weapon_skill != "" and Player.LEGACY_SKILL_SPLIT.get(skill_id, []).has(weapon_skill):
+					targets.append(weapon_skill)
+				else:
+					targets = Array(Player.LEGACY_SKILL_SPLIT.get(skill_id, []))
+			_:
+				if Player.LEGACY_SKILL_SPLIT.has(skill_id):
+					targets = Array(Player.LEGACY_SKILL_SPLIT[skill_id])
+				else:
+					targets.append(String(skill_id))
+		for mapped_skill in targets:
+			if player.skills.has(mapped_skill):
+				# If multiple legacy keys land on same sub-skill, take the max so we
+				# don't overwrite a higher value with a lower one.
+				var prev: int = int(player.skills[mapped_skill].get("level", 0))
+				player.skills[mapped_skill]["level"] = max(prev, lvl)
+				if not default_active.has(mapped_skill):
+					default_active.append(mapped_skill)
 	player.set_active_skills(_class_default_active_skills(class_id, default_active))
 	if data.starting_xl > 0:
 		player.xl = data.starting_xl

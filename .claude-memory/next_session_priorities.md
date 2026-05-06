@@ -22,6 +22,17 @@ C3 구현 결정: `Player.resists`를 Array[tag]에서 **Dictionary[element → 
 이전 stack-tag 모델은 EssenceSystem의 set-semantics(.has/.append/.erase)와 affix의 stack-semantics가 충돌.
 Dict 모델이 단일 진실 소스 — 다음 세션에서 다시 Array로 되돌리지 말 것.
 
+### 3. Phase 3 ✅ 완료 (2026-05-06, commit f0d28fc4)
+
+- **H1**: 이전 세션에서 이미 closed (`AoeEffects.gd` 5 helper)
+- **H2**: Faith 8 dead 키 + shield_block_bonus getter 제거. desc는 flavor 그대로 유지
+- **H6**: `static var X = Engine.get_main_loop()...get_node_or_null` 패턴 14 파일 일괄 제거. ItemRegistry/ShrineDialog 인라인 케이스도 autoload 식별자로 교체
+- **H7**: CombatSystem 데미지 파이프라인 재정리 — base → flat → mult → brand. skill flats/race/backstab가 mult chain 통과 → 고스킬에서 ~36% 데미지 상승. **밸런스 검증 필요**
+- **H8**: TurnManager `_abort_actor_loop` 플래그, `Game._on_player_died`에서 set
+- **H9**: 이미 closed (awareness 5필드 cache+restore)
+
+세션 학습: audit 문서가 5건(C2/H4/H1/H9, getter 일부) stale 였음. 다음 세션은 audit 항목 진입 전 *코드 grep으로 실재 여부 먼저 확인*. CLAUDE.md 의 "behavior contradicts docs → read code first" 원칙 적용.
+
 ### 2. Phase 2 ✅ 완료 (2026-05-06, commit 99d2f4a2)
 
 - H3 BagDialog 탭 필터: 6개 탭 + `__other__` catch-all (미래 kind 자동 처리)
@@ -306,6 +317,172 @@ Advanced (is_starter=false, 18개):
 - is_debug 플래그를 JobSelect에서 존중 (archmage 숨김)
 - Save 마이그레이션은 의도적으로 안 함 (사용자가 wipe OK)
 - 미래 추가: dwarf 등 추가 종족, monster type 추가, Other 카테고리 더 (warper, hedge_wizard 등)
+
+## 2026-05-06 Mastery + Action-Routed XP System 결정 (밸런스 토론 종결)
+
+### 비전 — 초보·고수 양쪽 잡는 layered 시스템
+
+```
+표면: 카테고리 마스터리 (6개) — 누적 XP 기반 레벨, 광역 보너스
+깊이: sub-skill 30개 — XP 기반 레벨, 특화 보너스
+최종 효과 = 마스터리 보너스 + sub-skill 보너스 (중첩)
+
+초보자 (active_skills 빈 상태로 시작):
+  XP 라우팅 = 행동 기반 (단검 사용 → short_blades에 풀 XP)
+  카테고리 누적 XP 자연 상승 → 마스터리 광역 보너스
+  미드까지 진행 가능, 후반 한계 (sub-skill 분산되어 특화 약함)
+
+고수 (SkillsDialog 매뉴얼 모드 → 일부 sub-skill active 토글):
+  XP가 active 스킬에 비례 분배 (기존 동작)
+  같은 시간에 1-2 sub-skill 9까지 → 특화 보너스 큼
+  마스터리 + 특화 둘 다 → 후반 안정
+```
+
+### 카테고리 (5+1 분리 유지, 통합 안 함)
+
+`Melee / Ranged / Magic / Defense / Agility / Utility` — Defense+Agility는 mechanically 반대 전략(tank ↔ evader)이라 분리 유지.
+
+### 마스터리 공식 — 누적 XP 기반
+
+```gdscript
+# Player.gd
+const MASTERY_XP_DELTA: Array = [60, 140, 275, 475, 750, 1150, 1700, 2450, 3500]
+
+func get_category_total_xp(category: String) -> float:
+    var total: float = 0.0
+    for skill_id in SKILL_CATEGORIES.keys():
+        if SKILL_CATEGORIES[skill_id] != category:
+            continue
+        var s: Dictionary = skills.get(skill_id, {})
+        total += float(s.get("xp", 0.0))
+        var lv: int = int(s.get("level", 0))
+        for i in range(lv):
+            total += float(SKILL_XP_DELTA[i])  # 이미 소비된 XP 합산
+    return total
+
+func get_category_mastery_level(category: String) -> int:
+    var xp: float = get_category_total_xp(category)
+    var level: int = 0
+    var consumed: float = 0.0
+    for delta in MASTERY_XP_DELTA:
+        if xp >= consumed + float(delta):
+            consumed += float(delta)
+            level += 1
+        else:
+            break
+    return min(level, 9)
+```
+
+이게 초보·고수 양쪽 같은 시간에 *같은 마스터리 레벨* 보장 (총 사용량 기준). 차이는 sub-skill 특화 깊이.
+
+### 카테고리별 마스터리 효과 (튜닝 출발점)
+
+```
+Melee Mastery:    +0.5% 근접 데미지 / 레벨 (cap +4.5%)
+Ranged Mastery:   +0.5% 사거리 데미지 / 레벨
+Magic Mastery:    +0.5% 스펠 파워 / 레벨 (또는 -1 MP/3레벨)
+Defense Mastery:  +0.5% 받는 데미지 감소 / 레벨 (tank-leaning)
+Agility Mastery:  +1 EV / 3레벨 (evader-leaning)
+Utility Mastery:  +0.5% 두루마리/완드/도구 효과 / 레벨
+
+각 sub-skill = 별도 특화 보너스 (예: short_blades wielding 시 +1 acc & +1 dmg/level)
+```
+
+### XP 라우팅 (DCSS 모델)
+
+```gdscript
+func gain_skill_xp(action_skill: String, amount: float) -> void:
+    if active_skills.is_empty():
+        # 초보 디폴트 = 행동 기반 (단일 스킬에 풀 XP)
+        if SKILL_IDS.has(action_skill):
+            _add_xp(action_skill, amount)
+    else:
+        # 고수 매뉴얼 = active 스킬 비례 분배 (기존 동작)
+        var per: float = amount / float(active_skills.size())
+        for skill_id in active_skills:
+            _add_xp(skill_id, per)
+
+# caller 측 (CombatSystem / MagicSystem 등):
+gain_skill_xp(Player.weapon_skill_for_item(weapon), amount)
+gain_skill_xp(Player.progression_school_for(spell.school), amount)
+gain_skill_xp("evocations", amount)  # 완드/도구 사용
+```
+
+### 캐릭터 생성 시 active_skills
+
+**항상 빈 배열로 시작.** ClassData.default_active_skills는 *적용 안 함*, *권장 표시용*으로만 (SkillsDialog "Recommended for Fighter: ...").
+
+```gdscript
+# Game.gd 캐릭터 init:
+player.set_active_skills([])  # 항상 빈 시작 — 초보 친화 디폴트
+```
+
+### SkillsDialog 두 모드
+
+**Mastery View (기본 첫 화면)**:
+- 6개 카테고리 카드 (마스터리 레벨 + 효과 요약 + 진행바)
+- 각 카드 안 sub-skill 압축 요약 (level만)
+- 카드 탭 시 sub-skill 디테일 팝업 또는 카테고리 탭으로 이동
+- 하단 [✱ Manual ▸] 토글 버튼
+
+**Manual 모드 (토글 진입)**:
+- 동일 레이아웃 + sub-skill에 체크박스
+- 체크 → active_skills 추가 → 비례 분배 모드
+- 해제 → action-routed 복귀
+- 상단 상태: "Auto (action-routed)" 또는 "Manual: 3 active"
+- 하단 [◂ Mastery] 복귀
+
+기존 ACTIVE 탭은 *Mastery View가 흡수*. 6 카테고리 탭(MELEE/RANGED/MAGIC/DEFENSE/AGILITY/UTILITY)은 sub-skill 디테일 보기로 유지.
+
+### 작업 단계 (Issue 3 sub-step 2-7과 통합 트랙)
+
+```
+Step 1: Player.get_category_total_xp + get_category_mastery_level
+        + MASTERY_XP_DELTA 상수
+Step 2: gain_skill_xp 분기 (empty → action-routed / non-empty → 비례)
+        caller 측 (Combat/Magic) action_skill 명시 호출로 변경
+Step 3: 캐릭터 init에서 set_active_skills([]) 강제
+        ClassData.default_active_skills는 데이터로 보존 (UI 권장 표시용)
+Step 4: SkillsDialog 재작성
+        - Mastery View 첫 화면 (6 카테고리 카드)
+        - Manual 모드 토글 + 체크박스 UI
+        - ACTIVE 탭 제거 (Mastery가 흡수)
+        - 6 카테고리 탭 sub-skill 디테일
+Step 5: CombatSystem / MagicSystem 데미지 계산에 마스터리 보너스 추가
+        damage = base + sub_skill_bonus + mastery_bonus
+Step 6: 카테고리별 마스터리 효과 정의 + 플레이어 텍스트
+Step 7: Issue 3 sub-step 2-7 통합 — Race aptitude × 30, MagicSystem element-aware,
+        나머지 .tres 정리, ShrineDialog 잔여 참조
+Step 8: 밸런스 튜닝 — 구체 변경 (BalanceSimulator 시뮬 30회 검증)
+        ▸ XP_CURVE 압축: 합 ~17,000 (현재 183,000에서 91% 압축)
+          새 곡선: [0, 10, 25, 50, 90, 150, 230, 320, 420, 540,
+                   650, 800, 980, 1190, 1430, 1700, 2000, 2330, 2690, 3080]
+          MAX_XL = 20 유지 (광고 cap을 실제 도달 가능하게)
+        ▸ env_damage dead code 청소 (Game.gd:2386 함수 + ZoneManager 필드/게터)
+          이미 호출처 0, 동작 변화 없음. 단순 코드 정리.
+        ▸ Rune 픽업 시 entry_depth × 100 XL XP 보너스
+          rune_swamp 600 / rune_ice 900 / rune_infernal 1200 / rune_crypt 1500
+          깊은 가지 = 더 큰 보상으로 후반 동기 부여
+        ▸ 도달 XL 시뮬 목표 검증:
+            노가지 14층: XL 12-13 (미드 wall)
+            1가지 18층: XL 14-15 (빠듯)
+            풀 4가지 30층: XL 19-20 (마스터)
+        ▸ 마스터리 곡선도 함께 검증 (active_skills 0~3개 시나리오)
+```
+
+### 종결된 디자인 결정 (재오픈 금지 항목)
+
+- ✓ Defense + Agility 분리 유지 (DCSS 패턴 + 빌드 정체성)
+- ✓ Mastery 누적 XP 기반 (레벨 평균/합 아님)
+- ✓ XP 라우팅: empty active → 행동 기반 / 비어있지 않음 → 비례 분배
+- ✓ 신규 캐릭터는 항상 active_skills = [] (초보 친화)
+- ✓ ClassData.default_active_skills = 권장 표시용 (자동 적용 안 함)
+- ✓ SkillsDialog ACTIVE 탭 제거, Mastery View로 흡수 + Manual 토글
+- ✓ Mastery 시스템과 Issue 3 (DCSS 30 split) 통합 트랙
+
+### 결정 종결 시각
+
+2026-05-06. 다음 세션부터 *구현 단계*. 디자인 변경 필요 시엔 *명시적 재오픈* 후 갱신.
 
 ## 결정 보류 중인 것
 

@@ -53,15 +53,33 @@ Tool governs practical combat devices and flexible problem-solving.",
 
 const TABS: Array = [
 	{"id": "active",  "label": "ACTIVE"},
-	{"id": "weapon",  "label": "WEAPON"},
+	{"id": "melee",   "label": "MELEE"},
+	{"id": "ranged",  "label": "RANGED"},
 	{"id": "magic",   "label": "MAGIC"},
 	{"id": "defense", "label": "DEFENSE"},
+	{"id": "agility", "label": "AGILITY"},
+	{"id": "utility", "label": "UTILITY"},
 ]
 
+# Category → sub-skill list. When DCSS 30-skill split lands (Issue 3),
+# new sub-skills go into the matching category here:
+#   melee:    short_blades, long_blades, maces, axes, staves
+#   ranged:   bows, crossbows, slings, throwing
+#   magic:    fire, ice, air, earth, poison + charms, translocations,
+#             transmutation, conjurations
+#   agility:  dodging, stealth (when agility splits)
+#   utility:  invocations, evocations (when tool splits)
 const TAB_SKILLS: Dictionary = {
-	"weapon":  ["fighting", "unarmed", "blade", "hafted", "polearm", "ranged", "tool"],
-	"magic":   ["spellcasting", "elemental", "arcane", "hex", "necromancy", "summoning"],
-	"defense": ["armor", "shield", "agility"],
+	"melee":   ["fighting", "unarmed", "short_blades", "long_blades",
+				"maces", "axes", "staves", "polearms"],
+	"ranged":  ["bows", "crossbows", "slings", "throwing"],
+	"magic":   ["spellcasting",
+				"conjurations", "hexes", "charms", "summonings",
+				"necromancy", "translocations", "transmutation",
+				"fire", "ice", "air", "earth", "poison"],
+	"defense": ["armor", "shields"],
+	"agility": ["dodging", "stealth"],
+	"utility": ["invocations", "evocations"],
 }
 
 static func open(player: Player, parent: Node) -> void:
