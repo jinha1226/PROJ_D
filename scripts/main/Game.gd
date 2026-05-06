@@ -754,8 +754,12 @@ func _try_open_essence_pickup_popup() -> void:
 				floor_item.queue_free()
 		_close_essence_pickup_popup(popup)
 	var leave_cb := func() -> void:
-		CombatLog.post("You leave %s behind." % EssenceSystem.display_name(essence_id),
+		# Unchosen essences vanish — no second-thoughts pickup. Forces a real
+		# decision at drop time and prevents floor clutter from rejected drops.
+		CombatLog.post("The %s essence fades away." % EssenceSystem.display_name(essence_id),
 			Color(0.62, 0.62, 0.72))
+		if floor_item != null and is_instance_valid(floor_item):
+			floor_item.queue_free()
 		_close_essence_pickup_popup(popup)
 	popup.show_essence_pickup_popup(
 		essence_id,
@@ -3062,9 +3066,11 @@ func _handle_monster_essence_drop(monster: Monster) -> void:
 			Color(1.0, 0.75, 0.3))
 		_spawn_essence_floor_item(uid, monster.grid_pos)
 		return
-	# Tuned 2026-05-06 from 0.22+d×0.01 (max 0.40) — too frequent, dropped on
-	# every 3-4th kill. Halved so essences feel like a meaningful reward.
-	var chance: float = min(0.10 + GameManager.depth * 0.005, 0.20)
+	# Tuned 2026-05-06: 0.22+d×0.01/0.40 → 0.10+d×0.005/0.20 → 0.05+d×0.003/0.12.
+	# Original was every 3-4 kills (clutter). First cut to every 7-10 kills was
+	# still too frequent; this lands at every 15-20 kills so essences feel
+	# noticeably rare and worth picking up.
+	var chance: float = min(0.05 + GameManager.depth * 0.003, 0.12)
 	if randf() >= chance:
 		return
 	var essence_id: String
