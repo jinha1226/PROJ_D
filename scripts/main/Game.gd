@@ -1714,10 +1714,29 @@ func _try_open_shrine_choice() -> void:
 
 const _RESPAWN_INTERVAL: int = 18
 
+## Per-turn passive XP for skills with no event-driven trigger:
+##   stealth: trickles while no monster is aware of the player (sneaking)
+##   invocations: trickles while a faith is chosen (devotional practice)
+## Amounts kept tiny (0.25-0.4) since this fires every player turn — over a
+## long run accumulates without dominating active skill growth.
+func _grant_passive_skill_xp() -> void:
+	if player == null:
+		return
+	var any_aware: bool = false
+	for n in get_tree().get_nodes_in_group("monsters"):
+		if n is Monster and n.is_aware and n.hp > 0:
+			any_aware = true
+			break
+	if not any_aware:
+		player.grant_skill_xp("stealth", 0.4)
+	if String(player.faith_id) != "":
+		player.grant_skill_xp("invocations", 0.25)
+
 func _on_player_turn_started() -> void:
 	if player != null and player.hp > 0:
 		player.tick_statuses()
 		RacePassiveSystem.on_player_turn_end(player)
+		_grant_passive_skill_xp()
 		if ZoneManager.zone_id_for_depth(GameManager.depth) == "abyss" \
 				and GameManager.branch_zone == "":
 			_tick_abyss()
