@@ -32,25 +32,10 @@ offset_left = -496.0
 offset_top = 200.2
 offset_right = 496.0
 offset_bottom = 400.2
+mouse_filter = 0
 texture = ExtResource("3_titletex")
 expand_mode = 1
 stretch_mode = 6
-
-[node name="MenuCard" type="ColorRect" parent="." unique_id=1291450207]
-visible = false
-layout_mode = 0
-anchor_left = 0.5
-anchor_top = 0.75
-anchor_right = 0.5
-anchor_bottom = 0.75
-offset_left = -260.0
-offset_top = -96.0
-offset_right = 260.0
-offset_bottom = 246.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0.04, 0.04, 0.06, 0.82)
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=1881230099]
 layout_mode = 0
@@ -70,29 +55,37 @@ theme_override_constants/separation = 10
 visible = false
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.92, 0.86, 0.66, 1)
-theme_override_colors/font_focus_color = Color(1, 0.95, 0.74, 1)
 theme_override_font_sizes/font_size = 38
+flat = true
 text = "[ CONTINUE ]"
 
 [node name="StartButton" type="Button" parent="VBox" unique_id=1784536838]
 custom_minimum_size = Vector2(0, 82)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.89, 0.66, 1)
-theme_override_colors/font_focus_color = Color(1, 0.96, 0.78, 1)
 theme_override_font_sizes/font_size = 44
+flat = true
 text = "[ NEW GAME ]"
-
-[node name="DisplayButton" type="Button" parent="VBox" unique_id=1170180081]
-custom_minimum_size = Vector2(0, 64)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.84, 0.64, 1)
-theme_override_font_sizes/font_size = 34
-text = "[ DISPLAY ]"
 
 [node name="HelpButton" type="Button" parent="VBox" unique_id=397651126]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.86, 0.8, 0.62, 1)
 theme_override_font_sizes/font_size = 28
+flat = true
 text = "[ HOW TO PLAY ]"
+
+[node name="DisplayHint" type="Label" parent="." unique_id=4011230811]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.97
+anchor_right = 0.5
+anchor_bottom = 0.97
+offset_left = -120.0
+offset_top = -16.0
+offset_right = 120.0
+offset_bottom = 8.0
+modulate = Color(1, 1, 1, 0)
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+text = ""

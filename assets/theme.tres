@@ -93,7 +93,8 @@ content_margin_top = 8.0
 content_margin_right = 12.0
 content_margin_bottom = 8.0
 
-; ── Panel ────────────────────────────────────────────────────────────────────
+; ── Panel ───────────────────────────────────────────────────────────────────
+; Drop shadow (PD style depth) + LightGray border.
 [sub_resource type="StyleBoxFlat" id="panel_style"]
 bg_color = Color(0.05, 0.05, 0.07, 0.95)
 border_width_left = 2
@@ -105,8 +106,13 @@ corner_radius_top_left = 2
 corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
+shadow_color = Color(0.0, 0.0, 0.0, 0.6)
+shadow_size = 3
+shadow_offset = Vector2(0, 2)
 
-; ── Window / AcceptDialog (heavier top border for banner feel) ───────────────
+; ── Window / AcceptDialog ────────────────────────────────────────────────────
+; PD banner: 4px top border establishes a "title bar" visual cue. Slight drop
+; shadow gives the dialog depth above the gameplay layer behind it.
 [sub_resource type="StyleBoxFlat" id="window_panel"]
 bg_color = Color(0.03, 0.03, 0.05, 0.97)
 border_width_left = 2
@@ -122,6 +128,9 @@ content_margin_left = 16.0
 content_margin_top = 12.0
 content_margin_right = 16.0
 content_margin_bottom = 12.0
+shadow_color = Color(0.0, 0.0, 0.0, 0.7)
+shadow_size = 6
+shadow_offset = Vector2(0, 4)
 
 ; ── Separator ────────────────────────────────────────────────────────────────
 [sub_resource type="StyleBoxFlat" id="sep_style"]

@@ -9,14 +9,17 @@ extends Node
 ##
 ## Usage:
 ##   lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
-const TYPO_CAPTION: int = 18      # tips, hints, fine-print
-const TYPO_BODY: int = 22         # default running text, descriptions
-const TYPO_BODY_LARGE: int = 24   # action button labels, prominent values
-const TYPO_LABEL: int = 26        # row item names (bag entries, etc.)
-const TYPO_SUBTITLE: int = 28     # row entity names with hierarchy (skill name)
-const TYPO_TITLE: int = 30        # dialog content headings, player name
-const TYPO_HEADER: int = 32       # top-of-dialog headers (matches default theme size)
-const TYPO_DISPLAY: int = 36      # large glyphs, hero counts
+# Sizes are Galmuri11 multiples (11/22/33/44) for clean pixel-grid alignment.
+# Off-multiple sizes produce slight aliasing on the pixel font — accept it for
+# fine-print only. Hierarchy via color/weight/spacing where size collapses.
+const TYPO_CAPTION: int = 22      # tips, hints, fine-print (was 18)
+const TYPO_BODY: int = 22         # default running text, descriptions (2x)
+const TYPO_BODY_LARGE: int = 22   # action button labels, prominent values
+const TYPO_LABEL: int = 22        # row item names (bag entries, etc.)
+const TYPO_SUBTITLE: int = 33     # row entity names with hierarchy (3x)
+const TYPO_TITLE: int = 33        # dialog content headings, player name
+const TYPO_HEADER: int = 33       # top-of-dialog headers
+const TYPO_DISPLAY: int = 44      # large glyphs, hero counts (4x)
 
 ## Tap-target sizing — Android Material guideline is 48dp minimum.
 ## At 720×1280 viewport on phone, 1px ≈ 1dp.

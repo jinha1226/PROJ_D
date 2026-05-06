@@ -6,9 +6,9 @@ const BUILD_VERSION_LABEL: PackedScene = preload("res://scenes/ui/BuildVersionLa
 
 @onready var _continue_btn: Button = $VBox/ContinueButton
 @onready var _start_btn: Button = $VBox/StartButton
-@onready var _display_btn: Button = $VBox/DisplayButton
-@onready var _shards_btn: Button = $VBox/ShardsButton
 @onready var _help_btn: Button = $VBox/HelpButton
+@onready var _title: TextureRect = $Title
+@onready var _display_hint: Label = $DisplayHint
 
 func _ready() -> void:
 	theme = GameTheme.create()
@@ -16,12 +16,13 @@ func _ready() -> void:
 		_continue_btn.pressed.connect(_on_continue)
 		_continue_btn.visible = SaveManager.has_save()
 	_start_btn.pressed.connect(_on_start)
-	_display_btn.pressed.connect(_on_toggle_display)
-	if _shards_btn != null:
-		_shards_btn.hide()
 	if _help_btn != null:
 		_help_btn.pressed.connect(_on_help)
-	_refresh_display_label()
+	# Easter egg: tap the PocketCrawl logo to toggle between tile and ASCII
+	# rendering. No discoverable button — players find it by trying to interact
+	# with the only image on screen.
+	if _title != null:
+		_title.gui_input.connect(_on_title_input)
 	add_child(BUILD_VERSION_LABEL.instantiate())
 
 func _on_continue() -> void:
@@ -33,15 +34,27 @@ func _on_start() -> void:
 	GameManager.selected_class_id = ""
 	get_tree().change_scene_to_file(RACE_SELECT_PATH)
 
-func _on_toggle_display() -> void:
-	GameManager.toggle_tiles()
-	_refresh_display_label()
+func _on_title_input(event: InputEvent) -> void:
+	var clicked := false
+	if event is InputEventScreenTouch and not event.pressed:
+		clicked = true
+	elif event is InputEventMouseButton \
+			and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+		clicked = true
+	if clicked:
+		GameManager.toggle_tiles()
+		_show_display_hint()
 
-func _refresh_display_label() -> void:
-	_display_btn.text = "[ DISPLAY: %s ]" % ("TILES" if GameManager.use_tiles else "ASCII")
-
-func _on_shards() -> void:
-	pass
+func _show_display_hint() -> void:
+	if _display_hint == null:
+		return
+	_display_hint.text = "▸ %s mode" % ("TILE" if GameManager.use_tiles else "ASCII")
+	# Fade in then out — no Tween cleanup needed since the scene survives.
+	var tw := create_tween()
+	_display_hint.modulate.a = 0.0
+	tw.tween_property(_display_hint, "modulate:a", 1.0, 0.15)
+	tw.tween_interval(1.2)
+	tw.tween_property(_display_hint, "modulate:a", 0.0, 0.6)
 
 func _on_help() -> void:
 	var dlg: GameDialog = GameDialog.create("How to Play")
@@ -51,7 +64,7 @@ func _on_help() -> void:
 		var lab := Label.new()
 		lab.text = line
 		lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		lab.add_theme_font_size_override("font_size", 22)
+		lab.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		body.add_child(lab)
 
 func _help_lines() -> Array:
@@ -68,7 +81,6 @@ func _help_lines() -> Array:
 		"REST: auto-wait to full HP when no enemy is in sight.",
 		"MENU: save and return to the title screen.",
 		"",
-		"Display button toggles tile / ASCII rendering.",
 		"Choose a Faith at the start of each run.",
 		"",
 		"ASCII legend:",

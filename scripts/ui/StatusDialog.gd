@@ -37,6 +37,7 @@ static func _rebuild_body(dlg: GameDialog, player: Player, parent: Node) -> void
 	body.add_child(_faith_card(player))
 	body.add_child(_stats_card(player))
 	body.add_child(_combat_card(player))
+	body.add_child(_mastery_card(player))
 	body.add_child(_equipment_card(player))
 	body.add_child(_resists_card(player))
 	body.add_child(_essence_card(dlg, player, parent))
@@ -188,6 +189,84 @@ static func _combat_card(player: Player) -> Control:
 	notes.add_theme_color_override("font_color", Color(0.78, 0.76, 0.7))
 	vb.add_child(notes)
 	return card
+
+## Compact mastery overview — 6 categories with level, effect summary, and
+## progress bar. Mirror of SkillsDialog's mastery cards but condensed (no
+## sub-skill rows). Lets the player track build progression without leaving
+## the Status screen.
+const _MASTERY_CATEGORIES_COMPACT: Array = ["Melee", "Ranged", "Magic", "Defense", "Agility", "Utility"]
+
+static func _mastery_card(player: Player) -> Control:
+	var card := UICards.card(Color(0.94, 0.84, 0.42))
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", GameTheme.PAD_M)
+	card.add_child(vb)
+	vb.add_child(UICards.section_header("Mastery", GameTheme.TYPO_SUBTITLE))
+
+	for cat in _MASTERY_CATEGORIES_COMPACT:
+		vb.add_child(_mastery_row(cat, player))
+	return card
+
+static func _mastery_row(category: String, player: Player) -> Control:
+	var lv: int = player.get_category_mastery_level(category)
+	var total_xp: float = player.get_category_total_xp(category)
+	var consumed: float = 0.0
+	for i in range(lv):
+		consumed += float(Player.MASTERY_XP_DELTA[i])
+	var into_level: float = total_xp - consumed
+	var next_need: float = float(Player.MASTERY_XP_DELTA[lv]) if lv < Player.MAX_MASTERY_LEVEL else 0.0
+
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 2)
+
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", GameTheme.PAD_M)
+	vb.add_child(row)
+
+	var name_lbl := Label.new()
+	name_lbl.text = category
+	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+	name_lbl.add_theme_color_override("font_color", Color(0.94, 0.84, 0.42))
+	row.add_child(name_lbl)
+
+	var lv_lbl := Label.new()
+	lv_lbl.text = "MAX" if lv >= Player.MAX_MASTERY_LEVEL else "Lv.%d" % lv
+	lv_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+	lv_lbl.add_theme_color_override("font_color",
+		Color(1.0, 0.85, 0.2) if lv >= Player.MAX_MASTERY_LEVEL else Color(0.85, 0.85, 0.85))
+	row.add_child(lv_lbl)
+
+	var effect_lbl := Label.new()
+	effect_lbl.text = _mastery_effect_text(category, lv)
+	effect_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
+	effect_lbl.add_theme_color_override("font_color",
+		Color(0.6, 0.75, 0.6) if lv > 0 else Color(0.5, 0.5, 0.55))
+	effect_lbl.custom_minimum_size = Vector2(180, 0)
+	effect_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	row.add_child(effect_lbl)
+
+	if next_need > 0.0:
+		var bar := ProgressBar.new()
+		bar.max_value = next_need
+		bar.value = clamp(into_level, 0.0, next_need)
+		bar.show_percentage = false
+		bar.custom_minimum_size = Vector2(0, 4)
+		bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		vb.add_child(bar)
+	return vb
+
+static func _mastery_effect_text(category: String, lv: int) -> String:
+	if lv <= 0:
+		return ""
+	match category:
+		"Melee":   return "+%.1f%% melee dmg" % (0.5 * float(lv))
+		"Ranged":  return "+%.1f%% ranged dmg" % (0.5 * float(lv))
+		"Magic":   return "+%.1f%% spell power" % (0.5 * float(lv))
+		"Defense": return "-%.1f%% dmg taken" % (0.5 * float(lv))
+		"Agility": return "+%d EV" % (lv / 3)
+		"Utility": return "+%.1f%% tool effect" % (0.5 * float(lv))
+	return ""
 
 static func _equipment_card(player: Player) -> Control:
 	var card := UICards.card(Color(0.7, 0.7, 0.82))
