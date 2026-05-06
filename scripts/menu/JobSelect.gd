@@ -3,15 +3,21 @@ extends Control
 const GAME_SCENE_PATH: String = "res://scenes/main/Game.tscn"
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 const DEFAULT_BASE_PATH: String = "res://assets/tiles/individual/player/base/human_m.png"
-const GROUP_ORDER: Array = [
-	{"id": "fighter", "label": "FIGHTER"},
-	{"id": "rogue",   "label": "ROGUE"},
-	{"id": "mage",    "label": "MAGE"},
+
+# Category-based grouping (replaces class_group). Maps to ClassData.category.
+const CATEGORY_ORDER: Array = [
+	{"id": "Melee",  "label": "MELEE"},
+	{"id": "Ranged", "label": "RANGED"},
+	{"id": "Magic",  "label": "MAGIC"},
+	{"id": "Other",  "label": "OTHER"},
 ]
 
 @onready var _scroll: ScrollContainer = $ScrollContainer
 @onready var _container: VBoxContainer = $ScrollContainer/VBox
 @onready var _back_btn: Button = $BackButton
+
+# Default = starter classes only. Toggle button reveals advanced/unlocked.
+var _show_advanced: bool = false
 
 
 func _ready() -> void:
@@ -29,21 +35,36 @@ func _build_class_list() -> void:
 	for child in _container.get_children():
 		child.queue_free()
 
-	# Bucket classes by group
-	var by_group: Dictionary = {}
-	for entry in GROUP_ORDER:
-		by_group[entry["id"]] = []
+	# Toggle row at top: starter ↔ advanced
+	_container.add_child(_make_toggle_button())
+
+	# Bucket classes by category, filtered by view mode
+	var by_cat: Dictionary = {}
+	for entry in CATEGORY_ORDER:
+		by_cat[entry["id"]] = []
 	for data in ClassRegistry.all:
-		var g: String = String(data.class_group)
-		if by_group.has(g):
-			by_group[g].append(data)
+		if data.is_debug:
+			continue
+		if _show_advanced:
+			if data.is_starter:
+				continue
+		else:
+			if not data.is_starter:
+				continue
+		var c: String = String(data.category)
+		if by_cat.has(c):
+			by_cat[c].append(data)
+		elif by_cat.has("Other"):
+			by_cat["Other"].append(data)
 
 	var first_group := true
-	for entry in GROUP_ORDER:
-		var group_id: String = entry["id"]
-		var classes: Array = by_group.get(group_id, [])
+	var any_shown := false
+	for entry in CATEGORY_ORDER:
+		var cat_id: String = entry["id"]
+		var classes: Array = by_cat.get(cat_id, [])
 		if classes.is_empty():
 			continue
+		any_shown = true
 		if not first_group:
 			var spacer := Control.new()
 			spacer.custom_minimum_size = Vector2(0, 8)
@@ -58,6 +79,33 @@ func _build_class_list() -> void:
 
 		for data in classes:
 			_container.add_child(_make_card(data))
+
+	# Empty-state message (e.g. advanced view with nothing unlocked yet)
+	if not any_shown:
+		var empty := Label.new()
+		empty.text = "No advanced classes unlocked yet." if _show_advanced \
+			else "No starter classes available."
+		empty.add_theme_font_size_override("font_size", 18)
+		empty.add_theme_color_override("font_color", Color(0.6, 0.62, 0.7))
+		_container.add_child(empty)
+
+
+func _make_toggle_button() -> Control:
+	var btn := Button.new()
+	btn.custom_minimum_size = Vector2(0, GameTheme.TAP_MIN_HEIGHT)
+	btn.add_theme_font_size_override("font_size", 22)
+	if _show_advanced:
+		btn.text = "◂ Starter Classes"
+	else:
+		btn.text = "Advanced Classes ▸"
+	btn.pressed.connect(_on_toggle_advanced)
+	return btn
+
+
+func _on_toggle_advanced() -> void:
+	_show_advanced = not _show_advanced
+	_build_class_list()
+	_scroll.scroll_vertical = 0
 
 
 func _make_card(data: ClassData) -> Control:
