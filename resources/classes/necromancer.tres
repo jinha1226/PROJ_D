@@ -20,7 +20,7 @@ starting_skills = {
 "necromancy": 4,
 "spellcasting": 2
 }
-starting_spells = ["inflict_wounds", "ray_of_enfeeblement", "vampiric_touch"]
+starting_spells = ["pain", "animate_skeleton"]
 default_active_skills = ["spellcasting", "necromancy", "fighting"]
 starter_items = ["potion_healing", "potion_magic"]
 class_group = "mage"

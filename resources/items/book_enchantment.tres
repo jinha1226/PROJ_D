@@ -24,5 +24,5 @@ plus = 0
 description = "A patient treatise on influence, binding, and subtle domination. Study it to unlock the full school of Enchantment."
 unlocks_class_id = ""
 grants_spell_id = ""
-grants_spell_ids = ["sleep", "hold_person", "fear", "confusion", "hold_monster", "mass_suggestion", "power_word_pain", "power_word_stun", "power_word_kill"]
+grants_spell_ids = ["sleep"]
 identified_tile_path = ""

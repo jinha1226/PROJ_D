@@ -411,7 +411,7 @@ func _apply_class_to_player(class_id: String) -> void:
 	_apply_race_mods(GameManager.selected_race_id)
 	player.set_race_from_id(GameManager.selected_race_id)
 	var starting_weapon_id: String = data.starting_weapon
-	if (class_id == "fighter" or class_id == "hunter" or class_id == "melee" or class_id == "ranged") \
+	if (class_id == "fighter" or class_id == "hunter") \
 			and GameManager.selected_starting_weapon_id != "":
 		starting_weapon_id = GameManager.selected_starting_weapon_id
 	if starting_weapon_id != "":

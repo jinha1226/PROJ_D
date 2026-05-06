@@ -9,8 +9,6 @@ const _ALL: Array[Resource] = [
 	preload("res://resources/spells/ignition.tres"),
 	# Cold
 	preload("res://resources/spells/freeze.tres"),
-	preload("res://resources/spells/ice_bolt.tres"),
-	preload("res://resources/spells/hibernation.tres"),
 	preload("res://resources/spells/ozocubus_refrigeration.tres"),
 	preload("res://resources/spells/glaciate.tres"),
 	# Air
@@ -18,7 +16,6 @@ const _ALL: Array[Resource] = [
 	preload("res://resources/spells/static_discharge.tres"),
 	preload("res://resources/spells/lightning_bolt.tres"),
 	preload("res://resources/spells/airstrike.tres"),
-	preload("res://resources/spells/tornado.tres"),
 	# Earth
 	preload("res://resources/spells/stone_arrow.tres"),
 	preload("res://resources/spells/petrify.tres"),
@@ -40,9 +37,7 @@ const _ALL: Array[Resource] = [
 	# Translocation
 	preload("res://resources/spells/blink.tres"),
 	preload("res://resources/spells/shroud_of_golubria.tres"),
-	preload("res://resources/spells/conjure_fog.tres"),
 	preload("res://resources/spells/swiftness.tres"),
-	preload("res://resources/spells/teleport.tres"),
 	# Summoning
 	preload("res://resources/spells/call_imp.tres"),
 	preload("res://resources/spells/animate_skeleton.tres"),

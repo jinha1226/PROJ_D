@@ -20,12 +20,12 @@ starting_skills = {
 "arcane": 4,
 "spellcasting": 2
 }
-starting_spells = ["fog_cloud", "misty_step", "stinking_cloud"]
+starting_spells = ["shock", "static_discharge"]
 default_active_skills = ["spellcasting", "arcane", "fighting"]
 starter_items = ["potion_healing", "potion_magic"]
 class_group = "mage"
 category = "Magic"
-is_starter = false
+is_starter = true
 unlocked = false
 unlock_kind = "use_item"
 unlock_trigger_id = "book_conjuration"

@@ -21,7 +21,7 @@ starting_skills = {
 "hex": 4,
 "spellcasting": 2
 }
-starting_spells = ["sleep", "hold_person", "fear"]
+starting_spells = ["sleep"]
 default_active_skills = ["spellcasting", "hex", "fighting"]
 starter_items = ["potion_healing", "potion_magic"]
 class_group = "mage"

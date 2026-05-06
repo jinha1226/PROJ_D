@@ -25,4 +25,4 @@ default_active_skills = ["blade", "armor", "shield", "fighting"]
 starter_items = ["potion_healing", "potion_healing"]
 class_group = "fighter"
 category = "Melee"
-is_starter = false
+is_starter = true

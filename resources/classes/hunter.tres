@@ -24,4 +24,4 @@ default_active_skills = ["ranged", "agility", "blade", "fighting"]
 starter_items = ["dagger", "potion_healing", "potion_healing", "scroll_blinking"]
 class_group = "rogue"
 category = "Ranged"
-is_starter = false
+is_starter = true

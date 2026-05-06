@@ -116,14 +116,10 @@ CLASS_DESC_FIRE_ELEMENTALIST,"Fire specialist. Hurls flame and explodes foes. Fr
 CLASS_DESC_GLADIATOR,Arena fighter. Polearm and shield. Trained for spectacle combat.,Arena fighter. Polearm and shield. Trained for spectacle combat.
 CLASS_DESC_HUNTER,"Agile archer. High DEX. Kites from range, falls back to blade up close.","Agile archer. High DEX. Kites from range, falls back to blade up close."
 CLASS_DESC_ICE_ELEMENTALIST,"Cold specialist. Freezes and slows foes. Fragile body, high INT.","Cold specialist. Freezes and slows foes. Fragile body, high INT."
-CLASS_DESC_MAGIC,Spellcasting starter. Dagger and robe. Find your school as you find books.,Spellcasting starter. Dagger and robe. Find your school as you find books.
-CLASS_DESC_MELEE,Close-combat starter. Sword and shield. Find your weapon style as you go.,Close-combat starter. Sword and shield. Find your weapon style as you go.
 CLASS_DESC_MONK,Unarmed master. No weapon needed. Trades equipment for body discipline.,Unarmed master. No weapon needed. Trades equipment for body discipline.
 CLASS_DESC_NECROMANCER,"Necromancy specialist. Drains life, weakens foes, walks among the dead.","Necromancy specialist. Drains life, weakens foes, walks among the dead."
-CLASS_DESC_RANGED,"Distance starter. Bow and dagger backup. Stay back, kite, and pivot to drops.","Distance starter. Bow and dagger backup. Stay back, kite, and pivot to drops."
 CLASS_DESC_SUMMONER,Calls creatures to fight. Wins through allies and battlefield pressure.,Calls creatures to fight. Wins through allies and battlefield pressure.
 CLASS_DESC_WANDERER,"Survivor. Mixed kit, no clear path. Builds emerge from what you find.","Survivor. Mixed kit, no clear path. Builds emerge from what you find."
-CLASS_DESC_WIZARD,General-purpose magic-user. Broad over deep — knows a little of every school.,General-purpose magic-user. Broad over deep — knows a little of every school.
 CLASS_NAME_AIR_ELEMENTALIST,Air Elementalist,대기 정령술사
 CLASS_NAME_ARCHMAGE,Archmage,대마법사
 CLASS_NAME_ARTIFICER,Artificer,장인
@@ -137,14 +133,10 @@ CLASS_NAME_FIRE_ELEMENTALIST,Fire Elementalist,화염 정령술사
 CLASS_NAME_GLADIATOR,Gladiator,검투사
 CLASS_NAME_HUNTER,Hunter,사냥꾼
 CLASS_NAME_ICE_ELEMENTALIST,Ice Elementalist,냉기 정령술사
-CLASS_NAME_MAGIC,Magic,마법
-CLASS_NAME_MELEE,Melee,근접
 CLASS_NAME_MONK,Monk,수도승
 CLASS_NAME_NECROMANCER,Necromancer,강령술사
-CLASS_NAME_RANGED,Ranged,원거리
 CLASS_NAME_SUMMONER,Summoner,소환술사
 CLASS_NAME_WANDERER,Wanderer,방랑자
-CLASS_NAME_WIZARD,Wizard,마법사
 ITEM_DESC_AMULET_LIFE,"A survivor's charm from a harsher age. While worn, it steadies the body and grants +20 maximum HP.","A survivor's charm from a harsher age. While worn, it steadies the body and grants +20 maximum HP."
 ITEM_DESC_AMULET_MAGIC,"A cool blue pendant that hums with old formulae. While worn, it grants +8 maximum MP.","A cool blue pendant that hums with old formulae. While worn, it grants +8 maximum MP."
 ITEM_DESC_AMULET_STR,"A war charm once worn by front-line killers. While worn, it grants +3 Strength.","A war charm once worn by front-line killers. While worn, it grants +3 Strength."
@@ -565,183 +557,81 @@ RACE_NAME_TROLL,Troll,트롤
 RACE_NAME_VAMPIRE,Vampire,뱀파이어
 SPELL_DESC_AIRSTRIKE,Calls down a thunderous strike from the sky. Ignores cover and walls — effective against evasive or hidden foes.,Calls down a thunderous strike from the sky. Ignores cover and walls — effective against evasive or hidden foes.
 SPELL_DESC_ANIMATE_DEAD,Animates the spirits of the recently fallen. Creates temporary undead allies from recent kills.,Animates the spirits of the recently fallen. Creates temporary undead allies from recent kills.
-SPELL_DESC_ANIMATE_OBJECTS,Nearby objects spring to life and attack your enemies.,Nearby objects spring to life and attack your enemies.
 SPELL_DESC_ANIMATE_SKELETON,Animates skeletal remains as a temporary ally. Cheap and useful — best from durable enemy corpses.,Animates skeletal remains as a temporary ally. Cheap and useful — best from durable enemy corpses.
-SPELL_DESC_ASTRAL_PROJECTION,Project your astral form. You become ethereal and regenerate rapidly.,Project your astral form. You become ethereal and regenerate rapidly.
-SPELL_DESC_BLIGHT,Drain the vitality from a creature for 8d8 necrotic damage.,Drain the vitality from a creature for 8d8 necrotic damage.
 SPELL_DESC_BLINK,Teleports you a short distance away. Fast escape from bad positioning or surrounded situations.,Teleports you a short distance away. Fast escape from bad positioning or surrounded situations.
-SPELL_DESC_BLUR,Your form blurs. Attackers have disadvantage on rolls to hit you.,Your form blurs. Attackers have disadvantage on rolls to hit you.
 SPELL_DESC_CALL_IMP,Calls a small imp to fight at your side. Early summoning option; the imp is fragile but draws attention.,Calls a small imp to fight at your side. Early summoning option; the imp is fragile but draws attention.
 SPELL_DESC_CHAIN_LIGHTNING,Lightning deals 10d8 and bounces to up to 3 nearby targets.,Lightning deals 10d8 and bounces to up to 3 nearby targets.
-SPELL_DESC_CLOUDKILL,Poisonous yellow-green fog deals 5d8 poison damage per turn.,Poisonous yellow-green fog deals 5d8 poison damage per turn.
-SPELL_DESC_CONE_OF_COLD,Blast of freezing air deals 8d8 cold damage in a cone.,Blast of freezing air deals 8d8 cold damage in a cone.
 SPELL_DESC_CONFUSE,"Confuses the target, causing random movement. Neutralizes a dangerous enemy without dealing damage.","Confuses the target, causing random movement. Neutralizes a dangerous enemy without dealing damage."
-SPELL_DESC_CONFUSION,Creatures act randomly — attacking allies or standing dazed.,Creatures act randomly — attacking allies or standing dazed.
-SPELL_DESC_CONJURE_FEY,Summon a powerful fey spirit to fight by your side.,Summon a powerful fey spirit to fight by your side.
 SPELL_DESC_CONJURE_FLAME,Conjures a burst of magical flame around you. Most effective when surrounded or in melee range.,Conjures a burst of magical flame around you. Most effective when surrounded or in melee range.
-SPELL_DESC_CONJURE_FOG,Conjures a thick fog that blocks all sight. Cuts ranged threats and gives time to reposition.,Conjures a thick fog that blocks all sight. Cuts ranged threats and gives time to reposition.
-SPELL_DESC_CONTAGION,Afflict a creature with a chosen debilitating disease.,Afflict a creature with a chosen debilitating disease.
 SPELL_DESC_DEATHS_DOOR,Stands at death's threshold — briefly invulnerable. Use it at the last moment to survive a fight you would otherwise lose.,Stands at death's threshold — briefly invulnerable. Use it at the last moment to survive a fight you would otherwise lose.
-SPELL_DESC_DIMENSION_DOOR,Open a dimensional portal and step through to any explored tile.,Open a dimensional portal and step through to any explored tile.
-SPELL_DESC_DISINTEGRATE,A green ray reduces a target to dust. Deals 10d6+40 force damage.,A green ray reduces a target to dust. Deals 10d6+40 force damage.
-SPELL_DESC_EARTHQUAKE,Violent tremors knock all nearby creatures prone and break terrain.,Violent tremors knock all nearby creatures prone and break terrain.
-SPELL_DESC_ENLARGE,You grow large. Add 1d4 to all melee damage rolls.,You grow large. Add 1d4 to all melee damage rolls.
-SPELL_DESC_EXPEDITIOUS_RETREAT,"Your speed doubles, letting you dash past enemies.","Your speed doubles, letting you dash past enemies."
-SPELL_DESC_FEAR,Creatures in range become frightened and must flee from you.,Creatures in range become frightened and must flee from you.
-SPELL_DESC_FINGER_OF_DEATH,Send negative energy surging through a creature for 7d8+30 necrotic damage.,Send negative energy surging through a creature for 7d8+30 necrotic damage.
 SPELL_DESC_FIREBALL,An explosive ball of fire erupts among your enemies. Devastates grouped targets but costs more mana.,An explosive ball of fire erupts among your enemies. Devastates grouped targets but costs more mana.
 SPELL_DESC_FIRE_STORM,A devastating storm of fire consumes everything nearby. Use it to end crowded fights quickly.,A devastating storm of fire consumes everything nearby. Use it to end crowded fights quickly.
-SPELL_DESC_FOG_CLOUD,"A sphere of thick fog fills the area, blocking all vision.","A sphere of thick fog fills the area, blocking all vision."
 SPELL_DESC_FREEZE,A bolt of freezing energy chills the target. Fast and cheap; a solid early cold spell.,A bolt of freezing energy chills the target. Fast and cheap; a solid early cold spell.
-SPELL_DESC_GATE,Open a planar rift and drag a legendary creature through to fight for you.,Open a planar rift and drag a legendary creature through to fight for you.
 SPELL_DESC_GLACIATE,Unleashes a glacial torrent that encases all nearby in ice. Your strongest cold spell — clears groups fast.,Unleashes a glacial torrent that encases all nearby in ice. Your strongest cold spell — clears groups fast.
-SPELL_DESC_GLOBE_OF_INVULNERABILITY,A shimmering field renders spells of level 5 and below harmless.,A shimmering field renders spells of level 5 and below harmless.
-SPELL_DESC_HARM,Ravage a creature with necromantic energy for 14d6 damage.,Ravage a creature with necromantic energy for 14d6 damage.
 SPELL_DESC_HASTE,Time dilates around you. Gain an extra action each turn.,Time dilates around you. Gain an extra action each turn.
 SPELL_DESC_HAUNT,Haunting spirits tear through the target repeatedly. Strong sustained necrotic pressure against a single enemy.,Haunting spirits tear through the target repeatedly. Strong sustained necrotic pressure against a single enemy.
 SPELL_DESC_HEX_FEAR,Fills the target with overwhelming magical terror. Sends an enemy fleeing — useful for disengaging or splitting groups.,Fills the target with overwhelming magical terror. Sends an enemy fleeing — useful for disengaging or splitting groups.
 SPELL_DESC_HEX_SLEEP,Casts a deep magical slumber over the target. Removes an enemy from a fight temporarily — harder to resist than fear.,Casts a deep magical slumber over the target. Removes an enemy from a fight temporarily — harder to resist than fear.
-SPELL_DESC_HIBERNATION,Chills the blood to induce deep magical sleep. A reliable crowd-control tool — sleeping enemies skip their turns.,Chills the blood to induce deep magical sleep. A reliable crowd-control tool — sleeping enemies skip their turns.
-SPELL_DESC_HOLD_MONSTER,"Paralyze any creature, not just humanoids.","Paralyze any creature, not just humanoids."
-SPELL_DESC_HOLD_PERSON,Paralyze a humanoid. It cannot move or act until the spell ends.,Paralyze a humanoid. It cannot move or act until the spell ends.
-SPELL_DESC_HORRID_WILTING,Draw moisture from creatures in range for 12d8 necrotic damage.,Draw moisture from creatures in range for 12d8 necrotic damage.
-SPELL_DESC_ICE_BOLT,A heavy shard of ice impales the target. High single-target cold damage at mid-range.,A heavy shard of ice impales the target. High single-target cold damage at mid-range.
-SPELL_DESC_ICE_STORM,Hail and sleet deal 4d6 cold + 2d6 bludgeoning in the area.,Hail and sleet deal 4d6 cold + 2d6 bludgeoning in the area.
 SPELL_DESC_IGNITION,The air itself ignites in a catastrophic conflagration. Your most powerful fire spell — save it for the hardest moments.,The air itself ignites in a catastrophic conflagration. Your most powerful fire spell — save it for the hardest moments.
-SPELL_DESC_INFLICT_WOUNDS,Rot erupts at your touch dealing 3d10 necrotic damage.,Rot erupts at your touch dealing 3d10 necrotic damage.
-SPELL_DESC_INVULNERABILITY,You are immune to all damage for several turns.,You are immune to all damage for several turns.
 SPELL_DESC_LEE_RAPID_DECONSTRUCTION,"Violently deconstructs stone and bone alike. Strong area damage, especially against heavily armored or undead foes.","Violently deconstructs stone and bone alike. Strong area damage, especially against heavily armored or undead foes."
 SPELL_DESC_LEHUDIB_CRYSTAL_SPEAR,Hurls a massive crystalline spear of pure force. Deals extreme single-target damage regardless of resistances.,Hurls a massive crystalline spear of pure force. Deals extreme single-target damage regardless of resistances.
 SPELL_DESC_LIGHTNING_BOLT,A bolt of lightning arcs between enemies. Damages the chain — best with multiple targets in line.,A bolt of lightning arcs between enemies. Damages the chain — best with multiple targets in line.
-SPELL_DESC_MAGE_ARMOR,Magical force surrounds you. AC becomes 13 + DEX modifier.,Magical force surrounds you. AC becomes 13 + DEX modifier.
-SPELL_DESC_MAGIC_MISSILE,Three force darts each auto-find a visible enemy. Can't miss.,Three force darts each auto-find a visible enemy. Can't miss.
 SPELL_DESC_MALIGN_GATEWAY,"Opens a gateway to a malign realm, summoning powerful beings. Your strongest summoning spell — fills the room with danger for everyone.","Opens a gateway to a malign realm, summoning powerful beings. Your strongest summoning spell — fills the room with danger for everyone."
 SPELL_DESC_MASS_CONFUSION,Fills all visible enemies with chaotic confusion. Can neutralize an entire room — requires strong Magic skill.,Fills all visible enemies with chaotic confusion. Can neutralize an entire room — requires strong Magic skill.
-SPELL_DESC_MASS_SUGGESTION,Up to 12 creatures obey a reasonable one-sentence command.,Up to 12 creatures obey a reasonable one-sentence command.
-SPELL_DESC_MAZE,Banish a creature to a demiplane maze for several turns.,Banish a creature to a demiplane maze for several turns.
-SPELL_DESC_METEOR_SWARM,Four meteors strike for 20d6 fire + 20d6 bludgeoning damage each.,Four meteors strike for 20d6 fire + 20d6 bludgeoning damage each.
-SPELL_DESC_MIND_BLANK,Gain immunity to psychic damage and all mind-affecting magic.,Gain immunity to psychic damage and all mind-affecting magic.
-SPELL_DESC_MISTY_STEP,"Surrounded by silver mist, teleport up to 5 tiles away.","Surrounded by silver mist, teleport up to 5 tiles away."
 SPELL_DESC_MONSTROUS_MENAGERIE,Calls forth a menagerie of monstrous allies. Summons several strong creatures — powerful but mana-intensive.,Calls forth a menagerie of monstrous allies. Summons several strong creatures — powerful but mana-intensive.
 SPELL_DESC_OZOCUBUS_REFRIGERATION,Freezes the air around all visible foes simultaneously. Strong when enemies swarm you.,Freezes the air around all visible foes simultaneously. Strong when enemies swarm you.
 SPELL_DESC_PAIN,Wracks the target with necrotic pain. Cheap and reliable; your entry point into necromantic damage.,Wracks the target with necrotic pain. Cheap and reliable; your entry point into necromantic damage.
 SPELL_DESC_PETRIFY,Petrifies the target in place. Stops a dangerous enemy cold — best used before a hard fight turns bad.,Petrifies the target in place. Stops a dangerous enemy cold — best used before a hard fight turns bad.
 SPELL_DESC_POLYMORPH,Transform a creature into a harmless beast. It loses its abilities.,Transform a creature into a harmless beast. It loses its abilities.
-SPELL_DESC_POWER_WORD_KILL,Utter a word of power. A creature with 100 HP or fewer dies instantly.,Utter a word of power. A creature with 100 HP or fewer dies instantly.
-SPELL_DESC_POWER_WORD_PAIN,A creature with 100 HP or fewer is wracked with agony and incapacitated.,A creature with 100 HP or fewer is wracked with agony and incapacitated.
-SPELL_DESC_POWER_WORD_STUN,A creature with 150 HP or fewer is stunned until it passes a save.,A creature with 150 HP or fewer is stunned until it passes a save.
-SPELL_DESC_PRISMATIC_SPRAY,Seven beams of colored light each produce a random devastating effect.,Seven beams of colored light each produce a random devastating effect.
-SPELL_DESC_PROTECTION_FROM_ENERGY,"Gain resistance to one element: fire, cold, electric, or poison.","Gain resistance to one element: fire, cold, electric, or poison."
-SPELL_DESC_RAY_OF_ENFEEBLEMENT,A black ray halves a creature's weapon damage on failed CON save.,A black ray halves a creature's weapon damage on failed CON save.
-SPELL_DESC_REVERSE_GRAVITY,All creatures in the area are flung upward and stunned for several turns.,All creatures in the area are flung upward and stunned for several turns.
 SPELL_DESC_SCORCH,A dart of fire scorches the target. Low cost and reliable — your first fire spell.,A dart of fire scorches the target. Low cost and reliable — your first fire spell.
-SPELL_DESC_SCORCHING_RAY,Three rays of fire each deal 2d6 fire damage.,Three rays of fire each deal 2d6 fire damage.
 SPELL_DESC_SHATTER,"Shatters the earth itself, dealing massive area damage. Your most powerful earth spell — ends most fights outright.","Shatters the earth itself, dealing massive area damage. Your most powerful earth spell — ends most fights outright."
 SPELL_DESC_SHOCK,A jolt of electricity zaps a nearby enemy. Very cheap; bridges the gap until better spells unlock.,A jolt of electricity zaps a nearby enemy. Very cheap; bridges the gap until better spells unlock.
 SPELL_DESC_SHROUD_OF_GOLUBRIA,A translocation shroud distorts your position (+EV). Makes you harder to hit without sacrificing offense.,A translocation shroud distorts your position (+EV). Makes you harder to hit without sacrificing offense.
 SPELL_DESC_SLEEP,Creatures totaling 5d8 HP fall into magical slumber.,Creatures totaling 5d8 HP fall into magical slumber.
 SPELL_DESC_SLOW,Slows and weakens the target's attacks. Buys time and reduces threat from fast or powerful enemies.,Slows and weakens the target's attacks. Buys time and reduces threat from fast or powerful enemies.
 SPELL_DESC_STATIC_DISCHARGE,Discharges a burst of static through multiple targets. Excellent against tight clusters of enemies.,Discharges a burst of static through multiple targets. Excellent against tight clusters of enemies.
-SPELL_DESC_STINKING_CLOUD,Noxious fumes incapacitate creatures that fail a CON save.,Noxious fumes incapacitate creatures that fail a CON save.
 SPELL_DESC_STONESKIN,Your skin hardens like stone. Resist all nonmagical physical damage.,Your skin hardens like stone. Resist all nonmagical physical damage.
 SPELL_DESC_STONE_ARROW,A sharp shard of stone pierces the target. Cheap and accurate; a solid general-purpose earth spell.,A sharp shard of stone pierces the target. Cheap and accurate; a solid general-purpose earth spell.
 SPELL_DESC_SUMMON_VERMIN,Summons a swarm of creatures from the abyss. Creates many bodies to absorb damage and crowd enemies.,Summons a swarm of creatures from the abyss. Creates many bodies to absorb damage and crowd enemies.
-SPELL_DESC_SUNBURST,Brilliant light deals 12d6 radiant damage and blinds all in range.,Brilliant light deals 12d6 radiant damage and blinds all in range.
 SPELL_DESC_SWIFTNESS,Channels translocation energy for supernatural speed. Lets you control the pace of every fight while it lasts.,Channels translocation energy for supernatural speed. Lets you control the pace of every fight while it lasts.
-SPELL_DESC_TELEPORT,Precisely teleports you anywhere on the floor. Your safest escape — best saved for emergencies.,Precisely teleports you anywhere on the floor. Your safest escape — best saved for emergencies.
-SPELL_DESC_TIME_STOP,Time freezes. Take 1d4+1 extra turns before anything else can act.,Time freezes. Take 1d4+1 extra turns before anything else can act.
-SPELL_DESC_TORNADO,Summons a raging tornado that sweeps through all foes. Your most powerful air spell — enormous area damage.,Summons a raging tornado that sweeps through all foes. Your most powerful air spell — enormous area damage.
 SPELL_DESC_VAMPIRIC_DRAINING,Drains life from the target to heal yourself. Doubles as offense and recovery — most valuable at low HP.,Drains life from the target to heal yourself. Doubles as offense and recovery — most valuable at low HP.
-SPELL_DESC_VAMPIRIC_TOUCH,Deal 3d6 necrotic and heal for half the damage dealt.,Deal 3d6 necrotic and heal for half the damage dealt.
-SPELL_DESC_WALL_OF_FORCE,An invisible impassable wall blocks movement and all attacks.,An invisible impassable wall blocks movement and all attacks.
 SPELL_NAME_AIRSTRIKE,Airstrike,공중 강타
 SPELL_NAME_ANIMATE_DEAD,Animate Dead,죽음의 부활
-SPELL_NAME_ANIMATE_OBJECTS,Animate Objects,물체 활성화
 SPELL_NAME_ANIMATE_SKELETON,Animate Skeleton,해골 부활
-SPELL_NAME_ASTRAL_PROJECTION,Astral Projection,영체 투영
-SPELL_NAME_BLIGHT,Blight,황폐
 SPELL_NAME_BLINK,Blink,깜빡이
-SPELL_NAME_BLUR,Blur,흐릿함
 SPELL_NAME_CALL_IMP,Call Imp,임프 소환
 SPELL_NAME_CHAIN_LIGHTNING,Chain Lightning,연쇄 번개
-SPELL_NAME_CLOUDKILL,Cloudkill,죽음의 구름
-SPELL_NAME_CONE_OF_COLD,Cone of Cold,냉기 원뿔
 SPELL_NAME_CONFUSE,Confuse,혼란
-SPELL_NAME_CONFUSION,Confusion,대혼란
-SPELL_NAME_CONJURE_FEY,Conjure Fey,요정 소환
 SPELL_NAME_CONJURE_FLAME,Conjure Flame,화염 소환
-SPELL_NAME_CONJURE_FOG,Conjure Fog,안개 소환
-SPELL_NAME_CONTAGION,Contagion,역병
 SPELL_NAME_DEATHS_DOOR,Death's Door,죽음의 문턱
-SPELL_NAME_DIMENSION_DOOR,Dimension Door,차원문
-SPELL_NAME_DISINTEGRATE,Disintegrate,분해
-SPELL_NAME_EARTHQUAKE,Earthquake,지진
-SPELL_NAME_ENLARGE,Enlarge,확대
-SPELL_NAME_EXPEDITIOUS_RETREAT,Expeditious Retreat,신속한 퇴각
-SPELL_NAME_FEAR,Fear,공포
-SPELL_NAME_FINGER_OF_DEATH,Finger of Death,죽음의 손가락
 SPELL_NAME_FIREBALL,Fireball,화염구
 SPELL_NAME_FIRE_STORM,Fire Storm,화염 폭풍
-SPELL_NAME_FOG_CLOUD,Fog Cloud,안개구름
 SPELL_NAME_FREEZE,Freeze,결빙
-SPELL_NAME_GATE,Gate,관문
 SPELL_NAME_GLACIATE,Glaciate,빙결
-SPELL_NAME_GLOBE_OF_INVULNERABILITY,Globe of Invulnerability,무적의 구체
-SPELL_NAME_HARM,Harm,상해
 SPELL_NAME_HASTE,Haste,가속
 SPELL_NAME_HAUNT,Haunt,유령 출몰
 SPELL_NAME_HEX_FEAR,Cause Fear,공포 유발
 SPELL_NAME_HEX_SLEEP,Ensorcelled Hibernation,마법 동면
-SPELL_NAME_HIBERNATION,Hibernation,동면
-SPELL_NAME_HOLD_MONSTER,Hold Monster,괴물 결박
-SPELL_NAME_HOLD_PERSON,Hold Person,인간 결박
-SPELL_NAME_HORRID_WILTING,Horrid Wilting,끔찍한 시들음
-SPELL_NAME_ICE_BOLT,Ice Bolt,얼음 화살
-SPELL_NAME_ICE_STORM,Ice Storm,얼음 폭풍
 SPELL_NAME_IGNITION,Ignition,점화
-SPELL_NAME_INFLICT_WOUNDS,Inflict Wounds,상처 가하기
-SPELL_NAME_INVULNERABILITY,Invulnerability,무적
 SPELL_NAME_LEE_RAPID_DECONSTRUCTION,Lee's Rapid Deconstruction,리의 신속 분해
 SPELL_NAME_LEHUDIB_CRYSTAL_SPEAR,Lehudib's Crystal Spear,레후디브의 수정 창
 SPELL_NAME_LIGHTNING_BOLT,Lightning Bolt,번개
-SPELL_NAME_MAGE_ARMOR,Mage Armor,마법사의 갑옷
-SPELL_NAME_MAGIC_MISSILE,Magic Missile,마법 화살
 SPELL_NAME_MALIGN_GATEWAY,Malign Gateway,사악한 관문
 SPELL_NAME_MASS_CONFUSION,Mass Confusion,집단 혼란
-SPELL_NAME_MASS_SUGGESTION,Mass Suggestion,집단 암시
-SPELL_NAME_MAZE,Maze,미궁
-SPELL_NAME_METEOR_SWARM,Meteor Swarm,유성 폭풍
-SPELL_NAME_MIND_BLANK,Mind Blank,정신 차단
-SPELL_NAME_MISTY_STEP,Misty Step,안개 발걸음
 SPELL_NAME_MONSTROUS_MENAGERIE,Monstrous Menagerie,괴물 동물원
 SPELL_NAME_OZOCUBUS_REFRIGERATION,Ozocubu's Refrigeration,오조쿠부스의 냉장
 SPELL_NAME_PAIN,Pain,고통
 SPELL_NAME_PETRIFY,Petrify,석화
 SPELL_NAME_POLYMORPH,Polymorph,변신
-SPELL_NAME_POWER_WORD_KILL,Power Word Kill,절명의 단어
-SPELL_NAME_POWER_WORD_PAIN,Power Word Pain,고통의 단어
-SPELL_NAME_POWER_WORD_STUN,Power Word Stun,충격의 단어
-SPELL_NAME_PRISMATIC_SPRAY,Prismatic Spray,프리즘 분사
-SPELL_NAME_PROTECTION_FROM_ENERGY,Protection from Energy,원소 보호
-SPELL_NAME_RAY_OF_ENFEEBLEMENT,Ray of Enfeeblement,쇠약의 광선
-SPELL_NAME_REVERSE_GRAVITY,Reverse Gravity,중력 반전
 SPELL_NAME_SCORCH,Scorch,그을림
-SPELL_NAME_SCORCHING_RAY,Scorching Ray,작열 광선
 SPELL_NAME_SHATTER,Shatter,파쇄
 SPELL_NAME_SHOCK,Shock,전격
 SPELL_NAME_SHROUD_OF_GOLUBRIA,Shroud of Golubria,골루브리아의 장막
 SPELL_NAME_SLEEP,Sleep,수면
 SPELL_NAME_SLOW,Slow,둔화
 SPELL_NAME_STATIC_DISCHARGE,Static Discharge,정전기 방출
-SPELL_NAME_STINKING_CLOUD,Stinking Cloud,악취 구름
 SPELL_NAME_STONESKIN,Stoneskin,돌피부
 SPELL_NAME_STONE_ARROW,Stone Arrow,돌 화살
 SPELL_NAME_SUMMON_VERMIN,Summon Vermin,해충 소환
-SPELL_NAME_SUNBURST,Sunburst,태양 폭발
 SPELL_NAME_SWIFTNESS,Swiftness,신속
-SPELL_NAME_TELEPORT,Teleport,순간이동
-SPELL_NAME_TIME_STOP,Time Stop,시간 정지
-SPELL_NAME_TORNADO,Tornado,회오리
 SPELL_NAME_VAMPIRIC_DRAINING,Vampiric Draining,흡혈 흡수
-SPELL_NAME_VAMPIRIC_TOUCH,Vampiric Touch,흡혈의 손길
-SPELL_NAME_WALL_OF_FORCE,Wall of Force,역장의 벽

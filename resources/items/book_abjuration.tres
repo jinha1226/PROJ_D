@@ -24,5 +24,5 @@ plus = 0
 description = "A later-age abridgement of warding formulae. Study it to unlock protective and dismissive magic as your skill grows."
 unlocks_class_id = ""
 grants_spell_id = ""
-grants_spell_ids = ["mage_armor", "blur", "protection_from_energy", "stoneskin", "wall_of_force", "globe_of_invulnerability", "prismatic_spray", "mind_blank", "invulnerability"]
+grants_spell_ids = ["stoneskin"]
 identified_tile_path = ""
