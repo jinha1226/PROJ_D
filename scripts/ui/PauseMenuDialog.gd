@@ -1,28 +1,34 @@
 class_name PauseMenuDialog extends RefCounted
 
 static func open(game: Node) -> void:
-	var dlg: GameDialog = GameDialog.create("Menu")
+	var dlg: GameDialog = GameDialog.create(TranslationServer.translate("PAUSEMENU_TITLE"))
 	game.add_child(dlg)
 	var body: VBoxContainer = dlg.body()
 	if body == null:
 		return
 	body.add_theme_constant_override("separation", GameTheme.PAD_XL)
 
-	_add_btn(body, "도감 (Bestiary)", func() -> void:
+	_add_btn(body, TranslationServer.translate("PAUSEMENU_BESTIARY"), func() -> void:
 		dlg.close()
 		BestiaryDialog.open(game)
 	)
 
-	var tile_label: String = "Display: %s" % ("Tiles" if GameManager.use_tiles else "ASCII")
-	var tile_btn: Button = _make_btn(tile_label)
+	_add_btn(body, TranslationServer.translate("PAUSEMENU_OPTIONS"), func() -> void:
+		OptionsDialog.open(game)
+	)
+
+	var _tile_text := func() -> String:
+		var key: String = "OPTIONS_DISPLAY_TILES" if GameManager.use_tiles else "OPTIONS_DISPLAY_ASCII"
+		return "%s: %s" % [TranslationServer.translate("OPTIONS_DISPLAY"), TranslationServer.translate(key)]
+	var tile_btn: Button = _make_btn(_tile_text.call())
 	body.add_child(tile_btn)
 	tile_btn.pressed.connect(func() -> void:
 		GameManager.toggle_tiles()
-		tile_btn.text = "Display: %s" % ("Tiles" if GameManager.use_tiles else "ASCII")
+		tile_btn.text = _tile_text.call()
 		_refresh_display(game)
 	)
 
-	_add_btn(body, "저장 후 종료", func() -> void:
+	_add_btn(body, TranslationServer.translate("PAUSEMENU_SAVE_QUIT"), func() -> void:
 		dlg.close()
 		if game.get("player") != null and (game.player as Object).get("hp") > 0:
 			if game.has_method("save_with_cache"):

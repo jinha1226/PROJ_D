@@ -6,6 +6,7 @@ const BUILD_VERSION_LABEL: PackedScene = preload("res://scenes/ui/BuildVersionLa
 
 @onready var _continue_btn: Button = $VBox/ContinueButton
 @onready var _start_btn: Button = $VBox/StartButton
+@onready var _options_btn: Button = $VBox/OptionsButton
 @onready var _help_btn: Button = $VBox/HelpButton
 @onready var _title: TextureRect = $Title
 @onready var _display_hint: Label = $DisplayHint
@@ -16,8 +17,12 @@ func _ready() -> void:
 		_continue_btn.pressed.connect(_on_continue)
 		_continue_btn.visible = SaveManager.has_save()
 	_start_btn.pressed.connect(_on_start)
+	if _options_btn != null:
+		_options_btn.pressed.connect(_on_options)
 	if _help_btn != null:
 		_help_btn.pressed.connect(_on_help)
+	_refresh_button_labels()
+	LocaleManager.locale_changed.connect(func(_l): _refresh_button_labels())
 	# Easter egg: tap the PocketCrawl logo to toggle between tile and ASCII
 	# rendering. No discoverable button — players find it by trying to interact
 	# with the only image on screen.
@@ -55,6 +60,19 @@ func _show_display_hint() -> void:
 	tw.tween_property(_display_hint, "modulate:a", 1.0, 0.15)
 	tw.tween_interval(1.2)
 	tw.tween_property(_display_hint, "modulate:a", 0.0, 0.6)
+
+func _on_options() -> void:
+	OptionsDialog.open(self, func(): _refresh_button_labels())
+
+func _refresh_button_labels() -> void:
+	if _continue_btn != null:
+		_continue_btn.text = tr("MAINMENU_CONTINUE")
+	if _start_btn != null:
+		_start_btn.text = tr("MAINMENU_NEW_GAME")
+	if _options_btn != null:
+		_options_btn.text = tr("MAINMENU_OPTIONS")
+	if _help_btn != null:
+		_help_btn.text = tr("MAINMENU_HOW_TO_PLAY")
 
 func _on_help() -> void:
 	var dlg: GameDialog = GameDialog.create("How to Play")

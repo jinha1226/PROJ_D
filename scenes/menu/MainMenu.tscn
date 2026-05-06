@@ -66,6 +66,13 @@ theme_override_font_sizes/font_size = 44
 flat = true
 text = "[ NEW GAME ]"
 
+[node name="OptionsButton" type="Button" parent="VBox" unique_id=2855011030]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+flat = true
+text = "[ OPTIONS ]"
+
 [node name="HelpButton" type="Button" parent="VBox" unique_id=397651126]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
