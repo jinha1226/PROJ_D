@@ -1126,9 +1126,11 @@ func grant_skill_xp(id: String, amount: float) -> void:
 			_apply_max_hp_gain(hp_gain, "+%d max HP from Fighting." % hp_gain)
 	skills[id] = s
 
-## Rune pickup bonus: entry_depth × 100, where entry_depth = top of the branch
-## entrance range. Encourages deeper branch attempts (swamp 600, ice 900,
-## infernal 1200, crypt 1500). Returns 0 for unknown runes.
+## Rune pickup bonus: entry_depth × 150, where entry_depth = top of the branch
+## entrance range. Encourages deeper branch attempts (swamp 900, ice 1350,
+## infernal 1800, crypt 2250 — total 6300 for full-4). Returns 0 for unknown
+## runes. Tuned 2026-05-06 from ×100 → ×150 to push thorough full-4 runs to
+## the XL 19-20 target.
 func _rune_xp_bonus(rune_id: String) -> int:
 	var zm = get_node_or_null("/root/ZoneManager")
 	if zm == null:
@@ -1138,7 +1140,7 @@ func _rune_xp_bonus(rune_id: String) -> int:
 			continue
 		var rng: Array = cfg.get("entrance_range", [])
 		if rng.size() >= 2:
-			return int(rng[1]) * 100
+			return int(rng[1]) * 150
 		break
 	return 0
 

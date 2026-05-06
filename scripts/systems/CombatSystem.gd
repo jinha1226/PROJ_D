@@ -9,7 +9,7 @@ const BACKSTAB_PER_AGILITY: float = 0.05
 const BACKSTAB_ROGUE_BONUS: float = 0.25
 const BACKSTAB_DAGGER_BONUS: float = 0.25
 const BACKSTAB_MAX_BONUS: float = 1.0
-const XP_PACE_MULTIPLIER: float = 1.35
+const XP_PACE_MULTIPLIER: float = 2.2
 
 static func _player_attack_profile(player: Player) -> Dictionary:
 	var profile: Dictionary = {
