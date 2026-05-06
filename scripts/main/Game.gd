@@ -810,8 +810,10 @@ func _spawn_ui() -> void:
 	log_strip.anchor_right = 1.0
 	log_strip.anchor_top = 1.0
 	log_strip.anchor_bottom = 1.0
-	log_strip.offset_top = -268.0
-	log_strip.offset_bottom = -132.0
+	# Sit above BottomHUD (which is the bottom 148px) with a 50px gap so the
+	# log doesn't overlap quickslot/menu buttons. ~136px tall band.
+	log_strip.offset_top = -334.0
+	log_strip.offset_bottom = -198.0
 	log_strip.grow_horizontal = 2
 	log_strip.grow_vertical = 0
 	ui_layer.add_child(log_strip)

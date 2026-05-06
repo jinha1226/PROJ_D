@@ -130,18 +130,21 @@ static func open(player: Player, parent: Node) -> void:
 	rebuild.call()
 
 
-## Mastery card: header (name + level), effect, mastery progress bar, then
-## an embedded list of sub-skill rows. In manual mode the rows are tappable
-## (toggle active). Always long-press on a sub-skill name shows description.
+## Mastery card.
+## - Auto mode: header + effect + progress bar only (clean, card-style summary).
+## - Manual mode: same + embedded sub-skill rows with checkboxes for toggling
+##   active state. Single tap on a row toggles. Long-press shows description.
 static func _make_mastery_card(category: String, player: Player, parent: Node,
 		manual_mode: bool, on_change: Callable) -> Control:
-	var card := VBoxContainer.new()
-	card.add_theme_constant_override("separation", GameTheme.PAD_S)
+	var card := PanelContainer.new()
+	var inner := VBoxContainer.new()
+	inner.add_theme_constant_override("separation", GameTheme.PAD_S)
+	card.add_child(inner)
 
 	# Header row: category name + mastery level
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", GameTheme.PAD_M)
-	card.add_child(header)
+	inner.add_child(header)
 
 	var name_lbl := Label.new()
 	name_lbl.text = category.to_upper()
@@ -163,7 +166,7 @@ static func _make_mastery_card(category: String, player: Player, parent: Node,
 	effect_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	effect_lbl.add_theme_color_override("font_color",
 		Color(0.6, 0.75, 0.6) if lv > 0 else Color(0.5, 0.5, 0.55))
-	card.add_child(effect_lbl)
+	inner.add_child(effect_lbl)
 
 	# Mastery progress bar
 	var total_xp: float = player.get_category_total_xp(category)
@@ -175,7 +178,7 @@ static func _make_mastery_card(category: String, player: Player, parent: Node,
 	if next_need > 0.0:
 		var bar_row := HBoxContainer.new()
 		bar_row.add_theme_constant_override("separation", GameTheme.PAD_S)
-		card.add_child(bar_row)
+		inner.add_child(bar_row)
 		var bar := ProgressBar.new()
 		bar.max_value = next_need
 		bar.value = clamp(into_level, 0.0, next_need)
@@ -189,28 +192,27 @@ static func _make_mastery_card(category: String, player: Player, parent: Node,
 		bar_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
 		bar_row.add_child(bar_lbl)
 
-	# Sub-skill rows
-	var sub_list := VBoxContainer.new()
-	sub_list.add_theme_constant_override("separation", 2)
-	card.add_child(sub_list)
-	var skill_ids: Array = _CATEGORY_SKILLS.get(category, [])
-	for skill_id in skill_ids:
-		sub_list.add_child(_make_subskill_row(skill_id, player, parent, manual_mode, on_change))
-
-	# Trailing divider for visual card separation (no explicit panel — relies on
-	# spacing + colored category label as the cue)
-	var sep := HSeparator.new()
-	card.add_child(sep)
+	# Sub-skill rows: only shown in manual mode. Auto stays card-clean.
+	if manual_mode:
+		var sep := HSeparator.new()
+		inner.add_child(sep)
+		var sub_list := VBoxContainer.new()
+		sub_list.add_theme_constant_override("separation", 2)
+		inner.add_child(sub_list)
+		var skill_ids: Array = _CATEGORY_SKILLS.get(category, [])
+		for skill_id in skill_ids:
+			sub_list.add_child(_make_subskill_row(skill_id, player, parent, on_change))
 
 	return card
 
 
-## Single sub-skill row inside a mastery card.
-## - Always: name + apt + level + xp progress + bonus text. Long-press → desc.
-## - Manual mode: row is tappable to toggle active. Active rows show checkmark
-##   + share %. Inactive rows are dimmed.
+## Single sub-skill row inside a mastery card (manual mode only).
+## Use a Button container so a single tap reliably fires `pressed` — earlier
+## Control + gui_input approach failed because Labels default to mouse_filter
+## STOP and absorbed events before the parent saw them. Long-press for
+## description uses gui_input on the same button.
 static func _make_subskill_row(skill_id: String, player: Player, parent: Node,
-		manual_mode: bool, on_change: Callable) -> Control:
+		on_change: Callable) -> Control:
 	var s: Dictionary = player.skills.get(skill_id, {"level": 0, "xp": 0.0})
 	var level: int = int(s.get("level", 0))
 	var xp: float = float(s.get("xp", 0.0))
@@ -218,42 +220,36 @@ static func _make_subskill_row(skill_id: String, player: Player, parent: Node,
 	if level < Player.SKILL_XP_DELTA.size():
 		needed = Player.SKILL_XP_DELTA[level]
 
-	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 0)
-	vb.mouse_filter = Control.MOUSE_FILTER_STOP
+	var btn := Button.new()
+	btn.flat = true
+	btn.toggle_mode = false
+	btn.custom_minimum_size = Vector2(0, GameTheme.TAP_MIN_HEIGHT)
+	btn.add_theme_constant_override("h_separation", GameTheme.PAD_M)
+	# We provide our own layout via children — clear the button's text/icon.
+	btn.text = ""
 
-	var _long_pressed := [false]
-	var hold_timer := Timer.new()
-	hold_timer.wait_time = 0.6
-	hold_timer.one_shot = true
-	vb.add_child(hold_timer)
-	var desc: String = String(_DESCRIPTIONS.get(skill_id, ""))
-	hold_timer.timeout.connect(func():
-		_long_pressed[0] = true
-		_show_desc(skill_id, desc, parent)
-	)
-
+	# Wrap content in HBox child (button supports children for custom layout).
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", GameTheme.PAD_M)
-	row.custom_minimum_size = Vector2(0, GameTheme.TAP_MIN_HEIGHT if manual_mode else 32)
-	vb.add_child(row)
+	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE  # let button receive clicks
+	btn.add_child(row)
 
-	# Checkbox slot (visible always; checked only in manual mode w/ active)
 	var check_lbl := Label.new()
-	check_lbl.custom_minimum_size = Vector2(20, 0)
+	check_lbl.custom_minimum_size = Vector2(28, 0)
 	check_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
 	check_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	check_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(check_lbl)
 
-	# Name
 	var name_lbl := Label.new()
 	name_lbl.text = skill_id.capitalize().replace("_", " ")
 	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(name_lbl)
 
-	# Aptitude (if non-zero)
 	var apt: int = _apt_for(skill_id, player)
 	if apt != 0:
 		var apt_lbl := Label.new()
@@ -263,9 +259,9 @@ static func _make_subskill_row(skill_id: String, player: Player, parent: Node,
 			Color(0.45, 0.9, 0.5) if apt > 0 else Color(0.9, 0.45, 0.45))
 		apt_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		apt_lbl.custom_minimum_size = Vector2(28, 0)
+		apt_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(apt_lbl)
 
-	# Level
 	var lv_color: Color
 	if level >= Player.MAX_SKILL_LEVEL:
 		lv_color = Color(1.0, 0.85, 0.2)
@@ -278,41 +274,29 @@ static func _make_subskill_row(skill_id: String, player: Player, parent: Node,
 	lv_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	lv_lbl.add_theme_color_override("font_color", lv_color)
 	lv_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lv_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(lv_lbl)
 
-	# Active share % (when active and >0)
 	var pct_lbl := Label.new()
 	pct_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	pct_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	pct_lbl.custom_minimum_size = Vector2(40, 0)
 	pct_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	pct_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(pct_lbl)
 
-	# XP bar (compact, only if learning)
-	if level < Player.MAX_SKILL_LEVEL and needed > 0 and (level > 0 or xp > 0):
-		var xp_bar := ProgressBar.new()
-		xp_bar.max_value = needed
-		xp_bar.value = xp
-		xp_bar.show_percentage = false
-		xp_bar.custom_minimum_size = Vector2(0, 4)
-		xp_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		xp_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		vb.add_child(xp_bar)
+	# Optional thin xp bar overlaid below the row inside a wrapping VBox would
+	# require switching the outer Button to a different layout. We keep the
+	# row clean — sub-skill xp progress is a power-user detail visible via
+	# long-press description. Lv label already shows current progression.
 
 	var refresh_visual := func() -> void:
 		var is_active: bool = player.is_skill_active(skill_id)
-		if manual_mode:
-			check_lbl.text = "☑" if is_active else "☐"
-			check_lbl.add_theme_color_override("font_color",
-				Color(0.95, 0.85, 0.35) if is_active else Color(0.5, 0.5, 0.55))
-			name_lbl.add_theme_color_override("font_color",
-				Color(0.95, 0.9, 0.7) if is_active else Color(0.7, 0.7, 0.75))
-			vb.modulate = Color.WHITE
-		else:
-			check_lbl.text = ""
-			name_lbl.add_theme_color_override("font_color",
-				Color(0.95, 0.85, 0.35) if is_active else Color(0.78, 0.78, 0.82))
-			vb.modulate = Color.WHITE
+		check_lbl.text = "☑" if is_active else "☐"
+		check_lbl.add_theme_color_override("font_color",
+			Color(0.95, 0.85, 0.35) if is_active else Color(0.5, 0.5, 0.55))
+		name_lbl.add_theme_color_override("font_color",
+			Color(0.95, 0.9, 0.7) if is_active else Color(0.7, 0.7, 0.75))
 		var n: int = player.active_skills.size()
 		if is_active and n > 0:
 			pct_lbl.text = "%d%%" % int(round(100.0 / float(n)))
@@ -321,28 +305,31 @@ static func _make_subskill_row(skill_id: String, player: Player, parent: Node,
 			pct_lbl.text = ""
 	refresh_visual.call()
 
-	vb.gui_input.connect(func(ev: InputEvent) -> void:
-		var pressed: bool = false
-		var released: bool = false
-		if ev is InputEventScreenTouch:
-			pressed = ev.pressed
-			released = not ev.pressed
-		elif ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
-			pressed = ev.pressed
-			released = not ev.pressed
-		if pressed:
-			_long_pressed[0] = false
-			hold_timer.start()
-		elif released:
-			hold_timer.stop()
-			if not _long_pressed[0] and manual_mode:
-				if player.toggle_skill_active(skill_id):
-					refresh_visual.call()
-					if on_change.is_valid():
-						on_change.call()
-			_long_pressed[0] = false)
+	# Long-press → description popup. Set _long_pressed before any handler may
+	# read it so the closure captures the same array reference.
+	var _long_pressed := [false]
+	var hold_timer := Timer.new()
+	hold_timer.wait_time = 0.6
+	hold_timer.one_shot = true
+	btn.add_child(hold_timer)
+	var desc: String = String(_DESCRIPTIONS.get(skill_id, ""))
+	hold_timer.timeout.connect(func():
+		_long_pressed[0] = true
+		_show_desc(skill_id, desc, parent))
+	btn.button_down.connect(func():
+		_long_pressed[0] = false
+		hold_timer.start())
+	btn.button_up.connect(func():
+		hold_timer.stop())
+	btn.pressed.connect(func() -> void:
+		if _long_pressed[0]:
+			return
+		if player.toggle_skill_active(skill_id):
+			refresh_visual.call()
+			if on_change.is_valid():
+				on_change.call())
 
-	return vb
+	return btn
 
 
 static func _format_mastery_effect(category: String, lv: int) -> String:

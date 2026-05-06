@@ -42,7 +42,7 @@ window/stretch/mode="canvas_items"
 
 [gui]
 
-theme/custom="res://assets/fonts/korean_theme.tres"
+theme/custom="res://assets/theme.tres"
 
 [physics]
 
