@@ -427,6 +427,11 @@ func use_item(index: int) -> void:
 	var data: ItemData = ItemRegistry.get_by_id(entry_id) if ItemRegistry != null and entry_id != "" else null
 	if data == null:
 		return
+	# Utility XP: wands and scrolls train evocations on use. Books and potions
+	# don't (potions are consumables, books grant spells which already train
+	# spellcasting via cast events).
+	if data.kind == "wand" or data.kind == "scroll":
+		grant_skill_xp("evocations", 4.0)
 	var had_effect: bool = true
 	match data.effect:
 		"heal":
@@ -1074,7 +1079,16 @@ static func weapon_skill_for_item(item: ItemData) -> String:
 		"polearm":
 			return "polearms"
 		"ranged":
-			return "bows"  # TODO: split bows/crossbows/slings/throwing once item.category distinguishes
+			# No sub-category field on ItemData yet — match on id substring.
+			# Order matters: check "crossbow" before "bow".
+			var lid: String = String(item.id).to_lower()
+			if "crossbow" in lid or "arbalest" in lid:
+				return "crossbows"
+			if "sling" in lid:
+				return "slings"
+			if "javelin" in lid or "dart" in lid or "boomerang" in lid or "throw" in lid:
+				return "throwing"
+			return "bows"
 		"staff":
 			return "spellcasting"  # TODO: route to "staves" once items mark combat staff vs magical staff
 	return "unarmed"

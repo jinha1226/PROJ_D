@@ -3043,7 +3043,9 @@ func _handle_monster_essence_drop(monster: Monster) -> void:
 			Color(1.0, 0.75, 0.3))
 		_spawn_essence_floor_item(uid, monster.grid_pos)
 		return
-	var chance: float = min(0.22 + GameManager.depth * 0.01, 0.40)
+	# Tuned 2026-05-06 from 0.22+d×0.01 (max 0.40) — too frequent, dropped on
+	# every 3-4th kill. Halved so essences feel like a meaningful reward.
+	var chance: float = min(0.10 + GameManager.depth * 0.005, 0.20)
 	if randf() >= chance:
 		return
 	var essence_id: String

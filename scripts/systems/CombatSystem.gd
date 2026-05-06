@@ -363,9 +363,15 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	if to_hit_roll < player.ev:
 		CombatLog.miss("The %s %s at you and misses." \
 				% [monster.data.display_name, verb])
+		_grant_defense_xp(player, "dodging", DEFENSE_XP_DODGE)
 		return
 	if _try_player_shield_block(player, monster):
+		_grant_defense_xp(player, "shields", DEFENSE_XP_BLOCK)
 		return
+	if player.equipped_armor_id != "":
+		_grant_defense_xp(player, "armor", DEFENSE_XP_HIT_TAKEN)
+	if player.equipped_shield_id != "" and not player.has_two_handed_weapon():
+		_grant_defense_xp(player, "shields", DEFENSE_XP_HIT_TAKEN)
 	var raw: int = randi_range(1, max(1, dmg_base))
 	var soak: int = randi_range(0, player.ac + 1)
 	var final: int = max(1, raw - soak)
@@ -402,11 +408,21 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 		ev_roll = 0
 	elif luck == 1:
 		ev_roll = 9999
+	# Defensive skill XP. Constants live in DEFENSE_XP_PER_EVENT.
+	# A successful dodge (miss) trains dodging. A hit landing trains armor (if
+	# armor-equipped) and shields (if shield-equipped — practice gain even
+	# without a block). A successful block grants extra shields XP below.
 	if to_hit_roll < ev_roll:
 		CombatLog.miss("The %s misses you." % monster.data.display_name)
+		_grant_defense_xp(player, "dodging", DEFENSE_XP_DODGE)
 		return
 	if _try_player_shield_block(player, monster):
+		_grant_defense_xp(player, "shields", DEFENSE_XP_BLOCK)
 		return
+	if player.equipped_armor_id != "":
+		_grant_defense_xp(player, "armor", DEFENSE_XP_HIT_TAKEN)
+	if player.equipped_shield_id != "" and not player.has_two_handed_weapon():
+		_grant_defense_xp(player, "shields", DEFENSE_XP_HIT_TAKEN)
 	# Parry: blade weapon skill gives chance to halve damage
 	if player.equipped_weapon_id != "":
 		var _wp: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
@@ -451,6 +467,18 @@ static func ally_attack_monster(ally: Monster, target: Monster) -> void:
 	target.emit_signal("hit_taken", final)
 	if target.hp <= 0:
 		target.die()
+
+## Defense skill XP per defensive event. Tuned smaller than kill XP since
+## defensive events fire more frequently — every monster turn vs every kill.
+const DEFENSE_XP_HIT_TAKEN: float = 1.5  # armor / shields when struck
+const DEFENSE_XP_DODGE: float = 2.0      # dodging when EV beats to-hit
+const DEFENSE_XP_BLOCK: float = 3.0      # shields bonus on successful block
+
+static func _grant_defense_xp(player: Player, skill_id: String, amount: float) -> void:
+	# Bypass active_skills routing — defensive events should always train
+	# the relevant defensive sub-skill, not the player's chosen actives.
+	if Player.SKILL_IDS.has(skill_id):
+		player.grant_skill_xp(skill_id, amount)
 
 static func _try_player_shield_block(player: Player, monster: Monster) -> bool:
 	if player.equipped_shield_id == "" or player.has_two_handed_weapon():
