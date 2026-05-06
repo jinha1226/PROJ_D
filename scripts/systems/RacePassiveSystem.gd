@@ -42,7 +42,7 @@ func on_player_turn_end(player: Node) -> void:
 			_regen_counter = 0
 			if player.hp < player.hp_max:
 				player.hp = min(player.hp + 1, player.hp_max)
-				CombatLog.post("You regenerate.", Color(0.5, 1.0, 0.6))
+				CombatLog.post(LocaleManager.t("LOG_YOU_REGENERATE"), Color(0.5, 1.0, 0.6))
 				player.emit_signal("stats_changed")
 
 # ── Melee damage bonus (called before final damage dealt by player) ────────────
@@ -63,7 +63,7 @@ func on_player_killed_monster(player: Node) -> void:
 		var healed: int = min(3, player.hp_max - player.hp)
 		if healed > 0:
 			player.hp += healed
-			CombatLog.post("You drain blood. (+%d HP)" % healed, Color(0.8, 0.3, 0.3))
+			CombatLog.post(LocaleManager.t("LOG_YOU_DRAIN_BLOOD_HP") % healed, Color(0.8, 0.3, 0.3))
 			player.emit_signal("stats_changed")
 
 # ── Incoming damage hook (called before player.take_damage) ──────────────────

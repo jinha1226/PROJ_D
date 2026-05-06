@@ -102,7 +102,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	var skill_level: int = int(profile.skill_level)
 	if not _player_attack_hits(player, monster, profile):
 		monster.become_aware(player.grid_pos)
-		CombatLog.miss("You miss the %s." % monster.data.display_name)
+		CombatLog.miss(LocaleManager.t("LOG_YOU_MISS_THE") % monster.data.display_name)
 		return
 	var base_final: int = _player_attack_base_damage(player, monster, profile)
 	var backstab_bonus: int = _backstab_bonus(player, monster, weapon, weapon_plus)
@@ -166,10 +166,10 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		if w_check != null and w_check.category == "dagger":
 			var swift_chance: float = player.get_skill_level("blade") * 0.05
 			if swift_chance > 0.0 and randf() < swift_chance:
-				CombatLog.hit("Swift strike!")
+				CombatLog.hit(LocaleManager.t("LOG_SWIFT_STRIKE"))
 				_dagger_swift_strike(player, monster)
 	if was_alive and monster.hp <= 0:
-		CombatLog.hit("You kill the %s." % monster.data.display_name)
+		CombatLog.hit(LocaleManager.t("LOG_YOU_KILL_THE") % monster.data.display_name)
 		_apply_player_kill_rewards(player, monster, skill_id)
 
 static func _cleave_hit(player: Player, primary: Monster, base_dmg: int) -> void:
@@ -186,7 +186,7 @@ static func _cleave_hit(player: Player, primary: Monster, base_dmg: int) -> void
 		var dist: int = max(abs(m.grid_pos.x - player.grid_pos.x),
 				abs(m.grid_pos.y - player.grid_pos.y))
 		if dist <= 1:
-			CombatLog.hit("Cleave hits the %s for %d." % [m.data.display_name, cleave_dmg])
+			CombatLog.hit(LocaleManager.t("LOG_CLEAVE_HITS_THE_FOR") % [m.data.display_name, cleave_dmg])
 			m.take_damage(cleave_dmg)
 
 static func _dagger_swift_strike(player: Player, monster: Monster) -> void:
@@ -204,12 +204,12 @@ static func _dagger_swift_strike(player: Player, monster: Monster) -> void:
 	var eff_ac2: int = max(0, monster.data.ac - (2 if Status.has(monster, "corroded") else 0))
 	var soak: int = randi_range(0, eff_ac2 + 1)
 	var final: int = max(1, raw - soak)
-	CombatLog.hit("You hit the %s for %d." % [monster.data.display_name, final])
+	CombatLog.hit(LocaleManager.t("LOG_YOU_HIT_THE_FOR") % [monster.data.display_name, final])
 	var was_alive: bool = monster.hp > 0
 	monster.take_damage(final)
 	monster.become_aware(player.grid_pos)
 	if was_alive and monster.hp <= 0:
-		CombatLog.hit("You kill the %s." % monster.data.display_name)
+		CombatLog.hit(LocaleManager.t("LOG_YOU_KILL_THE") % monster.data.display_name)
 		var weapon_item: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if (player.equipped_weapon_id != "" and ItemRegistry != null) else null
 		_apply_player_kill_rewards(player, monster, Player.weapon_skill_for_item(weapon_item))
 
@@ -256,19 +256,19 @@ static func _apply_armor_brand_retaliation(player: Player, monster: Monster) -> 
 	match brand:
 		"venom":
 			Status.apply(monster, "poison", 3)
-			CombatLog.post("Your armor's venom lashes back!", Color(0.4, 1.0, 0.4))
+			CombatLog.post(LocaleManager.t("LOG_YOUR_ARMOR_S_VENOM_LASHES"), Color(0.4, 1.0, 0.4))
 		"freezing":
 			Status.apply(monster, "frozen", 1)
-			CombatLog.post("Your armor freezes the attacker!", Color(0.5, 0.85, 1.0))
+			CombatLog.post(LocaleManager.t("LOG_YOUR_ARMOR_FREEZES_THE_ATTACKER"), Color(0.5, 0.85, 1.0))
 		"flaming":
 			Status.apply(monster, "burning", 2)
-			CombatLog.post("Your armor burns the attacker!", Color(1.0, 0.55, 0.2))
+			CombatLog.post(LocaleManager.t("LOG_YOUR_ARMOR_BURNS_THE_ATTACKER"), Color(1.0, 0.55, 0.2))
 		"acid":
 			Status.apply(monster, "corroded", 3)
-			CombatLog.post("Your armor corrodes the attacker!", Color(0.6, 0.85, 0.3))
+			CombatLog.post(LocaleManager.t("LOG_YOUR_ARMOR_CORRODES_THE_ATTACKER"), Color(0.6, 0.85, 0.3))
 		"drain":
 			Status.apply(monster, "drained", 3)
-			CombatLog.post("Your armor drains the attacker!", Color(0.55, 0.35, 0.8))
+			CombatLog.post(LocaleManager.t("LOG_YOUR_ARMOR_DRAINS_THE_ATTACKER"), Color(0.55, 0.35, 0.8))
 
 static func brand_element_of(brand: String) -> String:
 	match brand:
@@ -361,7 +361,7 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	var to_hit_base: int = 15 + monster.data.hd
 	var to_hit_roll: int = randi_range(0, to_hit_base)
 	if to_hit_roll < player.ev:
-		CombatLog.miss("The %s %s at you and misses." \
+		CombatLog.miss(LocaleManager.t("LOG_THE_AT_YOU_AND_MISSES") \
 				% [monster.data.display_name, verb])
 		_grant_defense_xp(player, "dodging", DEFENSE_XP_DODGE)
 		return
@@ -379,7 +379,7 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	# Defense mastery: small multiplicative DR after flat soak/reduction.
 	final = max(1, int(round(float(final) * player.defense_mastery_incoming_mult())))
 	final = RacePassiveSystem.on_player_hit(player, final)
-	CombatLog.damage_taken("The %s %s you for %d." \
+	CombatLog.damage_taken(LocaleManager.t("LOG_THE_YOU_FOR") \
 			% [monster.data.display_name, verb, final])
 	player.take_damage(final, monster.data.id)
 	if player.hp > 0:
@@ -413,7 +413,7 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	# armor-equipped) and shields (if shield-equipped — practice gain even
 	# without a block). A successful block grants extra shields XP below.
 	if to_hit_roll < ev_roll:
-		CombatLog.miss("The %s misses you." % monster.data.display_name)
+		CombatLog.miss(LocaleManager.t("LOG_THE_MISSES_YOU") % monster.data.display_name)
 		_grant_defense_xp(player, "dodging", DEFENSE_XP_DODGE)
 		return
 	if _try_player_shield_block(player, monster):
@@ -429,7 +429,7 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 		if _wp != null and _wp.category == "blade":
 			var parry_chance: float = player.get_skill_level("blade") * 0.03
 			if parry_chance > 0.0 and randf() < parry_chance:
-				CombatLog.miss("You parry the %s's attack!" % monster.data.display_name)
+				CombatLog.miss(LocaleManager.t("LOG_YOU_PARRY_THE_S_ATTACK") % monster.data.display_name)
 				return
 	var dmg_lo: int = max(1, dmg_base * 3 / 5)
 	var dmg_hi: int = max(dmg_lo, dmg_base * 3 / 2)
@@ -442,14 +442,14 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	# Defense mastery: small multiplicative DR after flat soak/reduction.
 	final = max(1, int(round(float(final) * player.defense_mastery_incoming_mult())))
 	final = RacePassiveSystem.on_player_hit(player, final)
-	CombatLog.damage_taken("The %s hits you for %d." % [monster.data.display_name, final])
+	CombatLog.damage_taken(LocaleManager.t("LOG_THE_HITS_YOU_FOR") % [monster.data.display_name, final])
 	player.take_damage(final, monster.data.id)
 	if player.hp > 0:
 		_apply_armor_brand_retaliation(player, monster)
 	var poison_turns: int = int(attack.get("poison_turns", 0))
 	if poison_turns > 0 and player.hp > 0:
 		player.apply_status("poison", poison_turns)
-		CombatLog.damage_taken("You are poisoned.")
+		CombatLog.damage_taken(LocaleManager.t("LOG_YOU_ARE_POISONED"))
 
 static func ally_attack_monster(ally: Monster, target: Monster) -> void:
 	if ally.data == null or target.data == null:
@@ -460,7 +460,7 @@ static func ally_attack_monster(ally: Monster, target: Monster) -> void:
 	var raw: int = randi_range(max(1, base_dmg * 3 / 5), max(1, base_dmg * 3 / 2)) + ally.data.hd / 2
 	var soak: int = randi_range(0, target.data.hd / 2 + 1)
 	var final: int = max(1, raw - soak)
-	CombatLog.post("Your %s hits the %s for %d." % [
+	CombatLog.post(LocaleManager.t("LOG_YOUR_HITS_THE_FOR") % [
 		ally.data.display_name, target.data.display_name, final],
 		Color(0.5, 0.9, 0.55))
 	target.hp -= final
@@ -493,5 +493,5 @@ static func _try_player_shield_block(player: Player, monster: Monster) -> bool:
 		- missing * 0.04
 	if randf() >= block_pct:
 		return false
-	CombatLog.miss("You block the %s's attack!" % monster.data.display_name)
+	CombatLog.miss(LocaleManager.t("LOG_YOU_BLOCK_THE_S_ATTACK") % monster.data.display_name)
 	return true

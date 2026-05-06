@@ -312,7 +312,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 				action_btn.text = LocaleManager.t("EQUIP_UNEQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_weapon("")
-					CombatLog.post("You unequip %s." % data.loc_name())
+					CombatLog.post(LocaleManager.t("LOG_YOU_UNEQUIP") % data.loc_name())
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
@@ -320,7 +320,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 				action_btn.text = LocaleManager.t("EQUIP_EQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_weapon(String(entry.get("id", "")))
-					CombatLog.post("You equip %s." % data.loc_name())
+					CombatLog.post(LocaleManager.t("LOG_YOU_EQUIP") % data.loc_name())
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
@@ -329,7 +329,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 				action_btn.text = LocaleManager.t("EQUIP_UNEQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_armor("")
-					CombatLog.post("You unequip %s." % data.loc_name())
+					CombatLog.post(LocaleManager.t("LOG_YOU_UNEQUIP") % data.loc_name())
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
@@ -337,7 +337,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 				action_btn.text = LocaleManager.t("EQUIP_EQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_armor(String(entry.get("id", "")))
-					CombatLog.post("You don %s." % data.loc_name())
+					CombatLog.post(LocaleManager.t("LOG_YOU_DON") % data.loc_name())
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
@@ -346,7 +346,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 				action_btn.text = LocaleManager.t("EQUIP_UNEQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_shield("")
-					CombatLog.post("You lower %s." % data.loc_name())
+					CombatLog.post(LocaleManager.t("LOG_YOU_LOWER") % data.loc_name())
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
@@ -354,12 +354,12 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 				action_btn.text = LocaleManager.t("EQUIP_EQUIP")
 				action_btn.pressed.connect(func():
 					if player.has_two_handed_weapon():
-						CombatLog.post("2-hand weapon — cannot use a shield.",
+						CombatLog.post(LocaleManager.t("LOG_2_HAND_WEAPON_CANNOT_USE"),
 							Color(1.0, 0.6, 0.4))
 						detail_dlg.close()
 						return
 					player.set_equipped_shield(String(entry.get("id", "")))
-					CombatLog.post("You raise %s." % data.loc_name())
+					CombatLog.post(LocaleManager.t("LOG_YOU_RAISE") % data.loc_name())
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
@@ -368,7 +368,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 				action_btn.text = LocaleManager.t("EQUIP_UNEQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_ring("")
-					CombatLog.post("You remove %s." % data.loc_name())
+					CombatLog.post(LocaleManager.t("LOG_YOU_REMOVE") % data.loc_name())
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
@@ -376,7 +376,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 				action_btn.text = LocaleManager.t("EQUIP_EQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_ring(String(entry.get("id", "")))
-					CombatLog.post("You put on %s." % data.loc_name())
+					CombatLog.post(LocaleManager.t("LOG_YOU_PUT_ON") % data.loc_name())
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
@@ -385,7 +385,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 				action_btn.text = LocaleManager.t("EQUIP_UNEQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_amulet("")
-					CombatLog.post("You remove %s." % data.loc_name())
+					CombatLog.post(LocaleManager.t("LOG_YOU_REMOVE") % data.loc_name())
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
@@ -393,7 +393,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 				action_btn.text = LocaleManager.t("EQUIP_EQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_amulet(String(entry.get("id", "")))
-					CombatLog.post("You put on %s." % data.loc_name())
+					CombatLog.post(LocaleManager.t("LOG_YOU_PUT_ON") % data.loc_name())
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())

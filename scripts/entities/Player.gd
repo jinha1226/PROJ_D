@@ -247,7 +247,7 @@ func pickup(floor_item: FloorItem) -> void:
 	if data.kind == "gold":
 		var amount: int = max(1, data.effect_value)
 		gold += amount
-		CombatLog.pickup("You pick up %d gold." % amount)
+		CombatLog.pickup(LocaleManager.t("LOG_YOU_PICK_UP_GOLD") % amount)
 	elif data.kind == "essence":
 		var game_node: Node = get_tree().current_scene if get_tree() != null else null
 		if game_node != null and game_node.has_method("_pickup_essence_floor_item"):
@@ -259,12 +259,12 @@ func pickup(floor_item: FloorItem) -> void:
 		items.append(new_entry)
 		var pickup_name: String = ItemRegistry.entry_display_name(new_entry) if ItemRegistry != null else GameManager.display_name_of(data.id)
 		items_collected += 1
-		CombatLog.pickup("You pick up %s." % pickup_name)
+		CombatLog.pickup(LocaleManager.t("LOG_YOU_PICK_UP") % pickup_name)
 		if data.kind == "rune":
 			var rune_xp: int = _rune_xp_bonus(data.id)
 			if rune_xp > 0:
 				grant_xp(rune_xp)
-				CombatLog.post("The %s pulses with deep power. (+%d XP)" % [pickup_name, rune_xp],
+				CombatLog.post(LocaleManager.t("LOG_THE_PULSES_WITH_DEEP_POWER") % [pickup_name, rune_xp],
 					Color(1.0, 0.85, 0.4))
 		auto_bind_quickslot(data.id)
 	emit_signal("stats_changed")
@@ -438,37 +438,37 @@ func use_item(index: int) -> void:
 			var heal_amt: int = maxi(1, int(round(float(data.effect_value) * EssenceSystem.potion_heal_mult(self) * FaithSystem.potion_heal_mult(self))))
 			heal_amt += EssenceSystem.potion_heal_bonus(self)
 			heal(heal_amt)
-			CombatLog.post("You feel better. (+%d HP)" % heal_amt,
+			CombatLog.post(LocaleManager.t("LOG_YOU_FEEL_BETTER_HP") % heal_amt,
 				Color(0.6, 1.0, 0.6))
 		"bandage":
 			var heal_amt: int = 6
 			heal(heal_amt)
-			CombatLog.post("You bandage your wounds. (+%d HP)" % heal_amt, Color(0.85, 0.9, 0.65))
+			CombatLog.post(LocaleManager.t("LOG_YOU_BANDAGE_YOUR_WOUNDS_HP") % heal_amt, Color(0.85, 0.9, 0.65))
 		"blink":
 			_blink(data.effect_value)
 		"might":
 			strength += data.effect_value
-			CombatLog.post("You feel mighty. (+%d STR)" % data.effect_value,
+			CombatLog.post(LocaleManager.t("LOG_YOU_FEEL_MIGHTY_STR") % data.effect_value,
 				Color(1.0, 0.7, 0.55))
 		"map_reveal":
 			_reveal_map()
 		"cure":
 			if statuses.has("poison"):
 				statuses.erase("poison")
-				CombatLog.post("The poison clears.", Color(0.6, 1.0, 0.7))
+				CombatLog.post(LocaleManager.t("LOG_THE_POISON_CLEARS"), Color(0.6, 1.0, 0.7))
 			else:
-				CombatLog.post("You feel healthy.", Color(0.6, 1.0, 0.7))
+				CombatLog.post(LocaleManager.t("LOG_YOU_FEEL_HEALTHY"), Color(0.6, 1.0, 0.7))
 		"restore_mp":
 			var gain: int = max(1, data.effect_value)
 			mp = min(mp_max, mp + gain)
-			CombatLog.post("You feel recharged. (+%d MP)" % gain,
+			CombatLog.post(LocaleManager.t("LOG_YOU_FEEL_RECHARGED_MP") % gain,
 				Color(0.5, 0.85, 1.0))
 		"teleport":
 			_teleport_far()
 		"shroud":
 			apply_status("shrouded", max(4, data.effect_value))
 			_break_enemy_awareness(max(2, data.effect_value / 2))
-			CombatLog.post("Shadows gather around you.", Color(0.72, 0.86, 1.0))
+			CombatLog.post(LocaleManager.t("LOG_SHADOWS_GATHER_AROUND_YOU"), Color(0.72, 0.86, 1.0))
 		"enchant_weapon":
 			_enchant_weapon(max(1, data.effect_value))
 		"enchant_armor":
@@ -478,49 +478,49 @@ func use_item(index: int) -> void:
 		# --- New potion effects ---
 		"haste":
 			apply_status("haste", data.effect_value)
-			CombatLog.post("You feel a surge of speed.", Color(0.4, 1.0, 0.6))
+			CombatLog.post(LocaleManager.t("LOG_YOU_FEEL_A_SURGE_OF"), Color(0.4, 1.0, 0.6))
 		"invisible":
 			apply_status("invisible", data.effect_value)
-			CombatLog.post("You fade from sight.", Color(0.7, 0.7, 1.0))
+			CombatLog.post(LocaleManager.t("LOG_YOU_FADE_FROM_SIGHT"), Color(0.7, 0.7, 1.0))
 		"stat_dex":
 			dexterity += data.effect_value
 			refresh_ac_from_equipment()
-			CombatLog.post("You feel more agile. (+1 DEX)", Color(0.3, 0.8, 1.0))
+			CombatLog.post(LocaleManager.t("LOG_YOU_FEEL_MORE_AGILE_1"), Color(0.3, 0.8, 1.0))
 		"stat_int":
 			intelligence += data.effect_value
-			CombatLog.post("You feel sharper. (+1 INT)", Color(0.9, 0.9, 0.4))
+			CombatLog.post(LocaleManager.t("LOG_YOU_FEEL_SHARPER_1_INT"), Color(0.9, 0.9, 0.4))
 		"grant_xp":
 			grant_xp(data.effect_value)
-			CombatLog.post("You feel more experienced.", Color(0.9, 0.6, 1.0))
+			CombatLog.post(LocaleManager.t("LOG_YOU_FEEL_MORE_EXPERIENCED"), Color(0.9, 0.6, 1.0))
 		# --- New scroll effects ---
 		"scroll_fear":
 			var game_node: Node = get_tree().current_scene if get_tree() != null else null
 			if game_node != null and game_node.has_method("apply_fear_aoe"):
 				game_node.apply_fear_aoe(grid_pos, 6, data.effect_value)
-			CombatLog.post("The enemies flee in terror!", Color(0.9, 0.7, 1.0))
+			CombatLog.post(LocaleManager.t("LOG_THE_ENEMIES_FLEE_IN_TERROR"), Color(0.9, 0.7, 1.0))
 		"scroll_upgrade":
 			if equipped_weapon_id != "":
 				_enchant_weapon(1)
 			elif equipped_armor_id != "":
 				_enchant_armor(1)
 			else:
-				CombatLog.post("Nothing to upgrade.", Color(0.7, 0.7, 0.7))
+				CombatLog.post(LocaleManager.t("LOG_NOTHING_TO_UPGRADE"), Color(0.7, 0.7, 0.7))
 				had_effect = false
 		"scroll_fog":
 			var game_fog: Node = get_tree().current_scene if get_tree() != null else null
 			if game_fog != null and game_fog.has_method("apply_fog_aoe"):
 				game_fog.apply_fog_aoe(grid_pos, 4, data.effect_value)
-			CombatLog.post("Fog spreads around you.", Color(0.75, 0.85, 0.95))
+			CombatLog.post(LocaleManager.t("LOG_FOG_SPREADS_AROUND_YOU"), Color(0.75, 0.85, 0.95))
 		"scroll_brand":
 			_enchant_weapon(1)
-			CombatLog.post("Your weapon glows with new power.", Color(1.0, 0.85, 0.3))
+			CombatLog.post(LocaleManager.t("LOG_YOUR_WEAPON_GLOWS_WITH_NEW"), Color(1.0, 0.85, 0.3))
 		"branch_brand":
 			_apply_branch_brand(String(data.brand))
 		"scroll_silence":
 			var game_sil: Node = get_tree().current_scene if get_tree() != null else null
 			if game_sil != null and game_sil.has_method("apply_silence_aoe"):
 				game_sil.apply_silence_aoe(grid_pos, 6, data.effect_value)
-			CombatLog.post("Silence falls upon your foes.", Color(0.7, 0.85, 1.0))
+			CombatLog.post(LocaleManager.t("LOG_SILENCE_FALLS_UPON_YOUR_FOES"), Color(0.7, 0.85, 1.0))
 		"scroll_immolation":
 			var game_imm: Node = get_tree().current_scene if get_tree() != null else null
 			if game_imm != null and game_imm.has_method("apply_immolation_aoe"):
@@ -535,7 +535,7 @@ func use_item(index: int) -> void:
 						if not imm_map.visible_tiles.has(ent.grid_pos):
 							continue
 						ent.take_damage(data.effect_value, "fire")
-			CombatLog.post("Nearby enemies burst into flame!", Color(1.0, 0.5, 0.1))
+			CombatLog.post(LocaleManager.t("LOG_NEARBY_ENEMIES_BURST_INTO_FLAME"), Color(1.0, 0.5, 0.1))
 		"scroll_noise":
 			var game_ns: Node = get_tree().current_scene if get_tree() != null else null
 			if game_ns != null and game_ns.has_method("alert_all_monsters"):
@@ -547,40 +547,40 @@ func use_item(index: int) -> void:
 						var ent = ns_map.entities[eid]
 						if ent != self and ent.has_method("alert"):
 							ent.alert(grid_pos)
-			CombatLog.post("A loud noise echoes through the dungeon!", Color(1.0, 0.8, 0.4))
+			CombatLog.post(LocaleManager.t("LOG_A_LOUD_NOISE_ECHOES_THROUGH"), Color(1.0, 0.8, 0.4))
 		"resistance":
 			apply_status("resist_fire", data.effect_value)
 			apply_status("resist_cold", data.effect_value)
 			apply_status("resist_poison", data.effect_value)
-			CombatLog.post("You feel resistant to fire, cold and poison.", Color(0.4, 0.7, 1.0))
+			CombatLog.post(LocaleManager.t("LOG_YOU_FEEL_RESISTANT_TO_FIRE"), Color(0.4, 0.7, 1.0))
 		"cancellation":
 			var neg_statuses := ["poison", "slow", "fear", "blind", "silence", "burning", "frozen", "paralyzed"]
 			for st in neg_statuses:
 				if statuses.has(st):
 					statuses.erase(st)
 			stats_changed.emit()
-			CombatLog.post("Your negative effects are cancelled.", Color(0.85, 0.85, 0.85))
+			CombatLog.post(LocaleManager.t("LOG_YOUR_NEGATIVE_EFFECTS_ARE_CANCELLED"), Color(0.85, 0.85, 0.85))
 		# --- Wand effects ---
 		"wand_haste":
 			apply_status("haste", 12)
-			CombatLog.post("You feel a surge of speed.", Color(0.4, 1.0, 0.6))
+			CombatLog.post(LocaleManager.t("LOG_YOU_FEEL_A_SURGE_OF"), Color(0.4, 1.0, 0.6))
 		"wand_fear":
 			var game_wf: Node = get_tree().current_scene if get_tree() != null else null
 			if game_wf != null and game_wf.has_method("apply_fear_aoe"):
 				game_wf.apply_fear_aoe(grid_pos, 5, 8)
-			CombatLog.post("Your foes turn and flee!", Color(0.9, 0.7, 1.0))
+			CombatLog.post(LocaleManager.t("LOG_YOUR_FOES_TURN_AND_FLEE"), Color(0.9, 0.7, 1.0))
 		"wand_digging":
 			var game_wd: Node = get_tree().current_scene if get_tree() != null else null
 			if game_wd != null and game_wd.has_method("dig_toward"):
 				game_wd.dig_toward(grid_pos)
-			CombatLog.post("The wand pulses with digging energy.", Color(0.8, 0.7, 0.5))
+			CombatLog.post(LocaleManager.t("LOG_THE_WAND_PULSES_WITH_DIGGING"), Color(0.8, 0.7, 0.5))
 		"wand_teleport":
 			_teleport_far()
 		"wand_fire", "wand_frost", "wand_lightning":
 			pass  # effect and log handled by Game.gd before use_quickslot
 		# --- Throwing effects ---
 		"throw_pierce", "throw_heavy", "throw_fire_aoe", "throw_poison", "throw_smoke":
-			CombatLog.post("You throw the %s." % data.display_name, Color(0.85, 0.85, 0.7))
+			CombatLog.post(LocaleManager.t("LOG_YOU_THROW_THE") % data.display_name, Color(0.85, 0.85, 0.7))
 		"study":
 			var all_ids: Array = []
 			if data.grants_spell_id != "":
@@ -598,11 +598,11 @@ func use_item(index: int) -> void:
 					blocked_count += 1
 			if learned_count == 0:
 				if blocked_count > 0:
-					CombatLog.post("The tome is beyond your current intellect.", Color(1.0, 0.72, 0.5))
+					CombatLog.post(LocaleManager.t("LOG_THE_TOME_IS_BEYOND_YOUR"), Color(1.0, 0.72, 0.5))
 					if data.kind == "book":
 						return
 				else:
-					CombatLog.post("You already know all spells in this tome.", Color(0.7, 0.85, 1.0))
+					CombatLog.post(LocaleManager.t("LOG_YOU_ALREADY_KNOW_ALL_SPELLS"), Color(0.7, 0.85, 1.0))
 					had_effect = false
 		"identify":
 			items.remove_at(index)
@@ -619,20 +619,20 @@ func use_item(index: int) -> void:
 		known_spells.append(data.grants_spell_id)
 		var s: SpellData = SpellRegistry.get_by_id(data.grants_spell_id)
 		var sname: String = s.display_name if s != null else data.grants_spell_id
-		CombatLog.post("You learn %s." % sname, Color(0.7, 0.95, 1.0))
+		CombatLog.post(LocaleManager.t("LOG_YOU_LEARN") % sname, Color(0.7, 0.95, 1.0))
 		had_effect = true
 	for sid in data.grants_spell_ids:
 		if not known_spells.has(sid):
 			known_spells.append(sid)
 			var s2: SpellData = SpellRegistry.get_by_id(sid)
 			var sname2: String = s2.display_name if s2 != null else sid
-			CombatLog.post("You learn %s." % sname2, Color(0.7, 0.95, 1.0))
+			CombatLog.post(LocaleManager.t("LOG_YOU_LEARN") % sname2, Color(0.7, 0.95, 1.0))
 			had_effect = true
 	if String(data.unlocks_class_id) != "":
 		GameManager.try_use_unlock(data.id)
 		had_effect = true
 	if not had_effect:
-		CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
+		CombatLog.post(LocaleManager.t("LOG_NOTHING_HAPPENS"), Color(0.7, 0.7, 0.7))
 	# Wand: consume a charge instead of removing the item entirely.
 	if data.kind == "wand":
 		var wand_entry: Dictionary = items[index]
@@ -640,12 +640,12 @@ func use_item(index: int) -> void:
 		if randf() >= FaithSystem.wand_charge_save_chance(self):
 			charges -= 1
 		if charges <= 0:
-			CombatLog.post("The %s is exhausted." % data.display_name, Color(0.6, 0.6, 0.6))
+			CombatLog.post(LocaleManager.t("LOG_THE_IS_EXHAUSTED") % data.display_name, Color(0.6, 0.6, 0.6))
 			items.remove_at(index)
 		else:
 			wand_entry["charges"] = charges
 			items[index] = wand_entry
-			CombatLog.post("(%d charges remaining)" % charges, Color(0.5, 0.8, 0.9))
+			CombatLog.post(LocaleManager.t("LOG_CHARGES_REMAINING") % charges, Color(0.5, 0.8, 0.9))
 		emit_signal("stats_changed")
 		return
 	# Auto-identify on first successful use (consumables only).
@@ -738,7 +738,7 @@ func _apply_branch_brand(element: String) -> void:
 		target = "armor" if target == "weapon" else "weapon"
 		target_id = equipped_weapon_id if target == "weapon" else equipped_armor_id
 	if target_id == "":
-		CombatLog.post("You have no equipment to brand.", Color(1.0, 0.7, 0.5))
+		CombatLog.post(LocaleManager.t("LOG_YOU_HAVE_NO_EQUIPMENT_TO"), Color(1.0, 0.7, 0.5))
 		return
 	for i in range(items.size()):
 		var entry: Dictionary = items[i]
@@ -752,14 +752,14 @@ func _apply_branch_brand(element: String) -> void:
 				"freezing": Color(0.5, 0.85, 1.0),
 				"flaming": Color(1.0, 0.55, 0.2),
 			}
-			CombatLog.post("Your %s is branded with %s!" % [name_, element],
+			CombatLog.post(LocaleManager.t("LOG_YOUR_IS_BRANDED_WITH") % [name_, element],
 				element_colors.get(element, Color.WHITE))
 			emit_signal("stats_changed")
 			return
 
 func _enchant_weapon(amount: int) -> void:
 	if equipped_weapon_id == "":
-		CombatLog.post("Nothing to enchant.", Color(0.8, 0.8, 0.6))
+		CombatLog.post(LocaleManager.t("LOG_NOTHING_TO_ENCHANT"), Color(0.8, 0.8, 0.6))
 		return
 	for i in range(items.size()):
 		var entry: Dictionary = items[i]
@@ -768,13 +768,13 @@ func _enchant_weapon(amount: int) -> void:
 			items[i] = entry
 			var data: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null else null
 			var name_: String = data.display_name if data != null else "weapon"
-			CombatLog.post("Your %s glows. (+%d)" % [name_, amount],
+			CombatLog.post(LocaleManager.t("LOG_YOUR_GLOWS") % [name_, amount],
 				Color(1.0, 0.9, 0.5))
 			return
 
 func _enchant_armor(amount: int) -> void:
 	if equipped_armor_id == "":
-		CombatLog.post("Nothing to enchant.", Color(0.8, 0.8, 0.6))
+		CombatLog.post(LocaleManager.t("LOG_NOTHING_TO_ENCHANT"), Color(0.8, 0.8, 0.6))
 		return
 	for i in range(items.size()):
 		var entry: Dictionary = items[i]
@@ -783,7 +783,7 @@ func _enchant_armor(amount: int) -> void:
 			items[i] = entry
 			var data: ItemData = ItemRegistry.get_by_id(equipped_armor_id) if ItemRegistry != null and equipped_armor_id != "" else null
 			var name_: String = data.display_name if data != null else "armor"
-			CombatLog.post("Your %s glows. (+%d)" % [name_, amount],
+			CombatLog.post(LocaleManager.t("LOG_YOUR_GLOWS") % [name_, amount],
 				Color(0.85, 1.0, 0.7))
 			refresh_ac_from_equipment()
 			return
@@ -804,9 +804,9 @@ func _teleport_far() -> void:
 		grid_pos = p
 		position = _map.grid_to_world(p)
 		emit_signal("moved", grid_pos)
-		CombatLog.post("You teleport.", Color(0.85, 0.7, 1.0))
+		CombatLog.post(LocaleManager.t("LOG_YOU_TELEPORT"), Color(0.85, 0.7, 1.0))
 		return
-	CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
+	CombatLog.post(LocaleManager.t("LOG_NOTHING_HAPPENS"), Color(0.7, 0.7, 0.7))
 
 func _reveal_map() -> void:
 	if _map == null:
@@ -817,7 +817,7 @@ func _reveal_map() -> void:
 			if _map.tile_at(p) != DungeonMap.Tile.WALL:
 				_map.explored[p] = true
 	_map.queue_redraw()
-	CombatLog.post("The floor's layout becomes clear.",
+	CombatLog.post(LocaleManager.t("LOG_THE_FLOOR_S_LAYOUT_BECOMES"),
 		Color(0.85, 0.7, 1.0))
 
 func _blink(max_dist: int) -> void:
@@ -836,9 +836,9 @@ func _blink(max_dist: int) -> void:
 		grid_pos = target
 		position = _map.grid_to_world(target)
 		emit_signal("moved", grid_pos)
-		CombatLog.post("You blink.", Color(0.7, 0.85, 1.0))
+		CombatLog.post(LocaleManager.t("LOG_YOU_BLINK"), Color(0.7, 0.85, 1.0))
 		return
-	CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
+	CombatLog.post(LocaleManager.t("LOG_NOTHING_HAPPENS"), Color(0.7, 0.7, 0.7))
 
 func _break_enemy_awareness(radius: int) -> void:
 	var tree := get_tree()
@@ -861,7 +861,7 @@ func compute_fov() -> Dictionary:
 
 func take_damage(amount: int, source: String = "") -> void:
 	if has_status("invulnerable"):
-		CombatLog.post("You are invulnerable!", Color(1.0, 0.95, 0.5))
+		CombatLog.post(LocaleManager.t("LOG_YOU_ARE_INVULNERABLE"), Color(1.0, 0.95, 0.5))
 		return
 	hp = max(0, hp - amount)
 	if source != "":
@@ -1130,7 +1130,7 @@ func grant_skill_xp(id: String, amount: float) -> void:
 			and float(s.get("xp", 0.0)) >= SKILL_XP_DELTA[int(s.get("level", 0))]:
 		s["xp"] = float(s["xp"]) - SKILL_XP_DELTA[int(s["level"])]
 		s["level"] = int(s["level"]) + 1
-		CombatLog.post("%s skill reaches %d." \
+		CombatLog.post(LocaleManager.t("LOG_SKILL_REACHES") \
 				% [id.capitalize(), int(s["level"])],
 			Color(0.7, 0.95, 0.5))
 		if id == "agility":
@@ -1176,7 +1176,7 @@ func _level_up() -> void:
 	_apply_max_hp_gain(hp_gain)
 	var mp_gain: int = _level_up_mp_gain()
 	_apply_max_mp_gain(mp_gain)
-	CombatLog.post("Level up! You are now level %d." % xl,
+	CombatLog.post(LocaleManager.t("LOG_LEVEL_UP_YOU_ARE_NOW") % xl,
 		Color(1.0, 0.9, 0.3))
 	if xl == 12 or xl == 15 or xl == 18:
 		_auto_stat_bump()
@@ -1209,7 +1209,7 @@ func _auto_stat_bump() -> void:
 				_apply_max_hp_gain(hp_delta)
 		"dexterity": dexterity += 1
 		"intelligence": intelligence += 1
-	CombatLog.post("(+1 %s)" % lowest_name.to_upper(), Color(0.75, 0.85, 1))
+	CombatLog.post(LocaleManager.t("LOG_1") % lowest_name.to_upper(), Color(0.75, 0.85, 1))
 
 func learn_spell(spell_id: String) -> bool:
 	var sid: String = String(spell_id)
@@ -1220,10 +1220,10 @@ func learn_spell(spell_id: String) -> bool:
 		return false
 	var int_req: int = int_required_for_spell(spell)
 	if intelligence < int_req:
-		CombatLog.post("%s requires INT %d." % [spell.display_name, int_req], Color(1.0, 0.72, 0.5))
+		CombatLog.post(LocaleManager.t("LOG_REQUIRES_INT") % [spell.display_name, int_req], Color(1.0, 0.72, 0.5))
 		return false
 	known_spells.append(sid)
-	CombatLog.post("You memorize %s." % spell.display_name, Color(0.7, 0.95, 1.0))
+	CombatLog.post(LocaleManager.t("LOG_YOU_MEMORIZE") % spell.display_name, Color(0.7, 0.95, 1.0))
 	emit_signal("stats_changed")
 	return true
 
@@ -1263,12 +1263,12 @@ func is_wet() -> bool:
 func apply_wet(turns: int = 4) -> void:
 	apply_status("wet", turns)
 	if CombatLog != null:
-		CombatLog.post("Water soaks you.", Color(0.55, 0.8, 1.0))
+		CombatLog.post(LocaleManager.t("LOG_WATER_SOAKS_YOU"), Color(0.55, 0.8, 1.0))
 
 func tick_statuses() -> void:
 	var expired: Array = Status.tick_actor(self)
 	for id in expired:
-		CombatLog.post("Your %s wears off." % Status.display_name(id),
+		CombatLog.post(LocaleManager.t("LOG_YOUR_WEARS_OFF") % Status.display_name(id),
 			Color(0.75, 0.8, 0.9))
 	# Passive regen
 	if hp < hp_max:
@@ -1306,15 +1306,15 @@ func equip_essence(slot: int, essence_id: String) -> void:
 	if essence_id != "" and not FaithSystem.allows_essence(self):
 		if CombatLog != null:
 			if not FaithSystem.has_chosen_faith(self):
-				CombatLog.post("Choose a faith before attuning essences.", Color(1.0, 0.72, 0.5))
+				CombatLog.post(LocaleManager.t("LOG_CHOOSE_A_FAITH_BEFORE_ATTUNING"), Color(1.0, 0.72, 0.5))
 			else:
-				CombatLog.post("Your current faith does not allow essence attunement.", Color(1.0, 0.72, 0.5))
+				CombatLog.post(LocaleManager.t("LOG_YOUR_CURRENT_FAITH_DOES_NOT"), Color(1.0, 0.72, 0.5))
 		return
 	var old: String = String(essence_slots[slot])
 	if old == essence_id:
 		return
 	if old != "" and essence_id == "" and EssenceSystem.inventory_is_full(self):
-		CombatLog.post("Your essence inventory is full.", Color(1.0, 0.72, 0.5))
+		CombatLog.post(LocaleManager.t("LOG_YOUR_ESSENCE_INVENTORY_IS_FULL"), Color(1.0, 0.72, 0.5))
 		return
 	if old != "":
 		EssenceSystem.remove(self, old)
@@ -1357,7 +1357,7 @@ func replace_inventory_essence(old_id: String, new_id: String) -> bool:
 
 func apply_berserk(turns: int) -> void:
 	Status.apply(self, "berserk", turns)
-	CombatLog.post("You enter a berserk rage. (+4 STR)",
+	CombatLog.post(LocaleManager.t("LOG_YOU_ENTER_A_BERSERK_RAGE"),
 		Color(1.0, 0.55, 0.35))
 	emit_signal("stats_changed")
 

@@ -230,7 +230,7 @@ func try_kill_unlock(monster_id: String) -> void:
 		if String(r.unlock_kind) == "kill" \
 				and String(r.unlock_trigger_id) == monster_id \
 				and unlock(rid):
-			CombatLog.post("New race unlocked: %s!" % r.display_name,
+			CombatLog.post(LocaleManager.t("LOG_NEW_RACE_UNLOCKED") % r.display_name,
 				Color(1.0, 0.9, 0.4))
 
 func try_use_unlock(item_id: String) -> void:
@@ -242,7 +242,7 @@ func try_use_unlock(item_id: String) -> void:
 		if String(c.unlock_kind) == "use_item" \
 				and String(c.unlock_trigger_id) == item_id \
 				and unlock(cid):
-			CombatLog.post("New class unlocked: %s!" % c.display_name,
+			CombatLog.post(LocaleManager.t("LOG_NEW_CLASS_UNLOCKED") % c.display_name,
 				Color(1.0, 0.85, 0.35))
 
 func _load_settings() -> void:

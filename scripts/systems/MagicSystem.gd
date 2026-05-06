@@ -14,13 +14,13 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 	if spell == null:
 		return false
 	if spell.xl_required > player.xl:
-		CombatLog.post("%s requires XL %d." % [spell.display_name, spell.xl_required],
+		CombatLog.post(LocaleManager.t("LOG_REQUIRES_XL") % [spell.display_name, spell.xl_required],
 			Color(1.0, 0.7, 0.5))
 		return false
 	var wizardry_scale: float = max(0.6, 1.0 - float(player.wizardry_bonus) * 0.08)
 	var mp_cost: int = max(1, int(ceil(float(spell.mp_cost) * FaithSystem.spell_cost_mult(player) * wizardry_scale)))
 	if not RacePassiveSystem.on_spell_cast_mp_check(player, mp_cost):
-		CombatLog.post("Not enough MP for %s." % spell.display_name,
+		CombatLog.post(LocaleManager.t("LOG_NOT_ENOUGH_MP_FOR") % spell.display_name,
 			Color(1.0, 0.7, 0.5))
 		return false
 	player.mp = max(0, player.mp - mp_cost)
@@ -84,7 +84,7 @@ static func _cast_status_family(spell: SpellData, player: Player, game: Node) ->
 			_apply_status_to_target(spell, player, game, "diseased", 8)
 		"polymorph":
 			_apply_status_to_target(spell, player, game, "confused", 6)
-			CombatLog.post("The target's form shifts!", Color(0.5, 1.0, 0.6))
+			CombatLog.post(LocaleManager.t("LOG_THE_TARGET_S_FORM_SHIFTS"), Color(0.5, 1.0, 0.6))
 		_:
 			return false
 	return true
@@ -95,24 +95,24 @@ static func _cast_utility_family(spell: SpellData, player: Player, game: Node, p
 			_cast_heal(spell, player, power, game)
 		"blink":
 			player._blink(max(2, effective_spell_range(spell)))
-			CombatLog.post("You cast %s." % spell.display_name, Color(0.7, 0.85, 1.0))
+			CombatLog.post(LocaleManager.t("LOG_YOU_CAST") % spell.display_name, Color(0.7, 0.85, 1.0))
 		"banish":
 			_cast_banish(spell, player, game)
 		"fog":
 			if game != null and game.get("map") != null:
 				game.map.add_fog(player.grid_pos, 3, 8)
-			CombatLog.post("A thick fog fills the area.", Color(0.75, 0.8, 0.9))
+			CombatLog.post(LocaleManager.t("LOG_A_THICK_FOG_FILLS_THE"), Color(0.75, 0.8, 0.9))
 		"floor_travel":
 			player._teleport_far()
-			CombatLog.post("You vanish in a flash of light.", Color(0.8, 0.7, 1.0))
+			CombatLog.post(LocaleManager.t("LOG_YOU_VANISH_IN_A_FLASH"), Color(0.8, 0.7, 1.0))
 		"summon":
 			_cast_summon(spell, player, power, game)
 		"astral":
 			player.apply_status("invulnerable", 4)
-			CombatLog.post("You become ethereal!", Color(0.7, 0.85, 1.0))
+			CombatLog.post(LocaleManager.t("LOG_YOU_BECOME_ETHEREAL"), Color(0.7, 0.85, 1.0))
 		"time_stop":
 			player.apply_status("time_stopped", 4)
-			CombatLog.post("Time freezes around you!", Color(0.9, 0.6, 1.0))
+			CombatLog.post(LocaleManager.t("LOG_TIME_FREEZES_AROUND_YOU"), Color(0.9, 0.6, 1.0))
 		_:
 			return false
 	return true
@@ -153,7 +153,7 @@ static func _cast_buff_family(spell: SpellData, player: Player) -> void:
 static func _cast_heal(spell: SpellData, player: Player, power: int, game: Node) -> void:
 	var amt: int = 12 + power / 2
 	player.heal(amt)
-	CombatLog.post("You cast %s. (+%d HP)" % [spell.display_name, amt], Color(0.6, 1.0, 0.6))
+	CombatLog.post(LocaleManager.t("LOG_YOU_CAST_HP") % [spell.display_name, amt], Color(0.6, 1.0, 0.6))
 	if game != null:
 		if game.has_method("spawn_damage_number"):
 			game.spawn_damage_number(player.position, amt, Color(0.4, 1.0, 0.5))
@@ -164,17 +164,17 @@ static func _cast_heal(spell: SpellData, player: Player, power: int, game: Node)
 static func _cast_buff(player: Player, status_id: String, turns: int,
 		spell_name: String, message: String, col: Color) -> void:
 	player.apply_status(status_id, turns)
-	CombatLog.post("You cast %s. %s" % [spell_name, message], col)
+	CombatLog.post(LocaleManager.t("LOG_YOU_CAST_2") % [spell_name, message], col)
 
 
 static func _cast_drain(spell: SpellData, player: Player, power: int, game: Node) -> void:
 	var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 	if target == null:
-		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_NO_TARGET_IN_RANGE"), Color(0.75, 0.75, 0.75))
 		return
 	var dmg: int = spell.base_damage + randi_range(0, 2) + power / 4
 	var scaled: int = Status.resist_scale(dmg, target.data.resists, spell.element)
-	CombatLog.hit("You drain the %s for %d." % [target.data.display_name, scaled])
+	CombatLog.hit(LocaleManager.t("LOG_YOU_DRAIN_THE_FOR") % [target.data.display_name, scaled])
 	if game != null and game.has_method("spawn_spell_bolt"):
 		var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
 		game.spawn_spell_bolt(player.position + half, target.position + half, "drain")
@@ -183,7 +183,7 @@ static func _cast_drain(spell: SpellData, player: Player, power: int, game: Node
 	target.become_aware(player.grid_pos)
 	var heal_amt: int = max(1, scaled / 2)
 	player.heal(heal_amt)
-	CombatLog.post("You absorb %d HP." % heal_amt, Color(0.6, 0.9, 0.6))
+	CombatLog.post(LocaleManager.t("LOG_YOU_ABSORB_HP") % heal_amt, Color(0.6, 0.9, 0.6))
 	if was_alive and target.hp <= 0:
 		_on_kill(target, player, spell)
 
@@ -192,10 +192,10 @@ static func _apply_status_to_target(spell: SpellData, player: Player,
 		game: Node, status_id: String, turns: int) -> void:
 	var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 	if target == null:
-		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_NO_TARGET_IN_RANGE"), Color(0.75, 0.75, 0.75))
 		return
 	var label: String = Status.display_name(status_id).to_lower()
-	CombatLog.post("The %s is %s!" % [target.data.display_name, label],
+	CombatLog.post(LocaleManager.t("LOG_THE_IS") % [target.data.display_name, label],
 		Color(0.8, 0.7, 1.0))
 	Status.apply(target, status_id, turns)
 	target.become_aware(player.grid_pos)
@@ -206,14 +206,14 @@ static func _cast_sleep(spell: SpellData, player: Player, game: Node) -> void:
 		+ randi_range(0, 8) + randi_range(0, 8) + randi_range(0, 8) + randi_range(0, 8)
 	var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 	if target == null:
-		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_NO_TARGET_IN_RANGE"), Color(0.75, 0.75, 0.75))
 		return
 	if target.hp > hp_threshold:
-		CombatLog.post("The %s resists the sleep!" % target.data.display_name,
+		CombatLog.post(LocaleManager.t("LOG_THE_RESISTS_THE_SLEEP") % target.data.display_name,
 			Color(0.75, 0.75, 0.75))
 		target.become_aware(player.grid_pos)
 		return
-	CombatLog.post("The %s falls asleep!" % target.data.display_name, Color(0.6, 0.65, 0.9))
+	CombatLog.post(LocaleManager.t("LOG_THE_FALLS_ASLEEP") % target.data.display_name, Color(0.6, 0.65, 0.9))
 	Status.apply(target, "sleeping", 6)
 	target.become_aware(player.grid_pos)
 
@@ -242,25 +242,25 @@ static func _aoe_status(spell: SpellData, player: Player, game: Node,
 		hits += 1
 	var label: String = Status.display_name(status_id).to_lower()
 	if hits > 0:
-		CombatLog.post("%s affects %d enemies!" % [spell.display_name, hits],
+		CombatLog.post(LocaleManager.t("LOG_AFFECTS_ENEMIES") % [spell.display_name, hits],
 			Color(0.8, 0.7, 1.0))
 		if game != null and game.has_method("spawn_aoe_burst"):
 			game.spawn_aoe_burst(hit_positions, spell.element)
 	else:
-		CombatLog.post("No targets in range.", Color(0.75, 0.75, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_NO_TARGETS_IN_RANGE"), Color(0.75, 0.75, 0.75))
 
 
 static func _cast_instant_kill(spell: SpellData, player: Player,
 		game: Node, hp_max: int) -> void:
 	var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 	if target == null:
-		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_NO_TARGET_IN_RANGE"), Color(0.75, 0.75, 0.75))
 		return
 	if target.hp > hp_max:
-		CombatLog.post("The %s is too powerful!" % target.data.display_name,
+		CombatLog.post(LocaleManager.t("LOG_THE_IS_TOO_POWERFUL") % target.data.display_name,
 			Color(0.75, 0.75, 0.75))
 		return
-	CombatLog.hit("You obliterate the %s!" % target.data.display_name)
+	CombatLog.hit(LocaleManager.t("LOG_YOU_OBLITERATE_THE") % target.data.display_name)
 	var was_alive: bool = target.hp > 0
 	target.take_damage(99999)
 	if was_alive and target.hp <= 0:
@@ -271,29 +271,29 @@ static func _cast_power_word(spell: SpellData, player: Player, game: Node,
 		hp_threshold: int, mode: String) -> void:
 	var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 	if target == null:
-		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_NO_TARGET_IN_RANGE"), Color(0.75, 0.75, 0.75))
 		return
 	if target.hp > hp_threshold:
-		CombatLog.post("The %s is too powerful to affect!" % target.data.display_name,
+		CombatLog.post(LocaleManager.t("LOG_THE_IS_TOO_POWERFUL_TO") % target.data.display_name,
 			Color(0.75, 0.75, 0.75))
 		return
 	if mode == "pain":
 		var dmg: int = target.hp / 2
-		CombatLog.hit("The %s writhes in agony! (-%d HP)" % [target.data.display_name, dmg])
+		CombatLog.hit(LocaleManager.t("LOG_THE_WRITHES_IN_AGONY_HP") % [target.data.display_name, dmg])
 		target.take_damage(dmg)
 		target.become_aware(player.grid_pos)
 	elif mode == "stun":
 		Status.apply(target, "stunned", 4)
-		CombatLog.hit("The %s is stunned!" % target.data.display_name)
+		CombatLog.hit(LocaleManager.t("LOG_THE_IS_STUNNED") % target.data.display_name)
 		target.become_aware(player.grid_pos)
 
 
 static func _cast_banish(spell: SpellData, player: Player, game: Node) -> void:
 	var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 	if target == null:
-		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_NO_TARGET_IN_RANGE"), Color(0.75, 0.75, 0.75))
 		return
-	CombatLog.hit("You banish the %s!" % target.data.display_name)
+	CombatLog.hit(LocaleManager.t("LOG_YOU_BANISH_THE") % target.data.display_name)
 	target.take_damage(99999)
 	target.become_aware(player.grid_pos)
 
@@ -336,7 +336,7 @@ static func _compute_power(player: Player, spell: SpellData) -> int:
 
 static func _apply_element_bonus(spell: SpellData, target: Monster, dmg: int) -> int:
 	if spell.element == "lightning" and target.is_wet():
-		CombatLog.post("Soaked! Lightning surges for extra damage!", Color(0.6, 0.85, 1.0))
+		CombatLog.post(LocaleManager.t("LOG_SOAKED_LIGHTNING_SURGES_FOR_EXTRA"), Color(0.6, 0.85, 1.0))
 		return int(ceil(dmg * 1.5))
 	return dmg
 
@@ -356,7 +356,7 @@ static func _apply_elemental_side_effects(spell: SpellData, target: Monster) -> 
 
 
 static func _on_kill(target: Monster, player: Player, spell: SpellData) -> void:
-	CombatLog.hit("You kill the %s." % target.data.display_name)
+	CombatLog.hit(LocaleManager.t("LOG_YOU_KILL_THE") % target.data.display_name)
 	player.grant_xp(target.data.xp_value)
 	player.grant_kill_skill_xp(float(target.data.xp_value), player.spell_skill_for(spell))
 	player.register_kill()
@@ -367,7 +367,7 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 		power: int, game: Node) -> void:
 	var target: Monster = _find_nearest_visible(player, game, effective_spell_range(spell))
 	if target == null:
-		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_NO_TARGET_IN_RANGE"), Color(0.75, 0.75, 0.75))
 		return
 	var dmg: int = spell.base_damage + randi_range(0, 2) + power / 4
 	dmg = _apply_element_bonus(spell, target, dmg)
@@ -376,11 +376,11 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 		var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
 		game.spawn_spell_bolt(player.position + half, target.position + half, spell.element)
 	if scaled <= 0 and dmg > 0:
-		CombatLog.post("The %s is immune to %s."
+		CombatLog.post(LocaleManager.t("LOG_THE_IS_IMMUNE_TO")
 				% [target.data.display_name, spell.display_name],
 			Color(0.65, 0.75, 0.85))
 		return
-	CombatLog.hit("You hit the %s with %s for %d." \
+	CombatLog.hit(LocaleManager.t("LOG_YOU_HIT_THE_WITH_FOR") \
 			% [target.data.display_name, spell.display_name, scaled])
 	var was_alive: bool = target.hp > 0
 	target.take_damage(scaled)
@@ -403,7 +403,7 @@ static func _multi_damage(spell: SpellData, player: Player,
 		var dmg: int = spell.base_damage + randi_range(0, 2) + power / 4
 		dmg = _apply_element_bonus(spell, target, dmg)
 		var scaled: int = Status.resist_scale(dmg, target.data.resists, spell.element)
-		CombatLog.hit("A dart strikes the %s for %d." % [target.data.display_name, scaled])
+		CombatLog.hit(LocaleManager.t("LOG_A_DART_STRIKES_THE_FOR") % [target.data.display_name, scaled])
 		if game != null and game.has_method("spawn_spell_bolt"):
 			game.spawn_spell_bolt(player.position + half, target.position + half,
 					spell.element, Callable(), i * 0.09)
@@ -416,7 +416,7 @@ static func _multi_damage(spell: SpellData, player: Player,
 			_on_kill(target, player, spell)
 		fired += 1
 	if fired == 0:
-		CombatLog.post("No target in range.", Color(0.75, 0.75, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_NO_TARGET_IN_RANGE"), Color(0.75, 0.75, 0.75))
 
 
 static func _chain_damage(spell: SpellData, player: Player,
@@ -437,7 +437,7 @@ static func _chain_damage(spell: SpellData, player: Player,
 		if d <= range_val:
 			targets.append(n)
 	if targets.is_empty():
-		CombatLog.post("No targets in range.", Color(0.75, 0.75, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_NO_TARGETS_IN_RANGE"), Color(0.75, 0.75, 0.75))
 		return
 	var bounces: int = mini(3, targets.size())
 	var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
@@ -448,7 +448,7 @@ static func _chain_damage(spell: SpellData, player: Player,
 		dmg = int(dmg * pow(0.7, i))
 		dmg = _apply_element_bonus(spell, t, dmg)
 		var scaled: int = Status.resist_scale(dmg, t.data.resists, spell.element)
-		CombatLog.hit("Lightning arcs through the %s for %d." % [t.data.display_name, scaled])
+		CombatLog.hit(LocaleManager.t("LOG_LIGHTNING_ARCS_THROUGH_THE_FOR") % [t.data.display_name, scaled])
 		if game != null and game.has_method("spawn_spell_bolt"):
 			var tgt_pos: Vector2 = t.position + half
 			game.spawn_spell_bolt(prev_pos, tgt_pos, spell.element)
@@ -486,7 +486,7 @@ static func _aoe_damage(spell: SpellData, player: Player,
 		var scaled: int = Status.resist_scale(dmg, n.data.resists, spell.element)
 		if scaled <= 0 and dmg > 0:
 			continue
-		CombatLog.hit("%s hits the %s for %d." \
+		CombatLog.hit(LocaleManager.t("LOG_HITS_THE_FOR") \
 				% [spell.display_name, n.data.display_name, scaled])
 		hit_positions.append(n.position + half)
 		var was_alive: bool = n.hp > 0
@@ -498,7 +498,7 @@ static func _aoe_damage(spell: SpellData, player: Player,
 			_on_kill(n, player, spell)
 		hits += 1
 	if hits == 0:
-		CombatLog.post("The flames find no target.", Color(0.75, 0.75, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_THE_FLAMES_FIND_NO_TARGET"), Color(0.75, 0.75, 0.75))
 	if game != null and game.has_method("spawn_aoe_burst") and not hit_positions.is_empty():
 		game.spawn_aoe_burst(hit_positions, spell.element)
 	# AOE fire/poison spells leave lingering clouds
@@ -543,7 +543,7 @@ const _SUMMON_TABLE: Dictionary = {
 
 static func _cast_summon(spell: SpellData, player: Player, power: int, game: Node) -> void:
 	if game == null or not game.has_method("spawn_ally"):
-		CombatLog.post("A spectral ally answers your call!", Color(0.6, 0.9, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_A_SPECTRAL_ALLY_ANSWERS_YOUR"), Color(0.6, 0.9, 0.75))
 		return
 	var entry: Dictionary = _SUMMON_TABLE.get(spell.id, {})
 	var turns: int = int(entry.get("turns", 15)) + power / 8
@@ -559,9 +559,9 @@ static func _cast_summon(spell: SpellData, player: Player, power: int, game: Nod
 		if game.spawn_ally(monster_id, player.grid_pos, turns):
 			spawned += 1
 	if spawned > 0:
-		CombatLog.post("You call forth %s!" % spell.display_name, Color(0.6, 0.9, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_YOU_CALL_FORTH") % spell.display_name, Color(0.6, 0.9, 0.75))
 	else:
-		CombatLog.post("No room to summon!", Color(1.0, 0.7, 0.5))
+		CombatLog.post(LocaleManager.t("LOG_NO_ROOM_TO_SUMMON"), Color(1.0, 0.7, 0.5))
 
 static func _animate_dead(player: Player, turns: int, game: Node) -> void:
 	var tree := Engine.get_main_loop() as SceneTree
@@ -583,7 +583,7 @@ static func _animate_dead(player: Player, turns: int, game: Node) -> void:
 			best_d = d
 			best_idx = i
 	if best_idx < 0:
-		CombatLog.post("No corpses nearby to animate.", Color(1.0, 0.7, 0.5))
+		CombatLog.post(LocaleManager.t("LOG_NO_CORPSES_NEARBY_TO_ANIMATE"), Color(1.0, 0.7, 0.5))
 		return
 	var corpse: Dictionary = dmap.corpses[best_idx]
 	dmap.corpses.remove_at(best_idx)
@@ -591,9 +591,9 @@ static func _animate_dead(player: Player, turns: int, game: Node) -> void:
 	# Decide which undead to spawn based on original monster type
 	var zombie_id: String = "zombie"
 	if game.spawn_ally(zombie_id, player.grid_pos, turns):
-		CombatLog.post("A corpse rises to serve you!", Color(0.5, 0.9, 0.6))
+		CombatLog.post(LocaleManager.t("LOG_A_CORPSE_RISES_TO_SERVE"), Color(0.5, 0.9, 0.6))
 	else:
-		CombatLog.post("No room to animate!", Color(1.0, 0.7, 0.5))
+		CombatLog.post(LocaleManager.t("LOG_NO_ROOM_TO_ANIMATE"), Color(1.0, 0.7, 0.5))
 
 
 ## Spawn a lingering cloud at pos if the spell's element warrants it.

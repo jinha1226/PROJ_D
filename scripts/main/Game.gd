@@ -123,7 +123,7 @@ func _ready() -> void:
 	TurnManager.player_turn_started.connect(_on_player_turn_started)
 	_update_hud()
 	_refresh_quickslots()
-	CombatLog.post("B%d — tap a tile (or arrows) to step, bump to attack." \
+	CombatLog.post(LocaleManager.t("LOG_B_TAP_A_TILE_OR") \
 			% GameManager.depth, Color(0.7, 0.9, 1.0))
 
 func _process(delta: float) -> void:
@@ -171,7 +171,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					_confirm_targeting()
 				else:
 					_cancel_targeting()
-					CombatLog.post("Spell cancelled.", Color(0.65, 0.65, 0.65))
+					CombatLog.post(LocaleManager.t("LOG_SPELL_CANCELLED"), Color(0.65, 0.65, 0.65))
 				get_viewport().set_input_as_handled()
 				return
 			if not TurnManager.is_player_turn:
@@ -211,7 +211,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					_confirm_targeting()
 				else:
 					_cancel_targeting()
-					CombatLog.post("Spell cancelled.", Color(0.65, 0.65, 0.65))
+					CombatLog.post(LocaleManager.t("LOG_SPELL_CANCELLED"), Color(0.65, 0.65, 0.65))
 				get_viewport().set_input_as_handled()
 				return
 			if not TurnManager.is_player_turn:
@@ -395,7 +395,7 @@ func _cancel_auto_walk(reason: String) -> void:
 	_auto_exploring = false
 	_auto_known_ids.clear()
 	if reason == "new enemy":
-		CombatLog.post("You stop — enemy approaches.", Color(1.0, 0.7, 0.5))
+		CombatLog.post(LocaleManager.t("LOG_YOU_STOP_ENEMY_APPROACHES"), Color(1.0, 0.7, 0.5))
 
 func _apply_class_to_player(class_id: String) -> void:
 	var data: ClassData = ClassRegistry.get_by_id(class_id) if ClassRegistry != null and class_id != "" else null
@@ -482,7 +482,7 @@ func _apply_class_to_player(class_id: String) -> void:
 		player.items.append({"id": id, "plus": 0})
 	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
 	var race_name: String = race.display_name if race != null else "adventurer"
-	CombatLog.post("You start as %s %s." % [race_name, data.display_name],
+	CombatLog.post(LocaleManager.t("LOG_YOU_START_AS") % [race_name, data.display_name],
 		Color(0.85, 0.9, 1.0))
 	GameManager.selected_starting_essence_id = ""
 	GameManager.selected_faith_id = ""
@@ -670,7 +670,7 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.set_race_from_id(GameManager.selected_race_id)
 	RacePassiveSystem.register(player)
 	player._refresh_paperdoll()
-	CombatLog.post("Run resumed. Floor B%d." % GameManager.depth,
+	CombatLog.post(LocaleManager.t("LOG_RUN_RESUMED_FLOOR_B") % GameManager.depth,
 		Color(0.7, 0.9, 1.0))
 
 func _spawn_map() -> void:
@@ -709,7 +709,7 @@ func _queue_essence_pickup(essence_id: String, floor_item: FloorItem = null) -> 
 	if player == null or essence_id == "":
 		return
 	if player.essence_slots.has(essence_id) or player.essence_inventory.has(essence_id):
-		CombatLog.post("An essence fades away. (%s)" % EssenceSystem.display_name(essence_id),
+		CombatLog.post(LocaleManager.t("LOG_AN_ESSENCE_FADES_AWAY") % EssenceSystem.display_name(essence_id),
 			Color(0.6, 0.55, 0.7))
 		if floor_item != null and is_instance_valid(floor_item):
 			floor_item.queue_free()
@@ -739,14 +739,14 @@ func _try_open_essence_pickup_popup() -> void:
 	add_child(popup)
 	var take_cb := func() -> void:
 		if player != null and player.add_essence(essence_id):
-			CombatLog.post("You claim %s." % EssenceSystem.display_name(essence_id),
+			CombatLog.post(LocaleManager.t("LOG_YOU_CLAIM") % EssenceSystem.display_name(essence_id),
 				Color(0.82, 0.64, 1.0))
 			if floor_item != null and is_instance_valid(floor_item):
 				floor_item.queue_free()
 		_close_essence_pickup_popup(popup)
 	var replace_cb := func(replaced_id: String) -> void:
 		if player != null and player.replace_inventory_essence(replaced_id, essence_id):
-			CombatLog.post("You leave %s and take %s." % [
+			CombatLog.post(LocaleManager.t("LOG_YOU_LEAVE_AND_TAKE") % [
 				EssenceSystem.display_name(replaced_id),
 				EssenceSystem.display_name(essence_id),
 			], Color(0.82, 0.64, 1.0))
@@ -756,7 +756,7 @@ func _try_open_essence_pickup_popup() -> void:
 	var leave_cb := func() -> void:
 		# Unchosen essences vanish — no second-thoughts pickup. Forces a real
 		# decision at drop time and prevents floor clutter from rejected drops.
-		CombatLog.post("The %s essence fades away." % EssenceSystem.display_name(essence_id),
+		CombatLog.post(LocaleManager.t("LOG_THE_ESSENCE_FADES_AWAY") % EssenceSystem.display_name(essence_id),
 			Color(0.62, 0.62, 0.72))
 		if floor_item != null and is_instance_valid(floor_item):
 			floor_item.queue_free()
@@ -913,7 +913,7 @@ func _spawn_b3_temple_boss() -> void:
 	m.died.connect(_on_monster_died)
 	TurnManager.register_actor(m)
 	_roll_monster_weapon(m)
-	CombatLog.post("A lone guardian watches over the ruined pantheon...", Color(1.0, 0.78, 0.35))
+	CombatLog.post(LocaleManager.t("LOG_A_LONE_GUARDIAN_WATCHES_OVER"), Color(1.0, 0.78, 0.35))
 
 func _spawn_b15_boss_floor() -> void:
 	var md: MonsterData = MonsterRegistry.get_by_id("abyssal_sovereign")
@@ -940,7 +940,7 @@ func _spawn_b15_boss_floor() -> void:
 	m.died.connect(_on_monster_died)
 	m.awareness_changed.connect(_on_monster_awareness_changed)
 	TurnManager.register_actor(m)
-	CombatLog.post("A crushing darkness fills the air. Something ancient stirs...",
+	CombatLog.post(LocaleManager.t("LOG_A_CRUSHING_DARKNESS_FILLS_THE"),
 			Color(0.6, 0.1, 0.9))
 	map.queue_redraw()
 	# Also spawn a handful of undead guards
@@ -1226,7 +1226,7 @@ func _spawn_unique_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
 		m.died.connect(_on_monster_died)
 		TurnManager.register_actor(m)
 		_roll_monster_weapon(m)
-		CombatLog.post("A dangerous presence lurks on this floor...", Color(1.0, 0.75, 0.3))
+		CombatLog.post(LocaleManager.t("LOG_A_DANGEROUS_PRESENCE_LURKS_ON"), Color(1.0, 0.75, 0.3))
 		return
 
 func _spawn_monsters_for_floor(depth: int) -> void:
@@ -1762,7 +1762,7 @@ func _on_player_turn_started() -> void:
 			if n is Monster and n.is_ally and n.ally_turns_left > 0:
 				n.ally_turns_left -= 1
 				if n.ally_turns_left <= 0:
-					CombatLog.post("Your %s fades away." % n.data.display_name, Color(0.7, 0.7, 0.8))
+					CombatLog.post(LocaleManager.t("LOG_YOUR_FADES_AWAY") % n.data.display_name, Color(0.7, 0.7, 0.8))
 					n.die()
 	if TurnManager.turn_number % _RESPAWN_INTERVAL == 0:
 		_try_respawn_monster()
@@ -1782,7 +1782,7 @@ func _on_player_turn_started() -> void:
 func apply_fear_aoe(origin: Vector2i, radius: int, turns: int) -> void:
 	var n: int = AoeEffects.apply_fear(self, origin, radius, turns)
 	if n == 0:
-		CombatLog.post("Nothing nearby to frighten.", Color(0.7, 0.7, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_NOTHING_NEARBY_TO_FRIGHTEN"), Color(0.7, 0.7, 0.75))
 
 func apply_fog_aoe(origin: Vector2i, radius: int, turns: int) -> void:
 	AoeEffects.apply_fog(self, origin, radius, turns)
@@ -1790,7 +1790,7 @@ func apply_fog_aoe(origin: Vector2i, radius: int, turns: int) -> void:
 func apply_silence_aoe(origin: Vector2i, radius: int, turns: int) -> void:
 	var n: int = AoeEffects.apply_silence(self, origin, radius, turns)
 	if n == 0:
-		CombatLog.post("The silence finds no voices nearby.", Color(0.7, 0.75, 0.85))
+		CombatLog.post(LocaleManager.t("LOG_THE_SILENCE_FINDS_NO_VOICES"), Color(0.7, 0.75, 0.85))
 
 func alert_all_monsters() -> void:
 	var origin: Vector2i = player.grid_pos if player != null else Vector2i.ZERO
@@ -1799,15 +1799,15 @@ func alert_all_monsters() -> void:
 func dig_toward(target: Vector2i) -> void:
 	var carved: int = AoeEffects.dig_line(self, target, 4)
 	if carved == 0:
-		CombatLog.post("The wand finds no wall to dig.", Color(0.7, 0.7, 0.7))
+		CombatLog.post(LocaleManager.t("LOG_THE_WAND_FINDS_NO_WALL"), Color(0.7, 0.7, 0.7))
 	else:
-		CombatLog.post("The wand carves through %d tile%s of stone." \
+		CombatLog.post(LocaleManager.t("LOG_THE_WAND_CARVES_THROUGH_TILE") \
 				% [carved, "" if carved == 1 else "s"], Color(0.85, 0.75, 0.5))
 
 func apply_immolation_aoe(origin: Vector2i, radius: int) -> void:
 	if map == null:
 		return
-	CombatLog.post("The scroll ignites in a blazing inferno!", Color(1.0, 0.55, 0.1))
+	CombatLog.post(LocaleManager.t("LOG_THE_SCROLL_IGNITES_IN_A"), Color(1.0, 0.55, 0.1))
 	var visible: Dictionary = player.compute_fov() if player != null else {}
 	for dx in range(-radius, radius + 1):
 		for dy in range(-radius, radius + 1):
@@ -1835,7 +1835,7 @@ func _tick_cloud_damage_player() -> void:
 	var dmg: int = _cloud_damage(cloud.get("type", "fire"), player, null)
 	if dmg > 0:
 		player.take_damage(dmg, "cloud_%s" % cloud.get("type", ""))
-		CombatLog.damage_taken("The %s cloud burns you for %d." \
+		CombatLog.damage_taken(LocaleManager.t("LOG_THE_CLOUD_BURNS_YOU_FOR") \
 				% [cloud.get("type", ""), dmg])
 
 func _tick_hazard_damage_player() -> void:
@@ -1847,7 +1847,7 @@ func _tick_hazard_damage_player() -> void:
 	match htype:
 		"lava":
 			player.take_damage(8, "lava")
-			CombatLog.damage_taken("The lava scorches you for 8!")
+			CombatLog.damage_taken(LocaleManager.t("LOG_THE_LAVA_SCORCHES_YOU_FOR"))
 		"shallow_water":
 			player.apply_wet(3)
 
@@ -1895,7 +1895,7 @@ func _on_player_died() -> void:
 	# Stop the in-flight monster loop (audit H8) so subsequent actors don't
 	# keep spamming damage against a corpse.
 	TurnManager.abort_actor_loop()
-	CombatLog.post("YOU DIED.", Color(1.0, 0.3, 0.3))
+	CombatLog.post(LocaleManager.t("LOG_YOU_DIED"), Color(1.0, 0.3, 0.3))
 	GameManager.end_run("death")
 	_show_result_screen(false)
 
@@ -1934,7 +1934,7 @@ func _on_branch_enter() -> void:
 	var branch_id: String = ZoneManager.branch_entrance_for_depth(GameManager.depth)
 	if branch_id == "" or GameManager.branches_cleared.has(branch_id):
 		if GameManager.branches_cleared.has(branch_id):
-			CombatLog.post("You have already cleared the %s." \
+			CombatLog.post(LocaleManager.t("LOG_YOU_HAVE_ALREADY_CLEARED_THE") \
 				% ZoneManager.branch_config(branch_id).get("display_name", branch_id),
 				Color(0.7, 0.7, 0.5))
 		return
@@ -1944,7 +1944,7 @@ func _on_branch_enter() -> void:
 	GameManager.branch_floor = 1
 	GameManager.branch_entry_depth = GameManager.depth
 	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
-	CombatLog.post("You enter the %s." % cfg.get("display_name", branch_id),
+	CombatLog.post(LocaleManager.t("LOG_YOU_ENTER_THE") % cfg.get("display_name", branch_id),
 		Color(0.4, 1.0, 0.6))
 	_generate_branch_floor(branch_id, 1, true)
 	_center_camera_on_player(true)
@@ -1962,7 +1962,7 @@ func _on_branch_stairs_down() -> void:
 	_cancel_auto_walk("stairs")
 	_cache_branch_floor(branch_id, GameManager.branch_floor)
 	GameManager.branch_floor += 1
-	CombatLog.post("%s B%d." % [ZoneManager.branch_config(branch_id).get("display_name", branch_id),
+	CombatLog.post(LocaleManager.t("LOG_B") % [ZoneManager.branch_config(branch_id).get("display_name", branch_id),
 		GameManager.branch_floor], Color(0.4, 1.0, 0.6))
 	_generate_branch_floor(branch_id, GameManager.branch_floor, true)
 	_center_camera_on_player(true)
@@ -1980,7 +1980,7 @@ func _on_branch_stairs_up() -> void:
 		_cache_branch_floor(branch_id, 1)
 		GameManager.branch_zone = ""
 		GameManager.branch_floor = 0
-		CombatLog.post("You return to the main dungeon.", Color(0.7, 0.9, 1.0))
+		CombatLog.post(LocaleManager.t("LOG_YOU_RETURN_TO_THE_MAIN"), Color(0.7, 0.9, 1.0))
 		GameManager.depth = GameManager.branch_entry_depth
 		# If the main-path floor was never cached (e.g. old save from before
 		# floor_cache persistence, or branch entered on depth 1 fresh), fall
@@ -2004,7 +2004,7 @@ func _on_branch_cleared(branch_id: String) -> void:
 		return
 	GameManager.branches_cleared.append(branch_id)
 	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
-	CombatLog.post("%s cleared!" % cfg.get("display_name", branch_id), Color(1.0, 0.9, 0.3))
+	CombatLog.post(LocaleManager.t("LOG_CLEARED") % cfg.get("display_name", branch_id), Color(1.0, 0.9, 0.3))
 	# Per-branch title
 	match branch_id:
 		"swamp":      GameManager.earn_title("The Poisoner")
@@ -2014,7 +2014,7 @@ func _on_branch_cleared(branch_id: String) -> void:
 	# All-branches bonus
 	if GameManager.branches_cleared.size() >= 4:
 		GameManager.earn_title("The Delver")
-		CombatLog.post("All branches cleared!", Color(1.0, 0.9, 0.3))
+		CombatLog.post(LocaleManager.t("LOG_ALL_BRANCHES_CLEARED"), Color(1.0, 0.9, 0.3))
 
 func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_above: bool) -> void:
 	var cache_key: String = "%s_%d" % [branch_id, branch_floor]
@@ -2158,7 +2158,7 @@ func _spawn_abyss_floor(depth: int) -> void:
 			var p := Vector2i(x, y)
 			if map.tile_at(p) == DungeonMap.Tile.STAIRS_UP:
 				map.set_tile(p, DungeonMap.Tile.FLOOR)
-	CombatLog.post("The Abyss warps around you. There is no way back.", Color(0.6, 0.3, 0.9))
+	CombatLog.post(LocaleManager.t("LOG_THE_ABYSS_WARPS_AROUND_YOU"), Color(0.6, 0.3, 0.9))
 	# Spawn monsters — all immediately aware
 	var count: int = _monster_count_for_depth(depth) + 2
 	var rng := RandomNumberGenerator.new()
@@ -2242,7 +2242,7 @@ func _tick_abyss() -> void:
 		map.stairs_down_pos = new_exit
 		map.extra_stairs_down_positions.clear()
 		map.set_tile(new_exit, DungeonMap.Tile.STAIRS_DOWN)
-		CombatLog.post("The Abyss shifts... the exit has moved.", Color(0.6, 0.3, 0.9))
+		CombatLog.post(LocaleManager.t("LOG_THE_ABYSS_SHIFTS_THE_EXIT"), Color(0.6, 0.3, 0.9))
 	map.queue_redraw()
 
 func _abyss_find_new_exit() -> Vector2i:
@@ -2315,7 +2315,7 @@ func _spawn_branch_boss(branch_id: String) -> void:
 	m.died.connect(_on_branch_boss_died.bind(branch_id))
 	TurnManager.register_actor(m)
 	_roll_monster_weapon(m)
-	CombatLog.post("A powerful presence fills the chamber...", Color(1.0, 0.5, 0.2))
+	CombatLog.post(LocaleManager.t("LOG_A_POWERFUL_PRESENCE_FILLS_THE"), Color(1.0, 0.5, 0.2))
 
 func _spawn_branch_resistance_hint(branch_id: String) -> void:
 	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
@@ -2323,14 +2323,14 @@ func _spawn_branch_resistance_hint(branch_id: String) -> void:
 		var essence_id: String = String(cfg.get("essence_reward", ""))
 		if essence_id != "":
 			_spawn_essence_floor_item(essence_id, map.spawn_pos + Vector2i(1, 0))
-			CombatLog.post("The environment here is hostile — a protective essence manifests.", Color(0.9, 0.85, 0.4))
+			CombatLog.post(LocaleManager.t("LOG_THE_ENVIRONMENT_HERE_IS_HOSTILE"), Color(0.9, 0.85, 0.4))
 	else:
 		var ring_id: String = String(cfg.get("resist_ring", ""))
 		if ring_id != "":
 			var ring_data: ItemData = ItemRegistry.get_by_id(ring_id) if ItemRegistry != null and ring_id != "" else null
 			if ring_data != null:
 				_spawn_floor_item(ring_data, map.spawn_pos + Vector2i(1, 0), 0)
-				CombatLog.post("The environment here is hostile — a protective ring lies nearby.", Color(0.9, 0.85, 0.4))
+				CombatLog.post(LocaleManager.t("LOG_THE_ENVIRONMENT_HERE_IS_HOSTILE_2"), Color(0.9, 0.85, 0.4))
 
 func _on_branch_boss_died(monster: Monster, branch_id: String) -> void:
 	_on_monster_died(monster)
@@ -2348,7 +2348,7 @@ func _on_branch_boss_died(monster: Monster, branch_id: String) -> void:
 		var rune_data: ItemData = ItemRegistry.get_by_id(rune_id) if ItemRegistry != null and rune_id != "" else null
 		if rune_data != null:
 			_spawn_floor_item(rune_data, monster.grid_pos, 0)
-			CombatLog.post("A rune materialises!", Color(1.0, 0.9, 0.3))
+			CombatLog.post(LocaleManager.t("LOG_A_RUNE_MATERIALISES"), Color(1.0, 0.9, 0.3))
 	# Essence or ring depending on faith
 	if FaithSystem.allows_essence(player):
 		var essence_id: String = String(cfg.get("essence_reward", ""))
@@ -2360,7 +2360,7 @@ func _on_branch_boss_died(monster: Monster, branch_id: String) -> void:
 			var ring_data: ItemData = ItemRegistry.get_by_id(ring_id) if ItemRegistry != null and ring_id != "" else null
 			if ring_data != null:
 				_spawn_floor_item(ring_data, monster.grid_pos, 0)
-				CombatLog.post("A unique ring appears!", Color(0.8, 0.7, 1.0))
+				CombatLog.post(LocaleManager.t("LOG_A_UNIQUE_RING_APPEARS"), Color(0.8, 0.7, 1.0))
 	# Place stairs back to main
 	for p in _all_down_stairs_positions():
 		map.set_tile(p, DungeonMap.Tile.STAIRS_UP)
@@ -2411,7 +2411,7 @@ func save_with_cache() -> void:
 	SaveManager.save_run(player, GameManager)
 
 func _on_dungeon_cleared() -> void:
-	CombatLog.post("You have cleared the dungeon!", Color(1.0, 0.9, 0.2))
+	CombatLog.post(LocaleManager.t("LOG_YOU_HAVE_CLEARED_THE_DUNGEON"), Color(1.0, 0.9, 0.2))
 	GameManager.end_run("victory")
 	_show_result_screen(true)
 
@@ -2436,7 +2436,7 @@ func _on_stairs_down() -> void:
 	if GameManager.depth >= 16:
 		_on_dungeon_cleared()
 		return
-	CombatLog.post("You descend to B%d." % GameManager.depth, Color(0.6, 1.0, 1.0))
+	CombatLog.post(LocaleManager.t("LOG_YOU_DESCEND_TO_B") % GameManager.depth, Color(0.6, 1.0, 1.0))
 	_clear_monsters()
 	_clear_floor_items()
 	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth), true)
@@ -2451,13 +2451,13 @@ func _on_stairs_up() -> void:
 		_on_branch_stairs_up()
 		return
 	if GameManager.depth <= 1:
-		CombatLog.post("The way up is blocked.", Color(0.7, 0.7, 0.7))
+		CombatLog.post(LocaleManager.t("LOG_THE_WAY_UP_IS_BLOCKED"), Color(0.7, 0.7, 0.7))
 		TurnManager.end_player_turn()
 		return
 	_cancel_auto_walk("stairs")
 	_cache_current_floor()
 	GameManager.ascend()
-	CombatLog.post("You climb to B%d." % GameManager.depth,
+	CombatLog.post(LocaleManager.t("LOG_YOU_CLIMB_TO_B") % GameManager.depth,
 		Color(0.85, 1.0, 0.85))
 	_clear_monsters()
 	_clear_floor_items()
@@ -2479,7 +2479,7 @@ func _travel_to_floor(target_depth: int) -> void:
 	_clear_floor_items()
 	var going_down: bool = target_depth > GameManager.depth
 	GameManager.travel_to(target_depth)
-	CombatLog.post("You travel to B%d." % target_depth, Color(0.7, 0.9, 1.0))
+	CombatLog.post(LocaleManager.t("LOG_YOU_TRAVEL_TO_B") % target_depth, Color(0.7, 0.9, 1.0))
 	_generate_floor(target_depth, _floor_seed(target_depth), going_down)
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
@@ -2494,7 +2494,7 @@ func _on_item_dropped(entry: Dictionary, at_pos: Vector2i) -> void:
 		return
 	_spawn_floor_item(data, at_pos, int(entry.get("plus", 0)), entry)
 	var item_name: String = ItemRegistry.entry_display_name(entry) if ItemRegistry != null else GameManager.display_name_of(item_id)
-	CombatLog.post("You drop %s." % item_name)
+	CombatLog.post(LocaleManager.t("LOG_YOU_DROP") % item_name)
 
 func _on_menu_button_pressed() -> void:
 	var dlg: GameDialog = GameDialog.create("Menu")
@@ -2510,7 +2510,7 @@ func _on_menu_button_pressed() -> void:
 	save_btn.add_theme_font_size_override("font_size", 24)
 	save_btn.pressed.connect(func():
 		save_with_cache()
-		CombatLog.post("Game saved.", Color(0.6, 0.9, 0.6))
+		CombatLog.post(LocaleManager.t("LOG_GAME_SAVED"), Color(0.6, 0.9, 0.6))
 		dlg.queue_free())
 	body.add_child(save_btn)
 
@@ -2560,7 +2560,7 @@ func begin_spell_targeting(spell: SpellData, p: Player) -> void:
 	_targeting_node = SpellTargetOverlay.new()
 	_effect_layer.add_child(_targeting_node)
 	_targeting_node.init(spell, p, _targeting_tiles)
-	CombatLog.post("Tap highlighted tile to cast %s — tap elsewhere to cancel." \
+	CombatLog.post(LocaleManager.t("LOG_TAP_HIGHLIGHTED_TILE_TO_CAST") \
 			% spell.display_name, Color(0.8, 0.75, 1.0))
 
 ## Two-step targeting for single/auto/nearest spells: auto-selects nearest monster,
@@ -2587,7 +2587,7 @@ func begin_spell_targeting_auto(spell: SpellData, p: Player) -> void:
 			best_d = d
 			best = n
 	if best == null:
-		CombatLog.post("No targets in range.", Color(0.75, 0.75, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_NO_TARGETS_IN_RANGE"), Color(0.75, 0.75, 0.75))
 		return
 	_targeting_spell = spell
 	_targeting_monster = best
@@ -2595,7 +2595,7 @@ func begin_spell_targeting_auto(spell: SpellData, p: Player) -> void:
 	_effect_layer.add_child(_targeting_node)
 	_targeting_node.init(spell, p, _targeting_tiles)
 	_targeting_node.set_target(best.grid_pos)
-	CombatLog.post("Tap the %s to cast %s — tap elsewhere to cancel." \
+	CombatLog.post(LocaleManager.t("LOG_TAP_THE_TO_CAST_TAP") \
 			% [best.data.display_name, spell.display_name], Color(0.8, 0.75, 1.0))
 
 func _cancel_targeting() -> void:
@@ -2622,7 +2622,7 @@ func _on_rest_pressed() -> void:
 		TurnManager.end_player_turn()
 		return
 	if player.hp >= player.hp_max and player.mp >= player.mp_max:
-		CombatLog.post("You are already fully rested.", Color(0.7, 0.9, 0.6))
+		CombatLog.post(LocaleManager.t("LOG_YOU_ARE_ALREADY_FULLY_RESTED"), Color(0.7, 0.9, 0.6))
 		return
 	var ticks: int = 0
 	while ticks < 100 and (player.hp < player.hp_max or player.mp < player.mp_max) and player.hp > 0:
@@ -2630,7 +2630,7 @@ func _on_rest_pressed() -> void:
 		TurnManager.end_player_turn(1, true)
 		ticks += 1
 		if _monster_in_sight():
-			CombatLog.post("You stop resting — enemy spotted.", Color(1.0, 0.7, 0.5))
+			CombatLog.post(LocaleManager.t("LOG_YOU_STOP_RESTING_ENEMY_SPOTTED"), Color(1.0, 0.7, 0.5))
 			break
 
 func _monster_in_sight() -> bool:
@@ -2695,7 +2695,7 @@ func _use_targeting_wand(item_id: String, element: String, slot_index: int) -> v
 			best_d = d
 			best = n
 	if best == null:
-		CombatLog.post("No targets in range.", Color(0.75, 0.75, 0.75))
+		CombatLog.post(LocaleManager.t("LOG_NO_TARGETS_IN_RANGE"), Color(0.75, 0.75, 0.75))
 		return
 	var dmg: int = 8 + randi_range(0, 8)
 	var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
@@ -2706,7 +2706,7 @@ func _use_targeting_wand(item_id: String, element: String, slot_index: int) -> v
 		if is_instance_valid(target_ref) and target_ref.hp > 0:
 			target_ref.take_damage(dmg)
 	)
-	CombatLog.post("The wand fires at the %s." % best.data.display_name, Color(1.0, 0.85, 0.4))
+	CombatLog.post(LocaleManager.t("LOG_THE_WAND_FIRES_AT_THE") % best.data.display_name, Color(1.0, 0.85, 0.4))
 	player.use_quickslot(slot_index)
 	_refresh_quickslots()
 	TurnManager.end_player_turn()
@@ -2898,7 +2898,7 @@ func _on_act_pressed() -> void:
 		if dir != Vector2i.ZERO:
 			player.try_step(dir)
 		else:
-			CombatLog.post("Can't reach the %s." % nearest.data.display_name,
+			CombatLog.post(LocaleManager.t("LOG_CAN_T_REACH_THE") % nearest.data.display_name,
 					Color(1.0, 0.7, 0.5))
 	else:
 		_start_auto_explore()
@@ -2909,7 +2909,7 @@ func _on_pickup_pressed() -> void:
 		return
 	var item: FloorItem = _item_at(player.grid_pos)
 	if item == null:
-		CombatLog.post("Nothing here to pick up.", Color(0.6, 0.6, 0.6))
+		CombatLog.post(LocaleManager.t("LOG_NOTHING_HERE_TO_PICK_UP"), Color(0.6, 0.6, 0.6))
 		return
 	player.pickup(item)
 	TurnManager.end_player_turn()
@@ -2934,12 +2934,12 @@ func _start_auto_explore() -> void:
 	var target := _find_explore_target()
 	if target == Vector2i(-1, -1):
 		_auto_exploring = false
-		CombatLog.post("Nowhere left to explore.", Color(0.7, 0.9, 0.7))
+		CombatLog.post(LocaleManager.t("LOG_NOWHERE_LEFT_TO_EXPLORE"), Color(0.7, 0.9, 0.7))
 		return
 	var path := _bfs_path(player.grid_pos, target)
 	if path.is_empty():
 		_auto_exploring = false
-		CombatLog.post("Can't reach unexplored area.", Color(0.7, 0.7, 0.5))
+		CombatLog.post(LocaleManager.t("LOG_CAN_T_REACH_UNEXPLORED_AREA"), Color(0.7, 0.7, 0.5))
 		return
 	_begin_auto_walk(path, true)
 
@@ -3035,7 +3035,7 @@ func _on_monster_died(monster: Monster) -> void:
 	if monster != null and monster.data != null \
 			and monster.data.id == "abyssal_sovereign":
 		await get_tree().create_timer(1.2).timeout
-		CombatLog.post("The Abyssal Sovereign collapses. The dungeon trembles...",
+		CombatLog.post(LocaleManager.t("LOG_THE_ABYSSAL_SOVEREIGN_COLLAPSES_THE"),
 				Color(0.85, 0.6, 1.0))
 		await get_tree().create_timer(1.5).timeout
 		_show_result_screen(true)
@@ -3049,7 +3049,7 @@ func _handle_first_shrine_boss_clear(monster: Monster) -> void:
 	if GameManager.depth != 3 or map.altar_active or not monster.data.is_unique:
 		return
 	map.activate_altars()
-	CombatLog.post("Ancient power stirs. The altars glow with dormant faith.", Color(0.85, 0.75, 1.0))
+	CombatLog.post(LocaleManager.t("LOG_ANCIENT_POWER_STIRS_THE_ALTARS"), Color(0.85, 0.75, 1.0))
 
 func _handle_monster_essence_drop(monster: Monster) -> void:
 	if monster == null or monster.data == null:
@@ -3061,7 +3061,7 @@ func _handle_monster_essence_drop(monster: Monster) -> void:
 		var uid: String = String(monster.data.essence_id)
 		if uid == "":
 			uid = EssenceSystem.random_id()
-		CombatLog.post("The %s leaves behind an essence! (%s)" % [
+		CombatLog.post(LocaleManager.t("LOG_THE_LEAVES_BEHIND_AN_ESSENCE") % [
 			monster.data.display_name, EssenceSystem.display_name(uid)],
 			Color(1.0, 0.75, 0.3))
 		_spawn_essence_floor_item(uid, monster.grid_pos)
@@ -3078,7 +3078,7 @@ func _handle_monster_essence_drop(monster: Monster) -> void:
 		essence_id = String(monster.data.essence_id)
 	else:
 		essence_id = EssenceSystem.random_id()
-	CombatLog.post("An essence materializes! (%s)" % EssenceSystem.display_name(essence_id),
+	CombatLog.post(LocaleManager.t("LOG_AN_ESSENCE_MATERIALIZES") % EssenceSystem.display_name(essence_id),
 		Color(0.8, 0.6, 1.0))
 	_spawn_essence_floor_item(essence_id, monster.grid_pos)
 
@@ -3098,10 +3098,10 @@ func _on_monster_awareness_changed(monster: Monster, aware: bool) -> void:
 	var cell_size: float = DungeonMap.CELL_SIZE
 	var world_pos: Vector2 = monster.position + Vector2(cell_size * 0.5, -6.0)
 	if aware:
-		CombatLog.post("The %s notices you!" % monster.data.display_name, Color(1.0, 0.72, 0.45))
+		CombatLog.post(LocaleManager.t("LOG_THE_NOTICES_YOU") % monster.data.display_name, Color(1.0, 0.72, 0.45))
 		spawn_text_popup(world_pos, "!", Color(1.0, 0.72, 0.35), 32, 0.55)
 	else:
-		CombatLog.post("The %s loses track of you." % monster.data.display_name, Color(0.7, 0.82, 0.95))
+		CombatLog.post(LocaleManager.t("LOG_THE_LOSES_TRACK_OF_YOU") % monster.data.display_name, Color(0.7, 0.82, 0.95))
 		spawn_text_popup(world_pos, "?", Color(0.75, 0.88, 1.0), 26, 0.5)
 
 func _on_player_damaged(amount: int) -> void:
@@ -3362,7 +3362,7 @@ func _debug_warp_to(target_depth: int) -> void:
 	_clear_monsters()
 	_clear_floor_items()
 	GameManager.travel_to(target_depth)
-	CombatLog.post("[DEBUG] Warp to B%d." % target_depth, Color(1.0, 0.85, 0.3))
+	CombatLog.post(LocaleManager.t("LOG_DEBUG_WARP_TO_B") % target_depth, Color(1.0, 0.85, 0.3))
 	_generate_floor(target_depth, _floor_seed(target_depth), true)
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
@@ -3381,7 +3381,7 @@ func _debug_warp_to_branch(branch_id: String, branch_floor: int) -> void:
 	GameManager.branch_entry_depth = entry_depth
 	GameManager.branches_cleared.erase(branch_id)
 	GameManager.branch_floor_cache.erase("%s_%d" % [branch_id, branch_floor])
-	CombatLog.post("[DEBUG] Warp to %s F%d." % [branch_id, branch_floor], Color(1.0, 0.85, 0.3))
+	CombatLog.post(LocaleManager.t("LOG_DEBUG_WARP_TO_F") % [branch_id, branch_floor], Color(1.0, 0.85, 0.3))
 	_generate_branch_floor(branch_id, branch_floor, true)
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)

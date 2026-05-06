@@ -635,3 +635,192 @@ SPELL_NAME_STONE_ARROW,Stone Arrow,돌 화살
 SPELL_NAME_SUMMON_VERMIN,Summon Vermin,해충 소환
 SPELL_NAME_SWIFTNESS,Swiftness,신속
 SPELL_NAME_VAMPIRIC_DRAINING,Vampiric Draining,흡혈 흡수
+LOG_B,%s B%d.,%s B%d.
+LOG_AFFECTS_ENEMIES,%s affects %d enemies!,%s이(가) 적 %d명에게 영향을 미쳤다!
+LOG_CLEARED,%s cleared!,%s 클리어!
+LOG_HITS_THE_FOR,%s hits the %s for %d.,%s이(가) %s에게 %d 피해를 입혔다.
+LOG_REQUIRES_INT,%s requires INT %d.,%s은(는) INT %d 필요.
+LOG_REQUIRES_XL,%s requires XL %d.,%s은(는) XL %d 필요.
+LOG_SKILL_REACHES,%s skill reaches %d.,%s 스킬이 %d 레벨에 도달했다.
+LOG_CHARGES_REMAINING,(%d charges remaining),(충전 %d 남음)
+LOG_1,(+1 %s),(+1 %s)
+LOG_2_HAND_WEAPON_CANNOT_USE,2-hand weapon — cannot use a shield.,양손 무기 — 방패를 사용할 수 없다.
+LOG_A_CORPSE_RISES_TO_SERVE,A corpse rises to serve you!,시체가 일어나 그대를 섬긴다!
+LOG_A_CRUSHING_DARKNESS_FILLS_THE,A crushing darkness fills the air. Something ancient stirs...,압도적인 어둠이 공기를 채운다. 무언가 고대의 존재가 깨어난다...
+LOG_A_DANGEROUS_PRESENCE_LURKS_ON,A dangerous presence lurks on this floor...,이 층에 위험한 존재가 도사리고 있다...
+LOG_A_DART_STRIKES_THE_FOR,A dart strikes the %s for %d.,다트가 %s에게 %d 피해.
+LOG_A_LONE_GUARDIAN_WATCHES_OVER,A lone guardian watches over the ruined pantheon...,외로운 수호자가 폐허의 만신전을 지키고 있다...
+LOG_A_LOUD_NOISE_ECHOES_THROUGH,A loud noise echoes through the dungeon!,큰 소음이 던전에 울려퍼진다!
+LOG_A_POWERFUL_PRESENCE_FILLS_THE,A powerful presence fills the chamber...,강력한 존재가 방을 채운다...
+LOG_A_RUNE_MATERIALISES,A rune materialises!,룬이 형상화된다!
+LOG_A_SPECTRAL_ALLY_ANSWERS_YOUR,A spectral ally answers your call!,유령 동료가 부름에 응답한다!
+LOG_A_THICK_FOG_FILLS_THE,A thick fog fills the area.,짙은 안개가 주변을 채운다.
+LOG_A_UNIQUE_RING_APPEARS,A unique ring appears!,독특한 반지가 나타났다!
+LOG_ALL_BRANCHES_CLEARED,All branches cleared!,모든 가지 클리어!
+LOG_AN_ESSENCE_FADES_AWAY,An essence fades away. (%s),정수가 사라진다. (%s)
+LOG_AN_ESSENCE_MATERIALIZES,An essence materializes! (%s),정수가 형상화되었다! (%s)
+LOG_ANCIENT_POWER_STIRS_THE_ALTARS,Ancient power stirs. The altars glow with dormant faith.,고대의 힘이 깨어난다. 제단이 잠든 신앙으로 빛난다.
+LOG_B_TAP_A_TILE_OR,"B%d — tap a tile (or arrows) to step, bump to attack.","B%d — 타일을 탭(또는 방향키)해 이동, 부딪쳐 공격."
+LOG_CAN_T_REACH_THE,Can't reach the %s.,%s에게 닿을 수 없다.
+LOG_CAN_T_REACH_UNEXPLORED_AREA,Can't reach unexplored area.,미탐험 지역에 닿을 수 없다.
+LOG_CHOOSE_A_FAITH_BEFORE_ATTUNING,Choose a faith before attuning essences.,정수 동조 전에 신앙을 선택해야 한다.
+LOG_CLEAVE_HITS_THE_FOR,Cleave hits the %s for %d.,베기가 %s에게 %d 피해.
+LOG_FOG_SPREADS_AROUND_YOU,Fog spreads around you.,안개가 주변에 퍼진다.
+LOG_GAME_SAVED,Game saved.,게임이 저장되었다.
+LOG_LEVEL_UP_YOU_ARE_NOW,Level up! You are now level %d.,레벨 업! 레벨 %d가 되었다.
+LOG_LIGHTNING_ARCS_THROUGH_THE_FOR,Lightning arcs through the %s for %d.,번개가 %s를 관통해 %d 피해.
+LOG_NEARBY_ENEMIES_BURST_INTO_FLAME,Nearby enemies burst into flame!,근처 적들이 불길에 휩싸인다!
+LOG_NEW_CLASS_UNLOCKED,New class unlocked: %s!,새 클래스 해금: %s!
+LOG_NEW_RACE_UNLOCKED,New race unlocked: %s!,새 종족 해금: %s!
+LOG_NO_CORPSES_NEARBY_TO_ANIMATE,No corpses nearby to animate.,근처에 부활시킬 시체가 없다.
+LOG_NO_ROOM_TO_ANIMATE,No room to animate!,부활시킬 공간이 없다!
+LOG_NO_ROOM_TO_SUMMON,No room to summon!,소환할 공간이 없다!
+LOG_NO_TARGET_IN_RANGE,No target in range.,사정거리에 표적이 없다.
+LOG_NO_TARGETS_IN_RANGE,No targets in range.,사정거리에 표적이 없다.
+LOG_NOT_ENOUGH_MP_FOR,Not enough MP for %s.,%s 시전에 MP가 부족하다.
+LOG_NOTHING_HAPPENS,Nothing happens.,아무 일도 일어나지 않는다.
+LOG_NOTHING_HERE_TO_PICK_UP,Nothing here to pick up.,주울 것이 없다.
+LOG_NOTHING_NEARBY_TO_FRIGHTEN,Nothing nearby to frighten.,근처에 겁 줄 대상이 없다.
+LOG_NOTHING_TO_ENCHANT,Nothing to enchant.,강화할 것이 없다.
+LOG_NOTHING_TO_UPGRADE,Nothing to upgrade.,업그레이드할 것이 없다.
+LOG_NOWHERE_LEFT_TO_EXPLORE,Nowhere left to explore.,더 탐험할 곳이 없다.
+LOG_RUN_RESUMED_FLOOR_B,Run resumed. Floor B%d.,달리기 재개. 층 B%d.
+LOG_SHADOWS_GATHER_AROUND_YOU,Shadows gather around you.,그림자가 주변에 모여든다.
+LOG_SILENCE_FALLS_UPON_YOUR_FOES,Silence falls upon your foes.,적들에게 침묵이 내린다.
+LOG_SOAKED_LIGHTNING_SURGES_FOR_EXTRA,Soaked! Lightning surges for extra damage!,흠뻑 젖었다! 번개가 추가 피해를 가한다!
+LOG_SPELL_CANCELLED,Spell cancelled.,주문 취소됨.
+LOG_SWIFT_STRIKE,Swift strike!,신속한 일격!
+LOG_TAP_HIGHLIGHTED_TILE_TO_CAST,Tap highlighted tile to cast %s — tap elsewhere to cancel.,강조된 타일을 탭해 %s 시전 — 다른 곳 탭으로 취소.
+LOG_TAP_THE_TO_CAST_TAP,Tap the %s to cast %s — tap elsewhere to cancel.,%s를 탭해 %s 시전 — 다른 곳 탭으로 취소.
+LOG_THE_AT_YOU_AND_MISSES,The %s %s at you and misses.,%s이(가) 그대에게 %s지만 빗나갔다.
+LOG_THE_YOU_FOR,The %s %s you for %d.,%s이(가) 그대를 %s해 %d 피해.
+LOG_THE_CALLS_FOR_REINFORCEMENTS,The %s calls for reinforcements!,%s이(가) 지원을 요청한다!
+LOG_THE_CALLS_UPON_DIVINE_POWER,The %s calls upon divine power — the %s is healed!,%s이(가) 신성한 힘을 발휘 — %s이(가) 치유되었다!
+LOG_THE_CLOUD_BURNS_YOU_FOR,The %s cloud burns you for %d.,%s 구름이 그대를 %d 피해로 태운다.
+LOG_THE_DRAINS_YOUR_LIFE_FORCE,The %s drains your life force!,%s이(가) 그대의 생명력을 흡수한다!
+LOG_THE_ESSENCE_FADES_AWAY,The %s essence fades away.,%s 정수가 사라진다.
+LOG_THE_FALLS_ASLEEP,The %s falls asleep!,%s이(가) 잠들었다!
+LOG_THE_HITS_YOU_FOR,The %s hits you for %d.,%s이(가) 그대에게 %d 피해.
+LOG_THE_IS,The %s is %s!,%s이(가) %s 상태!
+LOG_THE_IS_EXHAUSTED,The %s is exhausted.,%s이(가) 모두 소진되었다.
+LOG_THE_IS_IMMUNE_TO,The %s is immune to %s.,%s이(가) %s에 면역.
+LOG_THE_IS_STUNNED,The %s is stunned!,%s이(가) 기절했다!
+LOG_THE_IS_TOO_POWERFUL_TO,The %s is too powerful to affect!,%s이(가) 너무 강해 영향을 줄 수 없다!
+LOG_THE_IS_TOO_POWERFUL,The %s is too powerful!,%s이(가) 너무 강하다!
+LOG_THE_LEAVES_BEHIND_AN_ESSENCE,The %s leaves behind an essence! (%s),%s이(가) 정수를 남겼다! (%s)
+LOG_THE_LOSES_TRACK_OF_YOU,The %s loses track of you.,%s이(가) 그대를 놓쳤다.
+LOG_THE_MISSES_YOU,The %s misses you.,%s이(가) 빗나갔다.
+LOG_THE_NOTICES_YOU,The %s notices you!,%s이(가) 그대를 발견했다!
+LOG_THE_PULSES_WITH_DEEP_POWER,The %s pulses with deep power. (+%d XP),%s이(가) 깊은 힘으로 진동한다. (+%d XP)
+LOG_THE_RESISTS_THE_SLEEP,The %s resists the sleep!,%s이(가) 수면에 저항했다!
+LOG_THE_WRITHES_IN_AGONY_HP,The %s writhes in agony! (-%d HP),%s이(가) 고통에 몸부림친다! (-%d HP)
+LOG_THE_S_ATTACK_HITS_YOU,The %s's attack hits you for %d!,%s의 공격이 %d 피해를 입혔다!
+LOG_THE_ABYSS_SHIFTS_THE_EXIT,The Abyss shifts... the exit has moved.,심연이 뒤틀린다... 출구가 옮겨졌다.
+LOG_THE_ABYSS_WARPS_AROUND_YOU,The Abyss warps around you. There is no way back.,심연이 그대를 휘감는다. 돌아갈 길은 없다.
+LOG_THE_ABYSSAL_SOVEREIGN_COLLAPSES_THE,The Abyssal Sovereign collapses. The dungeon trembles...,심연의 군주가 쓰러진다. 던전이 흔들린다...
+LOG_THE_ABYSSAL_SOVEREIGN_S_POWER,The Abyssal Sovereign's power surges — it moves with terrible speed!,심연 군주의 힘이 폭주한다 — 무서운 속도로 움직인다!
+LOG_THE_SOVEREIGN_S_SERVANTS_HEED,The Sovereign's servants heed its call!,군주의 종복들이 부름에 응한다!
+LOG_THE_ENEMIES_FLEE_IN_TERROR,The enemies flee in terror!,적들이 공포에 질려 도망친다!
+LOG_THE_ENVIRONMENT_HERE_IS_HOSTILE,The environment here is hostile — a protective essence manifests.,이곳의 환경이 적대적이다 — 보호 정수가 나타난다.
+LOG_THE_ENVIRONMENT_HERE_IS_HOSTILE_2,The environment here is hostile — a protective ring lies nearby.,이곳의 환경이 적대적이다 — 근처에 보호 반지가 있다.
+LOG_THE_FLAMES_FIND_NO_TARGET,The flames find no target.,화염이 표적을 찾지 못한다.
+LOG_THE_FLOOR_S_LAYOUT_BECOMES,The floor's layout becomes clear.,이 층의 구조가 드러난다.
+LOG_THE_LAVA_SCORCHES_YOU_FOR,The lava scorches you for 8!,용암이 그대를 8 피해로 태운다!
+LOG_THE_POISON_CLEARS,The poison clears.,독이 사라진다.
+LOG_THE_SCROLL_IGNITES_IN_A,The scroll ignites in a blazing inferno!,두루마리가 불타는 지옥불로 점화된다!
+LOG_THE_SILENCE_FINDS_NO_VOICES,The silence finds no voices nearby.,침묵이 주변에서 목소리를 찾지 못한다.
+LOG_THE_TARGET_S_FORM_SHIFTS,The target's form shifts!,표적의 모습이 변한다!
+LOG_THE_TOME_IS_BEYOND_YOUR,The tome is beyond your current intellect.,이 책은 그대의 현재 지능으로는 다룰 수 없다.
+LOG_THE_WAND_CARVES_THROUGH_TILE,The wand carves through %d tile%s of stone.,막대가 돌 %d타일을 깎아낸다.
+LOG_THE_WAND_FINDS_NO_WALL,The wand finds no wall to dig.,막대가 팔 벽을 찾지 못한다.
+LOG_THE_WAND_FIRES_AT_THE,The wand fires at the %s.,막대가 %s를 향해 발사된다.
+LOG_THE_WAND_PULSES_WITH_DIGGING,The wand pulses with digging energy.,막대가 굴착 에너지로 진동한다.
+LOG_THE_WAY_UP_IS_BLOCKED,The way up is blocked.,위로 가는 길이 막혔다.
+LOG_TIME_FREEZES_AROUND_YOU,Time freezes around you!,주변의 시간이 멈춘다!
+LOG_WATER_SOAKS_YOU,Water soaks you.,물이 그대를 적신다.
+LOG_YOU_DIED,YOU DIED.,사망했습니다.
+LOG_YOU_ABSORB_HP,You absorb %d HP.,%d HP를 흡수했다.
+LOG_YOU_ALREADY_KNOW_ALL_SPELLS,You already know all spells in this tome.,이 책의 모든 주문을 이미 알고 있다.
+LOG_YOU_ARE_ALREADY_FULLY_RESTED,You are already fully rested.,이미 완전히 회복됐다.
+LOG_YOU_ARE_INVULNERABLE,You are invulnerable!,무적 상태!
+LOG_YOU_ARE_POISONED,You are poisoned.,중독되었다.
+LOG_YOU_BANDAGE_YOUR_WOUNDS_HP,You bandage your wounds. (+%d HP),상처를 치료했다. (+%d HP)
+LOG_YOU_BANISH_THE,You banish the %s!,%s를 추방했다!
+LOG_YOU_BECOME_ETHEREAL,You become ethereal!,영체화되었다!
+LOG_YOU_BIND_TO_YOUR_FIRST,You bind %s to your first essence slot.,%s를 첫 번째 정수 슬롯에 봉했다.
+LOG_YOU_BLINK,You blink.,순간이동했다.
+LOG_YOU_BLOCK_THE_S_ATTACK,You block the %s's attack!,%s의 공격을 막아냈다!
+LOG_YOU_CALL_FORTH,You call forth %s!,%s를 소환했다!
+LOG_YOU_CAST,You cast %s.,%s를 시전했다.
+LOG_YOU_CAST_2,You cast %s. %s,%s를 시전했다. %s
+LOG_YOU_CAST_HP,You cast %s. (+%d HP),%s를 시전했다. (+%d HP)
+LOG_YOU_CLAIM,You claim %s.,%s를 손에 넣었다.
+LOG_YOU_CLIMB_TO_B,You climb to B%d.,B%d로 올라갔다.
+LOG_YOU_DESCEND_TO_B,You descend to B%d.,B%d로 내려갔다.
+LOG_YOU_DODGE_THE_S_ATTACK,You dodge the %s's attack!,%s의 공격을 회피했다!
+LOG_YOU_DON,You don %s.,%s를 착용했다.
+LOG_YOU_DRAIN_BLOOD_HP,You drain blood. (+%d HP),피를 흡수했다. (+%d HP)
+LOG_YOU_DRAIN_THE_FOR,You drain the %s for %d.,%s에게서 %d를 흡수했다.
+LOG_YOU_DROP,You drop %s.,%s를 버렸다.
+LOG_YOU_ENTER_A_BERSERK_RAGE,You enter a berserk rage. (+4 STR),광폭 상태에 빠졌다. (+4 STR)
+LOG_YOU_ENTER_THE,You enter the %s.,%s에 진입했다.
+LOG_YOU_EQUIP,You equip %s.,%s를 장착했다.
+LOG_YOU_FADE_FROM_SIGHT,You fade from sight.,시야에서 사라진다.
+LOG_YOU_FEEL_A_SURGE_OF,You feel a surge of speed.,속도가 솟구친다.
+LOG_YOU_FEEL_BETTER_HP,You feel better. (+%d HP),기분이 나아졌다. (+%d HP)
+LOG_YOU_FEEL_HEALTHY,You feel healthy.,건강해진 느낌이다.
+LOG_YOU_FEEL_MIGHTY_STR,You feel mighty. (+%d STR),강해진 느낌이다. (+%d STR)
+LOG_YOU_FEEL_MORE_AGILE_1,You feel more agile. (+1 DEX),더 민첩해진 느낌이다. (+1 DEX)
+LOG_YOU_FEEL_MORE_EXPERIENCED,You feel more experienced.,경험이 늘어난 느낌이다.
+LOG_YOU_FEEL_RECHARGED_MP,You feel recharged. (+%d MP),재충전됐다. (+%d MP)
+LOG_YOU_FEEL_RESISTANT_TO_FIRE,"You feel resistant to fire, cold and poison.","화염, 냉기, 독에 저항이 생긴 느낌이다."
+LOG_YOU_FEEL_SHARPER_1_INT,You feel sharper. (+1 INT),예리해진 느낌이다. (+1 INT)
+LOG_YOU_FOLLOW_THE_PATH_OF,You follow the path of %s.,%s의 길을 따른다.
+LOG_YOU_HAVE_ALREADY_CLEARED_THE,You have already cleared the %s.,%s는 이미 클리어했다.
+LOG_YOU_HAVE_CLEARED_THE_DUNGEON,You have cleared the dungeon!,던전을 클리어했다!
+LOG_YOU_HAVE_NO_EQUIPMENT_TO,You have no equipment to brand.,브랜드를 새길 장비가 없다.
+LOG_YOU_HIT_THE_FOR,You hit the %s for %d.,%s에게 %d 피해를 입혔다.
+LOG_YOU_HIT_THE_WITH_FOR,You hit the %s with %s for %d.,%s에게 %s로 %d 피해.
+LOG_YOU_HOLD_IN_RESERVE,You hold %s in reserve.,%s를 예비로 보관했다.
+LOG_YOU_IDENTIFY,You identify %s.,%s를 감정했다.
+LOG_YOU_KILL_THE,You kill the %s.,%s를 처치했다.
+LOG_YOU_LEARN,You learn %s.,%s를 배웠다.
+LOG_YOU_LEAVE_AND_TAKE,You leave %s and take %s.,%s를 두고 %s를 챙겼다.
+LOG_YOU_LOSE_HP,You lose %d HP.,HP %d를 잃었다.
+LOG_YOU_LOWER,You lower %s.,%s를 풀었다.
+LOG_YOU_MEMORIZE,You memorize %s.,%s를 기억했다.
+LOG_YOU_MISS_THE,You miss the %s.,%s에게 빗나갔다.
+LOG_YOU_OBLITERATE_THE,You obliterate the %s!,%s를 산산조각 냈다!
+LOG_YOU_PARRY_THE_S_ATTACK,You parry the %s's attack!,%s의 공격을 받아쳤다!
+LOG_YOU_PICK_UP_GOLD,You pick up %d gold.,금화 %d를 주웠다.
+LOG_YOU_PICK_UP,You pick up %s.,%s를 주웠다.
+LOG_YOU_PUT_ON,You put on %s.,%s를 착용했다.
+LOG_YOU_RAISE,You raise %s.,%s를 들었다.
+LOG_YOU_REGENERATE,You regenerate.,회복한다.
+LOG_YOU_REMOVE,You remove %s.,%s를 벗었다.
+LOG_YOU_RETURN_TO_THE_MAIN,You return to the main dungeon.,메인 던전으로 돌아왔다.
+LOG_YOU_START_AS,You start as %s %s.,%s %s로 시작한다.
+LOG_YOU_STOP_RESTING_ENEMY_SPOTTED,You stop resting — enemy spotted.,휴식 중단 — 적 발견.
+LOG_YOU_STOP_ENEMY_APPROACHES,You stop — enemy approaches.,정지 — 적이 접근한다.
+LOG_YOU_TELEPORT,You teleport.,순간이동했다.
+LOG_YOU_THROW_THE,You throw the %s.,%s를 던졌다.
+LOG_YOU_TRAVEL_TO_B,You travel to B%d.,B%d로 이동했다.
+LOG_YOU_UNEQUIP,You unequip %s.,%s를 해제했다.
+LOG_YOU_VANISH_IN_A_FLASH,You vanish in a flash of light.,빛의 섬광 속으로 사라졌다.
+LOG_YOUR_FADES_AWAY,Your %s fades away.,%s 효과가 사라진다.
+LOG_YOUR_GLOWS,Your %s glows. (+%d),%s가 빛난다. (+%d)
+LOG_YOUR_HITS_THE_FOR,Your %s hits the %s for %d.,그대의 %s가 %s에게 %d 피해.
+LOG_YOUR_IS_BRANDED_WITH,Your %s is branded with %s!,%s에 %s 브랜드가 새겨졌다!
+LOG_YOUR_WEARS_OFF,Your %s wears off.,%s 효과가 풀렸다.
+LOG_YOUR_ARMOR_BURNS_THE_ATTACKER,Your armor burns the attacker!,갑옷이 공격자를 태운다!
+LOG_YOUR_ARMOR_CORRODES_THE_ATTACKER,Your armor corrodes the attacker!,갑옷이 공격자를 부식시킨다!
+LOG_YOUR_ARMOR_DRAINS_THE_ATTACKER,Your armor drains the attacker!,갑옷이 공격자를 흡수한다!
+LOG_YOUR_ARMOR_FREEZES_THE_ATTACKER,Your armor freezes the attacker!,갑옷이 공격자를 얼린다!
+LOG_YOUR_ARMOR_S_VENOM_LASHES,Your armor's venom lashes back!,갑옷의 독이 반격한다!
+LOG_YOUR_CURRENT_FAITH_DOES_NOT,Your current faith does not allow essence attunement.,현재 신앙은 정수 동조를 허락하지 않는다.
+LOG_YOUR_ESSENCE_INVENTORY_IS_FULL,Your essence inventory is full.,정수 인벤토리가 가득 찼다.
+LOG_YOUR_FOES_TURN_AND_FLEE,Your foes turn and flee!,적들이 돌아서서 도망친다!
+LOG_YOUR_NEGATIVE_EFFECTS_ARE_CANCELLED,Your negative effects are cancelled.,부정 효과가 모두 해제됐다.
+LOG_YOUR_WEAPON_GLOWS_WITH_NEW,Your weapon glows with new power.,무기가 새로운 힘으로 빛난다.
+LOG_DEBUG_WARP_TO_F,[DEBUG] Warp to %s F%d.,[DEBUG] %s F%d로 이동.
+LOG_DEBUG_WARP_TO_B,[DEBUG] Warp to B%d.,[DEBUG] B%d로 이동.

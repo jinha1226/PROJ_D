@@ -232,7 +232,7 @@ static func _open_confirm(faith_id: String, player: Player, parent: Node, dlg: G
 static func _apply_faith(faith_id: String, player: Player, parent: Node) -> void:
 	if not FaithSystem.choose_faith(player, faith_id):
 		return
-	CombatLog.post("You follow the path of %s." % FaithSystem.display_name(faith_id),
+	CombatLog.post(LocaleManager.t("LOG_YOU_FOLLOW_THE_PATH_OF") % FaithSystem.display_name(faith_id),
 		FaithSystem.color_of(faith_id))
 
 	if faith_id == FaithSystem.ESSENCE_FAITH_ID:
@@ -321,11 +321,11 @@ static func _grant_first_essence(eid: String, player: Player) -> void:
 	var slot_count: int = EssenceSystem.active_slot_count(player)
 	if slot_count > 0 and String(player.essence_slots[0]) == "":
 		player.equip_essence(0, eid)
-		CombatLog.post("You bind %s to your first essence slot." % EssenceSystem.display_name(eid),
+		CombatLog.post(LocaleManager.t("LOG_YOU_BIND_TO_YOUR_FIRST") % EssenceSystem.display_name(eid),
 			EssenceSystem.color_of(eid))
 	else:
 		player.add_essence(eid)
-		CombatLog.post("You hold %s in reserve." % EssenceSystem.display_name(eid),
+		CombatLog.post(LocaleManager.t("LOG_YOU_HOLD_IN_RESERVE") % EssenceSystem.display_name(eid),
 			EssenceSystem.color_of(eid))
 
 

@@ -177,7 +177,7 @@ static func _try_boss_telegraph(monster: Monster, player: Player, map: DungeonMa
 static func _smite(monster: Monster, player: Player, msg: String) -> void:
 	var dmg: int = randi_range(monster.data.hd, monster.data.hd * 2 + 2)
 	CombatLog.post(msg, Color(1.0, 0.65, 0.2))
-	CombatLog.damage_taken("The %s hits you for %d." % [monster.data.display_name, dmg])
+	CombatLog.damage_taken(LocaleManager.t("LOG_THE_HITS_YOU_FOR") % [monster.data.display_name, dmg])
 	player.take_damage(dmg, monster.data.id)
 	monster.become_aware(player.grid_pos)
 
@@ -185,8 +185,8 @@ static func _smite(monster: Monster, player: Player, msg: String) -> void:
 ## Drain life: deals damage and heals the monster.
 static func _drain_life(monster: Monster, player: Player) -> void:
 	var dmg: int = randi_range(monster.data.hd, monster.data.hd + 4)
-	CombatLog.post("The %s drains your life force!" % monster.data.display_name, Color(0.7, 0.3, 1.0))
-	CombatLog.damage_taken("You lose %d HP." % dmg)
+	CombatLog.post(LocaleManager.t("LOG_THE_DRAINS_YOUR_LIFE_FORCE") % monster.data.display_name, Color(0.7, 0.3, 1.0))
+	CombatLog.damage_taken(LocaleManager.t("LOG_YOU_LOSE_HP") % dmg)
 	player.take_damage(dmg, monster.data.id)
 	monster.hp = min(monster.data.hp, monster.hp + dmg / 2)
 	monster.emit_signal("stats_changed")
@@ -236,10 +236,10 @@ static func _fire_charge(monster: Monster, player: Player, map: DungeonMap) -> v
 	var hit_tiles: Array = charge.get("tiles", [])
 	var dmg: int = int(charge.get("damage", monster.data.hd * 2))
 	if player.grid_pos in hit_tiles:
-		CombatLog.damage_taken("The %s's attack hits you for %d!" % [monster.data.display_name, dmg])
+		CombatLog.damage_taken(LocaleManager.t("LOG_THE_S_ATTACK_HITS_YOU") % [monster.data.display_name, dmg])
 		player.take_damage(dmg, monster.data.id)
 	else:
-		CombatLog.post("You dodge the %s's attack!" % monster.data.display_name, Color(0.6, 1.0, 0.6))
+		CombatLog.post(LocaleManager.t("LOG_YOU_DODGE_THE_S_ATTACK") % monster.data.display_name, Color(0.6, 1.0, 0.6))
 
 static func _flee_step(monster: Monster, map: DungeonMap,
 		threat: Vector2i) -> void:
@@ -460,7 +460,7 @@ static func _try_heal_ally(healer: Monster) -> bool:
 	var heal: int = healer.data.hd * 3
 	best.hp = min(best.data.hp, best.hp + heal)
 	best.emit_signal("stats_changed")
-	CombatLog.post("The %s calls upon divine power — the %s is healed!" \
+	CombatLog.post(LocaleManager.t("LOG_THE_CALLS_UPON_DIVINE_POWER") \
 			% [healer.data.display_name, best.data.display_name], Color(0.5, 1.0, 0.6))
 	return true
 
@@ -490,7 +490,7 @@ static func _try_summon(summoner: Monster, map: DungeonMap) -> void:
 		if game.spawn_monster_at(mid, free_tiles[i]):
 			spawned += 1
 	if spawned > 0:
-		CombatLog.post("The %s calls for reinforcements!" % summoner.data.display_name,
+		CombatLog.post(LocaleManager.t("LOG_THE_CALLS_FOR_REINFORCEMENTS") % summoner.data.display_name,
 				Color(1.0, 0.75, 0.3))
 
 
@@ -505,7 +505,7 @@ static func _abyssal_sovereign_turn(monster: Monster, player: Player, map: Dunge
 	# Activate phase 2 speed boost once
 	if phase2 and monster.data.speed == 12:
 		monster.data.speed = 15
-		CombatLog.post("The Abyssal Sovereign's power surges — it moves with terrible speed!",
+		CombatLog.post(LocaleManager.t("LOG_THE_ABYSSAL_SOVEREIGN_S_POWER"),
 				Color(0.8, 0.3, 1.0))
 
 	# Always telegraph — boss doesn't "idle"
@@ -529,7 +529,7 @@ static func _abyssal_sovereign_turn(monster: Monster, player: Player, map: Dunge
 							var mid: String = ["zombie","crypt_zombie","wraith"][randi() % 3]
 							if game.spawn_monster_at(mid, t):
 								break
-		CombatLog.post("The Sovereign's servants heed its call!", Color(0.7, 0.3, 1.0))
+		CombatLog.post(LocaleManager.t("LOG_THE_SOVEREIGN_S_SERVANTS_HEED"), Color(0.7, 0.3, 1.0))
 	else:
 		# Phase 1: AOE r=2, 30% summon zombie
 		_telegraph_aoe(monster, map, 2,
