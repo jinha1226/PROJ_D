@@ -6,27 +6,15 @@ signal settings_changed
 
 const SETTINGS_PATH: String = "user://settings.json"
 
-const _POTION_COLORS: Array = [
-	{"file": "brown",        "name": "갈색"},
-	{"file": "ruby",         "name": "루비색"},
-	{"file": "sky_blue",     "name": "하늘색"},
-	{"file": "golden",       "name": "황금색"},
-	{"file": "emerald",      "name": "에메랄드색"},
-	{"file": "purple_red",   "name": "자주색"},
-	{"file": "magenta",      "name": "자홍색"},
-	{"file": "cyan",         "name": "청록색"},
-	{"file": "pink",         "name": "분홍색"},
-	{"file": "silver",       "name": "은색"},
-	{"file": "white",        "name": "흰색"},
-	{"file": "orange",       "name": "주황색"},
-	{"file": "murky",        "name": "탁한"},
-	{"file": "puce",         "name": "적갈색"},
-	{"file": "fizzy",        "name": "탄산"},
-	{"file": "bubbly",       "name": "보글보글"},
-	{"file": "cloudy",       "name": "흐린"},
-	{"file": "dark",         "name": "어두운"},
-	{"file": "black",        "name": "검은"},
-	{"file": "yellow",       "name": "노란"},
+## Potion color file names. Display name resolves through translations.csv —
+## color_file → POTION_COLOR_<UPPER> key. Stored as just the file id so
+## live language switches translate on display without re-rolling the
+## per-run color assignment.
+const _POTION_COLOR_FILES: Array = [
+	"brown", "ruby", "sky_blue", "golden", "emerald",
+	"purple_red", "magenta", "cyan", "pink", "silver",
+	"white", "orange", "murky", "puce", "fizzy",
+	"bubbly", "cloudy", "dark", "black", "yellow",
 ]
 const _SCROLL_WORDS: Array = ["GIB XON", "VEL AMR", "HYAR ZED",
 	"MOR TEX", "ARN BEK", "DUO LIS", "KER NAR", "FAL MIR",
@@ -168,7 +156,7 @@ func identify(item_id: String) -> void:
 func _generate_pseudonyms() -> void:
 	pseudonyms.clear()
 	potion_colors.clear()
-	var colors: Array = _POTION_COLORS.duplicate()
+	var colors: Array = _POTION_COLOR_FILES.duplicate()
 	var scrolls: Array = _SCROLL_WORDS.duplicate()
 	var books: Array = _BOOK_ADJ.duplicate()
 	colors.shuffle()
@@ -178,10 +166,12 @@ func _generate_pseudonyms() -> void:
 	for item in ItemRegistry.all:
 		match item.kind:
 			"potion":
-				var col: Dictionary = colors[ci % colors.size()]
+				var color_file: String = String(colors[ci % colors.size()])
 				ci += 1
-				potion_colors[item.id] = col.file
-				pseudonyms[item.id] = "%s 포션" % col.name
+				potion_colors[item.id] = color_file
+				# Marker prefix `__potion_color__:<file>` — display_name_of()
+				# expands it via LocaleManager so language switches live.
+				pseudonyms[item.id] = "__potion_color__:%s" % color_file
 			"scroll":
 				if not scrolls.is_empty():
 					pseudonyms[item.id] = "scroll labeled %s" % scrolls.pop_back()
@@ -204,7 +194,13 @@ func display_name_of(item_id: String) -> String:
 		return data.display_name
 	if is_identified(lookup_id):
 		return data.display_name
-	return pseudonyms.get(lookup_id, data.display_name)
+	var raw: String = String(pseudonyms.get(lookup_id, data.display_name))
+	# Expand the live-locale marker for unidentified potions.
+	if raw.begins_with("__potion_color__:"):
+		var color_file: String = raw.substr("__potion_color__:".length())
+		var color_key: String = "POTION_COLOR_" + color_file.to_upper()
+		return "%s %s" % [LocaleManager.t(color_key), LocaleManager.t("POTION_KIND")]
+	return raw
 
 func toggle_tiles() -> void:
 	use_tiles = not use_tiles

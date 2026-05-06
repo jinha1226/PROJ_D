@@ -15,7 +15,7 @@ func _ready() -> void:
 		$RuneLabel.hide()
 	if has_node("SkipButton"):
 		$SkipButton.hide()
-	_title.text = "신앙 선택"
+	_title.text = LocaleManager.t("ESSENCESELECT_TITLE")
 	_back_btn.pressed.connect(_on_back)
 	TouchScrollHelper.install(_scroll)
 	_build_list()
@@ -79,7 +79,7 @@ func _make_card(faith_id: String) -> Control:
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(130, 52)
 	btn.add_theme_font_size_override("font_size", 24)
-	btn.text = "선택"
+	btn.text = LocaleManager.t("ESSENCESELECT_PICK")
 	btn.pressed.connect(_on_pick.bind(faith_id))
 	hb.add_child(btn)
 

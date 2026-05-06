@@ -98,7 +98,7 @@ static func _build_description(data: ItemData) -> Control:
 	var is_consumable: bool = data.kind in ["potion", "scroll", "book"]
 	var text: String
 	if is_consumable and not GameManager.is_identified(data.id):
-		text = "정체를 알 수 없다..."
+		text = LocaleManager.t("COMMON_UNKNOWN")
 	elif data.description != "":
 		text = data.description
 	else:
@@ -112,21 +112,21 @@ static func _build_description(data: ItemData) -> Control:
 
 static func _effect_desc(data: ItemData) -> String:
 	if not GameManager.is_identified(data.id):
-		return "정체를 알 수 없다..."
+		return LocaleManager.t("COMMON_UNKNOWN")
 	match data.effect:
-		"heal":           return "HP +%d 회복" % data.effect_value
-		"restore_mp":     return "MP +%d 회복" % data.effect_value
-		"map_reveal":     return "현재 층 맵 공개"
-		"blink":          return "단거리 순간이동"
-		"cure":           return "독 치료"
-		"teleport":       return "랜덤 순간이동"
-		"enchant_weapon": return "무기 +1 인챈트"
-		"enchant_armor":  return "방어구 +1 인챈트"
-		"berserk":        return "광란 상태 — 공격력 ↑, HP 소모"
-		"identify":       return "아이템 감정"
-		"study":          return "주문 습득 (마법책)"
-		"might":          return "힘 일시 강화"
-	return data.effect if data.effect != "" else "(설명 없음)"
+		"heal":           return LocaleManager.t("ITEM_EFFECT_HEAL") % data.effect_value
+		"restore_mp":     return LocaleManager.t("ITEM_EFFECT_RESTORE_MP") % data.effect_value
+		"map_reveal":     return LocaleManager.t("ITEM_EFFECT_MAP_REVEAL")
+		"blink":          return LocaleManager.t("ITEM_EFFECT_BLINK")
+		"cure":           return LocaleManager.t("ITEM_EFFECT_CURE")
+		"teleport":       return LocaleManager.t("ITEM_EFFECT_TELEPORT")
+		"enchant_weapon": return LocaleManager.t("ITEM_EFFECT_ENCHANT_WEAPON")
+		"enchant_armor":  return LocaleManager.t("ITEM_EFFECT_ENCHANT_ARMOR")
+		"berserk":        return LocaleManager.t("ITEM_EFFECT_BERSERK")
+		"identify":       return LocaleManager.t("ITEM_EFFECT_IDENTIFY")
+		"study":          return LocaleManager.t("ITEM_EFFECT_STUDY")
+		"might":          return LocaleManager.t("ITEM_EFFECT_MIGHT")
+	return data.effect if data.effect != "" else LocaleManager.t("COMMON_NO_DESCRIPTION")
 
 
 # ── Stats card ────────────────────────────────────────────────────────────────
@@ -163,12 +163,12 @@ static func _build_stats_card(data: ItemData, plus: int) -> Control:
 		"shield":
 			vbox.add_child(UICards.dim_hint("STATS", 22))
 			var blk_row := HBoxContainer.new()
-			blk_row.add_child(_stat_label("차단율"))
+			blk_row.add_child(_stat_label(LocaleManager.t("ITEM_STAT_BLOCK")))
 			blk_row.add_child(UICards.accent_value("%d%%" % data.effect_value, 30))
 			vbox.add_child(blk_row)
 			if data.ev_penalty > 0:
 				var ev_row := HBoxContainer.new()
-				ev_row.add_child(_stat_label("EV 페널티"))
+				ev_row.add_child(_stat_label(LocaleManager.t("ITEM_STAT_EV_PEN")))
 				ev_row.add_child(UICards.accent_value("-%d" % data.ev_penalty, 30))
 				vbox.add_child(ev_row)
 		"ring", "amulet":
@@ -178,7 +178,7 @@ static func _build_stats_card(data: ItemData, plus: int) -> Control:
 			vbox.add_child(UICards.dim_hint("EFFECT", 22))
 			vbox.add_child(UICards.accent_value(_effect_desc(data), 28))
 		_:
-			vbox.add_child(UICards.dim_hint("(기타 아이템)", 26))
+			vbox.add_child(UICards.dim_hint(LocaleManager.t("COMMON_OTHER_ITEM"), 26))
 
 	return card
 
@@ -221,7 +221,7 @@ static func _build_comparison(data: ItemData, plus: int, player: Player) -> Cont
 		var vbox := VBoxContainer.new()
 		vbox.add_theme_constant_override("separation", GameTheme.PAD_M)
 		card.add_child(vbox)
-		vbox.add_child(UICards.dim_hint("vs 장착: %s" % ew.display_name, 22))
+		vbox.add_child(UICards.dim_hint(LocaleManager.t("COMMON_VS_EQUIPPED") % ew.display_name, 22))
 		vbox.add_child(_delta_row("Damage",
 				ew.damage + ew_plus, data.damage + plus, "d%d", "d%d"))
 		return card
@@ -237,7 +237,7 @@ static func _build_comparison(data: ItemData, plus: int, player: Player) -> Cont
 		var vbox := VBoxContainer.new()
 		vbox.add_theme_constant_override("separation", GameTheme.PAD_M)
 		card.add_child(vbox)
-		vbox.add_child(UICards.dim_hint("vs 장착: %s" % ea.display_name, 22))
+		vbox.add_child(UICards.dim_hint(LocaleManager.t("COMMON_VS_EQUIPPED") % ea.display_name, 22))
 		vbox.add_child(_delta_row("AC",
 				ea.ac_bonus + ea_plus, data.ac_bonus + plus, "+%d", "+%d"))
 		if data.ev_penalty != ea.ev_penalty:
@@ -309,7 +309,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 	match data.kind:
 		"weapon":
 			if player.equipped_weapon_id == data.id:
-				action_btn.text = "장착 해제"
+				action_btn.text = LocaleManager.t("EQUIP_UNEQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_weapon("")
 					CombatLog.post("You unequip %s." % data.display_name)
@@ -317,7 +317,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
 			else:
-				action_btn.text = "장착"
+				action_btn.text = LocaleManager.t("EQUIP_EQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_weapon(String(entry.get("id", "")))
 					CombatLog.post("You equip %s." % data.display_name)
@@ -326,7 +326,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 					TurnManager.end_player_turn())
 		"armor":
 			if player.equipped_armor_id == data.id:
-				action_btn.text = "장착 해제"
+				action_btn.text = LocaleManager.t("EQUIP_UNEQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_armor("")
 					CombatLog.post("You unequip %s." % data.display_name)
@@ -334,7 +334,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
 			else:
-				action_btn.text = "장착"
+				action_btn.text = LocaleManager.t("EQUIP_EQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_armor(String(entry.get("id", "")))
 					CombatLog.post("You don %s." % data.display_name)
@@ -343,7 +343,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 					TurnManager.end_player_turn())
 		"shield":
 			if player.equipped_shield_id == data.id:
-				action_btn.text = "장착 해제"
+				action_btn.text = LocaleManager.t("EQUIP_UNEQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_shield("")
 					CombatLog.post("You lower %s." % data.display_name)
@@ -351,7 +351,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
 			else:
-				action_btn.text = "장착"
+				action_btn.text = LocaleManager.t("EQUIP_EQUIP")
 				action_btn.pressed.connect(func():
 					if player.has_two_handed_weapon():
 						CombatLog.post("2-hand weapon — cannot use a shield.",
@@ -365,7 +365,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 					TurnManager.end_player_turn())
 		"ring":
 			if player.equipped_ring_id == data.id:
-				action_btn.text = "장착 해제"
+				action_btn.text = LocaleManager.t("EQUIP_UNEQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_ring("")
 					CombatLog.post("You remove %s." % data.display_name)
@@ -373,7 +373,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
 			else:
-				action_btn.text = "장착"
+				action_btn.text = LocaleManager.t("EQUIP_EQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_ring(String(entry.get("id", "")))
 					CombatLog.post("You put on %s." % data.display_name)
@@ -382,7 +382,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 					TurnManager.end_player_turn())
 		"amulet":
 			if player.equipped_amulet_id == data.id:
-				action_btn.text = "장착 해제"
+				action_btn.text = LocaleManager.t("EQUIP_UNEQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_amulet("")
 					CombatLog.post("You remove %s." % data.display_name)
@@ -390,7 +390,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
 			else:
-				action_btn.text = "장착"
+				action_btn.text = LocaleManager.t("EQUIP_EQUIP")
 				action_btn.pressed.connect(func():
 					player.set_equipped_amulet(String(entry.get("id", "")))
 					CombatLog.post("You put on %s." % data.display_name)
@@ -398,18 +398,18 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
 		"book":
-			action_btn.text = "읽기"
+			action_btn.text = LocaleManager.t("ITEM_ACTION_READ")
 			action_btn.pressed.connect(func():
 				if not player.use_item_by_entry(entry):
-					CombatLog.post("그 아이템은 더 이상 없습니다.", Color(0.7, 0.7, 0.7))
+					CombatLog.post(LocaleManager.t("ITEM_NOT_FOUND"), Color(0.7, 0.7, 0.7))
 				detail_dlg.close()
 				bag_dlg.close()
 				TurnManager.end_player_turn())
 		_:
-			action_btn.text = "사용"
+			action_btn.text = LocaleManager.t("ITEM_ACTION_USE")
 			action_btn.pressed.connect(func():
 				if not player.use_item_by_entry(entry):
-					CombatLog.post("그 아이템은 더 이상 없습니다.", Color(0.7, 0.7, 0.7))
+					CombatLog.post(LocaleManager.t("ITEM_NOT_FOUND"), Color(0.7, 0.7, 0.7))
 				detail_dlg.close()
 				bag_dlg.close()
 				TurnManager.end_player_turn())
@@ -419,7 +419,7 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 	drop_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	drop_btn.custom_minimum_size = Vector2(0, 72)
 	drop_btn.add_theme_font_size_override("font_size", GameTheme.TYPO_SUBTITLE)
-	drop_btn.text = "버리기"
+	drop_btn.text = LocaleManager.t("ITEM_ACTION_DROP")
 	drop_btn.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
 	drop_btn.pressed.connect(func():
 		player.drop_item_by_entry(entry)
@@ -434,15 +434,15 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 
 static func _kind_label(kind: String) -> String:
 	match kind:
-		"weapon": return "무기"
-		"armor":  return "방어구"
-		"potion": return "포션"
-		"scroll": return "스크롤"
-		"book":   return "마법책"
-		"gold":   return "골드"
-		"ring":   return "반지"
-		"amulet": return "목걸이"
-		"shield": return "방패"
+		"weapon": return LocaleManager.t("ITEM_KIND_WEAPON")
+		"armor":  return LocaleManager.t("ITEM_KIND_ARMOR")
+		"potion": return LocaleManager.t("ITEM_KIND_POTION")
+		"scroll": return LocaleManager.t("ITEM_KIND_SCROLL")
+		"book":   return LocaleManager.t("ITEM_KIND_BOOK")
+		"gold":   return LocaleManager.t("ITEM_KIND_GOLD")
+		"ring":   return LocaleManager.t("ITEM_KIND_RING")
+		"amulet": return LocaleManager.t("ITEM_KIND_AMULET")
+		"shield": return LocaleManager.t("ITEM_KIND_SHIELD")
 		_:        return kind.capitalize()
 
 static func _kind_color(kind: String) -> Color:

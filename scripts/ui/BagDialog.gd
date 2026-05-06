@@ -17,13 +17,13 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 
 	# Gold
 	var gold_lbl := Label.new()
-	gold_lbl.text = "%d Gold" % player.gold
+	gold_lbl.text = LocaleManager.t("BAG_GOLD") % player.gold
 	gold_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_TITLE)
 	gold_lbl.add_theme_color_override("font_color", Color(1.0, 0.88, 0.3))
 	body.add_child(gold_lbl)
 
 	# Equipped section
-	body.add_child(UICards.section_header("EQUIPPED"))
+	body.add_child(UICards.section_header(LocaleManager.t("BAG_EQUIPPED")))
 	var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
 	var a: ItemData = ItemRegistry.get_by_id(player.equipped_armor_id) if ItemRegistry != null and player.equipped_armor_id != "" else null
 	var r: ItemData = ItemRegistry.get_by_id(player.equipped_ring_id) if ItemRegistry != null and player.equipped_ring_id != "" else null
@@ -31,27 +31,27 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 	var sh: ItemData = ItemRegistry.get_by_id(player.equipped_shield_id) if ItemRegistry != null and player.equipped_shield_id != "" else null
 	var w_plus: int = int(player.equipped_weapon_entry().get("plus", 0)) if w != null else 0
 	var a_plus: int = int(player.equipped_armor_entry().get("plus", 0)) if a != null else 0
-	body.add_child(_equipped_row("무기",
-			w.display_name if w != null else "(맨손)",
+	body.add_child(_equipped_row(LocaleManager.t("EQUIP_WEAPON"),
+			w.display_name if w != null else LocaleManager.t("COMMON_UNARMED"),
 			"d%d" % ((w.damage + w_plus) if w != null else 2)))
-	body.add_child(_equipped_row("방어구",
-			a.display_name if a != null else "(없음)",
+	body.add_child(_equipped_row(LocaleManager.t("EQUIP_ARMOR"),
+			a.display_name if a != null else LocaleManager.t("COMMON_NONE"),
 			"+%d AC" % ((a.ac_bonus + a_plus) if a != null else 0)))
-	body.add_child(_equipped_row("방패",
-			sh.display_name if sh != null else "(없음)",
-			"%d%% 차단" % (sh.effect_value if sh != null else 0)))
-	body.add_child(_equipped_row("반지",
-			r.display_name if r != null else "(없음)",
+	body.add_child(_equipped_row(LocaleManager.t("EQUIP_SHIELD"),
+			sh.display_name if sh != null else LocaleManager.t("COMMON_NONE"),
+			LocaleManager.t("SHIELD_BLOCK_PCT") % (sh.effect_value if sh != null else 0)))
+	body.add_child(_equipped_row(LocaleManager.t("EQUIP_RING"),
+			r.display_name if r != null else LocaleManager.t("COMMON_NONE"),
 			_accessory_stat_text(r)))
-	body.add_child(_equipped_row("목걸이",
-			am.display_name if am != null else "(없음)",
+	body.add_child(_equipped_row(LocaleManager.t("EQUIP_AMULET"),
+			am.display_name if am != null else LocaleManager.t("COMMON_NONE"),
 			_accessory_stat_text(am)))
 
 	# Inventory sub-tabs
-	body.add_child(UICards.section_header("INVENTORY  (%d)" % player.items.size()))
+	body.add_child(UICards.section_header("%s  (%d)" % [LocaleManager.t("BAG_INVENTORY"), player.items.size()]))
 	if player.items.is_empty():
 		var empty := Label.new()
-		empty.text = "(empty)"
+		empty.text = LocaleManager.t("BAG_EMPTY")
 		empty.add_theme_color_override("font_color", Color(0.55, 0.55, 0.6))
 		body.add_child(empty)
 		return
@@ -68,7 +68,14 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 	# Tab layout — each entry: [label, kinds]. Empty kinds = "전체" (all).
 	# Special kind "__other__" = catch-all for kinds not in any other tab,
 	# so newly-added item kinds stay visible until explicitly placed.
-	var tab_labels: Array = ["전체", "무기", "방어구", "장신구", "소모품", "기타"]
+	var tab_labels: Array = [
+		LocaleManager.t("BAG_TAB_ALL"),
+		LocaleManager.t("BAG_TAB_WEAPONS"),
+		LocaleManager.t("BAG_TAB_ARMOR"),
+		LocaleManager.t("BAG_TAB_ACCESSORY"),
+		LocaleManager.t("BAG_TAB_CONSUMABLES"),
+		LocaleManager.t("BAG_TAB_OTHER"),
+	]
 	var tab_filters: Array = [
 		[],                                   # 전체
 		["weapon", "throwing"],               # 무기 — throwing은 던지는 무기
@@ -156,7 +163,7 @@ static func _fill_inventory(container: VBoxContainer, player: Player,
 
 	if stacks.is_empty():
 		var empty := Label.new()
-		empty.text = "(없음)"
+		empty.text = LocaleManager.t("COMMON_NONE")
 		empty.add_theme_color_override("font_color", Color(0.55, 0.55, 0.6))
 		empty.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
 		container.add_child(empty)
@@ -291,7 +298,7 @@ static func _build_item_row(data: ItemData, indices: Array, plus: int,
 		or data.id == player.equipped_shield_id
 	if is_equipped:
 		var eq_lbl := Label.new()
-		eq_lbl.text = "장착중"
+		eq_lbl.text = LocaleManager.t("COMMON_EQUIPPED")
 		eq_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		eq_lbl.add_theme_color_override("font_color", Color(0.4, 0.9, 0.55))
 		eq_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER

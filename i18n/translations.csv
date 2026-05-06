@@ -20,11 +20,17 @@ MAINMENU_HOW_TO_PLAY,[ HOW TO PLAY ],[ 도움말 ]
 COMMON_NONE,(none),(없음)
 COMMON_UNARMED,(unarmed),(맨손)
 COMMON_EQUIPPED,equipped,장착중
+COMMON_UNKNOWN,unknown...,정체를 알 수 없다...
+COMMON_NO_DESCRIPTION,(no description),(설명 없음)
+COMMON_OTHER_ITEM,(other item),(기타 아이템)
+COMMON_VS_EQUIPPED,"vs equipped: %s","vs 장착: %s"
 EQUIP_WEAPON,Weapon,무기
 EQUIP_ARMOR,Armor,방어구
 EQUIP_SHIELD,Shield,방패
 EQUIP_RING,Ring,반지
 EQUIP_AMULET,Amulet,목걸이
+EQUIP_EQUIP,Equip,장착
+EQUIP_UNEQUIP,Unequip,장착 해제
 BAG_TAB_ALL,All,전체
 BAG_TAB_WEAPONS,Weapons,무기
 BAG_TAB_ARMOR,Armor,방어구
@@ -36,3 +42,64 @@ BAG_INVENTORY,INVENTORY,인벤토리
 BAG_EQUIPPED,EQUIPPED,장착
 BAG_EMPTY,(empty),(비어있음)
 SHIELD_BLOCK_PCT,%d%% block,%d%% 차단
+ITEM_KIND_WEAPON,weapon,무기
+ITEM_KIND_ARMOR,armor,방어구
+ITEM_KIND_POTION,potion,포션
+ITEM_KIND_SCROLL,scroll,스크롤
+ITEM_KIND_BOOK,spellbook,마법책
+ITEM_KIND_GOLD,gold,골드
+ITEM_KIND_RING,ring,반지
+ITEM_KIND_AMULET,amulet,목걸이
+ITEM_KIND_SHIELD,shield,방패
+ITEM_EFFECT_HEAL,Restores %d HP,HP +%d 회복
+ITEM_EFFECT_RESTORE_MP,Restores %d MP,MP +%d 회복
+ITEM_EFFECT_MAP_REVEAL,Reveals the current floor,현재 층 맵 공개
+ITEM_EFFECT_BLINK,Short-range teleport,단거리 순간이동
+ITEM_EFFECT_CURE,Cures poison,독 치료
+ITEM_EFFECT_TELEPORT,Random teleport,랜덤 순간이동
+ITEM_EFFECT_ENCHANT_WEAPON,Weapon +1 enchantment,무기 +1 인챈트
+ITEM_EFFECT_ENCHANT_ARMOR,Armor +1 enchantment,방어구 +1 인챈트
+ITEM_EFFECT_BERSERK,Berserk — damage ↑ HP drains,광란 상태 — 공격력 ↑ HP 소모
+ITEM_EFFECT_IDENTIFY,Identify an item,아이템 감정
+ITEM_EFFECT_STUDY,Learn a spell (spellbook),주문 습득 (마법책)
+ITEM_EFFECT_MIGHT,Temporary STR boost,힘 일시 강화
+ITEM_STAT_BLOCK,Block %,차단율
+ITEM_STAT_EV_PEN,EV penalty,EV 페널티
+ITEM_ACTION_READ,Read,읽기
+ITEM_ACTION_USE,Use,사용
+ITEM_ACTION_DROP,Drop,버리기
+ITEM_NOT_FOUND,That item is no longer available.,그 아이템은 더 이상 없습니다.
+TILE_RESISTS,"Resists: %s","저항: %s"
+TILE_STAIRS_DOWN_NAME,Stairs Down,하강 계단
+TILE_STAIRS_DOWN_DESC,Leads to a deeper floor.,더 깊은 층으로 이어진다.
+TILE_STAIRS_UP_NAME,Stairs Up,상승 계단
+TILE_STAIRS_UP_DESC,Leads to the floor above.,위층으로 이어진다.
+TILE_DOOR_CLOSED_NAME,Closed Door,닫힌 문
+TILE_DOOR_CLOSED_DESC,Opens automatically when entered.,통과하면 자동으로 열린다.
+TILE_DOOR_OPEN_NAME,Open Door,열린 문
+TILE_WALL_NAME,Wall,벽
+TILE_WALL_DESC,Impassable.,통행 불가.
+POTION_KIND,potion,포션
+POTION_COLOR_BROWN,brown,갈색
+POTION_COLOR_RUBY,ruby,루비색
+POTION_COLOR_SKY_BLUE,sky-blue,하늘색
+POTION_COLOR_GOLDEN,golden,황금색
+POTION_COLOR_EMERALD,emerald,에메랄드색
+POTION_COLOR_PURPLE_RED,purple-red,자주색
+POTION_COLOR_MAGENTA,magenta,자홍색
+POTION_COLOR_CYAN,cyan,청록색
+POTION_COLOR_PINK,pink,분홍색
+POTION_COLOR_SILVER,silver,은색
+POTION_COLOR_WHITE,white,흰색
+POTION_COLOR_ORANGE,orange,주황색
+POTION_COLOR_MURKY,murky,탁한
+POTION_COLOR_PUCE,puce,적갈색
+POTION_COLOR_FIZZY,fizzy,탄산
+POTION_COLOR_BUBBLY,bubbly,보글보글
+POTION_COLOR_CLOUDY,cloudy,흐린
+POTION_COLOR_DARK,dark,어두운
+POTION_COLOR_BLACK,black,검은
+POTION_COLOR_YELLOW,yellow,노란
+ESSENCESELECT_TITLE,Faith Selection,신앙 선택
+ESSENCESELECT_PICK,Pick,선택
+

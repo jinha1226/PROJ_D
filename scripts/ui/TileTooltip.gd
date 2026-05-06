@@ -57,7 +57,7 @@ static func _monster_lines(m: Monster) -> Array:
 	if data.ac > 0:
 		lines.append("AC %d" % data.ac)
 	if data.resists.size() > 0:
-		lines.append("저항: %s" % ", ".join(data.resists))
+		lines.append(LocaleManager.t("TILE_RESISTS") % ", ".join(data.resists))
 	if data.description != "":
 		lines.append(data.description)
 	return lines
@@ -77,15 +77,15 @@ static func _tile_lines(pos: Vector2i, map) -> Array:
 	var tile: int = map.tile_at(pos)
 	match tile:
 		DungeonMap.Tile.STAIRS_DOWN:
-			return ["하강 계단", "더 깊은 층으로 이어진다."]
+			return [LocaleManager.t("TILE_STAIRS_DOWN_NAME"), LocaleManager.t("TILE_STAIRS_DOWN_DESC")]
 		DungeonMap.Tile.STAIRS_UP:
-			return ["상승 계단", "위층으로 이어진다."]
+			return [LocaleManager.t("TILE_STAIRS_UP_NAME"), LocaleManager.t("TILE_STAIRS_UP_DESC")]
 		DungeonMap.Tile.DOOR_CLOSED:
-			return ["닫힌 문", "통과하면 자동으로 열린다."]
+			return [LocaleManager.t("TILE_DOOR_CLOSED_NAME"), LocaleManager.t("TILE_DOOR_CLOSED_DESC")]
 		DungeonMap.Tile.DOOR_OPEN:
-			return ["열린 문", ""]
+			return [LocaleManager.t("TILE_DOOR_OPEN_NAME"), ""]
 		DungeonMap.Tile.WALL:
-			return ["벽", "통행 불가."]
+			return [LocaleManager.t("TILE_WALL_NAME"), LocaleManager.t("TILE_WALL_DESC")]
 	# Check for altar
 	if map.altar_map != null and map.altar_map.has(pos):
 		var faith_id: String = String(map.altar_map[pos])

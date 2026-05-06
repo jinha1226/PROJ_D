@@ -23,6 +23,12 @@ func _ready() -> void:
 		saved = DEFAULT_LOCALE
 	TranslationServer.set_locale(saved)
 
+## Static-context shorthand for TranslationServer.translate(). RefCounted
+## helpers (BagDialog, OptionsDialog, etc.) use static functions and can't
+## call `tr()` (which is an instance method on Object).
+static func t(key: String) -> String:
+	return TranslationServer.translate(key)
+
 func current_locale() -> String:
 	return TranslationServer.get_locale()
 
