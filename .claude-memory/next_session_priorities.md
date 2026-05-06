@@ -484,6 +484,55 @@ Step 8: 밸런스 튜닝 — 구체 변경 (BalanceSimulator 시뮬 30회 검증
 
 2026-05-06. 다음 세션부터 *구현 단계*. 디자인 변경 필요 시엔 *명시적 재오픈* 후 갱신.
 
+## 2026-05-06 PROJ_SS 후속 세션 — Mastery 시스템 구현 완료
+
+이 세션에서 Step 1~8 모두 적용 (F5 스모크 검증은 사용자가 추후 일괄 실시 예정).
+
+### 완료된 단계
+
+- **Step 1** ✓ Player.gd `MASTERY_XP_DELTA` + `get_category_total_xp()` + `get_category_mastery_level()`
+- **Step 2** ✓ `grant_kill_skill_xp(amount, action_skill)` 분기 — empty active → action-routed full XP / non-empty → 비례 분배. CombatSystem 30-split fallout 정정 (`weapon_skill_for_item` 단일 진입점, dead `"ranged"`/`"blade"` skill_id 제거)
+- **Step 3** ✓ 캐릭터 init `set_active_skills([])`. `["blade"]` fallback 전부 제거. ClassData.default_active_skills는 데이터 보존(자동 적용 안 함)
+- **Step 4** ✓ SkillsDialog 재작성 — MASTERY 첫 화면 (6 카테고리 카드 + 진행바 + 효과 텍스트), ACTIVE 탭 → 상단 mode 배너로 흡수, 6 sub-skill 탭 유지. `_DESCRIPTIONS`/`_bonus_text` 30-split 키로 갱신
+- **Step 5** ✓ CombatSystem mult chain에 `melee_mastery_dmg_mult` / `ranged_mastery_dmg_mult` 합산. `monster_attack_player`/`monster_ranged_attack_player`에 `defense_mastery_incoming_mult` 적용
+- **Step 5(magic)** ✓ MagicSystem `_compute_power`에 `magic_mastery_power_mult` 곱
+- **Step 6** ✓ 6개 mastery 효과 helper + Agility EV 보너스 (Player.refresh_ac_from_equipment). SKILL_CATEGORIES Defense/Agility 분리 (dodging/stealth → Agility)
+- **Step 7 (부분)** ✓ Race aptitude 30-skill **runtime fallback** — `Player.aptitude_for(race, skill_id)` static helper가 LEGACY_SKILL_SPLIT 통한 legacy key lookup. .tres mass edit 없이 30 sub-skill 모두 정상 aptitude 적용
+- **Step 8** ✓ XP_CURVE 압축 (sum ~17,000), env_damage dead code 제거 (Game._apply_branch_env_damage + ZoneManager.branch_env_damage/branch_env_element/필드), Rune 픽업 entry_depth × 100 XP 보너스 (`Player._rune_xp_bonus`)
+
+### Step 7 잔여 (보류)
+
+- `.tres` race 파일 직접 30-key 변환은 *DCSS 출처 vetting 필요* — runtime fallback이 currently 모든 신규 sub-skill에 부모 카테고리 aptitude 그대로 부여. fine-grained DCSS 값(예: short_blades vs long_blades 차이)이 필요하면 별도 트랙으로
+- 12 클래스 .tres `starting_skills` legacy 키(blade/hafted) 그대로 — Game.gd remap이 LEGACY_SKILL_SPLIT 통해 처리하므로 동작 OK. 시각적 정리는 보류
+- `default_active_skills` 데이터는 legacy 키 유지 — 현재 자동 적용 안 됨, "Recommended for X" UI 작업 시 같이 정리
+
+### 다음 세션 진입 순서 권장
+
+1. **F5 스모크 일괄** — 5월 5~6일 누적 변경 + 이번 세션 Mastery 시스템 통합 검증
+   - 검증 항목 정리:
+     - 신규 캐릭터: SkillsDialog MASTERY 탭 디폴트, mode 배너 "Auto", active 0개
+     - 단검 공격 5킬 → `short_blades` xp 차오름 (legacy "blade" 아닌)
+     - 스펠 캐스팅 → 학파 + spellcasting 양쪽 progression
+     - SHORT_BLADES 탭 → 토글 → 배너 "Manual: 1 active"
+     - Agility mastery 3 도달 → 장비 재장착 시 +1 EV
+     - Rune 픽업 시 +600/900/1200/1500 XP 로그
+     - Zone 전환 (depth 4/7/10/13)
+     - 21 클래스 starter 3개만 노출 + archmage(is_debug) 숨김 (이건 별도 — UI 미구현일 수도)
+2. **밸런스 시뮬** — BalanceSimulator 살리거나 새 sim. 도달 XL 검증 (목표: 노가지 14F XL 12-13 / 1가지 18F XL 14-15 / 풀 4가지 30F XL 19-20)
+3. **JobSelect 두 단계 UI** — is_starter/is_debug 플래그 존중 (남은 작업)
+4. **SaveManager 30 스킬 마이그레이션 1:N 분배** — 사용자 wipe-OK 결정이라 우선순위 낮음
+5. **추가 감사** (성능/UX/자산 라이선스/Android) — 출시 전 필수
+6. **Race aptitude .tres 직접 30-key 변환** — DCSS 출처 vetting 후 (현재 runtime fallback로 게임 정상 동작)
+
+### Mastery 시스템 핵심 설계 메모 (재오픈 금지 — 다시 확인할 때 빠르게)
+
+- 5+1 카테고리: `Melee / Ranged / Magic / Defense / Agility / Utility`
+- Mastery 레벨 = 카테고리 누적 XP (소비분 + 미소비분 합) 기반, 0~9
+- 효과 (linear): Melee/Ranged/Magic/Utility/Defense는 0.5%/lv, Agility는 EV +1 / 3lv
+- XP 라우팅: empty active → action_skill에 풀 / non-empty → 비례. 신규 캐릭터 항상 empty
+- `default_active_skills` 데이터는 권장 표시용으로만 보존, 자동 적용 안 함
+- Mastery는 sub-skill 보너스와 **곱연산** (mult chain 통과). 9 mastery × 9 sub = 한 카테고리 max +4.5% × ~+(level×6%)
+
 ## 결정 보류 중인 것
 
 - `oldproject/` archive 이동 — Phase 0 완료됐으니 시체 path 의존이 끊겼는지 다시 확인 후 archive 이동 가능. `Game.gd:35` 와 LPC generator 의존이 진짜 0인지 grep 후 결정.

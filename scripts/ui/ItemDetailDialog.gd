@@ -25,7 +25,7 @@ static func open(item_index: int, player: Player,
 	var body: VBoxContainer = dlg.body()
 	if body == null:
 		return
-	body.add_theme_constant_override("separation", 14)
+	body.add_theme_constant_override("separation", GameTheme.PAD_L)
 
 	body.add_child(_build_header(data, plus))
 	body.add_child(_build_description(data))
@@ -45,7 +45,7 @@ static func open(item_index: int, player: Player,
 
 static func _build_header(data: ItemData, plus: int) -> Control:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
+	row.add_theme_constant_override("separation", GameTheme.PAD_L)
 
 	# Thumbnail 72×72
 	var thumb := Control.new()
@@ -77,7 +77,7 @@ static func _build_header(data: ItemData, plus: int) -> Control:
 	var right := VBoxContainer.new()
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	right.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	right.add_theme_constant_override("separation", 6)
+	right.add_theme_constant_override("separation", GameTheme.PAD_M)
 
 	var pill_row := HBoxContainer.new()
 	pill_row.add_child(UICards.pill(_kind_label(data.kind), _kind_color(data.kind)))
@@ -134,7 +134,7 @@ static func _effect_desc(data: ItemData) -> String:
 static func _build_stats_card(data: ItemData, plus: int) -> Control:
 	var card := UICards.card(Color(0.5, 0.6, 0.8))
 	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 6)
+	vbox.add_theme_constant_override("separation", GameTheme.PAD_M)
 	card.add_child(vbox)
 
 	match data.kind:
@@ -202,7 +202,7 @@ static func _build_artifact_card(entry: Dictionary) -> Control:
 		return null
 	var card := UICards.card(Color(0.75, 0.55, 0.2))
 	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 4)
+	vbox.add_theme_constant_override("separation", GameTheme.PAD_S)
 	card.add_child(vbox)
 	vbox.add_child(UICards.dim_hint("ARTIFACT", 22))
 	for line in lines:
@@ -219,7 +219,7 @@ static func _build_comparison(data: ItemData, plus: int, player: Player) -> Cont
 		var ew_plus: int = int(player.equipped_weapon_entry().get("plus", 0))
 		var card := UICards.card(Color(0.3, 0.7, 0.4))
 		var vbox := VBoxContainer.new()
-		vbox.add_theme_constant_override("separation", 6)
+		vbox.add_theme_constant_override("separation", GameTheme.PAD_M)
 		card.add_child(vbox)
 		vbox.add_child(UICards.dim_hint("vs 장착: %s" % ew.display_name, 22))
 		vbox.add_child(_delta_row("Damage",
@@ -235,7 +235,7 @@ static func _build_comparison(data: ItemData, plus: int, player: Player) -> Cont
 		var ea_plus: int = int(player.equipped_armor_entry().get("plus", 0))
 		var card := UICards.card(Color(0.3, 0.7, 0.4))
 		var vbox := VBoxContainer.new()
-		vbox.add_theme_constant_override("separation", 6)
+		vbox.add_theme_constant_override("separation", GameTheme.PAD_M)
 		card.add_child(vbox)
 		vbox.add_child(UICards.dim_hint("vs 장착: %s" % ea.display_name, 22))
 		vbox.add_child(_delta_row("AC",
@@ -250,7 +250,7 @@ static func _build_comparison(data: ItemData, plus: int, player: Player) -> Cont
 static func _delta_row(stat: String, old_val: int, new_val: int,
 		old_fmt: String, new_fmt: String) -> Control:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", GameTheme.PAD_M)
 
 	var key_lbl := Label.new()
 	key_lbl.text = stat
@@ -299,7 +299,7 @@ static func _delta_row(stat: String, old_val: int, new_val: int,
 static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 		detail_dlg: GameDialog, bag_dlg: GameDialog) -> Control:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
+	row.add_theme_constant_override("separation", GameTheme.PAD_L)
 
 	var action_btn := Button.new()
 	action_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL

@@ -1,85 +1,65 @@
 class_name SkillsDialog extends RefCounted
 
+## Per-sub-skill long-press descriptions. Keys are the post-30-split sub-skill ids.
 const _DESCRIPTIONS: Dictionary = {
-	"fighting": "Increases max HP by 5 each level.
-
-Fighting is the primary way to grow your HP pool. It also gives a small bonus to melee accuracy and melee damage, but weapon skills remain the main offensive growth path.",
-	"unarmed": "Improves bare-handed combat and bestial melee.
-
-Use this if you plan to fight without a weapon or rely on natural attacks.",
-	"blade": "Improves daggers, swords, and light arcane staves.
-
-Blade covers precise close combat, fast weapons, and most finesse-driven melee builds.",
-	"hafted": "Improves maces, clubs, and axes.
-
-Hafted weapons are heavier and hit harder, favoring sturdy front-line fighters.",
-	"polearm": "Improves spears and other reach weapons.
-
-Polearms reward spacing and safer melee positioning.",
-	"ranged": "Improves bows and other dedicated ranged weapons.
-
-Ranged improves attacks made from a distance and rewards line-of-sight control.",
-	"spellcasting": "Improves MP efficiency, magical fundamentals, and universal spell power.
-
-Every serious caster benefits from Spellcasting, regardless of school.",
-	"elemental": "Improves fire, cold, air, earth, and alchemical elemental spells.
-
-This is the main school for direct elemental offense.",
-	"arcane": "Improves conjurations, movement magic, wards, evocations, and pure arcane utility.
-
-Arcane covers force, control of space, and general magical technique.",
-	"hex": "Improves disabling, confusion, fear, sleep, and other hostile control magic.
-
-Hexes are about making enemies fail rather than killing them outright.",
-	"necromancy": "Improves pain, drain, death, and undead magic.
-
-Necromancy is the school of life theft, corruption, and dark momentum.",
-	"summoning": "Improves creature-calling and gateway magic.
-
-Summoning builds win by creating allies and battlefield pressure.",
-	"armor": "Improves armor handling and reduces armor penalties.
-
-Armor is the main defensive skill for heavy gear and long attrition fights.",
-	"shield": "Improves blocking with shields.
-
-Shield is the dedicated skill for off-hand defense and reliable protection.",
-	"agility": "Improves evasion, mobility, and opportunistic fighting.
-
-Agility helps evasive builds survive without heavy armor.",
-	"tool": "Improves wands, thrown tools, and trick-based combat.
-
-Tool governs practical combat devices and flexible problem-solving.",
+	"fighting": "Increases max HP by 5 each level.\n\nFighting is the universal melee foundation — every melee build wants it for HP and a small accuracy bonus.",
+	"unarmed": "Improves bare-handed combat.\n\nFor builds without a weapon or with claw/bite natural attacks.",
+	"short_blades": "Improves daggers and short swords.\n\nFavors stab/backstab playstyles and rewards positioning over raw damage.",
+	"long_blades": "Improves long swords, scimitars, and other heavy blades.\n\nBalanced damage and accuracy for the standard melee fighter.",
+	"maces": "Improves maces, clubs, and morningstars.\n\nHigh damage swings, slower than blades.",
+	"axes": "Improves axes and cleavers.\n\nAxes can hit adjacent foes (cleave) — strong against grouped enemies.",
+	"staves": "Improves quarterstaves and combat staves.\n\nReach without polearm bulk; pairs with magic staff users.",
+	"polearms": "Improves spears, halberds, and glaives.\n\nReach attacks reward kiting and safer positioning.",
+	"bows": "Improves longbows and shortbows.",
+	"crossbows": "Improves crossbows and arbalests.",
+	"slings": "Improves slings and stones.",
+	"throwing": "Improves thrown weapons (javelins, darts, boomerangs).",
+	"armor": "Reduces armor penalties and improves heavy armor handling.",
+	"shields": "Improves shield blocking and reduces shield penalties.",
+	"dodging": "Improves evasion and active dodging.",
+	"stealth": "Improves staying unseen and ambush positioning.",
+	"spellcasting": "Improves MP efficiency and universal spell power. Every caster wants it.",
+	"conjurations": "Improves direct-damage arcane spells (force, magic missile, summons of energy).",
+	"hexes": "Improves disabling magic — confusion, fear, sleep, slow.",
+	"charms": "Improves buff and ward magic — haste, mage armor, repel.",
+	"summonings": "Improves creature-calling and gateway magic.",
+	"necromancy": "Improves pain, drain, death, and undead magic.",
+	"translocations": "Improves blink, teleport, and gateway control.",
+	"transmutation": "Improves shape-change, alteration, and physical-conversion magic.",
+	"fire": "Improves fire-element spells and fire damage.",
+	"ice": "Improves cold/ice spells and ice damage.",
+	"air": "Improves lightning/wind spells and air damage.",
+	"earth": "Improves earth/stone spells and earth damage.",
+	"poison": "Improves poison/venom spells and poison damage.",
+	"invocations": "Improves faith-granted abilities and divine effects.",
+	"evocations": "Improves wands, scrolls, and magical tools.",
 }
 
-const TABS: Array = [
-	{"id": "active",  "label": "ACTIVE"},
-	{"id": "melee",   "label": "MELEE"},
-	{"id": "ranged",  "label": "RANGED"},
-	{"id": "magic",   "label": "MAGIC"},
-	{"id": "defense", "label": "DEFENSE"},
-	{"id": "agility", "label": "AGILITY"},
-	{"id": "utility", "label": "UTILITY"},
-]
+## Per-mastery-category effect description. Numbers come from Player.gd helpers
+## so this mirrors the actual formula — keep in sync if Player tuning changes.
+const _MASTERY_LABELS: Dictionary = {
+	"Melee":   "+%.1f%% melee damage",
+	"Ranged":  "+%.1f%% ranged damage",
+	"Magic":   "+%.1f%% spell power",
+	"Defense": "-%.1f%% damage taken",
+	"Agility": "+%d EV",
+	"Utility": "+%.1f%% scroll/wand/tool effect",
+}
 
-# Category → sub-skill list. When DCSS 30-skill split lands (Issue 3),
-# new sub-skills go into the matching category here:
-#   melee:    short_blades, long_blades, maces, axes, staves
-#   ranged:   bows, crossbows, slings, throwing
-#   magic:    fire, ice, air, earth, poison + charms, translocations,
-#             transmutation, conjurations
-#   agility:  dodging, stealth (when agility splits)
-#   utility:  invocations, evocations (when tool splits)
-const TAB_SKILLS: Dictionary = {
-	"melee":   ["fighting", "unarmed", "short_blades", "long_blades",
+const _MASTERY_CATEGORIES: Array = ["Melee", "Ranged", "Magic", "Defense", "Agility", "Utility"]
+
+## Category → ordered sub-skill list embedded under each mastery card.
+const _CATEGORY_SKILLS: Dictionary = {
+	"Melee":   ["fighting", "unarmed", "short_blades", "long_blades",
 				"maces", "axes", "staves", "polearms"],
-	"ranged":  ["bows", "crossbows", "slings", "throwing"],
-	"magic":   ["spellcasting",
+	"Ranged":  ["bows", "crossbows", "slings", "throwing"],
+	"Magic":   ["spellcasting",
 				"conjurations", "hexes", "charms", "summonings",
 				"necromancy", "translocations", "transmutation",
 				"fire", "ice", "air", "earth", "poison"],
-	"defense": ["armor", "shields"],
-	"agility": ["dodging", "stealth"],
-	"utility": ["invocations", "evocations"],
+	"Defense": ["armor", "shields"],
+	"Agility": ["dodging", "stealth"],
+	"Utility": ["invocations", "evocations"],
 }
 
 static func open(player: Player, parent: Node) -> void:
@@ -95,112 +75,143 @@ static func open(player: Player, parent: Node) -> void:
 	if player.skills.is_empty():
 		player.init_skills()
 
-	# ── tip ──────────────────────────────────────────────────────────────────
-	var tip := Label.new()
-	tip.text = "Kill XP is split between ACTIVE skills. Tap to toggle. Long-press for details."
-	tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	tip.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
-	tip.add_theme_color_override("font_color", Color(0.7, 0.78, 0.85))
-	body.add_child(tip)
+	# manual_mode is wrapped in a 1-element array so the closures can mutate it.
+	var manual_mode: Array = [false]
 
-	# ── tab bar ───────────────────────────────────────────────────────────────
-	var tab_bar := HBoxContainer.new()
-	tab_bar.add_theme_constant_override("separation", GameTheme.PAD_S)
-	body.add_child(tab_bar)
+	# ── mode banner ──────────────────────────────────────────────────────────
+	var mode_lbl := Label.new()
+	mode_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	mode_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
+	body.add_child(mode_lbl)
 
-	# ── content area ─────────────────────────────────────────────────────────
+	# ── content (mastery cards) ──────────────────────────────────────────────
 	var content := VBoxContainer.new()
 	content.add_theme_constant_override("separation", GameTheme.PAD_M)
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	body.add_child(content)
 
-	# ── tab button refs for highlight swap ───────────────────────────────────
-	var tab_btns: Array = []
+	# ── bottom toggle button ─────────────────────────────────────────────────
+	var toggle_btn := Button.new()
+	toggle_btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
+	toggle_btn.custom_minimum_size = Vector2(0, GameTheme.TAP_MIN_HEIGHT)
+	body.add_child(toggle_btn)
 
-	var _switch_tab := func(tab_id: String) -> void:
+	var refresh_banner := func() -> void:
+		var n: int = player.active_skills.size()
+		if manual_mode[0]:
+			if n == 0:
+				mode_lbl.text = "Manual mode — tap a sub-skill to mark it active."
+			else:
+				mode_lbl.text = "Manual mode — kill XP splits across %d active sub-skill%s." \
+					% [n, "" if n == 1 else "s"]
+			mode_lbl.add_theme_color_override("font_color", Color(0.95, 0.85, 0.35))
+		else:
+			if n == 0:
+				mode_lbl.text = "Auto (action-routed) — each action trains its own skill."
+				mode_lbl.add_theme_color_override("font_color", Color(0.6, 0.85, 0.95))
+			else:
+				mode_lbl.text = "Manual: %d active sub-skill%s. Toggle Manual to edit." \
+					% [n, "" if n == 1 else "s"]
+				mode_lbl.add_theme_color_override("font_color", Color(0.95, 0.85, 0.35))
+
+	var rebuild := func() -> void:
 		for child in content.get_children():
 			child.queue_free()
-		var ids: Array = []
-		if tab_id == "active":
-			for id in Player.SKILL_IDS:
-				var s: Dictionary = player.skills.get(id, {"level": 0, "xp": 0.0})
-				if player.is_skill_active(id) or int(s.get("level", 0)) > 0:
-					ids.append(id)
-			if ids.is_empty():
-				var empty := Label.new()
-				empty.text = "No active or learned skills yet."
-				empty.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
-				empty.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
-				content.add_child(empty)
-		else:
-			ids = Array(TAB_SKILLS.get(tab_id, []))
-		for id in ids:
-			var s: Dictionary = player.skills.get(id, {"level": 0, "xp": 0.0})
-			content.add_child(_make_skill_row(id, s, player, parent))
-		# highlight active tab button
-		for i in tab_btns.size():
-			var btn: Button = tab_btns[i]
-			var is_sel: bool = (TABS[i]["id"] == tab_id)
-			btn.modulate = Color(1.0, 1.0, 1.0) if is_sel else Color(0.55, 0.55, 0.6)
+		var on_change := func() -> void:
+			refresh_banner.call()
+		for cat in _MASTERY_CATEGORIES:
+			content.add_child(_make_mastery_card(cat, player, parent, manual_mode[0], on_change))
+		toggle_btn.text = "◂ Mastery View" if manual_mode[0] else "✱ Manual ▸"
+		refresh_banner.call()
 
-	# build tab buttons
-	for tab in TABS:
-		var btn := Button.new()
-		btn.text = tab["label"]
-		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
-		btn.custom_minimum_size = Vector2(0, GameTheme.TAP_MIN_HEIGHT)
-		var tid: String = tab["id"]
-		btn.pressed.connect(func(): _switch_tab.call(tid))
-		tab_bar.add_child(btn)
-		tab_btns.append(btn)
+	toggle_btn.pressed.connect(func():
+		manual_mode[0] = not manual_mode[0]
+		rebuild.call())
+	rebuild.call()
 
-	_switch_tab.call("active")
 
-static func _bonus_text(id: String, level: int, player: Player) -> String:
-	if level == 0:
-		return "(no bonus yet)"
-	match id:
-		"fighting":
-			return "+%d max HP" % [level * 5]
-		"unarmed":
-			return "+%d to-hit / +%d%% dmg" % [level, level * 5]
-		"blade":
-			return "+%d to-hit / +%d%% dmg / +%d%% finesse" % [level, level * 4, level * 3]
-		"hafted":
-			return "+%d to-hit / +%d%% dmg" % [level, level * 5]
-		"polearm":
-			return "+%d to-hit / +%d%% dmg / safer reach" % [level, level * 4]
-		"ranged":
-			return "+%d to-hit / +%d%% dmg" % [level, level * 4]
-		"tool":
-			return "+%d to-hit / +%d%% dmg" % [level, level * 4]
-		"spellcasting":
-			var power: int = int(float(player.intelligence) * (1.0 + float(level) * 0.04))
-			return "core spell power %d / mana efficiency" % [power]
-		"elemental", "arcane", "hex", "necromancy", "summoning":
-			var power: int = int(float(player.intelligence) * (1.0 + float(level) * 0.07))
-			return "school power %d" % [power]
-		"armor":
-			var pct: int = min(level * 10, 90)
-			return "armor penalty -%d%% / attrition resist" % [pct]
-		"shield":
-			return "block +%d%%" % [level * 3]
-		"agility":
-			return "+%d EV / ambush +%d%% / harder to detect" % [level, 50 + level * 5]
-	return ""
+## Mastery card: header (name + level), effect, mastery progress bar, then
+## an embedded list of sub-skill rows. In manual mode the rows are tappable
+## (toggle active). Always long-press on a sub-skill name shows description.
+static func _make_mastery_card(category: String, player: Player, parent: Node,
+		manual_mode: bool, on_change: Callable) -> Control:
+	var card := VBoxContainer.new()
+	card.add_theme_constant_override("separation", GameTheme.PAD_S)
 
-static func _apt_for(id: String, player: Player) -> int:
-	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id) \
-			if GameManager != null and RaceRegistry != null else null
-	if race == null:
-		return 0
-	return int(race.skill_aptitudes.get(id, 0))
+	# Header row: category name + mastery level
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", GameTheme.PAD_M)
+	card.add_child(header)
 
-static func _apt_label(apt: int) -> String:
-	return "%+d" % apt
+	var name_lbl := Label.new()
+	name_lbl.text = category.to_upper()
+	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_SUBTITLE)
+	name_lbl.add_theme_color_override("font_color", Color(0.94, 0.84, 0.42))
+	header.add_child(name_lbl)
 
-static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: Node) -> Control:
+	var lv: int = player.get_category_mastery_level(category)
+	var lv_lbl := Label.new()
+	lv_lbl.text = "MAX" if lv >= Player.MAX_MASTERY_LEVEL else "Mastery %d / %d" % [lv, Player.MAX_MASTERY_LEVEL]
+	lv_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
+	lv_lbl.add_theme_color_override("font_color",
+		Color(1.0, 0.85, 0.2) if lv >= Player.MAX_MASTERY_LEVEL else Color(0.85, 0.85, 0.85))
+	header.add_child(lv_lbl)
+
+	var effect_lbl := Label.new()
+	effect_lbl.text = _format_mastery_effect(category, lv)
+	effect_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
+	effect_lbl.add_theme_color_override("font_color",
+		Color(0.6, 0.75, 0.6) if lv > 0 else Color(0.5, 0.5, 0.55))
+	card.add_child(effect_lbl)
+
+	# Mastery progress bar
+	var total_xp: float = player.get_category_total_xp(category)
+	var consumed: float = 0.0
+	for i in range(lv):
+		consumed += float(Player.MASTERY_XP_DELTA[i])
+	var into_level: float = total_xp - consumed
+	var next_need: float = float(Player.MASTERY_XP_DELTA[lv]) if lv < Player.MAX_MASTERY_LEVEL else 0.0
+	if next_need > 0.0:
+		var bar_row := HBoxContainer.new()
+		bar_row.add_theme_constant_override("separation", GameTheme.PAD_S)
+		card.add_child(bar_row)
+		var bar := ProgressBar.new()
+		bar.max_value = next_need
+		bar.value = clamp(into_level, 0.0, next_need)
+		bar.show_percentage = false
+		bar.custom_minimum_size = Vector2(0, 10)
+		bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		bar_row.add_child(bar)
+		var bar_lbl := Label.new()
+		bar_lbl.text = "%d/%d" % [int(into_level), int(next_need)]
+		bar_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
+		bar_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
+		bar_row.add_child(bar_lbl)
+
+	# Sub-skill rows
+	var sub_list := VBoxContainer.new()
+	sub_list.add_theme_constant_override("separation", 2)
+	card.add_child(sub_list)
+	var skill_ids: Array = _CATEGORY_SKILLS.get(category, [])
+	for skill_id in skill_ids:
+		sub_list.add_child(_make_subskill_row(skill_id, player, parent, manual_mode, on_change))
+
+	# Trailing divider for visual card separation (no explicit panel — relies on
+	# spacing + colored category label as the cue)
+	var sep := HSeparator.new()
+	card.add_child(sep)
+
+	return card
+
+
+## Single sub-skill row inside a mastery card.
+## - Always: name + apt + level + xp progress + bonus text. Long-press → desc.
+## - Manual mode: row is tappable to toggle active. Active rows show checkmark
+##   + share %. Inactive rows are dimmed.
+static func _make_subskill_row(skill_id: String, player: Player, parent: Node,
+		manual_mode: bool, on_change: Callable) -> Control:
+	var s: Dictionary = player.skills.get(skill_id, {"level": 0, "xp": 0.0})
 	var level: int = int(s.get("level", 0))
 	var xp: float = float(s.get("xp", 0.0))
 	var needed: int = 0
@@ -208,7 +219,7 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 		needed = Player.SKILL_XP_DELTA[level]
 
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 2)
+	vb.add_theme_constant_override("separation", 0)
 	vb.mouse_filter = Control.MOUSE_FILTER_STOP
 
 	var _long_pressed := [false]
@@ -216,85 +227,99 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 	hold_timer.wait_time = 0.6
 	hold_timer.one_shot = true
 	vb.add_child(hold_timer)
-	var desc: String = String(_DESCRIPTIONS.get(id, ""))
+	var desc: String = String(_DESCRIPTIONS.get(skill_id, ""))
 	hold_timer.timeout.connect(func():
 		_long_pressed[0] = true
-		_show_desc(id, desc, parent)
+		_show_desc(skill_id, desc, parent)
 	)
 
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", GameTheme.PAD_M)
-	row.custom_minimum_size = Vector2(0, GameTheme.ROW_MIN_HEIGHT)
+	row.custom_minimum_size = Vector2(0, GameTheme.TAP_MIN_HEIGHT if manual_mode else 32)
 	vb.add_child(row)
 
-	var name_col := VBoxContainer.new()
-	name_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_col.add_theme_constant_override("separation", 0)
-	row.add_child(name_col)
+	# Checkbox slot (visible always; checked only in manual mode w/ active)
+	var check_lbl := Label.new()
+	check_lbl.custom_minimum_size = Vector2(20, 0)
+	check_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
+	check_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(check_lbl)
 
-	var name_row := HBoxContainer.new()
-	name_row.add_theme_constant_override("separation", GameTheme.PAD_S)
-	name_col.add_child(name_row)
-
+	# Name
 	var name_lbl := Label.new()
-	name_lbl.text = id.capitalize()
-	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_SUBTITLE)
-	name_row.add_child(name_lbl)
+	name_lbl.text = skill_id.capitalize().replace("_", " ")
+	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(name_lbl)
 
-	var apt: int = _apt_for(id, player)
+	# Aptitude (if non-zero)
+	var apt: int = _apt_for(skill_id, player)
 	if apt != 0:
 		var apt_lbl := Label.new()
 		apt_lbl.text = _apt_label(apt)
-		apt_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+		apt_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 		apt_lbl.add_theme_color_override("font_color",
 			Color(0.45, 0.9, 0.5) if apt > 0 else Color(0.9, 0.45, 0.45))
 		apt_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		name_row.add_child(apt_lbl)
+		apt_lbl.custom_minimum_size = Vector2(28, 0)
+		row.add_child(apt_lbl)
 
-	var bonus_lbl := Label.new()
-	bonus_lbl.text = _bonus_text(id, level, player)
-	bonus_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
-	bonus_lbl.add_theme_color_override("font_color", Color(0.6, 0.75, 0.6))
-	name_col.add_child(bonus_lbl)
-
+	# Level
 	var lv_color: Color
 	if level >= Player.MAX_SKILL_LEVEL:
 		lv_color = Color(1.0, 0.85, 0.2)
-	elif level >= Player.MAX_SKILL_LEVEL - 2:
-		lv_color = Color(0.7, 1.0, 0.6)
 	elif level == 0:
 		lv_color = Color(0.55, 0.55, 0.6)
 	else:
 		lv_color = Color(0.85, 0.85, 0.85)
-
 	var lv_lbl := Label.new()
 	lv_lbl.text = "MAX" if level >= Player.MAX_SKILL_LEVEL else "Lv.%d" % level
-	lv_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
+	lv_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	lv_lbl.add_theme_color_override("font_color", lv_color)
 	lv_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(lv_lbl)
 
-	var xp_pct_lbl := Label.new()
-	xp_pct_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
-	xp_pct_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	xp_pct_lbl.custom_minimum_size = Vector2(52, 0)
-	xp_pct_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	row.add_child(xp_pct_lbl)
+	# Active share % (when active and >0)
+	var pct_lbl := Label.new()
+	pct_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
+	pct_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	pct_lbl.custom_minimum_size = Vector2(40, 0)
+	pct_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	row.add_child(pct_lbl)
 
-	# 활성 상태 색상 갱신 함수
-	var _refresh_active := func() -> void:
-		var is_active: bool = player.is_skill_active(id)
-		name_lbl.add_theme_color_override("font_color",
-			Color(0.95, 0.85, 0.35) if is_active else Color(0.45, 0.45, 0.5))
-		vb.modulate = Color(1.0, 1.0, 1.0) if is_active else Color(0.7, 0.7, 0.75)
-		var active_count: int = player.active_skills.size()
-		if is_active and active_count > 0:
-			var pct: int = int(round(100.0 / float(active_count)))
-			xp_pct_lbl.text = "%d%%" % pct
-			xp_pct_lbl.add_theme_color_override("font_color", Color(0.7, 0.95, 0.7))
+	# XP bar (compact, only if learning)
+	if level < Player.MAX_SKILL_LEVEL and needed > 0 and (level > 0 or xp > 0):
+		var xp_bar := ProgressBar.new()
+		xp_bar.max_value = needed
+		xp_bar.value = xp
+		xp_bar.show_percentage = false
+		xp_bar.custom_minimum_size = Vector2(0, 4)
+		xp_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		xp_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		vb.add_child(xp_bar)
+
+	var refresh_visual := func() -> void:
+		var is_active: bool = player.is_skill_active(skill_id)
+		if manual_mode:
+			check_lbl.text = "☑" if is_active else "☐"
+			check_lbl.add_theme_color_override("font_color",
+				Color(0.95, 0.85, 0.35) if is_active else Color(0.5, 0.5, 0.55))
+			name_lbl.add_theme_color_override("font_color",
+				Color(0.95, 0.9, 0.7) if is_active else Color(0.7, 0.7, 0.75))
+			vb.modulate = Color.WHITE
 		else:
-			xp_pct_lbl.text = ""
-	_refresh_active.call()
+			check_lbl.text = ""
+			name_lbl.add_theme_color_override("font_color",
+				Color(0.95, 0.85, 0.35) if is_active else Color(0.78, 0.78, 0.82))
+			vb.modulate = Color.WHITE
+		var n: int = player.active_skills.size()
+		if is_active and n > 0:
+			pct_lbl.text = "%d%%" % int(round(100.0 / float(n)))
+			pct_lbl.add_theme_color_override("font_color", Color(0.7, 0.95, 0.7))
+		else:
+			pct_lbl.text = ""
+	refresh_visual.call()
 
 	vb.gui_input.connect(func(ev: InputEvent) -> void:
 		var pressed: bool = false
@@ -310,39 +335,39 @@ static func _make_skill_row(id: String, s: Dictionary, player: Player, parent: N
 			hold_timer.start()
 		elif released:
 			hold_timer.stop()
-			if not _long_pressed[0]:
-				if player.toggle_skill_active(id):
-					_refresh_active.call()
+			if not _long_pressed[0] and manual_mode:
+				if player.toggle_skill_active(skill_id):
+					refresh_visual.call()
+					if on_change.is_valid():
+						on_change.call()
 			_long_pressed[0] = false)
 
-	if level < Player.MAX_SKILL_LEVEL and needed > 0:
-		var xp_row := HBoxContainer.new()
-		xp_row.add_theme_constant_override("separation", GameTheme.PAD_S)
-		xp_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		vb.add_child(xp_row)
-
-		var xp_bar := ProgressBar.new()
-		xp_bar.max_value = needed
-		xp_bar.value = xp
-		xp_bar.show_percentage = false
-		xp_bar.custom_minimum_size = Vector2(0, 10)
-		xp_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		xp_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		xp_row.add_child(xp_bar)
-
-		var xp_lbl := Label.new()
-		xp_lbl.text = "%d/%d" % [int(xp), needed]
-		xp_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
-		xp_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
-		xp_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		xp_row.add_child(xp_lbl)
-
 	return vb
+
+
+static func _format_mastery_effect(category: String, lv: int) -> String:
+	if lv <= 0:
+		return "(no mastery bonus yet)"
+	var fmt: String = String(_MASTERY_LABELS.get(category, ""))
+	match category:
+		"Melee", "Ranged", "Magic", "Defense", "Utility":
+			return fmt % (0.5 * float(lv))
+		"Agility":
+			return fmt % (lv / 3)
+	return ""
+
+static func _apt_for(id: String, _player: Player) -> int:
+	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id) \
+			if GameManager != null and RaceRegistry != null else null
+	return Player.aptitude_for(race, id)
+
+static func _apt_label(apt: int) -> String:
+	return "%+d" % apt
 
 static func _show_desc(skill_id: String, desc: String, parent: Node) -> void:
 	if desc == "":
 		return
-	var dlg: GameDialog = GameDialog.create(skill_id.capitalize())
+	var dlg: GameDialog = GameDialog.create(skill_id.capitalize().replace("_", " "))
 	parent.add_child(dlg)
 	var body := dlg.body()
 	if body == null:

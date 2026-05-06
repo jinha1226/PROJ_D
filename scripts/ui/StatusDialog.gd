@@ -30,7 +30,7 @@ static func _rebuild_body(dlg: GameDialog, player: Player, parent: Node) -> void
 		return
 	for child in body.get_children():
 		child.queue_free()
-	body.add_theme_constant_override("separation", 12)
+	body.add_theme_constant_override("separation", GameTheme.PAD_L)
 
 	body.add_child(_header_card(player))
 	body.add_child(_vitals_card(player))
@@ -45,7 +45,7 @@ static func _rebuild_body(dlg: GameDialog, player: Player, parent: Node) -> void
 
 static func _header_card(player: Player) -> Control:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
+	row.add_theme_constant_override("separation", GameTheme.PAD_L)
 	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 	var portrait_card := UICards.card(Color(0.9, 0.8, 0.45))
@@ -58,7 +58,7 @@ static func _header_card(player: Player) -> Control:
 	row.add_child(info_card)
 
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 4)
+	vb.add_theme_constant_override("separation", GameTheme.PAD_S)
 	info_card.add_child(vb)
 
 	var class_id: String = GameManager.selected_class_id if GameManager != null else ""
@@ -92,7 +92,7 @@ static func _header_card(player: Player) -> Control:
 static func _vitals_card(player: Player) -> Control:
 	var card := UICards.card(Color(0.75, 0.3, 0.3))
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 8)
+	vb.add_theme_constant_override("separation", GameTheme.PAD_M)
 	card.add_child(vb)
 	vb.add_child(UICards.section_header("Vitals", GameTheme.TYPO_SUBTITLE))
 
@@ -112,7 +112,7 @@ static func _faith_card(player: Player) -> Control:
 	var tint := FaithSystem.color_of(faith_id) if faith_id != "" else Color(0.6, 0.6, 0.7)
 	var card := UICards.card(tint)
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 8)
+	vb.add_theme_constant_override("separation", GameTheme.PAD_M)
 	card.add_child(vb)
 	vb.add_child(UICards.section_header("Faith", GameTheme.TYPO_SUBTITLE))
 
@@ -146,14 +146,14 @@ static func _faith_card(player: Player) -> Control:
 static func _stats_card(player: Player) -> Control:
 	var card := UICards.card(Color(0.45, 0.85, 0.55))
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 8)
+	vb.add_theme_constant_override("separation", GameTheme.PAD_M)
 	card.add_child(vb)
 	vb.add_child(UICards.section_header("Stats", GameTheme.TYPO_SUBTITLE))
 
 	var grid := GridContainer.new()
 	grid.columns = 3
-	grid.add_theme_constant_override("h_separation", 10)
-	grid.add_theme_constant_override("v_separation", 8)
+	grid.add_theme_constant_override("h_separation", GameTheme.PAD_L)
+	grid.add_theme_constant_override("v_separation", GameTheme.PAD_M)
 	vb.add_child(grid)
 
 	grid.add_child(_stat_block("STR", player.strength, "Melee power and carrying brute force."))
@@ -164,14 +164,14 @@ static func _stats_card(player: Player) -> Control:
 static func _combat_card(player: Player) -> Control:
 	var card := UICards.card(Color(0.9, 0.55, 0.25))
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 8)
+	vb.add_theme_constant_override("separation", GameTheme.PAD_M)
 	card.add_child(vb)
 	vb.add_child(UICards.section_header("Combat", GameTheme.TYPO_SUBTITLE))
 
 	var row := GridContainer.new()
 	row.columns = 2
-	row.add_theme_constant_override("h_separation", 16)
-	row.add_theme_constant_override("v_separation", 6)
+	row.add_theme_constant_override("h_separation", GameTheme.PAD_XL)
+	row.add_theme_constant_override("v_separation", GameTheme.PAD_M)
 	vb.add_child(row)
 
 	row.add_child(_kv_row("AC", str(player.ac)))
@@ -192,7 +192,7 @@ static func _combat_card(player: Player) -> Control:
 static func _equipment_card(player: Player) -> Control:
 	var card := UICards.card(Color(0.7, 0.7, 0.82))
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 8)
+	vb.add_theme_constant_override("separation", GameTheme.PAD_M)
 	card.add_child(vb)
 	vb.add_child(UICards.section_header("Equipment", GameTheme.TYPO_SUBTITLE))
 
@@ -205,13 +205,13 @@ static func _equipment_card(player: Player) -> Control:
 static func _resists_card(player: Player) -> Control:
 	var card := UICards.card(Color(0.45, 0.8, 0.95))
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 8)
+	vb.add_theme_constant_override("separation", GameTheme.PAD_M)
 	card.add_child(vb)
 	vb.add_child(UICards.section_header("Resistances", GameTheme.TYPO_SUBTITLE))
 
 	var flow := FlowContainer.new()
-	flow.add_theme_constant_override("h_separation", 8)
-	flow.add_theme_constant_override("v_separation", 8)
+	flow.add_theme_constant_override("h_separation", GameTheme.PAD_M)
+	flow.add_theme_constant_override("v_separation", GameTheme.PAD_M)
 	vb.add_child(flow)
 
 	for element in _RESIST_ELEMENTS:
@@ -223,7 +223,7 @@ static func _essence_card(dlg: GameDialog, player: Player, parent: Node) -> Cont
 	var tint := Color(0.8, 0.7, 1.0) if enabled else Color(0.5, 0.5, 0.58)
 	var card := UICards.card(tint)
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 8)
+	vb.add_theme_constant_override("separation", GameTheme.PAD_M)
 	card.add_child(vb)
 	vb.add_child(UICards.section_header("Essence", GameTheme.TYPO_SUBTITLE))
 
@@ -284,7 +284,7 @@ static func _essence_card(dlg: GameDialog, player: Player, parent: Node) -> Cont
 static func _effects_card(player: Player) -> Control:
 	var card := UICards.card(Color(0.7, 0.5, 0.95))
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 8)
+	vb.add_theme_constant_override("separation", GameTheme.PAD_M)
 	card.add_child(vb)
 	vb.add_child(UICards.section_header("Effects", GameTheme.TYPO_SUBTITLE))
 
@@ -308,14 +308,14 @@ static func _effects_card(player: Player) -> Control:
 static func _run_card(player: Player) -> Control:
 	var card := UICards.card(Color(0.6, 0.65, 0.75))
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 8)
+	vb.add_theme_constant_override("separation", GameTheme.PAD_M)
 	card.add_child(vb)
 	vb.add_child(UICards.section_header("Run", GameTheme.TYPO_SUBTITLE))
 
 	var grid := GridContainer.new()
 	grid.columns = 2
-	grid.add_theme_constant_override("h_separation", 16)
-	grid.add_theme_constant_override("v_separation", 6)
+	grid.add_theme_constant_override("h_separation", GameTheme.PAD_XL)
+	grid.add_theme_constant_override("v_separation", GameTheme.PAD_M)
 	vb.add_child(grid)
 
 	var depth_text := str(GameManager.depth) if GameManager != null else "?"
@@ -374,10 +374,10 @@ static func _add_portrait_layer(parent: Control, tex: Texture2D) -> void:
 
 static func _resource_bar(label_text: String, value: int, max_value: int, tint: Color) -> Control:
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 4)
+	vb.add_theme_constant_override("separation", GameTheme.PAD_S)
 
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
+	row.add_theme_constant_override("separation", GameTheme.PAD_L)
 	vb.add_child(row)
 
 	var label := Label.new()
@@ -411,7 +411,7 @@ static func _resource_bar(label_text: String, value: int, max_value: int, tint: 
 static func _stat_block(label_text: String, value: int, help: String) -> Control:
 	var card := UICards.card(Color(0.45, 0.75, 0.48))
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 4)
+	vb.add_theme_constant_override("separation", GameTheme.PAD_S)
 	card.add_child(vb)
 
 	var name := Label.new()
@@ -436,7 +436,7 @@ static func _stat_block(label_text: String, value: int, help: String) -> Control
 
 static func _kv_row(label_text: String, value_text: String) -> Control:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
+	row.add_theme_constant_override("separation", GameTheme.PAD_L)
 	var label := Label.new()
 	label.text = "%s:" % label_text
 	label.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
@@ -464,7 +464,7 @@ static func _equipment_row(label_text: String, slot: String, player: Player) -> 
 			name_text += " %+d" % plus_val
 
 	var top := HBoxContainer.new()
-	top.add_theme_constant_override("separation", 8)
+	top.add_theme_constant_override("separation", GameTheme.PAD_M)
 	row.add_child(top)
 
 	var label := Label.new()
@@ -532,10 +532,10 @@ static func _essence_slot_row(dlg: GameDialog, player: Player, parent: Node, slo
 	var unlocked := EssenceSystem.slot_is_unlocked(player, slot_index)
 	var current_id := String(player.essence_slots[slot_index])
 	var row := VBoxContainer.new()
-	row.add_theme_constant_override("separation", 4)
+	row.add_theme_constant_override("separation", GameTheme.PAD_S)
 
 	var top := HBoxContainer.new()
-	top.add_theme_constant_override("separation", 10)
+	top.add_theme_constant_override("separation", GameTheme.PAD_L)
 	row.add_child(top)
 
 	var title := Label.new()
@@ -584,7 +584,7 @@ static func _essence_slot_row(dlg: GameDialog, player: Player, parent: Node, slo
 
 static func _essence_inventory_row(essence_id: String) -> Control:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
+	row.add_theme_constant_override("separation", GameTheme.PAD_L)
 	var icon := TextureRect.new()
 	icon.texture = EssenceSystem.icon_texture_of(essence_id)
 	icon.custom_minimum_size = Vector2(28, 28)
@@ -607,7 +607,7 @@ static func _open_essence_slot_picker(dlg: GameDialog, player: Player, parent: N
 	var body := picker.body()
 	if body == null:
 		return
-	body.add_theme_constant_override("separation", 10)
+	body.add_theme_constant_override("separation", GameTheme.PAD_L)
 
 	var current_id := String(player.essence_slots[slot_index])
 	var current := Label.new()

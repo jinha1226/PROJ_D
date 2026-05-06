@@ -17,8 +17,12 @@ const SIGHT_RADIUS: int = 6
 const DEFAULT_BASE_TEX: Texture2D = preload(
 	"res://assets/tiles/individual/player/base/human_m.png")
 
-const XP_CURVE: Array = [0, 10, 30, 70, 140, 250, 420, 700, 1150, 1800,
-	2800, 4200, 6000, 8400, 11500, 15500, 20500, 27000, 35500, 47000]
+# 2026-05-06 compression: sum ~17,000 (91% reduction from prior ~183,000) so
+# MAX_XL=20 is reachable in long runs. Tuning targets:
+#   no-branch 14F → XL 12-13, 1-branch 18F → XL 14-15, full 4-branch 30F → XL 19-20.
+# Rune pickups grant entry_depth × 100 bonus XP to keep deep branches rewarding.
+const XP_CURVE: Array = [0, 10, 25, 50, 90, 150, 230, 320, 420, 540,
+	650, 800, 980, 1190, 1430, 1700, 2000, 2330, 2690, 3080]
 
 ## Paper-doll layer lookup tables. When equipped item id matches a key,
 ## the corresponding sprite is drawn on top of the base race sprite.
@@ -115,6 +119,10 @@ const SKILL_IDS: Array = [
 	"invocations", "evocations",
 ]
 const SKILL_XP_DELTA: Array = [12, 28, 55, 95, 150, 230, 340, 490, 700]
+# Mastery levels run 0..9 from category-wide cumulative XP. Steeper than per-skill
+# delta so spreading across a category is slower than specializing one sub-skill.
+const MASTERY_XP_DELTA: Array = [60, 140, 275, 475, 750, 1150, 1700, 2450, 3500]
+const MAX_MASTERY_LEVEL: int = 9
 const FIGHTING_HP_PER_LEVEL: int = 5
 const MAGIC_SCHOOLS: Array = [
 	"conjurations", "hexes", "charms", "summonings", "necromancy",
@@ -128,7 +136,8 @@ const SKILL_CATEGORIES: Dictionary = {
 	"short_blades": "Melee", "long_blades": "Melee",
 	"maces": "Melee", "axes": "Melee", "staves": "Melee", "polearms": "Melee",
 	"bows": "Ranged", "crossbows": "Ranged", "slings": "Ranged", "throwing": "Ranged",
-	"armor": "Defense", "shields": "Defense", "dodging": "Defense", "stealth": "Defense",
+	"armor": "Defense", "shields": "Defense",
+	"dodging": "Agility", "stealth": "Agility",
 	"spellcasting": "Magic",
 	"conjurations": "Magic", "hexes": "Magic", "charms": "Magic", "summonings": "Magic",
 	"necromancy": "Magic", "translocations": "Magic", "transmutation": "Magic",
@@ -251,6 +260,12 @@ func pickup(floor_item: FloorItem) -> void:
 		var pickup_name: String = ItemRegistry.entry_display_name(new_entry) if ItemRegistry != null else GameManager.display_name_of(data.id)
 		items_collected += 1
 		CombatLog.pickup("You pick up %s." % pickup_name)
+		if data.kind == "rune":
+			var rune_xp: int = _rune_xp_bonus(data.id)
+			if rune_xp > 0:
+				grant_xp(rune_xp)
+				CombatLog.post("The %s pulses with deep power. (+%d XP)" % [pickup_name, rune_xp],
+					Color(1.0, 0.85, 0.4))
 		auto_bind_quickslot(data.id)
 	emit_signal("stats_changed")
 	if data.kind != "essence":
@@ -706,6 +721,7 @@ func refresh_ac_from_equipment() -> void:
 		ac = max(ac, 13 + dexterity / 2)
 	ac += EssenceSystem.bonus_ac(self)
 	ev += EssenceSystem.bonus_ev(self)
+	ev += agility_mastery_ev_bonus()
 	ev = max(0, ev)
 	emit_signal("stats_changed")
 
@@ -892,49 +908,110 @@ func heal(amount: int) -> void:
 	emit_signal("stats_changed")
 
 func init_skills() -> void:
+	# active_skills stays empty by default — XP is action-routed (the action's own
+	# sub-skill receives full XP). Players opt into manual proportional split via
+	# SkillsDialog Manual mode (toggle_skill_active).
 	for id in SKILL_IDS:
 		if not skills.has(id):
 			skills[id] = {"level": 0, "xp": 0.0}
-	if active_skills.is_empty():
-		active_skills = ["blade"]
 
 func is_skill_active(id: String) -> bool:
 	return active_skills.has(id)
 
 func set_active_skills(ids: Array) -> void:
+	# Empty array is a valid state (= action-routed mode). Do not auto-fill.
 	active_skills.clear()
 	for id in ids:
 		var sid: String = String(id)
 		if SKILL_IDS.has(sid) and not active_skills.has(sid):
 			active_skills.append(sid)
-	if active_skills.is_empty():
-		active_skills = ["blade"]
 	emit_signal("stats_changed")
 
 func toggle_skill_active(id: String) -> bool:
+	# Allows emptying the list — empty = action-routed (auto) mode.
 	if not SKILL_IDS.has(id):
 		return false
 	if active_skills.has(id):
-		if active_skills.size() <= 1:
-			return false
 		active_skills.erase(id)
 	else:
 		active_skills.append(id)
 	emit_signal("stats_changed")
 	return true
 
-func grant_kill_skill_xp(amount: float, preferred_skill: String = "") -> void:
+func grant_kill_skill_xp(amount: float, action_skill: String = "") -> void:
+	# Two-mode XP routing:
+	#   active_skills empty  → action-routed: full XP to action_skill (DCSS default,
+	#                          beginner-friendly: dagger use trains short_blades)
+	#   active_skills filled → manual: proportional split across active sub-skills
+	#                          (heavy users specialize 1-2 sub-skills faster)
+	# action_skill is the sub-skill the action belongs to (weapon skill, spell school, etc.)
+	var fallback: String = action_skill if SKILL_IDS.has(action_skill) else "fighting"
+	if active_skills.is_empty():
+		grant_skill_xp(fallback, amount)
+		return
 	var targets: Array = []
 	for id in active_skills:
 		var sid: String = String(id)
 		if SKILL_IDS.has(sid) and get_skill_level(sid) < MAX_SKILL_LEVEL:
 			targets.append(sid)
 	if targets.is_empty():
-		var fallback: String = preferred_skill if SKILL_IDS.has(preferred_skill) else "blade"
+		# Every active sub-skill is capped — give to the action's own skill so
+		# XP is not silently dropped.
 		targets = [fallback]
 	var share: float = amount / float(targets.size())
 	for sid in targets:
 		grant_skill_xp(String(sid), share)
+
+## Mastery effects (per-category, layered on top of sub-skill bonuses).
+## Tuning baseline 2026-05-06: linear +0.5%/level for damage/power/effect,
+## linear DR for incoming damage, EV every 3 mastery levels for Agility.
+## All callers should multiply (not add) so stacking with sub-skill bonuses
+## stays bounded; max mastery 9 → +4.5% / -4.5% / +3 EV.
+func melee_mastery_dmg_mult() -> float:
+	return 1.0 + 0.005 * float(get_category_mastery_level("Melee"))
+
+func ranged_mastery_dmg_mult() -> float:
+	return 1.0 + 0.005 * float(get_category_mastery_level("Ranged"))
+
+func magic_mastery_power_mult() -> float:
+	return 1.0 + 0.005 * float(get_category_mastery_level("Magic"))
+
+func defense_mastery_incoming_mult() -> float:
+	# Multiplier applied to incoming damage after AC soak. <1.0 reduces damage.
+	return max(0.5, 1.0 - 0.005 * float(get_category_mastery_level("Defense")))
+
+func agility_mastery_ev_bonus() -> int:
+	return get_category_mastery_level("Agility") / 3
+
+func utility_mastery_effect_mult() -> float:
+	return 1.0 + 0.005 * float(get_category_mastery_level("Utility"))
+
+func get_category_total_xp(category: String) -> float:
+	# Sum of (banked unspent xp + already-consumed xp from levelups) for every
+	# sub-skill in the category. Action-routed beginners and specialist heavies
+	# reach the same mastery level after spending the same total category XP.
+	var total: float = 0.0
+	for skill_id in SKILL_IDS:
+		if String(SKILL_CATEGORIES.get(skill_id, "")) != category:
+			continue
+		var s: Dictionary = skills.get(skill_id, {})
+		total += float(s.get("xp", 0.0))
+		var lv: int = int(s.get("level", 0))
+		for i in range(lv):
+			total += float(SKILL_XP_DELTA[i])
+	return total
+
+func get_category_mastery_level(category: String) -> int:
+	var xp: float = get_category_total_xp(category)
+	var level: int = 0
+	var consumed: float = 0.0
+	for delta in MASTERY_XP_DELTA:
+		if xp >= consumed + float(delta):
+			consumed += float(delta)
+			level += 1
+		else:
+			break
+	return min(level, MAX_MASTERY_LEVEL)
 
 func get_skill_level(id: String) -> int:
 	var s: Dictionary = skills.get(id, {})
@@ -1007,12 +1084,26 @@ func spell_skill_for(spell: SpellData) -> String:
 		return "spellcasting"
 	return progression_school_for(String(spell.school))
 
+## Aptitude lookup with legacy-key fallback. Race .tres files still use the
+## pre-30-split keys (blade/hafted/elemental/etc.); we map a new sub-skill id
+## back to its legacy parent and read that aptitude. Migrating .tres to the 30
+## keys directly is deferred (needs vetted DCSS species values per sub-skill).
+static func aptitude_for(race: RaceData, skill_id: String) -> int:
+	if race == null:
+		return 0
+	var direct = race.skill_aptitudes.get(skill_id, null)
+	if direct != null:
+		return int(direct)
+	for legacy_id in LEGACY_SKILL_SPLIT.keys():
+		if (LEGACY_SKILL_SPLIT[legacy_id] as Array).has(skill_id):
+			return int(race.skill_aptitudes.get(legacy_id, 0))
+	return 0
+
 func _skill_apt_mult(id: String) -> float:
 	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id) if GameManager != null and RaceRegistry != null else null
 	if race == null:
 		return 1.0
-	var apt: int = int(race.skill_aptitudes.get(id, 0))
-	return pow(1.2, apt)
+	return pow(1.2, aptitude_for(race, id))
 
 func grant_skill_xp(id: String, amount: float) -> void:
 	if not SKILL_IDS.has(id):
@@ -1034,6 +1125,22 @@ func grant_skill_xp(id: String, amount: float) -> void:
 			var hp_gain: int = _fighting_hp_gain()
 			_apply_max_hp_gain(hp_gain, "+%d max HP from Fighting." % hp_gain)
 	skills[id] = s
+
+## Rune pickup bonus: entry_depth × 100, where entry_depth = top of the branch
+## entrance range. Encourages deeper branch attempts (swamp 600, ice 900,
+## infernal 1200, crypt 1500). Returns 0 for unknown runes.
+func _rune_xp_bonus(rune_id: String) -> int:
+	var zm = get_node_or_null("/root/ZoneManager")
+	if zm == null:
+		return 0
+	for cfg in zm.BRANCHES.values():
+		if String(cfg.get("rune_reward", "")) != rune_id:
+			continue
+		var rng: Array = cfg.get("entrance_range", [])
+		if rng.size() >= 2:
+			return int(rng[1]) * 100
+		break
+	return 0
 
 func grant_xp(amount: int) -> void:
 	xp += amount

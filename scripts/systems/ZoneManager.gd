@@ -31,7 +31,6 @@ const BRANCHES: Dictionary = {
 		"env": "poison",
 		"entrance_range": [4, 6],
 		"floors": 4,
-		"env_damage": 2,
 		"resistance": "poison+",
 		"boss_id": "bog_serpent",
 		"essence_reward": "essence_plague",
@@ -49,7 +48,6 @@ const BRANCHES: Dictionary = {
 		"env": "cold",
 		"entrance_range": [7, 9],
 		"floors": 4,
-		"env_damage": 2,
 		"resistance": "cold+",
 		"boss_id": "glacial_sovereign",
 		"essence_reward": "essence_glacial",
@@ -67,7 +65,6 @@ const BRANCHES: Dictionary = {
 		"env": "fire",
 		"entrance_range": [10, 12],
 		"floors": 4,
-		"env_damage": 2,
 		"resistance": "fire+",
 		"boss_id": "ember_tyrant",
 		"essence_reward": "essence_infernal",
@@ -85,7 +82,6 @@ const BRANCHES: Dictionary = {
 		"env": "necro",
 		"entrance_range": [13, 15],
 		"floors": 4,
-		"env_damage": 2,
 		"resistance": "necro+",
 		"boss_id": "ancient_lich",
 		"essence_reward": "essence_undeath",
@@ -122,17 +118,6 @@ func branch_entrance_for_depth(depth: int) -> String:
 # ── Branch helpers ───────────────────────────────────────────────────────────
 func branch_config(branch_id: String) -> Dictionary:
 	return BRANCHES.get(branch_id, {})
-
-func branch_env_damage(branch_id: String, branch_floor: int) -> int:
-	var cfg: Dictionary = BRANCHES.get(branch_id, {})
-	if cfg.is_empty():
-		return 0
-	if branch_floor <= 1:
-		return 0
-	return int(cfg.get("env_damage", 2))
-
-func branch_env_element(branch_id: String) -> String:
-	return String(BRANCHES.get(branch_id, {}).get("env", ""))
 
 func branch_resistance(branch_id: String) -> String:
 	return String(BRANCHES.get(branch_id, {}).get("resistance", ""))

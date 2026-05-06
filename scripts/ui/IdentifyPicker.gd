@@ -13,7 +13,7 @@ static func open(player: Player, parent: Node,
 		return
 	for child in body.get_children():
 		child.queue_free()
-	body.add_theme_constant_override("separation", 6)
+	body.add_theme_constant_override("separation", GameTheme.PAD_M)
 
 	var seen: Dictionary = {}
 	var found: bool = false
@@ -49,7 +49,7 @@ static func _make_row(data: ItemData, id: String, player: Player,
 		dlg: GameDialog, on_picked: Callable) -> Control:
 	var row := HBoxContainer.new()
 	row.custom_minimum_size = Vector2(0, 60)
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", GameTheme.PAD_M)
 	var count: int = player.count_item(id)
 	var name_lab := Label.new()
 	name_lab.text = "%s ×%d" % [GameManager.display_name_of(id), count]

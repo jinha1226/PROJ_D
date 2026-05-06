@@ -30,20 +30,20 @@ static func _player_attack_profile(player: Player) -> Dictionary:
 			profile.weapon = weapon
 			profile.weapon_plus = int(entry.get("plus", 0))
 			profile.weapon_dmg = max(UNARMED_DAMAGE, weapon.damage + int(profile.weapon_plus))
+			# DCSS 30-split: weapon_skill_for_item returns the canonical sub-skill
+			# (short_blades / bows / spellcasting / etc). Stat source/scale stay
+			# weapon-class-specific because finesse weapons key off DEX while
+			# heavy weapons key off STR.
+			profile.skill_id = Player.weapon_skill_for_item(weapon)
 			if weapon.category == "ranged":
-				profile.skill_id = "ranged"
 				profile.stat_source = player.dexterity
 				profile.stat_scale = 0.25
 			elif weapon.category == "staff":
-				profile.skill_id = "spellcasting"
 				profile.stat_source = player.intelligence
 				profile.stat_scale = 0.25
 			elif weapon.category == "dagger":
-				profile.skill_id = "blade"
 				profile.stat_source = player.dexterity
 				profile.stat_scale = 0.25
-			else:
-				profile.skill_id = Player.weapon_skill_for_item(weapon)
 			var pen: Dictionary = _weapon_req_penalty(player, weapon)
 			profile.req_hit_pen = pen.hit
 			profile.req_dmg_pct = pen.dmg_pct
@@ -61,7 +61,9 @@ static func _player_attack_hits(player: Player, monster: Monster, profile: Dicti
 	var to_hit_base: int = 15 + stat_bonus + weapon_plus + req_hit_pen + player.slay_bonus
 	to_hit_base += randi_range(0, skill_level * 2) if skill_level > 0 else 0
 	var skill_id: String = String(profile.skill_id)
-	if skill_id in ["unarmed", "blade", "hafted", "polearm"]:
+	# Fighting skill grants accuracy bonus to all melee attacks. Use category
+	# to identify melee post-30-split (covers all blades/maces/axes/staves/polearms/unarmed).
+	if String(Player.SKILL_CATEGORIES.get(skill_id, "")) == "Melee":
 		to_hit_base += player.get_skill_level("fighting") / 2
 	var to_hit_roll: int = randi_range(0, max(1, to_hit_base))
 	var eff_ev: int = max(0, monster.data.ev - (2 if Status.has(monster, "drained") else 0))
@@ -113,11 +115,16 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	flat_bonus += RacePassiveSystem.melee_damage_bonus(player)
 	flat_bonus += backstab_bonus
 	var mult: float = 1.0 + float(skill_level) * 0.04
-	if skill_id == "ranged":
+	# Mastery: category-wide layered bonus on top of sub-skill mult.
+	# Melee branch covers all melee categories post-30-split; Ranged branch is bows/etc.
+	var skill_category: String = String(Player.SKILL_CATEGORIES.get(skill_id, ""))
+	if skill_category == "Ranged":
 		mult *= EssenceSystem.ranged_damage_mult(player)
 		mult *= FaithSystem.ranged_damage_mult(player)
-	if skill_id in ["unarmed", "blade", "hafted", "polearm", ""]:
+		mult *= player.ranged_mastery_dmg_mult()
+	elif skill_category == "Melee" or skill_id == "":
 		mult *= FaithSystem.melee_damage_mult(player)
+		mult *= player.melee_mastery_dmg_mult()
 	if not monster.is_aware:
 		var uw_mult: float = EssenceSystem.unaware_damage_mult(player)
 		if uw_mult > 1.0:
@@ -203,7 +210,8 @@ static func _dagger_swift_strike(player: Player, monster: Monster) -> void:
 	monster.become_aware(player.grid_pos)
 	if was_alive and monster.hp <= 0:
 		CombatLog.hit("You kill the %s." % monster.data.display_name)
-		_apply_player_kill_rewards(player, monster, "blade")
+		var weapon_item: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if (player.equipped_weapon_id != "" and ItemRegistry != null) else null
+		_apply_player_kill_rewards(player, monster, Player.weapon_skill_for_item(weapon_item))
 
 static func _apply_player_kill_rewards(player: Player, monster: Monster, skill_id: String) -> void:
 	var xp_award: int = max(1, int(round(float(monster.data.xp_value) * XP_PACE_MULTIPLIER)))
@@ -362,6 +370,8 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	var soak: int = randi_range(0, player.ac + 1)
 	var final: int = max(1, raw - soak)
 	final = max(1, final - EssenceSystem.incoming_damage_reduction(player))
+	# Defense mastery: small multiplicative DR after flat soak/reduction.
+	final = max(1, int(round(float(final) * player.defense_mastery_incoming_mult())))
 	final = RacePassiveSystem.on_player_hit(player, final)
 	CombatLog.damage_taken("The %s %s you for %d." \
 			% [monster.data.display_name, verb, final])
@@ -413,6 +423,8 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 		soak += randi_range(2, 5)
 	var final: int = max(1, raw - soak)
 	final = max(1, final - EssenceSystem.incoming_damage_reduction(player))
+	# Defense mastery: small multiplicative DR after flat soak/reduction.
+	final = max(1, int(round(float(final) * player.defense_mastery_incoming_mult())))
 	final = RacePassiveSystem.on_player_hit(player, final)
 	CombatLog.damage_taken("The %s hits you for %d." % [monster.data.display_name, final])
 	player.take_damage(final, monster.data.id)

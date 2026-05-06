@@ -1,0 +1,197 @@
+; PocketCrawl master Theme.
+; PD layout (sharp 2-3px corners, banner-style headers, mobile tap targets)
+; with DCSS CGA-16 monochrome palette (near-black bg, LightGray borders/text,
+; Yellow hover, LightCyan accent). Galmuri11 pixel font as default.
+;
+; Single source of truth — GameTheme.create() loads this.
+; Layout token constants (TYPO_*, PAD_*, TAP_MIN_HEIGHT) live in GameTheme.gd.
+
+[gd_resource type="Theme" load_steps=20 format=3 uid="uid://b_pcr_theme_002"]
+
+[ext_resource type="FontFile" path="res://assets/fonts/Galmuri11.ttf" id="1_font"]
+
+; ── Buttons ──────────────────────────────────────────────────────────────────
+; DCSS-style: nearly-black bg, LightGray (#AAAAAA) border. Hover = Yellow.
+; Pressed = LightCyan (action confirm). Disabled = DarkGray.
+[sub_resource type="StyleBoxFlat" id="btn_normal"]
+bg_color = Color(0.07, 0.07, 0.08, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.667, 0.667, 0.667, 1.0)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="btn_hover"]
+bg_color = Color(0.12, 0.10, 0.04, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1.0, 1.0, 0.333, 1.0)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="btn_pressed"]
+bg_color = Color(0.04, 0.10, 0.12, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.333, 1.0, 1.0, 1.0)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="btn_disabled"]
+bg_color = Color(0.04, 0.04, 0.05, 0.7)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.333, 0.333, 0.333, 0.7)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="btn_focus"]
+bg_color = Color(0.07, 0.07, 0.08, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.333, 0.667, 1.0, 1.0)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+
+; ── Panel ────────────────────────────────────────────────────────────────────
+[sub_resource type="StyleBoxFlat" id="panel_style"]
+bg_color = Color(0.05, 0.05, 0.07, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.667, 0.667, 0.667, 0.85)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+; ── Window / AcceptDialog (heavier top border for banner feel) ───────────────
+[sub_resource type="StyleBoxFlat" id="window_panel"]
+bg_color = Color(0.03, 0.03, 0.05, 0.97)
+border_width_left = 2
+border_width_top = 4
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.667, 0.667, 0.667, 0.95)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+
+; ── Separator ────────────────────────────────────────────────────────────────
+[sub_resource type="StyleBoxFlat" id="sep_style"]
+bg_color = Color(0.333, 0.333, 0.333, 0.7)
+content_margin_top = 4.0
+content_margin_bottom = 4.0
+
+; ── ScrollBar ────────────────────────────────────────────────────────────────
+[sub_resource type="StyleBoxFlat" id="scroll_bg"]
+bg_color = Color(0.05, 0.05, 0.07, 0.5)
+content_margin_left = 4.0
+content_margin_right = 4.0
+
+[sub_resource type="StyleBoxFlat" id="scroll_grabber"]
+bg_color = Color(0.333, 0.333, 0.333, 0.85)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="scroll_grabber_hl"]
+bg_color = Color(0.667, 0.667, 0.667, 1.0)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+; ── ProgressBar ──────────────────────────────────────────────────────────────
+; LightCyan fill (DCSS standard for progress/info accent).
+[sub_resource type="StyleBoxFlat" id="prog_bg"]
+bg_color = Color(0.04, 0.04, 0.06, 1.0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.333, 0.333, 0.333, 0.85)
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+
+[sub_resource type="StyleBoxFlat" id="prog_fill"]
+bg_color = Color(0.333, 1.0, 1.0, 1.0)
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+
+[resource]
+default_font = ExtResource("1_font")
+default_font_size = 22
+Button/colors/font_color = Color(0.667, 0.667, 0.667, 1.0)
+Button/colors/font_hover_color = Color(1.0, 1.0, 0.333, 1.0)
+Button/colors/font_pressed_color = Color(0.333, 1.0, 1.0, 1.0)
+Button/colors/font_disabled_color = Color(0.333, 0.333, 0.333, 1.0)
+Button/styles/normal = SubResource("btn_normal")
+Button/styles/hover = SubResource("btn_hover")
+Button/styles/pressed = SubResource("btn_pressed")
+Button/styles/disabled = SubResource("btn_disabled")
+Button/styles/focus = SubResource("btn_focus")
+CheckBox/colors/font_color = Color(0.667, 0.667, 0.667, 1.0)
+CheckBox/colors/font_hover_color = Color(1.0, 1.0, 0.333, 1.0)
+Label/colors/font_color = Color(0.667, 0.667, 0.667, 1.0)
+Panel/styles/panel = SubResource("panel_style")
+PanelContainer/styles/panel = SubResource("panel_style")
+Window/styles/embedded_border = SubResource("window_panel")
+AcceptDialog/styles/panel = SubResource("window_panel")
+HSeparator/styles/separator = SubResource("sep_style")
+VScrollBar/styles/scroll = SubResource("scroll_bg")
+VScrollBar/styles/grabber = SubResource("scroll_grabber")
+VScrollBar/styles/grabber_highlight = SubResource("scroll_grabber_hl")
+ProgressBar/styles/background = SubResource("prog_bg")
+ProgressBar/styles/fill = SubResource("prog_fill")

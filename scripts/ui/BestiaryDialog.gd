@@ -8,7 +8,7 @@ static func open(parent: Node) -> void:
 	var body: VBoxContainer = dlg.body()
 	if body == null:
 		return
-	body.add_theme_constant_override("separation", 8)
+	body.add_theme_constant_override("separation", GameTheme.PAD_M)
 
 	var all_monsters: Array = MonsterRegistry.all
 	if all_monsters.is_empty():
@@ -41,14 +41,14 @@ static func open(parent: Node) -> void:
 static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 	var panel := PanelContainer.new()
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 10)
-	margin.add_theme_constant_override("margin_right", 10)
-	margin.add_theme_constant_override("margin_top", 8)
-	margin.add_theme_constant_override("margin_bottom", 8)
+	margin.add_theme_constant_override("margin_left", GameTheme.PAD_L)
+	margin.add_theme_constant_override("margin_right", GameTheme.PAD_L)
+	margin.add_theme_constant_override("margin_top", GameTheme.PAD_M)
+	margin.add_theme_constant_override("margin_bottom", GameTheme.PAD_M)
 	panel.add_child(margin)
 
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 4)
+	vb.add_theme_constant_override("separation", GameTheme.PAD_S)
 	margin.add_child(vb)
 
 	if kills == 0:
@@ -60,7 +60,7 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 		return panel
 
 	var header_row := HBoxContainer.new()
-	header_row.add_theme_constant_override("separation", 10)
+	header_row.add_theme_constant_override("separation", GameTheme.PAD_L)
 	vb.add_child(header_row)
 
 	var glyph_lbl := Label.new()
@@ -110,7 +110,7 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 	var eid: String = String(data.essence_id)
 	if eid != "":
 		var ess_row := HBoxContainer.new()
-		ess_row.add_theme_constant_override("separation", 10)
+		ess_row.add_theme_constant_override("separation", GameTheme.PAD_L)
 		var ess_icon := TextureRect.new()
 		ess_icon.texture = EssenceSystem.icon_texture_of(eid)
 		ess_icon.custom_minimum_size = Vector2(32, 32)

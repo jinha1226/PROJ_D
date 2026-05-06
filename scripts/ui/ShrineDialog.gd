@@ -40,7 +40,7 @@ static func open_altar_info(faith_id: String, altar_active: bool, player: Player
 	var body: VBoxContainer = dlg.body()
 	if body == null:
 		return
-	body.add_theme_constant_override("separation", 12)
+	body.add_theme_constant_override("separation", GameTheme.PAD_L)
 
 	# Altar icon row
 	var icon_path: String = String(DungeonMap.ALTAR_TEXTURES.get(faith_id, ""))
@@ -114,7 +114,7 @@ static func open_choice(player: Player, parent: Node) -> void:
 	var body: VBoxContainer = dlg.body()
 	if body == null:
 		return
-	body.add_theme_constant_override("separation", 10)
+	body.add_theme_constant_override("separation", GameTheme.PAD_L)
 
 	var sub_lbl := Label.new()
 	sub_lbl.text = "The first descent leaves a mark upon you. Choose the power that will shape the rest of this run."
@@ -136,14 +136,14 @@ static func _make_choice_card(faith_id: String, player: Player, parent: Node, dl
 	panel.custom_minimum_size = Vector2(0, 92)
 
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 12)
-	margin.add_theme_constant_override("margin_right", 12)
-	margin.add_theme_constant_override("margin_top", 8)
-	margin.add_theme_constant_override("margin_bottom", 8)
+	margin.add_theme_constant_override("margin_left", GameTheme.PAD_L)
+	margin.add_theme_constant_override("margin_right", GameTheme.PAD_L)
+	margin.add_theme_constant_override("margin_top", GameTheme.PAD_M)
+	margin.add_theme_constant_override("margin_bottom", GameTheme.PAD_M)
 	panel.add_child(margin)
 
 	var hb := HBoxContainer.new()
-	hb.add_theme_constant_override("separation", 10)
+	hb.add_theme_constant_override("separation", GameTheme.PAD_L)
 	margin.add_child(hb)
 
 	var vb := VBoxContainer.new()
@@ -160,7 +160,7 @@ static func _make_choice_card(faith_id: String, player: Player, parent: Node, dl
 	var desc_lbl := Label.new()
 	desc_lbl.text = String(faith.get("short", ""))
 	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_lbl.add_theme_font_size_override("font_size", 19)
+	desc_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	desc_lbl.add_theme_color_override("font_color", Color(0.65, 0.68, 0.75))
 	vb.add_child(desc_lbl)
 
@@ -189,7 +189,7 @@ static func _open_confirm(faith_id: String, player: Player, parent: Node, dlg: G
 	var body: VBoxContainer = conf.body()
 	if body == null:
 		return
-	body.add_theme_constant_override("separation", 12)
+	body.add_theme_constant_override("separation", GameTheme.PAD_L)
 
 	var q_lbl := Label.new()
 	q_lbl.text = String(lines[0])
@@ -206,7 +206,7 @@ static func _open_confirm(faith_id: String, player: Player, parent: Node, dlg: G
 	body.add_child(sub_lbl)
 
 	var btn_row := HBoxContainer.new()
-	btn_row.add_theme_constant_override("separation", 12)
+	btn_row.add_theme_constant_override("separation", GameTheme.PAD_L)
 	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	body.add_child(btn_row)
 
@@ -249,7 +249,7 @@ static func _open_first_essence_choice(player: Player, parent: Node) -> void:
 	var body: VBoxContainer = dlg.body()
 	if body == null:
 		return
-	body.add_theme_constant_override("separation", 10)
+	body.add_theme_constant_override("separation", GameTheme.PAD_L)
 
 	var sub_lbl := Label.new()
 	sub_lbl.text = "Monster remnants answer your call. Choose what form your path will take."
@@ -270,14 +270,14 @@ static func _make_essence_card(eid: String, player: Player, parent: Node, dlg: G
 	panel.custom_minimum_size = Vector2(0, 90)
 
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 12)
-	margin.add_theme_constant_override("margin_right", 12)
-	margin.add_theme_constant_override("margin_top", 8)
-	margin.add_theme_constant_override("margin_bottom", 8)
+	margin.add_theme_constant_override("margin_left", GameTheme.PAD_L)
+	margin.add_theme_constant_override("margin_right", GameTheme.PAD_L)
+	margin.add_theme_constant_override("margin_top", GameTheme.PAD_M)
+	margin.add_theme_constant_override("margin_bottom", GameTheme.PAD_M)
 	panel.add_child(margin)
 
 	var hb := HBoxContainer.new()
-	hb.add_theme_constant_override("separation", 10)
+	hb.add_theme_constant_override("separation", GameTheme.PAD_L)
 	margin.add_child(hb)
 
 	var icon := TextureRect.new()
@@ -302,7 +302,7 @@ static func _make_essence_card(eid: String, player: Player, parent: Node, dlg: G
 	var desc_lbl := Label.new()
 	desc_lbl.text = EssenceSystem.description(eid)
 	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_lbl.add_theme_font_size_override("font_size", 19)
+	desc_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	desc_lbl.add_theme_color_override("font_color", Color(0.65, 0.68, 0.75))
 	vb.add_child(desc_lbl)
 

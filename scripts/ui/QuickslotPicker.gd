@@ -18,7 +18,7 @@ static func _populate(dlg: GameDialog, player: Player, slot_index: int,
 		return
 	for child in body.get_children():
 		child.queue_free()
-	body.add_theme_constant_override("separation", 6)
+	body.add_theme_constant_override("separation", GameTheme.PAD_M)
 
 	var current_id: String = String(player.quickslots[slot_index])
 	var header := Label.new()
@@ -87,7 +87,7 @@ static func _make_spell_row(spell: SpellData, player: Player, slot_index: int,
 		dlg: GameDialog, on_change: Callable) -> Control:
 	var row := HBoxContainer.new()
 	row.custom_minimum_size = Vector2(0, 60)
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", GameTheme.PAD_M)
 
 	var icon_rect := TextureRect.new()
 	icon_rect.custom_minimum_size = Vector2(40, 40)
@@ -125,7 +125,7 @@ static func _make_item_row(data: ItemData, player: Player, slot_index: int,
 		dlg: GameDialog, on_change: Callable) -> Control:
 	var row := HBoxContainer.new()
 	row.custom_minimum_size = Vector2(0, 56)
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", GameTheme.PAD_M)
 
 	var name_lab := Label.new()
 	var count: int = player.count_item(data.id)

@@ -16,7 +16,7 @@ static func _populate(dlg: GameDialog, player: Player, game: Node) -> void:
 		return
 	for child in body.get_children():
 		child.queue_free()
-	body.add_theme_constant_override("separation", 6)
+	body.add_theme_constant_override("separation", GameTheme.PAD_M)
 
 	var mp_lbl := Label.new()
 	mp_lbl.text = "MP  %d / %d" % [player.mp, player.mp_max]
@@ -73,7 +73,7 @@ static func _make_spell_row(spell: SpellData, player: Player,
 	var no_mp: bool = player.mp < spell.mp_cost
 
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", GameTheme.PAD_M)
 
 	# Spell icon
 	var icon_rect := TextureRect.new()
@@ -130,7 +130,7 @@ static func _make_spell_row(spell: SpellData, player: Player,
 			spell.mp_cost, range_str, _describe(player, spell), armor_note]
 		var stat_color: Color = Color(0.85, 0.55, 0.35) if armor_mult < 1.0 else Color(0.6, 0.62, 0.68)
 		stat_lbl.add_theme_color_override("font_color", stat_color)
-	stat_lbl.add_theme_font_size_override("font_size", 19)
+	stat_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	stat_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	info.add_child(stat_lbl)
 

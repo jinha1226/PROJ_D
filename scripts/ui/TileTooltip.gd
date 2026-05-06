@@ -12,7 +12,7 @@ static func show_at(grid_pos: Vector2i, parent: Node) -> void:
 	var body: VBoxContainer = dlg.body()
 	if body == null:
 		return
-	body.add_theme_constant_override("separation", 8)
+	body.add_theme_constant_override("separation", GameTheme.PAD_M)
 
 	for line in body_lines:
 		var lbl := Label.new()

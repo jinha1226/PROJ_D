@@ -6,7 +6,7 @@ static func open(game: Node) -> void:
 	var body: VBoxContainer = dlg.body()
 	if body == null:
 		return
-	body.add_theme_constant_override("separation", 16)
+	body.add_theme_constant_override("separation", GameTheme.PAD_XL)
 
 	_add_btn(body, "도감 (Bestiary)", func() -> void:
 		dlg.close()

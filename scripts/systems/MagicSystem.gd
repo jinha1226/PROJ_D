@@ -330,7 +330,8 @@ static func _compute_power(player: Player, spell: SpellData) -> int:
 	var total_skill: float = float(spellcasting) * 0.5 + float(school_skill)
 	var base: int = int(float(player.intelligence) * (1.0 + total_skill * 0.06) * _armor_spell_mult(player))
 	var power: int = base + EssenceSystem.spell_power_bonus(player, spell) + player.wizardry_bonus * 4
-	return int(float(power) * FaithSystem.spell_damage_mult(player))
+	# Magic mastery: category-wide bonus on top of school sub-skill scaling.
+	return int(float(power) * FaithSystem.spell_damage_mult(player) * player.magic_mastery_power_mult())
 
 
 static func _apply_element_bonus(spell: SpellData, target: Monster, dmg: int) -> int:

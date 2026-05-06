@@ -43,13 +43,13 @@ func _build_class_list() -> void:
 	for entry in CATEGORY_ORDER:
 		by_cat[entry["id"]] = []
 	for data in ClassRegistry.all:
-		if data.is_debug:
-			continue
 		if _show_advanced:
-			if data.is_starter:
+			# Advanced view hides starters AND debug classes
+			if data.is_starter or data.is_debug:
 				continue
 		else:
-			if not data.is_starter:
+			# Starter view shows starters + debug classes (archmage etc. for testing)
+			if not (data.is_starter or data.is_debug):
 				continue
 		var c: String = String(data.category)
 		if by_cat.has(c):

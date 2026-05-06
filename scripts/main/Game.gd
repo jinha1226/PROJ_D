@@ -460,7 +460,10 @@ func _apply_class_to_player(class_id: String) -> void:
 				player.skills[mapped_skill]["level"] = max(prev, lvl)
 				if not default_active.has(mapped_skill):
 					default_active.append(mapped_skill)
-	player.set_active_skills(_class_default_active_skills(class_id, default_active))
+	# Mastery model: new characters start with empty active_skills (action-routed
+	# XP). ClassData.default_active_skills is kept as UI-side recommendation only —
+	# do not apply it here. Players opt into manual mode via SkillsDialog.
+	player.set_active_skills([])
 	if data.starting_xl > 0:
 		player.xl = data.starting_xl
 	player.refresh_ac_from_equipment()
@@ -639,10 +642,9 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 		for _sid in ["armor", "shield"]:
 			if not player.active_skills.has(_sid):
 				player.active_skills.append(_sid)
-	if player.active_skills.is_empty():
-		player.set_active_skills(_class_default_active_skills(GameManager.selected_class_id, []))
-	else:
-		player.set_active_skills(player.active_skills)
+	# Empty is a valid state under the mastery model (action-routed mode).
+	# Re-run set_active_skills to filter out unknown ids and emit stats_changed.
+	player.set_active_skills(player.active_skills)
 	var saved_qs = data.get("quickslots", null)
 	if saved_qs is Array:
 		for i in range(min(int(saved_qs.size()), player.quickslots.size())):
@@ -2382,23 +2384,6 @@ func save_with_cache() -> void:
 	else:
 		_cache_current_floor()
 	SaveManager.save_run(player, GameManager)
-
-func _apply_branch_env_damage() -> void:
-	if player == null or player.hp <= 0:
-		return
-	var branch_id: String = GameManager.branch_zone
-	if branch_id == "":
-		return
-	var resistance: String = ZoneManager.branch_resistance(branch_id)
-	if resistance != "" and Status.resist_level(player.resists, resistance) >= 1:
-		return
-	var dmg: int = ZoneManager.branch_env_damage(branch_id, GameManager.branch_floor)
-	if dmg <= 0:
-		return
-	var element: String = ZoneManager.branch_env_element(branch_id)
-	CombatLog.damage_taken("The %s environment damages you for %d." \
-		% [ZoneManager.branch_config(branch_id).get("display_name", branch_id), dmg])
-	player.take_damage(dmg, element)
 
 func _on_dungeon_cleared() -> void:
 	CombatLog.post("You have cleared the dungeon!", Color(1.0, 0.9, 0.2))
