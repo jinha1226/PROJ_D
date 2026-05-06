@@ -75,7 +75,7 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 	header_row.add_child(name_col)
 
 	var name_lbl := Label.new()
-	name_lbl.text = data.display_name
+	name_lbl.text = data.loc_name()
 	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_TITLE)
 	name_lbl.add_theme_color_override("font_color", Color(0.95, 0.85, 0.55))
 	name_col.add_child(name_lbl)

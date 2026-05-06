@@ -191,10 +191,10 @@ func display_name_of(item_id: String) -> String:
 		return item_id
 	# Weapons / armor / gold are always recognisable.
 	if data.kind != "potion" and data.kind != "scroll" and data.kind != "book":
-		return data.display_name
+		return data.loc_name()
 	if is_identified(lookup_id):
-		return data.display_name
-	var raw: String = String(pseudonyms.get(lookup_id, data.display_name))
+		return data.loc_name()
+	var raw: String = String(pseudonyms.get(lookup_id, data.loc_name()))
 	# Expand the live-locale marker for unidentified potions.
 	if raw.begins_with("__potion_color__:"):
 		var color_file: String = raw.substr("__potion_color__:".length())

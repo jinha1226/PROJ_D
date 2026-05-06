@@ -45,3 +45,22 @@ func unlock_hint() -> String:
 		"use_item":
 			return "Use a %s to unlock." % unlock_trigger_id.replace("_", " ")
 	return "Locked."
+
+
+## Localized display name. Falls back to the .tres display_name if the
+## translation key isn't registered (graceful for new content not yet
+## translated). Key convention: RACE_NAME_<UPPER_ID>.
+func loc_name() -> String:
+	if id == "":
+		return display_name
+	var key: String = "RACE_NAME_" + id.to_upper()
+	var translated: String = TranslationServer.translate(key)
+	return translated if translated != key else display_name
+
+## Localized description. Same fallback contract as loc_name().
+func loc_description() -> String:
+	if id == '':
+		return description
+	var key: String = 'RACE_DESC_' + id.to_upper()
+	var translated: String = TranslationServer.translate(key)
+	return translated if translated != key else description

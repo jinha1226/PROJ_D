@@ -103,3 +103,645 @@ POTION_COLOR_YELLOW,yellow,노란
 ESSENCESELECT_TITLE,Faith Selection,신앙 선택
 ESSENCESELECT_PICK,Pick,선택
 
+CLASS_DESC_AIR_ELEMENTALIST,"Storm specialist. Shocks and chains lightning. Fragile body, high INT.","Storm specialist. Shocks and chains lightning. Fragile body, high INT."
+CLASS_DESC_ARCHMAGE,"Test character. Knows all spells, max skills, full stats.","Test character. Knows all spells, max skills, full stats."
+CLASS_DESC_ARTIFICER,Wand and tool specialist. Evokes magical items rather than casting raw spells.,Wand and tool specialist. Evokes magical items rather than casting raw spells.
+CLASS_DESC_BERSERKER,"Raging warrior. High HP, battle-axe, permanent passive +2 STR. Fights through pain.","Raging warrior. High HP, battle-axe, permanent passive +2 STR. Fights through pain."
+CLASS_DESC_BRIGAND,Sneaky dagger-wielder. Invis/blink/fog tools set up backstabs from unaware foes.,Sneaky dagger-wielder. Invis/blink/fog tools set up backstabs from unaware foes.
+CLASS_DESC_CONJURER,"Conjuration specialist. Controls space, fog and dimensional forces.","Conjuration specialist. Controls space, fog and dimensional forces."
+CLASS_DESC_EARTH_ELEMENTALIST,"Earth specialist. Stone shots and petrifying force. Sturdy body, high INT.","Earth specialist. Stone shots and petrifying force. Sturdy body, high INT."
+CLASS_DESC_ENCHANTER,"Enchantment specialist. Bends minds — sleep, fear and paralysis.","Enchantment specialist. Bends minds — sleep, fear and paralysis."
+CLASS_DESC_FIGHTER,Tough melee warrior. High STR and HP. Grows into any weapon style.,Tough melee warrior. High STR and HP. Grows into any weapon style.
+CLASS_DESC_FIRE_ELEMENTALIST,"Fire specialist. Hurls flame and explodes foes. Fragile body, high INT.","Fire specialist. Hurls flame and explodes foes. Fragile body, high INT."
+CLASS_DESC_GLADIATOR,Arena fighter. Polearm and shield. Trained for spectacle combat.,Arena fighter. Polearm and shield. Trained for spectacle combat.
+CLASS_DESC_HUNTER,"Agile archer. High DEX. Kites from range, falls back to blade up close.","Agile archer. High DEX. Kites from range, falls back to blade up close."
+CLASS_DESC_ICE_ELEMENTALIST,"Cold specialist. Freezes and slows foes. Fragile body, high INT.","Cold specialist. Freezes and slows foes. Fragile body, high INT."
+CLASS_DESC_MAGIC,Spellcasting starter. Dagger and robe. Find your school as you find books.,Spellcasting starter. Dagger and robe. Find your school as you find books.
+CLASS_DESC_MELEE,Close-combat starter. Sword and shield. Find your weapon style as you go.,Close-combat starter. Sword and shield. Find your weapon style as you go.
+CLASS_DESC_MONK,Unarmed master. No weapon needed. Trades equipment for body discipline.,Unarmed master. No weapon needed. Trades equipment for body discipline.
+CLASS_DESC_NECROMANCER,"Necromancy specialist. Drains life, weakens foes, walks among the dead.","Necromancy specialist. Drains life, weakens foes, walks among the dead."
+CLASS_DESC_RANGED,"Distance starter. Bow and dagger backup. Stay back, kite, and pivot to drops.","Distance starter. Bow and dagger backup. Stay back, kite, and pivot to drops."
+CLASS_DESC_SUMMONER,Calls creatures to fight. Wins through allies and battlefield pressure.,Calls creatures to fight. Wins through allies and battlefield pressure.
+CLASS_DESC_WANDERER,"Survivor. Mixed kit, no clear path. Builds emerge from what you find.","Survivor. Mixed kit, no clear path. Builds emerge from what you find."
+CLASS_DESC_WIZARD,General-purpose magic-user. Broad over deep — knows a little of every school.,General-purpose magic-user. Broad over deep — knows a little of every school.
+CLASS_NAME_AIR_ELEMENTALIST,Air Elementalist,대기 정령술사
+CLASS_NAME_ARCHMAGE,Archmage,대마법사
+CLASS_NAME_ARTIFICER,Artificer,장인
+CLASS_NAME_BERSERKER,Berserker,광전사
+CLASS_NAME_BRIGAND,Brigand,도적
+CLASS_NAME_CONJURER,Conjurer,환술사
+CLASS_NAME_EARTH_ELEMENTALIST,Earth Elementalist,대지 정령술사
+CLASS_NAME_ENCHANTER,Enchanter,주술사
+CLASS_NAME_FIGHTER,Fighter,전사
+CLASS_NAME_FIRE_ELEMENTALIST,Fire Elementalist,화염 정령술사
+CLASS_NAME_GLADIATOR,Gladiator,검투사
+CLASS_NAME_HUNTER,Hunter,사냥꾼
+CLASS_NAME_ICE_ELEMENTALIST,Ice Elementalist,냉기 정령술사
+CLASS_NAME_MAGIC,Magic,마법
+CLASS_NAME_MELEE,Melee,근접
+CLASS_NAME_MONK,Monk,수도승
+CLASS_NAME_NECROMANCER,Necromancer,강령술사
+CLASS_NAME_RANGED,Ranged,원거리
+CLASS_NAME_SUMMONER,Summoner,소환술사
+CLASS_NAME_WANDERER,Wanderer,방랑자
+CLASS_NAME_WIZARD,Wizard,마법사
+ITEM_DESC_AMULET_LIFE,"A survivor's charm from a harsher age. While worn, it steadies the body and grants +20 maximum HP.","A survivor's charm from a harsher age. While worn, it steadies the body and grants +20 maximum HP."
+ITEM_DESC_AMULET_MAGIC,"A cool blue pendant that hums with old formulae. While worn, it grants +8 maximum MP.","A cool blue pendant that hums with old formulae. While worn, it grants +8 maximum MP."
+ITEM_DESC_AMULET_STR,"A war charm once worn by front-line killers. While worn, it grants +3 Strength.","A war charm once worn by front-line killers. While worn, it grants +3 Strength."
+ITEM_DESC_ARMING_SWORD,"A serviceable one-handed blade, neither ornate nor humble. Requires Blade skill 2.","A serviceable one-handed blade, neither ornate nor humble. Requires Blade skill 2."
+ITEM_DESC_ASSASSIN_BLADE,A narrow killing blade made for gaps in armour and moments of certainty. Requires Blade skill 6.,A narrow killing blade made for gaps in armour and moments of certainty. Requires Blade skill 6.
+ITEM_DESC_BANDAGE,"Clean cloth and practised pressure can save a crawl. Treats wounds, clears injury, and restores your max recoverable HP.","Clean cloth and practised pressure can save a crawl. Treats wounds, clears injury, and restores your max recoverable HP."
+ITEM_DESC_BASTARD_SWORD,A hand-and-a-half sword for those who trust reach and leverage over elegance. Requires Blade skill 6.,A hand-and-a-half sword for those who trust reach and leverage over elegance. Requires Blade skill 6.
+ITEM_DESC_BATTLE_AXE,"A broad-bitted axe built to end shield walls and narrow corridors alike. Heavy, slow, and brutally convincing.","A broad-bitted axe built to end shield walls and narrow corridors alike. Heavy, slow, and brutally convincing."
+ITEM_DESC_BOMB,A clay shell packed with unstable fire. It bursts on impact and is best used where the blast can catch more than one foe.,A clay shell packed with unstable fire. It bursts on impact and is best used where the blast can catch more than one foe.
+ITEM_DESC_BOOK_ABJURATION,A later-age abridgement of warding formulae. Study it to unlock protective and dismissive magic as your skill grows.,A later-age abridgement of warding formulae. Study it to unlock protective and dismissive magic as your skill grows.
+ITEM_DESC_BOOK_AIR,"A weather-eaten grimoire of winds, sparks, and sudden violence. Study it to unlock the Air school.","A weather-eaten grimoire of winds, sparks, and sudden violence. Study it to unlock the Air school."
+ITEM_DESC_BOOK_COLD,The pages are stiff with rime. Study it to unlock the Cold school.,The pages are stiff with rime. Study it to unlock the Cold school.
+ITEM_DESC_BOOK_CONJURATION,A practical manual of shaped force and disciplined destruction. Study it to unlock the full school of Conjuration.,A practical manual of shaped force and disciplined destruction. Study it to unlock the full school of Conjuration.
+ITEM_DESC_BOOK_EARTH,Stone dust still clings to the binding. Study it to unlock the Earth school.,Stone dust still clings to the binding. Study it to unlock the Earth school.
+ITEM_DESC_BOOK_ENCHANTMENT,"A patient treatise on influence, binding, and subtle domination. Study it to unlock the full school of Enchantment.","A patient treatise on influence, binding, and subtle domination. Study it to unlock the full school of Enchantment."
+ITEM_DESC_BOOK_EVOCATION,"Collected notes on devices, charges, and will imposed through crafted power. Study it to unlock the full school of Evocation.","Collected notes on devices, charges, and will imposed through crafted power. Study it to unlock the full school of Evocation."
+ITEM_DESC_BOOK_FIRE,The margins are singed and the ink smells faintly of lamp oil. Study it to unlock the Fire school.,The margins are singed and the ink smells faintly of lamp oil. Study it to unlock the Fire school.
+ITEM_DESC_BOOK_HEXES,"A slim black volume on frailty, fear, and the art of making enemies worse. Study it to unlock the Hexes school.","A slim black volume on frailty, fear, and the art of making enemies worse. Study it to unlock the Hexes school."
+ITEM_DESC_BOOK_NECROMANCY,Its script grows clearer the longer you stare at it. Study it to unlock the Necromancy school.,Its script grows clearer the longer you stare at it. Study it to unlock the Necromancy school.
+ITEM_DESC_BOOK_SUMMONING,"A catalogue of names, bargains, and doors best opened carefully. Study it to unlock the Summoning school.","A catalogue of names, bargains, and doors best opened carefully. Study it to unlock the Summoning school."
+ITEM_DESC_BOOK_TRANSLOCATION,A traveler would call it impossible; a mage would call it merely expensive. Study it to unlock the Translocation school.,A traveler would call it impossible; a mage would call it merely expensive. Study it to unlock the Translocation school.
+ITEM_DESC_BOOK_TRANSMUTATION,"A physician, a sculptor, and a heretic could all read this differently. Study it to unlock the full school of Transmutation.","A physician, a sculptor, and a heretic could all read this differently. Study it to unlock the full school of Transmutation."
+ITEM_DESC_BUCKLER,A small shield meant for fast hands and changing angles. Grants a modest block chance with no EV penalty.,A small shield meant for fast hands and changing angles. Grants a modest block chance with no EV penalty.
+ITEM_DESC_CHAIN_MAIL,"Linked rings that turn glancing blows and punish poor footwork. Solid AC, but it asks something from your evasion.","Linked rings that turn glancing blows and punish poor footwork. Solid AC, but it asks something from your evasion."
+ITEM_DESC_CROSSBOW,"A brutal mechanical bow that cares little for grace. Slow to load, severe on impact, and apt to punch through armour.","A brutal mechanical bow that cares little for grace. Slow to load, severe on impact, and apt to punch through armour."
+ITEM_DESC_DAGGER,"A short blade for close work, quick decisions, and quicker hands. Favours DEX and precision over force.","A short blade for close work, quick decisions, and quicker hands. Favours DEX and precision over force."
+ITEM_DESC_DIRK,"Longer and sturdier than a common dagger, but no less intimate. Requires Dagger skill 4.","Longer and sturdier than a common dagger, but no less intimate. Requires Dagger skill 4."
+ITEM_DESC_ESSENCE_SHARD,A crystallized fragment of monster-remnant power. It must be attuned before its nature can be made useful.,A crystallized fragment of monster-remnant power. It must be attuned before its nature can be made useful.
+ITEM_DESC_ESSENCE_UNDEATH,A shard of grave-cold instinct. It hardens you against necromancy and lets your melee blows leech life from the living.,A shard of grave-cold instinct. It hardens you against necromancy and lets your melee blows leech life from the living.
+ITEM_DESC_FLAMING_SWORD,A blade branded with disciplined flame. Its edge burns on contact and leaves fire where steel alone would not suffice.,A blade branded with disciplined flame. Its edge burns on contact and leaves fire where steel alone would not suffice.
+ITEM_DESC_FROST_DAGGER,Rimed steel that bites cold before it bites flesh. It deals extra cold damage and may freeze a wavering foe in place.,Rimed steel that bites cold before it bites flesh. It deals extra cold damage and may freeze a wavering foe in place.
+ITEM_DESC_GOLD_PILE,"Coins, cut edges, and old emblems from kingdoms that did not last. Spend it in safety, or count it when the run is over.","Coins, cut edges, and old emblems from kingdoms that did not last. Spend it in safety, or count it when the run is over."
+ITEM_DESC_GREAT_BLADE,A grand two-handed sword that makes a statement every time it is drawn. Requires Blade skill 8.,A grand two-handed sword that makes a statement every time it is drawn. Requires Blade skill 8.
+ITEM_DESC_JAVELIN,A heavy throwing spear balanced for one committed cast. Best saved for targets worth the throw.,A heavy throwing spear balanced for one committed cast. Best saved for targets worth the throw.
+ITEM_DESC_KITE_SHIELD,"A broad shield that turns more than it dodges. Better block, better AC, and enough weight to trouble the unwary.","A broad shield that turns more than it dodges. Better block, better AC, and enough weight to trouble the unwary."
+ITEM_DESC_LEATHER_ARMOR,Hardened hide stitched for travelers who expect trouble but still intend to move.,Hardened hide stitched for travelers who expect trouble but still intend to move.
+ITEM_DESC_LONGBOW,"A war bow for strong backs and patient shots. Slower than a shortbow, but far harsher when it lands.","A war bow for strong backs and patient shots. Slower than a shortbow, but far harsher when it lands."
+ITEM_DESC_LONG_SWORD,"The dependable middle road of steel: long enough to matter, simple enough to trust.","The dependable middle road of steel: long enough to matter, simple enough to trust."
+ITEM_DESC_MACE,"A blunt answer to creatures that respect neither cuts nor ceremony. Slower than a blade, but honest in its damage.","A blunt answer to creatures that respect neither cuts nor ceremony. Slower than a blade, but honest in its damage."
+ITEM_DESC_PLATE_MAIL,"Full plate from an age that expected sieges. Superb protection, but it taxes movement and punishes untrained spellcasting.","Full plate from an age that expected sieges. Superb protection, but it taxes movement and punishes untrained spellcasting."
+ITEM_DESC_POISON_FLASK,A stoppered glass bottle of venom and intent. It shatters into a brief advantage against the unprotected.,A stoppered glass bottle of venom and intent. It shatters into a brief advantage against the unprotected.
+ITEM_DESC_POTION_AGILITY,"Thin, bright, and unsettlingly clear. Permanently increases Dexterity by 1.","Thin, bright, and unsettlingly clear. Permanently increases Dexterity by 1."
+ITEM_DESC_POTION_BERSERK,A red surge that turns fear into appetite. Grants a brief rage and should not be trusted near an empty life bar.,A red surge that turns fear into appetite. Grants a brief rage and should not be trusted near an empty life bar.
+ITEM_DESC_POTION_BRILLIANCE,A cool draught that sharpens thought into spellcraft. Permanently increases Intelligence by 1.,A cool draught that sharpens thought into spellcraft. Permanently increases Intelligence by 1.
+ITEM_DESC_POTION_CANCELLATION,"Flat and bitter, but invaluable. It strips away hostile enchantments and worsening conditions alike.","Flat and bitter, but invaluable. It strips away hostile enchantments and worsening conditions alike."
+ITEM_DESC_POTION_CURE_POISON,"Simple, clean, and always worth carrying. It purges poison before venom can become a plan.","Simple, clean, and always worth carrying. It purges poison before venom can become a plan."
+ITEM_DESC_POTION_EXPERIENCE,"A draught of stolen understanding. Use it when one level, one spell, or one threshold would change the crawl.","A draught of stolen understanding. Use it when one level, one spell, or one threshold would change the crawl."
+ITEM_DESC_POTION_HASTE,Time contracts around the drinker. A priceless answer to fights that are about to become unfair.,Time contracts around the drinker. A priceless answer to fights that are about to become unfair.
+ITEM_DESC_POTION_HEALING,The classic mercy of the dungeon. It restores health immediately and rarely grows better with waiting.,The classic mercy of the dungeon. It restores health immediately and rarely grows better with waiting.
+ITEM_DESC_POTION_INVISIBLE,"Sight slips past you for a while. Useful for escape, setup, and every plan that prefers not to be seen.","Sight slips past you for a while. Useful for escape, setup, and every plan that prefers not to be seen."
+ITEM_DESC_POTION_MAGIC,A reserve of thought and power in liquid form. Best spent when one more spell still matters.,A reserve of thought and power in liquid form. Best spent when one more spell still matters.
+ITEM_DESC_POTION_MIGHT,"Thick, iron-tasting, and direct. Permanently increases Strength by 2.","Thick, iron-tasting, and direct. Permanently increases Strength by 2."
+ITEM_DESC_POTION_RESISTANCE,"For a brief while the elements feel distant and negotiable. Grants resistance to fire, cold, and poison.","For a brief while the elements feel distant and negotiable. Grants resistance to fire, cold, and poison."
+ITEM_DESC_QUICK_BLADE,Almost weightless in the hand and dangerous in the right one. Requires Dagger skill 8.,Almost weightless in the hand and dangerous in the right one. Requires Dagger skill 8.
+ITEM_DESC_RING_BOG,"A murky signet that stinks faintly of reeds and rot. It grants poison immunity, +2 AC, and a little life on each kill.","A murky signet that stinks faintly of reeds and rot. It grants poison immunity, +2 AC, and a little life on each kill."
+ITEM_DESC_RING_COLD_RESIST,A chill stone set in a plain band. It grants cold immunity while worn.,A chill stone set in a plain band. It grants cold immunity while worn.
+ITEM_DESC_RING_DEX,A slender ring for careful hands. It grants +2 Dexterity and +1 EV while worn.,A slender ring for careful hands. It grants +2 Dexterity and +1 EV while worn.
+ITEM_DESC_RING_EMBER,A warm band that never cools. It grants fire immunity and lends your melee strikes a chance to ignite.,A warm band that never cools. It grants fire immunity and lends your melee strikes a chance to ignite.
+ITEM_DESC_RING_FIRE_RESIST,A ruby ring meant for hotter places than sanity recommends. It grants fire immunity while worn.,A ruby ring meant for hotter places than sanity recommends. It grants fire immunity while worn.
+ITEM_DESC_RING_GLACIER,"A pale ring that gathers frost around the knuckle. It grants cold immunity, +3 EV, and a chance to freeze on hit.","A pale ring that gathers frost around the knuckle. It grants cold immunity, +3 EV, and a chance to freeze on hit."
+ITEM_DESC_RING_INT,An austere ring prized by scholars and dangerous people alike. It grants +2 Intelligence while worn.,An austere ring prized by scholars and dangerous people alike. It grants +2 Intelligence while worn.
+ITEM_DESC_RING_MAIL,A practical band worked in the likeness of linked steel. It offers respectable protection with little magical fuss.,A practical band worked in the likeness of linked steel. It offers respectable protection with little magical fuss.
+ITEM_DESC_RING_NECRO_RESIST,A blackened ring that deadens hostile gravecraft. It grants necromantic immunity while worn.,A blackened ring that deadens hostile gravecraft. It grants necromantic immunity while worn.
+ITEM_DESC_RING_POISON_RESIST,"An emerald ring favoured by delvers who expect fangs, fumes, and bad air. It grants poison immunity while worn.","An emerald ring favoured by delvers who expect fangs, fumes, and bad air. It grants poison immunity while worn."
+ITEM_DESC_RING_PROTECTION,A plain ring with an expensive secret. It grants +3 AC while worn.,A plain ring with an expensive secret. It grants +3 AC while worn.
+ITEM_DESC_RING_SLAYING,"A bright ring cut with old victory marks. While worn, it lends +3 slaying to your attacks.","A bright ring cut with old victory marks. While worn, it lends +3 slaying to your attacks."
+ITEM_DESC_RING_STR,A thick ring cast for warriors who prefer certainty. It grants +2 Strength while worn.,A thick ring cast for warriors who prefer certainty. It grants +2 Strength while worn.
+ITEM_DESC_RING_UNDEATH,A pale ring cold as a crypt door. It grants necromantic immunity and restores 3 HP on kill.,A pale ring cold as a crypt door. It grants necromantic immunity and restores 3 HP on kill.
+ITEM_DESC_RING_WIZARDRY,"A pale ring that hums with remembered formulae. While worn, it eases difficult spellwork.","A pale ring that hums with remembered formulae. While worn, it eases difficult spellwork."
+ITEM_DESC_ROBE,"A simple robe with room enough for movement and thought. Little protection, no EV penalty, and a slight sympathy for spell power.","A simple robe with room enough for movement and thought. Little protection, no EV penalty, and a slight sympathy for spell power."
+ITEM_DESC_ROUND_SHIELD,A middle path between buckler and tower. It blocks more reliably than a buckler without fully becoming a burden.,A middle path between buckler and tower. It blocks more reliably than a buckler without fully becoming a burden.
+ITEM_DESC_RUNE_CRYPT,A blackened rune from the silent halls below. Proof that the Crypt did not keep you.,A blackened rune from the silent halls below. Proof that the Crypt did not keep you.
+ITEM_DESC_RUNE_ICE,A rune preserved in impossible cold. Proof that the Ice Caves broke before you did.,A rune preserved in impossible cold. Proof that the Ice Caves broke before you did.
+ITEM_DESC_RUNE_INFERNAL,"A rune marked by flame and old bargains. Proof that the Infernal was survivable, however briefly.","A rune marked by flame and old bargains. Proof that the Infernal was survivable, however briefly."
+ITEM_DESC_RUNE_SWAMP,A swamp rune slick with old water and older things. Proof that the marsh has one less claimant.,A swamp rune slick with old water and older things. Proof that the marsh has one less claimant.
+ITEM_DESC_SCALE_MAIL,Overlapping metal scales that value surviving over elegance. Reliable protection with a noticeable cost to spell ease.,Overlapping metal scales that value surviving over elegance. Reliable protection with a noticeable cost to spell ease.
+ITEM_DESC_SCROLL_BLINKING,A disciplined little miracle. It shifts you a short distance instantly and often turns disaster into a recoverable mistake.,A disciplined little miracle. It shifts you a short distance instantly and often turns disaster into a recoverable mistake.
+ITEM_DESC_SCROLL_BRAND,A scroll that teaches steel a new cruelty. Best used on a weapon worth keeping.,A scroll that teaches steel a new cruelty. Best used on a weapon worth keeping.
+ITEM_DESC_SCROLL_BRAND_ACID,A corrosive inscription. On weapons it strips enemy armour; on armour it punishes those who strike you.,A corrosive inscription. On weapons it strips enemy armour; on armour it punishes those who strike you.
+ITEM_DESC_SCROLL_BRAND_DRAIN,A hungry script that stains steel with necromantic appetite. Melee hits drain life and weaken what survives them.,A hungry script that stains steel with necromantic appetite. Melee hits drain life and weaken what survives them.
+ITEM_DESC_SCROLL_BRAND_FLAMING,A warm scroll whose writing curls at the edges. It brands a weapon with fire.,A warm scroll whose writing curls at the edges. It brands a weapon with fire.
+ITEM_DESC_SCROLL_BRAND_FREEZING,A pale scroll that leaves frost on the fingertips. It brands a weapon with cold.,A pale scroll that leaves frost on the fingertips. It brands a weapon with cold.
+ITEM_DESC_SCROLL_BRAND_VENOM,The script smells faintly medicinal and deeply untrustworthy. It brands a weapon with venom.,The script smells faintly medicinal and deeply untrustworthy. It brands a weapon with venom.
+ITEM_DESC_SCROLL_ENCHANT_ARMOR,An old improvement formula for those who intend to keep breathing. It raises the quality of your armour by 1.,An old improvement formula for those who intend to keep breathing. It raises the quality of your armour by 1.
+ITEM_DESC_SCROLL_ENCHANT_WEAPON,A tried and dangerous promise to better steel. It improves your current weapon by 1.,A tried and dangerous promise to better steel. It improves your current weapon by 1.
+ITEM_DESC_SCROLL_FEAR,"A sharp little sermon on mortality. Nearby enemies flee for a short while, which is often enough.","A sharp little sermon on mortality. Nearby enemies flee for a short while, which is often enough."
+ITEM_DESC_SCROLL_FOG,"The letters blur as you read them, and then so does everything else. Fills the area with obscuring fog.","The letters blur as you read them, and then so does everything else. Fills the area with obscuring fog."
+ITEM_DESC_SCROLL_IDENTIFY,"Knowledge first, greed later. It reveals the true nature of an unknown item.","Knowledge first, greed later. It reveals the true nature of an unknown item."
+ITEM_DESC_SCROLL_IMMOLATION,A disastrous idea made portable. It sets nearby enemies up for fire and chain reactions.,A disastrous idea made portable. It sets nearby enemies up for fire and chain reactions.
+ITEM_DESC_SCROLL_MAGIC_MAPPING,A cartographer's cheat and a delver's relief. It reveals the floor layout.,A cartographer's cheat and a delver's relief. It reveals the floor layout.
+ITEM_DESC_SCROLL_NOISE,A truly unhelpful piece of parchment. It makes a great deal of sound and improves nothing.,A truly unhelpful piece of parchment. It makes a great deal of sound and improves nothing.
+ITEM_DESC_SCROLL_SHROUDING,A dim script of soft edges and missed glances. It wraps you in a veil that makes distant enemies slower to notice you.,A dim script of soft edges and missed glances. It wraps you in a veil that makes distant enemies slower to notice you.
+ITEM_DESC_SCROLL_SILENCE,The words go dead in the mouth. It suppresses spellcasting and other noisy miracles nearby.,The words go dead in the mouth. It suppresses spellcasting and other noisy miracles nearby.
+ITEM_DESC_SCROLL_TELEPORT,"A desperate classic. It hurls you elsewhere on the level, which is often better than here.","A desperate classic. It hurls you elsewhere on the level, which is often better than here."
+ITEM_DESC_SCROLL_UPGRADE,"A rarer, blunter improvement than a mere enchantment. It permanently upgrades a weapon or armour by +1.","A rarer, blunter improvement than a mere enchantment. It permanently upgrades a weapon or armour by +1."
+ITEM_DESC_SHOCK_MACE,A mace alive with bottled storm. It deals extra electric damage and bites harder against wet targets.,A mace alive with bottled storm. It deals extra electric damage and bites harder against wet targets.
+ITEM_DESC_SHORTBOW,"A light bow suited to quick shots and practical fights. Fast, moderate, and rarely spectacular.","A light bow suited to quick shots and practical fights. Fast, moderate, and rarely spectacular."
+ITEM_DESC_SHORT_SWORD,"A compact blade for close work and fast recoveries. Easy to use, easy to trust.","A compact blade for close work and fast recoveries. Easy to use, easy to trust."
+ITEM_DESC_SMOKE_BOMB,A thief's mercy and a coward's wisdom. It breaks line of sight and buys room to reposition.,A thief's mercy and a coward's wisdom. It breaks line of sight and buys room to reposition.
+ITEM_DESC_SPEAR,A thrusting weapon with honest reach. It lets you fight from one tile farther away than most enemies would like.,A thrusting weapon with honest reach. It lets you fight from one tile farther away than most enemies would like.
+ITEM_DESC_STAFF,"A mage's fallback, walking stick, and punctuation mark. It scales with INT and Spellcasting when steel is no longer the answer.","A mage's fallback, walking stick, and punctuation mark. It scales with INT and Spellcasting when steel is no longer the answer."
+ITEM_DESC_STILETTO,A thin dagger built to find seams in both armour and confidence. Requires Dagger skill 2.,A thin dagger built to find seams in both armour and confidence. Requires Dagger skill 2.
+ITEM_DESC_THROWING_KNIFE,"A balanced blade meant to be spent at the right moment. Fast, practical, and best for finishing work.","A balanced blade meant to be spent at the right moment. Fast, practical, and best for finishing work."
+ITEM_DESC_TOWER_SHIELD,"A wall with a handle. Heavy, effective, and happiest in the hands of someone willing to commit to it.","A wall with a handle. Heavy, effective, and happiest in the hands of someone willing to commit to it."
+ITEM_DESC_TROLL_LEATHER,Cured troll hide with a little of its original stubbornness left in it. Decent protection and improved natural recovery.,Cured troll hide with a little of its original stubbornness left in it. Decent protection and improved natural recovery.
+ITEM_DESC_VENOM_DAGGER,An envenomed blade for those who prefer their victories to worsen over time. It deals extra poison damage and poisons on hit.,An envenomed blade for those who prefer their victories to worsen over time. It deals extra poison damage and poisons on hit.
+ITEM_DESC_WAND_DIGGING,A miner's miracle and an escaper's delight. It opens walls into routes that did not exist a moment ago.,A miner's miracle and an escaper's delight. It opens walls into routes that did not exist a moment ago.
+ITEM_DESC_WAND_FEAR,A wand that persuades courage to leave first. It forces a target to flee.,A wand that persuades courage to leave first. It forces a target to flee.
+ITEM_DESC_WAND_FIRE,A practical instrument of heat and panic. Excellent for ending softer threats before they reach you.,A practical instrument of heat and panic. Excellent for ending softer threats before they reach you.
+ITEM_DESC_WAND_FROST,A focused lance of cold that doubles as control. It slows as often as it harms.,A focused lance of cold that doubles as control. It slows as often as it harms.
+ITEM_DESC_WAND_HASTE,Stored urgency in a narrow rod. Use it before the fight becomes honest.,Stored urgency in a narrow rod. Use it before the fight becomes honest.
+ITEM_DESC_WAND_LIGHTNING,A direct argument in blue-white form. Best spent when immediate impact matters more than efficiency.,A direct argument in blue-white form. Best spent when immediate impact matters more than efficiency.
+ITEM_DESC_WAND_TELEPORT,A wand for making problems become someone else's geography. It teleports a target to a random location.,A wand for making problems become someone else's geography. It teleports a target to a random location.
+ITEM_NAME_AMULET_LIFE,목걸이 of Life,생명의 목걸이
+ITEM_NAME_AMULET_MAGIC,목걸이 of the Archmage,대마법사의 목걸이
+ITEM_NAME_AMULET_STR,목걸이 of Might,힘의 목걸이
+ITEM_NAME_ARMING_SWORD,arming sword,양손검
+ITEM_NAME_ASSASSIN_BLADE,assassin's blade,암살자의 검
+ITEM_NAME_BANDAGE,bandage,붕대
+ITEM_NAME_BASTARD_SWORD,bastard sword,바스타드 소드
+ITEM_NAME_BATTLE_AXE,battle axe,전투 도끼
+ITEM_NAME_BOMB,bomb,폭탄
+ITEM_NAME_BOOK_ABJURATION,tome of abjuration,방호 마법서
+ITEM_NAME_BOOK_AIR,tome of Air,대기 마법서
+ITEM_NAME_BOOK_COLD,tome of Cold,냉기 마법서
+ITEM_NAME_BOOK_CONJURATION,tome of conjuration,환술 마법서
+ITEM_NAME_BOOK_EARTH,tome of Earth,대지 마법서
+ITEM_NAME_BOOK_ENCHANTMENT,tome of enchantment,주술 마법서
+ITEM_NAME_BOOK_EVOCATION,tome of evocation,환기 마법서
+ITEM_NAME_BOOK_FIRE,tome of Fire,화염 마법서
+ITEM_NAME_BOOK_HEXES,tome of Hexes,저주 마법서
+ITEM_NAME_BOOK_NECROMANCY,tome of Necromancy,강령 마법서
+ITEM_NAME_BOOK_SUMMONING,tome of Summoning,소환 마법서
+ITEM_NAME_BOOK_TRANSLOCATION,tome of Translocation,이동 마법서
+ITEM_NAME_BOOK_TRANSMUTATION,tome of transmutation,변성 마법서
+ITEM_NAME_BUCKLER,버클러,버클러
+ITEM_NAME_CHAIN_MAIL,chain mail,체인메일
+ITEM_NAME_CROSSBOW,crossbow,쇠뇌
+ITEM_NAME_DAGGER,dagger,단검
+ITEM_NAME_DIRK,dirk,단검
+ITEM_NAME_ESSENCE_SHARD,Essence,정수
+ITEM_NAME_ESSENCE_UNDEATH,Essence of Undeath,죽음의 정수
+ITEM_NAME_FLAMING_SWORD,flaming short sword,화염 단검
+ITEM_NAME_FROST_DAGGER,frost dagger,서리 단검
+ITEM_NAME_GOLD_PILE,gold,금화
+ITEM_NAME_GREAT_BLADE,great blade,대검
+ITEM_NAME_JAVELIN,javelin,투창
+ITEM_NAME_KITE_SHIELD,kite shield,카이트 실드
+ITEM_NAME_LEATHER_ARMOR,leather armor,가죽 갑옷
+ITEM_NAME_LONGBOW,longbow,장궁
+ITEM_NAME_LONG_SWORD,long sword,장검
+ITEM_NAME_MACE,mace,철퇴
+ITEM_NAME_PLATE_MAIL,plate mail,판금 갑옷
+ITEM_NAME_POISON_FLASK,poison flask,독 플라스크
+ITEM_NAME_POTION_AGILITY,potion of agility,민첩 포션
+ITEM_NAME_POTION_BERSERK,potion of berserk rage,광폭 포션
+ITEM_NAME_POTION_BRILLIANCE,potion of brilliance,지능 포션
+ITEM_NAME_POTION_CANCELLATION,potion of cancellation,취소 포션
+ITEM_NAME_POTION_CURE_POISON,potion of curing,해독 포션
+ITEM_NAME_POTION_EXPERIENCE,potion of experience,경험 포션
+ITEM_NAME_POTION_HASTE,potion of haste,가속 포션
+ITEM_NAME_POTION_HEALING,potion of healing,치유 포션
+ITEM_NAME_POTION_INVISIBLE,potion of invisibility,투명 포션
+ITEM_NAME_POTION_MAGIC,potion of magic,마나 포션
+ITEM_NAME_POTION_MIGHT,potion of might,강화 포션
+ITEM_NAME_POTION_RESISTANCE,potion of resistance,저항 포션
+ITEM_NAME_QUICK_BLADE,quick blade,쾌검
+ITEM_NAME_RING_BOG,Ring of the Bog,늪의 반지
+ITEM_NAME_RING_COLD_RESIST,Ring of Cold Resistance,냉기 저항의 반지
+ITEM_NAME_RING_DEX,반지 of Swiftness,민첩의 반지
+ITEM_NAME_RING_EMBER,Ring of Embers,잿불의 반지
+ITEM_NAME_RING_FIRE_RESIST,Ring of Fire Resistance,화염 저항의 반지
+ITEM_NAME_RING_GLACIER,Ring of the Glacier,빙하의 반지
+ITEM_NAME_RING_INT,반지 of Wizardry,지혜의 반지
+ITEM_NAME_RING_MAIL,ring mail,사슬 갑옷
+ITEM_NAME_RING_NECRO_RESIST,Ring of Necromantic Warding,사령 저항의 반지
+ITEM_NAME_RING_POISON_RESIST,Ring of Poison Resistance,독 저항의 반지
+ITEM_NAME_RING_PROTECTION,반지 of Protection,보호의 반지
+ITEM_NAME_RING_SLAYING,Ring of Slaying,처단의 반지
+ITEM_NAME_RING_STR,반지 of Might,힘의 반지
+ITEM_NAME_RING_UNDEATH,Ring of Undeath,죽음의 반지
+ITEM_NAME_RING_WIZARDRY,Ring of Wizardry,마법사의 반지
+ITEM_NAME_ROBE,robe,로브
+ITEM_NAME_ROUND_SHIELD,원형 방패,원형 방패
+ITEM_NAME_RUNE_CRYPT,Crypt Rune,지하묘소의 룬
+ITEM_NAME_RUNE_ICE,Ice Rune,얼음의 룬
+ITEM_NAME_RUNE_INFERNAL,Infernal Rune,지옥의 룬
+ITEM_NAME_RUNE_SWAMP,Swamp Rune,늪의 룬
+ITEM_NAME_SCALE_MAIL,scale mail,비늘 갑옷
+ITEM_NAME_SCROLL_BLINKING,scroll of blinking,순간이동 두루마리
+ITEM_NAME_SCROLL_BRAND,scroll of brand,브랜드 두루마리
+ITEM_NAME_SCROLL_BRAND_ACID,scroll of acid brand,산성 브랜드 두루마리
+ITEM_NAME_SCROLL_BRAND_DRAIN,scroll of drain branding,흡수 브랜드 두루마리
+ITEM_NAME_SCROLL_BRAND_FLAMING,scroll of flaming brand,화염 브랜드 두루마리
+ITEM_NAME_SCROLL_BRAND_FREEZING,scroll of freezing brand,냉기 브랜드 두루마리
+ITEM_NAME_SCROLL_BRAND_VENOM,scroll of venom brand,독 브랜드 두루마리
+ITEM_NAME_SCROLL_ENCHANT_ARMOR,scroll of enchant armor,방어구 강화 두루마리
+ITEM_NAME_SCROLL_ENCHANT_WEAPON,scroll of enchant weapon,무기 강화 두루마리
+ITEM_NAME_SCROLL_FEAR,scroll of fear,공포 두루마리
+ITEM_NAME_SCROLL_FOG,scroll of fog,안개 두루마리
+ITEM_NAME_SCROLL_IDENTIFY,scroll of identify,감정 두루마리
+ITEM_NAME_SCROLL_IMMOLATION,scroll of immolation,분신 두루마리
+ITEM_NAME_SCROLL_MAGIC_MAPPING,scroll of magic mapping,지도 두루마리
+ITEM_NAME_SCROLL_NOISE,scroll of noise,소음 두루마리
+ITEM_NAME_SCROLL_SHROUDING,scroll of shrouding,은폐 두루마리
+ITEM_NAME_SCROLL_SILENCE,scroll of silence,침묵 두루마리
+ITEM_NAME_SCROLL_TELEPORT,scroll of teleport,원거리 순간이동 두루마리
+ITEM_NAME_SCROLL_UPGRADE,scroll of upgrade,업그레이드 두루마리
+ITEM_NAME_SHOCK_MACE,electric mace,전격 철퇴
+ITEM_NAME_SHORTBOW,shortbow,단궁
+ITEM_NAME_SHORT_SWORD,short sword,단검
+ITEM_NAME_SMOKE_BOMB,smoke bomb,연막탄
+ITEM_NAME_SPEAR,spear,창
+ITEM_NAME_STAFF,staff,지팡이
+ITEM_NAME_STILETTO,stiletto,스틸레토
+ITEM_NAME_THROWING_KNIFE,throwing knife,투척 단검
+ITEM_NAME_TOWER_SHIELD,타워 실드,타워 실드
+ITEM_NAME_TROLL_LEATHER,troll leather armour,트롤 가죽 갑옷
+ITEM_NAME_VENOM_DAGGER,venomed dagger,독 단검
+ITEM_NAME_WAND_DIGGING,wand of digging,굴착 막대
+ITEM_NAME_WAND_FEAR,wand of fear,공포 막대
+ITEM_NAME_WAND_FIRE,wand of fire,화염 막대
+ITEM_NAME_WAND_FROST,wand of frost,서리 막대
+ITEM_NAME_WAND_HASTE,wand of haste,가속 막대
+ITEM_NAME_WAND_LIGHTNING,wand of lightning,번개 막대
+ITEM_NAME_WAND_TELEPORT,wand of teleportation,순간이동 막대
+MONSTER_DESC_ABYSSAL_SOVEREIGN,The sovereign of the Abyss. Its very presence warps reality. Defeat it to escape the dungeon.,The sovereign of the Abyss. Its very presence warps reality. Defeat it to escape the dungeon.
+MONSTER_DESC_ADDER,A quick snake with venom in every bite. Poison resistance makes these far less frightening.,A quick snake with venom in every bite. Poison resistance makes these far less frightening.
+MONSTER_DESC_ANCIENT_LICH,An ancient sorcerer who has transcended death. Commands the crypt with absolute authority.,An ancient sorcerer who has transcended death. Commands the crypt with absolute authority.
+MONSTER_DESC_ASHEN_MAGPIE,"A sly scavenger touched by cinder and greed. Quick hands, quick feet, and a tendency to turn small mistakes into losses. Do not underestimate a foe that survives by picking the field clean.","A sly scavenger touched by cinder and greed. Quick hands, quick feet, and a tendency to turn small mistakes into losses. Do not underestimate a foe that survives by picking the field clean."
+MONSTER_DESC_BALRUG,A towering fire demon of enormous power. Fire resistance is not optional — it is the minimum.,A towering fire demon of enormous power. Fire resistance is not optional — it is the minimum.
+MONSTER_DESC_BASILISK,A reptile whose gaze can slow and petrify. Do not stand still — movement breaks most of its advantage.,A reptile whose gaze can slow and petrify. Do not stand still — movement breaks most of its advantage.
+MONSTER_DESC_BAT,"Fast, evasive, and annoying to pin down. Weak on its own, but good at wasting your time and position.","Fast, evasive, and annoying to pin down. Weak on its own, but good at wasting your time and position."
+MONSTER_DESC_BLACK_BEAR,"A large predator that hits surprisingly hard. Straightforward to fight, but do not underestimate the opening blows.","A large predator that hits surprisingly hard. Straightforward to fight, but do not underestimate the opening blows."
+MONSTER_DESC_BLOOD_DUKE,"A noble predator that treats battle as harvest. The longer its enemies fall, the stronger its presence feels. Winning quickly is safer than trying to outlast it.","A noble predator that treats battle as harvest. The longer its enemies fall, the stronger its presence feels. Winning quickly is safer than trying to outlast it."
+MONSTER_DESC_BOG_SERPENT,An enormous serpent saturated with swamp venom. Its scales drip poison.,An enormous serpent saturated with swamp venom. Its scales drip poison.
+MONSTER_DESC_BONE_DRAGON,"A massive undead dragon cold-resistant and tireless. Expect a long, grinding fight.","A massive undead dragon cold-resistant and tireless. Expect a long, grinding fight."
+MONSTER_DESC_CENTAUR,A horse-bodied archer that punishes flat movement. Closing the gap quickly is the best answer.,A horse-bodied archer that punishes flat movement. Closing the gap quickly is the best answer.
+MONSTER_DESC_CRIMSON_IMP,A small fire-resistant demon with a nasty bite. Fast and difficult to corner.,A small fire-resistant demon with a nasty bite. Fast and difficult to corner.
+MONSTER_DESC_CRYPT_ZOMBIE,A shambling corpse animated by dark magic. Slow but relentless.,A shambling corpse animated by dark magic. Slow but relentless.
+MONSTER_DESC_CYCLOPS,A single-eyed giant who throws rocks from a distance. It hurts even from afar.,A single-eyed giant who throws rocks from a distance. It hurts even from afar.
+MONSTER_DESC_DEEP_ELF_ARCHER,"A disciplined ranged attacker. Fragile up close, but dangerous if allowed to keep distance.","A disciplined ranged attacker. Fragile up close, but dangerous if allowed to keep distance."
+MONSTER_DESC_DEEP_ELF_DEATH_MAGE,An elven necromancer who fields undead and necrotic spells. Kill it before the room fills with its minions.,An elven necromancer who fields undead and necrotic spells. Kill it before the room fills with its minions.
+MONSTER_DESC_DEEP_TROLL,A larger and more savage troll from the deep places. Outlasting it is rarely an option.,A larger and more savage troll from the deep places. Outlasting it is rarely an option.
+MONSTER_DESC_EARTH_ELEMENTAL,"Slow, heavy, and difficult to bring down. Best answered with power or patience, not panic.","Slow, heavy, and difficult to bring down. Best answered with power or patience, not panic."
+MONSTER_DESC_EMBER_TYRANT,A demon lord born of the deepest fires. Heat pours from its very presence.,A demon lord born of the deepest fires. Heat pours from its very presence.
+MONSTER_DESC_EXECUTIONER,"An executioner demon of terrifying melee precision. If it reaches you, it expects the fight to end quickly.","An executioner demon of terrifying melee precision. If it reaches you, it expects the fight to end quickly."
+MONSTER_DESC_FIRE_DRAGON,A powerful dragon that bathes everything in flame. Fire resistance is mandatory before engaging.,A powerful dragon that bathes everything in flame. Fire resistance is mandatory before engaging.
+MONSTER_DESC_FIRE_ELEMENTAL,"A being of living flame. Fire resistance matters, and careless positioning can turn deadly fast.","A being of living flame. Fire resistance matters, and careless positioning can turn deadly fast."
+MONSTER_DESC_FIRE_GIANT,A fire-immune giant that fights with burning force. Cold damage and fast pressure are both effective.,A fire-immune giant that fights with burning force. Cold damage and fast pressure are both effective.
+MONSTER_DESC_FROST_GIANT,A cold-immune giant that delivers crushing blows. Fire damage cuts through its defenses.,A cold-immune giant that delivers crushing blows. Fire damage cuts through its defenses.
+MONSTER_DESC_GARGOYLE,A living stone guardian with great physical resilience. Strong blows and magic work better than weak repeated attacks.,A living stone guardian with great physical resilience. Strong blows and magic work better than weak repeated attacks.
+MONSTER_DESC_GHOUL,"A paralysis-clawed undead predator. If it lands a paralyze, you may not get to respond.","A paralysis-clawed undead predator. If it lands a paralyze, you may not get to respond."
+MONSTER_DESC_GIANT_COCKROACH,"A large, resilient bug with no real threat. Useful early experience and little else.","A large, resilient bug with no real threat. Useful early experience and little else."
+MONSTER_DESC_GIANT_WOLF_SPIDER,A venomous predator with speed and patience. Treat it as both a melee threat and a poison threat.,A venomous predator with speed and patience. Treat it as both a melee threat and a poison threat.
+MONSTER_DESC_GLACIAL_SOVEREIGN,"An ancient being of living ice, ruling the frozen depths with absolute cold.","An ancient being of living ice, ruling the frozen depths with absolute cold."
+MONSTER_DESC_GNOLL,"A hyena-headed pack hunter. Dangerous in numbers, manageable alone — but they rarely travel alone.","A hyena-headed pack hunter. Dangerous in numbers, manageable alone — but they rarely travel alone."
+MONSTER_DESC_GNOLL_SERGEANT,A commanding gnoll that drives its kin to fight harder. Eliminating it early breaks a group's momentum.,A commanding gnoll that drives its kin to fight harder. Eliminating it early breaks a group's momentum.
+MONSTER_DESC_GNOLL_SHAMAN,A gnoll priest who calls down holy bolts from range. Prioritize it before it heals its allies.,A gnoll priest who calls down holy bolts from range. Prioritize it before it heals its allies.
+MONSTER_DESC_GNOLL_WARLORD,A fearsome gnoll champion that leads from the front. High HP and brutal melee — expect a long fight.,A fearsome gnoll champion that leads from the front. High HP and brutal melee — expect a long fight.
+MONSTER_DESC_GOBLIN,"A common raider with little durability. Not dangerous alone, but often the first sign of a crowded fight.","A common raider with little durability. Not dangerous alone, but often the first sign of a crowded fight."
+MONSTER_DESC_GOLDEN_DRAGON,"The apex of dragonkind, wielding multiple elements and tremendous HP. Nothing here is wasted.","The apex of dragonkind, wielding multiple elements and tremendous HP. Nothing here is wasted."
+MONSTER_DESC_HARROW_KNIGHT,"A dark champion who advances with cold discipline. It punishes panic, overextension, and weak resolve. Will and positioning matter as much as raw durability here.","A dark champion who advances with cold discipline. It punishes panic, overextension, and weak resolve. Will and positioning matter as much as raw durability here."
+MONSTER_DESC_HOBGOBLIN,"A larger, meaner cousin of the goblin. Tougher than it looks and often found in mixed groups.","A larger, meaner cousin of the goblin. Tougher than it looks and often found in mixed groups."
+MONSTER_DESC_HORNET,"A fast-flying insect that moves unpredictably. Difficult to pin down, and its sting may poison.","A fast-flying insect that moves unpredictably. Difficult to pin down, and its sting may poison."
+MONSTER_DESC_HOUND,"A swift pack animal bred to chase. Individually harmless, but hard to shake in numbers.","A swift pack animal bred to chase. Individually harmless, but hard to shake in numbers."
+MONSTER_DESC_ICE_DEVIL,A cold demon with high HP and punishing attacks. Cold resistance dulls its worst output.,A cold demon with high HP and punishing attacks. Cold resistance dulls its worst output.
+MONSTER_DESC_ICE_DRAGON,A cold dragon of great power and resilience. Cold resistance reduces the worst of its output.,A cold dragon of great power and resilience. Cold resistance reduces the worst of its output.
+MONSTER_DESC_IRON_GOLEM,A construct of pure iron that ignores most magic. Physical force is the most reliable answer.,A construct of pure iron that ignores most magic. Physical force is the most reliable answer.
+MONSTER_DESC_JACKAL,"A quick scavenger that bites and retreats. More annoying than lethal, but dangerous in a crowd.","A quick scavenger that bites and retreats. More annoying than lethal, but dangerous in a crowd."
+MONSTER_DESC_KOBOLD,A nimble and opportunistic tunnel dweller. Its speed and position matter more than its strength.,A nimble and opportunistic tunnel dweller. Its speed and position matter more than its strength.
+MONSTER_DESC_LICH,An ancient undead archmage who casts powerful spells and resists cold. Disrupting it early is better than weathering its output.,An ancient undead archmage who casts powerful spells and resists cold. Disrupting it early is better than weathering its output.
+MONSTER_DESC_MANTICORE,A winged predator that launches spike volleys from range. Do not let it maintain distance.,A winged predator that launches spike volleys from range. Do not let it maintain distance.
+MONSTER_DESC_MINOTAUR,A horned giant raised in the deep tunnels. Cold-resistant and ferocious in melee.,A horned giant raised in the deep tunnels. Cold-resistant and ferocious in melee.
+MONSTER_DESC_MUMMY,An ancient undead wrapped in curses. Cold-resistant and capable of landing debilitating effects.,An ancient undead wrapped in curses. Cold-resistant and capable of landing debilitating effects.
+MONSTER_DESC_OGRE,A massive brute with crushing melee power. Slow but capable of ending a fight in a single bad turn.,A massive brute with crushing melee power. Slow but capable of ending a fight in a single bad turn.
+MONSTER_DESC_OGRE_CHIEFTAIN,A veteran ogre whose blows hit harder than most. Give it space or you will regret it quickly.,A veteran ogre whose blows hit harder than most. Give it space or you will regret it quickly.
+MONSTER_DESC_OGRE_MAGE,A hulking mage combining brute force with arcane power. Neither its fists nor its spells should be underestimated.,A hulking mage combining brute force with arcane power. Neither its fists nor its spells should be underestimated.
+MONSTER_DESC_ORC,A brutal warrior who wins through direct force. Stronger than the smallest dungeon vermin and often backed by allies.,A brutal warrior who wins through direct force. Stronger than the smallest dungeon vermin and often backed by allies.
+MONSTER_DESC_ORC_PRIEST,An orcish healer who sustains its allies. Killing it first makes the rest of the encounter manageable.,An orcish healer who sustains its allies. Killing it first makes the rest of the encounter manageable.
+MONSTER_DESC_ORC_WARCHIEF,An elite orc commander backed by loyal troops. Dangerous on its own — worse surrounded by allies.,An elite orc commander backed by loyal troops. Dangerous on its own — worse surrounded by allies.
+MONSTER_DESC_ORC_WARRIOR,"A trained front-line brute. Hits hard, survives longer, and forces respect in early melee.","A trained front-line brute. Hits hard, survives longer, and forces respect in early melee."
+MONSTER_DESC_ORC_WIZARD,An orcish spellcaster who launches bolts from a safe distance. Close the gap fast before it punishes you.,An orcish spellcaster who launches bolts from a safe distance. Close the gap fast before it punishes you.
+MONSTER_DESC_PALE_SCHOLAR,"A final mind turned inward until only terrible clarity remained. It tests not only your strength, but your understanding of what your run has become. The battle should feel like a culmination, not a skirmish.","A final mind turned inward until only terrible clarity remained. It tests not only your strength, but your understanding of what your run has become. The battle should feel like a culmination, not a skirmish."
+MONSTER_DESC_PHANTOM,A ghost-like undead that resists cold and slips through walls. Spatial awareness matters here.,A ghost-like undead that resists cold and slips through walls. Spatial awareness matters here.
+MONSTER_DESC_RAT,"A weak scavenger, dangerous only in numbers. It teaches the first lesson of any dungeon: carelessness still costs blood.","A weak scavenger, dangerous only in numbers. It teaches the first lesson of any dungeon: carelessness still costs blood."
+MONSTER_DESC_RED_DEVIL,A mid-tier demon with fire resistance and steady melee. Survivable with the right preparation.,A mid-tier demon with fire resistance and steady melee. Survivable with the right preparation.
+MONSTER_DESC_REVENANT,A powerful undead with draining melee. It recovers from damage and fights on long after you expect it to fall.,A powerful undead with draining melee. It recovers from damage and fights on long after you expect it to fall.
+MONSTER_DESC_SCORPION,A venomous arachnid whose tail ends fights poorly. Poison resistance reduces its danger sharply.,A venomous arachnid whose tail ends fights poorly. Poison resistance reduces its danger sharply.
+MONSTER_DESC_SHADOW_WRAITH,"A swift shade that phases through darkness, draining life with each pass.","A swift shade that phases through darkness, draining life with each pass."
+MONSTER_DESC_SISTER_CINDER,A wandering zealot wrapped in smoke and sacred heat. Fire is both her weapon and her warning. Prepare for sustained pressure rather than a single burst.,A wandering zealot wrapped in smoke and sacred heat. Fire is both her weapon and her warning. Prepare for sustained pressure rather than a single burst.
+MONSTER_DESC_SKELETAL_WARRIOR,An undead fighter that shrugs off cold damage. It hits like a soldier and dies hard.,An undead fighter that shrugs off cold damage. It hits like a soldier and dies hard.
+MONSTER_DESC_SOVEREIGN_JELLY,"An immense sovereign of living acid, its mass dissolves everything it touches.","An immense sovereign of living acid, its mass dissolves everything it touches."
+MONSTER_DESC_STEAM_DRAGON,An early dragon that breathes scalding steam. Stay mobile and do not let it breathe on you twice.,An early dragon that breathes scalding steam. Stay mobile and do not let it breathe on you twice.
+MONSTER_DESC_STONE_GIANT,A colossus of living rock that hurls boulders with crushing force. Keep moving and do not stand still.,A colossus of living rock that hurls boulders with crushing force. Keep moving and do not stand still.
+MONSTER_DESC_STONE_WARDEN,"An ancient sentinel of weight, order, and refusal. It endures what would break lesser foes and grinds down reckless attackers. This is not a fight to rush without force to back it up.","An ancient sentinel of weight, order, and refusal. It endures what would break lesser foes and grinds down reckless attackers. This is not a fight to rush without force to back it up."
+MONSTER_DESC_STORM_HIEROPHANT,"A master of wrath from above, chaining pressure into disaster. It turns space into danger and punishes exposed movement. Enter this fight with a plan, not hope.","A master of wrath from above, chaining pressure into disaster. It turns space into danger and punishes exposed movement. Enter this fight with a plan, not hope."
+MONSTER_DESC_SWAMP_DRAGON,A poison-breathing dragon that turns the field toxic. Poison resistance converts a dangerous fight into a manageable one.,A poison-breathing dragon that turns the field toxic. Poison resistance converts a dangerous fight into a manageable one.
+MONSTER_DESC_TITAN,"The apex of giant-kind. Its presence alone warrants respect, and its reach warrants fear.","The apex of giant-kind. Its presence alone warrants respect, and its reach warrants fear."
+MONSTER_DESC_TROLL,"A massive brute with frightening endurance. If you cannot kill it cleanly, the fight quickly gets worse.","A massive brute with frightening endurance. If you cannot kill it cleanly, the fight quickly gets worse."
+MONSTER_DESC_TWO_HEADED_OGRE,Two heads mean two brains and twice the swings. Expect rapid repeated attacks at close range.,Two heads mean two brains and twice the swings. Expect rapid repeated attacks at close range.
+MONSTER_DESC_VAMPIRE,An undead noble who drains life on every hit. The drain accumulates quickly if you let the fight drag.,An undead noble who drains life on every hit. The drain accumulates quickly if you let the fight drag.
+MONSTER_DESC_VAMPIRE_BAT,A small bloodsucking bat — faster than a normal bat and prone to draining HP on a hit.,A small bloodsucking bat — faster than a normal bat and prone to draining HP on a hit.
+MONSTER_DESC_VAMPIRE_KNIGHT,An armored vampire with high HP and cold resistance. Do not let the drain stack — end it fast or burn an escape.,An armored vampire with high HP and cold resistance. Do not let the drain stack — end it fast or burn an escape.
+MONSTER_DESC_VIPER_SAINT,"A venom-priest whose faith runs through fang and ritual. Poison is its language, and patience is its cruelty. Enter the fight ready to answer venom quickly.","A venom-priest whose faith runs through fang and ritual. Poison is its language, and patience is its cruelty. Enter the fight ready to answer venom quickly."
+MONSTER_DESC_WARG,A massive warwolf ridden by goblinoids. Powerful and aggressive — it does not give ground.,A massive warwolf ridden by goblinoids. Powerful and aggressive — it does not give ground.
+MONSTER_DESC_WIGHT,A malevolent undead warrior with draining melee. Attack it fast before drain stacks up.,A malevolent undead warrior with draining melee. Attack it fast before drain stacks up.
+MONSTER_DESC_WOLF,A fast hunter that punishes hesitation. Dangerous when it reaches you before you are ready.,A fast hunter that punishes hesitation. Dangerous when it reaches you before you are ready.
+MONSTER_DESC_WRAITH,"A hungry spirit wrapped in malice. It is often more dangerous than its body suggests, and should not be underestimated.","A hungry spirit wrapped in malice. It is often more dangerous than its body suggests, and should not be underestimated."
+MONSTER_DESC_WYVERN,A lesser dragon with good speed and a venomous tail. Fast enough that evasion alone is not enough.,A lesser dragon with good speed and a venomous tail. Fast enough that evasion alone is not enough.
+MONSTER_DESC_YAK,A large grazing animal that charges when threatened. The first hit often hurts the most.,A large grazing animal that charges when threatened. The first hit often hurts the most.
+MONSTER_DESC_ZOMBIE,"A slow and mindless undead. Easy to outmaneuver, but its hits still carry weight.","A slow and mindless undead. Easy to outmaneuver, but its hits still carry weight."
+MONSTER_NAME_ABYSSAL_SOVEREIGN,Abyssal Sovereign,심연의 군주
+MONSTER_NAME_ADDER,adder,독사
+MONSTER_NAME_ANCIENT_LICH,Ancient Lich,고대 리치
+MONSTER_NAME_ASHEN_MAGPIE,Ashen Magpie,잿빛 까치
+MONSTER_NAME_BALRUG,balrug,발록
+MONSTER_NAME_BASILISK,basilisk,바실리스크
+MONSTER_NAME_BAT,bat,박쥐
+MONSTER_NAME_BLACK_BEAR,black bear,흑곰
+MONSTER_NAME_BLOOD_DUKE,Blood Duke,피의 공작
+MONSTER_NAME_BOG_SERPENT,Bog Serpent,늪의 뱀
+MONSTER_NAME_BONE_DRAGON,bone dragon,bone dragon
+MONSTER_NAME_CENTAUR,centaur,켄타우로스
+MONSTER_NAME_CRIMSON_IMP,crimson imp,crimson imp
+MONSTER_NAME_CRYPT_ZOMBIE,Zombie,Zombie
+MONSTER_NAME_CYCLOPS,cyclops,cyclops
+MONSTER_NAME_DEEP_ELF_ARCHER,deep elf archer,딥엘프 궁수
+MONSTER_NAME_DEEP_ELF_DEATH_MAGE,deep elf death mage,deep elf death mage
+MONSTER_NAME_DEEP_TROLL,deep troll,deep troll
+MONSTER_NAME_EARTH_ELEMENTAL,earth elemental,대지 정령
+MONSTER_NAME_EMBER_TYRANT,Ember Tyrant,불꽃의 폭군
+MONSTER_NAME_EXECUTIONER,executioner,executioner
+MONSTER_NAME_FIRE_DRAGON,fire dragon,fire dragon
+MONSTER_NAME_FIRE_ELEMENTAL,fire elemental,화염 정령
+MONSTER_NAME_FIRE_GIANT,fire giant,불의 거인
+MONSTER_NAME_FROST_GIANT,frost giant,서리 거인
+MONSTER_NAME_GARGOYLE,gargoyle,gargoyle
+MONSTER_NAME_GHOUL,ghoul,구울
+MONSTER_NAME_GIANT_COCKROACH,giant cockroach,giant cockroach
+MONSTER_NAME_GIANT_WOLF_SPIDER,giant wolf spider,거대 늑대 거미
+MONSTER_NAME_GLACIAL_SOVEREIGN,Glacial Sovereign,빙하의 군주
+MONSTER_NAME_GNOLL,gnoll,놀
+MONSTER_NAME_GNOLL_SERGEANT,gnoll sergeant,gnoll sergeant
+MONSTER_NAME_GNOLL_SHAMAN,gnoll shaman,놀 주술사
+MONSTER_NAME_GNOLL_WARLORD,Gnoll Warlord,Gnoll Warlord
+MONSTER_NAME_GOBLIN,goblin,고블린
+MONSTER_NAME_GOLDEN_DRAGON,golden dragon,golden dragon
+MONSTER_NAME_HARROW_KNIGHT,Harrow Knight,Harrow Knight
+MONSTER_NAME_HOBGOBLIN,hobgoblin,홉고블린
+MONSTER_NAME_HORNET,hornet,hornet
+MONSTER_NAME_HOUND,hound,hound
+MONSTER_NAME_ICE_DEVIL,ice devil,얼음 데빌
+MONSTER_NAME_ICE_DRAGON,ice dragon,ice dragon
+MONSTER_NAME_IRON_GOLEM,iron golem,iron golem
+MONSTER_NAME_JACKAL,jackal,jackal
+MONSTER_NAME_KOBOLD,kobold,코볼드
+MONSTER_NAME_LICH,lich,리치
+MONSTER_NAME_MANTICORE,manticore,만티코어
+MONSTER_NAME_MINOTAUR,minotaur,미노타우로스
+MONSTER_NAME_MUMMY,mummy,미라
+MONSTER_NAME_OGRE,ogre,오우거
+MONSTER_NAME_OGRE_CHIEFTAIN,Ogre Chieftain,Ogre Chieftain
+MONSTER_NAME_OGRE_MAGE,ogre mage,ogre mage
+MONSTER_NAME_ORC,orc,오크
+MONSTER_NAME_ORC_PRIEST,orc priest,orc priest
+MONSTER_NAME_ORC_WARCHIEF,Orc Warchief,Orc Warchief
+MONSTER_NAME_ORC_WARRIOR,orc warrior,orc warrior
+MONSTER_NAME_ORC_WIZARD,orc wizard,orc wizard
+MONSTER_NAME_PALE_SCHOLAR,The Pale Scholar,The Pale Scholar
+MONSTER_NAME_PHANTOM,phantom,팬텀
+MONSTER_NAME_RAT,rat,쥐
+MONSTER_NAME_RED_DEVIL,red devil,red devil
+MONSTER_NAME_REVENANT,Revenant,Revenant
+MONSTER_NAME_SCORPION,scorpion,전갈
+MONSTER_NAME_SHADOW_WRAITH,Shadow Wraith,Shadow Wraith
+MONSTER_NAME_SISTER_CINDER,Sister Cinder,Sister Cinder
+MONSTER_NAME_SKELETAL_WARRIOR,skeletal warrior,해골 전사
+MONSTER_NAME_SOVEREIGN_JELLY,Sovereign Jelly,Sovereign Jelly
+MONSTER_NAME_STEAM_DRAGON,steam dragon,steam dragon
+MONSTER_NAME_STONE_GIANT,stone giant,돌 거인
+MONSTER_NAME_STONE_WARDEN,Stone Warden,Stone Warden
+MONSTER_NAME_STORM_HIEROPHANT,Storm Hierophant,Storm Hierophant
+MONSTER_NAME_SWAMP_DRAGON,swamp dragon,swamp dragon
+MONSTER_NAME_TITAN,titan,titan
+MONSTER_NAME_TROLL,troll,트롤
+MONSTER_NAME_TWO_HEADED_OGRE,two-headed ogre,two-headed ogre
+MONSTER_NAME_VAMPIRE,vampire,뱀파이어
+MONSTER_NAME_VAMPIRE_BAT,vampire bat,vampire bat
+MONSTER_NAME_VAMPIRE_KNIGHT,vampire knight,vampire knight
+MONSTER_NAME_VIPER_SAINT,Viper Saint,Viper Saint
+MONSTER_NAME_WARG,warg,와르그
+MONSTER_NAME_WIGHT,Wight,와이트
+MONSTER_NAME_WOLF,wolf,늑대
+MONSTER_NAME_WRAITH,wraith,레이스
+MONSTER_NAME_WYVERN,wyvern,wyvern
+MONSTER_NAME_YAK,yak,yak
+MONSTER_NAME_ZOMBIE,zombie,좀비
+RACE_DESC_DWARF,"Stout and resilient. +2 STR, -3 DEX, +1 HP. Innate poison resistance.","Stout and resilient. +2 STR, -3 DEX, +1 HP. Innate poison resistance."
+RACE_DESC_ELF,"Sharp-minded and perceptive. -3 STR, +2 DEX, +4 INT, -2 HP, +2 MP. Immune to sleep.","Sharp-minded and perceptive. -3 STR, +2 DEX, +4 INT, -2 HP, +2 MP. Immune to sleep."
+RACE_DESC_GARGOYLE,"Living stone. +3 STR, -3 DEX, -2 HP. Natural AC +4 and immune to poison.","Living stone. +3 STR, -3 DEX, -2 HP. Natural AC +4 and immune to poison."
+RACE_DESC_HILL_ORC,"Brutal and resilient. +2 STR, -2 DEX, +1 HP. Deals bonus melee damage when injured.","Brutal and resilient. +2 STR, -2 DEX, +1 HP. Deals bonus melee damage when injured."
+RACE_DESC_HUMAN,"Versatile and adaptable. No stat bonuses, no stat penalties. Fits any class or faith path.","Versatile and adaptable. No stat bonuses, no stat penalties. Fits any class or faith path."
+RACE_DESC_KOBOLD,"Small and sly. -3 STR, +2 DEX, +1 INT, -2 HP. Poison resistant and adept with traps.","Small and sly. -3 STR, +2 DEX, +1 INT, -2 HP. Poison resistant and adept with traps."
+RACE_DESC_MINOTAUR,"Bullheaded warrior. +4 STR, -3 DEX, -3 INT, +1 HP, -1 MP. Gains free headbutts in melee.","Bullheaded warrior. +4 STR, -3 DEX, -3 INT, +1 HP, -1 MP. Gains free headbutts in melee."
+RACE_DESC_SPRIGGAN,"Tiny but fleet. -4 STR, +2 DEX, +1 INT, -3 HP, +1 MP. Fastest in the dungeon.","Tiny but fleet. -4 STR, +2 DEX, +1 INT, -3 HP, +1 MP. Fastest in the dungeon."
+RACE_DESC_TROLL,"Huge and regenerating. +7 STR, -3 DEX, -4 INT, +3 HP, -1 MP. Vulnerable to fire.","Huge and regenerating. +7 STR, -3 DEX, -4 INT, +3 HP, -1 MP. Vulnerable to fire."
+RACE_DESC_VAMPIRE,"Undead predator. -1 STR, +1 DEX, +2 INT. Resistant to negative energy; melee kills restore HP.","Undead predator. -1 STR, +1 DEX, +2 INT. Resistant to negative energy; melee kills restore HP."
+RACE_NAME_DWARF,Dwarf,드워프
+RACE_NAME_ELF,Elf,엘프
+RACE_NAME_GARGOYLE,Gargoyle,가고일
+RACE_NAME_HILL_ORC,Hill Orc,Hill Orc
+RACE_NAME_HUMAN,Human,인간
+RACE_NAME_KOBOLD,Kobold,코볼드
+RACE_NAME_MINOTAUR,Minotaur,미노타우로스
+RACE_NAME_SPRIGGAN,Spriggan,스프리간
+RACE_NAME_TROLL,Troll,트롤
+RACE_NAME_VAMPIRE,Vampire,뱀파이어
+SPELL_DESC_AIRSTRIKE,Calls down a thunderous strike from the sky. Ignores cover and walls — effective against evasive or hidden foes.,Calls down a thunderous strike from the sky. Ignores cover and walls — effective against evasive or hidden foes.
+SPELL_DESC_ANIMATE_DEAD,Animates the spirits of the recently fallen. Creates temporary undead allies from recent kills.,Animates the spirits of the recently fallen. Creates temporary undead allies from recent kills.
+SPELL_DESC_ANIMATE_OBJECTS,Nearby objects spring to life and attack your enemies.,Nearby objects spring to life and attack your enemies.
+SPELL_DESC_ANIMATE_SKELETON,Animates skeletal remains as a temporary ally. Cheap and useful — best from durable enemy corpses.,Animates skeletal remains as a temporary ally. Cheap and useful — best from durable enemy corpses.
+SPELL_DESC_ASTRAL_PROJECTION,Project your astral form. You become ethereal and regenerate rapidly.,Project your astral form. You become ethereal and regenerate rapidly.
+SPELL_DESC_BLIGHT,Drain the vitality from a creature for 8d8 necrotic damage.,Drain the vitality from a creature for 8d8 necrotic damage.
+SPELL_DESC_BLINK,Teleports you a short distance away. Fast escape from bad positioning or surrounded situations.,Teleports you a short distance away. Fast escape from bad positioning or surrounded situations.
+SPELL_DESC_BLUR,Your form blurs. Attackers have disadvantage on rolls to hit you.,Your form blurs. Attackers have disadvantage on rolls to hit you.
+SPELL_DESC_CALL_IMP,Calls a small imp to fight at your side. Early summoning option; the imp is fragile but draws attention.,Calls a small imp to fight at your side. Early summoning option; the imp is fragile but draws attention.
+SPELL_DESC_CHAIN_LIGHTNING,Lightning deals 10d8 and bounces to up to 3 nearby targets.,Lightning deals 10d8 and bounces to up to 3 nearby targets.
+SPELL_DESC_CLOUDKILL,Poisonous yellow-green fog deals 5d8 poison damage per turn.,Poisonous yellow-green fog deals 5d8 poison damage per turn.
+SPELL_DESC_CONE_OF_COLD,Blast of freezing air deals 8d8 cold damage in a cone.,Blast of freezing air deals 8d8 cold damage in a cone.
+SPELL_DESC_CONFUSE,"Confuses the target, causing random movement. Neutralizes a dangerous enemy without dealing damage.","Confuses the target, causing random movement. Neutralizes a dangerous enemy without dealing damage."
+SPELL_DESC_CONFUSION,Creatures act randomly — attacking allies or standing dazed.,Creatures act randomly — attacking allies or standing dazed.
+SPELL_DESC_CONJURE_FEY,Summon a powerful fey spirit to fight by your side.,Summon a powerful fey spirit to fight by your side.
+SPELL_DESC_CONJURE_FLAME,Conjures a burst of magical flame around you. Most effective when surrounded or in melee range.,Conjures a burst of magical flame around you. Most effective when surrounded or in melee range.
+SPELL_DESC_CONJURE_FOG,Conjures a thick fog that blocks all sight. Cuts ranged threats and gives time to reposition.,Conjures a thick fog that blocks all sight. Cuts ranged threats and gives time to reposition.
+SPELL_DESC_CONTAGION,Afflict a creature with a chosen debilitating disease.,Afflict a creature with a chosen debilitating disease.
+SPELL_DESC_DEATHS_DOOR,Stands at death's threshold — briefly invulnerable. Use it at the last moment to survive a fight you would otherwise lose.,Stands at death's threshold — briefly invulnerable. Use it at the last moment to survive a fight you would otherwise lose.
+SPELL_DESC_DIMENSION_DOOR,Open a dimensional portal and step through to any explored tile.,Open a dimensional portal and step through to any explored tile.
+SPELL_DESC_DISINTEGRATE,A green ray reduces a target to dust. Deals 10d6+40 force damage.,A green ray reduces a target to dust. Deals 10d6+40 force damage.
+SPELL_DESC_EARTHQUAKE,Violent tremors knock all nearby creatures prone and break terrain.,Violent tremors knock all nearby creatures prone and break terrain.
+SPELL_DESC_ENLARGE,You grow large. Add 1d4 to all melee damage rolls.,You grow large. Add 1d4 to all melee damage rolls.
+SPELL_DESC_EXPEDITIOUS_RETREAT,"Your speed doubles, letting you dash past enemies.","Your speed doubles, letting you dash past enemies."
+SPELL_DESC_FEAR,Creatures in range become frightened and must flee from you.,Creatures in range become frightened and must flee from you.
+SPELL_DESC_FINGER_OF_DEATH,Send negative energy surging through a creature for 7d8+30 necrotic damage.,Send negative energy surging through a creature for 7d8+30 necrotic damage.
+SPELL_DESC_FIREBALL,An explosive ball of fire erupts among your enemies. Devastates grouped targets but costs more mana.,An explosive ball of fire erupts among your enemies. Devastates grouped targets but costs more mana.
+SPELL_DESC_FIRE_STORM,A devastating storm of fire consumes everything nearby. Use it to end crowded fights quickly.,A devastating storm of fire consumes everything nearby. Use it to end crowded fights quickly.
+SPELL_DESC_FOG_CLOUD,"A sphere of thick fog fills the area, blocking all vision.","A sphere of thick fog fills the area, blocking all vision."
+SPELL_DESC_FREEZE,A bolt of freezing energy chills the target. Fast and cheap; a solid early cold spell.,A bolt of freezing energy chills the target. Fast and cheap; a solid early cold spell.
+SPELL_DESC_GATE,Open a planar rift and drag a legendary creature through to fight for you.,Open a planar rift and drag a legendary creature through to fight for you.
+SPELL_DESC_GLACIATE,Unleashes a glacial torrent that encases all nearby in ice. Your strongest cold spell — clears groups fast.,Unleashes a glacial torrent that encases all nearby in ice. Your strongest cold spell — clears groups fast.
+SPELL_DESC_GLOBE_OF_INVULNERABILITY,A shimmering field renders spells of level 5 and below harmless.,A shimmering field renders spells of level 5 and below harmless.
+SPELL_DESC_HARM,Ravage a creature with necromantic energy for 14d6 damage.,Ravage a creature with necromantic energy for 14d6 damage.
+SPELL_DESC_HASTE,Time dilates around you. Gain an extra action each turn.,Time dilates around you. Gain an extra action each turn.
+SPELL_DESC_HAUNT,Haunting spirits tear through the target repeatedly. Strong sustained necrotic pressure against a single enemy.,Haunting spirits tear through the target repeatedly. Strong sustained necrotic pressure against a single enemy.
+SPELL_DESC_HEX_FEAR,Fills the target with overwhelming magical terror. Sends an enemy fleeing — useful for disengaging or splitting groups.,Fills the target with overwhelming magical terror. Sends an enemy fleeing — useful for disengaging or splitting groups.
+SPELL_DESC_HEX_SLEEP,Casts a deep magical slumber over the target. Removes an enemy from a fight temporarily — harder to resist than fear.,Casts a deep magical slumber over the target. Removes an enemy from a fight temporarily — harder to resist than fear.
+SPELL_DESC_HIBERNATION,Chills the blood to induce deep magical sleep. A reliable crowd-control tool — sleeping enemies skip their turns.,Chills the blood to induce deep magical sleep. A reliable crowd-control tool — sleeping enemies skip their turns.
+SPELL_DESC_HOLD_MONSTER,"Paralyze any creature, not just humanoids.","Paralyze any creature, not just humanoids."
+SPELL_DESC_HOLD_PERSON,Paralyze a humanoid. It cannot move or act until the spell ends.,Paralyze a humanoid. It cannot move or act until the spell ends.
+SPELL_DESC_HORRID_WILTING,Draw moisture from creatures in range for 12d8 necrotic damage.,Draw moisture from creatures in range for 12d8 necrotic damage.
+SPELL_DESC_ICE_BOLT,A heavy shard of ice impales the target. High single-target cold damage at mid-range.,A heavy shard of ice impales the target. High single-target cold damage at mid-range.
+SPELL_DESC_ICE_STORM,Hail and sleet deal 4d6 cold + 2d6 bludgeoning in the area.,Hail and sleet deal 4d6 cold + 2d6 bludgeoning in the area.
+SPELL_DESC_IGNITION,The air itself ignites in a catastrophic conflagration. Your most powerful fire spell — save it for the hardest moments.,The air itself ignites in a catastrophic conflagration. Your most powerful fire spell — save it for the hardest moments.
+SPELL_DESC_INFLICT_WOUNDS,Rot erupts at your touch dealing 3d10 necrotic damage.,Rot erupts at your touch dealing 3d10 necrotic damage.
+SPELL_DESC_INVULNERABILITY,You are immune to all damage for several turns.,You are immune to all damage for several turns.
+SPELL_DESC_LEE_RAPID_DECONSTRUCTION,"Violently deconstructs stone and bone alike. Strong area damage, especially against heavily armored or undead foes.","Violently deconstructs stone and bone alike. Strong area damage, especially against heavily armored or undead foes."
+SPELL_DESC_LEHUDIB_CRYSTAL_SPEAR,Hurls a massive crystalline spear of pure force. Deals extreme single-target damage regardless of resistances.,Hurls a massive crystalline spear of pure force. Deals extreme single-target damage regardless of resistances.
+SPELL_DESC_LIGHTNING_BOLT,A bolt of lightning arcs between enemies. Damages the chain — best with multiple targets in line.,A bolt of lightning arcs between enemies. Damages the chain — best with multiple targets in line.
+SPELL_DESC_MAGE_ARMOR,Magical force surrounds you. AC becomes 13 + DEX modifier.,Magical force surrounds you. AC becomes 13 + DEX modifier.
+SPELL_DESC_MAGIC_MISSILE,Three force darts each auto-find a visible enemy. Can't miss.,Three force darts each auto-find a visible enemy. Can't miss.
+SPELL_DESC_MALIGN_GATEWAY,"Opens a gateway to a malign realm, summoning powerful beings. Your strongest summoning spell — fills the room with danger for everyone.","Opens a gateway to a malign realm, summoning powerful beings. Your strongest summoning spell — fills the room with danger for everyone."
+SPELL_DESC_MASS_CONFUSION,Fills all visible enemies with chaotic confusion. Can neutralize an entire room — requires strong Magic skill.,Fills all visible enemies with chaotic confusion. Can neutralize an entire room — requires strong Magic skill.
+SPELL_DESC_MASS_SUGGESTION,Up to 12 creatures obey a reasonable one-sentence command.,Up to 12 creatures obey a reasonable one-sentence command.
+SPELL_DESC_MAZE,Banish a creature to a demiplane maze for several turns.,Banish a creature to a demiplane maze for several turns.
+SPELL_DESC_METEOR_SWARM,Four meteors strike for 20d6 fire + 20d6 bludgeoning damage each.,Four meteors strike for 20d6 fire + 20d6 bludgeoning damage each.
+SPELL_DESC_MIND_BLANK,Gain immunity to psychic damage and all mind-affecting magic.,Gain immunity to psychic damage and all mind-affecting magic.
+SPELL_DESC_MISTY_STEP,"Surrounded by silver mist, teleport up to 5 tiles away.","Surrounded by silver mist, teleport up to 5 tiles away."
+SPELL_DESC_MONSTROUS_MENAGERIE,Calls forth a menagerie of monstrous allies. Summons several strong creatures — powerful but mana-intensive.,Calls forth a menagerie of monstrous allies. Summons several strong creatures — powerful but mana-intensive.
+SPELL_DESC_OZOCUBUS_REFRIGERATION,Freezes the air around all visible foes simultaneously. Strong when enemies swarm you.,Freezes the air around all visible foes simultaneously. Strong when enemies swarm you.
+SPELL_DESC_PAIN,Wracks the target with necrotic pain. Cheap and reliable; your entry point into necromantic damage.,Wracks the target with necrotic pain. Cheap and reliable; your entry point into necromantic damage.
+SPELL_DESC_PETRIFY,Petrifies the target in place. Stops a dangerous enemy cold — best used before a hard fight turns bad.,Petrifies the target in place. Stops a dangerous enemy cold — best used before a hard fight turns bad.
+SPELL_DESC_POLYMORPH,Transform a creature into a harmless beast. It loses its abilities.,Transform a creature into a harmless beast. It loses its abilities.
+SPELL_DESC_POWER_WORD_KILL,Utter a word of power. A creature with 100 HP or fewer dies instantly.,Utter a word of power. A creature with 100 HP or fewer dies instantly.
+SPELL_DESC_POWER_WORD_PAIN,A creature with 100 HP or fewer is wracked with agony and incapacitated.,A creature with 100 HP or fewer is wracked with agony and incapacitated.
+SPELL_DESC_POWER_WORD_STUN,A creature with 150 HP or fewer is stunned until it passes a save.,A creature with 150 HP or fewer is stunned until it passes a save.
+SPELL_DESC_PRISMATIC_SPRAY,Seven beams of colored light each produce a random devastating effect.,Seven beams of colored light each produce a random devastating effect.
+SPELL_DESC_PROTECTION_FROM_ENERGY,"Gain resistance to one element: fire, cold, electric, or poison.","Gain resistance to one element: fire, cold, electric, or poison."
+SPELL_DESC_RAY_OF_ENFEEBLEMENT,A black ray halves a creature's weapon damage on failed CON save.,A black ray halves a creature's weapon damage on failed CON save.
+SPELL_DESC_REVERSE_GRAVITY,All creatures in the area are flung upward and stunned for several turns.,All creatures in the area are flung upward and stunned for several turns.
+SPELL_DESC_SCORCH,A dart of fire scorches the target. Low cost and reliable — your first fire spell.,A dart of fire scorches the target. Low cost and reliable — your first fire spell.
+SPELL_DESC_SCORCHING_RAY,Three rays of fire each deal 2d6 fire damage.,Three rays of fire each deal 2d6 fire damage.
+SPELL_DESC_SHATTER,"Shatters the earth itself, dealing massive area damage. Your most powerful earth spell — ends most fights outright.","Shatters the earth itself, dealing massive area damage. Your most powerful earth spell — ends most fights outright."
+SPELL_DESC_SHOCK,A jolt of electricity zaps a nearby enemy. Very cheap; bridges the gap until better spells unlock.,A jolt of electricity zaps a nearby enemy. Very cheap; bridges the gap until better spells unlock.
+SPELL_DESC_SHROUD_OF_GOLUBRIA,A translocation shroud distorts your position (+EV). Makes you harder to hit without sacrificing offense.,A translocation shroud distorts your position (+EV). Makes you harder to hit without sacrificing offense.
+SPELL_DESC_SLEEP,Creatures totaling 5d8 HP fall into magical slumber.,Creatures totaling 5d8 HP fall into magical slumber.
+SPELL_DESC_SLOW,Slows and weakens the target's attacks. Buys time and reduces threat from fast or powerful enemies.,Slows and weakens the target's attacks. Buys time and reduces threat from fast or powerful enemies.
+SPELL_DESC_STATIC_DISCHARGE,Discharges a burst of static through multiple targets. Excellent against tight clusters of enemies.,Discharges a burst of static through multiple targets. Excellent against tight clusters of enemies.
+SPELL_DESC_STINKING_CLOUD,Noxious fumes incapacitate creatures that fail a CON save.,Noxious fumes incapacitate creatures that fail a CON save.
+SPELL_DESC_STONESKIN,Your skin hardens like stone. Resist all nonmagical physical damage.,Your skin hardens like stone. Resist all nonmagical physical damage.
+SPELL_DESC_STONE_ARROW,A sharp shard of stone pierces the target. Cheap and accurate; a solid general-purpose earth spell.,A sharp shard of stone pierces the target. Cheap and accurate; a solid general-purpose earth spell.
+SPELL_DESC_SUMMON_VERMIN,Summons a swarm of creatures from the abyss. Creates many bodies to absorb damage and crowd enemies.,Summons a swarm of creatures from the abyss. Creates many bodies to absorb damage and crowd enemies.
+SPELL_DESC_SUNBURST,Brilliant light deals 12d6 radiant damage and blinds all in range.,Brilliant light deals 12d6 radiant damage and blinds all in range.
+SPELL_DESC_SWIFTNESS,Channels translocation energy for supernatural speed. Lets you control the pace of every fight while it lasts.,Channels translocation energy for supernatural speed. Lets you control the pace of every fight while it lasts.
+SPELL_DESC_TELEPORT,Precisely teleports you anywhere on the floor. Your safest escape — best saved for emergencies.,Precisely teleports you anywhere on the floor. Your safest escape — best saved for emergencies.
+SPELL_DESC_TIME_STOP,Time freezes. Take 1d4+1 extra turns before anything else can act.,Time freezes. Take 1d4+1 extra turns before anything else can act.
+SPELL_DESC_TORNADO,Summons a raging tornado that sweeps through all foes. Your most powerful air spell — enormous area damage.,Summons a raging tornado that sweeps through all foes. Your most powerful air spell — enormous area damage.
+SPELL_DESC_VAMPIRIC_DRAINING,Drains life from the target to heal yourself. Doubles as offense and recovery — most valuable at low HP.,Drains life from the target to heal yourself. Doubles as offense and recovery — most valuable at low HP.
+SPELL_DESC_VAMPIRIC_TOUCH,Deal 3d6 necrotic and heal for half the damage dealt.,Deal 3d6 necrotic and heal for half the damage dealt.
+SPELL_DESC_WALL_OF_FORCE,An invisible impassable wall blocks movement and all attacks.,An invisible impassable wall blocks movement and all attacks.
+SPELL_NAME_AIRSTRIKE,Airstrike,공중 강타
+SPELL_NAME_ANIMATE_DEAD,Animate Dead,죽음의 부활
+SPELL_NAME_ANIMATE_OBJECTS,Animate Objects,물체 활성화
+SPELL_NAME_ANIMATE_SKELETON,Animate Skeleton,해골 부활
+SPELL_NAME_ASTRAL_PROJECTION,Astral Projection,영체 투영
+SPELL_NAME_BLIGHT,Blight,황폐
+SPELL_NAME_BLINK,Blink,깜빡이
+SPELL_NAME_BLUR,Blur,흐릿함
+SPELL_NAME_CALL_IMP,Call Imp,임프 소환
+SPELL_NAME_CHAIN_LIGHTNING,Chain Lightning,연쇄 번개
+SPELL_NAME_CLOUDKILL,Cloudkill,죽음의 구름
+SPELL_NAME_CONE_OF_COLD,Cone of Cold,냉기 원뿔
+SPELL_NAME_CONFUSE,Confuse,혼란
+SPELL_NAME_CONFUSION,Confusion,대혼란
+SPELL_NAME_CONJURE_FEY,Conjure Fey,요정 소환
+SPELL_NAME_CONJURE_FLAME,Conjure Flame,화염 소환
+SPELL_NAME_CONJURE_FOG,Conjure Fog,안개 소환
+SPELL_NAME_CONTAGION,Contagion,역병
+SPELL_NAME_DEATHS_DOOR,Death's Door,죽음의 문턱
+SPELL_NAME_DIMENSION_DOOR,Dimension Door,차원문
+SPELL_NAME_DISINTEGRATE,Disintegrate,분해
+SPELL_NAME_EARTHQUAKE,Earthquake,지진
+SPELL_NAME_ENLARGE,Enlarge,확대
+SPELL_NAME_EXPEDITIOUS_RETREAT,Expeditious Retreat,신속한 퇴각
+SPELL_NAME_FEAR,Fear,공포
+SPELL_NAME_FINGER_OF_DEATH,Finger of Death,죽음의 손가락
+SPELL_NAME_FIREBALL,Fireball,화염구
+SPELL_NAME_FIRE_STORM,Fire Storm,화염 폭풍
+SPELL_NAME_FOG_CLOUD,Fog Cloud,안개구름
+SPELL_NAME_FREEZE,Freeze,결빙
+SPELL_NAME_GATE,Gate,관문
+SPELL_NAME_GLACIATE,Glaciate,빙결
+SPELL_NAME_GLOBE_OF_INVULNERABILITY,Globe of Invulnerability,무적의 구체
+SPELL_NAME_HARM,Harm,상해
+SPELL_NAME_HASTE,Haste,가속
+SPELL_NAME_HAUNT,Haunt,유령 출몰
+SPELL_NAME_HEX_FEAR,Cause Fear,공포 유발
+SPELL_NAME_HEX_SLEEP,Ensorcelled Hibernation,마법 동면
+SPELL_NAME_HIBERNATION,Hibernation,동면
+SPELL_NAME_HOLD_MONSTER,Hold Monster,괴물 결박
+SPELL_NAME_HOLD_PERSON,Hold Person,인간 결박
+SPELL_NAME_HORRID_WILTING,Horrid Wilting,끔찍한 시들음
+SPELL_NAME_ICE_BOLT,Ice Bolt,얼음 화살
+SPELL_NAME_ICE_STORM,Ice Storm,얼음 폭풍
+SPELL_NAME_IGNITION,Ignition,점화
+SPELL_NAME_INFLICT_WOUNDS,Inflict Wounds,상처 가하기
+SPELL_NAME_INVULNERABILITY,Invulnerability,무적
+SPELL_NAME_LEE_RAPID_DECONSTRUCTION,Lee's Rapid Deconstruction,리의 신속 분해
+SPELL_NAME_LEHUDIB_CRYSTAL_SPEAR,Lehudib's Crystal Spear,레후디브의 수정 창
+SPELL_NAME_LIGHTNING_BOLT,Lightning Bolt,번개
+SPELL_NAME_MAGE_ARMOR,Mage Armor,마법사의 갑옷
+SPELL_NAME_MAGIC_MISSILE,Magic Missile,마법 화살
+SPELL_NAME_MALIGN_GATEWAY,Malign Gateway,사악한 관문
+SPELL_NAME_MASS_CONFUSION,Mass Confusion,집단 혼란
+SPELL_NAME_MASS_SUGGESTION,Mass Suggestion,집단 암시
+SPELL_NAME_MAZE,Maze,미궁
+SPELL_NAME_METEOR_SWARM,Meteor Swarm,유성 폭풍
+SPELL_NAME_MIND_BLANK,Mind Blank,정신 차단
+SPELL_NAME_MISTY_STEP,Misty Step,안개 발걸음
+SPELL_NAME_MONSTROUS_MENAGERIE,Monstrous Menagerie,괴물 동물원
+SPELL_NAME_OZOCUBUS_REFRIGERATION,Ozocubu's Refrigeration,오조쿠부스의 냉장
+SPELL_NAME_PAIN,Pain,고통
+SPELL_NAME_PETRIFY,Petrify,석화
+SPELL_NAME_POLYMORPH,Polymorph,변신
+SPELL_NAME_POWER_WORD_KILL,Power Word Kill,절명의 단어
+SPELL_NAME_POWER_WORD_PAIN,Power Word Pain,고통의 단어
+SPELL_NAME_POWER_WORD_STUN,Power Word Stun,충격의 단어
+SPELL_NAME_PRISMATIC_SPRAY,Prismatic Spray,프리즘 분사
+SPELL_NAME_PROTECTION_FROM_ENERGY,Protection from Energy,원소 보호
+SPELL_NAME_RAY_OF_ENFEEBLEMENT,Ray of Enfeeblement,쇠약의 광선
+SPELL_NAME_REVERSE_GRAVITY,Reverse Gravity,중력 반전
+SPELL_NAME_SCORCH,Scorch,그을림
+SPELL_NAME_SCORCHING_RAY,Scorching Ray,작열 광선
+SPELL_NAME_SHATTER,Shatter,파쇄
+SPELL_NAME_SHOCK,Shock,전격
+SPELL_NAME_SHROUD_OF_GOLUBRIA,Shroud of Golubria,골루브리아의 장막
+SPELL_NAME_SLEEP,Sleep,수면
+SPELL_NAME_SLOW,Slow,둔화
+SPELL_NAME_STATIC_DISCHARGE,Static Discharge,정전기 방출
+SPELL_NAME_STINKING_CLOUD,Stinking Cloud,악취 구름
+SPELL_NAME_STONESKIN,Stoneskin,돌피부
+SPELL_NAME_STONE_ARROW,Stone Arrow,돌 화살
+SPELL_NAME_SUMMON_VERMIN,Summon Vermin,해충 소환
+SPELL_NAME_SUNBURST,Sunburst,태양 폭발
+SPELL_NAME_SWIFTNESS,Swiftness,신속
+SPELL_NAME_TELEPORT,Teleport,순간이동
+SPELL_NAME_TIME_STOP,Time Stop,시간 정지
+SPELL_NAME_TORNADO,Tornado,회오리
+SPELL_NAME_VAMPIRIC_DRAINING,Vampiric Draining,흡혈 흡수
+SPELL_NAME_VAMPIRIC_TOUCH,Vampiric Touch,흡혈의 손길
+SPELL_NAME_WALL_OF_FORCE,Wall of Force,역장의 벽

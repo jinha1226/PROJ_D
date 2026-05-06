@@ -185,10 +185,10 @@ func entry_display_name(entry: Dictionary) -> String:
 	var data: ItemData = get_by_id(id)
 	if data == null:
 		return id
-	var base_name: String = GameManager.display_name_of(base_id_of(id)) if GameManager != null else data.display_name
+	var base_name: String = GameManager.display_name_of(base_id_of(id)) if GameManager != null else data.loc_name()
 	var artifact_name: String = String(entry.get("artifact_name", ""))
 	if artifact_name != "":
-		return 'the %s "%s"' % [data.display_name, artifact_name]
+		return 'the %s "%s"' % [data.loc_name(), artifact_name]
 	return base_name
 
 func entry_bonus_lines(entry: Dictionary) -> PackedStringArray:

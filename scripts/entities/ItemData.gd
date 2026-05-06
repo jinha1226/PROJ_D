@@ -43,3 +43,22 @@ class_name ItemData extends Resource
 ## scrolls / potions / books — lets pseudonym-only items show a
 ## generic look before the player learns what they are.
 @export var identified_tile_path: String = ""
+
+
+## Localized display name. Falls back to the .tres display_name if the
+## translation key isn't registered (graceful for new content not yet
+## translated). Key convention: ITEM_NAME_<UPPER_ID>.
+func loc_name() -> String:
+	if id == "":
+		return display_name
+	var key: String = "ITEM_NAME_" + id.to_upper()
+	var translated: String = TranslationServer.translate(key)
+	return translated if translated != key else display_name
+
+## Localized description. Same fallback contract as loc_name().
+func loc_description() -> String:
+	if id == '':
+		return description
+	var key: String = 'ITEM_DESC_' + id.to_upper()
+	var translated: String = TranslationServer.translate(key)
+	return translated if translated != key else description

@@ -104,7 +104,7 @@ static func _make_spell_row(spell: SpellData, player: Player,
 	row.add_child(info)
 
 	var name_lbl := Label.new()
-	name_lbl.text = spell.display_name
+	name_lbl.text = spell.loc_name()
 	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	var name_color: Color
 	var school_key: String = Player.progression_school_for(spell.school) if spell.school != "" else "arcane"

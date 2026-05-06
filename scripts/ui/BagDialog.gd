@@ -32,19 +32,19 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 	var w_plus: int = int(player.equipped_weapon_entry().get("plus", 0)) if w != null else 0
 	var a_plus: int = int(player.equipped_armor_entry().get("plus", 0)) if a != null else 0
 	body.add_child(_equipped_row(LocaleManager.t("EQUIP_WEAPON"),
-			w.display_name if w != null else LocaleManager.t("COMMON_UNARMED"),
+			w.loc_name() if w != null else LocaleManager.t("COMMON_UNARMED"),
 			"d%d" % ((w.damage + w_plus) if w != null else 2)))
 	body.add_child(_equipped_row(LocaleManager.t("EQUIP_ARMOR"),
-			a.display_name if a != null else LocaleManager.t("COMMON_NONE"),
+			a.loc_name() if a != null else LocaleManager.t("COMMON_NONE"),
 			"+%d AC" % ((a.ac_bonus + a_plus) if a != null else 0)))
 	body.add_child(_equipped_row(LocaleManager.t("EQUIP_SHIELD"),
-			sh.display_name if sh != null else LocaleManager.t("COMMON_NONE"),
+			sh.loc_name() if sh != null else LocaleManager.t("COMMON_NONE"),
 			LocaleManager.t("SHIELD_BLOCK_PCT") % (sh.effect_value if sh != null else 0)))
 	body.add_child(_equipped_row(LocaleManager.t("EQUIP_RING"),
-			r.display_name if r != null else LocaleManager.t("COMMON_NONE"),
+			r.loc_name() if r != null else LocaleManager.t("COMMON_NONE"),
 			_accessory_stat_text(r)))
 	body.add_child(_equipped_row(LocaleManager.t("EQUIP_AMULET"),
-			am.display_name if am != null else LocaleManager.t("COMMON_NONE"),
+			am.loc_name() if am != null else LocaleManager.t("COMMON_NONE"),
 			_accessory_stat_text(am)))
 
 	# Inventory sub-tabs

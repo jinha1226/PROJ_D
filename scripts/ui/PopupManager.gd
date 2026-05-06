@@ -164,7 +164,7 @@ func show_spell_learn_popup(spell_level: int, spell_ids: Array, callback: Callab
 		if spell == null:
 			continue
 		var b := Button.new()
-		b.text = "%s  [%s]" % [spell.display_name, spell.school.capitalize()]
+		b.text = "%s  [%s]" % [spell.loc_name(), spell.school.capitalize()]
 		b.custom_minimum_size = Vector2(0, 78)
 		b.add_theme_font_size_override("font_size", 28)
 		b.pressed.connect(func():

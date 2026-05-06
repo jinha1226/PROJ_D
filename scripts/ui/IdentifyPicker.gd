@@ -68,7 +68,7 @@ static func _make_row(data: ItemData, id: String, player: Player,
 static func _on_pick(id: String, data: ItemData, dlg: GameDialog,
 		on_picked: Callable) -> void:
 	GameManager.identify(id)
-	CombatLog.post("You identify %s." % data.display_name,
+	CombatLog.post("You identify %s." % data.loc_name(),
 		Color(0.85, 0.95, 1.0))
 	dlg.close()
 	if on_picked.is_valid():

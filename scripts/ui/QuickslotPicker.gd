@@ -101,7 +101,7 @@ static func _make_spell_row(spell: SpellData, player: Player, slot_index: int,
 	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(vb)
 	var name_lab := Label.new()
-	name_lab.text = spell.display_name
+	name_lab.text = spell.loc_name()
 	name_lab.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	name_lab.add_theme_color_override("font_color", Color(0.8, 0.7, 1.0))
 	vb.add_child(name_lab)
@@ -161,5 +161,5 @@ static func _set_binding(player: Player, slot_index: int, id: String,
 static func _name_of(id: String) -> String:
 	var spell: SpellData = SpellRegistry.get_by_id(id)
 	if spell != null:
-		return spell.display_name
+		return spell.loc_name()
 	return GameManager.display_name_of(id)
