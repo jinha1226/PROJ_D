@@ -670,19 +670,23 @@ static func apply_melee_hit_effects(player: Player, monster: Monster) -> void:
 			var fire_dmg: int = Status.resist_scale(3, monster.data.resists, "fire")
 			if fire_dmg > 0:
 				monster.take_damage(fire_dmg)
+				CombatLog.hit(TranslationServer.translate("ESSENCE_LOG_MELEE_FIRE") % [monster.data.loc_name(), fire_dmg])
 				if randf() < 0.35 and monster.hp > 0:
 					Status.apply(monster, "burning", 2)
 		elif effect_id == "cinder_fire":
 			var fire_dmg: int = Status.resist_scale(2, monster.data.resists, "fire")
 			if fire_dmg > 0:
 				monster.take_damage(fire_dmg)
+				CombatLog.hit(TranslationServer.translate("ESSENCE_LOG_CINDER_FIRE") % [monster.data.loc_name(), fire_dmg])
 		elif effect_id == "melee_chill":
 			if randf() < 0.4:
 				Status.apply(monster, "frozen", 1)
+				CombatLog.hit(TranslationServer.translate("ESSENCE_LOG_MELEE_CHILL") % monster.data.loc_name())
 		elif effect_id == "venom_touch":
 			var venom_dmg: int = Status.resist_scale(1, monster.data.resists, "poison")
 			if venom_dmg > 0:
 				monster.take_damage(venom_dmg)
+				CombatLog.hit(TranslationServer.translate("ESSENCE_LOG_VENOM_TOUCH") % [monster.data.loc_name(), venom_dmg])
 			if not monster.is_aware and has_synergy(player, "essence_swiftness", "essence_venom"):
 				Status.apply(monster, "poison", 5)
 		elif effect_id == "serpent_poison":

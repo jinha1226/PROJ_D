@@ -3,7 +3,7 @@ class_name BagDialog extends RefCounted
 const THUMB_SIZE := 48
 
 static func open(player: Player, parent: Node) -> void:
-	var dlg: GameDialog = GameDialog.create_ratio("Bag", 0.92, 0.92)
+	var dlg: GameDialog = GameDialog.create_ratio("", 0.92, 0.92)
 	parent.add_child(dlg)
 	_populate(dlg, player)
 
@@ -18,7 +18,7 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 	# Gold
 	var gold_lbl := Label.new()
 	gold_lbl.text = LocaleManager.t("BAG_GOLD") % player.gold
-	gold_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_TITLE)
+	gold_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
 	gold_lbl.add_theme_color_override("font_color", Color(1.0, 0.88, 0.3))
 	body.add_child(gold_lbl)
 
@@ -292,11 +292,15 @@ static func _build_item_row(data: ItemData, indices: Array, plus: int,
 	name_lbl.add_theme_color_override("font_color", _item_color(data.kind))
 	row.add_child(name_lbl)
 
-	var is_equipped: bool = data.id == player.equipped_weapon_id \
-		or data.id == player.equipped_armor_id \
-		or data.id == player.equipped_ring_id \
-		or data.id == player.equipped_amulet_id \
-		or data.id == player.equipped_shield_id
+	# Compare the entry's actual id (which keeps randart suffixes) against the
+	# equipped slot ids. data.id is the *base* id resolved by ItemRegistry —
+	# it would mismatch the suffixed equipped id for randarts.
+	var entry_id: String = String(entry_data.get("id", data.id))
+	var is_equipped: bool = entry_id == player.equipped_weapon_id \
+		or entry_id == player.equipped_armor_id \
+		or entry_id == player.equipped_ring_id \
+		or entry_id == player.equipped_amulet_id \
+		or entry_id == player.equipped_shield_id
 	if is_equipped:
 		var eq_lbl := Label.new()
 		eq_lbl.text = LocaleManager.t("COMMON_EQUIPPED")

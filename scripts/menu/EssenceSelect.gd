@@ -76,12 +76,20 @@ func _make_card(faith_id: String) -> Control:
 	desc_lbl.add_theme_color_override("font_color", Color(0.65, 0.68, 0.75))
 	vb.add_child(desc_lbl)
 
-	var btn := Button.new()
-	btn.custom_minimum_size = Vector2(130, 52)
-	btn.add_theme_font_size_override("font_size", 24)
-	btn.text = LocaleManager.t("ESSENCESELECT_PICK")
-	btn.pressed.connect(_on_pick.bind(faith_id))
-	hb.add_child(btn)
+	# Tap the whole card to pick — Pick button removed per UX feedback.
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	var touch_y := [-9999.0]
+	panel.gui_input.connect(func(ev: InputEvent) -> void:
+		if ev is InputEventScreenTouch:
+			if ev.pressed:
+				touch_y[0] = ev.position.y
+			elif touch_y[0] > -9000.0 and absf(ev.position.y - touch_y[0]) < 16.0:
+				touch_y[0] = -9999.0
+				_on_pick(faith_id)
+			else:
+				touch_y[0] = -9999.0
+		elif ev is InputEventMouseButton and not ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			_on_pick(faith_id))
 
 	return panel
 

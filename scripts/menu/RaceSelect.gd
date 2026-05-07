@@ -80,16 +80,28 @@ func _make_card(data: RaceData) -> Control:
 		hint_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		vb.add_child(hint_lab)
 
-	var btn := Button.new()
-	btn.custom_minimum_size = Vector2(0, 60)
-	btn.add_theme_font_size_override("font_size", 26)
-	if unlocked:
-		btn.text = LocaleManager.t("RACESELECT_PICK") % data.loc_name()
-		btn.pressed.connect(_on_pick.bind(data.id))
-	else:
-		btn.text = LocaleManager.t("COMMON_LOCKED")
-		btn.disabled = true
-	vb.add_child(btn)
+	if not unlocked:
+		var locked_lbl := Label.new()
+		locked_lbl.text = LocaleManager.t("COMMON_LOCKED")
+		locked_lbl.add_theme_font_size_override("font_size", 22)
+		locked_lbl.add_theme_color_override("font_color", Color(0.7, 0.55, 0.4))
+		vb.add_child(locked_lbl)
+		return panel
+
+	# The whole card is the tap target — no separate Pick button.
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	var touch_y := [-9999.0]
+	panel.gui_input.connect(func(ev: InputEvent) -> void:
+		if ev is InputEventScreenTouch:
+			if ev.pressed:
+				touch_y[0] = ev.position.y
+			elif touch_y[0] > -9000.0 and absf(ev.position.y - touch_y[0]) < 16.0:
+				touch_y[0] = -9999.0
+				_on_pick(data.id)
+			else:
+				touch_y[0] = -9999.0
+		elif ev is InputEventMouseButton and not ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			_on_pick(data.id))
 
 	return panel
 

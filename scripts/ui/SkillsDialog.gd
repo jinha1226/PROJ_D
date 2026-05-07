@@ -63,7 +63,7 @@ const _CATEGORY_SKILLS: Dictionary = {
 }
 
 static func open(player: Player, parent: Node) -> void:
-	var dlg: GameDialog = GameDialog.create_ratio("Skills", 0.92, 0.92)
+	var dlg: GameDialog = GameDialog.create_ratio("", 0.92, 0.92)
 	parent.add_child(dlg)
 	var body: VBoxContainer = dlg.body()
 	if body == null:

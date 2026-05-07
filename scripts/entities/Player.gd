@@ -43,14 +43,23 @@ const DOLL_HAND1_MAP: Dictionary = {
 	"dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
 	"mace": "res://assets/tiles/individual/player/hand1/mace.png",
 	"long_sword": "res://assets/tiles/individual/player/hand1/long_sword_slant.png",
+	"arming_sword": "res://assets/tiles/individual/player/hand1/long_sword_slant2.png",
+	"bastard_sword": "res://assets/tiles/individual/player/hand1/heavy_sword.png",
+	"great_blade": "res://assets/tiles/individual/player/hand1/great_sword_slant.png",
 	"battle_axe": "res://assets/tiles/individual/player/hand1/battleaxe.png",
 	"spear": "res://assets/tiles/individual/player/hand1/spear.png",
 	"shortbow": "res://assets/tiles/individual/player/hand1/shortbow.png",
+	"longbow": "res://assets/tiles/individual/player/hand1/great_bow.png",
+	"crossbow": "res://assets/tiles/individual/player/hand1/arbalest.png",
 	"staff": "res://assets/tiles/individual/player/hand1/staff.png",
 	"flaming_sword": "res://assets/tiles/individual/player/hand1/short_sword.png",
 	"frost_dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
 	"venom_dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
 	"shock_mace": "res://assets/tiles/individual/player/hand1/mace.png",
+	"dirk": "res://assets/tiles/individual/player/hand1/athame.png",
+	"stiletto": "res://assets/tiles/individual/player/hand1/dagger.png",
+	"quick_blade": "res://assets/tiles/individual/player/hand1/sword_thief.png",
+	"assassin_blade": "res://assets/tiles/individual/player/hand1/dagger.png",
 }
 
 var _base_tex: Texture2D = DEFAULT_BASE_TEX

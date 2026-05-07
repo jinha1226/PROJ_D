@@ -20,7 +20,7 @@ const _RESIST_LABELS: Dictionary = {
 static func open(player: Player, parent: Node) -> void:
 	if player == null or parent == null:
 		return
-	var dlg: GameDialog = GameDialog.create_ratio("Status", 0.94, 0.94)
+	var dlg: GameDialog = GameDialog.create_ratio("", 0.94, 0.94)
 	parent.add_child(dlg)
 	_rebuild_body(dlg, player, parent)
 

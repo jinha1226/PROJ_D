@@ -168,16 +168,23 @@ func _make_card(data: ClassData) -> Control:
 		hint_lab.add_theme_color_override("font_color", Color(1.0, 0.7, 0.45))
 		vb.add_child(hint_lab)
 
-	var pick_btn := Button.new()
-	pick_btn.custom_minimum_size = Vector2(0, 56)
-	pick_btn.add_theme_font_size_override("font_size", 24)
-	if unlocked:
-		pick_btn.text = LocaleManager.t("JOBSELECT_START_AS") % data.loc_name()
-		pick_btn.pressed.connect(_on_pick.bind(data.id))
-	else:
-		pick_btn.text = LocaleManager.t("COMMON_LOCKED")
-		pick_btn.disabled = true
-	vb.add_child(pick_btn)
+	if not unlocked:
+		return panel
+
+	# Tap the whole card to pick — Pick button removed per UX feedback.
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	var touch_y := [-9999.0]
+	panel.gui_input.connect(func(ev: InputEvent) -> void:
+		if ev is InputEventScreenTouch:
+			if ev.pressed:
+				touch_y[0] = ev.position.y
+			elif touch_y[0] > -9000.0 and absf(ev.position.y - touch_y[0]) < 16.0:
+				touch_y[0] = -9999.0
+				_on_pick(data.id)
+			else:
+				touch_y[0] = -9999.0
+		elif ev is InputEventMouseButton and not ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			_on_pick(data.id))
 
 	return panel
 

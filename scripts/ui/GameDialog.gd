@@ -51,8 +51,14 @@ func _ready() -> void:
 	_dim.gui_input.connect(_on_dim_input)
 	_close_button.pressed.connect(close)
 	if has_meta("_pending_title"):
-		_title_label.text = String(get_meta("_pending_title"))
+		var t: String = String(get_meta("_pending_title"))
+		_title_label.text = t
 		remove_meta("_pending_title")
+		# Hide the title row entirely when no title is supplied — saves
+		# vertical space on dialogs that already have their own header.
+		var title_row: Node = _title_label.get_parent()
+		if title_row is Control:
+			(title_row as Control).visible = (t != "")
 	if has_meta("_pending_ratio"):
 		_ratio = get_meta("_pending_ratio")
 		remove_meta("_pending_ratio")
