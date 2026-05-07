@@ -1633,9 +1633,22 @@ func _on_minimap_tapped() -> void:
 			is_press = true
 		if not is_press:
 			return
-		var local_pos := map_rect.get_local_mouse_position()
-		var gx := int(local_pos.x * DungeonMap.GRID_W / map_rect.size.x)
-		var gy := int(local_pos.y * DungeonMap.GRID_H / map_rect.size.y)
+		# STRETCH_KEEP_ASPECT_CENTERED letterboxes the texture inside
+		# map_rect, so we can't map local_pos directly to grid coords —
+		# need to convert through the actual displayed texture rect.
+		var rs: Vector2 = map_rect.size
+		var ts: Vector2 = map_rect.texture.get_size()
+		if ts.x <= 0 or ts.y <= 0 or rs.x <= 0 or rs.y <= 0:
+			return
+		var scale: float = min(rs.x / ts.x, rs.y / ts.y)
+		var disp: Vector2 = ts * scale
+		var origin: Vector2 = (rs - disp) * 0.5
+		var local_pos: Vector2 = map_rect.get_local_mouse_position() - origin
+		if local_pos.x < 0 or local_pos.y < 0 \
+				or local_pos.x >= disp.x or local_pos.y >= disp.y:
+			return
+		var gx := int(local_pos.x * DungeonMap.GRID_W / disp.x)
+		var gy := int(local_pos.y * DungeonMap.GRID_H / disp.y)
 		var nav_target := Vector2i(gx, gy)
 		if not map.in_bounds(nav_target) or not map.explored.has(nav_target) \
 				or not map.is_walkable(nav_target) or nav_target == player.grid_pos:
@@ -2770,7 +2783,7 @@ func _top_item_bar_ids() -> Array[String]:
 			continue
 		seen[id] = true
 		result.append(id)
-		if result.size() >= 8:
+		if result.size() >= 9:
 			break
 	return result
 
@@ -2779,7 +2792,7 @@ func _refresh_quickslots() -> void:
 		return
 	if top_hud != null:
 		var item_ids: Array[String] = _top_item_bar_ids()
-		for i in range(8):
+		for i in range(9):
 			if i >= item_ids.size():
 				top_hud.set_item_slot(i, null, "")
 				continue
