@@ -165,6 +165,16 @@ func _register(res) -> void:
 		return
 	by_id[String(res.id)] = res
 	all.append(res)
+	# Lint: warn if declared tile assets do not exist on disk so future
+	# bad name→image mappings surface at boot instead of as silent blank icons.
+	if "tile_path" in res:
+		var tp: String = String(res.tile_path)
+		if tp != "" and not ResourceLoader.exists(tp):
+			push_warning("ItemRegistry: %s tile_path missing: %s" % [String(res.id), tp])
+	if "identified_tile_path" in res:
+		var itp: String = String(res.identified_tile_path)
+		if itp != "" and not ResourceLoader.exists(itp):
+			push_warning("ItemRegistry: %s identified_tile_path missing: %s" % [String(res.id), itp])
 
 func get_by_id(id: String) -> ItemData:
 	if by_id.has(id):

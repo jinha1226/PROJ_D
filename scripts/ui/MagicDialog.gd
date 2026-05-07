@@ -26,7 +26,7 @@ static func _populate(dlg: GameDialog, player: Player, game: Node) -> void:
 
 	if player.known_spells.is_empty():
 		var empty := Label.new()
-		empty.text = "You know no spells."
+		empty.text = LocaleManager.t("MAGIC_NO_SPELLS")
 		empty.add_theme_color_override("font_color", Color(0.55, 0.55, 0.6))
 		body.add_child(empty)
 		return
@@ -117,7 +117,7 @@ static func _make_spell_row(spell: SpellData, player: Player,
 
 	var stat_lbl := Label.new()
 	if locked:
-		stat_lbl.text = "Requires XL %d" % spell.xl_required
+		stat_lbl.text = LocaleManager.t("MAGIC_REQUIRES_XL") % spell.xl_required
 		stat_lbl.add_theme_color_override("font_color", Color(0.55, 0.45, 0.45))
 	else:
 		var effective_range: int = MagicSystem.effective_spell_range(spell)
@@ -134,9 +134,9 @@ static func _make_spell_row(spell: SpellData, player: Player,
 	stat_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	info.add_child(stat_lbl)
 
-	if not locked and spell.description != "":
+	if not locked and spell.loc_description() != "":
 		var desc_lbl := Label.new()
-		desc_lbl.text = spell.description
+		desc_lbl.text = spell.loc_description()
 		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		desc_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 		desc_lbl.add_theme_color_override("font_color", Color(0.65, 0.68, 0.78))
@@ -147,13 +147,13 @@ static func _make_spell_row(spell: SpellData, player: Player,
 	btn.custom_minimum_size = Vector2(110, 52)
 	btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	if locked:
-		btn.text = "Locked"
+		btn.text = LocaleManager.t("COMMON_LOCKED")
 		btn.disabled = true
 	elif no_mp:
-		btn.text = "No MP"
+		btn.text = LocaleManager.t("MAGIC_NO_MP")
 		btn.disabled = true
 	else:
-		btn.text = "Cast"
+		btn.text = LocaleManager.t("MAGIC_CAST")
 		btn.pressed.connect(func(): _on_cast(spell.id, player, dlg, game))
 	row.add_child(btn)
 
@@ -207,7 +207,7 @@ static func _describe(player: Player, spell: SpellData) -> String:
 		"stun":         return "Stun area"
 		"prismatic":    return "Random effect"
 		"astral":       return "Ethereal form"
-	return spell.description.left(28)
+	return spell.loc_description().left(28)
 
 
 static func _armor_spell_mult(player: Player) -> float:

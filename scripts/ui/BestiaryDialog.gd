@@ -13,7 +13,7 @@ static func open(parent: Node) -> void:
 	var all_monsters: Array = MonsterRegistry.all
 	if all_monsters.is_empty():
 		var lbl := Label.new()
-		lbl.text = "No monsters in registry."
+		lbl.text = LocaleManager.t("BESTIARY_EMPTY")
 		body.add_child(lbl)
 		return
 
@@ -31,7 +31,7 @@ static func open(parent: Node) -> void:
 			killed_count += 1
 
 	var summary := Label.new()
-	summary.text = "Slain: %d / %d species" % [killed_count, total]
+	summary.text = LocaleManager.t("BESTIARY_SLAIN_FMT") % [killed_count, total]
 	summary.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 	summary.add_theme_color_override("font_color", Color(0.75, 0.9, 0.75))
 	body.add_child(summary)
@@ -53,7 +53,7 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 
 	if kills == 0:
 		var name_lbl := Label.new()
-		name_lbl.text = "%s ???   (B%d-B%d)" % [data.glyph, data.min_depth, data.max_depth]
+		name_lbl.text = "%s %s   (B%d-B%d)" % [data.glyph, LocaleManager.t("BESTIARY_UNKNOWN"), data.min_depth, data.max_depth]
 		name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_LABEL)
 		name_lbl.add_theme_color_override("font_color", Color(0.4, 0.4, 0.45))
 		vb.add_child(name_lbl)
@@ -99,9 +99,10 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 	stat_lbl.add_theme_color_override("font_color", Color(0.65, 0.65, 0.75))
 	vb.add_child(stat_lbl)
 
-	if data.description != "":
+	var desc_text: String = data.loc_description()
+	if desc_text != "":
 		var desc_lbl := Label.new()
-		desc_lbl.text = data.description
+		desc_lbl.text = desc_text
 		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		desc_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		desc_lbl.add_theme_color_override("font_color", Color(0.78, 0.78, 0.85))
@@ -119,7 +120,7 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 		ess_row.add_child(ess_icon)
 
 		var ess_lbl := Label.new()
-		ess_lbl.text = "Essence: %s - %s" % [
+		ess_lbl.text = LocaleManager.t("BESTIARY_ESSENCE_FMT") % [
 			EssenceSystem.display_name(eid), EssenceSystem.description(eid)]
 		ess_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		ess_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
@@ -129,7 +130,7 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 		vb.add_child(ess_row)
 	elif kills > 0:
 		var ess_lbl := Label.new()
-		ess_lbl.text = "Essence: random drop"
+		ess_lbl.text = LocaleManager.t("BESTIARY_ESSENCE_RANDOM")
 		ess_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 		ess_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
 		vb.add_child(ess_lbl)

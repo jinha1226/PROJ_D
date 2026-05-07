@@ -537,7 +537,7 @@ static func _equipment_row(label_text: String, slot: String, player: Player) -> 
 	var data: ItemData = ItemRegistry.get_by_id(item_id) if ItemRegistry != null and item_id != "" else null
 	var name_text := "(empty)"
 	if data != null:
-		name_text = data.display_name
+		name_text = data.loc_name()
 		var plus_val: int = int(entry.get("plus", 0))
 		if plus_val != 0:
 			name_text += " %+d" % plus_val
@@ -558,9 +558,9 @@ static func _equipment_row(label_text: String, slot: String, player: Player) -> 
 	value.add_theme_color_override("font_color", Color(0.95, 0.88, 0.6) if data != null else Color(0.6, 0.6, 0.68))
 	top.add_child(value)
 
-	if data != null and data.description != "":
+	if data != null and data.loc_description() != "":
 		var desc := Label.new()
-		desc.text = data.description
+		desc.text = data.loc_description()
 		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		desc.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 		desc.add_theme_color_override("font_color", Color(0.72, 0.74, 0.8))

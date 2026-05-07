@@ -52,24 +52,24 @@ static func _monster_lines(m: Monster) -> Array:
 	var data: MonsterData = m.data if "data" in m else null
 	if data == null:
 		return []
-	var lines: Array = [data.display_name]
+	var lines: Array = [data.loc_name()]
 	lines.append("HP %d / %d" % [m.hp, data.hp])
 	if data.ac > 0:
 		lines.append("AC %d" % data.ac)
 	if data.resists.size() > 0:
 		lines.append(LocaleManager.t("TILE_RESISTS") % ", ".join(data.resists))
-	if data.description != "":
-		lines.append(data.description)
+	if data.loc_description() != "":
+		lines.append(data.loc_description())
 	return lines
 
 
 static func _item_lines(data: ItemData) -> Array:
 	if data == null:
 		return []
-	var title: String = GameManager.display_name_of(data.id) if GameManager != null else data.display_name
+	var title: String = GameManager.display_name_of(data.id) if GameManager != null else data.loc_name()
 	var lines: Array = [title]
-	if data.description != "":
-		lines.append(data.description)
+	if data.loc_description() != "":
+		lines.append(data.loc_description())
 	return lines
 
 

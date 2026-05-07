@@ -99,8 +99,8 @@ static func _build_description(data: ItemData) -> Control:
 	var text: String
 	if is_consumable and not GameManager.is_identified(data.id):
 		text = LocaleManager.t("COMMON_UNKNOWN")
-	elif data.description != "":
-		text = data.description
+	elif data.loc_description() != "":
+		text = data.loc_description()
 	else:
 		text = _effect_desc(data)
 	var lbl := Label.new()

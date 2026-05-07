@@ -83,8 +83,8 @@ func _build_class_list() -> void:
 	# Empty-state message (e.g. advanced view with nothing unlocked yet)
 	if not any_shown:
 		var empty := Label.new()
-		empty.text = "No advanced classes unlocked yet." if _show_advanced \
-			else "No starter classes available."
+		empty.text = LocaleManager.t("JOBSELECT_NO_ADVANCED") if _show_advanced \
+			else LocaleManager.t("JOBSELECT_NO_BASIC")
 		empty.add_theme_font_size_override("font_size", 18)
 		empty.add_theme_color_override("font_color", Color(0.6, 0.62, 0.7))
 		_container.add_child(empty)
@@ -95,9 +95,9 @@ func _make_toggle_button() -> Control:
 	btn.custom_minimum_size = Vector2(0, GameTheme.TAP_MIN_HEIGHT)
 	btn.add_theme_font_size_override("font_size", 22)
 	if _show_advanced:
-		btn.text = "◂ Starter Classes"
+		btn.text = LocaleManager.t("JOBSELECT_STARTER")
 	else:
-		btn.text = "Advanced Classes ▸"
+		btn.text = LocaleManager.t("JOBSELECT_ADVANCED")
 	btn.pressed.connect(_on_toggle_advanced)
 	return btn
 
@@ -132,7 +132,7 @@ func _make_card(data: ClassData) -> Control:
 	hb.add_child(vb)
 
 	var name_lab := Label.new()
-	name_lab.text = data.display_name
+	name_lab.text = data.loc_name()
 	name_lab.add_theme_font_size_override("font_size", 36)
 	name_lab.add_theme_color_override("font_color", Color(0.95, 0.85, 0.5))
 	vb.add_child(name_lab)
@@ -172,10 +172,10 @@ func _make_card(data: ClassData) -> Control:
 	pick_btn.custom_minimum_size = Vector2(0, 56)
 	pick_btn.add_theme_font_size_override("font_size", 24)
 	if unlocked:
-		pick_btn.text = "Start as %s" % data.display_name
+		pick_btn.text = LocaleManager.t("JOBSELECT_START_AS") % data.loc_name()
 		pick_btn.pressed.connect(_on_pick.bind(data.id))
 	else:
-		pick_btn.text = "Locked"
+		pick_btn.text = LocaleManager.t("COMMON_LOCKED")
 		pick_btn.disabled = true
 	vb.add_child(pick_btn)
 

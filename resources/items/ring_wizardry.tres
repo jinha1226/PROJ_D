@@ -8,7 +8,8 @@ id = "ring_wizardry"
 display_name = "Ring of Wizardry"
 kind = "ring"
 tier = 3
-tile_path = "res://assets/tiles/individual/item/ring/white.png"
+tile_path = "res://assets/tiles/individual/item/ring/ivory.png"
+identified_tile_path = "res://assets/tiles/individual/item/ring/i-wizardry.png"
 glyph = "="
 glyph_color = Color(0.75, 0.85, 1, 1)
 damage = 0

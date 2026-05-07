@@ -183,3 +183,7 @@ size_flags_horizontal = 3
 [node name="ItemSlot7" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
 custom_minimum_size = Vector2(70, 56)
 size_flags_horizontal = 3
+
+[node name="ItemSlot8" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
+custom_minimum_size = Vector2(70, 56)
+size_flags_horizontal = 3

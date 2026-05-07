@@ -341,21 +341,26 @@ static func inventory_capacity(player: Player) -> int:
 static func inventory_is_full(player: Player) -> bool:
 	return player != null and player.essence_inventory.size() >= inventory_capacity(player)
 
+static func _tr_or(key: String, fallback: String) -> String:
+	var t: String = TranslationServer.translate(key)
+	return t if t != key else fallback
+
 static func display_name(id: String) -> String:
-	return String(ESSENCES.get(id, {}).get("name", id))
+	var fallback: String = String(ESSENCES.get(id, {}).get("name", id))
+	return _tr_or("ESSENCE_NAME_" + id.to_upper(), fallback)
 
 static func description(id: String) -> String:
 	var info: Dictionary = ESSENCES.get(id, {})
 	var parts: Array = []
-	var base: String = String(info.get("desc", ""))
-	var passive: String = String(info.get("passive_desc", ""))
-	var penalty: String = String(info.get("penalty_desc", ""))
+	var base: String = _tr_or("ESSENCE_DESC_" + id.to_upper(), String(info.get("desc", "")))
+	var passive: String = _tr_or("ESSENCE_PASSIVE_" + id.to_upper(), String(info.get("passive_desc", "")))
+	var penalty: String = _tr_or("ESSENCE_PENALTY_" + id.to_upper(), String(info.get("penalty_desc", "")))
 	if base != "":
 		parts.append(base)
 	if passive != "":
 		parts.append(passive)
 	if penalty != "":
-		parts.append("Penalty: %s" % penalty)
+		parts.append(TranslationServer.translate("ESSENCE_PENALTY_PREFIX") % penalty)
 	return " ".join(parts)
 
 static func color_of(id: String) -> Color:
@@ -502,35 +507,26 @@ static func passive_effect(id: String) -> String:
 	return String(ESSENCES.get(id, {}).get("passive_effect", ""))
 
 static func active_synergies(player: Player) -> Array:
+	var pairs: Array = [
+		["essence_fire", "essence_arcana", "ESSENCE_SYN_BLAZECRAFT"],
+		["essence_cold", "essence_arcana", "ESSENCE_SYN_FROSTCRAFT"],
+		["essence_arcana", "essence_warding", "ESSENCE_SYN_FORBIDDEN_WARD"],
+		["essence_swiftness", "essence_venom", "ESSENCE_SYN_GHOST_VENOM"],
+		["essence_stone", "essence_vitality", "ESSENCE_SYN_BULWARK_HEART"],
+		["essence_fury", "essence_drain", "ESSENCE_SYN_BLOODRUSH"],
+		["essence_gloam", "essence_swiftness", "ESSENCE_SYN_GLOAM_SWIFT"],
+		["essence_cinder", "essence_arcana", "ESSENCE_SYN_CINDER_ARCANA"],
+		["essence_serpent", "essence_swiftness", "ESSENCE_SYN_SERPENT_SWIFT"],
+		["essence_bastion", "essence_vitality", "ESSENCE_SYN_BASTION_VITAL"],
+		["essence_dread", "essence_warding", "ESSENCE_SYN_DREAD_WARD"],
+		["essence_bloodwake", "essence_fury", "ESSENCE_SYN_BLOODWAKE_FURY"],
+		["essence_tempest", "essence_arcana", "ESSENCE_SYN_TEMPEST_ARCANA"],
+		["essence_pale_star", "essence_arcana", "ESSENCE_SYN_PALE_STAR_ARCANA"],
+	]
 	var out: Array = []
-	if has_synergy(player, "essence_fire", "essence_arcana"):
-		out.append("Blazecraft: fire spells gain +4 power.")
-	if has_synergy(player, "essence_cold", "essence_arcana"):
-		out.append("Frostcraft: cold spells gain +4 power.")
-	if has_synergy(player, "essence_arcana", "essence_warding"):
-		out.append("Forbidden Ward: spell study INT -3 total.")
-	if has_synergy(player, "essence_swiftness", "essence_venom"):
-		out.append("Ghost Venom: stronger stealth and unaware poison setup.")
-	if has_synergy(player, "essence_stone", "essence_vitality"):
-		out.append("Bulwark Heart: damage -3 total.")
-	if has_synergy(player, "essence_fury", "essence_drain"):
-		out.append("Bloodrush: extra healing on kill.")
-	if has_synergy(player, "essence_gloam", "essence_swiftness"):
-		out.append("Gloam + Swiftness: first unaware hit also weakens for 2 turns.")
-	if has_synergy(player, "essence_cinder", "essence_arcana"):
-		out.append("Cinder + Arcana: fire spells gain +4 bonus power.")
-	if has_synergy(player, "essence_serpent", "essence_swiftness"):
-		out.append("Serpent + Swiftness: unaware opener gains +25% damage.")
-	if has_synergy(player, "essence_bastion", "essence_vitality"):
-		out.append("Bastion + Vitality: potion healing +3 HP.")
-	if has_synergy(player, "essence_dread", "essence_warding"):
-		out.append("Dread + Warding: feared enemies deal -2 damage.")
-	if has_synergy(player, "essence_bloodwake", "essence_fury"):
-		out.append("Bloodwake + Fury: on-kill surge lasts 3 turns.")
-	if has_synergy(player, "essence_tempest", "essence_arcana"):
-		out.append("Tempest + Arcana: spell study INT -3 total.")
-	if has_synergy(player, "essence_pale_star", "essence_arcana"):
-		out.append("Pale Star + Arcana: spell study INT -4 total.")
+	for p in pairs:
+		if has_synergy(player, p[0], p[1]):
+			out.append(TranslationServer.translate(p[2]))
 	return out
 
 static func has_venom_touch(player: Player) -> bool:

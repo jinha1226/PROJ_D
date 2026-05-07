@@ -147,7 +147,9 @@ static func _make_mastery_card(category: String, player: Player, parent: Node,
 	inner.add_child(header)
 
 	var name_lbl := Label.new()
-	name_lbl.text = category.to_upper()
+	var cat_key: String = "MASTERY_NAME_" + category.to_upper()
+	var cat_t: String = LocaleManager.t(cat_key)
+	name_lbl.text = cat_t if cat_t != cat_key else category.to_upper()
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_SUBTITLE)
 	name_lbl.add_theme_color_override("font_color", Color(0.94, 0.84, 0.42))
@@ -243,7 +245,9 @@ static func _make_subskill_row(skill_id: String, player: Player, parent: Node,
 	row.add_child(check_lbl)
 
 	var name_lbl := Label.new()
-	name_lbl.text = skill_id.capitalize().replace("_", " ")
+	var sk_key: String = "SKILL_NAME_" + skill_id.to_upper()
+	var sk_t: String = LocaleManager.t(sk_key)
+	name_lbl.text = sk_t if sk_t != sk_key else skill_id.capitalize().replace("_", " ")
 	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -312,7 +316,9 @@ static func _make_subskill_row(skill_id: String, player: Player, parent: Node,
 	hold_timer.wait_time = 0.6
 	hold_timer.one_shot = true
 	btn.add_child(hold_timer)
-	var desc: String = String(_DESCRIPTIONS.get(skill_id, ""))
+	var key: String = "SKILL_DESC_" + skill_id.to_upper()
+	var translated: String = LocaleManager.t(key)
+	var desc: String = translated if translated != key else String(_DESCRIPTIONS.get(skill_id, ""))
 	hold_timer.timeout.connect(func():
 		_long_pressed[0] = true
 		_show_desc(skill_id, desc, parent))
@@ -334,8 +340,10 @@ static func _make_subskill_row(skill_id: String, player: Player, parent: Node,
 
 static func _format_mastery_effect(category: String, lv: int) -> String:
 	if lv <= 0:
-		return "(no mastery bonus yet)"
-	var fmt: String = String(_MASTERY_LABELS.get(category, ""))
+		return LocaleManager.t("SKILLS_NO_MASTERY")
+	var key: String = "MASTERY_FMT_" + category.to_upper()
+	var t: String = LocaleManager.t(key)
+	var fmt: String = t if t != key else String(_MASTERY_LABELS.get(category, ""))
 	match category:
 		"Melee", "Ranged", "Magic", "Defense", "Utility":
 			return fmt % (0.5 * float(lv))
@@ -354,7 +362,10 @@ static func _apt_label(apt: int) -> String:
 static func _show_desc(skill_id: String, desc: String, parent: Node) -> void:
 	if desc == "":
 		return
-	var dlg: GameDialog = GameDialog.create(skill_id.capitalize().replace("_", " "))
+	var title_key: String = "SKILL_NAME_" + skill_id.to_upper()
+	var title_t: String = LocaleManager.t(title_key)
+	var title: String = title_t if title_t != title_key else skill_id.capitalize().replace("_", " ")
+	var dlg: GameDialog = GameDialog.create(title)
 	parent.add_child(dlg)
 	var body := dlg.body()
 	if body == null:

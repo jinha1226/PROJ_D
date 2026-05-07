@@ -8,7 +8,7 @@ id = "ring_cold_resist"
 display_name = "Ring of Cold Resistance"
 kind = "ring"
 tier = 3
-tile_path = "res://assets/tiles/individual/item/ring/sapphire.png"
+tile_path = "res://assets/tiles/individual/item/ring/diamond.png"
 glyph = "="
 glyph_color = Color(0.5, 0.85, 1, 1)
 slot = "ring"

@@ -29,6 +29,7 @@ signal item_slot_pressed(index: int)
     $MainMargin/MainVBox/ItemRow/ItemSlot5,
     $MainMargin/MainVBox/ItemRow/ItemSlot6,
     $MainMargin/MainVBox/ItemRow/ItemSlot7,
+    $MainMargin/MainVBox/ItemRow/ItemSlot8,
 ]
 
 var _pulse_t: float = 0.0

@@ -5,10 +5,11 @@
 [resource]
 script = ExtResource("1_idata")
 id = "ring_int"
-display_name = "반지 of Wizardry"
+display_name = "Ring of Intelligence"
 kind = "ring"
 tier = 2
-tile_path = "res://assets/tiles/individual/item/ring/sapphire.png"
+tile_path = "res://assets/tiles/individual/item/ring/moonstone.png"
+identified_tile_path = "res://assets/tiles/individual/item/ring/i-int.png"
 glyph = "="
 glyph_color = Color(0.4, 0.6, 1.0, 1)
 damage = 0

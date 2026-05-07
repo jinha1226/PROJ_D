@@ -21,8 +21,13 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 	if Status.is_fleeing(monster):
 		_flee_step(monster, map, player.grid_pos)
 		return
-	# Fire telegraphed ability from last turn
+	# Fire telegraphed ability — wait `turns_left` boss turns before firing.
+	# Player gets that many turns to step out of the warning tiles.
 	if not monster._ability_charge.is_empty():
+		var turns_left: int = int(monster._ability_charge.get("turns_left", 0))
+		if turns_left > 0:
+			monster._ability_charge["turns_left"] = turns_left - 1
+			return
 		_fire_charge(monster, player, map)
 		return
 	var confusion: float = Status.confusion_chance(monster)
@@ -160,7 +165,7 @@ static func _try_boss_telegraph(monster: Monster, player: Player, map: DungeonMa
 		"gnoll_warlord", "orc_warchief", "ogre_chieftain":
 			_telegraph_aoe(monster, map, 1,
 				"The %s raises its weapon for a mighty cleave!" % monster.data.display_name,
-				monster.data.hd * 5)
+				monster.data.hd * 4)
 		"storm_hierophant", "ember_tyrant":
 			_telegraph_line(monster, player, map,
 				"The %s charges a devastating bolt!" % monster.data.display_name,
@@ -206,7 +211,7 @@ static func _telegraph_aoe(monster: Monster, map: DungeonMap,
 				tiles.append(t)
 				map.set_warning(t, Color(1.0, 0.45, 0.0, 0.45))
 	CombatLog.post(msg, Color(1.0, 0.8, 0.2))
-	monster._ability_charge = {"name": "aoe", "tiles": tiles, "damage": dmg}
+	monster._ability_charge = {"name": "aoe", "tiles": tiles, "damage": dmg, "turns_left": 1}
 
 
 ## Telegraph a line bolt: show warning tiles along direction to player.
@@ -223,7 +228,7 @@ static func _telegraph_line(monster: Monster, player: Player, map: DungeonMap,
 		map.set_warning(cur, Color(1.0, 0.2, 0.2, 0.5))
 		cur += dir
 	CombatLog.post(msg, Color(1.0, 0.8, 0.2))
-	monster._ability_charge = {"name": "line", "tiles": tiles, "damage": dmg}
+	monster._ability_charge = {"name": "line", "tiles": tiles, "damage": dmg, "turns_left": 1}
 
 
 ## Execute a telegraphed ability (called the turn after telegraph).

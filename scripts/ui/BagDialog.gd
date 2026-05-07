@@ -23,7 +23,7 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 	body.add_child(gold_lbl)
 
 	# Equipped section
-	body.add_child(UICards.section_header(LocaleManager.t("BAG_EQUIPPED")))
+	body.add_child(UICards.section_header(LocaleManager.t("BAG_EQUIPPED"), 26))
 	var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
 	var a: ItemData = ItemRegistry.get_by_id(player.equipped_armor_id) if ItemRegistry != null and player.equipped_armor_id != "" else null
 	var r: ItemData = ItemRegistry.get_by_id(player.equipped_ring_id) if ItemRegistry != null and player.equipped_ring_id != "" else null
@@ -48,7 +48,7 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 			_accessory_stat_text(am)))
 
 	# Inventory sub-tabs
-	body.add_child(UICards.section_header("%s  (%d)" % [LocaleManager.t("BAG_INVENTORY"), player.items.size()]))
+	body.add_child(UICards.section_header("%s  (%d)" % [LocaleManager.t("BAG_INVENTORY"), player.items.size()], 26))
 	if player.items.is_empty():
 		var empty := Label.new()
 		empty.text = LocaleManager.t("BAG_EMPTY")

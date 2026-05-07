@@ -19,7 +19,7 @@ func _build_cards() -> void:
 	var ids: Array = RaceRegistry.ids_in_order()
 	if ids.is_empty():
 		var lab := Label.new()
-		lab.text = "No races loaded."
+		lab.text = LocaleManager.t("RACESELECT_EMPTY")
 		_container.add_child(lab)
 		return
 	for id in ids:
@@ -52,7 +52,7 @@ func _make_card(data: RaceData) -> Control:
 	hb.add_child(vb)
 
 	var name_lab := Label.new()
-	name_lab.text = data.display_name
+	name_lab.text = data.loc_name()
 	name_lab.add_theme_font_size_override("font_size", 40)
 	var name_col: Color = Color(0.95, 0.85, 0.5) if data.unlocked \
 			else Color(0.55, 0.55, 0.6)
@@ -60,7 +60,7 @@ func _make_card(data: RaceData) -> Control:
 	vb.add_child(name_lab)
 
 	var desc_lab := Label.new()
-	desc_lab.text = data.description
+	desc_lab.text = data.loc_description()
 	desc_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc_lab.add_theme_font_size_override("font_size", 20)
 	desc_lab.add_theme_color_override("font_color", Color(0.68, 0.65, 0.6))
@@ -84,10 +84,10 @@ func _make_card(data: RaceData) -> Control:
 	btn.custom_minimum_size = Vector2(0, 60)
 	btn.add_theme_font_size_override("font_size", 26)
 	if unlocked:
-		btn.text = "Pick %s" % data.display_name
+		btn.text = LocaleManager.t("RACESELECT_PICK") % data.loc_name()
 		btn.pressed.connect(_on_pick.bind(data.id))
 	else:
-		btn.text = "Locked"
+		btn.text = LocaleManager.t("COMMON_LOCKED")
 		btn.disabled = true
 	vb.add_child(btn)
 
