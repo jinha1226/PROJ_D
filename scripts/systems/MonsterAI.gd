@@ -584,13 +584,6 @@ static func _abyssal_sovereign_turn(monster: Monster, player: Player, map: Dunge
 	return true
 
 
-static func _find_game() -> Node:
-	var tree := Engine.get_main_loop() as SceneTree
-	if tree == null:
-		return null
-	return tree.get_first_node_in_group("game")
-
-
 static func _occupied(pos: Vector2i, self_monster: Monster) -> bool:
 	var tree := Engine.get_main_loop() as SceneTree
 	if tree == null:
