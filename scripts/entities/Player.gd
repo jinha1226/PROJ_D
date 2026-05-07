@@ -10,6 +10,7 @@ signal moved(new_pos: Vector2i)
 signal died
 signal item_dropped(entry: Dictionary, at_pos: Vector2i)
 signal damaged(amount: int)
+signal weapon_attacked(target: Vector2i, weapon_skill: String)
 
 @export var grid_pos: Vector2i = Vector2i(1, 1)
 
@@ -332,6 +333,9 @@ func try_attack_tile(target: Vector2i) -> bool:
 	var monster: Monster = _attack_target_for_tile(target)
 	if monster == null:
 		return false
+	play_bump_anim(target - grid_pos)
+	var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null and equipped_weapon_id != "" else null
+	weapon_attacked.emit(target, weapon_skill_for_item(w))
 	CombatSystem.player_attack_monster(self, monster)
 	TurnManager.end_player_turn(_weapon_action_cost())
 	return true
@@ -877,9 +881,25 @@ func take_damage(amount: int, source: String = "") -> void:
 		last_killer = source
 	emit_signal("damaged", amount)
 	emit_signal("stats_changed")
+	play_hit_anim()
 	if hp <= 0 and not _dead:
 		_dead = true
 		emit_signal("died")
+
+func play_bump_anim(dir: Vector2i) -> void:
+	var origin: Vector2 = position
+	var bump_offset := Vector2(dir.x, dir.y) * 8.0
+	var tw := create_tween()
+	tw.tween_property(self, "position", origin + bump_offset, 0.07)
+	tw.tween_property(self, "position", origin, 0.07)
+
+func play_hit_anim() -> void:
+	var origin: Vector2 = position
+	var tw := create_tween()
+	tw.tween_property(self, "position", origin + Vector2(4, 0), 0.04)
+	tw.tween_property(self, "position", origin + Vector2(-4, 0), 0.04)
+	tw.tween_property(self, "position", origin + Vector2(3, 0), 0.03)
+	tw.tween_property(self, "position", origin, 0.03)
 
 
 func register_kill() -> void:

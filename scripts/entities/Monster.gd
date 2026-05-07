@@ -99,12 +99,27 @@ func take_damage(amount: int) -> void:
 	hp = max(0, hp - amount)
 	emit_signal("stats_changed")
 	hit_taken.emit(amount)
-	# Red flash
 	modulate = Color(1.0, 0.25, 0.25, 1.0)
 	var tw := create_tween()
 	tw.tween_property(self, "modulate", Color.WHITE, 0.18)
+	play_hit_anim()
 	if hp <= 0:
 		die()
+
+func play_bump_anim(dir: Vector2i) -> void:
+	var origin: Vector2 = position
+	var bump_offset := Vector2(dir.x, dir.y) * 8.0
+	var tw := create_tween()
+	tw.tween_property(self, "position", origin + bump_offset, 0.07)
+	tw.tween_property(self, "position", origin, 0.07)
+
+func play_hit_anim() -> void:
+	var origin: Vector2 = position
+	var tw := create_tween()
+	tw.tween_property(self, "position", origin + Vector2(4, 0), 0.04)
+	tw.tween_property(self, "position", origin + Vector2(-4, 0), 0.04)
+	tw.tween_property(self, "position", origin + Vector2(3, 0), 0.03)
+	tw.tween_property(self, "position", origin, 0.03)
 
 func become_aware(player_pos: Vector2i) -> void:
 	if is_aware:

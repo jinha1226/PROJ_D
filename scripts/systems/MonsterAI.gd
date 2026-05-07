@@ -41,6 +41,7 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 	if dist == 1:
 		if _try_special_close(monster, player, map):
 			return
+		monster.play_bump_anim(player.grid_pos - monster.grid_pos)
 		CombatSystem.monster_attack_player(monster, player)
 		monster.become_aware(player.grid_pos)
 		return

@@ -709,6 +709,7 @@ func _spawn_player() -> void:
 	player.stats_changed.connect(_update_hud)
 	player.item_dropped.connect(_on_item_dropped)
 	player.damaged.connect(_on_player_damaged)
+	player.weapon_attacked.connect(_on_player_weapon_attacked)
 
 func _queue_essence_pickup(essence_id: String, floor_item: FloorItem = null) -> void:
 	if player == null or essence_id == "":
@@ -3164,6 +3165,18 @@ func spawn_text_popup(world_pos: Vector2, text: String, color: Color,
 	tw.parallel().tween_property(lbl, "modulate:a", 0.0, duration)
 	tw.tween_callback(lbl.queue_free)
 
+
+func _on_player_weapon_attacked(target: Vector2i, weapon_skill: String) -> void:
+	if map == null or _effect_layer == null or player == null:
+		return
+	const CS := DungeonMap.CELL_SIZE
+	var from_world := player.position + Vector2(CS * 0.5, CS * 0.5)
+	var to_world := map.grid_to_world(target) + Vector2(CS * 0.5, CS * 0.5)
+	var eff := WeaponSwingEffect.new()
+	eff.position = to_world
+	eff.z_index = 9
+	_effect_layer.add_child(eff)
+	eff.start(from_world, to_world, weapon_skill)
 
 ## Spawn a brief hit flash on a monster sprite node.
 func spawn_hit_flash(target_node: Node2D) -> void:
