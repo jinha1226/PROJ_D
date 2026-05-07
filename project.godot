@@ -46,6 +46,10 @@ window/stretch/mode="canvas_items"
 
 theme/custom="res://assets/theme.tres"
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://i18n/translations.en.translation", "res://i18n/translations.ko.translation")
+
 [physics]
 
 common/enable_pause_aware_picking=true
