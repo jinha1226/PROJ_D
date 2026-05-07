@@ -90,7 +90,8 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 		var btn := Button.new()
 		btn.text = tab_labels[i]
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+		btn.add_theme_font_size_override("font_size", 16)
+		btn.clip_text = true
 		btn.custom_minimum_size = Vector2(0, GameTheme.TAP_MIN_HEIGHT)
 		var idx: int = i
 		btn.pressed.connect(func():
