@@ -480,6 +480,11 @@ func _apply_class_to_player(class_id: String) -> void:
 	GameManager.selected_starting_school_id = ""
 	for id in _class_starter_items(class_id):
 		player.items.append({"id": id, "plus": 0})
+		# Starter consumables come pre-identified — players know what their
+		# class kit is. Without this, a Fighter's potion of healing shows as
+		# "potion of crimson liquid" until first use.
+		if GameManager != null:
+			GameManager.identify(id)
 	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
 	var race_name: String = race.display_name if race != null else "adventurer"
 	CombatLog.post(LocaleManager.t("LOG_YOU_START_AS") % [race_name, data.display_name],
