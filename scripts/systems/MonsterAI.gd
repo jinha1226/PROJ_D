@@ -157,23 +157,27 @@ static func _try_boss_telegraph(monster: Monster, player: Player, map: DungeonMa
 		"ashen_magpie":
 			_telegraph_aoe(monster, map, 2,
 				"The Ashen Magpie spreads its wings — brace for impact!",
-				monster.data.hd * 4)
+				monster.data.hd * 4, "")
 		"ancient_lich":
 			_telegraph_aoe(monster, map, 3,
 				"The Ancient Lich channels torment!",
-				monster.data.hd * 3)
+				monster.data.hd * 3, "drain")
 		"gnoll_warlord", "orc_warchief", "ogre_chieftain":
 			_telegraph_aoe(monster, map, 1,
 				"The %s raises its weapon for a mighty cleave!" % monster.data.display_name,
-				monster.data.hd * 4)
-		"storm_hierophant", "ember_tyrant":
+				monster.data.hd * 4, "")
+		"storm_hierophant":
 			_telegraph_line(monster, player, map,
 				"The %s charges a devastating bolt!" % monster.data.display_name,
-				monster.data.hd * 6)
+				monster.data.hd * 6, "lightning")
+		"ember_tyrant":
+			_telegraph_line(monster, player, map,
+				"The %s charges a devastating bolt!" % monster.data.display_name,
+				monster.data.hd * 6, "fire")
 		_:
 			_telegraph_aoe(monster, map, 2,
 				"The %s winds up for a powerful attack!" % monster.data.display_name,
-				monster.data.hd * 4)
+				monster.data.hd * 4, "")
 	monster.become_aware(player.grid_pos)
 	return true
 
@@ -200,7 +204,7 @@ static func _drain_life(monster: Monster, player: Player) -> void:
 
 ## Telegraph an AoE: show warning tiles for 1 turn around the monster.
 static func _telegraph_aoe(monster: Monster, map: DungeonMap,
-		radius: int, msg: String, dmg: int) -> void:
+		radius: int, msg: String, dmg: int, element: String = "") -> void:
 	var tiles: Array = []
 	for dx in range(-radius, radius + 1):
 		for dy in range(-radius, radius + 1):
@@ -211,12 +215,12 @@ static func _telegraph_aoe(monster: Monster, map: DungeonMap,
 				tiles.append(t)
 				map.set_warning(t, Color(1.0, 0.45, 0.0, 0.45))
 	CombatLog.post(msg, Color(1.0, 0.8, 0.2))
-	monster._ability_charge = {"name": "aoe", "tiles": tiles, "damage": dmg, "turns_left": 1}
+	monster._ability_charge = {"name": "aoe", "tiles": tiles, "damage": dmg, "turns_left": 1, "element": element}
 
 
 ## Telegraph a line bolt: show warning tiles along direction to player.
 static func _telegraph_line(monster: Monster, player: Player, map: DungeonMap,
-		msg: String, dmg: int) -> void:
+		msg: String, dmg: int, element: String = "") -> void:
 	var dir := Vector2i(sign(player.grid_pos.x - monster.grid_pos.x),
 						sign(player.grid_pos.y - monster.grid_pos.y))
 	var tiles: Array = []
@@ -228,7 +232,7 @@ static func _telegraph_line(monster: Monster, player: Player, map: DungeonMap,
 		map.set_warning(cur, Color(1.0, 0.2, 0.2, 0.5))
 		cur += dir
 	CombatLog.post(msg, Color(1.0, 0.8, 0.2))
-	monster._ability_charge = {"name": "line", "tiles": tiles, "damage": dmg, "turns_left": 1}
+	monster._ability_charge = {"name": "line", "tiles": tiles, "damage": dmg, "turns_left": 1, "element": element}
 
 
 ## Execute a telegraphed ability (called the turn after telegraph).
@@ -240,11 +244,30 @@ static func _fire_charge(monster: Monster, player: Player, map: DungeonMap) -> v
 	map.queue_redraw()
 	var hit_tiles: Array = charge.get("tiles", [])
 	var dmg: int = int(charge.get("damage", monster.data.hd * 2))
+	var element: String = String(charge.get("element", ""))
+	# Visual: spawn an AoE burst at every warning tile so the player sees
+	# the attack actually land, not just a damage number on themselves.
+	var game := _find_game()
+	if game != null and game.has_method("spawn_aoe_burst"):
+		var world_positions: Array = []
+		var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
+		for t in hit_tiles:
+			world_positions.append(map.grid_to_world(t) + half)
+		game.spawn_aoe_burst(world_positions, element)
 	if player.grid_pos in hit_tiles:
 		CombatLog.damage_taken(LocaleManager.t("LOG_THE_S_ATTACK_HITS_YOU") % [monster.data.display_name, dmg])
 		player.take_damage(dmg, monster.data.id)
 	else:
 		CombatLog.post(LocaleManager.t("LOG_YOU_DODGE_THE_S_ATTACK") % monster.data.display_name, Color(0.6, 1.0, 0.6))
+
+
+static func _find_game() -> Node:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return null
+	for n in tree.get_nodes_in_group("game"):
+		return n
+	return null
 
 static func _flee_step(monster: Monster, map: DungeonMap,
 		threat: Vector2i) -> void:
