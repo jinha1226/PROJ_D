@@ -740,6 +740,7 @@ func _try_open_essence_pickup_popup() -> void:
 		_try_open_essence_pickup_popup()
 		return
 	_essence_pickup_popup_open = true
+	_cancel_auto_walk("essence")
 	var popup := PopupManager.new()
 	add_child(popup)
 	var take_cb := func() -> void:

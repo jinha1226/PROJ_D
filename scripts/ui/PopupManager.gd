@@ -118,7 +118,11 @@ func show_essence_pickup_popup(essence_id: String, inventory: Array, cap: int, c
 	dlg.add_child(vb)
 	dlg.get_ok_button().visible = false
 	add_child(dlg)
-	dlg.popup_centered(Vector2i(440, 360))
+	# Width fixed at 440, height fits content; popup_centered() places it
+	# at the exact viewport center.
+	dlg.min_size = Vector2i(440, 0)
+	dlg.reset_size()
+	dlg.popup_centered()
 
 func show_levelup_popup(level: int, callback: Callable) -> void:
 	var dlg := AcceptDialog.new()
