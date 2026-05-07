@@ -47,5 +47,4 @@ skill_aptitudes = {
 "invocations": 3,
 "evocations": 1
 }
-passive_id = "stone_sense"
 hp_per_level = 6
