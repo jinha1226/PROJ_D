@@ -6,14 +6,14 @@
 script = ExtResource("1_rdata")
 id = "gargoyle"
 display_name = "Gargoyle"
-description = "Living stone. +3 STR, -3 DEX, -2 HP. Natural AC +4 and immune to poison."
+description = "Living stone. +3 STR, -3 DEX, -2 HP. Natural AC +4. Resistant to fire, electricity, and poison."
 base_sprite_path = "res://assets/tiles/individual/player/base/gargoyle_m.png"
 unlock_kind = "kill"
 unlock_trigger_id = "gargoyle"
 str_mod = 3
 dex_mod = -3
 hp_mod = -2
-resist_mods = ["poison+"]
+resist_mods = ["poison+", "fire+", "electric+"]
 skill_aptitudes = {
 "fighting": 1,
 "unarmed": 0,

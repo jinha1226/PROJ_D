@@ -214,6 +214,12 @@ func _dir_for_key(k: int) -> Vector2i:
 			return Vector2i(1, 0)
 	return Vector2i.ZERO
 
+func _race_speed_mod() -> float:
+	if GameManager == null or RaceRegistry == null:
+		return 1.0
+	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
+	return race.speed_mod if race != null else 1.0
+
 func _try_move(dir: Vector2i) -> void:
 	var target: Vector2i = grid_pos + dir
 	if try_attack_tile(target):
@@ -221,7 +227,7 @@ func _try_move(dir: Vector2i) -> void:
 	if _map.tile_at(target) == DungeonMap.Tile.DOOR_CLOSED:
 		_map.set_tile(target, DungeonMap.Tile.DOOR_OPEN)
 		emit_signal("moved", grid_pos)  # refresh FOV from current pos
-		TurnManager.end_player_turn()
+		TurnManager.end_player_turn(_race_speed_mod())
 		return
 	if not _map.is_walkable(target):
 		return
@@ -230,7 +236,7 @@ func _try_move(dir: Vector2i) -> void:
 	emit_signal("moved", grid_pos)
 	emit_signal("stats_changed")
 	_auto_pickup()
-	TurnManager.end_player_turn()
+	TurnManager.end_player_turn(_race_speed_mod())
 
 func _monster_at(pos: Vector2i) -> Monster:
 	var tree := get_tree()

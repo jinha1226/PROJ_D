@@ -53,7 +53,13 @@ func melee_damage_bonus(player: Node) -> int:
 			if player.hp * 2 < player.hp_max:
 				return 4
 		"headbutt":
-			return 2
+			# ~40% chance to headbutt for 3–7 bonus damage
+			if randf() < 0.4:
+				CombatLog.post(LocaleManager.t("LOG_YOU_HEADBUTT"), Color(1.0, 0.85, 0.3))
+				return randi_range(3, 7)
+		"regeneration":
+			# Troll natural claws: +3 bonus damage (always, unarmed or armed)
+			return 3
 	return 0
 
 # ── After player kills a monster ──────────────────────────────────────────────
@@ -115,12 +121,12 @@ static func passive_display_name(pid: String) -> String:
 static func passive_description(pid: String) -> String:
 	match pid:
 		"adaptable":    return "Essence effects last 1.5× longer."
-		"regeneration": return "+1 HP every 3 turns."
+		"regeneration": return "+1 HP every 3 turns. Natural claws deal +3 melee damage."
 		"bloodthirst":  return "+4 melee damage when below half HP."
 		"blood_drain":  return "Heal 3 HP on each kill."
 		"keen_eyes":    return "+1 vision range. Immune to sleep."
 		"fleet":        return "+1 EV."
-		"headbutt":     return "+2 melee damage at all times."
+		"headbutt":     return "40% chance to headbutt for 3–7 bonus damage on each melee attack."
 		"trapfinder":   return "Automatically reveals nearby traps."
 		"stone_body":   return "+4 AC from natural stone hide. Immune to poison."
 		"stone_sense":  return "Detect secret doors and traps through stone."

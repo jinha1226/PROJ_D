@@ -6,7 +6,7 @@
 script = ExtResource("1_rdata")
 id = "troll"
 display_name = "Troll"
-description = "Huge and regenerating. +7 STR, -3 DEX, -4 INT, +3 HP, -1 MP. Vulnerable to fire."
+description = "Huge and regenerating. +7 STR, -3 DEX, -4 INT, +3 HP, -1 MP. Natural claws +3 melee. Resistant to cold; vulnerable to fire. Moves slowly."
 base_sprite_path = "res://assets/tiles/individual/player/base/troll_m.png"
 unlocked = true
 unlock_kind = "kill"
@@ -16,7 +16,7 @@ dex_mod = -3
 int_mod = -4
 hp_mod = 3
 mp_mod = -1
-resist_mods = ["fire-"]
+resist_mods = ["fire-", "cold+"]
 skill_aptitudes = {
 "fighting": -2,
 "unarmed": 0,
@@ -52,3 +52,4 @@ skill_aptitudes = {
 }
 passive_id = "regeneration"
 hp_per_level = 8
+speed_mod = 1.2

@@ -6,7 +6,7 @@
 script = ExtResource("1_rdata")
 id = "minotaur"
 display_name = "Minotaur"
-description = "Bullheaded warrior. +4 STR, -3 DEX, -3 INT, +1 HP, -1 MP. Gains free headbutts in melee."
+description = "Bullheaded warrior. +4 STR, -3 DEX, -3 INT, +1 HP, -1 MP. 40% chance to headbutt for bonus damage on each melee attack."
 base_sprite_path = "res://assets/tiles/individual/player/base/minotaur_m.png"
 unlock_kind = "kill"
 unlock_trigger_id = "minotaur"

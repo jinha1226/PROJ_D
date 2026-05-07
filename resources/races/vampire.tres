@@ -6,14 +6,14 @@
 script = ExtResource("1_rdata")
 id = "vampire"
 display_name = "Vampire"
-description = "Undead predator. -1 STR, +1 DEX, +2 INT. Resistant to negative energy; melee kills restore HP."
+description = "Undead predator. -1 STR, +1 DEX, +2 INT. Resistant to cold, poison, and negative energy; melee kills restore HP."
 base_sprite_path = "res://assets/tiles/individual/player/base/vampire_m.png"
 unlock_kind = "kill"
 unlock_trigger_id = "vampire"
 str_mod = -1
 dex_mod = 1
 int_mod = 2
-resist_mods = ["neg+"]
+resist_mods = ["neg+", "cold+", "poison+"]
 skill_aptitudes = {
 "fighting": 0,
 "unarmed": 1,

@@ -50,3 +50,4 @@ skill_aptitudes = {
 }
 passive_id = "fleet"
 hp_per_level = 2
+speed_mod = 0.8

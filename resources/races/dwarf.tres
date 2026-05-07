@@ -6,14 +6,14 @@
 script = ExtResource("1_rdata")
 id = "dwarf"
 display_name = "Dwarf"
-description = "Stout and resilient. +2 STR, -3 DEX, +1 HP. Innate poison resistance."
+description = "Stout and resilient. +2 STR, -3 DEX, +1 HP. Resistant to fire and poison."
 base_sprite_path = "res://assets/tiles/individual/player/base/dwarf_m.png"
 unlock_kind = "kill"
 unlock_trigger_id = "deep_dwarf"
 str_mod = 2
 dex_mod = -3
 hp_mod = 1
-resist_mods = ["poison+"]
+resist_mods = ["poison+", "fire+"]
 skill_aptitudes = {
 "fighting": 1,
 "unarmed": 0,

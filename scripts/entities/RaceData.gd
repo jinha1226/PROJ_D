@@ -36,6 +36,10 @@ class_name RaceData extends Resource
 ## HP gained per XL on level-up (DCSS species HD). Default 5 = human baseline.
 @export var hp_per_level: int = 5
 
+## Movement speed modifier. Values < 1.0 = faster (costs fewer action points per step).
+## e.g. 0.8 = Spriggan (fast), 1.2 = Troll (slow). Default 1.0 = normal speed.
+@export var speed_mod: float = 1.0
+
 func unlock_hint() -> String:
 	if unlocked:
 		return ""

@@ -796,6 +796,7 @@ LOG_YOU_PICK_UP_GOLD,You pick up %d gold.,금화 %d를 주웠다.
 LOG_YOU_PICK_UP,You pick up %s.,%s를 주웠다.
 LOG_YOU_PUT_ON,You put on %s.,%s를 착용했다.
 LOG_YOU_RAISE,You raise %s.,%s를 들었다.
+LOG_YOU_HEADBUTT,You headbutt!,박치기!
 LOG_YOU_REGENERATE,You regenerate.,회복한다.
 LOG_YOU_REMOVE,You remove %s.,%s를 벗었다.
 LOG_YOU_RETURN_TO_THE_MAIN,You return to the main dungeon.,메인 던전으로 돌아왔다.
