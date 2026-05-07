@@ -1,15 +1,7 @@
-[gd_scene format=3 uid="uid://bbothudroot01" load_steps=11]
+[gd_scene format=3 uid="uid://bbothudroot01" load_steps=2]
 
 [ext_resource type="Script" path="res://scripts/ui/BottomHUD.gd" id="1_bh"]
 [ext_resource type="PackedScene" uid="uid://bquickslot01" path="res://scenes/ui/QuickSlot.tscn" id="2_qs"]
-[ext_resource type="Texture2D" path="res://assets/ui/hud/hud_attack.png" id="3_attack"]
-[ext_resource type="Texture2D" path="res://assets/ui/hud/hud_wait.png" id="4_wait"]
-[ext_resource type="Texture2D" path="res://assets/ui/hud/hud_bag.png" id="5_bag"]
-[ext_resource type="Texture2D" path="res://assets/ui/hud/hud_pickup.png" id="6_pickup"]
-[ext_resource type="Texture2D" path="res://assets/ui/hud/hud_skill.png" id="7_skill"]
-[ext_resource type="Texture2D" path="res://assets/ui/hud/hud_spell.png" id="8_spell"]
-[ext_resource type="Texture2D" path="res://assets/ui/hud/hud_status.png" id="9_status"]
-[ext_resource type="Texture2D" path="res://assets/ui/hud/hud_menu.png" id="10_menu"]
 
 [node name="BottomHUD" type="Control"]
 anchor_right = 1.0
@@ -82,15 +74,15 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(120, 0)
 size_flags_horizontal = 3
 size_flags_vertical = 3
-icon = ExtResource("3_attack")
-expand_icon = true
+theme_override_font_sizes/font_size = 22
+text = "AUTO"
 
 [node name="RestButton" type="Button" parent="BottomMargin/MainVBox/MainRow"]
 custom_minimum_size = Vector2(120, 0)
 size_flags_horizontal = 3
 size_flags_vertical = 3
-icon = ExtResource("4_wait")
-expand_icon = true
+theme_override_font_sizes/font_size = 22
+text = "REST"
 
 [node name="MenuRow" type="HBoxContainer" parent="BottomMargin/MainVBox"]
 size_flags_horizontal = 3
@@ -100,35 +92,35 @@ theme_override_constants/separation = 8
 [node name="BagButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
 custom_minimum_size = Vector2(0, 64)
 size_flags_horizontal = 3
-icon = ExtResource("5_bag")
-expand_icon = true
+theme_override_font_sizes/font_size = 18
+text = "BAG"
 
 [node name="PickupButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
 custom_minimum_size = Vector2(0, 64)
 size_flags_horizontal = 3
-icon = ExtResource("6_pickup")
-expand_icon = true
+theme_override_font_sizes/font_size = 18
+text = "PICK"
 
 [node name="SkillsButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
 custom_minimum_size = Vector2(0, 64)
 size_flags_horizontal = 3
-icon = ExtResource("7_skill")
-expand_icon = true
+theme_override_font_sizes/font_size = 18
+text = "SKILL"
 
 [node name="MagicButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
 custom_minimum_size = Vector2(0, 64)
 size_flags_horizontal = 3
-icon = ExtResource("8_spell")
-expand_icon = true
+theme_override_font_sizes/font_size = 18
+text = "SPELL"
 
 [node name="StatusButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
 custom_minimum_size = Vector2(0, 64)
 size_flags_horizontal = 3
-icon = ExtResource("9_status")
-expand_icon = true
+theme_override_font_sizes/font_size = 18
+text = "STATUS"
 
 [node name="MenuButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
 custom_minimum_size = Vector2(0, 64)
 size_flags_horizontal = 3
-icon = ExtResource("10_menu")
-expand_icon = true
+theme_override_font_sizes/font_size = 18
+text = "MENU"
