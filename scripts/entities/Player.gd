@@ -1376,6 +1376,10 @@ func set_equipped_weapon(id: String) -> void:
 	equipped_weapon_id = id
 	if id != "":
 		_apply_entry_affixes(equipped_weapon_entry())
+	# A two-handed weapon and a shield can never coexist: equipping the 2H
+	# auto-frees the shield slot.
+	if has_two_handed_weapon() and equipped_shield_id != "":
+		set_equipped_shield("")
 	_refresh_paperdoll()
 	emit_signal("stats_changed")
 
@@ -1414,14 +1418,27 @@ func set_equipped_shield(id: String) -> void:
 	equipped_shield_id = id
 	if id != "":
 		_apply_entry_affixes(equipped_shield_entry())
+		# Equipping a shield while wielding a two-hander forces the weapon
+		# off — the player explicitly chose the shield.
+		if has_two_handed_weapon():
+			set_equipped_weapon("")
 	_refresh_paperdoll()
 	refresh_ac_from_equipment()
+
+## Item ids that are two-handed despite their category being a 1H one (e.g.,
+## "blade"). Add new explicit two-handers here so shield/cleave/combat checks
+## stay in sync.
+const _TWO_HANDED_IDS: Array = ["great_blade"]
 
 func has_two_handed_weapon() -> bool:
 	if equipped_weapon_id == "":
 		return false
 	var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null else null
-	return w != null and (w.category == "axe" or w.category == "polearm")
+	if w == null:
+		return false
+	if w.category == "axe" or w.category == "polearm":
+		return true
+	return _TWO_HANDED_IDS.has(w.id)
 
 func _apply_accessory_stat(id: String) -> void:
 	var d: ItemData = ItemRegistry.get_by_id(id) if ItemRegistry != null else null
