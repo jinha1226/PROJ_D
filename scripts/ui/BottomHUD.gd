@@ -54,14 +54,23 @@ func _ready() -> void:
 			qs.drag_released.connect(_on_quickslot_drag_released)
 
 
+## Icons swap based on combat state — wait icon while a monster is in sight,
+## rest icon when safe; attack icon when adjacent enemy, auto-explore icon
+## otherwise. The two contextual buttons keep state-changing iconography
+## instead of static text labels.
+const _ICON_WAIT: Texture2D = preload("res://assets/ui/hud/hud_wait.png")
+const _ICON_REST: Texture2D = preload("res://assets/ui/hud/hud_rest.png")
+const _ICON_ATTACK: Texture2D = preload("res://assets/ui/hud/hud_attack.png")
+const _ICON_AUTO: Texture2D = preload("res://assets/ui/hud/hud_auto.png")
+
 func set_rest_label(monster_in_sight: bool) -> void:
 	if rest_button != null:
-		rest_button.text = "WAIT" if monster_in_sight else "REST"
+		rest_button.icon = _ICON_WAIT if monster_in_sight else _ICON_REST
 
 
 func set_act_label(monster_in_sight: bool) -> void:
 	if act_button != null:
-		act_button.text = "ATK" if monster_in_sight else "AUTO"
+		act_button.icon = _ICON_ATTACK if monster_in_sight else _ICON_AUTO
 
 
 func set_quickslot(i: int, icon: Texture2D, text: String) -> void:
