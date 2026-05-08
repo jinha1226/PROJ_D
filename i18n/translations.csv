@@ -794,6 +794,7 @@ LOG_YOU_MISS_THE,You miss the %s.,%s에게 빗나갔다.
 LOG_YOU_OBLITERATE_THE,You obliterate the %s!,%s를 산산조각 냈다!
 LOG_YOU_PARRY_THE_S_ATTACK,You parry the %s's attack!,%s의 공격을 받아쳤다!
 LOG_YOU_PICK_UP_GOLD,You pick up %d gold.,금화 %d를 주웠다.
+LOG_PICKUP_GOLD,You pick up %dg.,금화 %dg을 주웠다.
 LOG_YOU_PICK_UP,You pick up %s.,%s를 주웠다.
 LOG_YOU_PUT_ON,You put on %s.,%s를 착용했다.
 LOG_YOU_RAISE,You raise %s.,%s를 들었다.

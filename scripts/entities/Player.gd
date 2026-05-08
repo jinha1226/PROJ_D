@@ -261,7 +261,8 @@ func pickup(floor_item: FloorItem) -> void:
 		return
 	var data: ItemData = floor_item.data
 	if data.kind == "gold":
-		var amount: int = max(1, data.effect_value)
+		# Entry "amount" overrides the static effect_value for floor-scattered piles.
+		var amount: int = max(1, int(floor_item.entry.get("amount", data.effect_value)))
 		gold += amount
 		CombatLog.pickup(LocaleManager.t("LOG_YOU_PICK_UP_GOLD") % amount)
 	elif data.kind == "essence":

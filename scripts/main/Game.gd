@@ -1387,6 +1387,23 @@ func _spawn_items_for_floor(depth: int) -> void:
 			_spawn_floor_item(sp_data, p, 0, sp_entry)
 			break
 
+	# ── Gold scatter: 1-3 piles per floor ─────────────────────────────
+	var gold_count: int = rng.randi_range(1, 3)
+	for _gi in range(gold_count):
+		var attempts: int = 0
+		while attempts < 40:
+			attempts += 1
+			var p: Vector2i = map.random_floor_tile(rng)
+			if not map.is_walkable(p):
+				continue
+			if p == player.grid_pos:
+				continue
+			_spawn_gold_pile(p, rng.randi_range(5, 10 + depth * 2))
+			break
+
+	# ── Orc treasure room for depths 7-9 ──────────────────────────────
+	_spawn_orc_treasure_room(depth, rng)
+
 func spawn_ally(monster_id: String, near_pos: Vector2i, turns: int) -> bool:
 	if map == null or monsters_layer == null:
 		return false
@@ -1480,6 +1497,80 @@ func _spawn_partial_book_floor_item(partial_entry: Dictionary, pos: Vector2i) ->
 	var fi: FloorItem = FloorItemScene.new()
 	items_layer.add_child(fi)
 	fi.setup(base_data, map, pos, 0, partial_entry)
+
+## Spawns a gold pile floor item with a custom amount.
+## Uses gold_pile as the ItemData carrier; Player.pickup reads entry["amount"].
+func _spawn_gold_pile(pos: Vector2i, amount: int) -> void:
+	if ItemRegistry == null or items_layer == null:
+		return
+	var base_data: ItemData = ItemRegistry.get_by_id("gold_pile")
+	if base_data == null:
+		return
+	var entry: Dictionary = {
+		"id": "gold_pile",
+		"kind": "gold",
+		"amount": amount,
+		"plus": 0,
+	}
+	var fi: FloorItem = FloorItemScene.new()
+	items_layer.add_child(fi)
+	fi.setup(base_data, map, pos, 0, entry)
+
+## Orc treasure room: for floors 7-9 pick a room away from player and stairs,
+## scatter gold piles and bonus equipment inside it.
+func _spawn_orc_treasure_room(depth: int, rng: RandomNumberGenerator) -> void:
+	if depth < 7 or depth > 9:
+		return
+	if map == null or map.rooms.is_empty():
+		return
+	# Find rooms that don't contain spawn_pos or stairs_down_pos.
+	var eligible: Array[Rect2i] = []
+	for room in map.rooms:
+		if room.has_point(map.spawn_pos):
+			continue
+		if room.has_point(map.stairs_down_pos):
+			continue
+		eligible.append(room)
+	if eligible.is_empty():
+		# Fall back to any room if no eligible room found.
+		eligible = map.rooms.duplicate()
+	var treasure_room: Rect2i = eligible[rng.randi() % eligible.size()]
+	# Scatter 8-12 gold piles of 50-120g each.
+	var gold_count: int = rng.randi_range(8, 12)
+	for _i in range(gold_count):
+		var attempts: int = 0
+		while attempts < 40:
+			attempts += 1
+			var x: int = rng.randi_range(treasure_room.position.x, treasure_room.position.x + treasure_room.size.x - 1)
+			var y: int = rng.randi_range(treasure_room.position.y, treasure_room.position.y + treasure_room.size.y - 1)
+			var gpos := Vector2i(x, y)
+			if not map.is_walkable(gpos):
+				continue
+			if gpos == player.grid_pos:
+				continue
+			_spawn_gold_pile(gpos, rng.randi_range(50, 120))
+			break
+	# Scatter 2-3 bonus equipment items.
+	var eq_count: int = rng.randi_range(2, 3)
+	for _i in range(eq_count):
+		var attempts: int = 0
+		while attempts < 40:
+			attempts += 1
+			var x: int = rng.randi_range(treasure_room.position.x, treasure_room.position.x + treasure_room.size.x - 1)
+			var y: int = rng.randi_range(treasure_room.position.y, treasure_room.position.y + treasure_room.size.y - 1)
+			var epos := Vector2i(x, y)
+			if not map.is_walkable(epos):
+				continue
+			if epos == player.grid_pos:
+				continue
+			if _item_at(epos) != null:
+				continue
+			var eq_data: ItemData = ItemRegistry.pick_equipment_weighted(depth) if ItemRegistry != null else null
+			if eq_data == null:
+				break
+			var eq_entry: Dictionary = ItemRegistry.make_entry(eq_data.id, depth, 0) if ItemRegistry != null else {"id": eq_data.id, "plus": 0}
+			_spawn_floor_item(eq_data, epos, 0, eq_entry)
+			break
 
 func _find_item_drop_pos(origin: Vector2i) -> Vector2i:
 	if map == null:
