@@ -74,14 +74,16 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 		LocaleManager.t("BAG_TAB_ARMOR"),
 		LocaleManager.t("BAG_TAB_ACCESSORY"),
 		LocaleManager.t("BAG_TAB_CONSUMABLES"),
+		LocaleManager.t("BAG_TAB_TOOLS"),
 		LocaleManager.t("BAG_TAB_OTHER"),
 	]
 	var tab_filters: Array = [
 		[],                                   # 전체
-		["weapon", "throwing"],               # 무기 — throwing은 던지는 무기
+		["weapon"],                           # 무기
 		["armor", "shield"],                  # 방어구
-		["ring", "amulet", "essence"],        # 장신구 — essence는 정수 슬롯
-		["potion", "scroll", "book", "wand"], # 소모품 — wand는 충전식
+		["ring", "amulet"],                   # 장신구
+		["potion", "scroll", "book"],         # 소모품
+		["wand", "throwing", "spellpage"],    # 툴
 		["__other__"],                        # 기타 — rune 등 카테고리 외
 	]
 	var tab_btns: Array = []
@@ -109,9 +111,10 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 ## Kinds claimed by any non-"전체"/non-"기타" tab — single source of truth so
 ## the "기타" tab's catch-all stays in sync when a new tab is added above.
 const _ALL_TAB_KINDS: Array = [
-	"weapon", "throwing", "armor", "shield",
-	"ring", "amulet", "essence",
-	"potion", "scroll", "book", "wand",
+	"weapon", "armor", "shield",
+	"ring", "amulet",
+	"potion", "scroll", "book",
+	"wand", "throwing", "spellpage",
 ]
 
 static func _kind_matches_filter(kind: String, kind_filter: Array) -> bool:

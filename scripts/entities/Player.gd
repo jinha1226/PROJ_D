@@ -1638,7 +1638,7 @@ static func resists_from_tags(tags: Array) -> Dictionary:
 func add_resist(element: String, delta: int) -> void:
 	if element == "" or delta == 0:
 		return
-	var net: int = int(resists.get(element, 0)) + delta
+	var net: int = clamp(int(resists.get(element, 0)) + delta, -3, 3)
 	if net == 0:
 		resists.erase(element)
 	else:
