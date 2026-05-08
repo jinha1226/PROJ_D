@@ -102,6 +102,9 @@ var equipped_armor_id: String = ""
 var equipped_ring_id: String = ""
 var equipped_amulet_id: String = ""
 var equipped_shield_id: String = ""
+var equipped_helmet_id: String = ""
+var equipped_gloves_id: String = ""
+var equipped_boots_id: String = ""
 var essence_slots: Array = ["", "", ""]   # equipped essence ids (max 3)
 var essence_inventory: Array = []         # collected but unequipped essence ids
 var faith_id: String = ""                 # active faith: "war"/"arcana"/"trickery"/"death"/"essence"
@@ -698,6 +701,12 @@ func drop_item(index: int) -> void:
 		set_equipped_amulet("")
 	if id == equipped_shield_id:
 		set_equipped_shield("")
+	if id == equipped_helmet_id:
+		set_equipped_helmet("")
+	if id == equipped_gloves_id:
+		set_equipped_gloves("")
+	if id == equipped_boots_id:
+		set_equipped_boots("")
 	items.remove_at(index)
 	emit_signal("item_dropped", entry, grid_pos)
 	emit_signal("stats_changed")
@@ -717,6 +726,24 @@ func equipped_armor_entry() -> Dictionary:
 func equipped_shield_entry() -> Dictionary:
 	for entry in items:
 		if entry.get("id", "") == equipped_shield_id:
+			return entry
+	return {}
+
+func equipped_helmet_entry() -> Dictionary:
+	for entry in items:
+		if entry.get("id", "") == equipped_helmet_id:
+			return entry
+	return {}
+
+func equipped_gloves_entry() -> Dictionary:
+	for entry in items:
+		if entry.get("id", "") == equipped_gloves_id:
+			return entry
+	return {}
+
+func equipped_boots_entry() -> Dictionary:
+	for entry in items:
+		if entry.get("id", "") == equipped_boots_id:
 			return entry
 	return {}
 
@@ -751,6 +778,22 @@ func refresh_ac_from_equipment() -> void:
 		var shield_skill: int = get_skill_level("shield")
 		var shield_missing: int = max(0, shield.required_skill - shield_skill)
 		ev -= shield_missing
+
+	var helmet: ItemData = ItemRegistry.get_by_id(equipped_helmet_id) if ItemRegistry != null and equipped_helmet_id != "" else null
+	if helmet != null:
+		var helmet_plus: int = int(equipped_helmet_entry().get("plus", 0))
+		ac += helmet.ac_bonus + helmet_plus
+
+	var gloves: ItemData = ItemRegistry.get_by_id(equipped_gloves_id) if ItemRegistry != null and equipped_gloves_id != "" else null
+	if gloves != null:
+		var gloves_plus: int = int(equipped_gloves_entry().get("plus", 0))
+		ac += gloves.ac_bonus + gloves_plus
+
+	var boots: ItemData = ItemRegistry.get_by_id(equipped_boots_id) if ItemRegistry != null and equipped_boots_id != "" else null
+	if boots != null:
+		var boots_plus: int = int(equipped_boots_entry().get("plus", 0))
+		ac += boots.ac_bonus + boots_plus
+
 	if has_status("mage_armor"):
 		ac = max(ac, 13 + dexterity / 2)
 	ac += EssenceSystem.bonus_ac(self)
@@ -1467,6 +1510,33 @@ func set_equipped_shield(id: String) -> void:
 		# off — the player explicitly chose the shield.
 		if has_two_handed_weapon():
 			set_equipped_weapon("")
+	_refresh_paperdoll()
+	refresh_ac_from_equipment()
+
+func set_equipped_helmet(id: String) -> void:
+	if equipped_helmet_id != "":
+		_remove_entry_affixes(equipped_helmet_entry())
+	equipped_helmet_id = id
+	if id != "":
+		_apply_entry_affixes(equipped_helmet_entry())
+	_refresh_paperdoll()
+	refresh_ac_from_equipment()
+
+func set_equipped_gloves(id: String) -> void:
+	if equipped_gloves_id != "":
+		_remove_entry_affixes(equipped_gloves_entry())
+	equipped_gloves_id = id
+	if id != "":
+		_apply_entry_affixes(equipped_gloves_entry())
+	_refresh_paperdoll()
+	refresh_ac_from_equipment()
+
+func set_equipped_boots(id: String) -> void:
+	if equipped_boots_id != "":
+		_remove_entry_affixes(equipped_boots_entry())
+	equipped_boots_id = id
+	if id != "":
+		_apply_entry_affixes(equipped_boots_entry())
 	_refresh_paperdoll()
 	refresh_ac_from_equipment()
 
