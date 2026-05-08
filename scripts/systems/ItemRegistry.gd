@@ -541,12 +541,12 @@ func pick_floor_loot(depth: int) -> ItemData:
 	# Note: partial books (generate_partial_book) are NOT returned here because
 	# this function returns ItemData resources. Partial books are spawned via
 	# _spawn_items_for_floor in Game.gd using generate_partial_book() directly.
-	# Weights: potion 34%, scroll 30%, wand 12%, throwing 6%, spellpage 2%,
+	# Weights: potion 31%, scroll 27%, wand 18%, throwing 6%, spellpage 2%,
 	#          full school book 1%, gold 5%, equipment 10%.
 	var roll: float = randf()
-	if roll < 0.34:
+	if roll < 0.31:
 		return _pick_weighted(depth, ["potion"])
-	if roll < 0.64:
+	if roll < 0.58:
 		return _pick_weighted(depth, ["scroll"])
 	if roll < 0.76:
 		return _pick_weighted(depth, ["wand"])

@@ -357,7 +357,8 @@ static func _backstab_bonus(player: Player, monster: Monster, weapon: ItemData,
 	var base_damage: int = UNARMED_DAMAGE
 	if weapon != null:
 		base_damage = max(base_damage, weapon.damage + weapon_plus)
-	return max(1, int(round(float(base_damage) * bonus_mult)))
+	var result: int = max(1, int(round(float(base_damage) * bonus_mult)))
+	return int(round(float(result) * FaithSystem.first_strike_mult(player)))
 
 static func monster_ranged_attack_player(monster: Monster, player: Player,
 		ra: Dictionary) -> void:

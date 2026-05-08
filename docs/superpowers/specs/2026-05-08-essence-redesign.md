@@ -126,7 +126,7 @@ Negative shorthand:
 |---|---|---|---|---|
 | `vermin_a` | Vermin Essence | dex+2 | see_invis | scream |
 | `vermin_b` | Swarm Essence | dex+4 + stealth+1 | claw | vuln_cold |
-| `vermin_c` | Plague Essence | stealth+3 (camouflage) | detect | attract |
+| `vermin_c` | Plague Essence | miasma | rP | no_stealth |
 
 ---
 

@@ -25,11 +25,12 @@ const FAITHS: Dictionary = {
 	"trickery": {
 		"name": "Trickery",
 		"short": "Strength through speed, deceit, and precise tools.",
-		"desc": "Trickery favors agility, tools, ranged combat, and ambushes.\nIt rewards clever positioning and flexible resources.\nIt offers little help in a straight brawl.",
+		"desc": "Trickery favors agility, tools, ranged combat, and ambushes.\nIt rewards clever positioning and flexible resources.\nIt dramatically amplifies first strikes against unaware foes.\nIt offers little help in a straight brawl.",
 		"color": Color(0.4, 0.85, 0.5),
 		"allows_essence": false,
 		"ranged_damage_mult": 1.10,
 		"wand_charge_save_chance": 0.20,
+		"first_strike_mult": 1.50,
 	},
 	"death": {
 		"name": "Death",
@@ -51,7 +52,7 @@ const FAITHS: Dictionary = {
 		"allows_essence": true,
 		"essence_inventory_bonus": 1,
 		"resonance_mult": 1.25,
-		"unique_essence_drop_bonus": 0.15,
+		"unique_essence_drop_bonus": 0.10,
 	},
 }
 
@@ -212,3 +213,8 @@ static func unique_essence_drop_bonus(player) -> float:
 	if player == null:
 		return 0.0
 	return float(get_faith(current_faith_id(player)).get("unique_essence_drop_bonus", 0.0))
+
+static func first_strike_mult(player) -> float:
+	if player == null:
+		return 1.0
+	return float(get_faith(current_faith_id(player)).get("first_strike_mult", 1.0))
