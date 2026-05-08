@@ -101,7 +101,7 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 				child.queue_free()
 			_fill_inventory(content_container, player, dlg, tab_filters[idx])
 			for j in range(tab_btns.size()):
-				tab_btns[j].disabled = (j == idx))
+				tab_btns[j].disabled = (j == idx)
 		tab_bar.add_child(btn)
 		tab_btns.append(btn)
 	tab_btns[0].disabled = true
