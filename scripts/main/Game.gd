@@ -2180,60 +2180,6 @@ func apply_immolation_aoe(origin: Vector2i, radius: int) -> void:
 			n.become_aware(origin)
 
 
-func apply_fear_aoe(origin: Vector2i, radius: int, turns: int) -> void:
-	if map == null:
-		return
-	for n in get_tree().get_nodes_in_group("monsters"):
-		if not (n is Monster) or n.is_ally:
-			continue
-		var d: int = max(abs(n.grid_pos.x - origin.x), abs(n.grid_pos.y - origin.y))
-		if d <= radius:
-			n.is_aware = false
-			n.status["feared"] = turns
-
-
-func apply_fog_aoe(origin: Vector2i, radius: int, duration: int) -> void:
-	if map == null:
-		return
-	for dx in range(-radius, radius + 1):
-		for dy in range(-radius, radius + 1):
-			var pos := origin + Vector2i(dx, dy)
-			if map.in_bounds(pos) and map.tile_at(pos) != map.Tile.WALL:
-				map.add_cloud(pos, "fog", duration)
-
-
-func apply_silence_aoe(origin: Vector2i, radius: int, turns: int) -> void:
-	if map == null:
-		return
-	for n in get_tree().get_nodes_in_group("monsters"):
-		if not (n is Monster) or n.is_ally:
-			continue
-		var d: int = max(abs(n.grid_pos.x - origin.x), abs(n.grid_pos.y - origin.y))
-		if d <= radius:
-			n.status["silenced"] = turns
-
-
-func alert_all_monsters() -> void:
-	if player == null:
-		return
-	for n in get_tree().get_nodes_in_group("monsters"):
-		if not (n is Monster) or n.is_ally:
-			continue
-		n.become_aware(player.grid_pos)
-
-
-func dig_toward(origin: Vector2i) -> void:
-	if map == null:
-		return
-	# Dig walls in a 2-tile Chebyshev radius around origin
-	for dx in range(-2, 3):
-		for dy in range(-2, 3):
-			var pos := origin + Vector2i(dx, dy)
-			if map.in_bounds(pos) and map.tile_at(pos) == DungeonMap.Tile.WALL:
-				map.set_tile(pos, DungeonMap.Tile.FLOOR)
-	map.queue_redraw()
-
-
 func _tick_cloud_damage_player() -> void:
 	if player == null or player.hp <= 0 or map == null:
 		return
