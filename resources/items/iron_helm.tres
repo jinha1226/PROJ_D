@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bv2plk9d5ex9m"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "iron_helm"
+display_name = "iron helm"
+kind = "helmet"
+tier = 2
+tile_path = ""
+glyph = "]"
+glyph_color = Color(0.65, 0.7, 0.75, 1)
+damage = 0
+delay = 1.0
+category = ""
+brand = ""
+ac_bonus = 2
+ev_penalty = 0
+encumbrance = 4
+slot = "helmet"
+effect = ""
+effect_value = 0
+plus = 0
+description = "A solid iron helmet. Protects the skull at the cost of some peripheral vision."
