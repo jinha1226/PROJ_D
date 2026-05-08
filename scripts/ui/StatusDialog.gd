@@ -4,6 +4,9 @@ const _VISIBLE_EQUIP_SLOTS: Array = [
 	["Weapon", "weapon"],
 	["Armor", "body"],
 	["Shield", "shield"],
+	["Helmet", "helmet"],
+	["Gloves", "gloves"],
+	["Boots", "boots"],
 	["Ring", "ring"],
 	["Amulet", "amulet"],
 ]
@@ -735,6 +738,12 @@ static func _equip_id(slot: String, player: Player) -> String:
 			return player.equipped_ring_id
 		"amulet":
 			return player.equipped_amulet_id
+		"helmet":
+			return player.equipped_helmet_id
+		"gloves":
+			return player.equipped_gloves_id
+		"boots":
+			return player.equipped_boots_id
 	return ""
 
 static func _equip_entry(item_id: String, player: Player) -> Dictionary:
