@@ -1071,3 +1071,8 @@ ESSENCE_LOG_MELEE_FIRE,Your strike scorches the %s for %d fire damage.,당신의
 ESSENCE_LOG_CINDER_FIRE,Cinder essence sears the %s for %d fire damage.,잿불의 정수가 %s을(를) 화염 피해 %d로 태운다.
 ESSENCE_LOG_MELEE_CHILL,Frost from your touch freezes the %s.,당신의 손길에서 번진 서리가 %s을(를) 얼린다.
 ESSENCE_LOG_VENOM_TOUCH,Your venom stings the %s for %d.,당신의 독이 %s을(를) %d만큼 찌른다.
+SHOP_TITLE,Shop,상점
+SHOP_GOLD_LABEL,Gold: %dg,골드: %dg
+SHOP_BUY,Buy,구매
+SHOP_NOT_ENOUGH_GOLD,Not enough gold,골드가 부족합니다
+SHOP_SOLD,Sold,판매됨
