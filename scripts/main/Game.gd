@@ -902,6 +902,130 @@ func _place_shop_tile() -> void:
 	_shop_items = []  # generated lazily on first visit
 	_shop_is_special = (randf() < 0.15)
 
+## Tier-based purchase price for shop items.
+## Randarts use a separate (premium) price table.
+## Consumables (potion/scroll/spellpage) use a lower table.
+## Books use consumable table × 1.5.
+## Equipment uses the standard table.
+func _shop_price(item_data: ItemData, is_randart: bool) -> int:
+	if item_data == null:
+		return 0
+	var tier: int = clamp(item_data.tier, 1, 5)
+	if is_randart:
+		var randart_prices := [0, 0, 0, 0, 220, 320]
+		return randart_prices[tier]
+	var kind: String = String(item_data.kind)
+	if kind in ["potion", "scroll", "spellpage"]:
+		var consumable_prices := [0, 15, 25, 40, 60, 80]
+		return consumable_prices[tier]
+	elif kind == "book":
+		var base_prices := [0, 15, 25, 40, 60, 80]
+		return int(base_prices[tier] * 1.5)
+	else:
+		# equipment: weapon, armor, ring, amulet, shield, wand, throwing
+		var equipment_prices := [0, 40, 70, 110, 160, 220]
+		return equipment_prices[tier]
+
+## Populate _shop_items lazily on first visit to a shop tile.
+## Normal shop (85% chance): 4-6 mixed items.
+## Special shop (15% chance): 3-4 high-tier equipment entries + 1-2 consumables.
+## Partial books are excluded (ShopDialog requires ItemData; generate_partial_book
+## returns a Dictionary). Full school books may appear via normal item picks.
+func _generate_shop_inventory() -> void:
+	_shop_items = []
+	if ItemRegistry == null:
+		return
+	var depth: int = GameManager.depth
+
+	if _shop_is_special:
+		# Special shop: premium equipment (boosted depth for higher tiers) + consumables.
+		var boosted_depth: int = min(depth + 4, 20)
+		var eq_count: int = randi_range(3, 4)
+		for _i in range(eq_count):
+			var base_item: ItemData = ItemRegistry.pick_equipment_weighted(boosted_depth)
+			if base_item == null:
+				continue
+			var entry: Dictionary = ItemRegistry.make_entry(base_item.id, boosted_depth)
+			var is_randart: bool = entry.has("mods")
+			var display_item: ItemData = ItemRegistry.get_by_id(
+				String(entry.get("base_id", entry.get("id", ""))))
+			if display_item == null:
+				continue
+			var price: int = _shop_price(display_item, is_randart)
+			_shop_items.append({
+				"item_data": display_item,
+				"entry": entry,
+				"price": price,
+				"sold": false,
+			})
+		var consumable_count: int = randi_range(1, 2)
+		for _i in range(consumable_count):
+			var kind_roll: float = randf()
+			var item: ItemData
+			if kind_roll < 0.6:
+				item = ItemRegistry.pick_kind(boosted_depth, "potion")
+			else:
+				item = ItemRegistry.pick_kind(boosted_depth, "scroll")
+			if item == null:
+				continue
+			_shop_items.append({
+				"item_data": item,
+				"price": _shop_price(item, false),
+				"sold": false,
+			})
+	else:
+		# Normal shop: 4-6 mixed items.
+		var count: int = randi_range(4, 6)
+		for _i in range(count):
+			var roll: float = randf()
+			if roll < 0.25:
+				# Potion
+				var item: ItemData = ItemRegistry.pick_kind(depth, "potion")
+				if item == null:
+					continue
+				_shop_items.append({"item_data": item, "price": _shop_price(item, false), "sold": false})
+			elif roll < 0.45:
+				# Scroll
+				var item: ItemData = ItemRegistry.pick_kind(depth, "scroll")
+				if item == null:
+					continue
+				_shop_items.append({"item_data": item, "price": _shop_price(item, false), "sold": false})
+			elif roll < 0.65:
+				# Equipment (may become randart via make_entry)
+				var base_item: ItemData = ItemRegistry.pick_equipment_weighted(depth)
+				if base_item == null:
+					continue
+				var entry: Dictionary = ItemRegistry.make_entry(base_item.id, depth)
+				var is_randart: bool = entry.has("mods")
+				var display_item: ItemData = ItemRegistry.get_by_id(
+					String(entry.get("base_id", entry.get("id", ""))))
+				if display_item == null:
+					continue
+				_shop_items.append({
+					"item_data": display_item,
+					"entry": entry,
+					"price": _shop_price(display_item, is_randart),
+					"sold": false,
+				})
+			elif roll < 0.80:
+				# Spellpage
+				var item: ItemData = ItemRegistry.pick_random_spellpage(depth)
+				if item == null:
+					continue
+				_shop_items.append({"item_data": item, "price": _shop_price(item, false), "sold": false})
+			else:
+				# Full school book
+				var item: ItemData = ItemRegistry.pick_kind(depth, "book")
+				if item == null:
+					continue
+				_shop_items.append({"item_data": item, "price": _shop_price(item, false), "sold": false})
+
+## Open the shop dialog. Generates inventory on first visit (lazy).
+func _open_shop() -> void:
+	if _shop_items.is_empty():
+		_generate_shop_inventory()
+	ShopDialog.open(_shop_items, player, get_tree().current_scene)
+
 func _generate_floor(depth: int, map_seed: int,
 		arrive_from_above: bool = true) -> void:
 	_abyss_turn_counter = 0
@@ -1922,10 +2046,12 @@ func _update_hud() -> void:
 		bottom_hud.set_rest_label(hostile_visible)
 		bottom_hud.set_act_label(hostile_visible)
 
-func _on_player_moved(_new_pos: Vector2i) -> void:
+func _on_player_moved(new_pos: Vector2i) -> void:
 	_refresh_fov()
 	_center_camera_on_player()
 	_refresh_quickslots()
+	if map != null and map.tile_at(new_pos) == DungeonMap.Tile.SHOP:
+		_open_shop()
 
 func _try_open_shrine_choice() -> void:
 	if map == null or player == null:
