@@ -27,6 +27,9 @@ COMMON_VS_EQUIPPED,vs equipped: %s,vs 장착: %s
 EQUIP_WEAPON,Weapon,무기
 EQUIP_ARMOR,Armor,방어구
 EQUIP_SHIELD,Shield,방패
+EQUIP_HELMET,Helmet,투구
+EQUIP_GLOVES,Gloves,장갑
+EQUIP_BOOTS,Boots,신발
 EQUIP_RING,Ring,반지
 EQUIP_AMULET,Amulet,목걸이
 EQUIP_EQUIP,Equip,장착

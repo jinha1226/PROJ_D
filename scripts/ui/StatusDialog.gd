@@ -1,14 +1,14 @@
 class_name StatusDialog extends RefCounted
 
 const _VISIBLE_EQUIP_SLOTS: Array = [
-	["Weapon", "weapon"],
-	["Armor", "body"],
-	["Shield", "shield"],
-	["Helmet", "helmet"],
-	["Gloves", "gloves"],
-	["Boots", "boots"],
-	["Ring", "ring"],
-	["Amulet", "amulet"],
+	["EQUIP_WEAPON", "weapon"],
+	["EQUIP_ARMOR", "body"],
+	["EQUIP_SHIELD", "shield"],
+	["EQUIP_HELMET", "helmet"],
+	["EQUIP_GLOVES", "gloves"],
+	["EQUIP_BOOTS", "boots"],
+	["EQUIP_RING", "ring"],
+	["EQUIP_AMULET", "amulet"],
 ]
 
 const _RESIST_ELEMENTS: Array = ["fire", "cold", "poison", "necro"]
@@ -279,8 +279,9 @@ static func _equipment_card(player: Player) -> Control:
 	vb.add_child(UICards.section_header("Equipment", GameTheme.TYPO_SUBTITLE))
 
 	for pair in _VISIBLE_EQUIP_SLOTS:
-		var label: String = String(pair[0])
+		var key: String = String(pair[0])
 		var slot: String = String(pair[1])
+		var label: String = LocaleManager.t(key)
 		vb.add_child(_equipment_row(label, slot, player))
 	return card
 
