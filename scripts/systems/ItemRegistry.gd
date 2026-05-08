@@ -58,6 +58,13 @@ const _BUCKLER: Resource = preload("res://resources/items/buckler.tres")
 const _ROUND_SHIELD: Resource = preload("res://resources/items/round_shield.tres")
 const _KITE_SHIELD: Resource = preload("res://resources/items/kite_shield.tres")
 const _TOWER_SHIELD: Resource = preload("res://resources/items/tower_shield.tres")
+const _LEATHER_CAP: Resource = preload("res://resources/items/leather_cap.tres")
+const _IRON_HELM: Resource = preload("res://resources/items/iron_helm.tres")
+const _GREAT_HELM: Resource = preload("res://resources/items/great_helm.tres")
+const _LEATHER_GLOVES: Resource = preload("res://resources/items/leather_gloves.tres")
+const _IRON_GAUNTLETS: Resource = preload("res://resources/items/iron_gauntlets.tres")
+const _LEATHER_BOOTS: Resource = preload("res://resources/items/leather_boots.tres")
+const _IRON_GREAVES: Resource = preload("res://resources/items/iron_greaves.tres")
 const _SHORTBOW: Resource = preload("res://resources/items/shortbow.tres")
 const _LONGBOW: Resource = preload("res://resources/items/longbow.tres")
 const _CROSSBOW: Resource = preload("res://resources/items/crossbow.tres")
@@ -224,6 +231,9 @@ const _ALL_ITEMS: Array = [
 	_RING_STR, _RING_INT, _RING_DEX, _RING_PROTECTION, _RING_SLAYING, _RING_WIZARDRY,
 	_AMULET_LIFE, _AMULET_MAGIC, _AMULET_STR,
 	_BUCKLER, _ROUND_SHIELD, _KITE_SHIELD, _TOWER_SHIELD,
+	_LEATHER_CAP, _IRON_HELM, _GREAT_HELM,
+	_LEATHER_GLOVES, _IRON_GAUNTLETS,
+	_LEATHER_BOOTS, _IRON_GREAVES,
 	_SHORTBOW, _LONGBOW, _CROSSBOW,
 	_FLAMING_SWORD, _FROST_DAGGER, _VENOM_DAGGER, _SHOCK_MACE,
 	_LEATHER_ARMOR, _ROBE, _CHAIN_MAIL, _RING_MAIL, _SCALE_MAIL, _PLATE_MAIL, _TROLL_LEATHER,
@@ -558,16 +568,16 @@ func pick_floor_loot(depth: int) -> ItemData:
 		return _pick_weighted(depth, ["book"])
 	if roll < 0.90:
 		return _pick_weighted(depth, ["gold"])
-	return _pick_weighted(depth, ["weapon", "armor", "ring", "amulet", "shield"])
+	return _pick_weighted(depth, ["weapon", "armor", "ring", "amulet", "shield", "helmet", "gloves", "boots"])
 
 func pick_kind(depth: int, kind: String) -> ItemData:
 	return _pick_weighted(depth, [kind])
 
 func pick_equipment(depth: int) -> ItemData:
-	return _pick_weighted(depth, ["weapon", "armor", "ring", "amulet", "shield"])
+	return _pick_weighted(depth, ["weapon", "armor", "ring", "amulet", "shield", "helmet", "gloves", "boots"])
 
 func pick_equipment_weighted(depth: int) -> ItemData:
-	var eq_kinds: Array[String] = ["weapon", "armor", "ring", "amulet", "shield"]
+	var eq_kinds: Array[String] = ["weapon", "armor", "ring", "amulet", "shield", "helmet", "gloves", "boots"]
 	var candidates: Array = []
 	var weights: Array[int] = []
 	for it in all:
