@@ -25,3 +25,4 @@ glyph = "o"
 glyph_color = Color(0.5, 0.85, 0.35, 1)
 essence_id = "essence_might"
 description = "A brutal warrior who wins through direct force. Stronger than the smallest dungeon vermin and often backed by allies."
+gold_drop_max = 20

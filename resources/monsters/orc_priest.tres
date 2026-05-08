@@ -25,3 +25,4 @@ glyph_color = Color(0.9, 0.75, 0.2, 1)
 description = "An orcish healer who sustains its allies. Killing it first makes the rest of the encounter manageable."
 ai_flags = ["healer", "summoner"]
 summon_pool = ["orc"]
+gold_drop_max = 40

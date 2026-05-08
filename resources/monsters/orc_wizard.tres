@@ -25,3 +25,4 @@ tile_path = "res://assets/tiles/individual/mon/humanoids/orcs/orc_apostle_wizard
 glyph = "o"
 glyph_color = Color(0.65, 0.45, 0.85, 1)
 description = "An orcish spellcaster who launches bolts from a safe distance. Close the gap fast before it punishes you."
+gold_drop_max = 30

@@ -26,6 +26,7 @@ class_name MonsterData extends Resource
 @export var essence_id: String = ""   # specific essence this monster can drop; "" = random
 @export var ai_flags: Array = []      # ["kite", "healer", "summoner"]
 @export var summon_pool: Array = []   # summoner: monster ids to spawn
+@export var gold_drop_max: int = 0   # humanoid gold carry; 0 = no drop
 
 
 ## Localized display name. Falls back to the .tres display_name if the
