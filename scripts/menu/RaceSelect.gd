@@ -112,9 +112,12 @@ func _make_portrait(data: RaceData) -> Control:
 	cont.custom_minimum_size = Vector2(96, 120)
 	cont.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var dim: bool = not RaceRegistry.is_unlocked(data.id)
-	if data.base_sprite_path != "" and ResourceLoader.exists(data.base_sprite_path):
-		_add_layer(cont, data.base_sprite_path, dim)
-	_add_layer(cont, _DEFAULT_BODY, dim)
+	if data.menu_portrait_path != "" and ResourceLoader.exists(data.menu_portrait_path):
+		_add_layer(cont, data.menu_portrait_path, dim)
+	else:
+		if data.base_sprite_path != "" and ResourceLoader.exists(data.base_sprite_path):
+			_add_layer(cont, data.base_sprite_path, dim)
+		_add_layer(cont, _DEFAULT_BODY, dim)
 	return cont
 
 func _add_layer(parent: Control, path: String, dim: bool) -> void:
@@ -123,6 +126,7 @@ func _add_layer(parent: Control, path: String, dim: bool) -> void:
 	var rect := TextureRect.new()
 	rect.texture = load(path)
 	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	rect.anchor_right = 1.0
 	rect.anchor_bottom = 1.0
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE

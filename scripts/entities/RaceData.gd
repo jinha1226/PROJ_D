@@ -4,6 +4,9 @@ class_name RaceData extends Resource
 @export var display_name: String = ""
 @export var description: String = ""
 @export var base_sprite_path: String = ""
+## Optional larger portrait used by menu/select screens.
+## Falls back to base_sprite_path layered with starter visuals if empty.
+@export var menu_portrait_path: String = ""
 
 ## Unlock gating. If `unlocked` is true (or the id has been granted
 ## via GameManager.unlock), the race shows up as pickable. Otherwise

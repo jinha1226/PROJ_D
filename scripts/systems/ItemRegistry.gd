@@ -122,8 +122,6 @@ const _SPELLPAGE_STONESKIN: Resource = preload("res://resources/items/spellpage_
 const _SPELLPAGE_SLEEP: Resource = preload("res://resources/items/spellpage_sleep.tres")
 const _SPELLPAGE_POLYMORPH: Resource = preload("res://resources/items/spellpage_polymorph.tres")
 # Spellpages (tier 1)
-const _SPELLPAGE_SINGE: Resource = preload("res://resources/items/spellpage_singe.tres")
-const _SPELLPAGE_STONE_SHOT: Resource = preload("res://resources/items/spellpage_stone_shot.tres")
 const _SPELLPAGE_FREEZE: Resource = preload("res://resources/items/spellpage_freeze.tres")
 const _SPELLPAGE_PAIN: Resource = preload("res://resources/items/spellpage_pain.tres")
 const _SPELLPAGE_SHOCK: Resource = preload("res://resources/items/spellpage_shock.tres")
@@ -169,10 +167,10 @@ const SPELL_POOL: Array = [
 	{"spell_id": "freeze",          "tier": 1},
 	{"spell_id": "pain",            "tier": 1},
 	{"spell_id": "shock",           "tier": 1},
-	{"spell_id": "singe",           "tier": 1},
+
 	{"spell_id": "sleep",           "tier": 1},
 	{"spell_id": "slow",            "tier": 1},
-	{"spell_id": "stone_shot",      "tier": 1},
+
 	# Tier 2 — available from depth 2
 	{"spell_id": "animate_skeleton","tier": 2},
 	{"spell_id": "blink",           "tier": 2},
@@ -249,7 +247,7 @@ const _ALL_ITEMS: Array = [
 	_SPELLPAGE_FIREBALL, _SPELLPAGE_FIRE_STORM, _SPELLPAGE_CHAIN_LIGHTNING,
 	_SPELLPAGE_HASTE, _SPELLPAGE_STONESKIN, _SPELLPAGE_SLEEP, _SPELLPAGE_POLYMORPH,
 	# Tier 1 spellpages
-	_SPELLPAGE_SINGE, _SPELLPAGE_STONE_SHOT, _SPELLPAGE_FREEZE, _SPELLPAGE_PAIN,
+	_SPELLPAGE_FREEZE, _SPELLPAGE_PAIN,
 	_SPELLPAGE_SHOCK, _SPELLPAGE_SLOW,
 	# Tier 2 spellpages
 	_SPELLPAGE_ANIMATE_SKELETON, _SPELLPAGE_BLINK, _SPELLPAGE_CALL_IMP,

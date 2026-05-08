@@ -193,10 +193,16 @@ func _make_portrait(data: ClassData, dim: bool) -> Control:
 	var cont := Control.new()
 	cont.custom_minimum_size = Vector2(120, 130)
 	cont.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	if data.menu_portrait_path != "" and ResourceLoader.exists(data.menu_portrait_path):
+		_add_layer(cont, data.menu_portrait_path, dim)
+		return cont
 	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
 	var base_path: String = DEFAULT_BASE_PATH
-	if race != null and race.base_sprite_path != "" and ResourceLoader.exists(race.base_sprite_path):
-		base_path = race.base_sprite_path
+	if race != null:
+		if race.menu_portrait_path != "" and ResourceLoader.exists(race.menu_portrait_path):
+			base_path = race.menu_portrait_path
+		elif race.base_sprite_path != "" and ResourceLoader.exists(race.base_sprite_path):
+			base_path = race.base_sprite_path
 	_add_layer(cont, base_path, dim)
 	if data != null:
 		var body_path: String = ""
@@ -217,6 +223,7 @@ func _add_layer(parent: Control, path: String, dim: bool) -> void:
 	var rect := TextureRect.new()
 	rect.texture = load(path)
 	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	rect.anchor_right = 1.0
 	rect.anchor_bottom = 1.0
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE

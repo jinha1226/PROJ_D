@@ -12,6 +12,9 @@ class_name ClassData extends Resource
 @export var starting_armor: String = ""
 @export var starting_shield: String = ""
 @export var robe_path: String = ""  # overrides DOLL_BODY_MAP for portrait and paperdoll
+## Optional precomposed menu portrait used by class select.
+## If empty, the menu layers race base + starter gear as before.
+@export var menu_portrait_path: String = ""
 @export var starting_skills: Dictionary = {}
 @export var starting_spells: Array = []
 ## Skills that begin in the "active/training" set on run start.

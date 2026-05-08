@@ -138,3 +138,15 @@ Rationale:
 ## 2026-05 - Item Flavor Leans Toward A Late-Age DCSS Tone
 - PocketCrawl item descriptions should evoke a dungeon built on the ruins of an older Crawl age rather than read like neutral mechanical tooltips.
 - Mechanical clarity stays, but descriptions can suggest that this world inherits the bones of DCSS centuries later.
+
+
+## 2026-05-08 - Tile Production Uses Native 32x32 Workflow
+- Final tile production should be authored directly for 32x32 gameplay use.
+- PocketCrawl tile art should feel like a cleaner, slightly upgraded DCSS remaster rather than a new chibi or high-detail style.
+- Front-facing composition is the default, especially for humanoids and player-usable body templates.
+- Readability, silhouette, and overlay compatibility take priority over fine detail.
+
+## 2026-05-08 - Item Art Uses Split Asset Roles
+- Equipped gear overlays and dropped/inventory icons should be authored as separate assets.
+- Select screens should be allowed to use optional dedicated menu portraits instead of scaling raw in-game body sprites.
+- One sprite should not be forced to serve as gameplay body, equipped overlay, floor icon, and menu portrait at once.
