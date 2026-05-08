@@ -627,7 +627,7 @@ func use_item(index: int) -> void:
 			if learned_count == 0:
 				if blocked_count > 0:
 					CombatLog.post(LocaleManager.t("LOG_THE_TOME_IS_BEYOND_YOUR"), Color(1.0, 0.72, 0.5))
-					if data.kind == "book":
+					if data.kind in ["book", "spellpage"]:
 						return
 				else:
 					CombatLog.post(LocaleManager.t("LOG_YOU_ALREADY_KNOW_ALL_SPELLS"), Color(0.7, 0.85, 1.0))

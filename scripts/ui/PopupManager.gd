@@ -59,12 +59,12 @@ func show_essence_pickup_popup(essence_id: String, inventory: Array, cap: int, c
 	dlg.title = EssenceSystem.display_name(essence_id)
 	dlg.dialog_hide_on_ok = false
 	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 10)
+	vb.add_theme_constant_override("separation", 6)
 	var header := HBoxContainer.new()
-	header.add_theme_constant_override("separation", 12)
+	header.add_theme_constant_override("separation", 8)
 	var icon := TextureRect.new()
 	icon.texture = EssenceSystem.icon_texture_of(essence_id)
-	icon.custom_minimum_size = Vector2(48, 48)
+	icon.custom_minimum_size = Vector2(36, 36)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
@@ -72,19 +72,19 @@ func show_essence_pickup_popup(essence_id: String, inventory: Array, cap: int, c
 	var desc := Label.new()
 	desc.text = EssenceSystem.description(essence_id)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc.add_theme_font_size_override("font_size", 18)
+	desc.add_theme_font_size_override("font_size", 15)
 	desc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(desc)
 	vb.add_child(header)
 	var inv := Label.new()
 	inv.text = LocaleManager.t("ESSENCE_PICKUP_CARRIED") % [inventory.size(), cap]
-	inv.add_theme_font_size_override("font_size", 14)
+	inv.add_theme_font_size_override("font_size", 13)
 	inv.add_theme_color_override("font_color", Color(0.68, 0.72, 0.8))
 	vb.add_child(inv)
 	if inventory.size() < cap:
 		var take_btn := Button.new()
 		take_btn.text = LocaleManager.t("ESSENCE_PICKUP_TAKE")
-		take_btn.custom_minimum_size = Vector2(0, 44)
+		take_btn.custom_minimum_size = Vector2(0, 36)
 		take_btn.pressed.connect(func():
 			if callbacks.has("take"):
 				callbacks["take"].call()
@@ -94,14 +94,14 @@ func show_essence_pickup_popup(essence_id: String, inventory: Array, cap: int, c
 		var full := Label.new()
 		full.text = LocaleManager.t("ESSENCE_PICKUP_FULL")
 		full.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		full.add_theme_font_size_override("font_size", 14)
+		full.add_theme_font_size_override("font_size", 13)
 		full.add_theme_color_override("font_color", Color(1.0, 0.76, 0.48))
 		vb.add_child(full)
 		for existing_id in inventory:
 			var swap_btn := Button.new()
 			swap_btn.text = LocaleManager.t("ESSENCE_PICKUP_REPLACE") % EssenceSystem.display_name(String(existing_id))
 			swap_btn.icon = EssenceSystem.icon_texture_of(String(existing_id))
-			swap_btn.custom_minimum_size = Vector2(0, 40)
+			swap_btn.custom_minimum_size = Vector2(0, 34)
 			swap_btn.pressed.connect(func():
 				if callbacks.has("replace"):
 					callbacks["replace"].call(String(existing_id))
@@ -109,7 +109,7 @@ func show_essence_pickup_popup(essence_id: String, inventory: Array, cap: int, c
 			vb.add_child(swap_btn)
 	var leave_btn := Button.new()
 	leave_btn.text = LocaleManager.t("ESSENCE_PICKUP_LEAVE")
-	leave_btn.custom_minimum_size = Vector2(0, 40)
+	leave_btn.custom_minimum_size = Vector2(0, 34)
 	leave_btn.pressed.connect(func():
 		if callbacks.has("leave"):
 			callbacks["leave"].call()
