@@ -51,7 +51,7 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 		# Summoner: call reinforcements on first sighting
 		if monster.data.ai_flags.has("summoner") and not monster._summoned_once:
 			_try_summon(monster, map)
-		if _try_special_ranged(monster, player, map, dist):
+		if monster.status.get("silenced", 0) <= 0 and _try_special_ranged(monster, player, map, dist):
 			return
 		# Kiter: maintain preferred distance before shooting
 		if monster.data.ai_flags.has("kite") and dist < KITE_PREFERRED_RANGE:
