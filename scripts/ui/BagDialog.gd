@@ -80,7 +80,7 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 	var tab_filters: Array = [
 		[],                                   # 전체
 		["weapon"],                           # 무기
-		["armor", "shield"],                  # 방어구
+		["armor", "shield", "helmet", "gloves", "boots"],   # 방어구
 		["ring", "amulet"],                   # 장신구
 		["potion", "scroll", "book"],         # 소모품
 		["wand", "throwing", "spellpage"],    # 툴
@@ -111,7 +111,7 @@ static func _populate(dlg: GameDialog, player: Player) -> void:
 ## Kinds claimed by any non-"전체"/non-"기타" tab — single source of truth so
 ## the "기타" tab's catch-all stays in sync when a new tab is added above.
 const _ALL_TAB_KINDS: Array = [
-	"weapon", "armor", "shield",
+	"weapon", "armor", "shield", "helmet", "gloves", "boots",
 	"ring", "amulet",
 	"potion", "scroll", "book",
 	"wand", "throwing", "spellpage",
@@ -152,7 +152,10 @@ static func _fill_inventory(container: VBoxContainer, player: Player,
 			or sid == player.equipped_armor_id \
 			or sid == player.equipped_ring_id \
 			or sid == player.equipped_amulet_id \
-			or sid == player.equipped_shield_id
+			or sid == player.equipped_shield_id \
+			or sid == player.equipped_helmet_id \
+			or sid == player.equipped_gloves_id \
+			or sid == player.equipped_boots_id
 		if is_eq:
 			equipped_keys.append(key)
 		else:
@@ -303,7 +306,10 @@ static func _build_item_row(data: ItemData, indices: Array, plus: int,
 		or entry_id == player.equipped_armor_id \
 		or entry_id == player.equipped_ring_id \
 		or entry_id == player.equipped_amulet_id \
-		or entry_id == player.equipped_shield_id
+		or entry_id == player.equipped_shield_id \
+		or entry_id == player.equipped_helmet_id \
+		or entry_id == player.equipped_gloves_id \
+		or entry_id == player.equipped_boots_id
 	if is_equipped:
 		var eq_lbl := Label.new()
 		eq_lbl.text = LocaleManager.t("COMMON_EQUIPPED")
@@ -348,4 +354,7 @@ static func _item_color(kind: String) -> Color:
 		"ring":   return Color(1.0, 0.7, 0.9)
 		"amulet": return Color(0.9, 0.75, 0.5)
 		"shield": return Color(0.6, 0.75, 0.65)
+		"helmet": return Color(0.65, 0.7, 0.75)
+		"gloves": return Color(0.7, 0.65, 0.55)
+		"boots":  return Color(0.6, 0.55, 0.45)
 		_:        return Color(0.85, 0.85, 0.85)
