@@ -113,6 +113,14 @@ const _RUNE_SWAMP: Resource = preload("res://resources/items/rune_swamp.tres")
 const _RUNE_ICE: Resource = preload("res://resources/items/rune_ice.tres")
 const _RUNE_INFERNAL: Resource = preload("res://resources/items/rune_infernal.tres")
 const _RUNE_CRYPT: Resource = preload("res://resources/items/rune_crypt.tres")
+# Spellpages
+const _SPELLPAGE_FIREBALL: Resource = preload("res://resources/items/spellpage_fireball.tres")
+const _SPELLPAGE_FIRE_STORM: Resource = preload("res://resources/items/spellpage_fire_storm.tres")
+const _SPELLPAGE_CHAIN_LIGHTNING: Resource = preload("res://resources/items/spellpage_chain_lightning.tres")
+const _SPELLPAGE_HASTE: Resource = preload("res://resources/items/spellpage_haste.tres")
+const _SPELLPAGE_STONESKIN: Resource = preload("res://resources/items/spellpage_stoneskin.tres")
+const _SPELLPAGE_SLEEP: Resource = preload("res://resources/items/spellpage_sleep.tres")
+const _SPELLPAGE_POLYMORPH: Resource = preload("res://resources/items/spellpage_polymorph.tres")
 
 const _ALL_ITEMS: Array = [
 	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE, _SPEAR,
@@ -145,6 +153,8 @@ const _ALL_ITEMS: Array = [
 	_RING_BOG, _RING_GLACIER, _RING_EMBER, _RING_UNDEATH,
 	_ESSENCE_SHARD,
 	_RUNE_SWAMP, _RUNE_ICE, _RUNE_INFERNAL, _RUNE_CRYPT,
+	_SPELLPAGE_FIREBALL, _SPELLPAGE_FIRE_STORM, _SPELLPAGE_CHAIN_LIGHTNING,
+	_SPELLPAGE_HASTE, _SPELLPAGE_STONESKIN, _SPELLPAGE_SLEEP, _SPELLPAGE_POLYMORPH,
 ]
 
 var by_id: Dictionary = {}

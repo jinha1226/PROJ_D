@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dcch7j4e2qp66"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "spellpage_fireball"
+display_name = "Fireball Page"
+kind = "spellpage"
+tier = 3
+tile_path = "res://assets/tiles/individual/spell/fireball.png"
+identified_tile_path = "res://assets/tiles/individual/spell/fireball.png"
+glyph = "*"
+glyph_color = Color(1, 0.5, 0, 1)
+damage = 0
+delay = 1.0
+category = ""
+brand = ""
+ac_bonus = 0
+ev_penalty = 0
+slot = ""
+effect = "study"
+effect_value = 0
+plus = 0
+description = "A page bound in flame-treated leather. Studying it grants mastery over the fireball spell."
+unlocks_class_id = ""
+grants_spell_id = "fireball"

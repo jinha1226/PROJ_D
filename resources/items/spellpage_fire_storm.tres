@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dpck7xvwkf40c"]
+
+[ext_resource type="Script" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "spellpage_fire_storm"
+display_name = "Fire Storm Page"
+kind = "spellpage"
+tier = 5
+tile_path = "res://assets/tiles/individual/spell/fire_storm.png"
+identified_tile_path = "res://assets/tiles/individual/spell/fire_storm.png"
+glyph = "*"
+glyph_color = Color(1, 0.3, 0, 1)
+damage = 0
+delay = 1.0
+category = ""
+brand = ""
+ac_bonus = 0
+ev_penalty = 0
+slot = ""
+effect = "study"
+effect_value = 0
+plus = 0
+description = "A page suffused with infernal power. Studying it grants mastery over the fire storm spell."
+unlocks_class_id = ""
+grants_spell_id = "fire_storm"

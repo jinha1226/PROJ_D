@@ -668,7 +668,7 @@ func use_item(index: int) -> void:
 		emit_signal("stats_changed")
 		return
 	# Auto-identify on first successful use (consumables only).
-	if data.kind == "potion" or data.kind == "scroll" or data.kind == "book":
+	if data.kind in ["potion", "scroll", "book", "spellpage"]:
 		GameManager.identify(data.id)
 	items.remove_at(index)
 	emit_signal("stats_changed")
