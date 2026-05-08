@@ -688,18 +688,18 @@ static func apply_melee_hit_effects(player: Player, monster: Monster) -> void:
 				monster.take_damage(venom_dmg)
 				CombatLog.hit(TranslationServer.translate("ESSENCE_LOG_VENOM_TOUCH") % [monster.data.loc_name(), venom_dmg])
 			if not monster.is_aware and has_synergy(player, "essence_swiftness", "essence_venom"):
-				Status.apply(monster, "poison", 5)
+				Status.apply(monster, "poison", int(5 * FaithSystem.resonance_mult(player)))
 		elif effect_id == "serpent_poison":
 			if not monster.is_aware:
-				Status.apply(monster, "poison", 5)
+				Status.apply(monster, "poison", int(5 * FaithSystem.resonance_mult(player)))
 			elif randf() < 0.25:
-				Status.apply(monster, "poison", 3)
+				Status.apply(monster, "poison", int(3 * FaithSystem.resonance_mult(player)))
 		elif effect_id == "dread_fear":
 			if randf() < 0.20 and monster.hp > 0:
-				Status.apply(monster, "feared", 2)
+				Status.apply(monster, "feared", int(2 * FaithSystem.resonance_mult(player)))
 	# Gloam + Swiftness resonance: first unaware hit also weakens
 	if not monster.is_aware and has_synergy(player, "essence_gloam", "essence_swiftness"):
-		Status.apply(monster, "weak", 2)
+		Status.apply(monster, "weak", int(2 * FaithSystem.resonance_mult(player)))
 
 static func apply_on_kill_effects(player: Player) -> void:
 	var has_bloodwake_fury: bool = has_synergy(player, "essence_bloodwake", "essence_fury")

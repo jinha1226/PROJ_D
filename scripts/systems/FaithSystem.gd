@@ -207,3 +207,8 @@ static func resonance_mult(player) -> float:
 	if player == null:
 		return 1.0
 	return float(get_faith(current_faith_id(player)).get("resonance_mult", 1.0))
+
+static func unique_essence_drop_bonus(player) -> float:
+	if player == null:
+		return 0.0
+	return float(get_faith(current_faith_id(player)).get("unique_essence_drop_bonus", 0.0))

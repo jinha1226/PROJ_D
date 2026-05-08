@@ -3455,6 +3455,7 @@ func _handle_monster_essence_drop(monster: Monster) -> void:
 		return
 	if monster.data.is_unique:
 		var drop_chance: float = monster.data.drop_chance_override if monster.data.drop_chance_override >= 0.0 else 0.8
+		drop_chance = minf(1.0, drop_chance + FaithSystem.unique_essence_drop_bonus(player))
 		if randf() >= drop_chance:
 			return
 		var uid: String = String(monster.data.essence_id)
