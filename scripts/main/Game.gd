@@ -76,6 +76,11 @@ var _abyss_turn_counter: int = 0
 const _ABYSS_SHIFT_INTERVAL: int = 8  # tiles shift every 8 player turns
 const _ABYSS_SHIFT_COUNT: int = 12    # tiles flipped per shift
 
+# Shop state — reset each floor, persisted in floor cache
+var _shop_items: Array = []           # Array of {item_data: ItemData, price: int, sold: bool}
+var _shop_is_special: bool = false
+var _shop_tile_pos: Vector2i = Vector2i(-1, -1)
+
 # Auto-walk state — when the player taps a distant explored tile,
 # we enqueue a BFS path here and step one tile each player turn
 # until we hit the goal, an enemy enters view, or HP drops.
@@ -861,6 +866,42 @@ func _spawn_ui() -> void:
 func _floor_seed(depth: int) -> int:
 	return GameManager.seed * 1009 + depth * 31
 
+func _is_shop_floor(depth: int) -> bool:
+	# 5-floor blocks: [1-5], [6-10], [11-15], [16-20]
+	# Exclude floor 1 and the last floor of each block (which tends to be boss/transition).
+	var block_start: int = ((depth - 1) / 5) * 5 + 1
+	var block_end: int = block_start + 4
+	if depth == 1 or depth == block_end:
+		return false
+	# Seeded decision: 70% chance this block has a shop, and if so, which floor.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash("shop_block_%d" % block_start)
+	if rng.randf() >= 0.70:
+		return false  # this block has no shop
+	# Pick a floor in [block_start+1, block_end-1] (exclude first and last of block)
+	var inner_floors: Array = range(block_start + 1, block_end)  # e.g. [2,3,4] for block [1-5]
+	var shop_floor: int = inner_floors[rng.randi() % inner_floors.size()]
+	return depth == shop_floor
+
+func _place_shop_tile() -> void:
+	# Pick a room that's not the player spawn room and not the stairs room.
+	var eligible_rooms: Array = []
+	for room in map.rooms:
+		if room.has_point(map.spawn_pos) or room.has_point(map.stairs_down_pos):
+			continue
+		eligible_rooms.append(room)
+	if eligible_rooms.is_empty():
+		return
+	var chosen_room: Rect2i = eligible_rooms[randi() % eligible_rooms.size()]
+	var shop_pos := Vector2i(
+		chosen_room.position.x + chosen_room.size.x / 2,
+		chosen_room.position.y + chosen_room.size.y / 2
+	)
+	map.set_tile(shop_pos, DungeonMap.Tile.SHOP)
+	_shop_tile_pos = shop_pos
+	_shop_items = []  # generated lazily on first visit
+	_shop_is_special = (randf() < 0.15)
+
 func _generate_floor(depth: int, map_seed: int,
 		arrive_from_above: bool = true) -> void:
 	_abyss_turn_counter = 0
@@ -899,6 +940,12 @@ func _generate_floor(depth: int, map_seed: int,
 		else:
 			_spawn_monsters_for_floor(depth)
 		_scatter_hazard_tiles(zone.get("env", ""))
+		# Shop placement — reset each new floor, then conditionally place.
+		_shop_items = []
+		_shop_tile_pos = Vector2i(-1, -1)
+		_shop_is_special = false
+		if _is_shop_floor(depth):
+			_place_shop_tile()
 	_refresh_fov()
 
 func _spawn_b3_temple_boss() -> void:
@@ -1056,6 +1103,9 @@ func _cache_current_floor() -> void:
 		"cloud_tiles": map.cloud_tiles.duplicate(true),
 		"hazard_tiles": map.hazard_tiles.duplicate(true),
 		"fog_tiles": map.fog_tiles.duplicate(true),
+		"shop_items": _shop_items.duplicate(true),
+		"shop_is_special": _shop_is_special,
+		"shop_tile_pos": _shop_tile_pos,
 	}
 	for n in get_tree().get_nodes_in_group("floor_items"):
 		if n is FloorItem and n.data != null:
@@ -1121,6 +1171,12 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 	map.cloud_tiles = state.get("cloud_tiles", {}).duplicate(true)
 	map.hazard_tiles = state.get("hazard_tiles", {}).duplicate(true)
 	map.fog_tiles = state.get("fog_tiles", {}).duplicate(true)
+	# Restore shop state.
+	_shop_items = state.get("shop_items", []).duplicate(true)
+	_shop_is_special = bool(state.get("shop_is_special", false))
+	_shop_tile_pos = state.get("shop_tile_pos", Vector2i(-1, -1))
+	if _shop_tile_pos != Vector2i(-1, -1):
+		map.set_tile(_shop_tile_pos, DungeonMap.Tile.SHOP)
 	map._load_atmosphere(depth)
 	map.queue_redraw()
 	var arrival: Vector2i = map.stairs_up_pos if arrive_from_above \
