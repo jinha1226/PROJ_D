@@ -448,7 +448,7 @@ func generate_partial_book(depth: int) -> Dictionary:
 	]
 	var tile_path: String = book_tiles[randi() % book_tiles.size()]
 	return {
-		"id": "book_fire",           # base ItemData id for FloorItem / Player.use_item
+		"id": "book_partial",        # base ItemData id for FloorItem / Player.use_item
 		"kind": "book",
 		"effect": "study",
 		"tier": avg_tier,

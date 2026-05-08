@@ -1473,8 +1473,8 @@ func _spawn_essence_floor_item(essence_id: String, pos: Vector2i) -> void:
 func _spawn_partial_book_floor_item(partial_entry: Dictionary, pos: Vector2i) -> void:
 	if ItemRegistry == null or items_layer == null:
 		return
-	# Use book_fire as the base ItemData carrier (kind, effect, glyph are correct).
-	var base_data: ItemData = ItemRegistry.get_by_id("book_fire")
+	# Use book_partial as the base ItemData carrier (kind, effect, glyph are correct).
+	var base_data: ItemData = ItemRegistry.get_by_id("book_partial")
 	if base_data == null:
 		return
 	var fi: FloorItem = FloorItemScene.new()
