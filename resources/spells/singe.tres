@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_singe"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "singe"
+display_name = "Singe"
+school = "fire"
+spell_level = 1
+xl_required = 1
+mp_cost = 1
+difficulty = 1
+base_damage = 5
+max_range = 6
+targeting = "auto"
+element = "fire"
+effect = "damage"
+description = "A small tongue of flame scorches a nearby enemy. The cheapest fire spell."
+icon_path = "res://assets/tiles/individual/spell/magic_missile.png"

@@ -121,6 +121,46 @@ const _SPELLPAGE_HASTE: Resource = preload("res://resources/items/spellpage_hast
 const _SPELLPAGE_STONESKIN: Resource = preload("res://resources/items/spellpage_stoneskin.tres")
 const _SPELLPAGE_SLEEP: Resource = preload("res://resources/items/spellpage_sleep.tres")
 const _SPELLPAGE_POLYMORPH: Resource = preload("res://resources/items/spellpage_polymorph.tres")
+# Spellpages (tier 1)
+const _SPELLPAGE_SINGE: Resource = preload("res://resources/items/spellpage_singe.tres")
+const _SPELLPAGE_STONE_SHOT: Resource = preload("res://resources/items/spellpage_stone_shot.tres")
+const _SPELLPAGE_FREEZE: Resource = preload("res://resources/items/spellpage_freeze.tres")
+const _SPELLPAGE_PAIN: Resource = preload("res://resources/items/spellpage_pain.tres")
+const _SPELLPAGE_SHOCK: Resource = preload("res://resources/items/spellpage_shock.tres")
+const _SPELLPAGE_SLOW: Resource = preload("res://resources/items/spellpage_slow.tres")
+# Spellpages (tier 2)
+const _SPELLPAGE_ANIMATE_SKELETON: Resource = preload("res://resources/items/spellpage_animate_skeleton.tres")
+const _SPELLPAGE_BLINK: Resource = preload("res://resources/items/spellpage_blink.tres")
+const _SPELLPAGE_CALL_IMP: Resource = preload("res://resources/items/spellpage_call_imp.tres")
+const _SPELLPAGE_CONJURE_FLAME: Resource = preload("res://resources/items/spellpage_conjure_flame.tres")
+const _SPELLPAGE_PETRIFY: Resource = preload("res://resources/items/spellpage_petrify.tres")
+const _SPELLPAGE_SCORCH: Resource = preload("res://resources/items/spellpage_scorch.tres")
+const _SPELLPAGE_SHROUD_OF_GOLUBRIA: Resource = preload("res://resources/items/spellpage_shroud_of_golubria.tres")
+const _SPELLPAGE_STATIC_DISCHARGE: Resource = preload("res://resources/items/spellpage_static_discharge.tres")
+# Spellpages (tier 3)
+const _SPELLPAGE_CONFUSE: Resource = preload("res://resources/items/spellpage_confuse.tres")
+const _SPELLPAGE_HEX_FEAR: Resource = preload("res://resources/items/spellpage_hex_fear.tres")
+const _SPELLPAGE_LEE_RAPID_DECONSTRUCTION: Resource = preload("res://resources/items/spellpage_lee_rapid_deconstruction.tres")
+const _SPELLPAGE_LIGHTNING_BOLT: Resource = preload("res://resources/items/spellpage_lightning_bolt.tres")
+const _SPELLPAGE_STONE_ARROW: Resource = preload("res://resources/items/spellpage_stone_arrow.tres")
+const _SPELLPAGE_SUMMON_VERMIN: Resource = preload("res://resources/items/spellpage_summon_vermin.tres")
+const _SPELLPAGE_SWIFTNESS: Resource = preload("res://resources/items/spellpage_swiftness.tres")
+const _SPELLPAGE_VAMPIRIC_DRAINING: Resource = preload("res://resources/items/spellpage_vampiric_draining.tres")
+# Spellpages (tier 4)
+const _SPELLPAGE_AIRSTRIKE: Resource = preload("res://resources/items/spellpage_airstrike.tres")
+const _SPELLPAGE_ANIMATE_DEAD: Resource = preload("res://resources/items/spellpage_animate_dead.tres")
+const _SPELLPAGE_HEX_SLEEP: Resource = preload("res://resources/items/spellpage_hex_sleep.tres")
+const _SPELLPAGE_LEHUDIB_CRYSTAL_SPEAR: Resource = preload("res://resources/items/spellpage_lehudib_crystal_spear.tres")
+const _SPELLPAGE_MONSTROUS_MENAGERIE: Resource = preload("res://resources/items/spellpage_monstrous_menagerie.tres")
+const _SPELLPAGE_OZOCUBUS_REFRIGERATION: Resource = preload("res://resources/items/spellpage_ozocubus_refrigeration.tres")
+# Spellpages (tier 5)
+const _SPELLPAGE_DEATHS_DOOR: Resource = preload("res://resources/items/spellpage_deaths_door.tres")
+const _SPELLPAGE_IGNITION: Resource = preload("res://resources/items/spellpage_ignition.tres")
+const _SPELLPAGE_MALIGN_GATEWAY: Resource = preload("res://resources/items/spellpage_malign_gateway.tres")
+const _SPELLPAGE_SHATTER: Resource = preload("res://resources/items/spellpage_shatter.tres")
+const _SPELLPAGE_HAUNT: Resource = preload("res://resources/items/spellpage_haunt.tres")
+const _SPELLPAGE_MASS_CONFUSION: Resource = preload("res://resources/items/spellpage_mass_confusion.tres")
+const _SPELLPAGE_GLACIATE: Resource = preload("res://resources/items/spellpage_glaciate.tres")
 
 # All learnable spells with depth-based tiers (tier ≈ depth at which spell first appears).
 # Tiers are derived from spell_level: 1-2→tier1, 3-4→tier2, 5-6→tier3, 7-8→tier4, 9→tier5.
@@ -129,8 +169,10 @@ const SPELL_POOL: Array = [
 	{"spell_id": "freeze",          "tier": 1},
 	{"spell_id": "pain",            "tier": 1},
 	{"spell_id": "shock",           "tier": 1},
+	{"spell_id": "singe",           "tier": 1},
 	{"spell_id": "sleep",           "tier": 1},
 	{"spell_id": "slow",            "tier": 1},
+	{"spell_id": "stone_shot",      "tier": 1},
 	# Tier 2 — available from depth 2
 	{"spell_id": "animate_skeleton","tier": 2},
 	{"spell_id": "blink",           "tier": 2},
@@ -206,6 +248,24 @@ const _ALL_ITEMS: Array = [
 	_RUNE_SWAMP, _RUNE_ICE, _RUNE_INFERNAL, _RUNE_CRYPT,
 	_SPELLPAGE_FIREBALL, _SPELLPAGE_FIRE_STORM, _SPELLPAGE_CHAIN_LIGHTNING,
 	_SPELLPAGE_HASTE, _SPELLPAGE_STONESKIN, _SPELLPAGE_SLEEP, _SPELLPAGE_POLYMORPH,
+	# Tier 1 spellpages
+	_SPELLPAGE_SINGE, _SPELLPAGE_STONE_SHOT, _SPELLPAGE_FREEZE, _SPELLPAGE_PAIN,
+	_SPELLPAGE_SHOCK, _SPELLPAGE_SLOW,
+	# Tier 2 spellpages
+	_SPELLPAGE_ANIMATE_SKELETON, _SPELLPAGE_BLINK, _SPELLPAGE_CALL_IMP,
+	_SPELLPAGE_CONJURE_FLAME, _SPELLPAGE_PETRIFY, _SPELLPAGE_SCORCH,
+	_SPELLPAGE_SHROUD_OF_GOLUBRIA, _SPELLPAGE_STATIC_DISCHARGE,
+	# Tier 3 spellpages
+	_SPELLPAGE_CONFUSE, _SPELLPAGE_HEX_FEAR, _SPELLPAGE_LEE_RAPID_DECONSTRUCTION,
+	_SPELLPAGE_LIGHTNING_BOLT, _SPELLPAGE_STONE_ARROW, _SPELLPAGE_SUMMON_VERMIN,
+	_SPELLPAGE_SWIFTNESS, _SPELLPAGE_VAMPIRIC_DRAINING,
+	# Tier 4 spellpages
+	_SPELLPAGE_AIRSTRIKE, _SPELLPAGE_ANIMATE_DEAD, _SPELLPAGE_HEX_SLEEP,
+	_SPELLPAGE_LEHUDIB_CRYSTAL_SPEAR, _SPELLPAGE_MONSTROUS_MENAGERIE,
+	_SPELLPAGE_OZOCUBUS_REFRIGERATION,
+	# Tier 5 spellpages
+	_SPELLPAGE_DEATHS_DOOR, _SPELLPAGE_IGNITION, _SPELLPAGE_MALIGN_GATEWAY,
+	_SPELLPAGE_SHATTER, _SPELLPAGE_HAUNT, _SPELLPAGE_MASS_CONFUSION, _SPELLPAGE_GLACIATE,
 ]
 
 var by_id: Dictionary = {}

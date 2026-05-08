@@ -1076,3 +1076,7 @@ SHOP_GOLD_LABEL,Gold: %dg,골드: %dg
 SHOP_BUY,Buy,구매
 SHOP_NOT_ENOUGH_GOLD,Not enough gold,골드가 부족합니다
 SHOP_SOLD,Sold,판매됨
+SPELL_NAME_SINGE,Singe,그을음
+SPELL_DESC_SINGE,A small tongue of flame scorches a nearby enemy. The cheapest fire spell.,인근 적을 태우는 작은 불꽃. 가장 저렴한 화염 주문.
+SPELL_NAME_STONE_SHOT,Stone Shot,스톤샷
+SPELL_DESC_STONE_SHOT,A sharp pebble launched with earth magic. A reliable early earth attack.,대지 마법으로 쏘아내는 날카로운 돌멩이. 신뢰할 수 있는 초반 대지 공격.
