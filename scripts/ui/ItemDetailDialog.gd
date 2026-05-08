@@ -363,6 +363,57 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 					detail_dlg.close()
 					BagDialog._populate(bag_dlg, player)
 					TurnManager.end_player_turn())
+		"helmet":
+			if player.equipped_helmet_id == data.id:
+				action_btn.text = LocaleManager.t("EQUIP_UNEQUIP")
+				action_btn.pressed.connect(func():
+					player.set_equipped_helmet("")
+					CombatLog.post(LocaleManager.t("LOG_YOU_UNEQUIP") % data.loc_name())
+					detail_dlg.close()
+					BagDialog._populate(bag_dlg, player)
+					TurnManager.end_player_turn())
+			else:
+				action_btn.text = LocaleManager.t("EQUIP_EQUIP")
+				action_btn.pressed.connect(func():
+					player.set_equipped_helmet(String(entry.get("id", "")))
+					CombatLog.post(LocaleManager.t("LOG_YOU_DON") % data.loc_name())
+					detail_dlg.close()
+					BagDialog._populate(bag_dlg, player)
+					TurnManager.end_player_turn())
+		"gloves":
+			if player.equipped_gloves_id == data.id:
+				action_btn.text = LocaleManager.t("EQUIP_UNEQUIP")
+				action_btn.pressed.connect(func():
+					player.set_equipped_gloves("")
+					CombatLog.post(LocaleManager.t("LOG_YOU_UNEQUIP") % data.loc_name())
+					detail_dlg.close()
+					BagDialog._populate(bag_dlg, player)
+					TurnManager.end_player_turn())
+			else:
+				action_btn.text = LocaleManager.t("EQUIP_EQUIP")
+				action_btn.pressed.connect(func():
+					player.set_equipped_gloves(String(entry.get("id", "")))
+					CombatLog.post(LocaleManager.t("LOG_YOU_DON") % data.loc_name())
+					detail_dlg.close()
+					BagDialog._populate(bag_dlg, player)
+					TurnManager.end_player_turn())
+		"boots":
+			if player.equipped_boots_id == data.id:
+				action_btn.text = LocaleManager.t("EQUIP_UNEQUIP")
+				action_btn.pressed.connect(func():
+					player.set_equipped_boots("")
+					CombatLog.post(LocaleManager.t("LOG_YOU_UNEQUIP") % data.loc_name())
+					detail_dlg.close()
+					BagDialog._populate(bag_dlg, player)
+					TurnManager.end_player_turn())
+			else:
+				action_btn.text = LocaleManager.t("EQUIP_EQUIP")
+				action_btn.pressed.connect(func():
+					player.set_equipped_boots(String(entry.get("id", "")))
+					CombatLog.post(LocaleManager.t("LOG_YOU_DON") % data.loc_name())
+					detail_dlg.close()
+					BagDialog._populate(bag_dlg, player)
+					TurnManager.end_player_turn())
 		"ring":
 			if player.equipped_ring_id == data.id:
 				action_btn.text = LocaleManager.t("EQUIP_UNEQUIP")
