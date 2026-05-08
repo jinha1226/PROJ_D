@@ -38,7 +38,8 @@ func delete_save() -> void:
 ##       ranged→bows+crossbows+slings+throwing, elemental→fire+ice+air+earth+poison,
 ##       agility→dodging+stealth, tool→invocations+evocations, +new schools/elements).
 ##       Old skills dict invalid — saves at v<3 should be wiped or migrated externally.
-const SAVE_VERSION: int = 3
+##   4 — Equipment slots: helmet, gloves, boots (in addition to weapon, armor, ring, amulet, shield).
+const SAVE_VERSION: int = 4
 
 func save_run(player, game_manager) -> bool:
 	var data: Dictionary = {
@@ -73,6 +74,9 @@ func save_run(player, game_manager) -> bool:
 			"ring": player.equipped_ring_id,
 			"amulet": player.equipped_amulet_id,
 			"shield": player.equipped_shield_id,
+			"helmet": player.equipped_helmet_id,
+			"gloves": player.equipped_gloves_id,
+			"boots": player.equipped_boots_id,
 			"kills": player.kills,
 			"last_killer": player.last_killer,
 			"known_spells": player.known_spells,

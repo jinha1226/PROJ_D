@@ -561,6 +561,15 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.equipped_amulet_id = amulet_id
 	var shield_id: String = String(data.get("shield", ""))
 	player.equipped_shield_id = shield_id
+	var helmet_id: String = String(data.get("helmet", ""))
+	if helmet_id != "" and ItemRegistry.get_by_id(helmet_id) != null:
+		player.set_equipped_helmet(helmet_id)
+	var gloves_id: String = String(data.get("gloves", ""))
+	if gloves_id != "" and ItemRegistry.get_by_id(gloves_id) != null:
+		player.set_equipped_gloves(gloves_id)
+	var boots_id: String = String(data.get("boots", ""))
+	if boots_id != "" and ItemRegistry.get_by_id(boots_id) != null:
+		player.set_equipped_boots(boots_id)
 	player.kills = int(data.get("kills", 0))
 	player.last_killer = String(data.get("last_killer", ""))
 	player.known_spells = data.get("known_spells", [])
