@@ -10,6 +10,7 @@ enum Tile {
 	DOOR_CLOSED = 4,
 	DOOR_OPEN = 5,
 	BRANCH_DOWN = 6,
+	SHOP = 7,
 }
 
 const GRID_W: int = 42
@@ -461,6 +462,8 @@ func _glyph_for(t: int) -> String:
 			return "'"
 		Tile.BRANCH_DOWN:
 			return "B"
+		Tile.SHOP:
+			return "$"
 	return "?"
 
 func _glyph_color_for(t: int) -> Color:
@@ -479,6 +482,8 @@ func _glyph_color_for(t: int) -> Color:
 			return Color(0.55, 0.4, 0.25)
 		Tile.BRANCH_DOWN:
 			return Color(0.4, 1.0, 0.6)
+		Tile.SHOP:
+			return Color(1.0, 0.85, 0.2)
 	return Color.WHITE
 
 const _BROKEN_ALTAR_PATHS: Array = [
