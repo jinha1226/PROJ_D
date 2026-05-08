@@ -28,8 +28,12 @@ func setup(item_data: ItemData, map: DungeonMap, pos: Vector2i, plus_val: int = 
 		var essence_id: String = String(entry.get("essence_id", ""))
 		if essence_id != "":
 			_base_tex = EssenceSystem.icon_texture_of(essence_id)
-	elif data.tile_path != "":
-		_base_tex = load(data.tile_path) as Texture2D
+	else:
+		# Entry-level tile_path takes priority (used by partial books and overrides).
+		var entry_tile: String = String(entry.get("tile_path", ""))
+		var resolved_tile: String = entry_tile if entry_tile != "" else data.tile_path
+		if resolved_tile != "":
+			_base_tex = load(resolved_tile) as Texture2D
 	if data.identified_tile_path != "":
 		_overlay_tex = load(data.identified_tile_path) as Texture2D
 	queue_redraw()

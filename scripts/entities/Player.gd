@@ -602,10 +602,15 @@ func use_item(index: int) -> void:
 			CombatLog.post(LocaleManager.t("LOG_YOU_THROW_THE") % data.display_name, Color(0.85, 0.85, 0.7))
 		"study":
 			var all_ids: Array = []
-			if data.grants_spell_id != "":
-				all_ids.append(data.grants_spell_id)
-			for sid in data.grants_spell_ids:
-				all_ids.append(String(sid))
+			# Partial books store their spell list in the entry dict; check it first.
+			if entry.has("grants_spell_ids") and not entry["grants_spell_ids"].is_empty():
+				for sid in entry["grants_spell_ids"]:
+					all_ids.append(String(sid))
+			else:
+				if data.grants_spell_id != "":
+					all_ids.append(data.grants_spell_id)
+				for sid in data.grants_spell_ids:
+					all_ids.append(String(sid))
 			var learned_count: int = 0
 			var blocked_count: int = 0
 			for sid in all_ids:
@@ -632,21 +637,25 @@ func use_item(index: int) -> void:
 			return
 		_:
 			had_effect = false
-	# Side grants — run regardless of match.
-	if String(data.grants_spell_id) != "" \
-			and not known_spells.has(data.grants_spell_id):
-		known_spells.append(data.grants_spell_id)
-		var s: SpellData = SpellRegistry.get_by_id(data.grants_spell_id)
-		var sname: String = s.display_name if s != null else data.grants_spell_id
-		CombatLog.post(LocaleManager.t("LOG_YOU_LEARN") % sname, Color(0.7, 0.95, 1.0))
-		had_effect = true
-	for sid in data.grants_spell_ids:
-		if not known_spells.has(sid):
-			known_spells.append(sid)
-			var s2: SpellData = SpellRegistry.get_by_id(sid)
-			var sname2: String = s2.display_name if s2 != null else sid
-			CombatLog.post(LocaleManager.t("LOG_YOU_LEARN") % sname2, Color(0.7, 0.95, 1.0))
+	# Side grants — run regardless of match, but skip for partial books since
+	# the study match block already handled the entry-level grants_spell_ids.
+	var _entry_overrides_spells: bool = entry.has("grants_spell_ids") and \
+			not entry["grants_spell_ids"].is_empty()
+	if not _entry_overrides_spells:
+		if String(data.grants_spell_id) != "" \
+				and not known_spells.has(data.grants_spell_id):
+			known_spells.append(data.grants_spell_id)
+			var s: SpellData = SpellRegistry.get_by_id(data.grants_spell_id)
+			var sname: String = s.display_name if s != null else data.grants_spell_id
+			CombatLog.post(LocaleManager.t("LOG_YOU_LEARN") % sname, Color(0.7, 0.95, 1.0))
 			had_effect = true
+		for sid in data.grants_spell_ids:
+			if not known_spells.has(sid):
+				known_spells.append(sid)
+				var s2: SpellData = SpellRegistry.get_by_id(sid)
+				var sname2: String = s2.display_name if s2 != null else sid
+				CombatLog.post(LocaleManager.t("LOG_YOU_LEARN") % sname2, Color(0.7, 0.95, 1.0))
+				had_effect = true
 	if String(data.unlocks_class_id) != "":
 		GameManager.try_use_unlock(data.id)
 		had_effect = true

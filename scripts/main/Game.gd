@@ -1287,10 +1287,22 @@ func _spawn_items_for_floor(depth: int) -> void:
 		var d: ItemData = ItemRegistry.pick_equipment_weighted(depth)
 		if d != null: to_place.append(d)
 
-	# ~1 book per 2-3 floors (40% chance)
-	if rng.randf() < 0.40:
+	# ~1 full school book per 10 floors (10% chance, reduced from 40%)
+	if rng.randf() < 0.10:
 		var d: ItemData = ItemRegistry.pick_kind(depth, "book")
 		if d != null: to_place.append(d)
+
+	# ~3 in 10 floors: partial spellbook with 2–3 depth-appropriate spells
+	var partial_books_to_place: Array = []
+	if rng.randf() < 0.30:
+		if ItemRegistry != null:
+			partial_books_to_place.append(ItemRegistry.generate_partial_book(depth))
+
+	# ~2 in 10 floors: random spellpage
+	var spellpages_to_place: Array[ItemData] = []
+	if rng.randf() < 0.20:
+		var sp: ItemData = ItemRegistry.pick_random_spellpage(depth) if ItemRegistry != null else null
+		if sp != null: spellpages_to_place.append(sp)
 
 	# ── Sector guaranteed drops (sector = 3-floor block) ───────────────
 	# Sector total: enchant_weapon ×1, enchant_armor ×1, wand 1-2, healing 2-3, essence ×2
@@ -1346,6 +1358,33 @@ func _spawn_items_for_floor(depth: int) -> void:
 			if _item_at(p) != null:
 				continue
 			_spawn_essence_floor_item(String(essence_id), p)
+			break
+	for partial_entry in partial_books_to_place:
+		var attempts: int = 0
+		while attempts < 40:
+			attempts += 1
+			var p: Vector2i = map.random_floor_tile(rng)
+			if not map.is_walkable(p):
+				continue
+			if p == player.grid_pos:
+				continue
+			if _item_at(p) != null:
+				continue
+			_spawn_partial_book_floor_item(partial_entry, p)
+			break
+	for sp_data in spellpages_to_place:
+		var attempts: int = 0
+		while attempts < 40:
+			attempts += 1
+			var p: Vector2i = map.random_floor_tile(rng)
+			if not map.is_walkable(p):
+				continue
+			if p == player.grid_pos:
+				continue
+			if _item_at(p) != null:
+				continue
+			var sp_entry: Dictionary = {"id": sp_data.id, "plus": 0}
+			_spawn_floor_item(sp_data, p, 0, sp_entry)
 			break
 
 func spawn_ally(monster_id: String, near_pos: Vector2i, turns: int) -> bool:
@@ -1428,6 +1467,19 @@ func _spawn_essence_floor_item(essence_id: String, pos: Vector2i) -> void:
 	if data == null:
 		return
 	_spawn_floor_item(data, pos, 0, {"id": "essence_shard", "plus": 0, "essence_id": essence_id})
+
+# Spawns a partial book at pos using a base book ItemData but overriding the
+# entry dict so Player.use_item reads grants_spell_ids from the entry.
+func _spawn_partial_book_floor_item(partial_entry: Dictionary, pos: Vector2i) -> void:
+	if ItemRegistry == null or items_layer == null:
+		return
+	# Use book_fire as the base ItemData carrier (kind, effect, glyph are correct).
+	var base_data: ItemData = ItemRegistry.get_by_id("book_fire")
+	if base_data == null:
+		return
+	var fi: FloorItem = FloorItemScene.new()
+	items_layer.add_child(fi)
+	fi.setup(base_data, map, pos, 0, partial_entry)
 
 func _find_item_drop_pos(origin: Vector2i) -> Vector2i:
 	if map == null:

@@ -122,6 +122,57 @@ const _SPELLPAGE_STONESKIN: Resource = preload("res://resources/items/spellpage_
 const _SPELLPAGE_SLEEP: Resource = preload("res://resources/items/spellpage_sleep.tres")
 const _SPELLPAGE_POLYMORPH: Resource = preload("res://resources/items/spellpage_polymorph.tres")
 
+# All learnable spells with depth-based tiers (tier ≈ depth at which spell first appears).
+# Tiers are derived from spell_level: 1-2→tier1, 3-4→tier2, 5-6→tier3, 7-8→tier4, 9→tier5.
+const SPELL_POOL: Array = [
+	# Tier 1 — available from depth 1
+	{"spell_id": "freeze",          "tier": 1},
+	{"spell_id": "pain",            "tier": 1},
+	{"spell_id": "shock",           "tier": 1},
+	{"spell_id": "sleep",           "tier": 1},
+	{"spell_id": "slow",            "tier": 1},
+	# Tier 2 — available from depth 2
+	{"spell_id": "animate_skeleton","tier": 2},
+	{"spell_id": "blink",           "tier": 2},
+	{"spell_id": "call_imp",        "tier": 2},
+	{"spell_id": "conjure_flame",   "tier": 2},
+	{"spell_id": "petrify",         "tier": 2},
+	{"spell_id": "scorch",          "tier": 2},
+	{"spell_id": "shroud_of_golubria","tier": 2},
+	{"spell_id": "static_discharge","tier": 2},
+	# Tier 3 — available from depth 3
+	{"spell_id": "confuse",         "tier": 3},
+	{"spell_id": "hex_fear",        "tier": 3},
+	{"spell_id": "lee_rapid_deconstruction","tier": 3},
+	{"spell_id": "lightning_bolt",  "tier": 3},
+	{"spell_id": "stone_arrow",     "tier": 3},
+	{"spell_id": "summon_vermin",   "tier": 3},
+	{"spell_id": "swiftness",       "tier": 3},
+	{"spell_id": "vampiric_draining","tier": 3},
+	# Tier 4 — available from depth 4
+	{"spell_id": "airstrike",       "tier": 4},
+	{"spell_id": "animate_dead",    "tier": 4},
+	{"spell_id": "hex_sleep",       "tier": 4},
+	{"spell_id": "lehudib_crystal_spear","tier": 4},
+	{"spell_id": "monstrous_menagerie","tier": 4},
+	{"spell_id": "ozocubus_refrigeration","tier": 4},
+	{"spell_id": "polymorph",       "tier": 4},
+	{"spell_id": "stoneskin",       "tier": 4},
+	# Tier 5 — available from depth 5
+	{"spell_id": "deaths_door",     "tier": 5},
+	{"spell_id": "fireball",        "tier": 5},
+	{"spell_id": "ignition",        "tier": 5},
+	{"spell_id": "malign_gateway",  "tier": 5},
+	{"spell_id": "shatter",         "tier": 5},
+	{"spell_id": "haste",           "tier": 6},
+	{"spell_id": "haunt",           "tier": 6},
+	{"spell_id": "mass_confusion",  "tier": 6},
+	# Tier 7 — high-end spells
+	{"spell_id": "chain_lightning", "tier": 7},
+	{"spell_id": "fire_storm",      "tier": 7},
+	{"spell_id": "glaciate",        "tier": 7},
+]
+
 const _ALL_ITEMS: Array = [
 	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE, _SPEAR,
 	_STILETTO, _DIRK, _ASSASSIN_BLADE, _QUICK_BLADE,
@@ -202,6 +253,9 @@ func entry_display_name(entry: Dictionary) -> String:
 		var essence_id: String = String(entry.get("essence_id", ""))
 		if essence_id != "":
 			return EssenceSystem.display_name(essence_id)
+	# Partial books carry their display_name directly in the entry dict.
+	if entry.get("is_partial_book", false) and entry.has("display_name"):
+		return String(entry["display_name"])
 	var data: ItemData = get_by_id(id)
 	if data == null:
 		return id
@@ -366,6 +420,49 @@ func _randart_name() -> String:
 	var right: Array[String] = ["Choir", "Answer", "Tithe", "Promise", "Wake", "Vigil", "Crown", "Ladder", "Engine", "Oath"]
 	return "%s %s" % [left[randi() % left.size()], right[randi() % right.size()]]
 
+# Returns a runtime Dictionary entry (not a .tres resource) representing a
+# partial spellbook with 2–3 spells appropriate for the given depth.
+# Caller must handle spawning via _spawn_floor_item with a book base ItemData.
+func generate_partial_book(depth: int) -> Dictionary:
+	var eligible: Array = SPELL_POOL.filter(func(s): return int(s.get("tier", 1)) <= depth)
+	if eligible.is_empty():
+		eligible = SPELL_POOL.duplicate()
+	eligible.shuffle()
+	var count: int = randi_range(2, min(3, eligible.size()))
+	var chosen: Array = eligible.slice(0, count)
+	var spell_ids: Array = chosen.map(func(s): return String(s.get("spell_id", "")))
+	var tier_sum: int = 0
+	for s in chosen:
+		tier_sum += int(s.get("tier", 1))
+	var avg_tier: int = ceili(float(tier_sum) / float(count))
+	var book_names: Array[String] = [
+		"Worn Spellbook", "Scribbled Notes", "Dog-eared Tome",
+		"Tattered Grimoire", "Partial Codex",
+	]
+	var display_name: String = book_names[randi() % book_names.size()]
+	var book_tiles: Array[String] = [
+		"res://assets/tiles/individual/item/book/dark_blue.png",
+		"res://assets/tiles/individual/item/book/purple.png",
+		"res://assets/tiles/individual/item/book/cloth.png",
+		"res://assets/tiles/individual/item/book/leather.png",
+	]
+	var tile_path: String = book_tiles[randi() % book_tiles.size()]
+	return {
+		"id": "book_fire",           # base ItemData id for FloorItem / Player.use_item
+		"kind": "book",
+		"effect": "study",
+		"tier": avg_tier,
+		"display_name": display_name,
+		"tile_path": tile_path,
+		"grants_spell_ids": spell_ids,
+		"plus": 0,
+		"is_partial_book": true,     # sentinel so callers can distinguish
+	}
+
+# Picks a random spellpage ItemData from the registered spellpages.
+func pick_random_spellpage(depth: int) -> ItemData:
+	return _pick_weighted(depth, ["spellpage"])
+
 func pick_by_depth(depth: int, kind_filter: String = "") -> ItemData:
 	var candidates: Array = []
 	for it in all:
@@ -378,6 +475,11 @@ func pick_by_depth(depth: int, kind_filter: String = "") -> ItemData:
 	return candidates[randi() % candidates.size()]
 
 func pick_floor_loot(depth: int) -> ItemData:
+	# Note: partial books (generate_partial_book) are NOT returned here because
+	# this function returns ItemData resources. Partial books are spawned via
+	# _spawn_items_for_floor in Game.gd using generate_partial_book() directly.
+	# Weights: potion 34%, scroll 30%, wand 12%, throwing 6%, spellpage 2%,
+	#          full school book 1%, gold 5%, equipment 10%.
 	var roll: float = randf()
 	if roll < 0.34:
 		return _pick_weighted(depth, ["potion"])
@@ -387,9 +489,11 @@ func pick_floor_loot(depth: int) -> ItemData:
 		return _pick_weighted(depth, ["wand"])
 	if roll < 0.82:
 		return _pick_weighted(depth, ["throwing"])
+	if roll < 0.84:
+		return _pick_weighted(depth, ["spellpage"])
 	if roll < 0.85:
 		return _pick_weighted(depth, ["book"])
-	if roll < 0.91:
+	if roll < 0.90:
 		return _pick_weighted(depth, ["gold"])
 	return _pick_weighted(depth, ["weapon", "armor", "ring", "amulet", "shield"])
 
