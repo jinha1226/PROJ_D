@@ -3491,17 +3491,8 @@ func spawn_text_popup(world_pos: Vector2, text: String, color: Color,
 	tw.tween_callback(lbl.queue_free)
 
 
-func _on_player_weapon_attacked(target: Vector2i, weapon_skill: String) -> void:
-	if map == null or _effect_layer == null or player == null:
-		return
-	const CS := DungeonMap.CELL_SIZE
-	var from_world := player.position + Vector2(CS * 0.5, CS * 0.5)
-	var to_world := map.grid_to_world(target) + Vector2(CS * 0.5, CS * 0.5)
-	var eff := WeaponSwingEffect.new()
-	eff.position = to_world
-	eff.z_index = 9
-	_effect_layer.add_child(eff)
-	eff.start(from_world, to_world, weapon_skill)
+func _on_player_weapon_attacked(_target: Vector2i, _weapon_skill: String) -> void:
+	pass
 
 ## Spawn a brief hit flash on a monster sprite node.
 func spawn_hit_flash(target_node: Node2D) -> void:
@@ -3582,40 +3573,15 @@ func spawn_spell_bolt(world_start: Vector2, world_end: Vector2,
 		tw.tween_callback(rect.queue_free)
 		if on_arrive.is_valid():
 			tw.tween_callback(on_arrive)
-		tw.tween_callback(func(): spawn_hit_effect(world_end, element))
 	else:
 		if on_arrive.is_valid():
 			on_arrive.call()
 
-func spawn_hit_effect(world_pos: Vector2, element: String) -> void:
-	if _effect_layer == null:
-		return
-	var key: String = element if _HIT_TILES.has(element) else ""
-	var frames: Array = _HIT_TILES[key]
-	const SZ := 32.0
-	var half := Vector2(SZ * 0.5, SZ * 0.5)
-	if frames.is_empty() or not ResourceLoader.exists(frames[0]):
-		return
-	var rect := TextureRect.new()
-	rect.texture = load(frames[0])
-	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	rect.custom_minimum_size = Vector2(SZ, SZ)
-	rect.size = Vector2(SZ, SZ)
-	rect.position = world_pos - half
-	rect.z_index = 9
-	_effect_layer.add_child(rect)
-	var tw := rect.create_tween()
-	for i in range(1, frames.size()):
-		var fp: String = frames[i]
-		if ResourceLoader.exists(fp):
-			tw.tween_callback(func(): rect.texture = load(fp))
-		tw.tween_interval(0.08)
-	tw.tween_property(rect, "modulate:a", 0.0, 0.1)
-	tw.tween_callback(rect.queue_free)
+func spawn_hit_effect(_world_pos: Vector2, _element: String) -> void:
+	pass
 
-func spawn_aoe_burst(target_positions: Array, element: String) -> void:
-	for pos in target_positions:
-		spawn_hit_effect(pos, element)
+func spawn_aoe_burst(_target_positions: Array, _element: String) -> void:
+	pass
 
 # ── Archmage debug floor panel ───────────────────────────────────────────────
 var _debug_panel: PanelContainer = null
