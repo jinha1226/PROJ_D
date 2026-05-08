@@ -339,7 +339,7 @@ static func _build_item_row(data: ItemData, indices: Array, plus: int,
 					ItemDetailDialog.open(first, player, dlg, dlg.get_parent())
 		elif ev is InputEventMouseButton \
 				and not ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-			ItemDetailDialog.open(first, player, dlg, dlg.get_parent())
+			ItemDetailDialog.open(first, player, dlg, dlg.get_parent()))
 
 	return row
 
