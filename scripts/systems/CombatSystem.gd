@@ -223,6 +223,13 @@ static func _apply_player_kill_rewards(player: Player, monster: Monster, skill_i
 	EssenceSystem.apply_on_kill_effects(player)
 	RingSystem.apply_on_kill_effects(player)
 
+	# Humanoid gold drop: direct reward (no floor item needed)
+	if monster.data.gold_drop_max > 0 and randf() < 0.30:
+		var g: int = randi_range(monster.data.gold_drop_max / 2, monster.data.gold_drop_max)
+		player.gold += g
+		player.emit_signal("stats_changed")
+		CombatLog.post(LocaleManager.t("LOG_YOU_LOOT_GOLD") % g, Color(1.0, 0.88, 0.3))
+
 static func _weapon_brand(player: Player) -> String:
 	if player.equipped_weapon_id == "":
 		return ""

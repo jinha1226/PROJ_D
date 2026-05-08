@@ -784,6 +784,7 @@ LOG_YOU_HIT_THE_WITH_FOR,You hit the %s with %s for %d.,%s에게 %s로 %d 피해
 LOG_YOU_HOLD_IN_RESERVE,You hold %s in reserve.,%s를 예비로 보관했다.
 LOG_YOU_IDENTIFY,You identify %s.,%s를 감정했다.
 LOG_YOU_KILL_THE,You kill the %s.,%s를 처치했다.
+LOG_YOU_LOOT_GOLD,You loot %dg.,전리품 %dg을 챙겼다.
 LOG_YOU_LEARN,You learn %s.,%s를 배웠다.
 LOG_YOU_LEAVE_AND_TAKE,You leave %s and take %s.,%s를 두고 %s를 챙겼다.
 LOG_YOU_LOSE_HP,You lose %d HP.,HP %d를 잃었다.
