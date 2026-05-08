@@ -126,6 +126,8 @@ const _SPELLPAGE_FREEZE: Resource = preload("res://resources/items/spellpage_fre
 const _SPELLPAGE_PAIN: Resource = preload("res://resources/items/spellpage_pain.tres")
 const _SPELLPAGE_SHOCK: Resource = preload("res://resources/items/spellpage_shock.tres")
 const _SPELLPAGE_SLOW: Resource = preload("res://resources/items/spellpage_slow.tres")
+const _SPELLPAGE_SANDBLAST: Resource = preload("res://resources/items/spellpage_sandblast.tres")
+const _SPELLPAGE_FOXFIRE: Resource = preload("res://resources/items/spellpage_foxfire.tres")
 # Spellpages (tier 2)
 const _SPELLPAGE_ANIMATE_SKELETON: Resource = preload("res://resources/items/spellpage_animate_skeleton.tres")
 const _SPELLPAGE_BLINK: Resource = preload("res://resources/items/spellpage_blink.tres")
@@ -170,6 +172,8 @@ const SPELL_POOL: Array = [
 
 	{"spell_id": "sleep",           "tier": 1},
 	{"spell_id": "slow",            "tier": 1},
+	{"spell_id": "sandblast",       "tier": 1},
+	{"spell_id": "foxfire",         "tier": 1},
 
 	# Tier 2 — available from depth 2
 	{"spell_id": "animate_skeleton","tier": 2},
@@ -249,6 +253,7 @@ const _ALL_ITEMS: Array = [
 	# Tier 1 spellpages
 	_SPELLPAGE_FREEZE, _SPELLPAGE_PAIN,
 	_SPELLPAGE_SHOCK, _SPELLPAGE_SLOW,
+	_SPELLPAGE_SANDBLAST, _SPELLPAGE_FOXFIRE,
 	# Tier 2 spellpages
 	_SPELLPAGE_ANIMATE_SKELETON, _SPELLPAGE_BLINK, _SPELLPAGE_CALL_IMP,
 	_SPELLPAGE_CONJURE_FLAME, _SPELLPAGE_PETRIFY, _SPELLPAGE_SCORCH,

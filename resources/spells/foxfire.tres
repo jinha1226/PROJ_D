@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_foxfire"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "foxfire"
+display_name = "Foxfire"
+school = "fire"
+spell_level = 1
+xl_required = 1
+mp_cost = 1
+difficulty = 1
+base_damage = 5
+max_range = 6
+targeting = "auto"
+element = "fire"
+effect = "damage"
+description = "Creates a small bolt of foxfire that seeks out a nearby enemy."
+icon_path = "res://assets/tiles/individual/spell/magic_missile.png"

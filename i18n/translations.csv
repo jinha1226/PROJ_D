@@ -1077,3 +1077,7 @@ SHOP_BUY,Buy,구매
 SHOP_NOT_ENOUGH_GOLD,Not enough gold,골드가 부족합니다
 SHOP_SOLD,Sold,판매됨
 
+SPELL_NAME_SANDBLAST,Sandblast,샌드블라스트
+SPELL_DESC_SANDBLAST,Hurls a spray of sharp sand at a nearby enemy. Short range but reliable earth damage.,인근 적에게 날카로운 모래를 뿌린다. 짧은 사거리지만 신뢰할 수 있는 대지 피해.
+SPELL_NAME_FOXFIRE,Foxfire,폭스파이어
+SPELL_DESC_FOXFIRE,Creates a small bolt of foxfire that seeks out a nearby enemy.,인근 적을 추적하는 작은 폭스파이어 화염을 만든다.
