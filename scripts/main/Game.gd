@@ -53,6 +53,7 @@ const _CORPSE_GREEN_BLOOD: Dictionary = {
 @onready var RaceRegistry = get_node("/root/RaceRegistry")
 @onready var RacePassiveSystem = get_node("/root/RacePassiveSystem")
 
+var _floor_lifecycle: FloorLifecycle
 var map: DungeonMap
 var player: Player
 var items_layer: Node2D
@@ -104,6 +105,10 @@ const AUTO_STEP_DELAY_SEC: float = 0.05
 
 func _ready() -> void:
 	add_to_group("game")
+	_floor_lifecycle = FloorLifecycle.new()
+	_floor_lifecycle.name = "FloorLifecycle"
+	add_child(_floor_lifecycle)
+	_floor_lifecycle.setup(self)
 	if not GameManager.run_in_progress:
 		GameManager.start_new_run()
 	_spawn_map()
@@ -122,7 +127,7 @@ func _ready() -> void:
 	if GameManager.branch_zone != "" and GameManager.branch_floor > 0:
 		_generate_branch_floor(GameManager.branch_zone, GameManager.branch_floor, true)
 	else:
-		_generate_floor(GameManager.depth, _floor_seed(GameManager.depth))
+		_floor_lifecycle._generate_floor(GameManager.depth, _floor_lifecycle._floor_seed(GameManager.depth))
 	_spawn_camera()
 	_spawn_ui()
 	TurnManager.player_turn_started.connect(_on_player_turn_started)
@@ -872,26 +877,6 @@ func _spawn_ui() -> void:
 		_spawn_debug_floor_panel()
 
 
-func _floor_seed(depth: int) -> int:
-	return GameManager.seed * 1009 + depth * 31
-
-func _is_shop_floor(depth: int) -> bool:
-	# 5-floor blocks: [1-5], [6-10], [11-15], [16-20]
-	# Exclude floor 1 and the last floor of each block (which tends to be boss/transition).
-	var block_start: int = ((depth - 1) / 5) * 5 + 1
-	var block_end: int = block_start + 4
-	if depth == 1 or depth == block_end:
-		return false
-	# Seeded decision: 70% chance this block has a shop, and if so, which floor.
-	var rng := RandomNumberGenerator.new()
-	rng.seed = hash("shop_block_%d" % block_start)
-	if rng.randf() >= 0.70:
-		return false  # this block has no shop
-	# Pick a floor in [block_start+1, block_end-1] (exclude first and last of block)
-	var inner_floors: Array = range(block_start + 1, block_end)  # e.g. [2,3,4] for block [1-5]
-	var shop_floor: int = inner_floors[rng.randi() % inner_floors.size()]
-	return depth == shop_floor
-
 func _place_shop_tile() -> void:
 	# Pick a room that's not the player spawn room and not the stairs room.
 	var eligible_rooms: Array = []
@@ -1035,52 +1020,6 @@ func _open_shop() -> void:
 		_generate_shop_inventory()
 	ShopDialog.open(_shop_items, player, get_tree().current_scene)
 
-func _generate_floor(depth: int, map_seed: int,
-		arrive_from_above: bool = true) -> void:
-	_abyss_turn_counter = 0
-	if GameManager.floor_cache.has(depth):
-		_restore_floor_from_cache(depth, arrive_from_above)
-	else:
-		# Defensive clear protects all entry paths (audit C4). Branch-up exit
-		# falls through here when the main-path floor was never cached;
-		# without this, the just-vacated branch's monsters/items leak in.
-		_clear_monsters()
-		_clear_floor_items()
-		var has_branch: bool = ZoneManager.branch_entrance_for_depth(depth) != ""
-		var already_cleared: bool = false
-		var bid: String = ZoneManager.branch_entrance_for_depth(depth)
-		if has_branch:
-			already_cleared = GameManager.branches_cleared.has(bid)
-		var zone: Dictionary = ZoneManager.zone_for_depth(depth)
-		var zone_style: String = "temple" if depth == 3 else String(zone.get("map_style", "bsp"))
-		map.generate(map_seed, has_branch and not already_cleared, zone_style)
-		if has_branch and not already_cleared:
-			var ecfg: Dictionary = ZoneManager.branch_config(bid)
-			var etex_path: String = String(ecfg.get("entrance_tile", ""))
-			map._tex_branch_entrance = load(etex_path) as Texture2D if etex_path != "" else null
-		else:
-			map._tex_branch_entrance = null
-		if depth == 3:
-			_place_b3_altars(map_seed)
-		player.bind_map(map, map.spawn_pos)
-		_spawn_items_for_floor(depth)
-		if depth == 3:
-			_spawn_b3_temple_boss()
-		elif depth == 15:
-			_spawn_b15_boss_floor()
-		elif String(zone.get("id", "")) == "abyss":
-			_spawn_abyss_floor(depth)
-		else:
-			_spawn_monsters_for_floor(depth)
-		_scatter_hazard_tiles(zone.get("env", ""))
-		# Shop placement — reset each new floor, then conditionally place.
-		_shop_items = []
-		_shop_tile_pos = Vector2i(-1, -1)
-		_shop_is_special = false
-		if _is_shop_floor(depth):
-			_place_shop_tile()
-	_refresh_fov()
-
 func _spawn_b3_temple_boss() -> void:
 	var md: MonsterData = MonsterRegistry.unique_for_depth(3)
 	if md == null:
@@ -1216,182 +1155,6 @@ func _place_b3_altars(_seed: int) -> void:
 			picked[best] = true
 	map.queue_redraw()
 
-func _cache_current_floor() -> void:
-	if map == null or GameManager == null:
-		return
-	var state: Dictionary = {
-		"tiles": PackedByteArray(map.tiles),
-		"explored": map.explored.duplicate(true),
-		"spawn_pos": map.spawn_pos,
-		"stairs_down_pos": map.stairs_down_pos,
-		"extra_stairs_down_positions": map.extra_stairs_down_positions.duplicate(),
-		"stairs_up_pos": map.stairs_up_pos,
-		"rooms": map.rooms.duplicate(),
-		"altar_map": map.altar_map.duplicate(),
-		"broken_altar_positions": map.broken_altar_positions.duplicate(),
-		"altar_active": map.altar_active,
-		"items": [],
-		"monsters": [],
-		"corpses": map.corpses.duplicate(true),
-		"cloud_tiles": map.cloud_tiles.duplicate(true),
-		"hazard_tiles": map.hazard_tiles.duplicate(true),
-		"fog_tiles": map.fog_tiles.duplicate(true),
-		"shop_items": _shop_items.duplicate(true),
-		"shop_is_special": _shop_is_special,
-		"shop_tile_pos": _shop_tile_pos,
-	}
-	for n in get_tree().get_nodes_in_group("floor_items"):
-		if n is FloorItem and n.data != null:
-			state.items.append({
-				"id": n.data.id,
-				"pos": n.grid_pos,
-				"plus": n.plus,
-				"entry": n.entry.duplicate(true) if not n.entry.is_empty() else {"id": n.data.id, "plus": n.plus},
-			})
-	for n in get_tree().get_nodes_in_group("monsters"):
-		if n is Monster and n.data != null and n.hp > 0:
-			var msnap: Dictionary = {
-				"id": n.data.id,
-				"pos": n.grid_pos,
-				"hp": n.hp,
-				"status": n.status.duplicate(),
-			}
-			# Awareness state (audit H9) — preserved across save/load.
-			if "is_aware" in n: msnap["is_aware"] = n.is_aware
-			if "is_alerted" in n: msnap["is_alerted"] = n.is_alerted
-			if "last_known_player_pos" in n: msnap["last_known_player_pos"] = n.last_known_player_pos
-			if "pending_energy" in n: msnap["pending_energy"] = n.pending_energy
-			if "_ability_charge" in n: msnap["_ability_charge"] = n._ability_charge
-			state.monsters.append(msnap)
-	GameManager.floor_cache[GameManager.depth] = state
-
-func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
-	# Defensive clear protects all entry paths. Idempotent — empty groups are fine.
-	# Fixes audit C4 (branch 1F-up exit was leaking branch monsters/items into main dungeon).
-	_clear_monsters()
-	_clear_floor_items()
-	var state: Dictionary = GameManager.floor_cache[depth]
-	map.tiles = state.tiles
-	map.explored = state.explored.duplicate(true)
-	map.spawn_pos = state.spawn_pos
-	map.stairs_down_pos = state.stairs_down_pos
-	map.extra_stairs_down_positions = state.get("extra_stairs_down_positions", []).duplicate()
-	map.stairs_up_pos = state.stairs_up_pos
-	map.rooms = state.rooms.duplicate()
-	map.altar_map = state.get("altar_map", {}).duplicate()
-	map.broken_altar_positions = state.get("broken_altar_positions", []).duplicate()
-	map.altar_active = bool(state.get("altar_active", false))
-	map.visible_tiles.clear()
-	map.corpses = state.get("corpses", []).duplicate(true)
-	# Disk-loaded corpses lack the runtime Texture2D (not JSON-safe).
-	# Rebuild from monster_id; fallback to glyph if id is missing or unknown.
-	for corpse in map.corpses:
-		if not (corpse is Dictionary):
-			continue
-		if corpse.get("tile", null) != null:
-			continue
-		var mid: String = String(corpse.get("monster_id", ""))
-		if mid == "":
-			continue
-		if _corpse_tex_cache.has(mid):
-			corpse["tile"] = _corpse_tex_cache[mid]
-			continue
-		var mdata: MonsterData = MonsterRegistry.get_by_id(mid) if MonsterRegistry != null else null
-		if mdata != null:
-			var tex: Texture2D = _build_corpse_texture(mdata)
-			_corpse_tex_cache[mid] = tex
-			corpse["tile"] = tex
-	map.cloud_tiles = state.get("cloud_tiles", {}).duplicate(true)
-	map.hazard_tiles = state.get("hazard_tiles", {}).duplicate(true)
-	map.fog_tiles = state.get("fog_tiles", {}).duplicate(true)
-	# Restore shop state.
-	_shop_items = state.get("shop_items", []).duplicate(true)
-	_shop_is_special = bool(state.get("shop_is_special", false))
-	_shop_tile_pos = state.get("shop_tile_pos", Vector2i(-1, -1))
-	if _shop_tile_pos != Vector2i(-1, -1):
-		map.set_tile(_shop_tile_pos, DungeonMap.Tile.SHOP)
-	map._load_atmosphere(depth)
-	map.queue_redraw()
-	var arrival: Vector2i = map.stairs_up_pos if arrive_from_above \
-			else map.stairs_down_pos
-	player.bind_map(map, arrival)
-	for entry in state.items:
-		var item_entry: Dictionary = entry.get("entry", {"id": String(entry.get("id", "")), "plus": int(entry.get("plus", 0))})
-		var d: ItemData = ItemRegistry.get_by_id(String(item_entry.get("id", ""))) if ItemRegistry != null else null
-		if d == null:
-			continue
-		var p: Vector2i = entry.get("pos", Vector2i.ZERO)
-		if p == player.grid_pos:
-			continue  # Don't spawn item under player on arrival.
-		_spawn_floor_item(d, p, int(item_entry.get("plus", 0)), item_entry)
-	for entry in state.monsters:
-		var md: MonsterData = MonsterRegistry.get_by_id(
-				String(entry.get("id", "")))
-		if md == null:
-			continue
-		var p: Vector2i = entry.get("pos", Vector2i.ZERO)
-		if p == player.grid_pos:
-			continue  # Skip monster that would spawn on top of player.
-		var m: Monster = MonsterScene.new()
-		monsters_layer.add_child(m)
-		m.setup(md, map, p)
-		m.hp = int(entry.get("hp", md.hp))
-		m.status = entry.get("status", {}).duplicate()
-		# Restore awareness state if present (audit H9). Old caches lack these
-		# keys; .has() guards keep behavior unchanged for in-memory restores.
-		if entry.has("is_aware"): m.is_aware = bool(entry["is_aware"])
-		if entry.has("is_alerted"): m.is_alerted = bool(entry["is_alerted"])
-		if entry.has("last_known_player_pos"):
-			var lkp = entry["last_known_player_pos"]
-			if lkp is Vector2i: m.last_known_player_pos = lkp
-		if entry.has("pending_energy"): m.pending_energy = float(entry["pending_energy"])
-		if entry.has("_ability_charge"): m._ability_charge = (entry["_ability_charge"] as Dictionary).duplicate(true) if entry["_ability_charge"] is Dictionary else {}
-		if m.has_signal("hit_taken"):
-			m.hit_taken.connect(_on_monster_hit.bind(m))
-		if m.has_signal("awareness_changed"):
-			m.awareness_changed.connect(_on_monster_awareness_changed)
-		m.died.connect(_on_monster_died)
-		TurnManager.register_actor(m)
-		_roll_monster_weapon(m)
-	# Top up to full population on revisit so a previously-cleared floor isn't
-	# empty for ~18 turns waiting on _try_respawn_monster's drip-feed.
-	_top_up_monsters_to_target(depth)
-
-func _top_up_monsters_to_target(depth: int) -> void:
-	if map == null or player == null:
-		return
-	var target: int = _monster_count_for_depth(depth)
-	var current: int = get_tree().get_nodes_in_group("monsters").size()
-	if current >= target:
-		return
-	var rng := RandomNumberGenerator.new()
-	rng.randomize()
-	var attempts: int = 0
-	while current < target and attempts < 400:
-		attempts += 1
-		var p: Vector2i = map.random_floor_tile(rng)
-		if not map.is_walkable(p):
-			continue
-		if p == player.grid_pos:
-			continue
-		if _chebyshev(p, player.grid_pos) < 6:
-			continue
-		if _monster_at(p) != null:
-			continue
-		var data: MonsterData = MonsterRegistry.pick_by_depth(depth)
-		if data == null:
-			return
-		var m: Monster = MonsterScene.new()
-		monsters_layer.add_child(m)
-		m.setup(data, map, p)
-		m.hit_taken.connect(_on_monster_hit.bind(m))
-		if m.has_signal("awareness_changed"):
-			m.awareness_changed.connect(_on_monster_awareness_changed)
-		m.died.connect(_on_monster_died)
-		TurnManager.register_actor(m)
-		_roll_monster_weapon(m)
-		current += 1
-
 func _spawn_unique_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
 	var unique_data: MonsterData = MonsterRegistry.unique_for_depth(depth)
 	if unique_data == null:
@@ -1428,7 +1191,7 @@ func _spawn_unique_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
 func _spawn_monsters_for_floor(depth: int) -> void:
 	var count: int = _monster_count_for_depth(depth)
 	var rng := RandomNumberGenerator.new()
-	rng.seed = _floor_seed(depth) ^ 0x5A5A5A5A
+	rng.seed = _floor_lifecycle._floor_seed(depth) ^ 0x5A5A5A5A
 	_spawn_unique_for_floor(depth, rng)
 	var placed: int = 0
 	var attempts: int = 0
@@ -1459,7 +1222,7 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 
 func _spawn_items_for_floor(depth: int) -> void:
 	var rng := RandomNumberGenerator.new()
-	rng.seed = _floor_seed(depth) ^ 0x3C3C3C3C
+	rng.seed = _floor_lifecycle._floor_seed(depth) ^ 0x3C3C3C3C
 
 	# Build the item list to place this floor.
 	var to_place: Array[ItemData] = []
@@ -1938,7 +1701,7 @@ func _update_minimap() -> void:
 func _on_minimap_tapped() -> void:
 	if map == null or player == null:
 		return
-	_cache_current_floor()
+	_floor_lifecycle._cache_current_floor()
 	const MAP_SCALE: int = 6
 	var tex: ImageTexture = MinimapRenderer.render(map, player, self, MAP_SCALE)
 	var dlg: GameDialog = GameDialog.create_ratio("Map", 0.96, 0.96)
@@ -2293,7 +2056,7 @@ func _on_branch_enter() -> void:
 				Color(0.7, 0.7, 0.5))
 		return
 	_cancel_auto_walk("branch")
-	_cache_current_floor()
+	_floor_lifecycle._cache_current_floor()
 	GameManager.branch_zone = branch_id
 	GameManager.branch_floor = 1
 	GameManager.branch_entry_depth = GameManager.depth
@@ -2340,9 +2103,9 @@ func _on_branch_stairs_up() -> void:
 		# floor_cache persistence, or branch entered on depth 1 fresh), fall
 		# back to fresh generation rather than crashing on missing key.
 		if GameManager.floor_cache.has(GameManager.depth):
-			_restore_floor_from_cache(GameManager.depth, false)
+			_floor_lifecycle._restore_floor_from_cache(GameManager.depth, false)
 		else:
-			_generate_floor(GameManager.depth, _floor_seed(GameManager.depth), false)
+			_floor_lifecycle._generate_floor(GameManager.depth, _floor_lifecycle._floor_seed(GameManager.depth), false)
 		_refresh_fov()
 	else:
 		_cache_branch_floor(branch_id, GameManager.branch_floor)
@@ -2516,7 +2279,7 @@ func _spawn_abyss_floor(depth: int) -> void:
 	# Spawn monsters — all immediately aware
 	var count: int = _monster_count_for_depth(depth) + 2
 	var rng := RandomNumberGenerator.new()
-	rng.seed = _floor_seed(depth) ^ 0xAB155001
+	rng.seed = _floor_lifecycle._floor_seed(depth) ^ 0xAB155001
 	var placed: int = 0
 	var attempts: int = 0
 	while placed < count and attempts < 800:
@@ -2622,7 +2385,7 @@ func _abyss_find_new_exit() -> Vector2i:
 func _spawn_branch_monsters(branch_id: String, eff_depth: int) -> void:
 	var count: int = _monster_count_for_depth(eff_depth)
 	var rng := RandomNumberGenerator.new()
-	rng.seed = _floor_seed(eff_depth) ^ 0xBBAACC11
+	rng.seed = _floor_lifecycle._floor_seed(eff_depth) ^ 0xBBAACC11
 	var placed: int = 0
 	var attempts: int = 0
 	while placed < count and attempts < 800:
@@ -2761,7 +2524,7 @@ func save_with_cache() -> void:
 	if GameManager.branch_zone != "" and GameManager.branch_floor > 0:
 		_cache_branch_floor(GameManager.branch_zone, GameManager.branch_floor)
 	else:
-		_cache_current_floor()
+		_floor_lifecycle._cache_current_floor()
 	SaveManager.save_run(player, GameManager)
 
 func _on_dungeon_cleared() -> void:
@@ -2785,7 +2548,7 @@ func _on_stairs_down() -> void:
 		_on_branch_stairs_down()
 		return
 	_cancel_auto_walk("stairs")
-	_cache_current_floor()
+	_floor_lifecycle._cache_current_floor()
 	GameManager.descend()
 	if GameManager.depth >= 16:
 		_on_dungeon_cleared()
@@ -2793,7 +2556,7 @@ func _on_stairs_down() -> void:
 	CombatLog.post(LocaleManager.t("LOG_YOU_DESCEND_TO_B") % GameManager.depth, Color(0.6, 1.0, 1.0))
 	_clear_monsters()
 	_clear_floor_items()
-	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth), true)
+	_floor_lifecycle._generate_floor(GameManager.depth, _floor_lifecycle._floor_seed(GameManager.depth), true)
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
@@ -2809,13 +2572,13 @@ func _on_stairs_up() -> void:
 		TurnManager.end_player_turn()
 		return
 	_cancel_auto_walk("stairs")
-	_cache_current_floor()
+	_floor_lifecycle._cache_current_floor()
 	GameManager.ascend()
 	CombatLog.post(LocaleManager.t("LOG_YOU_CLIMB_TO_B") % GameManager.depth,
 		Color(0.85, 1.0, 0.85))
 	_clear_monsters()
 	_clear_floor_items()
-	_generate_floor(GameManager.depth, _floor_seed(GameManager.depth), false)
+	_floor_lifecycle._generate_floor(GameManager.depth, _floor_lifecycle._floor_seed(GameManager.depth), false)
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
@@ -2828,13 +2591,13 @@ func _travel_to_floor(target_depth: int) -> void:
 	if not GameManager.floor_cache.has(target_depth):
 		return
 	_cancel_auto_walk("floor travel")
-	_cache_current_floor()
+	_floor_lifecycle._cache_current_floor()
 	_clear_monsters()
 	_clear_floor_items()
 	var going_down: bool = target_depth > GameManager.depth
 	GameManager.travel_to(target_depth)
 	CombatLog.post(LocaleManager.t("LOG_YOU_TRAVEL_TO_B") % target_depth, Color(0.7, 0.9, 1.0))
-	_generate_floor(target_depth, _floor_seed(target_depth), going_down)
+	_floor_lifecycle._generate_floor(target_depth, _floor_lifecycle._floor_seed(target_depth), going_down)
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
@@ -3691,12 +3454,12 @@ func _debug_warp_to(target_depth: int) -> void:
 	if GameManager.branch_zone != "":
 		GameManager.branch_zone = ""
 		GameManager.branch_floor = 0
-	_cache_current_floor()
+	_floor_lifecycle._cache_current_floor()
 	_clear_monsters()
 	_clear_floor_items()
 	GameManager.travel_to(target_depth)
 	CombatLog.post(LocaleManager.t("LOG_DEBUG_WARP_TO_B") % target_depth, Color(1.0, 0.85, 0.3))
-	_generate_floor(target_depth, _floor_seed(target_depth), true)
+	_floor_lifecycle._generate_floor(target_depth, _floor_lifecycle._floor_seed(target_depth), true)
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
 	_update_hud()
@@ -3704,7 +3467,7 @@ func _debug_warp_to(target_depth: int) -> void:
 func _debug_warp_to_branch(branch_id: String, branch_floor: int) -> void:
 	_debug_panel.visible = false
 	_debug_panel_visible = false
-	_cache_current_floor()
+	_floor_lifecycle._cache_current_floor()
 	_clear_monsters()
 	_clear_floor_items()
 	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
