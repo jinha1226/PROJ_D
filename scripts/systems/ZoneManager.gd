@@ -6,19 +6,21 @@ extends Node
 # wall/floor: zone-themed tiles (override depth-based selection)
 # Note: depth 3 (B3 ruined temple) is overridden in DungeonMap._load_atmosphere
 const MAIN_ZONES: Array = [
-	{"id": "dungeon",     "from": 1,  "to": 3,  "env": "",      "map_style": "bsp",
+	# 15-floor PROJ_D layout compressed to 5 PROJ_G themed floors (2026-05-21).
+	# Original ranges retained in comments for migration reference.
+	{"id": "dungeon",     "from": 1, "to": 1, "env": "",      "map_style": "bsp",       # was depths 1-3 (Catacombs)
 		"wall":  "res://assets/tiles/individual/dngn/wall/catacombs0.png",
 		"floor": "res://assets/tiles/individual/dngn/floor/dirt0.png"},
-	{"id": "lair",        "from": 4,  "to": 6,  "env": "",      "map_style": "cave",
+	{"id": "lair",        "from": 2, "to": 2, "env": "",      "map_style": "cave",      # was depths 4-6 (Lair)
 		"wall":  "res://assets/tiles/individual/dngn/wall/lair0.png",
 		"floor": "res://assets/tiles/individual/dngn/floor/lair0.png"},
-	{"id": "orc_mines",   "from": 7,  "to": 9,  "env": "",      "map_style": "bsp",
+	{"id": "orc_mines",   "from": 3, "to": 3, "env": "",      "map_style": "bsp",       # was depths 7-9 (Orc Mines)
 		"wall":  "res://assets/tiles/individual/dngn/wall/orc0.png",
 		"floor": "res://assets/tiles/individual/dngn/floor/orc0.png"},
-	{"id": "elven_halls", "from": 10, "to": 12, "env": "",      "map_style": "bsp_large",
+	{"id": "elven_halls", "from": 4, "to": 4, "env": "",      "map_style": "bsp_large", # was depths 10-12 (Elven Halls)
 		"wall":  "res://assets/tiles/individual/dngn/wall/elf-stone0.png",
 		"floor": "res://assets/tiles/individual/dngn/floor/marble_floor1.png"},
-	{"id": "abyss",       "from": 13, "to": 14, "env": "abyss", "map_style": "cave",
+	{"id": "abyss",       "from": 5, "to": 5, "env": "abyss", "map_style": "cave",      # was depths 13-14 (Abyss + final boss)
 		"wall":  "res://assets/tiles/individual/dngn/wall/abyss/abyss0.png",
 		"floor": "res://assets/tiles/individual/dngn/floor/depthstone_floor0.png"},
 ]
@@ -29,8 +31,8 @@ const BRANCHES: Dictionary = {
 		"display_name": "Swamp",
 		"map_style": "cave",
 		"env": "poison",
-		"entrance_range": [4, 6],
-		"floors": 4,
+		"entrance_range": [2, 2],
+		"floors": 3,
 		"resistance": "poison+",
 		"boss_id": "bog_serpent",
 		"essence_reward": "essence_plague",
@@ -46,8 +48,8 @@ const BRANCHES: Dictionary = {
 		"display_name": "Ice Caves",
 		"map_style": "cave",
 		"env": "cold",
-		"entrance_range": [7, 9],
-		"floors": 4,
+		"entrance_range": [3, 3],
+		"floors": 3,
 		"resistance": "cold+",
 		"boss_id": "glacial_sovereign",
 		"essence_reward": "essence_glacial",
@@ -63,8 +65,8 @@ const BRANCHES: Dictionary = {
 		"display_name": "Infernal",
 		"map_style": "bsp_large",
 		"env": "fire",
-		"entrance_range": [10, 12],
-		"floors": 4,
+		"entrance_range": [4, 4],
+		"floors": 3,
 		"resistance": "fire+",
 		"boss_id": "ember_tyrant",
 		"essence_reward": "essence_infernal",
@@ -80,8 +82,8 @@ const BRANCHES: Dictionary = {
 		"display_name": "Crypt",
 		"map_style": "crypt",
 		"env": "necro",
-		"entrance_range": [13, 15],
-		"floors": 4,
+		"entrance_range": [1, 1],
+		"floors": 3,
 		"resistance": "necro+",
 		"boss_id": "ancient_lich",
 		"essence_reward": "essence_undeath",

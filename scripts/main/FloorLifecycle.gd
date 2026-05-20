@@ -58,10 +58,11 @@ func _generate_floor(depth: int, map_seed: int,
 			host.map._tex_branch_entrance = null
 		host.player.bind_map(host.map, host.map.spawn_pos)
 		host._spawn_service._spawn_items_for_floor(depth)
-		if depth == 15:
-			host._spawn_b15_boss_floor()
-		elif String(zone.get("id", "")) == "abyss":
+		var zone_id := String(zone.get("id", ""))
+		if zone_id == "abyss":
 			host._spawn_abyss_floor(depth)
+			if depth == 5:
+				host._spawn_final_boss_floor()
 		else:
 			host._spawn_service._spawn_monsters_for_floor(depth)
 		host._scatter_hazard_tiles(zone.get("env", ""))

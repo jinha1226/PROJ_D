@@ -1022,7 +1022,7 @@ func _open_shop() -> void:
 		_generate_shop_inventory()
 	ShopDialog.open(_shop_items, player, get_tree().current_scene)
 
-func _spawn_b15_boss_floor() -> void:
+func _spawn_final_boss_floor() -> void:
 	var md: MonsterData = MonsterRegistry.get_by_id("abyssal_sovereign")
 	if md == null:
 		push_error("abyssal_sovereign MonsterData not found!")
@@ -1979,7 +1979,7 @@ func _on_stairs_down() -> void:
 	_cancel_auto_walk("stairs")
 	_floor_lifecycle._cache_current_floor()
 	GameManager.descend()
-	if GameManager.depth >= 16:
+	if GameManager.depth >= 6:
 		_on_dungeon_cleared()
 		return
 	CombatLog.post(LocaleManager.t("LOG_YOU_DESCEND_TO_B") % GameManager.depth, Color(0.6, 1.0, 1.0))
@@ -2517,7 +2517,7 @@ func _on_monster_died(monster: Monster) -> void:
 		player.heal(kill_hp)
 	if kill_mp > 0:
 		player.mp = min(player.mp_max, player.mp + kill_mp)
-	# B15 final boss death → victory
+	# Final boss death → victory
 	if monster != null and monster.data != null \
 			and monster.data.id == "abyssal_sovereign":
 		await get_tree().create_timer(1.2).timeout
