@@ -54,6 +54,7 @@ const _CORPSE_GREEN_BLOOD: Dictionary = {
 @onready var RacePassiveSystem = get_node("/root/RacePassiveSystem")
 
 var _floor_lifecycle: FloorLifecycle
+var _spawn_service: SpawnService
 var map: DungeonMap
 var player: Player
 var items_layer: Node2D
@@ -109,11 +110,15 @@ func _ready() -> void:
 	_floor_lifecycle.name = "FloorLifecycle"
 	add_child(_floor_lifecycle)
 	_floor_lifecycle.setup(self)
+	_spawn_service = SpawnService.new()
+	_spawn_service.name = "SpawnService"
+	add_child(_spawn_service)
+	_spawn_service.setup(self)
 	if not GameManager.run_in_progress:
 		GameManager.start_new_run()
 	_spawn_map()
-	_spawn_items_layer()
-	_spawn_monsters_layer()
+	_spawn_service._spawn_items_layer()
+	_spawn_service._spawn_monsters_layer()
 	_spawn_path_overlay()
 	_spawn_player()
 	if not GameManager.pending_player_state.is_empty():
@@ -703,16 +708,6 @@ func _spawn_map() -> void:
 	map.reveal_all = false
 	add_child(map)
 
-func _spawn_items_layer() -> void:
-	items_layer = Node2D.new()
-	items_layer.name = "Items"
-	add_child(items_layer)
-
-func _spawn_monsters_layer() -> void:
-	monsters_layer = Node2D.new()
-	monsters_layer.name = "Monsters"
-	add_child(monsters_layer)
-
 func _spawn_path_overlay() -> void:
 	_path_overlay = PathOverlay.new()
 	_path_overlay.name = "PathOverlay"
@@ -1038,7 +1033,7 @@ func _spawn_b3_temple_boss() -> void:
 		m.awareness_changed.connect(_on_monster_awareness_changed)
 	m.died.connect(_on_monster_died)
 	TurnManager.register_actor(m)
-	_roll_monster_weapon(m)
+	_spawn_service._roll_monster_weapon(m)
 	CombatLog.post(LocaleManager.t("LOG_A_LONE_GUARDIAN_WATCHES_OVER"), Color(1.0, 0.78, 0.35))
 
 func _spawn_b15_boss_floor() -> void:
@@ -1155,318 +1150,13 @@ func _place_b3_altars(_seed: int) -> void:
 			picked[best] = true
 	map.queue_redraw()
 
-func _spawn_unique_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
-	var unique_data: MonsterData = MonsterRegistry.unique_for_depth(depth)
-	if unique_data == null:
-		return
-	# Only spawn on the last floor of the sector (floor_in_sector == 2) so
-	# the player has a chance to prepare across the first two floors.
-	var floor_in_sector: int = (depth - 1) % 3
-	if floor_in_sector != 2:
-		return
-	var attempts: int = 0
-	while attempts < 200:
-		attempts += 1
-		var p: Vector2i = map.random_floor_tile(rng)
-		if not map.is_walkable(p):
-			continue
-		if p == player.grid_pos:
-			continue
-		if _chebyshev(p, player.grid_pos) < 5:
-			continue
-		if _monster_at(p) != null:
-			continue
-		var m: Monster = MonsterScene.new()
-		monsters_layer.add_child(m)
-		m.setup(unique_data, map, p)
-		m.hit_taken.connect(_on_monster_hit.bind(m))
-		if m.has_signal("awareness_changed"):
-			m.awareness_changed.connect(_on_monster_awareness_changed)
-		m.died.connect(_on_monster_died)
-		TurnManager.register_actor(m)
-		_roll_monster_weapon(m)
-		CombatLog.post(LocaleManager.t("LOG_A_DANGEROUS_PRESENCE_LURKS_ON"), Color(1.0, 0.75, 0.3))
-		return
-
-func _spawn_monsters_for_floor(depth: int) -> void:
-	var count: int = _monster_count_for_depth(depth)
-	var rng := RandomNumberGenerator.new()
-	rng.seed = _floor_lifecycle._floor_seed(depth) ^ 0x5A5A5A5A
-	_spawn_unique_for_floor(depth, rng)
-	var placed: int = 0
-	var attempts: int = 0
-	while placed < count and attempts < 800:
-		attempts += 1
-		var p: Vector2i = map.random_floor_tile(rng)
-		if not map.is_walkable(p):
-			continue
-		if p == player.grid_pos:
-			continue
-		if _chebyshev(p, player.grid_pos) < 3:
-			continue
-		if _monster_at(p) != null:
-			continue
-		var data: MonsterData = MonsterRegistry.pick_by_depth(depth)
-		if data == null:
-			return
-		var m: Monster = MonsterScene.new()
-		monsters_layer.add_child(m)
-		m.setup(data, map, p)
-		m.hit_taken.connect(_on_monster_hit.bind(m))
-		if m.has_signal("awareness_changed"):
-			m.awareness_changed.connect(_on_monster_awareness_changed)
-		m.died.connect(_on_monster_died)
-		TurnManager.register_actor(m)
-		_roll_monster_weapon(m)
-		placed += 1
-
-func _spawn_items_for_floor(depth: int) -> void:
-	var rng := RandomNumberGenerator.new()
-	rng.seed = _floor_lifecycle._floor_seed(depth) ^ 0x3C3C3C3C
-
-	# Build the item list to place this floor.
-	var to_place: Array[ItemData] = []
-	var essence_to_place: Array[String] = []
-
-	# ── Per-floor random drops ──────────────────────────────────────────
-	for _i in range(rng.randi_range(1, 3)):
-		var d: ItemData = ItemRegistry.pick_kind(depth, "potion")
-		if d != null: to_place.append(d)
-	for _i in range(rng.randi_range(1, 3)):
-		var d: ItemData = ItemRegistry.pick_kind(depth, "scroll")
-		if d != null: to_place.append(d)
-	for _i in range(rng.randi_range(1, 2)):
-		var d: ItemData = ItemRegistry.pick_equipment_weighted(depth)
-		if d != null: to_place.append(d)
-
-	# ~1 full school book per 10 floors (10% chance, reduced from 40%)
-	if rng.randf() < 0.10:
-		var d: ItemData = ItemRegistry.pick_kind(depth, "book")
-		if d != null: to_place.append(d)
-
-	# ~3 in 10 floors: partial spellbook with 2–3 depth-appropriate spells
-	var partial_books_to_place: Array = []
-	if rng.randf() < 0.30:
-		if ItemRegistry != null:
-			partial_books_to_place.append(ItemRegistry.generate_partial_book(depth))
-
-	# ~2 in 10 floors: random spellpage
-	var spellpages_to_place: Array[ItemData] = []
-	if rng.randf() < 0.20:
-		var sp: ItemData = ItemRegistry.pick_random_spellpage(depth) if ItemRegistry != null else null
-		if sp != null: spellpages_to_place.append(sp)
-
-	# ── Sector guaranteed drops (sector = 3-floor block) ───────────────
-	# Sector total: enchant_weapon ×1, enchant_armor ×1, wand 1-2, healing 2-3, essence ×2
-	var floor_in_sector: int = (depth - 1) % 3  # 0, 1, or 2
-	if floor_in_sector == 0:
-		# Floor 1: healing + enchant_weapon + wand + essence
-		to_place.append(ItemRegistry.get_by_id("potion_healing") if ItemRegistry != null else null)
-		to_place.append(ItemRegistry.get_by_id("scroll_enchant_weapon") if ItemRegistry != null else null)
-		var wd: ItemData = ItemRegistry.pick_kind(depth, "wand") if ItemRegistry != null else null
-		if wd != null: to_place.append(wd)
-		essence_to_place.append(EssenceSystem.random_id())
-	elif floor_in_sector == 1:
-		# Floor 2: healing + enchant_armor + essence
-		to_place.append(ItemRegistry.get_by_id("potion_healing") if ItemRegistry != null else null)
-		to_place.append(ItemRegistry.get_by_id("scroll_enchant_armor") if ItemRegistry != null else null)
-		essence_to_place.append(EssenceSystem.random_id())
-	else:
-		# Floor 3: 50% extra healing + 50% upgrade scroll + 50% wand
-		if rng.randf() < 0.5:
-			to_place.append(ItemRegistry.get_by_id("potion_healing") if ItemRegistry != null else null)
-		if rng.randf() < 0.5:
-			to_place.append(ItemRegistry.get_by_id("scroll_upgrade") if ItemRegistry != null else null)
-		if rng.randf() < 0.5:
-			var wd: ItemData = ItemRegistry.pick_kind(depth, "wand") if ItemRegistry != null else null
-			if wd != null: to_place.append(wd)
-
-	# ── Place all items on random floor tiles ───────────────────────────
-	for item in to_place:
-		if item == null:
-			continue
-		var attempts: int = 0
-		while attempts < 40:
-			attempts += 1
-			var p: Vector2i = map.random_floor_tile(rng)
-			if not map.is_walkable(p):
-				continue
-			if p == player.grid_pos:
-				continue
-			if _item_at(p) != null:
-				continue
-			var entry_override: Dictionary = ItemRegistry.make_entry(item.id, depth, 0) if ItemRegistry != null else {"id": item.id, "plus": 0}
-			_spawn_floor_item(item, p, 0, entry_override)
-			break
-	for essence_id in essence_to_place:
-		var attempts: int = 0
-		while attempts < 40:
-			attempts += 1
-			var p: Vector2i = map.random_floor_tile(rng)
-			if not map.is_walkable(p):
-				continue
-			if p == player.grid_pos:
-				continue
-			if _item_at(p) != null:
-				continue
-			_spawn_essence_floor_item(String(essence_id), p)
-			break
-	for partial_entry in partial_books_to_place:
-		var attempts: int = 0
-		while attempts < 40:
-			attempts += 1
-			var p: Vector2i = map.random_floor_tile(rng)
-			if not map.is_walkable(p):
-				continue
-			if p == player.grid_pos:
-				continue
-			if _item_at(p) != null:
-				continue
-			_spawn_partial_book_floor_item(partial_entry, p)
-			break
-	for sp_data in spellpages_to_place:
-		var attempts: int = 0
-		while attempts < 40:
-			attempts += 1
-			var p: Vector2i = map.random_floor_tile(rng)
-			if not map.is_walkable(p):
-				continue
-			if p == player.grid_pos:
-				continue
-			if _item_at(p) != null:
-				continue
-			var sp_entry: Dictionary = {"id": sp_data.id, "plus": 0}
-			_spawn_floor_item(sp_data, p, 0, sp_entry)
-			break
-
-	# ── Gold scatter: 1-3 piles per floor ─────────────────────────────
-	var gold_count: int = rng.randi_range(1, 3)
-	for _gi in range(gold_count):
-		var attempts: int = 0
-		while attempts < 40:
-			attempts += 1
-			var p: Vector2i = map.random_floor_tile(rng)
-			if not map.is_walkable(p):
-				continue
-			if p == player.grid_pos:
-				continue
-			_spawn_gold_pile(p, rng.randi_range(5, 10 + depth * 2))
-			break
-
-	# ── Orc treasure room for depths 7-9 ──────────────────────────────
-	_spawn_orc_treasure_room(depth, rng)
-
+## Thin pass-through to SpawnService — kept for external callers (MagicSystem).
 func spawn_ally(monster_id: String, near_pos: Vector2i, turns: int) -> bool:
-	if map == null or monsters_layer == null:
-		return false
-	var md: MonsterData = MonsterRegistry.get_by_id(monster_id)
-	if md == null:
-		return false
-	# Find an open adjacent tile
-	var offsets: Array = [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1),
-		Vector2i(1,1), Vector2i(-1,1), Vector2i(1,-1), Vector2i(-1,-1)]
-	var spawn_at: Vector2i = Vector2i(-1, -1)
-	for off in offsets:
-		var p: Vector2i = near_pos + off
-		if map.is_walkable(p) and _monster_at(p) == null and p != player.grid_pos:
-			spawn_at = p
-			break
-	if spawn_at == Vector2i(-1, -1):
-		return false
-	var m: Monster = MonsterScene.new()
-	monsters_layer.add_child(m)
-	m.setup(md, map, spawn_at)
-	m.is_ally = true
-	m.ally_turns_left = turns
-	m.hit_taken.connect(_on_monster_hit.bind(m))
-	m.died.connect(_on_monster_died)
-	TurnManager.register_actor(m)
-	map.queue_redraw()
-	return true
+	return _spawn_service.spawn_ally(monster_id, near_pos, turns)
 
-## Spawn a hostile monster at an exact tile (used by summoner AI).
+## Thin pass-through to SpawnService — kept for external callers (MonsterAI).
 func spawn_monster_at(monster_id: String, pos: Vector2i) -> bool:
-	if map == null or monsters_layer == null:
-		return false
-	var md: MonsterData = MonsterRegistry.get_by_id(monster_id)
-	if md == null:
-		return false
-	if not map.is_walkable(pos) or _monster_at(pos) != null or pos == player.grid_pos:
-		return false
-	var m: Monster = MonsterScene.new()
-	monsters_layer.add_child(m)
-	m.setup(md, map, pos)
-	m.become_aware(player.grid_pos)
-	m.hit_taken.connect(_on_monster_hit.bind(m))
-	m.died.connect(_on_monster_died)
-	m.awareness_changed.connect(_on_monster_awareness_changed)
-	_roll_monster_weapon(m)
-	TurnManager.register_actor(m)
-	map.queue_redraw()
-	return true
-
-
-func _roll_monster_weapon(monster: Monster) -> void:
-	if monster.data == null:
-		return
-	var pool_entry = _MONSTER_WEAPON_POOLS.get(monster.data.id, null)
-	if pool_entry == null:
-		return
-	var normal_pool: Array = pool_entry[0]
-	var rare_pool: Array = pool_entry[1]
-	# 5% chance for branded/rare weapon
-	var weapon_id: String = ""
-	if not rare_pool.is_empty() and randf() < 0.05:
-		weapon_id = rare_pool[randi() % rare_pool.size()]
-	elif not normal_pool.is_empty():
-		weapon_id = normal_pool[randi() % normal_pool.size()]
-	monster.equipped_weapon_id = weapon_id
-
-func _spawn_floor_item(data: ItemData, pos: Vector2i, plus: int, entry_override: Dictionary = {}) -> void:
-	if items_layer == null:
-		return
-	var fi: FloorItem = FloorItemScene.new()
-	items_layer.add_child(fi)
-	fi.setup(data, map, pos, plus, entry_override)
-
-func _spawn_essence_floor_item(essence_id: String, pos: Vector2i) -> void:
-	if ItemRegistry == null or essence_id == "":
-		return
-	var data: ItemData = ItemRegistry.get_by_id("essence_shard")
-	if data == null:
-		return
-	_spawn_floor_item(data, pos, 0, {"id": "essence_shard", "plus": 0, "essence_id": essence_id})
-
-# Spawns a partial book at pos using a base book ItemData but overriding the
-# entry dict so Player.use_item reads grants_spell_ids from the entry.
-func _spawn_partial_book_floor_item(partial_entry: Dictionary, pos: Vector2i) -> void:
-	if ItemRegistry == null or items_layer == null:
-		return
-	# Use book_partial as the base ItemData carrier (kind, effect, glyph are correct).
-	var base_data: ItemData = ItemRegistry.get_by_id("book_partial")
-	if base_data == null:
-		return
-	var fi: FloorItem = FloorItemScene.new()
-	items_layer.add_child(fi)
-	fi.setup(base_data, map, pos, 0, partial_entry)
-
-## Spawns a gold pile floor item with a custom amount.
-## Uses gold_pile as the ItemData carrier; Player.pickup reads entry["amount"].
-func _spawn_gold_pile(pos: Vector2i, amount: int) -> void:
-	if ItemRegistry == null or items_layer == null:
-		return
-	var base_data: ItemData = ItemRegistry.get_by_id("gold_pile")
-	if base_data == null:
-		return
-	var entry: Dictionary = {
-		"id": "gold_pile",
-		"kind": "gold",
-		"amount": amount,
-		"plus": 0,
-	}
-	var fi: FloorItem = FloorItemScene.new()
-	items_layer.add_child(fi)
-	fi.setup(base_data, map, pos, 0, entry)
+	return _spawn_service.spawn_monster_at(monster_id, pos)
 
 ## Orc treasure room: for floors 7-9 pick a room away from player and stairs,
 ## scatter gold piles and bonus equipment inside it.
@@ -1500,7 +1190,7 @@ func _spawn_orc_treasure_room(depth: int, rng: RandomNumberGenerator) -> void:
 				continue
 			if gpos == player.grid_pos:
 				continue
-			_spawn_gold_pile(gpos, rng.randi_range(50, 120))
+			_spawn_service._spawn_gold_pile(gpos, rng.randi_range(50, 120))
 			break
 	# Scatter 2-3 bonus equipment items.
 	var eq_count: int = rng.randi_range(2, 3)
@@ -1521,23 +1211,8 @@ func _spawn_orc_treasure_room(depth: int, rng: RandomNumberGenerator) -> void:
 			if eq_data == null:
 				break
 			var eq_entry: Dictionary = ItemRegistry.make_entry(eq_data.id, depth, 0) if ItemRegistry != null else {"id": eq_data.id, "plus": 0}
-			_spawn_floor_item(eq_data, epos, 0, eq_entry)
+			_spawn_service._spawn_floor_item(eq_data, epos, 0, eq_entry)
 			break
-
-func _find_item_drop_pos(origin: Vector2i) -> Vector2i:
-	if map == null:
-		return origin
-	if map.is_walkable(origin) and _monster_at(origin) == null and origin != player.grid_pos:
-		return origin
-	var offsets: Array = [
-		Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1),
-		Vector2i(1, 1), Vector2i(-1, 1), Vector2i(1, -1), Vector2i(-1, -1),
-	]
-	for off in offsets:
-		var p: Vector2i = origin + off
-		if map.is_walkable(p) and _monster_at(p) == null and p != player.grid_pos:
-			return p
-	return origin
 
 ## DCSS-style corpse composition: monster body tile, darkened, blitted onto a
 ## blood puddle background. Result is cached per monster id so each monster
@@ -1653,24 +1328,6 @@ func _corpsify_image(orig: Image, cw: int, ch: int, cut_separate: int, cut_heigh
 			for yy in range(start, min(start + wound_height, ch)):
 				out.set_pixel(x, yy, wound)
 	return out
-
-func _monster_count_for_depth(d: int) -> int:
-	if d <= 5:
-		return randi_range(7, 10)
-	if d <= 15:
-		return randi_range(10, 14)
-	return randi_range(9, 13)
-
-func _clear_monsters() -> void:
-	for n in get_tree().get_nodes_in_group("monsters"):
-		TurnManager.unregister_actor(n)
-		n.remove_from_group("monsters")
-		n.queue_free()
-
-func _clear_floor_items() -> void:
-	for n in get_tree().get_nodes_in_group("floor_items"):
-		n.remove_from_group("floor_items")
-		n.queue_free()
 
 func _refresh_fov() -> void:
 	if player == null or map == null:
@@ -1981,7 +1638,7 @@ func _try_respawn_monster() -> void:
 	if map == null or player == null or player.hp <= 0:
 		return
 	var current: int = get_tree().get_nodes_in_group("monsters").size()
-	var max_count: int = _monster_count_for_depth(GameManager.depth)
+	var max_count: int = _spawn_service._monster_count_for_depth(GameManager.depth)
 	if current >= max_count:
 		return
 	var attempts: int = 0
@@ -2005,7 +1662,7 @@ func _try_respawn_monster() -> void:
 			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died)
 		TurnManager.register_actor(m)
-		_roll_monster_weapon(m)
+		_spawn_service._roll_monster_weapon(m)
 		return
 
 func _on_player_died() -> void:
@@ -2172,8 +1829,8 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 		var arrival: Vector2i = map.spawn_pos if arrive_from_above else map.stairs_down_pos
 		player.bind_map(map, arrival)
 		# Restore monsters
-		_clear_monsters()
-		_clear_floor_items()
+		_spawn_service._clear_monsters()
+		_spawn_service._clear_floor_items()
 		for entry in state.get("monsters", []):
 			var md: MonsterData = MonsterRegistry.get_by_id(String(entry.get("id", "")))
 			if md == null: continue
@@ -2200,12 +1857,12 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 			else:
 				m.died.connect(_on_monster_died)
 			TurnManager.register_actor(m)
-			_roll_monster_weapon(m)
+			_spawn_service._roll_monster_weapon(m)
 		for entry in state.get("items", []):
 			var item_entry: Dictionary = entry.get("entry", {"id": String(entry.get("id", "")), "plus": int(entry.get("plus", 0))})
 			var d: ItemData = ItemRegistry.get_by_id(String(item_entry.get("id", ""))) if ItemRegistry != null else null
 			if d == null: continue
-			_spawn_floor_item(d, entry.get("pos", Vector2i.ZERO), int(item_entry.get("plus", 0)), item_entry)
+			_spawn_service._spawn_floor_item(d, entry.get("pos", Vector2i.ZERO), int(item_entry.get("plus", 0)), item_entry)
 		_refresh_fov()
 		return
 
@@ -2226,13 +1883,13 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 	map.queue_redraw()
 	var arrival_pos: Vector2i = map.spawn_pos if arrive_from_above else map.stairs_down_pos
 	player.bind_map(map, arrival_pos)
-	_clear_monsters()
-	_clear_floor_items()
+	_spawn_service._clear_monsters()
+	_spawn_service._clear_floor_items()
 	if is_boss_floor:
 		_spawn_branch_boss(branch_id)
 	else:
 		_spawn_branch_monsters(branch_id, eff_depth)
-		_spawn_items_for_floor(eff_depth)
+		_spawn_service._spawn_items_for_floor(eff_depth)
 		if branch_floor == 1:
 			_spawn_branch_resistance_hint(branch_id)
 	_scatter_hazard_tiles(cfg.get("env", ""))
@@ -2277,7 +1934,7 @@ func _spawn_abyss_floor(depth: int) -> void:
 				map.set_tile(p, DungeonMap.Tile.FLOOR)
 	CombatLog.post(LocaleManager.t("LOG_THE_ABYSS_WARPS_AROUND_YOU"), Color(0.6, 0.3, 0.9))
 	# Spawn monsters — all immediately aware
-	var count: int = _monster_count_for_depth(depth) + 2
+	var count: int = _spawn_service._monster_count_for_depth(depth) + 2
 	var rng := RandomNumberGenerator.new()
 	rng.seed = _floor_lifecycle._floor_seed(depth) ^ 0xAB155001
 	var placed: int = 0
@@ -2300,7 +1957,7 @@ func _spawn_abyss_floor(depth: int) -> void:
 		m.died.connect(_on_monster_died)
 		m.become_aware(player.grid_pos)
 		TurnManager.register_actor(m)
-		_roll_monster_weapon(m)
+		_spawn_service._roll_monster_weapon(m)
 		placed += 1
 
 func _tick_abyss() -> void:
@@ -2383,7 +2040,7 @@ func _abyss_find_new_exit() -> Vector2i:
 	return far_tiles[randi() % far_tiles.size()]
 
 func _spawn_branch_monsters(branch_id: String, eff_depth: int) -> void:
-	var count: int = _monster_count_for_depth(eff_depth)
+	var count: int = _spawn_service._monster_count_for_depth(eff_depth)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = _floor_lifecycle._floor_seed(eff_depth) ^ 0xBBAACC11
 	var placed: int = 0
@@ -2405,7 +2062,7 @@ func _spawn_branch_monsters(branch_id: String, eff_depth: int) -> void:
 			m.awareness_changed.connect(_on_monster_awareness_changed)
 		m.died.connect(_on_monster_died)
 		TurnManager.register_actor(m)
-		_roll_monster_weapon(m)
+		_spawn_service._roll_monster_weapon(m)
 		placed += 1
 
 func _spawn_branch_boss(branch_id: String) -> void:
@@ -2431,7 +2088,7 @@ func _spawn_branch_boss(branch_id: String) -> void:
 		m.awareness_changed.connect(_on_monster_awareness_changed)
 	m.died.connect(_on_branch_boss_died.bind(branch_id))
 	TurnManager.register_actor(m)
-	_roll_monster_weapon(m)
+	_spawn_service._roll_monster_weapon(m)
 	CombatLog.post(LocaleManager.t("LOG_A_POWERFUL_PRESENCE_FILLS_THE"), Color(1.0, 0.5, 0.2))
 
 func _spawn_branch_resistance_hint(branch_id: String) -> void:
@@ -2439,14 +2096,14 @@ func _spawn_branch_resistance_hint(branch_id: String) -> void:
 	if FaithSystem.allows_essence(player):
 		var essence_id: String = String(cfg.get("essence_reward", ""))
 		if essence_id != "":
-			_spawn_essence_floor_item(essence_id, map.spawn_pos + Vector2i(1, 0))
+			_spawn_service._spawn_essence_floor_item(essence_id, map.spawn_pos + Vector2i(1, 0))
 			CombatLog.post(LocaleManager.t("LOG_THE_ENVIRONMENT_HERE_IS_HOSTILE"), Color(0.9, 0.85, 0.4))
 	else:
 		var ring_id: String = String(cfg.get("resist_ring", ""))
 		if ring_id != "":
 			var ring_data: ItemData = ItemRegistry.get_by_id(ring_id) if ItemRegistry != null and ring_id != "" else null
 			if ring_data != null:
-				_spawn_floor_item(ring_data, map.spawn_pos + Vector2i(1, 0), 0)
+				_spawn_service._spawn_floor_item(ring_data, map.spawn_pos + Vector2i(1, 0), 0)
 				CombatLog.post(LocaleManager.t("LOG_THE_ENVIRONMENT_HERE_IS_HOSTILE_2"), Color(0.9, 0.85, 0.4))
 
 func _on_branch_boss_died(monster: Monster, branch_id: String) -> void:
@@ -2458,25 +2115,25 @@ func _on_branch_boss_died(monster: Monster, branch_id: String) -> void:
 	var scroll_id: String = "scroll_brand_%s" % element
 	var scroll_data: ItemData = ItemRegistry.get_by_id(scroll_id) if ItemRegistry != null and scroll_id != "" else null
 	if scroll_data != null:
-		_spawn_floor_item(scroll_data, monster.grid_pos, 0)
+		_spawn_service._spawn_floor_item(scroll_data, monster.grid_pos, 0)
 	# Rune — always dropped near the boss
 	var rune_id: String = String(cfg.get("rune_reward", ""))
 	if rune_id != "":
 		var rune_data: ItemData = ItemRegistry.get_by_id(rune_id) if ItemRegistry != null and rune_id != "" else null
 		if rune_data != null:
-			_spawn_floor_item(rune_data, monster.grid_pos, 0)
+			_spawn_service._spawn_floor_item(rune_data, monster.grid_pos, 0)
 			CombatLog.post(LocaleManager.t("LOG_A_RUNE_MATERIALISES"), Color(1.0, 0.9, 0.3))
 	# Essence or ring depending on faith
 	if FaithSystem.allows_essence(player):
 		var essence_id: String = String(cfg.get("essence_reward", ""))
 		if essence_id != "":
-			_spawn_essence_floor_item(essence_id, monster.grid_pos)
+			_spawn_service._spawn_essence_floor_item(essence_id, monster.grid_pos)
 	else:
 		var ring_id: String = String(cfg.get("ring_reward", ""))
 		if ring_id != "":
 			var ring_data: ItemData = ItemRegistry.get_by_id(ring_id) if ItemRegistry != null and ring_id != "" else null
 			if ring_data != null:
-				_spawn_floor_item(ring_data, monster.grid_pos, 0)
+				_spawn_service._spawn_floor_item(ring_data, monster.grid_pos, 0)
 				CombatLog.post(LocaleManager.t("LOG_A_UNIQUE_RING_APPEARS"), Color(0.8, 0.7, 1.0))
 	# Place stairs back to main
 	for p in _all_down_stairs_positions():
@@ -2554,8 +2211,8 @@ func _on_stairs_down() -> void:
 		_on_dungeon_cleared()
 		return
 	CombatLog.post(LocaleManager.t("LOG_YOU_DESCEND_TO_B") % GameManager.depth, Color(0.6, 1.0, 1.0))
-	_clear_monsters()
-	_clear_floor_items()
+	_spawn_service._clear_monsters()
+	_spawn_service._clear_floor_items()
 	_floor_lifecycle._generate_floor(GameManager.depth, _floor_lifecycle._floor_seed(GameManager.depth), true)
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
@@ -2576,8 +2233,8 @@ func _on_stairs_up() -> void:
 	GameManager.ascend()
 	CombatLog.post(LocaleManager.t("LOG_YOU_CLIMB_TO_B") % GameManager.depth,
 		Color(0.85, 1.0, 0.85))
-	_clear_monsters()
-	_clear_floor_items()
+	_spawn_service._clear_monsters()
+	_spawn_service._clear_floor_items()
 	_floor_lifecycle._generate_floor(GameManager.depth, _floor_lifecycle._floor_seed(GameManager.depth), false)
 	RacePassiveSystem.on_floor_changed(player)
 	_center_camera_on_player(true)
@@ -2592,8 +2249,8 @@ func _travel_to_floor(target_depth: int) -> void:
 		return
 	_cancel_auto_walk("floor travel")
 	_floor_lifecycle._cache_current_floor()
-	_clear_monsters()
-	_clear_floor_items()
+	_spawn_service._clear_monsters()
+	_spawn_service._clear_floor_items()
 	var going_down: bool = target_depth > GameManager.depth
 	GameManager.travel_to(target_depth)
 	CombatLog.post(LocaleManager.t("LOG_YOU_TRAVEL_TO_B") % target_depth, Color(0.7, 0.9, 1.0))
@@ -2609,7 +2266,7 @@ func _on_item_dropped(entry: Dictionary, at_pos: Vector2i) -> void:
 	var data: ItemData = ItemRegistry.get_by_id(item_id) if ItemRegistry != null and item_id != "" else null
 	if data == null:
 		return
-	_spawn_floor_item(data, at_pos, int(entry.get("plus", 0)), entry)
+	_spawn_service._spawn_floor_item(data, at_pos, int(entry.get("plus", 0)), entry)
 	var item_name: String = ItemRegistry.entry_display_name(entry) if ItemRegistry != null else GameManager.display_name_of(item_id)
 	CombatLog.post(LocaleManager.t("LOG_YOU_DROP") % item_name)
 
@@ -3131,7 +2788,7 @@ func _on_monster_died(monster: Monster) -> void:
 	if monster != null and monster.equipped_weapon_id != "":
 		var wdata: ItemData = ItemRegistry.get_by_id(monster.equipped_weapon_id) if ItemRegistry != null else null
 		if wdata != null:
-			_spawn_floor_item(wdata, monster.grid_pos, 0)
+			_spawn_service._spawn_floor_item(wdata, monster.grid_pos, 0)
 	# Leave a corpse (non-unique only)
 	if monster != null and monster.data != null and not monster.data.is_unique:
 		map.corpses.append({
@@ -3182,7 +2839,7 @@ func _handle_monster_essence_drop(monster: Monster) -> void:
 		CombatLog.post(LocaleManager.t("LOG_THE_LEAVES_BEHIND_AN_ESSENCE") % [
 			monster.data.display_name, EssenceSystem.display_name(uid)],
 			Color(1.0, 0.75, 0.3))
-		_spawn_essence_floor_item(uid, monster.grid_pos)
+		_spawn_service._spawn_essence_floor_item(uid, monster.grid_pos)
 		return
 	# Tuned 2026-05-06: 0.22+d×0.01/0.40 → 0.10+d×0.005/0.20 → 0.05+d×0.003/0.12.
 	# Original was every 3-4 kills (clutter). First cut to every 7-10 kills was
@@ -3198,7 +2855,7 @@ func _handle_monster_essence_drop(monster: Monster) -> void:
 		essence_id = EssenceSystem.random_id()
 	CombatLog.post(LocaleManager.t("LOG_AN_ESSENCE_MATERIALIZES") % EssenceSystem.display_name(essence_id),
 		Color(0.8, 0.6, 1.0))
-	_spawn_essence_floor_item(essence_id, monster.grid_pos)
+	_spawn_service._spawn_essence_floor_item(essence_id, monster.grid_pos)
 
 func _on_monster_hit(amount: int, monster: Monster) -> void:
 	if not is_instance_valid(monster):
@@ -3455,8 +3112,8 @@ func _debug_warp_to(target_depth: int) -> void:
 		GameManager.branch_zone = ""
 		GameManager.branch_floor = 0
 	_floor_lifecycle._cache_current_floor()
-	_clear_monsters()
-	_clear_floor_items()
+	_spawn_service._clear_monsters()
+	_spawn_service._clear_floor_items()
 	GameManager.travel_to(target_depth)
 	CombatLog.post(LocaleManager.t("LOG_DEBUG_WARP_TO_B") % target_depth, Color(1.0, 0.85, 0.3))
 	_floor_lifecycle._generate_floor(target_depth, _floor_lifecycle._floor_seed(target_depth), true)
@@ -3468,8 +3125,8 @@ func _debug_warp_to_branch(branch_id: String, branch_floor: int) -> void:
 	_debug_panel.visible = false
 	_debug_panel_visible = false
 	_floor_lifecycle._cache_current_floor()
-	_clear_monsters()
-	_clear_floor_items()
+	_spawn_service._clear_monsters()
+	_spawn_service._clear_floor_items()
 	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
 	var entry_depth: int = int(cfg.get("entrance_range", [1, 1])[1])
 	GameManager.branch_zone = branch_id

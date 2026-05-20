@@ -40,8 +40,8 @@ func _generate_floor(depth: int, map_seed: int,
 		# Defensive clear protects all entry paths (audit C4). Branch-up exit
 		# falls through here when the main-path floor was never cached;
 		# without this, the just-vacated branch's monsters/items leak in.
-		host._clear_monsters()
-		host._clear_floor_items()
+		host._spawn_service._clear_monsters()
+		host._spawn_service._clear_floor_items()
 		var has_branch: bool = ZoneManager.branch_entrance_for_depth(depth) != ""
 		var already_cleared: bool = false
 		var bid: String = ZoneManager.branch_entrance_for_depth(depth)
@@ -59,7 +59,7 @@ func _generate_floor(depth: int, map_seed: int,
 		if depth == 3:
 			host._place_b3_altars(map_seed)
 		host.player.bind_map(host.map, host.map.spawn_pos)
-		host._spawn_items_for_floor(depth)
+		host._spawn_service._spawn_items_for_floor(depth)
 		if depth == 3:
 			host._spawn_b3_temple_boss()
 		elif depth == 15:
@@ -67,7 +67,7 @@ func _generate_floor(depth: int, map_seed: int,
 		elif String(zone.get("id", "")) == "abyss":
 			host._spawn_abyss_floor(depth)
 		else:
-			host._spawn_monsters_for_floor(depth)
+			host._spawn_service._spawn_monsters_for_floor(depth)
 		host._scatter_hazard_tiles(zone.get("env", ""))
 		# Shop placement — reset each new floor, then conditionally place.
 		host._shop_items = []
@@ -129,8 +129,8 @@ func _cache_current_floor() -> void:
 func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 	# Defensive clear protects all entry paths. Idempotent — empty groups are fine.
 	# Fixes audit C4 (branch 1F-up exit was leaking branch monsters/items into main dungeon).
-	host._clear_monsters()
-	host._clear_floor_items()
+	host._spawn_service._clear_monsters()
+	host._spawn_service._clear_floor_items()
 	var state: Dictionary = GameManager.floor_cache[depth]
 	host.map.tiles = state.tiles
 	host.map.explored = state.explored.duplicate(true)
@@ -184,7 +184,7 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 		var p: Vector2i = entry.get("pos", Vector2i.ZERO)
 		if p == host.player.grid_pos:
 			continue  # Don't spawn item under player on arrival.
-		host._spawn_floor_item(d, p, int(item_entry.get("plus", 0)), item_entry)
+		host._spawn_service._spawn_floor_item(d, p, int(item_entry.get("plus", 0)), item_entry)
 	for entry in state.monsters:
 		var md: MonsterData = MonsterRegistry.get_by_id(
 				String(entry.get("id", "")))
@@ -213,7 +213,7 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 			m.awareness_changed.connect(host._on_monster_awareness_changed)
 		m.died.connect(host._on_monster_died)
 		TurnManager.register_actor(m)
-		host._roll_monster_weapon(m)
+		host._spawn_service._roll_monster_weapon(m)
 	# Top up to full population on revisit so a previously-cleared floor isn't
 	# empty for ~18 turns waiting on _try_respawn_monster's drip-feed.
 	_top_up_monsters_to_target(depth)
@@ -221,7 +221,7 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 func _top_up_monsters_to_target(depth: int) -> void:
 	if host.map == null or host.player == null:
 		return
-	var target: int = host._monster_count_for_depth(depth)
+	var target: int = host._spawn_service._monster_count_for_depth(depth)
 	var current: int = host.get_tree().get_nodes_in_group("monsters").size()
 	if current >= target:
 		return
@@ -250,5 +250,5 @@ func _top_up_monsters_to_target(depth: int) -> void:
 			m.awareness_changed.connect(host._on_monster_awareness_changed)
 		m.died.connect(host._on_monster_died)
 		TurnManager.register_actor(m)
-		host._roll_monster_weapon(m)
+		host._spawn_service._roll_monster_weapon(m)
 		current += 1
