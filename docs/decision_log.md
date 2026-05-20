@@ -150,3 +150,8 @@ Rationale:
 - Equipped gear overlays and dropped/inventory icons should be authored as separate assets.
 - Select screens should be allowed to use optional dedicated menu portraits instead of scaling raw in-game body sprites.
 - One sprite should not be forced to serve as gameplay body, equipped overlay, floor icon, and menu portrait at once.
+
+## 2026-05-08 - Early Dungeon Walls Should Be Flatter Than First Test Pass
+- The first generated B1-B2 wall pass had too much depth/extrusion and looked awkward when repeated vertically.
+- Early dungeon walls should be closer to DCSS's flatter read, while still being slightly cleaner than the original tiles.
+- Floor and wall tones should be pushed further apart so they do not visually merge on mobile.

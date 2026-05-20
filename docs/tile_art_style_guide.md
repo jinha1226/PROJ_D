@@ -156,6 +156,12 @@ A tile is ready only if it passes these checks:
 PocketCrawl should use direct 32x32 production tiles rather than a higher-resolution base-first workflow.
 The style target is "DCSS remaster" rather than SD, painterly, or highly rendered fantasy art.
 
+## Current Dungeon Tile Notes
+- Early dungeon wall tiles should avoid strong isometric or deeply extruded block shading.
+- For B1-B2, wall mass should read flatter and more graphic, closer to the floor tile language, so vertical wall placement does not look skewed or awkward.
+- Floor and wall tiles should not share nearly identical value ranges; walls should separate more clearly from floors at a glance.
+- Stairs can keep stronger depth cues than walls, but should still sit naturally beside flatter floor/wall treatment.
+
 ## Humanoid Size Specs
 ### Small
 - Use the same frontal body logic as medium, but reduce shoulder width and total leg mass.
