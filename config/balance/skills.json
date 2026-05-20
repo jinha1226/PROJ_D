@@ -1,5 +1,5 @@
 {
-  "version": "balance_v3_split_core",
+  "version": "balance_v4_proj_g_9skill_dual_tier",
   "xp_distribution": {
     "source": "kill_xp",
     "active_only": true,
@@ -12,148 +12,33 @@
     "level_4_to_6": "medium",
     "level_7_to_9": "slow"
   },
-  "skills": {
-    "fighting": {
-      "effects": {
-        "max_hp_per_level": 5
-      },
-      "scope": "general combat fitness and survivability"
-    },
-    "unarmed": {
-      "effects": {
-        "hit_per_level": 1,
-        "damage_per_level_pct": 5
-      },
-      "scope": "bare-handed combat and beastly fighting"
-    },
-    "blade": {
-      "effects": {
-        "hit_per_level": 1,
-        "damage_per_level_pct": 6
-      },
-      "scope": "daggers, swords, and light arcane staves"
-    },
-    "hafted": {
-      "effects": {
-        "hit_per_level": 1,
-        "damage_per_level_pct": 7
-      },
-      "scope": "maces, clubs, and axes"
-    },
-    "polearm": {
-      "effects": {
-        "hit_per_level": 1,
-        "damage_per_level_pct": 6
-      },
-      "scope": "spears and other reach weapons"
-    },
-    "ranged": {
-      "effects": {
-        "hit_per_level": 1,
-        "damage_per_level_pct": 6
-      },
-      "scope": "bows, crossbows, and dedicated ranged weapons"
-    },
-    "spellcasting": {
-      "effects": {
-        "spell_output_per_level_pct": 4,
-        "mp_efficiency_per_level_pct": 4
-      },
-      "scope": "all spellcasting fundamentals and mana control"
-    },
-    "elemental": {
-      "effects": {
-        "spell_output_per_level_pct": 7
-      },
-      "scope": "fire, cold, air, earth, and alchemical elemental magic"
-    },
-    "arcane": {
-      "effects": {
-        "spell_output_per_level_pct": 7
-      },
-      "scope": "conjurations, translocation, transmutation, abjuration, evocation, and forgecraft"
-    },
-    "hex": {
-      "effects": {
-        "spell_output_per_level_pct": 7
-      },
-      "scope": "mental manipulation, control, and disabling magic"
-    },
-    "necromancy": {
-      "effects": {
-        "spell_output_per_level_pct": 7
-      },
-      "scope": "death, drain, pain, and undead magic"
-    },
-    "summoning": {
-      "effects": {
-        "spell_output_per_level_pct": 7
-      },
-      "scope": "creature and gateway summoning"
-    },
-    "armor": {
-      "effects": {
-        "armor_ev_penalty_reduction_per_level_pct": 10,
-        "injury_reduction_per_level_pct": 4
-      },
-      "scope": "armor handling, encumbrance control, and attrition tolerance"
-    },
-    "shield": {
-      "effects": {
-        "block_per_level_pct": 3
-      },
-      "scope": "shield handling, blocking, and off-hand defense"
-    },
-    "agility": {
-      "effects": {
-        "ev_per_level": 1,
-        "detect_range_reduction_every_3_levels": 1,
-        "backstab_bonus_per_level_pct": 5
-      },
-      "scope": "evasion, awareness control, ambush, and mobility"
-    },
-    "tool": {
-      "effects": {
-        "hit_per_level": 1,
-        "damage_per_level_pct": 4
-      },
-      "scope": "wands, thrown tools, and trick-based combat support"
-    }
+  "tiers": {
+    "visible_contribution_pct": 80,
+    "hidden_familiarity_contribution_pct": 20,
+    "note": "Balance-pass wires the 80/20 split. Current commit: visible 100%, hidden 0% (data preserved but unwired)."
   },
+  "skills": {
+    "weapon_mastery": {"effects": {"max_hp_per_level": 5, "hit_per_level": 1, "damage_per_level_pct": 6}, "scope": "melee accuracy, melee damage, broad weapon handling"},
+    "archery":        {"effects": {"hit_per_level": 1, "damage_per_level_pct": 6},                       "scope": "ranged accuracy, range penalty control, ranged criticals"},
+    "tactics":        {"effects": {"crit_per_level_pct": 1, "damage_per_level_pct": 2},                  "scope": "criticals, weak points, positional bonuses (post-balance wiring)"},
+    "defense":        {"effects": {"armor_ev_penalty_reduction_per_level_pct": 10, "block_per_level_pct": 3, "injury_reduction_per_level_pct": 4}, "scope": "armor handling, shield blocking, incoming damage reduction"},
+    "magery":         {"effects": {"spell_output_per_level_pct": 7, "mp_efficiency_per_level_pct": 4},   "scope": "spell reliability, spell power, mana efficiency"},
+    "stealth":        {"effects": {"ev_per_level": 1, "backstab_bonus_per_level_pct": 5, "detect_range_reduction_every_3_levels": 1}, "scope": "sneaking, ambush, detection avoidance"},
+    "lockpicking":    {"effects": {"lockpick_per_level_pct": 5},                                          "scope": "locked doors, chests, traps (post-balance wiring)"},
+    "tracking":       {"effects": {"detect_range_per_level": 1},                                          "scope": "monster trails, danger preview, hidden paths (post-balance wiring)"},
+    "survival":       {"effects": {"recovery_per_level_pct": 3},                                          "scope": "expedition endurance, recovery, hazard tolerance (post-balance wiring)"}
+  },
+  "hidden_familiarity_subskills": [
+    "fighting","unarmed","short_blades","long_blades","maces","axes","staves","polearms",
+    "bows","crossbows","slings","throwing",
+    "armor","shields","dodging",
+    "spellcasting","conjurations","hexes","charms","summonings","necromancy","translocations","transmutation",
+    "fire","ice","air","earth","poison",
+    "invocations","evocations"
+  ],
   "class_starts": {
-    "warrior": {
-      "starting_skills": {
-        "blade": 2,
-        "armor": 1,
-        "shield": 1
-      },
-      "active_skills": [
-        "blade",
-        "armor",
-        "shield"
-      ]
-    },
-    "mage": {
-      "starting_skills": {
-        "spellcasting": 2,
-        "arcane": 1
-      },
-      "active_skills": [
-        "spellcasting",
-        "arcane"
-      ]
-    },
-    "rogue": {
-      "starting_skills": {
-        "ranged": 1,
-        "agility": 2,
-        "tool": 1
-      },
-      "active_skills": [
-        "ranged",
-        "agility",
-        "tool"
-      ]
-    }
+    "warrior": {"starting_skills": {"weapon_mastery": 2, "defense": 1}, "active_skills": ["weapon_mastery", "defense"]},
+    "mage":    {"starting_skills": {"magery": 2},                       "active_skills": ["magery"]},
+    "rogue":   {"starting_skills": {"archery": 1, "stealth": 2},        "active_skills": ["archery", "stealth"]}
   }
 }

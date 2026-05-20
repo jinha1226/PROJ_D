@@ -39,7 +39,11 @@ func delete_save() -> void:
 ##       agility→dodging+stealth, tool→invocations+evocations, +new schools/elements).
 ##       Old skills dict invalid — saves at v<3 should be wiped or migrated externally.
 ##   4 — Equipment slots: helmet, gloves, boots (in addition to weapon, armor, ring, amulet, shield).
-const SAVE_VERSION: int = 4
+##   5 — Dual-tier skill model: `skills` is now PROJ_G 9-bucket only; `hidden_skills`
+##       stores per-DCSS-sub-skill familiarity XP banks. Legacy v<5 saves migrate
+##       inline in Game._apply_loaded_player_state (visible = max-of-old level + sum
+##       XP; hidden = per-sub-skill data preserved verbatim).
+const SAVE_VERSION: int = 5
 
 func save_run(player, game_manager) -> bool:
 	var data: Dictionary = {
@@ -83,6 +87,7 @@ func save_run(player, game_manager) -> bool:
 			"statuses": player.statuses,
 			"resists": player.resists,
 			"skills": player.skills,
+			"hidden_skills": player.hidden_skills,
 			"active_skills": player.active_skills,
 			"quickslots": player.quickslots,
 			"essence_slots": player.essence_slots,

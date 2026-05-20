@@ -450,38 +450,28 @@ func _apply_class_to_player(class_id: String) -> void:
 	var starter_weapon: ItemData = ItemRegistry.get_by_id(String(data.starting_weapon)) if ItemRegistry != null and String(data.starting_weapon) != "" else null
 	for skill_id in data.starting_skills.keys():
 		var lvl: int = clampi(int(data.starting_skills[skill_id]), 0, Player.MAX_SKILL_LEVEL)
-		# Resolve legacy / generic skill keys to one or more new sub-skill IDs.
-		var targets: Array = []
-		match String(skill_id):
-			"melee":
-				targets.append(Player.weapon_skill_for_item(starter_weapon))
-			"magic":
-				targets.append("spellcasting")
-			"defense":
-				targets.append("armor")
-			"dodge":
-				targets.append("dodging")
-			"blade", "hafted", "ranged":
-				# Use weapon to disambiguate when starter_weapon matches the family;
-				# otherwise distribute to all sub-skills (legacy umbrella behavior).
-				var weapon_skill: String = Player.weapon_skill_for_item(starter_weapon) if starter_weapon != null else ""
-				if weapon_skill != "" and Player.LEGACY_SKILL_SPLIT.get(skill_id, []).has(weapon_skill):
-					targets.append(weapon_skill)
-				else:
-					targets = Array(Player.LEGACY_SKILL_SPLIT.get(skill_id, []))
-			_:
-				if Player.LEGACY_SKILL_SPLIT.has(skill_id):
-					targets = Array(Player.LEGACY_SKILL_SPLIT[skill_id])
-				else:
-					targets.append(String(skill_id))
-		for mapped_skill in targets:
-			if player.skills.has(mapped_skill):
-				# If multiple legacy keys land on same sub-skill, take the max so we
-				# don't overwrite a higher value with a lower one.
-				var prev: int = int(player.skills[mapped_skill].get("level", 0))
-				player.skills[mapped_skill]["level"] = max(prev, lvl)
-				if not default_active.has(mapped_skill):
-					default_active.append(mapped_skill)
+		# Route any legacy/sub-skill id (e.g., "blade", "fighting", "fire") to the
+		# canonical visible bucket. Class .tres files may still reference legacy
+		# ids — SKILL_REMAP keeps them working without per-file migration.
+		var canon: String = String(Player.SKILL_REMAP.get(String(skill_id), ""))
+		# Special case: starter weapon disambiguates a generic "melee" starter
+		# bonus by routing through weapon_skill_for_item → SKILL_REMAP.
+		if String(skill_id) == "melee" and starter_weapon != null:
+			canon = String(Player.SKILL_REMAP.get(Player.weapon_skill_for_item(starter_weapon), "weapon_mastery"))
+		if canon == "" or not player.skills.has(canon):
+			continue
+		var prev: int = int(player.skills[canon].get("level", 0))
+		player.skills[canon]["level"] = max(prev, lvl)
+		if not default_active.has(canon):
+			default_active.append(canon)
+		# Mirror the starter level into the matching hidden sub-skill if the
+		# class data referenced one — keeps the hidden tier non-empty for
+		# specialist classes from turn 1.
+		if Player.HIDDEN_SUBSKILL_IDS.has(String(skill_id)):
+			if not player.hidden_skills.has(String(skill_id)):
+				player.hidden_skills[String(skill_id)] = {"level": 0, "xp": 0.0}
+			var h_prev: int = int(player.hidden_skills[String(skill_id)].get("level", 0))
+			player.hidden_skills[String(skill_id)]["level"] = max(h_prev, lvl)
 	# Mastery model: new characters start with empty active_skills (action-routed
 	# XP). ClassData.default_active_skills is kept as UI-side recommendation only —
 	# do not apply it here. Players opt into manual mode via SkillsDialog.
@@ -616,70 +606,61 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 		player.resists = Player.resists_from_tags(loaded_resists)
 	else:
 		player.resists = {}
-	player.skills = data.get("skills", {})
+	# ── Skill migration to dual-tier 9+30 (save_version >= 5) ──────────────
+	# Old saves carry a `skills` dict that may contain any of:
+	#   - DCSS 30-split sub-skill ids (post-2026-05 saves)
+	#   - PROJ_G 9-skill ids (current format)
+	#   - even older umbrella ids (melee/magic/defense/dodge/stealth)
+	# Strategy: route every old key through Player.SKILL_REMAP to a canonical
+	# visible bucket; level becomes max-of-old, XP becomes sum-of-old per
+	# bucket. Hidden tier is reconstructed by copying any sub-skill keys from
+	# the old `skills` dict (per-sub-skill data preserved verbatim), then
+	# overwritten by `hidden_skills` if present (post-v5 saves).
+	var loaded_skills: Dictionary = data.get("skills", {})
+	var loaded_hidden: Dictionary = data.get("hidden_skills", {})
+	# Pre-v5 umbrella keys: collapse to nearest sub-skill so SKILL_REMAP works.
+	if loaded_skills.has("melee") and not loaded_skills.has("fighting"):
+		loaded_skills["fighting"] = loaded_skills["melee"]
+	loaded_skills.erase("melee")
+	if loaded_skills.has("magic") and not loaded_skills.has("spellcasting"):
+		loaded_skills["spellcasting"] = loaded_skills["magic"]
+	loaded_skills.erase("magic")
+	if loaded_skills.has("dodge") and not loaded_skills.has("dodging"):
+		loaded_skills["dodging"] = loaded_skills["dodge"]
+	loaded_skills.erase("dodge")
+	# Visible: sum XP across old keys that remap to the same new bucket;
+	# level becomes max-of-old.
+	var new_visible: Dictionary = {}
+	for vid in Player.SKILL_IDS:
+		new_visible[vid] = {"level": 0, "xp": 0.0}
+	for old_id in loaded_skills.keys():
+		var canon: String = String(Player.SKILL_REMAP.get(old_id, ""))
+		if canon == "" or not new_visible.has(canon):
+			continue
+		var old_entry = loaded_skills[old_id]
+		if typeof(old_entry) != TYPE_DICTIONARY:
+			continue
+		var lv: int = clampi(int(old_entry.get("level", 0)), 0, Player.MAX_SKILL_LEVEL)
+		var xp: float = float(old_entry.get("xp", 0.0))
+		new_visible[canon]["xp"] = float(new_visible[canon]["xp"]) + xp
+		new_visible[canon]["level"] = max(int(new_visible[canon]["level"]), lv)
+	player.skills = new_visible
+	# Hidden: preserve per-sub-skill data verbatim.
+	#   1) pre-v5 saves: the old `skills` dict itself contains sub-skill keys.
+	#   2) v5+ saves: `hidden_skills` is the canonical source — it overrides.
+	var new_hidden: Dictionary = {}
+	for hid in Player.HIDDEN_SUBSKILL_IDS:
+		new_hidden[hid] = {"level": 0, "xp": 0.0}
+	for old_id in loaded_skills.keys():
+		if Player.HIDDEN_SUBSKILL_IDS.has(old_id) and typeof(loaded_skills[old_id]) == TYPE_DICTIONARY:
+			new_hidden[old_id] = (loaded_skills[old_id] as Dictionary).duplicate(true)
+	for hid in loaded_hidden.keys():
+		if Player.HIDDEN_SUBSKILL_IDS.has(hid) and typeof(loaded_hidden[hid]) == TYPE_DICTIONARY:
+			new_hidden[hid] = (loaded_hidden[hid] as Dictionary).duplicate(true)
+	player.hidden_skills = new_hidden
+	# Active skills: route legacy ids through SKILL_REMAP via set_active_skills,
+	# which dedupes and emits stats_changed.
 	player.active_skills = data.get("active_skills", [])
-	if player.skills.has("dodge") and not player.skills.has("agility"):
-		player.skills["agility"] = player.skills["dodge"]
-	player.skills.erase("dodge")
-	if player.skills.has("melee"):
-		var _melee_level: int = int(player.skills["melee"].get("level", 0))
-		var _melee_xp: float = float(player.skills["melee"].get("xp", 0.0))
-		for _sid in ["unarmed", "blade", "hafted", "polearm"]:
-			if not player.skills.has(_sid) or int(player.skills[_sid].get("level", 0)) == 0:
-				player.skills[_sid] = {"level": _melee_level, "xp": _melee_xp}
-		player.skills.erase("melee")
-	if player.skills.has("stealth") and not player.skills.has("agility"):
-		player.skills["agility"] = player.skills["stealth"]
-	player.skills.erase("stealth")
-	if player.skills.has("magic"):
-		var _magic_level: int = int(player.skills["magic"].get("level", 0))
-		var _magic_xp: float = float(player.skills["magic"].get("xp", 0.0))
-		if not player.skills.has("spellcasting"):
-			player.skills["spellcasting"] = {"level": _magic_level, "xp": _magic_xp}
-		for _sid in ["elemental", "arcane", "hex", "necromancy", "summoning"]:
-			if not player.skills.has(_sid):
-				player.skills[_sid] = {"level": max(0, _magic_level - 1), "xp": 0.0}
-		player.skills.erase("magic")
-	if player.skills.has("defense"):
-		var _def_level: int = int(player.skills["defense"].get("level", 0))
-		var _def_xp: float = float(player.skills["defense"].get("xp", 0.0))
-		if not player.skills.has("armor"):
-			player.skills["armor"] = {"level": _def_level, "xp": _def_xp}
-		if not player.skills.has("shield"):
-			player.skills["shield"] = {"level": max(0, _def_level - 1), "xp": 0.0}
-		player.skills.erase("defense")
-	# tool skill migration: old saves may not have "tool" yet (that's fine, will be added below)
-	if player.skills.is_empty():
-		player.init_skills()
-	else:
-		# Ensure all simplified skills exist and clamp legacy saves.
-		for _sk_id: String in Player.SKILL_IDS:
-			if not player.skills.has(_sk_id):
-				player.skills[_sk_id] = {"level": 0, "xp": 0.0}
-			else:
-				player.skills[_sk_id]["level"] = clampi(int(player.skills[_sk_id].get("level", 0)), 0, Player.MAX_SKILL_LEVEL)
-	if player.active_skills.has("dodge") and not player.active_skills.has("agility"):
-		player.active_skills.append("agility")
-	player.active_skills.erase("dodge")
-	if player.active_skills.has("melee"):
-		player.active_skills.erase("melee")
-		if not player.active_skills.has("blade"):
-			player.active_skills.append("blade")
-	if player.active_skills.has("stealth") and not player.active_skills.has("agility"):
-		player.active_skills.append("agility")
-	player.active_skills.erase("stealth")
-	if player.active_skills.has("magic"):
-		player.active_skills.erase("magic")
-		for _sid in ["spellcasting", "arcane"]:
-			if not player.active_skills.has(_sid):
-				player.active_skills.append(_sid)
-	if player.active_skills.has("defense"):
-		player.active_skills.erase("defense")
-		for _sid in ["armor", "shield"]:
-			if not player.active_skills.has(_sid):
-				player.active_skills.append(_sid)
-	# Empty is a valid state under the mastery model (action-routed mode).
-	# Re-run set_active_skills to filter out unknown ids and emit stats_changed.
 	player.set_active_skills(player.active_skills)
 	var saved_qs = data.get("quickslots", null)
 	if saved_qs is Array:

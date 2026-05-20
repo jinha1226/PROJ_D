@@ -61,10 +61,11 @@ static func _player_attack_hits(player: Player, monster: Monster, profile: Dicti
 	var to_hit_base: int = 15 + stat_bonus + weapon_plus + req_hit_pen + player.slay_bonus
 	to_hit_base += randi_range(0, skill_level * 2) if skill_level > 0 else 0
 	var skill_id: String = String(profile.skill_id)
-	# Fighting skill grants accuracy bonus to all melee attacks. Use category
-	# to identify melee post-30-split (covers all blades/maces/axes/staves/polearms/unarmed).
-	if String(Player.SKILL_CATEGORIES.get(skill_id, "")) == "Melee":
-		to_hit_base += player.get_skill_level("fighting") / 2
+	# Weapon Mastery grants accuracy bonus to all melee attacks. Use SKILL_REMAP
+	# to identify melee under the dual-tier model: any sub-skill that maps to
+	# weapon_mastery counts as melee.
+	if String(Player.SKILL_REMAP.get(skill_id, "")) == "weapon_mastery":
+		to_hit_base += player.get_skill_level("weapon_mastery") / 2
 	var to_hit_roll: int = randi_range(0, max(1, to_hit_base))
 	var eff_ev: int = max(0, monster.data.ev - (2 if Status.has(monster, "drained") else 0))
 	var ev_roll: int = (randi_range(0, eff_ev * 2) + randi_range(0, eff_ev * 2)) / 2
@@ -82,8 +83,11 @@ static func _player_attack_base_damage(player: Player, monster: Monster, profile
 	var req_dmg_pct: float = float(profile.req_dmg_pct)
 	var raw: int = weapon_dmg + int(float(stat_source) * stat_scale) + randi_range(0, 3) + player.slay_bonus
 	var skill_id: String = String(profile.skill_id)
-	if skill_id in ["unarmed", "blade", "hafted", "polearm"]:
-		raw += player.get_skill_level("fighting") / 4
+	# Any melee sub-skill (canonical bucket = weapon_mastery) gets the
+	# fighting-style flat damage add. Previously hard-coded list; now
+	# uses SKILL_REMAP so new ids work without editing CombatSystem.
+	if String(Player.SKILL_REMAP.get(skill_id, "")) == "weapon_mastery":
+		raw += player.get_skill_level("weapon_mastery") / 4
 	if req_dmg_pct < 1.0:
 		raw = max(1, int(float(raw) * req_dmg_pct))
 	if Status.has(player, "damage_boost"):
@@ -115,14 +119,15 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	flat_bonus += RacePassiveSystem.melee_damage_bonus(player)
 	flat_bonus += backstab_bonus
 	var mult: float = 1.0 + float(skill_level) * 0.04
-	# Mastery: category-wide layered bonus on top of sub-skill mult.
-	# Melee branch covers all melee categories post-30-split; Ranged branch is bows/etc.
-	var skill_category: String = String(Player.SKILL_CATEGORIES.get(skill_id, ""))
-	if skill_category == "Ranged":
+	# Faith/essence damage hooks routed by canonical bucket. Mastery mults
+	# stubbed to 1.0 under the dual-tier model — left in chain so future
+	# wiring of the 20% hidden-familiarity bonus can replace them in place.
+	var canon_skill: String = String(Player.SKILL_REMAP.get(skill_id, ""))
+	if canon_skill == "archery":
 		mult *= EssenceSystem.ranged_damage_mult(player)
 		mult *= FaithSystem.ranged_damage_mult(player)
 		mult *= player.ranged_mastery_dmg_mult()
-	elif skill_category == "Melee" or skill_id == "":
+	elif canon_skill == "weapon_mastery" or skill_id == "":
 		mult *= FaithSystem.melee_damage_mult(player)
 		mult *= player.melee_mastery_dmg_mult()
 	if not monster.is_aware:

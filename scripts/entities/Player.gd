@@ -94,8 +94,12 @@ var statuses: Dictionary = {}  # id -> turns_remaining (Status.gd manages)
 ## Resists: element → signed magnitude (positive = resist tier, negative = vulnerability tier).
 ## Status.resist_scale clamps net level to [-3, +3]. Add via add_resist(element, delta).
 var resists: Dictionary = {}
-var skills: Dictionary = {}  # skill_id -> {"level": int, "xp": float}
-var active_skills: Array = []  # active skill ids receiving kill XP
+var skills: Dictionary = {}  # skill_id -> {"level": int, "xp": float}  (visible 9-skill tier)
+# Hidden familiarity XP banks (DCSS-style sub-skills). Same shape as `skills`
+# but only stores hidden ids. UI never reads from this; only the future
+# balance pass / debug tools do. Dual-write keeps both tiers in sync.
+var hidden_skills: Dictionary = {}
+var active_skills: Array = []  # active visible skill ids receiving kill XP
 var quickslots: Array = ["", "", "", "", "", ""]  # item/spell ids, index = slot
 var equipped_weapon_id: String = ""
 var equipped_armor_id: String = ""
@@ -111,70 +115,91 @@ var faith_id: String = ""                 # active faith: "war"/"arcana"/"tricke
 var first_shrine_choice_done: bool = false
 
 const MAX_XL: int = 20
-const MAX_SKILL_LEVEL: int = 9
-# DCSS-style 30 sub-skill list. Surface UI groups into 5+1 categories
-# (Melee/Ranged/Defense/Magic/Utility) via SKILL_CATEGORIES below.
+# PROJ_G visible 9-skill set. These are the ONLY skills shown in UI,
+# save files, tutorials, and the character sheet. Each represents 80%
+# of player performance in its domain after the balance pass.
 const SKILL_IDS: Array = [
-	# Melee (8)
+	"weapon_mastery", "archery", "tactics", "defense",
+	"magery", "stealth", "lockpicking", "tracking", "survival",
+]
+const SKILL_XP_DELTA: Array = [12, 28, 55, 95, 150, 230, 340, 490, 700]
+const MAX_SKILL_LEVEL: int = 9
+const FIGHTING_HP_PER_LEVEL: int = 5  # now applies to weapon_mastery level-ups
+
+# Hidden familiarity tier — DCSS sub-skills retained as silent XP banks.
+# UI never displays them. XP grants dual-write to BOTH the hidden id and
+# the canonical visible bucket. Reserved for the balance pass which will
+# wire 20% narrow bonuses (e.g., dagger familiarity boosts only dagger
+# attacks). Until then, hidden buckets accrue data but contribute 0 to
+# combat formulas.
+const HIDDEN_SUBSKILL_IDS: Array = [
+	# Melee subskills
 	"fighting", "unarmed",
 	"short_blades", "long_blades",
 	"maces", "axes", "staves", "polearms",
-	# Ranged (4)
+	# Ranged subskills
 	"bows", "crossbows", "slings", "throwing",
-	# Defense (4)
-	"armor", "dodging", "stealth", "shields",
-	# Magic (13): spellcasting umbrella + 7 schools + 5 elements
+	# Defense subskills
+	"armor", "shields",
+	# Stealth subskills
+	"dodging",
+	# Magic subskills
 	"spellcasting",
 	"conjurations", "hexes", "charms", "summonings",
 	"necromancy", "translocations", "transmutation",
 	"fire", "ice", "air", "earth", "poison",
-	# Utility (2)
+	# Utility subskills
 	"invocations", "evocations",
 ]
-const SKILL_XP_DELTA: Array = [12, 28, 55, 95, 150, 230, 340, 490, 700]
-# Mastery levels run 0..9 from category-wide cumulative XP. Steeper than per-skill
-# delta so spreading across a category is slower than specializing one sub-skill.
+
+# Deprecated DCSS mastery system. Constants kept as empty/identity so UI
+# files referencing them don't crash; mastery getters return 0/identity.
+# The UI sweep will remove the mastery cards in a follow-up.
 const MASTERY_XP_DELTA: Array = [60, 140, 275, 475, 750, 1150, 1700, 2450, 3500]
 const MAX_MASTERY_LEVEL: int = 9
-const FIGHTING_HP_PER_LEVEL: int = 5
+
+# Spell school list (data routing for spells — unrelated to skill ids).
 const MAGIC_SCHOOLS: Array = [
 	"conjurations", "hexes", "charms", "summonings", "necromancy",
 	"translocations", "transmutation",
 	"fire", "ice", "air", "earth", "poison",
 ]
-# Surface category for SkillsDialog tab grouping. Stable mapping —
-# adding a new sub-skill = add SKILL_IDS line + SKILL_CATEGORIES line.
+
+# Surface category grouping for SkillsDialog (only the 9 visible skills).
 const SKILL_CATEGORIES: Dictionary = {
-	"fighting": "Melee", "unarmed": "Melee",
-	"short_blades": "Melee", "long_blades": "Melee",
-	"maces": "Melee", "axes": "Melee", "staves": "Melee", "polearms": "Melee",
-	"bows": "Ranged", "crossbows": "Ranged", "slings": "Ranged", "throwing": "Ranged",
-	"armor": "Defense", "shields": "Defense",
-	"dodging": "Agility", "stealth": "Agility",
-	"spellcasting": "Magic",
-	"conjurations": "Magic", "hexes": "Magic", "charms": "Magic", "summonings": "Magic",
-	"necromancy": "Magic", "translocations": "Magic", "transmutation": "Magic",
-	"fire": "Magic", "ice": "Magic", "air": "Magic", "earth": "Magic", "poison": "Magic",
-	"invocations": "Utility", "evocations": "Utility",
+	"weapon_mastery": "Combat", "archery": "Combat", "tactics": "Combat",
+	"defense": "Defense",
+	"magery": "Magic",
+	"stealth": "Utility", "lockpicking": "Utility", "tracking": "Utility", "survival": "Utility",
 }
-# Legacy skill ID → array of new sub-skills. Used by:
-#   1. Game.gd starting_skills remap (level applied to each sub-skill)
-#   2. get_skill_level legacy fallback (returns max of sub-skills)
-#   3. progression_school_for legacy school routing
-# Data files (.tres) gradually migrating; remap layer keeps old keys working
-# during transition. Eventually all .tres should use new keys directly.
-const LEGACY_SKILL_SPLIT: Dictionary = {
-	"blade":      ["short_blades", "long_blades"],
-	"hafted":     ["maces", "axes", "staves"],
-	"polearm":    ["polearms"],
-	"ranged":     ["bows", "crossbows", "slings", "throwing"],
-	"elemental":  ["fire", "ice", "air", "earth", "poison"],
-	"arcane":     ["conjurations", "translocations", "transmutation", "charms"],
-	"hex":        ["hexes"],
-	"summoning":  ["summonings"],
-	"shield":     ["shields"],
-	"agility":    ["dodging", "stealth"],
-	"tool":       ["invocations", "evocations"],
+
+# Translation: any legacy/sub-skill id → canonical visible bucket.
+# When external code asks for "fighting" / "polearms" / "fire" / etc.,
+# this routes them to the right one of the 9. Includes identity entries
+# for the new ids so direct-name lookups also work.
+const SKILL_REMAP: Dictionary = {
+	# Combat → weapon_mastery
+	"fighting": "weapon_mastery", "unarmed": "weapon_mastery",
+	"short_blades": "weapon_mastery", "long_blades": "weapon_mastery", "blade": "weapon_mastery",
+	"maces": "weapon_mastery", "axes": "weapon_mastery", "staves": "weapon_mastery", "hafted": "weapon_mastery",
+	"polearms": "weapon_mastery", "polearm": "weapon_mastery",
+	# Combat → archery
+	"bows": "archery", "crossbows": "archery", "slings": "archery", "throwing": "archery", "ranged": "archery",
+	# Defense
+	"armor": "defense", "shields": "defense", "shield": "defense",
+	# Stealth
+	"dodging": "stealth", "agility": "stealth",
+	# Magic → magery (umbrellas, schools, elements)
+	"spellcasting": "magery", "conjurations": "magery", "hexes": "magery", "charms": "magery",
+	"summonings": "magery", "necromancy": "magery", "translocations": "magery", "transmutation": "magery",
+	"fire": "magery", "ice": "magery", "air": "magery", "earth": "magery", "poison": "magery",
+	"invocations": "magery", "evocations": "magery",
+	"elemental": "magery", "arcane": "magery", "hex": "magery", "summoning": "magery",
+	"tool": "magery",
+	# Identity (new ids resolve to themselves)
+	"weapon_mastery": "weapon_mastery", "archery": "archery", "tactics": "tactics",
+	"defense": "defense", "magery": "magery", "stealth": "stealth",
+	"lockpicking": "lockpicking", "tracking": "tracking", "survival": "survival",
 }
 
 var _map: DungeonMap
@@ -1002,45 +1027,62 @@ func heal(amount: int) -> void:
 
 func init_skills() -> void:
 	# active_skills stays empty by default — XP is action-routed (the action's own
-	# sub-skill receives full XP). Players opt into manual proportional split via
+	# skill receives full XP). Players opt into manual proportional split via
 	# SkillsDialog Manual mode (toggle_skill_active).
 	for id in SKILL_IDS:
 		if not skills.has(id):
 			skills[id] = {"level": 0, "xp": 0.0}
+	for id in HIDDEN_SUBSKILL_IDS:
+		if not hidden_skills.has(id):
+			hidden_skills[id] = {"level": 0, "xp": 0.0}
+
+func _canonical_skill(id: String) -> String:
+	return String(SKILL_REMAP.get(id, ""))
 
 func is_skill_active(id: String) -> bool:
-	return active_skills.has(id)
+	var canon: String = _canonical_skill(id)
+	if canon == "":
+		return false
+	return active_skills.has(canon)
 
 func set_active_skills(ids: Array) -> void:
 	# Empty array is a valid state (= action-routed mode). Do not auto-fill.
+	# Translate legacy ids through SKILL_REMAP so callers passing sub-skill ids
+	# still resolve to a valid visible bucket.
 	active_skills.clear()
 	for id in ids:
-		var sid: String = String(id)
-		if SKILL_IDS.has(sid) and not active_skills.has(sid):
-			active_skills.append(sid)
+		var canon: String = _canonical_skill(String(id))
+		if canon != "" and SKILL_IDS.has(canon) and not active_skills.has(canon):
+			active_skills.append(canon)
 	emit_signal("stats_changed")
 
 func toggle_skill_active(id: String) -> bool:
 	# Allows emptying the list — empty = action-routed (auto) mode.
-	if not SKILL_IDS.has(id):
+	var canon: String = _canonical_skill(id)
+	if canon == "" or not SKILL_IDS.has(canon):
 		return false
-	if active_skills.has(id):
-		active_skills.erase(id)
+	if active_skills.has(canon):
+		active_skills.erase(canon)
 	else:
-		active_skills.append(id)
+		active_skills.append(canon)
 	emit_signal("stats_changed")
 	return true
 
 func grant_kill_skill_xp(amount: float, action_skill: String = "") -> void:
-	# Two-mode XP routing:
-	#   active_skills empty  → action-routed: full XP to action_skill (DCSS default,
-	#                          beginner-friendly: dagger use trains short_blades)
-	#   active_skills filled → manual: proportional split across active sub-skills
-	#                          (heavy users specialize 1-2 sub-skills faster)
-	# action_skill is the sub-skill the action belongs to (weapon skill, spell school, etc.)
-	var fallback: String = action_skill if SKILL_IDS.has(action_skill) else "fighting"
+	# Route kill XP through grant_skill_xp so dual-write to hidden tier
+	# happens correctly. Two-mode XP routing:
+	#   active_skills empty  → action-routed: full XP to action_skill
+	#   active_skills filled → manual: split across active visible skills
+	# action_skill may be a legacy/sub-skill id; it is translated to canonical.
+	if amount <= 0.0:
+		return
+	var canon_action: String = _canonical_skill(action_skill)
+	var fallback: String = canon_action if canon_action != "" else "weapon_mastery"
 	if active_skills.is_empty():
-		grant_skill_xp(fallback, amount)
+		# Preserve the caller's original id (could be a hidden sub-skill like
+		# "polearms") so dual-write into hidden tier still fires for it.
+		var grant_id: String = action_skill if HIDDEN_SUBSKILL_IDS.has(action_skill) or SKILL_IDS.has(action_skill) else fallback
+		grant_skill_xp(grant_id, amount)
 		return
 	var targets: Array = []
 	for id in active_skills:
@@ -1048,79 +1090,62 @@ func grant_kill_skill_xp(amount: float, action_skill: String = "") -> void:
 		if SKILL_IDS.has(sid) and get_skill_level(sid) < MAX_SKILL_LEVEL:
 			targets.append(sid)
 	if targets.is_empty():
-		# Every active sub-skill is capped — give to the action's own skill so
-		# XP is not silently dropped.
 		targets = [fallback]
 	var share: float = amount / float(targets.size())
 	for sid in targets:
 		grant_skill_xp(String(sid), share)
 
-## Mastery effects (per-category, layered on top of sub-skill bonuses).
-## Tuning baseline 2026-05-06: linear +0.5%/level for damage/power/effect,
-## linear DR for incoming damage, EV every 3 mastery levels for Agility.
-## All callers should multiply (not add) so stacking with sub-skill bonuses
-## stays bounded; max mastery 9 → +4.5% / -4.5% / +3 EV.
+## DCSS mastery system — DEPRECATED under PROJ_G 9-skill model.
+## Stubs return identity values so UI cards render empty/no-effect until the
+## UI sweep removes them. Do not add new callers.
 func melee_mastery_dmg_mult() -> float:
-	return 1.0 + 0.005 * float(get_category_mastery_level("Melee"))
+	return 1.0
 
 func ranged_mastery_dmg_mult() -> float:
-	return 1.0 + 0.005 * float(get_category_mastery_level("Ranged"))
+	return 1.0
 
 func magic_mastery_power_mult() -> float:
-	return 1.0 + 0.005 * float(get_category_mastery_level("Magic"))
+	return 1.0
 
 func defense_mastery_incoming_mult() -> float:
-	# Multiplier applied to incoming damage after AC soak. <1.0 reduces damage.
-	return max(0.5, 1.0 - 0.005 * float(get_category_mastery_level("Defense")))
+	return 1.0
 
 func agility_mastery_ev_bonus() -> int:
-	return get_category_mastery_level("Agility") / 3
+	return 0
 
 func utility_mastery_effect_mult() -> float:
-	return 1.0 + 0.005 * float(get_category_mastery_level("Utility"))
+	return 1.0
 
-func get_category_total_xp(category: String) -> float:
-	# Sum of (banked unspent xp + already-consumed xp from levelups) for every
-	# sub-skill in the category. Action-routed beginners and specialist heavies
-	# reach the same mastery level after spending the same total category XP.
-	var total: float = 0.0
-	for skill_id in SKILL_IDS:
-		if String(SKILL_CATEGORIES.get(skill_id, "")) != category:
-			continue
-		var s: Dictionary = skills.get(skill_id, {})
-		total += float(s.get("xp", 0.0))
-		var lv: int = int(s.get("level", 0))
-		for i in range(lv):
-			total += float(SKILL_XP_DELTA[i])
-	return total
+func get_category_total_xp(_category: String) -> float:
+	return 0.0
 
-func get_category_mastery_level(category: String) -> int:
-	var xp: float = get_category_total_xp(category)
-	var level: int = 0
-	var consumed: float = 0.0
-	for delta in MASTERY_XP_DELTA:
-		if xp >= consumed + float(delta):
-			consumed += float(delta)
-			level += 1
-		else:
-			break
-	return min(level, MAX_MASTERY_LEVEL)
+func get_category_mastery_level(_category: String) -> int:
+	return 0
 
 func get_skill_level(id: String) -> int:
-	var s: Dictionary = skills.get(id, {})
-	if not s.is_empty():
-		return int(s.get("level", 0))
-	# Legacy alias fallback — return max of mapped sub-skills.
-	# Lets old code paths (MagicSystem element lookup, legacy callers) still
-	# function while sub-skills become the canonical source of truth.
-	if LEGACY_SKILL_SPLIT.has(id):
-		var max_lv: int = 0
-		for new_id in LEGACY_SKILL_SPLIT[id]:
-			var lv: int = int(skills.get(new_id, {}).get("level", 0))
-			if lv > max_lv:
-				max_lv = lv
-		return max_lv
-	return 0
+	var canon: String = _canonical_skill(id)
+	if canon == "":
+		return 0
+	var entry: Dictionary = skills.get(canon, {"level": 0})
+	return int(entry.get("level", 0))
+
+func get_skill_xp(id: String) -> float:
+	var canon: String = _canonical_skill(id)
+	if canon == "":
+		return 0.0
+	var entry: Dictionary = skills.get(canon, {"xp": 0.0})
+	return float(entry.get("xp", 0.0))
+
+## Hidden-tier inspector — reserved for the future balance pass / debug tools.
+## UI must not surface this. Returns the silent familiarity level for a
+## DCSS-style sub-skill id (dagger / polearms / fire / etc.).
+func get_hidden_familiarity_level(subskill_id: String) -> int:
+	var entry: Dictionary = hidden_skills.get(subskill_id, {"level": 0})
+	return int(entry.get("level", 0))
+
+func get_hidden_familiarity_xp(subskill_id: String) -> float:
+	var entry: Dictionary = hidden_skills.get(subskill_id, {"xp": 0.0})
+	return float(entry.get("xp", 0.0))
 
 static func progression_school_for(raw_school: String) -> String:
 	match raw_school:
@@ -1186,20 +1211,32 @@ func spell_skill_for(spell: SpellData) -> String:
 		return "spellcasting"
 	return progression_school_for(String(spell.school))
 
-## Aptitude lookup with legacy-key fallback. Race .tres files still use the
-## pre-30-split keys (blade/hafted/elemental/etc.); we map a new sub-skill id
-## back to its legacy parent and read that aptitude. Migrating .tres to the 30
-## keys directly is deferred (needs vetted DCSS species values per sub-skill).
+## Aptitude lookup. Translates the requested id to the canonical visible
+## bucket, then:
+##   1) tries the canonical key directly on the race aptitude dict
+##   2) falls back to averaging all old (sub-skill / legacy) keys that
+##      remap to the same canonical bucket — keeps existing race .tres
+##      files working without per-file migration.
+## Return value is int to preserve the previous signature (callers expect int).
 static func aptitude_for(race: RaceData, skill_id: String) -> int:
 	if race == null:
 		return 0
-	var direct = race.skill_aptitudes.get(skill_id, null)
-	if direct != null:
-		return int(direct)
-	for legacy_id in LEGACY_SKILL_SPLIT.keys():
-		if (LEGACY_SKILL_SPLIT[legacy_id] as Array).has(skill_id):
-			return int(race.skill_aptitudes.get(legacy_id, 0))
-	return 0
+	var canon: String = String(SKILL_REMAP.get(skill_id, ""))
+	if canon == "":
+		return 0
+	var apts: Dictionary = race.skill_aptitudes if race.skill_aptitudes != null else {}
+	if apts.has(canon):
+		return int(apts[canon])
+	# Fallback: average all old keys that remap to the same canonical bucket.
+	var total: float = 0.0
+	var count: int = 0
+	for old_id in apts.keys():
+		if String(SKILL_REMAP.get(old_id, "")) == canon:
+			total += float(apts[old_id])
+			count += 1
+	if count == 0:
+		return 0
+	return int(round(total / float(count)))
 
 func _skill_apt_mult(id: String) -> float:
 	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id) if GameManager != null and RaceRegistry != null else null
@@ -1207,26 +1244,70 @@ func _skill_apt_mult(id: String) -> float:
 		return 1.0
 	return pow(1.2, aptitude_for(race, id))
 
-func grant_skill_xp(id: String, amount: float) -> void:
-	if not SKILL_IDS.has(id):
-		return
-	if not skills.has(id):
-		skills[id] = {"level": 0, "xp": 0.0}
-	var s: Dictionary = skills[id]
-	s["xp"] = float(s.get("xp", 0.0)) + amount * _skill_apt_mult(id)
-	while int(s.get("level", 0)) < MAX_SKILL_LEVEL \
-			and float(s.get("xp", 0.0)) >= SKILL_XP_DELTA[int(s.get("level", 0))]:
-		s["xp"] = float(s["xp"]) - SKILL_XP_DELTA[int(s["level"])]
-		s["level"] = int(s["level"]) + 1
-		CombatLog.post(LocaleManager.t("LOG_SKILL_REACHES") \
-				% [id.capitalize(), int(s["level"])],
-			Color(0.7, 0.95, 0.5))
-		if id == "agility":
+## Visible-tier level-up side effects. Extracted so the hidden tier can
+## share level-up math without firing UI logs / stat bumps. Caller must
+## have already incremented `skills[canon]["level"]`.
+func _on_visible_skill_level_up(canonical_id: String, new_level: int) -> void:
+	var pretty: String = canonical_id.capitalize().replace("_", " ")
+	CombatLog.post(LocaleManager.t("LOG_SKILL_REACHES") % [pretty, new_level],
+		Color(0.7, 0.95, 0.5))
+	match canonical_id:
+		"stealth":
 			ev += 1
-		elif id == "fighting":
+		"weapon_mastery":
 			var hp_gain: int = _fighting_hp_gain()
-			_apply_max_hp_gain(hp_gain, "+%d max HP from Fighting." % hp_gain)
-	skills[id] = s
+			_apply_max_hp_gain(hp_gain, "+%d max HP from Weapon Mastery." % hp_gain)
+
+## Dual-write skill XP grant.
+##   - Resolve canonical visible bucket via SKILL_REMAP.
+##   - Add XP to visible bucket (with race aptitude mult on visible only),
+##     run level-up loop, fire side effects.
+##   - If `id` is also a hidden sub-skill, ALSO add raw XP to the matching
+##     hidden bucket and run a silent level-up loop (no log, no stats).
+##   - Unknown ids: silent no-op.
+##   - `active_skills` filter applies to the visible tier only.
+func grant_skill_xp(id: String, amount: float) -> void:
+	if amount <= 0.0:
+		return
+	var canon: String = _canonical_skill(id)
+	if canon == "":
+		return  # unknown id, silent no-op
+	# ── Visible tier ─────────────────────────────────────────────────────
+	if active_skills.size() > 0 and not active_skills.has(canon):
+		# Visible bucket filtered out by manual-mode selection. Hidden tier
+		# still gets to accumulate (it represents item-specific familiarity,
+		# which is independent of which visible skill the player is grinding).
+		pass
+	else:
+		if not skills.has(canon):
+			skills[canon] = {"level": 0, "xp": 0.0}
+		var v_entry: Dictionary = skills[canon]
+		v_entry["xp"] = float(v_entry.get("xp", 0.0)) + amount * _skill_apt_mult(canon)
+		while int(v_entry.get("level", 0)) < MAX_SKILL_LEVEL:
+			var lv: int = int(v_entry["level"])
+			var need: float = float(SKILL_XP_DELTA[lv]) if lv < SKILL_XP_DELTA.size() else 99999.0
+			if float(v_entry["xp"]) < need:
+				break
+			v_entry["xp"] = float(v_entry["xp"]) - need
+			v_entry["level"] = lv + 1
+			_on_visible_skill_level_up(canon, int(v_entry["level"]))
+		skills[canon] = v_entry
+	# ── Hidden tier (only if caller passed a hidden-tier sub-skill id) ───
+	if HIDDEN_SUBSKILL_IDS.has(id):
+		if not hidden_skills.has(id):
+			hidden_skills[id] = {"level": 0, "xp": 0.0}
+		var h_entry: Dictionary = hidden_skills[id]
+		h_entry["xp"] = float(h_entry.get("xp", 0.0)) + amount
+		while int(h_entry.get("level", 0)) < MAX_SKILL_LEVEL:
+			var lv2: int = int(h_entry["level"])
+			var need2: float = float(SKILL_XP_DELTA[lv2]) if lv2 < SKILL_XP_DELTA.size() else 99999.0
+			if float(h_entry["xp"]) < need2:
+				break
+			h_entry["xp"] = float(h_entry["xp"]) - need2
+			h_entry["level"] = lv2 + 1
+			# silent — no log, no stat side effect
+		hidden_skills[id] = h_entry
+	emit_signal("stats_changed")
 
 ## Rune pickup bonus: entry_depth × 150, where entry_depth = top of the branch
 ## entrance range. Encourages deeper branch attempts (swamp 900, ice 1350,
