@@ -269,9 +269,6 @@ func _handle_tap(screen_pos: Vector2) -> void:
 			_on_stairs_up()
 		elif tile == DungeonMap.Tile.BRANCH_DOWN:
 			_on_branch_enter()
-		elif map.altar_map.has(player.grid_pos):
-			var faith_id: String = String(map.altar_map[player.grid_pos])
-			ShrineDialog.open_altar_info(faith_id, map.altar_active, player, self)
 		else:
 			player.wait_turn()
 			TurnManager.end_player_turn()
@@ -1025,27 +1022,6 @@ func _open_shop() -> void:
 		_generate_shop_inventory()
 	ShopDialog.open(_shop_items, player, get_tree().current_scene)
 
-func _spawn_b3_temple_boss() -> void:
-	var md: MonsterData = MonsterRegistry.unique_for_depth(3)
-	if md == null:
-		md = MonsterRegistry.get_by_id("orc_warchief")
-	if md == null:
-		push_error("B3 temple boss not found!")
-		return
-	var boss_pos: Vector2i = Vector2i(DungeonMap.GRID_W / 2, DungeonMap.GRID_H / 2)
-	if map != null and map.rooms.size() >= 3:
-		boss_pos = map.rooms[2].get_center()
-	var m: Monster = MonsterScene.new()
-	monsters_layer.add_child(m)
-	m.setup(md, map, boss_pos)
-	m.hit_taken.connect(_on_monster_hit.bind(m))
-	if m.has_signal("awareness_changed"):
-		m.awareness_changed.connect(_on_monster_awareness_changed)
-	m.died.connect(_on_monster_died)
-	TurnManager.register_actor(m)
-	_spawn_service._roll_monster_weapon(m)
-	CombatLog.post(LocaleManager.t("LOG_A_LONE_GUARDIAN_WATCHES_OVER"), Color(1.0, 0.78, 0.35))
-
 func _spawn_b15_boss_floor() -> void:
 	var md: MonsterData = MonsterRegistry.get_by_id("abyssal_sovereign")
 	if md == null:
@@ -1091,74 +1067,6 @@ func _spawn_b15_boss_floor() -> void:
 		var gid: String = guard_ids[randi() % guard_ids.size()]
 		if spawn_monster_at(gid, gp):
 			spawned += 1
-
-
-const _B3_FAITH_IDS: Array = ["war", "arcana", "trickery", "death", "essence"]
-
-func _place_b3_altars(_seed: int) -> void:
-	# Temple generator pre-populates broken_altar_positions and preset_faith_altar_positions.
-	if map.preset_faith_altar_positions.size() == _B3_FAITH_IDS.size():
-		for i in _B3_FAITH_IDS.size():
-			map.altar_map[map.preset_faith_altar_positions[i]] = _B3_FAITH_IDS[i]
-		map.queue_redraw()
-		return
-
-	# Fallback: random placement for non-temple layouts.
-	var rng := RandomNumberGenerator.new()
-	rng.seed = _seed ^ 0xA17A1234
-	var floor_tiles: Array = []
-	for y in range(DungeonMap.GRID_H):
-		for x in range(DungeonMap.GRID_W):
-			var p := Vector2i(x, y)
-			if map.tile_at(p) == DungeonMap.Tile.FLOOR:
-				floor_tiles.append(p)
-	if floor_tiles.is_empty():
-		return
-
-	var picked: Dictionary = {}
-	var shuffled: Array = floor_tiles.duplicate()
-	for i in range(shuffled.size() - 1, 0, -1):
-		var j: int = rng.randi_range(0, i)
-		var tmp = shuffled[i]
-		shuffled[i] = shuffled[j]
-		shuffled[j] = tmp
-
-	if map.broken_altar_positions.is_empty():
-		var broken: Array = []
-		for p in shuffled:
-			if broken.size() >= 6:
-				break
-			if _is_reserved_map_feature(p):
-				continue
-			broken.append(p)
-			picked[p] = true
-		map.broken_altar_positions = broken
-	else:
-		for p in map.broken_altar_positions:
-			picked[p] = true
-
-	var faith_positions: Array = []
-	for fid in _B3_FAITH_IDS:
-		var best: Vector2i = Vector2i(-1, -1)
-		var best_score: float = -1.0
-		for p in shuffled:
-			if picked.get(p, false):
-				continue
-			if _is_reserved_map_feature(p):
-				continue
-			var min_dist: float = 999.0
-			for existing in faith_positions:
-				min_dist = min(min_dist, Vector2(p.x - existing.x, p.y - existing.y).length())
-			if faith_positions.is_empty():
-				min_dist = 999.0
-			if min_dist > best_score:
-				best_score = min_dist
-				best = p
-		if best != Vector2i(-1, -1):
-			map.altar_map[best] = fid
-			faith_positions.append(best)
-			picked[best] = true
-	map.queue_redraw()
 
 ## Thin pass-through to SpawnService — kept for external callers (MagicSystem).
 func spawn_ally(monster_id: String, near_pos: Vector2i, turns: int) -> bool:
@@ -1381,14 +1289,6 @@ func _on_player_moved(new_pos: Vector2i) -> void:
 	_refresh_quickslots()
 	if map != null and map.tile_at(new_pos) == DungeonMap.Tile.SHOP:
 		_open_shop()
-
-func _try_open_shrine_choice() -> void:
-	if map == null or player == null:
-		return
-	if not map.altar_map.has(player.grid_pos):
-		return
-	var faith_id: String = String(map.altar_map[player.grid_pos])
-	ShrineDialog.open_altar_info(faith_id, map.altar_active, player, self)
 
 const _RESPAWN_INTERVAL: int = 18
 
@@ -2626,16 +2526,7 @@ func _on_monster_died(monster: Monster) -> void:
 		await get_tree().create_timer(1.5).timeout
 		_show_result_screen(true)
 		return
-	_handle_first_shrine_boss_clear(monster)
 	_handle_monster_essence_drop(monster)
-
-func _handle_first_shrine_boss_clear(monster: Monster) -> void:
-	if map == null or monster == null or monster.data == null:
-		return
-	if GameManager.depth != 3 or map.altar_active or not monster.data.is_unique:
-		return
-	map.activate_altars()
-	CombatLog.post(LocaleManager.t("LOG_ANCIENT_POWER_STIRS_THE_ALTARS"), Color(0.85, 0.75, 1.0))
 
 func _handle_monster_essence_drop(monster: Monster) -> void:
 	if monster == null or monster.data == null:

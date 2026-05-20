@@ -56,13 +56,9 @@ func _generate_floor(depth: int, map_seed: int,
 			host.map._tex_branch_entrance = load(etex_path) as Texture2D if etex_path != "" else null
 		else:
 			host.map._tex_branch_entrance = null
-		if depth == 3:
-			host._place_b3_altars(map_seed)
 		host.player.bind_map(host.map, host.map.spawn_pos)
 		host._spawn_service._spawn_items_for_floor(depth)
-		if depth == 3:
-			host._spawn_b3_temple_boss()
-		elif depth == 15:
+		if depth == 15:
 			host._spawn_b15_boss_floor()
 		elif String(zone.get("id", "")) == "abyss":
 			host._spawn_abyss_floor(depth)

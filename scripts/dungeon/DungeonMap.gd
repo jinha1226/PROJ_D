@@ -52,7 +52,7 @@ var altar_map: Dictionary = {}
 var broken_altar_positions: Array = []
 ## true after B3 unique boss dies — faith altars become interactive
 var altar_active: bool = false
-## preset faith altar positions from temple generator (used by Game._place_b3_altars)
+## preset faith altar positions from temple generator (legacy — no longer placed at depth 3)
 var preset_faith_altar_positions: Array = []
 
 ## Warning tiles from telegraphed boss attacks: Vector2i -> Color
