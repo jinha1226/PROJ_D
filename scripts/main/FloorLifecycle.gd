@@ -159,7 +159,7 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 			continue
 		var mdata: MonsterData = MonsterRegistry.get_by_id(mid) if MonsterRegistry != null else null
 		if mdata != null:
-			var tex: Texture2D = host._build_corpse_texture(mdata)
+			var tex: Texture2D = host._effects_layer._build_corpse_texture(mdata)
 			host._corpse_tex_cache[mid] = tex
 			corpse["tile"] = tex
 	host.map.cloud_tiles = state.get("cloud_tiles", {}).duplicate(true)
