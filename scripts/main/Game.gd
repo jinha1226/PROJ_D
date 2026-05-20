@@ -56,6 +56,7 @@ const _CORPSE_GREEN_BLOOD: Dictionary = {
 var _floor_lifecycle: FloorLifecycle
 var _spawn_service: SpawnService
 var _effects_layer: EffectsLayer
+var _spell_targeting: SpellTargeting
 var map: DungeonMap
 var player: Player
 var items_layer: Node2D
@@ -119,6 +120,10 @@ func _ready() -> void:
 	_effects_layer.name = "EffectsLayer"
 	add_child(_effects_layer)
 	_effects_layer.setup(self)
+	_spell_targeting = SpellTargeting.new()
+	_spell_targeting.name = "SpellTargeting"
+	add_child(_spell_targeting)
+	_spell_targeting.setup(self)
 	if not GameManager.run_in_progress:
 		GameManager.start_new_run()
 	_spawn_map()
@@ -186,11 +191,11 @@ func _unhandled_input(event: InputEvent) -> void:
 				var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
 				var tile: Vector2i = map.world_to_grid(world_pos)
 				if _targeting_monster != null and tile == _targeting_monster.grid_pos:
-					_confirm_targeting()
+					_spell_targeting._confirm_targeting()
 				elif _targeting_monster == null and _targeting_tiles.has(tile):
-					_confirm_targeting()
+					_spell_targeting._confirm_targeting()
 				else:
-					_cancel_targeting()
+					_spell_targeting._cancel_targeting()
 					CombatLog.post(LocaleManager.t("LOG_SPELL_CANCELLED"), Color(0.65, 0.65, 0.65))
 				get_viewport().set_input_as_handled()
 				return
@@ -226,11 +231,11 @@ func _unhandled_input(event: InputEvent) -> void:
 				var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
 				var tile: Vector2i = map.world_to_grid(world_pos)
 				if _targeting_monster != null and tile == _targeting_monster.grid_pos:
-					_confirm_targeting()
+					_spell_targeting._confirm_targeting()
 				elif _targeting_monster == null and _targeting_tiles.has(tile):
-					_confirm_targeting()
+					_spell_targeting._confirm_targeting()
 				else:
-					_cancel_targeting()
+					_spell_targeting._cancel_targeting()
 					CombatLog.post(LocaleManager.t("LOG_SPELL_CANCELLED"), Color(0.65, 0.65, 0.65))
 				get_viewport().set_input_as_handled()
 				return
@@ -1447,52 +1452,24 @@ func _on_player_turn_started() -> void:
 		_start_auto_explore()
 
 ## AOE bridges — Player.use_item duck-types these on the current scene.
-## Real logic lives in AoeEffects so Game.gd doesn't grow further (audit M1).
+## Pass-throughs to SpellTargeting (Phase 0 extraction).
 func apply_fear_aoe(origin: Vector2i, radius: int, turns: int) -> void:
-	var n: int = AoeEffects.apply_fear(self, origin, radius, turns)
-	if n == 0:
-		CombatLog.post(LocaleManager.t("LOG_NOTHING_NEARBY_TO_FRIGHTEN"), Color(0.7, 0.7, 0.75))
+	_spell_targeting.apply_fear_aoe(origin, radius, turns)
 
 func apply_fog_aoe(origin: Vector2i, radius: int, turns: int) -> void:
-	AoeEffects.apply_fog(self, origin, radius, turns)
+	_spell_targeting.apply_fog_aoe(origin, radius, turns)
 
 func apply_silence_aoe(origin: Vector2i, radius: int, turns: int) -> void:
-	var n: int = AoeEffects.apply_silence(self, origin, radius, turns)
-	if n == 0:
-		CombatLog.post(LocaleManager.t("LOG_THE_SILENCE_FINDS_NO_VOICES"), Color(0.7, 0.75, 0.85))
+	_spell_targeting.apply_silence_aoe(origin, radius, turns)
 
 func alert_all_monsters() -> void:
-	var origin: Vector2i = player.grid_pos if player != null else Vector2i.ZERO
-	AoeEffects.alert_all(self, origin)
+	_spell_targeting.alert_all_monsters()
 
 func dig_toward(target: Vector2i) -> void:
-	var carved: int = AoeEffects.dig_line(self, target, 4)
-	if carved == 0:
-		CombatLog.post(LocaleManager.t("LOG_THE_WAND_FINDS_NO_WALL"), Color(0.7, 0.7, 0.7))
-	else:
-		CombatLog.post(LocaleManager.t("LOG_THE_WAND_CARVES_THROUGH_TILE") \
-				% [carved, "" if carved == 1 else "s"], Color(0.85, 0.75, 0.5))
+	_spell_targeting.dig_toward(target)
 
 func apply_immolation_aoe(origin: Vector2i, radius: int) -> void:
-	if map == null:
-		return
-	CombatLog.post(LocaleManager.t("LOG_THE_SCROLL_IGNITES_IN_A"), Color(1.0, 0.55, 0.1))
-	var visible: Dictionary = player.compute_fov() if player != null else {}
-	for dx in range(-radius, radius + 1):
-		for dy in range(-radius, radius + 1):
-			var pos := origin + Vector2i(dx, dy)
-			if not map.in_bounds(pos) or map.tile_at(pos) == map.Tile.WALL:
-				continue
-			map.add_cloud(pos, "fire", 5)
-	# Damage all visible monsters in radius
-	for n in get_tree().get_nodes_in_group("monsters"):
-		if not (n is Monster) or n.is_ally:
-			continue
-		var d: int = max(abs(n.grid_pos.x - origin.x), abs(n.grid_pos.y - origin.y))
-		if d <= radius and visible.has(n.grid_pos):
-			var dmg: int = randi_range(8, 16)
-			n.take_damage(dmg)
-			n.become_aware(origin)
+	_spell_targeting.apply_immolation_aoe(origin, radius)
 
 
 func _tick_cloud_damage_player() -> void:
@@ -2217,70 +2194,10 @@ func _on_bestiary_pressed() -> void:
 	BestiaryDialog.open(self)
 
 func begin_spell_targeting(spell: SpellData, p: Player) -> void:
-	_cancel_targeting()
-	_targeting_spell = spell
-	var visible: Dictionary = p.compute_fov()
-	var range_val: int = MagicSystem.effective_spell_range(spell)
-	_targeting_tiles = []
-	for tile: Vector2i in visible.keys():
-		var d: int = max(abs(tile.x - p.grid_pos.x), abs(tile.y - p.grid_pos.y))
-		if d > 0 and d <= range_val:
-			_targeting_tiles.append(tile)
-	_targeting_node = SpellTargetOverlay.new()
-	_effect_layer.add_child(_targeting_node)
-	_targeting_node.init(spell, p, _targeting_tiles)
-	CombatLog.post(LocaleManager.t("LOG_TAP_HIGHLIGHTED_TILE_TO_CAST") \
-			% spell.display_name, Color(0.8, 0.75, 1.0))
+	_spell_targeting.begin_spell_targeting(spell, p)
 
-## Two-step targeting for single/auto/nearest spells: auto-selects nearest monster,
-## highlights it, requires a second tap on it to confirm the cast.
 func begin_spell_targeting_auto(spell: SpellData, p: Player) -> void:
-	_cancel_targeting()
-	var range_val: int = MagicSystem.effective_spell_range(spell)
-	var visible: Dictionary = p.compute_fov()
-	_targeting_tiles = []
-	for tile: Vector2i in visible.keys():
-		var d: int = max(abs(tile.x - p.grid_pos.x), abs(tile.y - p.grid_pos.y))
-		if d > 0 and d <= range_val:
-			_targeting_tiles.append(tile)
-	# Find nearest non-ally visible monster in range
-	var best: Monster = null
-	var best_d: int = range_val + 1
-	for n in get_tree().get_nodes_in_group("monsters"):
-		if not (n is Monster) or n.is_ally:
-			continue
-		if not visible.has(n.grid_pos):
-			continue
-		var d: int = max(abs(n.grid_pos.x - p.grid_pos.x), abs(n.grid_pos.y - p.grid_pos.y))
-		if d <= range_val and d < best_d:
-			best_d = d
-			best = n
-	if best == null:
-		CombatLog.post(LocaleManager.t("LOG_NO_TARGETS_IN_RANGE"), Color(0.75, 0.75, 0.75))
-		return
-	_targeting_spell = spell
-	_targeting_monster = best
-	_targeting_node = SpellTargetOverlay.new()
-	_effect_layer.add_child(_targeting_node)
-	_targeting_node.init(spell, p, _targeting_tiles)
-	_targeting_node.set_target(best.grid_pos)
-	CombatLog.post(LocaleManager.t("LOG_TAP_THE_TO_CAST_TAP") \
-			% [best.data.display_name, spell.display_name], Color(0.8, 0.75, 1.0))
-
-func _cancel_targeting() -> void:
-	_targeting_spell = null
-	_targeting_tiles = []
-	_targeting_monster = null
-	if _targeting_node != null:
-		_targeting_node.queue_free()
-		_targeting_node = null
-
-func _confirm_targeting() -> void:
-	var spell := _targeting_spell
-	_cancel_targeting()
-	var ok: bool = MagicSystem.cast(spell.id, player, self)
-	if ok:
-		TurnManager.end_player_turn()
+	_spell_targeting.begin_spell_targeting_auto(spell, p)
 
 func _on_rest_pressed() -> void:
 	if player == null or player.hp <= 0 or not TurnManager.is_player_turn:
