@@ -605,6 +605,7 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 			_migrated.append(_resolved)
 	player.known_spells = _migrated
 	player.statuses = data.get("statuses", {})
+	player.body_wounds = data.get("body_wounds", {})
 	# Resists were Array[tag] pre-2026-05; now Dict[element → int]. Migrate either.
 	var loaded_resists = data.get("resists", {})
 	if typeof(loaded_resists) == TYPE_DICTIONARY:

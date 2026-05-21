@@ -93,6 +93,7 @@ func save_run(player, game_manager) -> bool:
 			"essence_inventory": player.essence_inventory,
 			"faith_id": player.faith_id,
 			"first_shrine_choice_done": player.first_shrine_choice_done,
+			"body_wounds": player.body_wounds,
 		},
 		# Branch state (audit C1).
 		"branch_zone": game_manager.branch_zone,
