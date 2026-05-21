@@ -1084,3 +1084,53 @@ SPELL_NAME_SANDBLAST,Sandblast,샌드블라스트
 SPELL_DESC_SANDBLAST,Hurls a spray of sharp sand at a nearby enemy. Short range but reliable earth damage.,인근 적에게 날카로운 모래를 뿌린다. 짧은 사거리지만 신뢰할 수 있는 대지 피해.
 SPELL_NAME_FOXFIRE,Foxfire,폭스파이어
 SPELL_DESC_FOXFIRE,Creates a small bolt of foxfire that seeks out a nearby enemy.,인근 적을 추적하는 작은 폭스파이어 화염을 만든다.
+UI_TOWN_TITLE,Town,마을
+UI_TOWN_BTN_START_EXPEDITION,Start Expedition,원정 시작
+UI_TOWN_BTN_NEW_CHAR,New Character,새 캐릭터
+UI_TOWN_BTN_BACK_MENU,Back to Menu,메뉴로
+UI_TOWN_BTN_SHOP,Shop,상점
+UI_TOWN_STATUS_ACTIVE_READY,"Active Character: %s
+Ready for expedition.","현재 캐릭터: %s
+원정 준비 완료."
+UI_TOWN_STATUS_ACTIVE_MEMORIAL,"Active Character: %s
+%s","현재 캐릭터: %s
+%s"
+UI_TOWN_STATUS_ACTIVE_RETURNED,Returned safely from B%d.,B%d에서 무사히 귀환.
+UI_TOWN_STATUS_NO_CHAR_VICTORY,"No active character.
+Last: %s cleared the dungeon.","활동 캐릭터 없음.
+직전: %s가 던전을 클리어함."
+UI_TOWN_STATUS_NO_CHAR_DEATH,"No active character.
+Last: %s fell at B%d to %s.","활동 캐릭터 없음.
+직전: %s가 B%d에서 %s에게 쓰러짐."
+UI_TOWN_STATUS_NO_CHAR_FIRST,"No active character.
+Create a new one to begin.","활동 캐릭터 없음.
+새 캐릭터를 만들어 시작하세요."
+UI_TOWN_EXPEDITION_COUNT,Expeditions: %d,원정 횟수: %d
+UI_STARTER_TITLE,Starter Shop,시작 상점
+UI_STARTER_CHOOSING_FOR,"Choosing for: %s
+Pick one bundle (120g)","선택 대상: %s
+번들 하나를 고르세요 (120g)"
+UI_STARTER_PICK_FALLBACK,Pick one starter bundle (120g),시작 번들 하나를 고르세요 (120g)
+UI_STARTER_BTN_BACK,Back,뒤로
+UI_STARTER_BTN_CHOOSE,Choose,선택
+UI_STARTER_ITEMS_PREFIX,Items: ,아이템: 
+UI_BUNDLE_NAME_SWORD_SHIELD,Sword & Shield,검과 방패
+UI_BUNDLE_DESC_SWORD_SHIELD,"Reliable melee opener. Short sword, light armor, healing.","안정적인 근접 출발. 단검, 가벼운 갑옷, 회복."
+UI_BUNDLE_NAME_HEAVY_STRIKER,Heavy Striker,중타격
+UI_BUNDLE_DESC_HEAVY_STRIKER,"Mace, light armor, bandages for the long haul.","철퇴, 가벼운 갑옷, 장기전용 붕대."
+UI_BUNDLE_NAME_ARCHER,Archer,궁수
+UI_BUNDLE_DESC_ARCHER,"Shortbow, light armor, dagger backup.","단궁, 가벼운 갑옷, 단검 보조."
+UI_BUNDLE_NAME_MAGIC_INITIATE,Magic Initiate,마법 입문자
+UI_BUNDLE_DESC_MAGIC_INITIATE,"Staff, conjuration tome, dagger backup, mana to start.","지팡이, 환영 마법서, 단검 보조, 시작 마나."
+UI_BUNDLE_NAME_SKIRMISHER,Skirmisher,기습꾼
+UI_BUNDLE_DESC_SKIRMISHER,"Dual dagger, light armor, identify-heavy for exploration.","쌍단검, 가벼운 갑옷, 탐험용 감별 위주."
+UI_BUNDLE_NAME_SURVIVALIST,Survivalist,생존주의자
+UI_BUNDLE_DESC_SURVIVALIST,"Bow + bandages. Long expeditions, slow recovery.","활 + 붕대. 장기 원정, 느린 회복."
+UI_SHOP_TITLE,Town Shop,마을 상점
+UI_SHOP_BTN_DONE,Done,완료
+UI_SHOP_GOLD,Gold: %d,골드: %d
+UI_SHOP_BTN_BUY,Buy,구매
+LOG_EXPEDITION_PRESSURE,Expedition pressure: %d turns remain on this floor.,원정 압박: 이 층에서 %d턴 남음.
+LOG_EXPEDITION_SAFE_RETURN_ATTEMPT,The dungeon presses in. Attempting safe return (%d%% chance)...,던전이 조여옵니다. 안전 귀환 시도 (%d%% 확률)...
+LOG_EXPEDITION_SAFE_RETURN_OK,You slip back toward town with what you have.,가진 것을 들고 마을로 빠져나옵니다.
+LOG_EXPEDITION_SAFE_RETURN_FAIL,Lost in the dungeon. The expedition fails.,던전에서 길을 잃었습니다. 원정 실패.

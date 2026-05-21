@@ -1440,10 +1440,10 @@ func _on_turn_budget_exhausted() -> void:
 	TurnManager.abort_actor_loop()
 	var chance: float = ExpeditionState.safe_return_chance(player, GameManager.depth)
 	CombatLog.post(
-		"The dungeon presses in. Attempting safe return (%d%% chance)..." % int(chance * 100.0),
+		LocaleManager.t("LOG_EXPEDITION_SAFE_RETURN_ATTEMPT") % int(chance * 100.0),
 		Color(0.9, 0.7, 0.5))
 	if randf() < chance:
-		CombatLog.post("You slip back toward town with what you have.", Color(0.5, 0.95, 0.7))
+		CombatLog.post(LocaleManager.t("LOG_EXPEDITION_SAFE_RETURN_OK"), Color(0.5, 0.95, 0.7))
 		TownState.record_safe_return({
 			"race": GameManager.selected_race_id,
 			"depth_reached": GameManager.depth,
@@ -1453,7 +1453,7 @@ func _on_turn_budget_exhausted() -> void:
 		await get_tree().create_timer(2.0).timeout
 		get_tree().change_scene_to_file(TOWN_SCENE_PATH)
 	else:
-		CombatLog.post("Lost in the dungeon. The expedition fails.", Color(1.0, 0.3, 0.3))
+		CombatLog.post(LocaleManager.t("LOG_EXPEDITION_SAFE_RETURN_FAIL"), Color(1.0, 0.3, 0.3))
 		player.last_killer = "lost in the dungeon"
 		player.hp = 0
 		_on_player_died()

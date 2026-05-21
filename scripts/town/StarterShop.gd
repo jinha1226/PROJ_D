@@ -5,41 +5,42 @@ const RACE_SELECT_PATH: String = "res://scenes/menu/RaceSelect.tscn"
 
 # 6 fixed bundles. Each bundle = one full 120g spend.
 # Items must exist in resources/items/ — verified at write time.
+# `name_key` / `desc_key` are i18n keys resolved via LocaleManager.t() at render time.
 const BUNDLES: Array = [
 	{
 		"id": "sword_shield",
-		"name": "Sword & Shield",
-		"desc": "Reliable melee opener. Short sword, light armor, healing.",
+		"name_key": "UI_BUNDLE_NAME_SWORD_SHIELD",
+		"desc_key": "UI_BUNDLE_DESC_SWORD_SHIELD",
 		"items": ["short_sword", "leather_armor", "buckler", "potion_healing", "potion_healing", "scroll_identify"],
 	},
 	{
 		"id": "heavy_striker",
-		"name": "Heavy Striker",
-		"desc": "Mace, light armor, bandages for the long haul.",
+		"name_key": "UI_BUNDLE_NAME_HEAVY_STRIKER",
+		"desc_key": "UI_BUNDLE_DESC_HEAVY_STRIKER",
 		"items": ["mace", "leather_armor", "bandage", "bandage", "bandage", "potion_healing"],
 	},
 	{
 		"id": "archer",
-		"name": "Archer",
-		"desc": "Shortbow, light armor, dagger backup.",
+		"name_key": "UI_BUNDLE_NAME_ARCHER",
+		"desc_key": "UI_BUNDLE_DESC_ARCHER",
 		"items": ["shortbow", "leather_armor", "dagger", "potion_healing", "potion_healing", "scroll_identify"],
 	},
 	{
 		"id": "magic_initiate",
-		"name": "Magic Initiate",
-		"desc": "Staff, conjuration tome, dagger backup, mana to start.",
+		"name_key": "UI_BUNDLE_NAME_MAGIC_INITIATE",
+		"desc_key": "UI_BUNDLE_DESC_MAGIC_INITIATE",
 		"items": ["staff", "book_conjuration", "dagger", "potion_magic", "potion_healing", "scroll_identify"],
 	},
 	{
 		"id": "skirmisher",
-		"name": "Skirmisher",
-		"desc": "Dual dagger, light armor, identify-heavy for exploration.",
+		"name_key": "UI_BUNDLE_NAME_SKIRMISHER",
+		"desc_key": "UI_BUNDLE_DESC_SKIRMISHER",
 		"items": ["dagger", "dirk", "leather_armor", "scroll_identify", "scroll_identify", "potion_healing"],
 	},
 	{
 		"id": "survivalist",
-		"name": "Survivalist",
-		"desc": "Bow + bandages. Long expeditions, slow recovery.",
+		"name_key": "UI_BUNDLE_NAME_SURVIVALIST",
+		"desc_key": "UI_BUNDLE_DESC_SURVIVALIST",
 		"items": ["shortbow", "leather_armor", "bandage", "bandage", "bandage", "bandage"],
 	},
 ]
@@ -52,14 +53,14 @@ const BUNDLES: Array = [
 func _ready() -> void:
 	if ResourceLoader.exists("res://scripts/ui/GameTheme.gd"):
 		theme = load("res://scripts/ui/GameTheme.gd").create()
-	_title.text = "Starter Shop"
+	_title.text = LocaleManager.t("UI_STARTER_TITLE")
 	if RaceRegistry != null:
 		var race_data = RaceRegistry.get_by_id(TownState.current_character_race)
 		var race_name: String = race_data.display_name if race_data != null else TownState.current_character_race.capitalize()
-		_race_info.text = "Choosing for: %s\nPick one bundle (120g)" % race_name
+		_race_info.text = LocaleManager.t("UI_STARTER_CHOOSING_FOR") % race_name
 	else:
-		_race_info.text = "Pick one starter bundle (120g)"
-	_back_btn.text = "Back"
+		_race_info.text = LocaleManager.t("UI_STARTER_PICK_FALLBACK")
+	_back_btn.text = LocaleManager.t("UI_STARTER_BTN_BACK")
 	_back_btn.pressed.connect(_on_back)
 	_build_cards()
 
@@ -82,11 +83,11 @@ func _make_card(bundle: Dictionary) -> Control:
 	vb.add_theme_constant_override("separation", 6)
 	margin.add_child(vb)
 	var name_lbl := Label.new()
-	name_lbl.text = String(bundle["name"])
+	name_lbl.text = LocaleManager.t(String(bundle["name_key"]))
 	name_lbl.add_theme_font_size_override("font_size", 24)
 	vb.add_child(name_lbl)
 	var desc_lbl := Label.new()
-	desc_lbl.text = String(bundle["desc"])
+	desc_lbl.text = LocaleManager.t(String(bundle["desc_key"]))
 	desc_lbl.add_theme_font_size_override("font_size", 16)
 	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	vb.add_child(desc_lbl)
@@ -97,7 +98,7 @@ func _make_card(bundle: Dictionary) -> Control:
 	items_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	vb.add_child(items_lbl)
 	var btn := Button.new()
-	btn.text = "Choose"
+	btn.text = LocaleManager.t("UI_STARTER_BTN_CHOOSE")
 	btn.custom_minimum_size = Vector2(0, 48)
 	btn.pressed.connect(_on_pick.bind(String(bundle["id"])))
 	vb.add_child(btn)
@@ -120,7 +121,7 @@ func _format_items(item_ids: Array) -> String:
 			parts.append("%s × %d" % [item_name, count])
 		else:
 			parts.append(item_name)
-	return "Items: " + ", ".join(parts)
+	return LocaleManager.t("UI_STARTER_ITEMS_PREFIX") + ", ".join(parts)
 
 func _on_pick(bundle_id: String) -> void:
 	for bundle in BUNDLES:

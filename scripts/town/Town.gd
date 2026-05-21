@@ -14,10 +14,10 @@ const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 func _ready() -> void:
 	if ResourceLoader.exists("res://scripts/ui/GameTheme.gd"):
 		theme = load("res://scripts/ui/GameTheme.gd").create()
-	_start_btn.text = "Start Expedition"
-	_new_char_btn.text = "New Character"
-	_menu_btn.text = "Back to Menu"
-	_shop_btn.text = "Shop"
+	_start_btn.text = LocaleManager.t("UI_TOWN_BTN_START_EXPEDITION")
+	_new_char_btn.text = LocaleManager.t("UI_TOWN_BTN_NEW_CHAR")
+	_menu_btn.text = LocaleManager.t("UI_TOWN_BTN_BACK_MENU")
+	_shop_btn.text = LocaleManager.t("UI_TOWN_BTN_SHOP")
 	_start_btn.pressed.connect(_on_start)
 	_new_char_btn.pressed.connect(_on_new_char)
 	_menu_btn.pressed.connect(_on_menu)
@@ -25,19 +25,24 @@ func _ready() -> void:
 	_refresh()
 
 func _refresh() -> void:
-	_expedition_count.text = "Expeditions: %d" % TownState.expedition_count
+	_expedition_count.text = LocaleManager.t("UI_TOWN_EXPEDITION_COUNT") % TownState.expedition_count
 	if TownState.current_character_alive:
 		var race_name: String = TownState.current_character_race.capitalize()
 		if RaceRegistry != null:
 			var race_data = RaceRegistry.get_by_id(TownState.current_character_race)
 			if race_data != null and race_data.display_name != "":
 				race_name = race_data.display_name
-		var last_line: String = "Ready for expedition."
+		var last_line: String = ""
+		var has_safe_return: bool = false
 		if not TownState.last_character_summary.is_empty():
 			var s: Dictionary = TownState.last_character_summary
 			if bool(s.get("safe_return", false)):
-				last_line = "Returned safely from B%d." % int(s.get("depth_reached", 0))
-		_char_status.text = "Active Character: %s\n%s" % [race_name, last_line]
+				has_safe_return = true
+				last_line = LocaleManager.t("UI_TOWN_STATUS_ACTIVE_RETURNED") % int(s.get("depth_reached", 0))
+		if has_safe_return:
+			_char_status.text = LocaleManager.t("UI_TOWN_STATUS_ACTIVE_MEMORIAL") % [race_name, last_line]
+		else:
+			_char_status.text = LocaleManager.t("UI_TOWN_STATUS_ACTIVE_READY") % race_name
 		_start_btn.visible = true
 		_new_char_btn.visible = false
 		_shop_btn.visible = SaveManager.has_save()
@@ -49,11 +54,11 @@ func _refresh() -> void:
 			var killer := String(s.get("death_cause", "unknown"))
 			var victory := bool(s.get("victory", false))
 			if victory:
-				_char_status.text = "No active character.\nLast: %s cleared the dungeon." % race.capitalize()
+				_char_status.text = LocaleManager.t("UI_TOWN_STATUS_NO_CHAR_VICTORY") % race.capitalize()
 			else:
-				_char_status.text = "No active character.\nLast: %s fell at B%d to %s." % [race.capitalize(), depth, killer]
+				_char_status.text = LocaleManager.t("UI_TOWN_STATUS_NO_CHAR_DEATH") % [race.capitalize(), depth, killer]
 		else:
-			_char_status.text = "No active character.\nCreate a new one to begin."
+			_char_status.text = LocaleManager.t("UI_TOWN_STATUS_NO_CHAR_FIRST")
 		_start_btn.visible = false
 		_new_char_btn.visible = true
 		_shop_btn.visible = false

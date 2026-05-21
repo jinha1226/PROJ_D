@@ -19,8 +19,8 @@ signal closed
 var _save_data: Dictionary = {}
 
 func _ready() -> void:
-	_title.text = "Town Shop"
-	_close_btn.text = "Done"
+	_title.text = LocaleManager.t("UI_SHOP_TITLE")
+	_close_btn.text = LocaleManager.t("UI_SHOP_BTN_DONE")
 	_close_btn.pressed.connect(_on_close)
 	_load_save()
 	_build_cards()
@@ -45,7 +45,7 @@ func _set_current_gold(g: int) -> void:
 func _build_cards() -> void:
 	for child in _grid.get_children():
 		child.queue_free()
-	_gold_label.text = "Gold: %d" % _current_gold()
+	_gold_label.text = LocaleManager.t("UI_SHOP_GOLD") % _current_gold()
 	for entry in CATALOG:
 		_grid.add_child(_make_card(entry))
 
@@ -67,7 +67,7 @@ func _make_card(entry: Dictionary) -> Control:
 	price_lbl.add_theme_color_override("font_color", Color(0.95, 0.85, 0.45))
 	row.add_child(price_lbl)
 	var btn := Button.new()
-	btn.text = "Buy"
+	btn.text = LocaleManager.t("UI_SHOP_BTN_BUY")
 	btn.custom_minimum_size = Vector2(96, 56)
 	btn.disabled = _current_gold() < price
 	btn.pressed.connect(_on_buy.bind(id, price))

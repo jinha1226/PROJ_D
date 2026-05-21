@@ -40,7 +40,7 @@ func tick() -> void:
 		if remaining == t and not _warnings_fired.get(t, false):
 			_warnings_fired[t] = true
 			if CombatLog != null:
-				CombatLog.post("Expedition pressure: %d turns remain on this floor." % t, Color(0.95, 0.85, 0.4))
+				CombatLog.post(LocaleManager.t("LOG_EXPEDITION_PRESSURE") % t, Color(0.95, 0.85, 0.4))
 	if is_exhausted() and not paused:
 		paused = true  # latch — prevents re-emit while handler resolves
 		emit_signal("exhausted")
