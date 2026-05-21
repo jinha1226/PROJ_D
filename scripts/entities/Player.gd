@@ -67,6 +67,16 @@ var _base_tex: Texture2D = DEFAULT_BASE_TEX
 var _body_doll_tex: Texture2D = null
 var _hand1_doll_tex: Texture2D = null
 var _hand2_doll_tex: Texture2D = null
+var _equip_sheets: Array[Texture2D] = []
+
+const _EQUIP_SHEET_SLOTS: Array = [
+	["equipped_armor_id",  "armor"],
+	["equipped_helmet_id", "helmet"],
+	["equipped_gloves_id", "gloves"],
+	["equipped_boots_id",  "boots"],
+	["equipped_weapon_id", "sword"],
+	["equipped_shield_id", "shield"],
+]
 
 var hp: int = 22
 var hp_max: int = 22
@@ -1624,7 +1634,12 @@ func set_race_from_id(race_id: String) -> void:
 		_base_tex = load(race.base_sprite_path) as Texture2D
 	else:
 		_base_tex = DEFAULT_BASE_TEX
-	queue_redraw()
+	_refresh_paperdoll()
+
+func _get_sprite_dir() -> String:
+	if _base_tex != null and _base_tex.resource_path != "":
+		return _base_tex.resource_path.get_base_dir()
+	return ""
 
 func set_equipped_weapon(id: String) -> void:
 	if equipped_weapon_id != "":
@@ -1901,6 +1916,19 @@ func _refresh_paperdoll() -> void:
 		var path: String = String(DOLL_HAND2_MAP[shield_base_id])
 		if ResourceLoader.exists(path):
 			_hand2_doll_tex = load(path) as Texture2D
+	# Load 8-dir equipment sheets from race sprite folder
+	_equip_sheets.clear()
+	var sprite_dir := _get_sprite_dir()
+	if sprite_dir != "":
+		for pair in _EQUIP_SHEET_SLOTS:
+			var slot_val: String = get(pair[0]) if pair[0] in self else ""
+			if slot_val == "":
+				continue
+			var path := sprite_dir + "/" + pair[1] + ".png"
+			if ResourceLoader.exists(path):
+				var tex := load(path) as Texture2D
+				if tex != null:
+					_equip_sheets.append(tex)
 	queue_redraw()
 
 ## Returns spritesheet column index for an 8-dir horizontal sheet.
@@ -1930,12 +1958,26 @@ func _draw() -> void:
 				draw_texture_rect_region(_base_tex, rect, src)
 			else:
 				draw_texture_rect(_base_tex, rect, false)
-		if _body_doll_tex != null:
-			draw_texture_rect(_body_doll_tex, rect, false)
-		if _hand1_doll_tex != null:
-			draw_texture_rect(_hand1_doll_tex, rect, false)
-		if _hand2_doll_tex != null:
-			draw_texture_rect(_hand2_doll_tex, rect, false)
+		# 8-dir equipment sheets (drawn over base, same frame selection)
+		var frame := _facing_to_frame()
+		for etex in _equip_sheets:
+			if etex == null:
+				continue
+			var etw := etex.get_width()
+			var eth := etex.get_height()
+			if etw >= eth * 4:
+				var efw := etw / 8
+				draw_texture_rect_region(etex, rect, Rect2(frame * efw, 0, efw, eth))
+			else:
+				draw_texture_rect(etex, rect, false)
+		# Legacy single-frame paperdoll fallback (no 8-dir sheet available)
+		if _equip_sheets.is_empty():
+			if _body_doll_tex != null:
+				draw_texture_rect(_body_doll_tex, rect, false)
+			if _hand1_doll_tex != null:
+				draw_texture_rect(_hand1_doll_tex, rect, false)
+			if _hand2_doll_tex != null:
+				draw_texture_rect(_hand2_doll_tex, rect, false)
 	else:
 		draw_string(ThemeDB.fallback_font,
 			Vector2(6, DungeonMap.CELL_SIZE - 6),
