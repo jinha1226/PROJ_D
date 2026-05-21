@@ -7,6 +7,7 @@ const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 @onready var _char_status: Label = $StatusBox/CharacterStatus
 @onready var _expedition_count: Label = $StatusBox/ExpeditionCount
 @onready var _start_btn: Button = $ButtonBox/StartButton
+@onready var _shop_btn: Button = $ButtonBox/ShopButton
 @onready var _new_char_btn: Button = $ButtonBox/NewCharButton
 @onready var _menu_btn: Button = $ButtonBox/MenuButton
 
@@ -16,9 +17,11 @@ func _ready() -> void:
 	_start_btn.text = "Start Expedition"
 	_new_char_btn.text = "New Character"
 	_menu_btn.text = "Back to Menu"
+	_shop_btn.text = "Shop"
 	_start_btn.pressed.connect(_on_start)
 	_new_char_btn.pressed.connect(_on_new_char)
 	_menu_btn.pressed.connect(_on_menu)
+	_shop_btn.pressed.connect(_on_shop)
 	_refresh()
 
 func _refresh() -> void:
@@ -37,6 +40,7 @@ func _refresh() -> void:
 		_char_status.text = "Active Character: %s\n%s" % [race_name, last_line]
 		_start_btn.visible = true
 		_new_char_btn.visible = false
+		_shop_btn.visible = SaveManager.has_save()
 	else:
 		if TownState.has_last_summary():
 			var s: Dictionary = TownState.last_character_summary
@@ -52,6 +56,7 @@ func _refresh() -> void:
 			_char_status.text = "No active character.\nCreate a new one to begin."
 		_start_btn.visible = false
 		_new_char_btn.visible = true
+		_shop_btn.visible = false
 
 func _on_start() -> void:
 	get_tree().change_scene_to_file(GAME_SCENE_PATH)
@@ -61,3 +66,12 @@ func _on_new_char() -> void:
 
 func _on_menu() -> void:
 	get_tree().change_scene_to_file(MENU_SCENE_PATH)
+
+func _on_shop() -> void:
+	var shop_scene: PackedScene = load("res://scenes/town/TownShop.tscn")
+	if shop_scene == null:
+		return
+	var shop_node: Node = shop_scene.instantiate()
+	add_child(shop_node)
+	if shop_node.has_signal("closed"):
+		shop_node.closed.connect(_refresh)
