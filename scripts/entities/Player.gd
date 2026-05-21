@@ -1912,10 +1912,13 @@ func _facing_to_frame() -> int:
 		Vector2i(-1,  0): return 2  # W
 		Vector2i(-1,  1): return 3  # SW
 		Vector2i( 0,  1): return 4  # S
-		Vector2i( 1,  1): return 5  # SE
+		Vector2i( 1,  1): return 3  # SE → flip of SW
 		Vector2i( 1,  0): return 6  # E
-		Vector2i( 1, -1): return 7  # NE
+		Vector2i( 1, -1): return 1  # NE → flip of NW
 	return 4
+
+func _facing_flip_h() -> bool:
+	return facing.x > 0 and facing.y != 0
 
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
@@ -1926,7 +1929,9 @@ func _draw() -> void:
 			if tw >= th * 4:
 				# 8-direction horizontal spritesheet — select frame by facing
 				var fw := tw / 8
-				var src := Rect2(_facing_to_frame() * fw, 0, fw, th)
+				var frame := _facing_to_frame()
+				var src := Rect2(frame * fw, 0, fw, th) if not _facing_flip_h() \
+						else Rect2((frame + 1) * fw, 0, -fw, th)
 				draw_texture_rect_region(_base_tex, rect, src)
 			else:
 				draw_texture_rect(_base_tex, rect, false)
