@@ -41,6 +41,10 @@ var selected_faith_id: String = ""
 # load and writes into the freshly-instantiated Player, then clears it.
 var pending_player_state: Dictionary = {}
 
+# Items the player picked at the Starter Shop. Game._ready consumes
+# this on new-run setup, then clears it.
+var pending_starter_items: Array = []
+
 # Per-depth cached floor state — kept in-memory across ascend/descend
 # so revisiting a floor restores its tiles, explored fog, remaining
 # items, and survivor monsters. Not persisted to disk (save on stairs

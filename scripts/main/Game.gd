@@ -141,7 +141,7 @@ func _ready() -> void:
 		player.set_active_skills([])
 		player.refresh_ac_from_equipment()
 		player._refresh_paperdoll()
-		_apply_default_starter_kit()
+		_apply_starter_kit()
 		var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
 		var race_name: String = race.display_name if race != null else "adventurer"
 		CombatLog.post(LocaleManager.t("LOG_YOU_START_AS") % [race_name, ""],
@@ -429,24 +429,39 @@ func _cancel_auto_walk(reason: String) -> void:
 	if reason == "new enemy":
 		CombatLog.post(LocaleManager.t("LOG_YOU_STOP_ENEMY_APPROACHES"), Color(1.0, 0.7, 0.5))
 
-func _apply_default_starter_kit() -> void:
-	# Race-neutral baseline starter kit (replaces deleted class starter kits).
-	# Balance pass will refine per-race. For now: a basic dagger, leather armor,
-	# two healing potions, two scrolls of identify. All pre-identified.
-	var kit: Array = ["dagger", "leather_armor", "potion_healing", "potion_healing",
-			"scroll_identify", "scroll_identify"]
+func _apply_starter_kit() -> void:
+	# Use the player's Starter Shop selection if present; otherwise fall
+	# back to a minimal race-neutral kit (covers save-test paths that
+	# bypass the shop or savefile loads that lost the pending list).
+	var kit: Array = GameManager.pending_starter_items
+	if kit.is_empty():
+		kit = ["dagger", "leather_armor", "potion_healing", "potion_healing", "scroll_identify"]
 	for id in kit:
-		player.items.append({"id": id, "plus": 0})
+		player.items.append({"id": String(id), "plus": 0})
 		if GameManager != null:
-			GameManager.identify(id)
-	player.equipped_weapon_id = "dagger"
-	player.equipped_armor_id = "leather_armor"
+			GameManager.identify(String(id))
+	# Auto-equip first weapon and first armor found in the kit, mirroring
+	# the prior default-kit behavior so the player walks into floor 1 ready.
+	if player.equipped_weapon_id == "":
+		for id in kit:
+			var wdata = ItemRegistry.get_by_id(String(id)) if ItemRegistry != null else null
+			if wdata != null and String(wdata.kind) == "weapon":
+				player.equipped_weapon_id = String(id)
+				break
+	if player.equipped_armor_id == "":
+		for id in kit:
+			var adata = ItemRegistry.get_by_id(String(id)) if ItemRegistry != null else null
+			if adata != null and String(adata.kind) == "armor":
+				player.equipped_armor_id = String(id)
+				break
 	player.refresh_ac_from_equipment()
 	player._refresh_paperdoll()
 	GameManager.selected_starting_weapon_id = ""
 	GameManager.selected_starting_school_id = ""
 	GameManager.selected_starting_essence_id = ""
 	GameManager.selected_faith_id = ""
+	# Consumed; clear so a subsequent new-run starts fresh.
+	GameManager.pending_starter_items = []
 
 func _apply_race_mods(race_id: String) -> void:
 	var race: RaceData = RaceRegistry.get_by_id(race_id)
