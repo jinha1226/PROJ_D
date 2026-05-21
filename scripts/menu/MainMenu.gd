@@ -36,7 +36,6 @@ func _on_continue() -> void:
 
 func _on_start() -> void:
 	GameManager.selected_race_id = ""
-	GameManager.selected_class_id = ""
 	get_tree().change_scene_to_file(RACE_SELECT_PATH)
 
 func _on_title_input(event: InputEvent) -> void:

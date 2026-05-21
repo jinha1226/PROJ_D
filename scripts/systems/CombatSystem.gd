@@ -352,10 +352,6 @@ static func _backstab_bonus(player: Player, monster: Monster, weapon: ItemData,
 		return 0
 	var bonus_mult: float = BACKSTAB_BASE_BONUS
 	bonus_mult += float(player.get_skill_level("agility")) * BACKSTAB_PER_AGILITY
-	var class_id: String = GameManager.selected_class_id if GameManager != null else ""
-	var cls: ClassData = ClassRegistry.get_by_id(class_id) if ClassRegistry != null and class_id != "" else null
-	if cls != null and cls.class_group == "rogue":
-		bonus_mult += BACKSTAB_ROGUE_BONUS
 	if weapon != null and weapon.category == "dagger":
 		bonus_mult += BACKSTAB_DAGGER_BONUS
 	bonus_mult = min(BACKSTAB_MAX_BONUS, bonus_mult)

@@ -65,15 +65,12 @@ static func _header_card(player: Player) -> Control:
 	vb.add_theme_constant_override("separation", GameTheme.PAD_S)
 	info_card.add_child(vb)
 
-	var class_id: String = GameManager.selected_class_id if GameManager != null else ""
 	var race_id: String = GameManager.selected_race_id if GameManager != null else ""
-	var class_data: ClassData = ClassRegistry.get_by_id(class_id) if ClassRegistry != null and class_id != "" else null
 	var race_data: RaceData = RaceRegistry.get_by_id(race_id) if race_id != "" else null
-	var cls_name := class_data.display_name if class_data != null else class_id.capitalize()
 	var race_name := race_data.display_name if race_data != null else race_id.capitalize()
 
 	var title := Label.new()
-	title.text = "%s %s" % [race_name, cls_name]
+	title.text = "%s" % [race_name]
 	title.add_theme_font_size_override("font_size", GameTheme.TYPO_HEADER)
 	title.add_theme_color_override("font_color", Color(0.95, 0.88, 0.55))
 	vb.add_child(title)

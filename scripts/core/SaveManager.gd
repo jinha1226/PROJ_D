@@ -52,7 +52,6 @@ func save_run(player, game_manager) -> bool:
 		"depth": game_manager.depth,
 		"seed": game_manager.seed,
 		"gold": game_manager.gold,
-		"selected_class_id": game_manager.selected_class_id,
 		"selected_race_id": game_manager.selected_race_id,
 		"identified": game_manager.identified,
 		"pseudonyms": game_manager.pseudonyms,

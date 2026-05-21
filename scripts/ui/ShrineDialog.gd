@@ -330,5 +330,5 @@ static func _grant_first_essence(eid: String, player: Player) -> void:
 
 
 static func _first_essence_pool_for(_player: Player) -> Array:
-	var class_id: String = String(GameManager.selected_class_id) if GameManager != null else ""
-	return _FIRST_ESSENCE_POOLS.get(class_id, _FALLBACK_POOL)
+	# Class system removed; first essence pool falls back to a race-neutral set.
+	return _FALLBACK_POOL

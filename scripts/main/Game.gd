@@ -48,7 +48,6 @@ const _CORPSE_GREEN_BLOOD: Dictionary = {
 @onready var SaveManager = get_node("/root/SaveManager")
 @onready var MonsterRegistry = get_node("/root/MonsterRegistry")
 @onready var ItemRegistry = get_node("/root/ItemRegistry")
-@onready var ClassRegistry = get_node("/root/ClassRegistry")
 @onready var SpellRegistry = get_node("/root/SpellRegistry")
 @onready var RaceRegistry = get_node("/root/RaceRegistry")
 @onready var RacePassiveSystem = get_node("/root/RacePassiveSystem")
@@ -135,7 +134,17 @@ func _ready() -> void:
 		_apply_loaded_player_state(GameManager.pending_player_state)
 		GameManager.pending_player_state = {}
 	elif GameManager.depth <= 1:
-		_apply_class_to_player(GameManager.selected_class_id)
+		_apply_race_mods(GameManager.selected_race_id)
+		player.set_race_from_id(GameManager.selected_race_id)
+		player.init_skills()
+		player.set_active_skills([])
+		player.refresh_ac_from_equipment()
+		player._refresh_paperdoll()
+		_apply_default_starter_kit()
+		var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
+		var race_name: String = race.display_name if race != null else "adventurer"
+		CombatLog.post(LocaleManager.t("LOG_YOU_START_AS") % [race_name, ""],
+			Color(0.85, 0.9, 1.0))
 	# Resume into branch: the cache-hit path inside _generate_branch_floor
 	# restores tiles/items/monsters/atmosphere. Falls back to fresh generation
 	# if the loaded save predates branch_floor_cache persistence.
@@ -419,88 +428,22 @@ func _cancel_auto_walk(reason: String) -> void:
 	if reason == "new enemy":
 		CombatLog.post(LocaleManager.t("LOG_YOU_STOP_ENEMY_APPROACHES"), Color(1.0, 0.7, 0.5))
 
-func _apply_class_to_player(class_id: String) -> void:
-	var data: ClassData = ClassRegistry.get_by_id(class_id) if ClassRegistry != null and class_id != "" else null
-	if data == null:
-		return
-	player.strength = data.starting_str
-	player.dexterity = data.starting_dex
-	player.intelligence = data.starting_int
-	player.hp_max = player.compute_starting_hp(data.starting_hp, data.starting_str)
-	player.hp = player.hp_max
-	player.mp_max = data.starting_mp
-	player.mp = data.starting_mp
-	_apply_race_mods(GameManager.selected_race_id)
-	player.set_race_from_id(GameManager.selected_race_id)
-	var starting_weapon_id: String = data.starting_weapon
-	if (class_id == "fighter" or class_id == "hunter") \
-			and GameManager.selected_starting_weapon_id != "":
-		starting_weapon_id = GameManager.selected_starting_weapon_id
-	if starting_weapon_id != "":
-		player.items.append({"id": starting_weapon_id, "plus": 0})
-		player.equipped_weapon_id = starting_weapon_id
-	if data.starting_armor != "":
-		player.items.append({"id": data.starting_armor, "plus": 0})
-		player.equipped_armor_id = data.starting_armor
-	if data.starting_shield != "":
-		player.items.append({"id": data.starting_shield, "plus": 0})
-		player.equipped_shield_id = data.starting_shield
-	player.init_skills()
-	var default_active: Array = []
-	var starter_weapon: ItemData = ItemRegistry.get_by_id(String(data.starting_weapon)) if ItemRegistry != null and String(data.starting_weapon) != "" else null
-	for skill_id in data.starting_skills.keys():
-		var lvl: int = clampi(int(data.starting_skills[skill_id]), 0, Player.MAX_SKILL_LEVEL)
-		# Route any legacy/sub-skill id (e.g., "blade", "fighting", "fire") to the
-		# canonical visible bucket. Class .tres files may still reference legacy
-		# ids — SKILL_REMAP keeps them working without per-file migration.
-		var canon: String = String(Player.SKILL_REMAP.get(String(skill_id), ""))
-		# Special case: starter weapon disambiguates a generic "melee" starter
-		# bonus by routing through weapon_skill_for_item → SKILL_REMAP.
-		if String(skill_id) == "melee" and starter_weapon != null:
-			canon = String(Player.SKILL_REMAP.get(Player.weapon_skill_for_item(starter_weapon), "weapon_mastery"))
-		if canon == "" or not player.skills.has(canon):
-			continue
-		var prev: int = int(player.skills[canon].get("level", 0))
-		player.skills[canon]["level"] = max(prev, lvl)
-		if not default_active.has(canon):
-			default_active.append(canon)
-		# Mirror the starter level into the matching hidden sub-skill if the
-		# class data referenced one — keeps the hidden tier non-empty for
-		# specialist classes from turn 1.
-		if Player.HIDDEN_SUBSKILL_IDS.has(String(skill_id)):
-			if not player.hidden_skills.has(String(skill_id)):
-				player.hidden_skills[String(skill_id)] = {"level": 0, "xp": 0.0}
-			var h_prev: int = int(player.hidden_skills[String(skill_id)].get("level", 0))
-			player.hidden_skills[String(skill_id)]["level"] = max(h_prev, lvl)
-	# Mastery model: new characters start with empty active_skills (action-routed
-	# XP). ClassData.default_active_skills is kept as UI-side recommendation only —
-	# do not apply it here. Players opt into manual mode via SkillsDialog.
-	player.set_active_skills([])
-	if data.starting_xl > 0:
-		player.xl = data.starting_xl
-	player.refresh_ac_from_equipment()
-	player._refresh_paperdoll()
-	player.known_spells = data.starting_spells.duplicate()
-	if data.class_group == "mage" or class_id == "archmage":
-		var start_school: String = GameManager.selected_starting_school_id
-		if start_school != "" and class_id != "archmage":
-			player.add_school_spells(start_school)
-		else:
-			for school in Player.MAGIC_SCHOOLS:
-				player.add_school_spells(school)
-	GameManager.selected_starting_weapon_id = ""
-	GameManager.selected_starting_school_id = ""
-	for id in _class_starter_items(class_id):
+func _apply_default_starter_kit() -> void:
+	# Race-neutral baseline starter kit (replaces deleted class starter kits).
+	# Balance pass will refine per-race. For now: a basic dagger, leather armor,
+	# two healing potions, two scrolls of identify. All pre-identified.
+	var kit: Array = ["dagger", "leather_armor", "potion_healing", "potion_healing",
+			"scroll_identify", "scroll_identify"]
+	for id in kit:
 		player.items.append({"id": id, "plus": 0})
-		# Starter consumables come pre-identified — players know what their
-		# class kit is. Without this, a Fighter's potion of healing shows as
-		# "potion of crimson liquid" until first use.
 		if GameManager != null:
 			GameManager.identify(id)
-	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
-	var race_name: String = race.display_name if race != null else "adventurer"
-	CombatLog.post(LocaleManager.t("LOG_YOU_START_AS") % [race_name, data.display_name],
-		Color(0.85, 0.9, 1.0))
+	player.equipped_weapon_id = "dagger"
+	player.equipped_armor_id = "leather_armor"
+	player.refresh_ac_from_equipment()
+	player._refresh_paperdoll()
+	GameManager.selected_starting_weapon_id = ""
+	GameManager.selected_starting_school_id = ""
 	GameManager.selected_starting_essence_id = ""
 	GameManager.selected_faith_id = ""
 
@@ -517,28 +460,6 @@ func _apply_race_mods(race_id: String) -> void:
 	player.mp = player.mp_max
 	player.resists = Player.resists_from_tags(race.resist_mods)
 	RacePassiveSystem.register(player)
-
-func _class_starter_items(class_id: String) -> Array:
-	# Data-first: read from ClassData.starter_items.
-	# All 12 classes ship populated; if ClassRegistry is missing or the class
-	# is unknown, return [] (caller still gets a playable run via class equipment).
-	if ClassRegistry == null or class_id == "":
-		return []
-	var data: ClassData = ClassRegistry.get_by_id(class_id)
-	if data != null:
-		return data.starter_items.duplicate()
-	return []
-
-func _class_default_active_skills(class_id: String, fallback: Array) -> Array:
-	# Data-first: read from ClassData.default_active_skills.
-	# Empty data → caller's fallback → ["fighting"] (universal HP skill).
-	if ClassRegistry != null and class_id != "":
-		var data: ClassData = ClassRegistry.get_by_id(class_id)
-		if data != null and not data.default_active_skills.is_empty():
-			return data.default_active_skills.duplicate()
-	if not fallback.is_empty():
-		return fallback
-	return ["fighting"]
 
 func _apply_loaded_player_state(data: Dictionary) -> void:
 	player.hp = int(data.get("hp", 22))
@@ -590,10 +511,6 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 		if _resolved != "" and SpellRegistry.get_by_id(_resolved) != null:
 			_migrated.append(_resolved)
 	player.known_spells = _migrated
-	if player.known_spells.is_empty():
-		var cls: ClassData = ClassRegistry.get_by_id(GameManager.selected_class_id) if ClassRegistry != null and GameManager != null and GameManager.selected_class_id != "" else null
-		if cls != null:
-			player.known_spells = cls.starting_spells.duplicate()
 	player.statuses = data.get("statuses", {})
 	# Resists were Array[tag] pre-2026-05; now Dict[element → int]. Migrate either.
 	var loaded_resists = data.get("resists", {})
@@ -856,8 +773,6 @@ func _spawn_ui() -> void:
 	_effect_layer.z_index = 5
 	add_child(_effect_layer)
 	_refresh_quickslots()
-	if GameManager.selected_class_id == "archmage":
-		_spawn_debug_floor_panel()
 
 
 func _place_shop_tile() -> void:
@@ -1446,7 +1361,6 @@ func _show_result_screen(victory: bool) -> void:
 func _on_result_retry(res: Node) -> void:
 	if is_instance_valid(res):
 		res.queue_free()
-	GameManager.selected_class_id = ""
 	GameManager.selected_race_id = ""
 	get_tree().change_scene_to_file(RACE_SELECT_PATH)
 

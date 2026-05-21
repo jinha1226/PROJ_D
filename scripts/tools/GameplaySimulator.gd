@@ -57,9 +57,9 @@ func _simulate_class(class_id: String, race_id: String, runs: int) -> Dictionary
 
 func _simulate_run(class_id: String, race_id: String, seed: int) -> Dictionary:
 	_reset_globals()
-	GameManager.selected_class_id = class_id
+	# Class system removed; class_id kept as a label-only tag in result rows.
 	GameManager.selected_race_id = race_id
-	GameManager.selected_starting_weapon_id = "short_sword" if class_id == "fighter" else ""
+	GameManager.selected_starting_weapon_id = ""
 	GameManager.start_new_run(seed)
 	var game: Node = GAME_SCENE.instantiate()
 	root.add_child(game)

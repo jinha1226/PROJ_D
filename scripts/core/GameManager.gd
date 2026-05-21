@@ -31,7 +31,6 @@ var potion_colors: Dictionary = {} # item_id -> "brown" (file base name)
 var run_in_progress: bool = false
 
 # Character selection — set by menus before start_new_run().
-var selected_class_id: String = ""
 var selected_race_id: String = "human"
 var selected_starting_weapon_id: String = ""
 var selected_starting_school_id: String = ""
@@ -116,7 +115,6 @@ func load_run() -> bool:
 	depth = int(data.get("depth", 1))
 	seed = int(data.get("seed", 0))
 	gold = int(data.get("gold", 0))
-	selected_class_id = String(data.get("selected_class_id", ""))
 	selected_race_id = String(data.get("selected_race_id", "human"))
 	identified = data.get("identified", {})
 	pseudonyms = data.get("pseudonyms", {})
@@ -233,17 +231,9 @@ func try_kill_unlock(monster_id: String) -> void:
 			CombatLog.post(LocaleManager.t("LOG_NEW_RACE_UNLOCKED") % r.display_name,
 				Color(1.0, 0.9, 0.4))
 
-func try_use_unlock(item_id: String) -> void:
-	# Class unlock by item use.
-	for cid in ClassRegistry.by_id.keys():
-		var c: ClassData = ClassRegistry.get_by_id(cid)
-		if c == null:
-			continue
-		if String(c.unlock_kind) == "use_item" \
-				and String(c.unlock_trigger_id) == item_id \
-				and unlock(cid):
-			CombatLog.post(LocaleManager.t("LOG_NEW_CLASS_UNLOCKED") % c.display_name,
-				Color(1.0, 0.85, 0.35))
+func try_use_unlock(_item_id: String) -> void:
+	# Class system removed; item-use unlocks no longer applicable.
+	pass
 
 func _load_settings() -> void:
 	if not FileAccess.file_exists(SETTINGS_PATH):
