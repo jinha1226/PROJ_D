@@ -1919,16 +1919,21 @@ func _refresh_paperdoll() -> void:
 	# Load 8-dir equipment sheets from race sprite folder
 	_equip_sheets.clear()
 	var sprite_dir := _get_sprite_dir()
-	if sprite_dir != "":
-		for pair in _EQUIP_SHEET_SLOTS:
-			var slot_val: String = get(pair[0]) if pair[0] in self else ""
-			if slot_val == "":
-				continue
-			var path: String = sprite_dir + "/" + (pair[1] as String) + ".png"
-			if ResourceLoader.exists(path):
-				var tex := load(path) as Texture2D
-				if tex != null:
-					_equip_sheets.append(tex)
+	for pair in _EQUIP_SHEET_SLOTS:
+		var slot_val: String = get(pair[0]) if pair[0] in self else ""
+		if slot_val == "":
+			continue
+		# Prefer per-item overlay path if the item defines one.
+		var path: String = ""
+		var item_data: ItemData = ItemRegistry.get_by_id(slot_val) if ItemRegistry != null else null
+		if item_data != null and item_data.equip_overlay_path != "":
+			path = item_data.equip_overlay_path
+		elif sprite_dir != "":
+			path = sprite_dir + "/" + (pair[1] as String) + ".png"
+		if path != "" and ResourceLoader.exists(path):
+			var tex := load(path) as Texture2D
+			if tex != null:
+				_equip_sheets.append(tex)
 	queue_redraw()
 
 ## Returns spritesheet column index for an 8-dir horizontal sheet.

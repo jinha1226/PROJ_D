@@ -43,6 +43,10 @@ class_name ItemData extends Resource
 ## scrolls / potions / books — lets pseudonym-only items show a
 ## generic look before the player learns what they are.
 @export var identified_tile_path: String = ""
+## 8-dir equipment overlay spritesheet drawn over the player sprite when this
+## item is equipped. Leave empty to use the default slot overlay (e.g.
+## armor_overlay.png) from the race sprite directory.
+@export var equip_overlay_path: String = ""
 
 
 ## Localized display name. Falls back to the .tres display_name if the

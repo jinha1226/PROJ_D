@@ -23,3 +23,4 @@ effect = ""
 effect_value = 0
 plus = 0
 description = "Hardened hide stitched for travelers who expect trouble but still intend to move."
+equip_overlay_path = "res://assets/tiles/individual/player/human_8dir/armor_leather_overlay.png"
