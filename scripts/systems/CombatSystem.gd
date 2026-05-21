@@ -82,6 +82,10 @@ static func _player_attack_base_damage(player: Player, monster: Monster, profile
 	var stat_scale: float = float(profile.stat_scale)
 	var req_dmg_pct: float = float(profile.req_dmg_pct)
 	var raw: int = weapon_dmg + int(float(stat_source) * stat_scale) + randi_range(0, 3) + player.slay_bonus
+	if "body_wounds" in player:
+		var arm_penalty: int = (int(player.body_wounds.get("left_arm", 0))
+				+ int(player.body_wounds.get("right_arm", 0))) * 2
+		raw = max(1, raw - arm_penalty)
 	var skill_id: String = String(profile.skill_id)
 	# Any melee sub-skill (canonical bucket = weapon_mastery) gets the
 	# fighting-style flat damage add. Previously hard-coded list; now
@@ -149,6 +153,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	CombatLog.hit(_hit_log(monster.data.display_name, brand, final, brand_extra, backstab_bonus))
 	var was_alive: bool = monster.hp > 0
 	monster.take_damage(final)
+	BodyPartSystem.process_hit(monster, final, player.grid_pos)
 	monster.become_aware(player.grid_pos)
 	if brand != "" and brand_extra > 0 and monster.hp > 0:
 		_apply_brand_status(monster, brand)
@@ -391,6 +396,7 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	CombatLog.damage_taken(LocaleManager.t("LOG_THE_YOU_FOR") \
 			% [monster.data.display_name, verb, final])
 	player.take_damage(final, monster.data.id)
+	BodyPartSystem.process_hit(player, final, monster.grid_pos)
 	if player.hp > 0:
 		_apply_armor_brand_retaliation(player, monster)
 
@@ -453,6 +459,7 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	final = RacePassiveSystem.on_player_hit(player, final)
 	CombatLog.damage_taken(LocaleManager.t("LOG_THE_HITS_YOU_FOR") % [monster.data.display_name, final])
 	player.take_damage(final, monster.data.id)
+	BodyPartSystem.process_hit(player, final, monster.grid_pos)
 	if player.hp > 0:
 		_apply_armor_brand_retaliation(player, monster)
 	var poison_turns: int = int(attack.get("poison_turns", 0))
