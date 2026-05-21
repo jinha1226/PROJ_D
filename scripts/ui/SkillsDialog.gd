@@ -31,7 +31,7 @@ const _DESCRIPTIONS: Dictionary = {
 	"air": "Improves lightning/wind spells and air damage.",
 	"earth": "Improves earth/stone spells and earth damage.",
 	"poison": "Improves poison/venom spells and poison damage.",
-	"invocations": "Improves faith-granted abilities and divine effects.",
+	"invocations": "Improves channelled magical invocations and ritual effects.",
 	"evocations": "Improves wands, scrolls, and magical tools.",
 }
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://b8townshop0001"]
+[gd_scene format=3 uid="uid://b4q4mtue4k441"]
 
 [ext_resource type="Script" path="res://scripts/town/TownShop.gd" id="1_townshop"]
 

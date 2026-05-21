@@ -69,7 +69,6 @@ static func _rebuild_body(dlg: GameDialog, player: Player, parent: Node) -> void
 
 	body.add_child(_header_card(player))
 	body.add_child(_vitals_card(player))
-	body.add_child(_faith_card(player))
 	body.add_child(_stats_card(player))
 	body.add_child(_combat_card(player))
 	body.add_child(_skills_card(player))
@@ -114,7 +113,7 @@ static func _header_card(player: Player) -> Control:
 	vb.add_child(sub)
 
 	var tip := Label.new()
-	tip.text = "A compact summary of your build, defenses, faith, and active essence path."
+	tip.text = "A compact summary of your build, defenses, and active essence path."
 	tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	tip.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	tip.add_theme_color_override("font_color", Color(0.76, 0.76, 0.82))
@@ -138,42 +137,6 @@ static func _vitals_card(player: Player) -> Control:
 	hint.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	hint.add_theme_color_override("font_color", Color(0.75, 0.78, 0.82))
 	vb.add_child(hint)
-	return card
-
-static func _faith_card(player: Player) -> Control:
-	var faith_id := FaithSystem.current_faith_id(player)
-	var tint := FaithSystem.color_of(faith_id) if faith_id != "" else Color(0.6, 0.6, 0.7)
-	var card := UICards.card(tint)
-	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", GameTheme.PAD_M)
-	card.add_child(vb)
-	vb.add_child(UICards.section_header("Faith", GameTheme.TYPO_SUBTITLE))
-
-	var faith_name := "None"
-	var faith_desc := "No path chosen yet."
-	if faith_id != "":
-		var info: Dictionary = FaithSystem.get_faith(faith_id)
-		faith_name = String(info.get("name", faith_id.capitalize()))
-		faith_desc = String(info.get("short", String(info.get("desc", ""))))
-
-	var name_lbl := Label.new()
-	name_lbl.text = faith_name
-	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_TITLE)
-	name_lbl.add_theme_color_override("font_color", tint)
-	vb.add_child(name_lbl)
-
-	var desc_lbl := Label.new()
-	desc_lbl.text = faith_desc
-	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
-	desc_lbl.add_theme_color_override("font_color", Color(0.78, 0.78, 0.85))
-	vb.add_child(desc_lbl)
-
-	var mode_lbl := Label.new()
-	mode_lbl.text = "Essences: enabled" if FaithSystem.allows_essence(player) else "Essences: disabled by current faith"
-	mode_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
-	mode_lbl.add_theme_color_override("font_color", Color(0.8, 0.85, 0.92) if FaithSystem.allows_essence(player) else Color(0.72, 0.62, 0.62))
-	vb.add_child(mode_lbl)
 	return card
 
 static func _stats_card(player: Player) -> Control:
@@ -325,8 +288,7 @@ static func _resists_card(player: Player) -> Control:
 	return card
 
 static func _essence_card(dlg: GameDialog, player: Player, parent: Node) -> Control:
-	var enabled: bool = FaithSystem.allows_essence(player)
-	var tint := Color(0.8, 0.7, 1.0) if enabled else Color(0.5, 0.5, 0.58)
+	var tint := Color(0.8, 0.7, 1.0)
 	var card := UICards.card(tint)
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", GameTheme.PAD_M)
@@ -341,15 +303,6 @@ static func _essence_card(dlg: GameDialog, player: Player, parent: Node) -> Cont
 	summary.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	summary.add_theme_color_override("font_color", Color(0.78, 0.78, 0.85))
 	vb.add_child(summary)
-
-	if not enabled:
-		var disabled := Label.new()
-		disabled.text = "Your current faith does not allow essence attunement."
-		disabled.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		disabled.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
-		disabled.add_theme_color_override("font_color", Color(0.88, 0.7, 0.7))
-		vb.add_child(disabled)
-		return card
 
 	for i in range(EssenceSystem.SLOT_COUNT):
 		vb.add_child(_essence_slot_row(dlg, player, parent, i))
