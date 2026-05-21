@@ -273,6 +273,7 @@ func _try_move(dir: Vector2i) -> void:
 	grid_pos = target
 	facing = dir
 	position = _map.grid_to_world(grid_pos)
+	queue_redraw()
 	emit_signal("moved", grid_pos)
 	emit_signal("stats_changed")
 	_auto_pickup()
@@ -392,6 +393,7 @@ func try_attack_tile(target: Vector2i) -> bool:
 		dir.y = sign(dir.y)
 	if dir != Vector2i.ZERO:
 		facing = dir
+		queue_redraw()
 	play_bump_anim(target - grid_pos)
 	var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null and equipped_weapon_id != "" else null
 	weapon_attacked.emit(target, weapon_skill_for_item(w))
@@ -1901,11 +1903,33 @@ func _refresh_paperdoll() -> void:
 			_hand2_doll_tex = load(path) as Texture2D
 	queue_redraw()
 
+## Returns spritesheet column index for an 8-dir horizontal sheet.
+## Expected sheet order (left→right): NW, W, SW, S, SE, E, NE, N
+func _facing_to_frame() -> int:
+	match facing:
+		Vector2i(-1, -1): return 0  # NW
+		Vector2i(-1,  0): return 1  # W
+		Vector2i(-1,  1): return 2  # SW
+		Vector2i( 0,  1): return 3  # S
+		Vector2i( 1,  1): return 4  # SE
+		Vector2i( 1,  0): return 5  # E
+		Vector2i( 1, -1): return 6  # NE
+		Vector2i( 0, -1): return 7  # N
+	return 3
+
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
 	if GameManager.use_tiles:
 		if _base_tex != null:
-			draw_texture_rect(_base_tex, rect, false)
+			var tw := _base_tex.get_width()
+			var th := _base_tex.get_height()
+			if tw >= th * 4:
+				# 8-direction horizontal spritesheet — select frame by facing
+				var fw := tw / 8
+				var src := Rect2(_facing_to_frame() * fw, 0, fw, th)
+				draw_texture_rect_region(_base_tex, rect, src)
+			else:
+				draw_texture_rect(_base_tex, rect, false)
 		if _body_doll_tex != null:
 			draw_texture_rect(_body_doll_tex, rect, false)
 		if _hand1_doll_tex != null:

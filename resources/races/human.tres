@@ -7,6 +7,6 @@ script = ExtResource("1_rdata")
 id = "human"
 display_name = "Human"
 description = "Versatile and adaptable. No stat bonuses, no stat penalties. Fits any class or faith path."
-base_sprite_path = "res://assets/tiles/individual/player/base/human_m.png"
+base_sprite_path = "res://assets/tiles/individual/player/human_8dir/base.png"
 unlocked = true
 passive_id = "adaptable"

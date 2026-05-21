@@ -26,9 +26,10 @@ jobs:
         uses: actions/checkout@v5
         with:
           lfs: true
+          submodules: false
 
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
         with:
           enablement: true
 
@@ -81,7 +82,7 @@ jobs:
           sed -i "s|<head>|<head><meta http-equiv=\"Cache-Control\" content=\"no-cache, no-store, must-revalidate\"><meta name=\"build-id\" content=\"${BUILD_ID}\">|" build/web/404.html
 
       - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: build/web
 
@@ -95,4 +96,4 @@ jobs:
     steps:
       - name: Deploy artifact
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
