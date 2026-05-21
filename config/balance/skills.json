@@ -18,15 +18,14 @@
     "note": "Balance-pass wires the 80/20 split. Current commit: visible 100%, hidden 0% (data preserved but unwired)."
   },
   "skills": {
-    "weapon_mastery": {"effects": {"max_hp_per_level": 5, "hit_per_level": 1, "damage_per_level_pct": 6}, "scope": "melee accuracy, melee damage, broad weapon handling"},
+    "weapon_mastery": {"effects": {"hit_per_level": 1, "damage_per_level_pct": 6}, "scope": "melee accuracy, melee damage, broad weapon handling"},
     "archery":        {"effects": {"hit_per_level": 1, "damage_per_level_pct": 6},                       "scope": "ranged accuracy, range penalty control, ranged criticals"},
-    "tactics":        {"effects": {"crit_per_level_pct": 1, "damage_per_level_pct": 2},                  "scope": "criticals, weak points, positional bonuses (post-balance wiring)"},
+    "tactics":        {"effects": {"max_hp_per_level": 5, "backstab_kill_bonus_xp": 5},                  "scope": "general combat fitness (HP per level), backstab killing-blow XP bonus"},
     "defense":        {"effects": {"armor_ev_penalty_reduction_per_level_pct": 10, "block_per_level_pct": 3, "injury_reduction_per_level_pct": 4}, "scope": "armor handling, shield blocking, incoming damage reduction"},
     "magery":         {"effects": {"spell_output_per_level_pct": 7, "mp_efficiency_per_level_pct": 4},   "scope": "spell reliability, spell power, mana efficiency"},
     "stealth":        {"effects": {"ev_per_level": 1, "backstab_bonus_per_level_pct": 5, "detect_range_reduction_every_3_levels": 1}, "scope": "sneaking, ambush, detection avoidance"},
-    "lockpicking":    {"effects": {"lockpick_per_level_pct": 5},                                          "scope": "locked doors, chests, traps (post-balance wiring)"},
-    "tracking":       {"effects": {"detect_range_per_level": 1},                                          "scope": "monster trails, danger preview, hidden paths (post-balance wiring)"},
-    "survival":       {"effects": {"recovery_per_level_pct": 3},                                          "scope": "expedition endurance, recovery, hazard tolerance (post-balance wiring)"}
+    "tracking":       {"effects": {"sight_bestiary_unlock_at_level_3": 1, "xp_per_kill": 1, "xp_per_revealed_tile": 0.2}, "scope": "bestiary discovery, exploration XP, sight-unlocks at level 3"},
+    "survival":       {"effects": {"hp_regen_period_minus_per_3_levels": 1, "status_duration_reduction_per_level_pct": 5, "potion_bandage_efficacy_per_level_pct": 3}, "scope": "expedition endurance, faster regen, shorter debuffs, better heals"}
   },
   "hidden_familiarity_subskills": [
     "fighting","unarmed","short_blades","long_blades","maces","axes","staves","polearms",

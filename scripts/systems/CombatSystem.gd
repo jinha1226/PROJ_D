@@ -181,6 +181,10 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	if was_alive and monster.hp <= 0:
 		CombatLog.hit(LocaleManager.t("LOG_YOU_KILL_THE") % monster.data.display_name)
 		_apply_player_kill_rewards(player, monster, skill_id)
+		# Tactics XP bonus on a backstab killing-blow. backstab_bonus > 0
+		# iff the kill landed before the monster was aware of the player.
+		if backstab_bonus > 0:
+			player.grant_skill_xp("tactics", 5.0)
 
 static func _cleave_hit(player: Player, primary: Monster, base_dmg: int) -> void:
 	var tree := Engine.get_main_loop() as SceneTree
@@ -227,6 +231,8 @@ static func _apply_player_kill_rewards(player: Player, monster: Monster, skill_i
 	var xp_award: int = max(1, int(round(float(monster.data.xp_value) * XP_PACE_MULTIPLIER)))
 	player.grant_xp(xp_award)
 	player.grant_kill_skill_xp(float(xp_award), skill_id)
+	# Tracking XP: flat per-kill grant for hunting any creature.
+	player.grant_skill_xp("tracking", 1.0)
 	player.register_kill()
 	GameManager.try_kill_unlock(monster.data.id)
 	RacePassiveSystem.on_player_killed_monster(player)

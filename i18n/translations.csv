@@ -1148,3 +1148,4 @@ UI_SHOP_TAB_SELL,Sell,판매
 UI_SHOP_BTN_SELL,Sell,판매
 UI_SHOP_NO_ITEMS_TO_SELL,Nothing to sell.,판매할 아이템이 없습니다.
 UI_SHOP_ITEM_EQUIPPED,(equipped),(장착 중)
+LOG_TRACKING_OBSERVED,You make a note about the %s.,%s에 대한 기록을 남깁니다.

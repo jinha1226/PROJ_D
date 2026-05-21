@@ -122,6 +122,14 @@ static func apply(actor, id: String, turns: int) -> void:
 	var key: String = _dict_name(actor)
 	if key == "":
 		return
+	# Survival shortens negative status durations on the player. Beneficial
+	# statuses (shroud/might/haste) also shrink as a side effect — acceptable
+	# first-pass tradeoff; balance pass can split positive vs negative lists.
+	if actor is Player and actor.has_method("get_skill_level"):
+		var survival_lv: int = actor.get_skill_level("survival")
+		if survival_lv > 0:
+			var reduction: float = float(survival_lv) * 0.05
+			turns = max(1, int(round(float(turns) * (1.0 - reduction))))
 	var d: Dictionary = actor.get(key)
 	var first: bool = not d.has(id)
 	d[id] = max(int(d.get(id, 0)), turns)

@@ -37,7 +37,7 @@ const _DESCRIPTIONS: Dictionary = {
 
 const _VISIBLE_ORDER: Array = [
 	"weapon_mastery", "archery", "tactics", "defense",
-	"magery", "stealth", "lockpicking", "tracking", "survival",
+	"magery", "stealth", "tracking", "survival",
 ]
 
 const _VISIBLE_LABELS: Dictionary = {
@@ -47,7 +47,6 @@ const _VISIBLE_LABELS: Dictionary = {
 	"defense": "Defense",
 	"magery": "Magery",
 	"stealth": "Stealth",
-	"lockpicking": "Lockpicking",
 	"tracking": "Tracking",
 	"survival": "Survival",
 }
@@ -63,8 +62,7 @@ const _HIDDEN_BY_VISIBLE: Dictionary = {
 		"necromancy", "translocations", "transmutation",
 		"fire", "ice", "air", "earth", "poison", "invocations", "evocations"],
 	"stealth": ["dodging"],
-	"tactics": [],
-	"lockpicking": [],
+	"tactics": ["fighting"],
 	"tracking": [],
 	"survival": [],
 }

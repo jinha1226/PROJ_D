@@ -222,7 +222,16 @@ func is_unlocked(id: String) -> bool:
 	return bool(unlocks.get(id, false))
 
 func try_kill_unlock(monster_id: String) -> void:
-	kill_counts[monster_id] = kill_counts.get(monster_id, 0) + 1
+	var prev_count: int = int(kill_counts.get(monster_id, 0))
+	kill_counts[monster_id] = prev_count + 1
+	if prev_count == 0:
+		# First time killing this monster id → bestiary entry just unlocked.
+		# Reward Tracking XP for the discovery.
+		var tree := get_tree() if Engine.get_main_loop() is SceneTree else null
+		if tree != null:
+			var p = tree.get_first_node_in_group("player")
+			if p != null and p.has_method("grant_skill_xp"):
+				p.grant_skill_xp("tracking", 5.0)
 	_save_settings()
 	# Race unlock by kill.
 	for rid in RaceRegistry.by_id.keys():

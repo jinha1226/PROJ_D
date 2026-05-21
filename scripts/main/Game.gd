@@ -1130,13 +1130,43 @@ var _corpse_tex_cache: Dictionary = {}
 func _refresh_fov() -> void:
 	if player == null or map == null:
 		return
-	map.set_fov(player.compute_fov())
+	var newly_revealed: int = map.set_fov(player.compute_fov())
+	if newly_revealed > 0:
+		player.grant_skill_xp("tracking", float(newly_revealed) * 0.2)
+	_grant_sight_bestiary_unlocks()
 	_update_minimap()
 	_refresh_entity_visibility()
 	if bottom_hud != null:
 		var hostile: bool = _monster_in_sight()
 		bottom_hud.set_rest_label(hostile)
 		bottom_hud.set_act_label(hostile)
+
+func _grant_sight_bestiary_unlocks() -> void:
+	# Tracking ≥ 3: monsters seen in FOV are auto-recorded in the bestiary
+	# without needing to be killed. kill_counts goes 0 → 1; no XP awarded
+	# here (the natural kill XP path still pays out if/when killed).
+	if player == null or map == null:
+		return
+	if player.get_skill_level("tracking") < 3:
+		return
+	var tree := get_tree()
+	if tree == null:
+		return
+	var any_unlocked: bool = false
+	for n in tree.get_nodes_in_group("monsters"):
+		if not (n is Monster) or n.data == null:
+			continue
+		var mid: String = n.data.id
+		if int(GameManager.kill_counts.get(mid, 0)) > 0:
+			continue
+		if not map.visible_tiles.has(n.grid_pos):
+			continue
+		GameManager.kill_counts[mid] = 1
+		any_unlocked = true
+		CombatLog.post(LocaleManager.t("LOG_TRACKING_OBSERVED") % n.data.display_name,
+			Color(0.6, 0.85, 1.0))
+	if any_unlocked:
+		GameManager._save_settings()
 
 func _refresh_entity_visibility() -> void:
 	for n in get_tree().get_nodes_in_group("monsters"):
@@ -1445,6 +1475,9 @@ func _on_turn_budget_exhausted() -> void:
 		LocaleManager.t("LOG_EXPEDITION_SAFE_RETURN_ATTEMPT") % int(chance * 100.0),
 		Color(0.9, 0.7, 0.5))
 	if randf() < chance:
+		# Survival XP: successful safe return is a major endurance milestone.
+		if player != null:
+			player.grant_skill_xp("survival", 15.0)
 		CombatLog.post(LocaleManager.t("LOG_EXPEDITION_SAFE_RETURN_OK"), Color(0.5, 0.95, 0.7))
 		TownState.record_safe_return({
 			"race": GameManager.selected_race_id,
@@ -2634,6 +2667,9 @@ func _on_monster_awareness_changed(monster: Monster, aware: bool) -> void:
 func _on_player_damaged(amount: int) -> void:
 	if player == null:
 		return
+	# Survival XP: endurance gained from taking hits (while still alive).
+	if amount > 0 and player.hp > 0:
+		player.grant_skill_xp("survival", float(amount) * 0.3)
 	var cell_size: float = DungeonMap.CELL_SIZE
 	var world_pos: Vector2 = player.position + Vector2(cell_size * 0.5, 0.0)
 	spawn_damage_number(world_pos, amount, Color(1.0, 0.35, 0.35))

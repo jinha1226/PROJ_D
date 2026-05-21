@@ -140,11 +140,11 @@ func _add_layer(parent: Control, path: String, dim: bool) -> void:
 # we average those that map to the same visible skill.
 const _APT_ORDER: Array = [
 	"weapon_mastery", "archery", "tactics", "defense",
-	"magery", "stealth", "lockpicking", "tracking", "survival",
+	"magery", "stealth", "tracking", "survival",
 ]
 const _APT_LABELS: Dictionary = {
 	"weapon_mastery": "Melee", "archery": "Bow", "tactics": "Tac", "defense": "Def",
-	"magery": "Mag", "stealth": "Sth", "lockpicking": "Lock", "tracking": "Trk", "survival": "Surv",
+	"magery": "Mag", "stealth": "Sth", "tracking": "Trk", "survival": "Surv",
 }
 
 func _aggregate_aptitude(data: RaceData, visible_id: String) -> int:

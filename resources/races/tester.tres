@@ -22,7 +22,6 @@ skill_aptitudes = {
 "defense": 9,
 "magery": 9,
 "stealth": 9,
-"lockpicking": 9,
 "tracking": 9,
 "survival": 9
 }

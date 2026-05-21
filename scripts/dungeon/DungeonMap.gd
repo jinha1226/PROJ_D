@@ -297,11 +297,17 @@ func random_floor_tile(rng: RandomNumberGenerator = null) -> Vector2i:
 		y = randi_range(room.position.y, room.position.y + room.size.y - 1)
 	return Vector2i(x, y)
 
-func set_fov(new_visible: Dictionary) -> void:
+func set_fov(new_visible: Dictionary) -> int:
+	# Returns the count of tiles that transitioned from unexplored → explored
+	# this update so callers (e.g. Game._refresh_fov) can reward Tracking XP.
 	visible_tiles = new_visible
+	var newly_revealed: int = 0
 	for pos in new_visible.keys():
+		if not explored.has(pos):
+			newly_revealed += 1
 		explored[pos] = true
 	queue_redraw()
+	return newly_revealed
 
 func _draw() -> void:
 	var dim: Color = Color(0.45, 0.45, 0.55, 1.0)

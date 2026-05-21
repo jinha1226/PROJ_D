@@ -7,13 +7,12 @@
     "defense": "armor handling, blocking, and incoming damage reduction",
     "magery": "spell power and universal magical fundamentals",
     "stealth": "evasion-side growth, awareness control, and ambush power",
-    "lockpicking": "locks, treasure access, and dungeon interaction",
     "tracking": "monster awareness, trail reading, and scouting",
     "survival": "expedition endurance, recovery, and hazard tolerance"
   },
   "rules": {
     "spell_failure": false,
-    "skill_model": "9_visible_plus_hidden_familiarity",
+    "skill_model": "8_visible_plus_hidden_familiarity",
     "skill_xp_source": "action_routed_visible_with_hidden_dual_write",
     "skill_activation_toggle": true,
     "essence_model": "passive_only",

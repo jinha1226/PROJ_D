@@ -122,11 +122,13 @@ const MAX_XL: int = 20
 # of player performance in its domain after the balance pass.
 const SKILL_IDS: Array = [
 	"weapon_mastery", "archery", "tactics", "defense",
-	"magery", "stealth", "lockpicking", "tracking", "survival",
+	"magery", "stealth", "tracking", "survival",
 ]
 const SKILL_XP_DELTA: Array = [12, 28, 55, 95, 150, 230, 340, 490, 700]
 const MAX_SKILL_LEVEL: int = 9
-const FIGHTING_HP_PER_LEVEL: int = 5  # now applies to weapon_mastery level-ups
+# Name retained for DCSS "general combat fitness" semantics; the gate is now
+# tactics (the fighting hidden subskill moved tactics→ in 2026-05-21).
+const FIGHTING_HP_PER_LEVEL: int = 5
 
 # Hidden familiarity tier — DCSS sub-skills retained as silent XP banks.
 # UI never displays them. XP grants dual-write to BOTH the hidden id and
@@ -172,7 +174,7 @@ const SKILL_CATEGORIES: Dictionary = {
 	"weapon_mastery": "Combat", "archery": "Combat", "tactics": "Combat",
 	"defense": "Defense",
 	"magery": "Magic",
-	"stealth": "Utility", "lockpicking": "Utility", "tracking": "Utility", "survival": "Utility",
+	"stealth": "Utility", "tracking": "Utility", "survival": "Utility",
 }
 
 # Translation: any legacy/sub-skill id → canonical visible bucket.
@@ -180,8 +182,9 @@ const SKILL_CATEGORIES: Dictionary = {
 # this routes them to the right one of the 9. Includes identity entries
 # for the new ids so direct-name lookups also work.
 const SKILL_REMAP: Dictionary = {
-	# Combat → weapon_mastery (hidden sub-skills only; umbrellas removed 2026-05-21)
-	"fighting": "weapon_mastery", "unarmed": "weapon_mastery",
+	# Combat → tactics (general fitness) / weapon_mastery (specific weapons)
+	"fighting": "tactics",
+	"unarmed": "weapon_mastery",
 	"short_blades": "weapon_mastery", "long_blades": "weapon_mastery",
 	"maces": "weapon_mastery", "axes": "weapon_mastery", "staves": "weapon_mastery",
 	"polearms": "weapon_mastery",
@@ -199,7 +202,7 @@ const SKILL_REMAP: Dictionary = {
 	# Identity (new ids resolve to themselves)
 	"weapon_mastery": "weapon_mastery", "archery": "archery", "tactics": "tactics",
 	"defense": "defense", "magery": "magery", "stealth": "stealth",
-	"lockpicking": "lockpicking", "tracking": "tracking", "survival": "survival",
+	"tracking": "tracking", "survival": "survival",
 }
 
 var _map: DungeonMap
@@ -487,14 +490,16 @@ func use_item(index: int) -> void:
 	var had_effect: bool = true
 	match data.effect:
 		"heal":
-			var heal_amt: int = maxi(1, int(round(float(data.effect_value) * EssenceSystem.potion_heal_mult(self) * FaithSystem.potion_heal_mult(self))))
+			var survival_mult: float = 1.0 + float(get_skill_level("survival")) * 0.03
+			var heal_amt: int = maxi(1, int(round(float(data.effect_value) * EssenceSystem.potion_heal_mult(self) * FaithSystem.potion_heal_mult(self) * survival_mult)))
 			heal_amt += EssenceSystem.potion_heal_bonus(self)
 			heal(heal_amt)
 			BodyPartSystem.reduce_wounds(self, 1)
 			CombatLog.post(LocaleManager.t("LOG_YOU_FEEL_BETTER_HP") % heal_amt,
 				Color(0.6, 1.0, 0.6))
 		"bandage":
-			var heal_amt: int = 6
+			var survival_mult: float = 1.0 + float(get_skill_level("survival")) * 0.03
+			var heal_amt: int = maxi(1, int(round(6.0 * survival_mult)))
 			heal(heal_amt)
 			BodyPartSystem.reduce_wounds(self, 1)
 			CombatLog.post(LocaleManager.t("LOG_YOU_BANDAGE_YOUR_WOUNDS_HP") % heal_amt, Color(0.85, 0.9, 0.65))
@@ -1260,9 +1265,9 @@ func _on_visible_skill_level_up(canonical_id: String, new_level: int) -> void:
 	match canonical_id:
 		"stealth":
 			ev += 1
-		"weapon_mastery":
+		"tactics":
 			var hp_gain: int = _fighting_hp_gain()
-			_apply_max_hp_gain(hp_gain, "+%d max HP from Weapon Mastery." % hp_gain)
+			_apply_max_hp_gain(hp_gain, "+%d max HP from Tactics." % hp_gain)
 
 ## Dual-write skill XP grant.
 ##   - Resolve canonical visible bucket via SKILL_REMAP.
@@ -1466,9 +1471,12 @@ func tick_statuses() -> void:
 
 func hp_regen_period() -> int:
 	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id) if ItemRegistry != null and equipped_armor_id != "" else null
-	if armor != null and armor.brand == "regen":
-		return 3
-	return 5
+	var base: int = 3 if armor != null and armor.brand == "regen" else 5
+	# Survival shortens the regen period (faster HP recovery). Floor at 2 so the
+	# bonus stays meaningful but never trivialises healing.
+	var survival_lv: int = get_skill_level("survival")
+	var reduced: int = base - int(floor(float(survival_lv) / 3.0))
+	return max(2, reduced)
 
 func mp_regen_period() -> int:
 	return 6

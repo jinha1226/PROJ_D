@@ -34,6 +34,12 @@ func tick() -> void:
 	if paused or turn_budget <= 0:
 		return
 	turns_spent += 1
+	# Passive Survival XP — endurance from time spent in expedition.
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree != null:
+		var p = tree.get_first_node_in_group("player")
+		if p != null and p.has_method("grant_skill_xp"):
+			p.grant_skill_xp("survival", 0.05)
 	var remaining: int = turns_remaining()
 	for thr in WARNING_THRESHOLDS:
 		var t: int = int(thr)
