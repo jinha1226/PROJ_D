@@ -1936,13 +1936,13 @@ func _refresh_paperdoll() -> void:
 func _facing_to_frame() -> int:
 	match facing:
 		Vector2i( 0, -1): return 0  # N
-		Vector2i(-1, -1): return 1  # NW
+		Vector2i(-1, -1): return 7  # NW  (sheet col 7 = NW visual)
 		Vector2i(-1,  0): return 2  # W
-		Vector2i(-1,  1): return 3  # SW
+		Vector2i(-1,  1): return 5  # SW  (sheet col 5 = SW visual)
 		Vector2i( 0,  1): return 4  # S
-		Vector2i( 1,  1): return 5  # SE
+		Vector2i( 1,  1): return 3  # SE  (sheet col 3 = SE visual)
 		Vector2i( 1,  0): return 6  # E
-		Vector2i( 1, -1): return 7  # NE
+		Vector2i( 1, -1): return 1  # NE  (sheet col 1 = NE visual)
 	return 4
 
 func _draw() -> void:
