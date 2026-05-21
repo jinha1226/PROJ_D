@@ -134,17 +134,35 @@ func _add_layer(parent: Control, path: String, dim: bool) -> void:
 		rect.modulate = Color(0.4, 0.4, 0.45, 1)
 	parent.add_child(rect)
 
+# 9-skill visible aptitude row. Each cell aggregates the race's
+# sub-skill aptitudes into the canonical PROJ_G bucket — race .tres files
+# still store DCSS sub-skill ids (short_blades, fire, dodging, ...) and
+# we average those that map to the same visible skill.
 const _APT_ORDER: Array = [
-	"fighting", "unarmed", "blade", "hafted", "polearm", "ranged",
-	"spellcasting", "elemental", "arcane", "hex", "necromancy", "summoning",
-	"armor", "shield", "agility", "tool"
+	"weapon_mastery", "archery", "tactics", "defense",
+	"magery", "stealth", "lockpicking", "tracking", "survival",
 ]
 const _APT_LABELS: Dictionary = {
-	"fighting": "Fight", "unarmed": "Unarm", "blade": "Blade", "hafted": "Haft",
-	"polearm": "Pole", "ranged": "Rng", "spellcasting": "Spell", "elemental": "Elem",
-	"arcane": "Arc", "hex": "Hex", "necromancy": "Nec", "summoning": "Sum",
-	"armor": "Arm", "shield": "Shd", "agility": "Agi", "tool": "Tool"
+	"weapon_mastery": "Melee", "archery": "Bow", "tactics": "Tac", "defense": "Def",
+	"magery": "Mag", "stealth": "Sth", "lockpicking": "Lock", "tracking": "Trk", "survival": "Surv",
 }
+
+func _aggregate_aptitude(data: RaceData, visible_id: String) -> int:
+	# Direct hit first (race file uses the visible id explicitly — rare).
+	if data.skill_aptitudes.has(visible_id):
+		return int(data.skill_aptitudes[visible_id])
+	# Otherwise average all sub-skill aptitudes that remap to this visible id.
+	var total: float = 0.0
+	var count: int = 0
+	for sub_id in Player.HIDDEN_SUBSKILL_IDS:
+		if String(Player.SKILL_REMAP.get(sub_id, "")) != visible_id:
+			continue
+		if data.skill_aptitudes.has(sub_id):
+			total += float(data.skill_aptitudes[sub_id])
+			count += 1
+	if count == 0:
+		return 0
+	return int(round(total / float(count)))
 
 func _make_apt_row(data: RaceData) -> Control:
 	if data.skill_aptitudes.is_empty():
@@ -155,7 +173,7 @@ func _make_apt_row(data: RaceData) -> Control:
 	flow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var any := false
 	for sid in _APT_ORDER:
-		var apt: int = int(data.skill_aptitudes.get(sid, 0))
+		var apt: int = _aggregate_aptitude(data, sid)
 		if apt == 0:
 			continue
 		any = true

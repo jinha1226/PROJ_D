@@ -178,24 +178,22 @@ const SKILL_CATEGORIES: Dictionary = {
 # this routes them to the right one of the 9. Includes identity entries
 # for the new ids so direct-name lookups also work.
 const SKILL_REMAP: Dictionary = {
-	# Combat → weapon_mastery
+	# Combat → weapon_mastery (hidden sub-skills only; umbrellas removed 2026-05-21)
 	"fighting": "weapon_mastery", "unarmed": "weapon_mastery",
-	"short_blades": "weapon_mastery", "long_blades": "weapon_mastery", "blade": "weapon_mastery",
-	"maces": "weapon_mastery", "axes": "weapon_mastery", "staves": "weapon_mastery", "hafted": "weapon_mastery",
-	"polearms": "weapon_mastery", "polearm": "weapon_mastery",
+	"short_blades": "weapon_mastery", "long_blades": "weapon_mastery",
+	"maces": "weapon_mastery", "axes": "weapon_mastery", "staves": "weapon_mastery",
+	"polearms": "weapon_mastery",
 	# Combat → archery
-	"bows": "archery", "crossbows": "archery", "slings": "archery", "throwing": "archery", "ranged": "archery",
+	"bows": "archery", "crossbows": "archery", "slings": "archery", "throwing": "archery",
 	# Defense
-	"armor": "defense", "shields": "defense", "shield": "defense",
+	"armor": "defense", "shields": "defense",
 	# Stealth
-	"dodging": "stealth", "agility": "stealth",
-	# Magic → magery (umbrellas, schools, elements)
+	"dodging": "stealth",
+	# Magic → magery (hidden sub-skills only; umbrella names removed 2026-05-21)
 	"spellcasting": "magery", "conjurations": "magery", "hexes": "magery", "charms": "magery",
 	"summonings": "magery", "necromancy": "magery", "translocations": "magery", "transmutation": "magery",
 	"fire": "magery", "ice": "magery", "air": "magery", "earth": "magery", "poison": "magery",
 	"invocations": "magery", "evocations": "magery",
-	"elemental": "magery", "arcane": "magery", "hex": "magery", "summoning": "magery",
-	"tool": "magery",
 	# Identity (new ids resolve to themselves)
 	"weapon_mastery": "weapon_mastery", "archery": "archery", "tactics": "tactics",
 	"defense": "defense", "magery": "magery", "stealth": "stealth",

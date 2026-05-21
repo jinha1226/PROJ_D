@@ -325,7 +325,7 @@ static func _effective_sight_range(monster: Monster, player: Player) -> int:
 	var radius: int = max(3, monster.data.sight_range - 1)
 	if player == null:
 		return radius
-	var stealth_score: int = player.get_skill_level("agility")
+	var stealth_score: int = player.get_skill_level("stealth")
 	if player.equipped_weapon_id != "":
 		var weapon: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
 		if weapon != null and weapon.category == "dagger":

@@ -166,10 +166,10 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		RingSystem.apply_melee_hit_effects(player, monster)
 	if weapon != null and weapon.category == "axe":
 		_cleave_hit(player, monster, final)
-	if skill_id == "blade" and monster.hp > 0:
+	if monster.hp > 0:
 		var w_check: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
 		if w_check != null and w_check.category == "dagger":
-			var swift_chance: float = player.get_skill_level("blade") * 0.05
+			var swift_chance: float = player.get_skill_level("weapon_mastery") * 0.05
 			if swift_chance > 0.0 and randf() < swift_chance:
 				CombatLog.hit(LocaleManager.t("LOG_SWIFT_STRIKE"))
 				_dagger_swift_strike(player, monster)
@@ -351,7 +351,7 @@ static func _backstab_bonus(player: Player, monster: Monster, weapon: ItemData,
 	if monster == null or monster.is_aware:
 		return 0
 	var bonus_mult: float = BACKSTAB_BASE_BONUS
-	bonus_mult += float(player.get_skill_level("agility")) * BACKSTAB_PER_AGILITY
+	bonus_mult += float(player.get_skill_level("stealth")) * BACKSTAB_PER_AGILITY
 	if weapon != null and weapon.category == "dagger":
 		bonus_mult += BACKSTAB_DAGGER_BONUS
 	bonus_mult = min(BACKSTAB_MAX_BONUS, bonus_mult)
@@ -436,7 +436,7 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	if player.equipped_weapon_id != "":
 		var _wp: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
 		if _wp != null and _wp.category == "blade":
-			var parry_chance: float = player.get_skill_level("blade") * 0.03
+			var parry_chance: float = player.get_skill_level("weapon_mastery") * 0.03
 			if parry_chance > 0.0 and randf() < parry_chance:
 				CombatLog.miss(LocaleManager.t("LOG_YOU_PARRY_THE_S_ATTACK") % monster.data.display_name)
 				return
@@ -495,7 +495,7 @@ static func _try_player_shield_block(player: Player, monster: Monster) -> bool:
 	var shield: ItemData = ItemRegistry.get_by_id(player.equipped_shield_id) if ItemRegistry != null and player.equipped_shield_id != "" else null
 	if shield == null:
 		return false
-	var shield_skill: int = player.get_skill_level("shield")
+	var shield_skill: int = player.get_skill_level("defense")
 	var missing: int = max(0, shield.required_skill - shield_skill)
 	var block_pct: float = float(shield.effect_value) / 100.0 \
 		+ shield_skill * 0.03 \
