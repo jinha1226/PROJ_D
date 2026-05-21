@@ -82,8 +82,10 @@ static func _player_attack_hits(player: Player, monster: Monster, profile: Dicti
 	# weapon_mastery counts as melee.
 	if String(Player.SKILL_REMAP.get(skill_id, "")) == "weapon_mastery":
 		to_hit_base += player.get_skill_level("weapon_mastery") / 2
+	# Status penalties: blind attacker swings wildly; blind defender dodges less.
+	to_hit_base = max(1, to_hit_base - Status.hit_penalty(player))
 	var to_hit_roll: int = randi_range(0, max(1, to_hit_base))
-	var eff_ev: int = max(0, monster.data.ev - (2 if Status.has(monster, "drained") else 0))
+	var eff_ev: int = max(0, monster.data.ev - (2 if Status.has(monster, "drained") else 0) - Status.ev_penalty(monster))
 	var ev_roll: int = (randi_range(0, eff_ev * 2) + randi_range(0, eff_ev * 2)) / 2
 	var luck: int = randi_range(0, 19)
 	if luck == 0:
@@ -404,9 +406,10 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	_face_toward(player, monster.grid_pos)
 	var dmg_base: int = int(ra.get("damage", 2))
 	var verb: String = String(ra.get("verb", "shoots"))
-	var to_hit_base: int = 15 + monster.data.hd
+	var to_hit_base: int = max(1, 15 + monster.data.hd - Status.hit_penalty(monster))
 	var to_hit_roll: int = randi_range(0, to_hit_base)
-	if to_hit_roll < player.ev:
+	var eff_player_ev: int = max(0, player.ev - Status.ev_penalty(player))
+	if to_hit_roll < eff_player_ev:
 		CombatLog.miss(LocaleManager.t("LOG_THE_AT_YOU_AND_MISSES") \
 				% [monster.data.display_name, verb])
 		_grant_defense_xp(player, "dodging", DEFENSE_XP_DODGE)
@@ -451,9 +454,9 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 		if witem != null:
 			dmg_base += witem.damage / 2
 
-	var eff_ev: int = player.ev + (3 if Status.has(player, "blur") else 0)
-	# DCSS monster to-hit: random2(15 + hd + 1)
-	var to_hit_roll: int = randi_range(0, 15 + monster.data.hd)
+	var eff_ev: int = max(0, player.ev + (3 if Status.has(player, "blur") else 0) - Status.ev_penalty(player))
+	# DCSS monster to-hit: random2(15 + hd + 1); reduced if monster is blind.
+	var to_hit_roll: int = randi_range(0, max(1, 15 + monster.data.hd - Status.hit_penalty(monster)))
 	# Player EV roll: average of two random2(ev*2)
 	var ev_roll: int = (randi_range(0, eff_ev * 2) + randi_range(0, eff_ev * 2)) / 2
 	var luck: int = randi_range(0, 19)

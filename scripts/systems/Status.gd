@@ -26,7 +26,7 @@ const INFO: Dictionary = {
 	"slow":         {"name": "Slow",         "color": Color(0.55, 0.65, 0.85),
 		"speed_mult": 1.5},
 	"blind":        {"name": "Blind",        "color": Color(0.4, 0.4, 0.5),
-		"fov_clamp": 0},
+		"fov_clamp": 0, "hit_penalty": 8, "ev_penalty": 6},
 	"crippled":     {"name": "Crippled",     "color": Color(0.8, 0.45, 0.1),
 		"speed_mult": 3.0},
 	# Action-denial
@@ -218,6 +218,34 @@ static func fov_clamp(actor) -> int:
 		if info.has("fov_clamp"):
 			return int(info["fov_clamp"])
 	return -1
+
+## Summed flat penalty to to_hit_base across all active statuses on actor.
+## Used by CombatSystem hit-resolution to apply blind etc.
+static func hit_penalty(actor) -> int:
+	var key: String = _dict_name(actor)
+	if key == "":
+		return 0
+	var d: Dictionary = actor.get(key)
+	var total: int = 0
+	for id in d.keys():
+		var info: Dictionary = INFO.get(id, {})
+		if info.has("hit_penalty"):
+			total += int(info["hit_penalty"])
+	return total
+
+## Summed flat penalty to effective EV across all active statuses on actor.
+## Used by CombatSystem to make blind actors easier to hit.
+static func ev_penalty(actor) -> int:
+	var key: String = _dict_name(actor)
+	if key == "":
+		return 0
+	var d: Dictionary = actor.get(key)
+	var total: int = 0
+	for id in d.keys():
+		var info: Dictionary = INFO.get(id, {})
+		if info.has("ev_penalty"):
+			total += int(info["ev_penalty"])
+	return total
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 static func display_name(id: String) -> String:
