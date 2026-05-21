@@ -9,6 +9,7 @@ const BottomHUDScene = preload("res://scenes/ui/BottomHUD.tscn")
 const ResultScreenScene = preload("res://scenes/ui/ResultScreen.tscn")
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 const RACE_SELECT_PATH: String = "res://scenes/menu/RaceSelect.tscn"
+const TOWN_SCENE_PATH: String = "res://scenes/town/Town.tscn"
 
 # Monster weapon pools: monster_id -> [normal_weapons], rare_brands (5% chance)
 const _MONSTER_WEAPON_POOLS: Dictionary = {
@@ -1339,6 +1340,13 @@ func _on_player_died() -> void:
 	TurnManager.abort_actor_loop()
 	CombatLog.post(LocaleManager.t("LOG_YOU_DIED"), Color(1.0, 0.3, 0.3))
 	GameManager.end_run("death")
+	TownState.record_death({
+		"race": GameManager.selected_race_id,
+		"depth_reached": GameManager.depth,
+		"kills": player.kills,
+		"turns": TurnManager.turn_number,
+		"death_cause": player.last_killer,
+	})
 	_show_result_screen(false)
 
 func _show_result_screen(victory: bool) -> void:
@@ -1362,7 +1370,7 @@ func _on_result_retry(res: Node) -> void:
 	if is_instance_valid(res):
 		res.queue_free()
 	GameManager.selected_race_id = ""
-	get_tree().change_scene_to_file(RACE_SELECT_PATH)
+	get_tree().change_scene_to_file(TOWN_SCENE_PATH)
 
 func _on_result_meta(res: Node) -> void:
 	if is_instance_valid(res):
@@ -1854,6 +1862,13 @@ func save_with_cache() -> void:
 func _on_dungeon_cleared() -> void:
 	CombatLog.post(LocaleManager.t("LOG_YOU_HAVE_CLEARED_THE_DUNGEON"), Color(1.0, 0.9, 0.2))
 	GameManager.end_run("victory")
+	TownState.record_victory({
+		"race": GameManager.selected_race_id,
+		"depth_reached": GameManager.depth,
+		"kills": player.kills,
+		"turns": TurnManager.turn_number,
+		"death_cause": "",
+	})
 	_show_result_screen(true)
 
 func _count_collected_runes() -> int:
@@ -2419,6 +2434,13 @@ func _on_monster_died(monster: Monster) -> void:
 		CombatLog.post(LocaleManager.t("LOG_THE_ABYSSAL_SOVEREIGN_COLLAPSES_THE"),
 				Color(0.85, 0.6, 1.0))
 		await get_tree().create_timer(1.5).timeout
+		TownState.record_victory({
+			"race": GameManager.selected_race_id,
+			"depth_reached": GameManager.depth,
+			"kills": player.kills,
+			"turns": TurnManager.turn_number,
+			"death_cause": "",
+		})
 		_show_result_screen(true)
 		return
 	_handle_monster_essence_drop(monster)

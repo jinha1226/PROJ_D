@@ -1,6 +1,6 @@
 extends Control
 
-const GAME_SCENE_PATH: String = "res://scenes/main/Game.tscn"
+const TOWN_SCENE_PATH: String = "res://scenes/town/Town.tscn"
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 
 @onready var _scroll: ScrollContainer = $ScrollContainer
@@ -187,7 +187,8 @@ func _make_apt_row(data: RaceData) -> Control:
 
 func _on_pick(race_id: String) -> void:
 	GameManager.selected_race_id = race_id
-	get_tree().change_scene_to_file(GAME_SCENE_PATH)
+	TownState.start_new_character(race_id)
+	get_tree().change_scene_to_file(TOWN_SCENE_PATH)
 
 func _on_back() -> void:
 	get_tree().change_scene_to_file(MENU_SCENE_PATH)
