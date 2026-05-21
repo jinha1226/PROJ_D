@@ -1,7 +1,8 @@
 extends Node
 
-const ACTIVE_RACE_IDS: Array = ["human", "hill_orc", "elf", "kobold", "troll", "dwarf", "minotaur", "spriggan", "vampire", "gargoyle"]
+const ACTIVE_RACE_IDS: Array = ["tester", "human", "hill_orc", "elf", "kobold", "troll", "dwarf", "minotaur", "spriggan", "vampire", "gargoyle"]
 
+const _TESTER: Resource = preload("res://resources/races/tester.tres")
 const _HUMAN: Resource = preload("res://resources/races/human.tres")
 const _KOBOLD: Resource = preload("res://resources/races/kobold.tres")
 const _ORC: Resource = preload("res://resources/races/orc.tres")
@@ -17,7 +18,7 @@ var by_id: Dictionary = {}
 var all: Array = []
 
 func _ready() -> void:
-	for res in [_HUMAN, _KOBOLD, _ORC, _TROLL, _MINOTAUR, _ELF,
+	for res in [_TESTER, _HUMAN, _KOBOLD, _ORC, _TROLL, _MINOTAUR, _ELF,
 			_DWARF, _SPRIGGAN, _VAMPIRE, _GARGOYLE]:
 		_register(res)
 	if all.is_empty():

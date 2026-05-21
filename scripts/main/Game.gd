@@ -139,12 +139,12 @@ func _ready() -> void:
 		player.set_race_from_id(GameManager.selected_race_id)
 		player.init_skills()
 		player.set_active_skills([])
-			player.refresh_ac_from_equipment()
-			player._refresh_paperdoll()
-			_apply_starter_kit()
-			if GameManager.selected_race_id == "tester":
-				_apply_tester_character_setup()
-			var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
+		player.refresh_ac_from_equipment()
+		player._refresh_paperdoll()
+		_apply_starter_kit()
+		if GameManager.selected_race_id == "tester":
+			_apply_tester_character_setup()
+		var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
 		var race_name: String = race.display_name if race != null else "adventurer"
 		CombatLog.post(LocaleManager.t("LOG_YOU_START_AS") % [race_name, ""],
 			Color(0.85, 0.9, 1.0))
@@ -1265,6 +1265,7 @@ func _update_hud() -> void:
 		top_hud.set_depth(GameManager.depth)
 	top_hud.set_gold(player.gold)
 	top_hud.set_turn(TurnManager.turn_number)
+	top_hud.set_turn_budget(ExpeditionState.turns_remaining(), ExpeditionState.turn_budget)
 	top_hud.set_buffs(player.statuses)
 	top_hud.set_runes(player.items)
 	if bottom_hud != null:

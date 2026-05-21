@@ -98,9 +98,37 @@ func set_gold(g: int) -> void:
         gold_label.text = "%dg" % g
 
 
+var _last_turn: int = 0
+var _budget_remaining: int = -1
+var _budget_total: int = 0
+
 func set_turn(t: int) -> void:
-    if turn_label:
-        turn_label.text = "T:%d" % t
+    _last_turn = t
+    _refresh_turn_label()
+
+func set_turn_budget(remaining: int, total: int) -> void:
+    _budget_remaining = remaining
+    _budget_total = total
+    _refresh_turn_label()
+
+func _refresh_turn_label() -> void:
+    if turn_label == null:
+        return
+    if _budget_total > 0:
+        turn_label.text = "T:%d  ⏳%d/%d" % [_last_turn, _budget_remaining, _budget_total]
+        # Color the budget red when low; orange when warning; normal otherwise.
+        var ratio: float = float(_budget_remaining) / float(_budget_total)
+        if ratio <= 0.0:
+            turn_label.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35))
+        elif ratio <= 0.10:
+            turn_label.add_theme_color_override("font_color", Color(1.0, 0.45, 0.35))
+        elif ratio <= 0.25:
+            turn_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
+        else:
+            turn_label.remove_theme_color_override("font_color")
+    else:
+        turn_label.text = "T:%d" % _last_turn
+        turn_label.remove_theme_color_override("font_color")
 
 
 func set_depth(d: int) -> void:

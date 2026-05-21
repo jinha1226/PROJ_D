@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="RaceData" format=3 uid="uid://race_tester_0521"]
+
+[ext_resource type="Script" uid="uid://suogob65ee47" path="res://scripts/entities/RaceData.gd" id="1_rdata"]
+
+[resource]
+script = ExtResource("1_rdata")
+id = "tester"
+display_name = "Tester"
+description = "Debug-only test character. Starts with max skills, all spells, all essences, consumables, scrolls, and map warp access."
+base_sprite_path = "res://assets/tiles/individual/player/base/human_m.png"
+unlocked = true
+str_mod = 30
+dex_mod = 30
+int_mod = 30
+hp_mod = 250
+mp_mod = 120
+resist_mods = ["fire+++", "cold+++", "poison+++", "necromancy+++"]
+skill_aptitudes = {
+"weapon_mastery": 9,
+"archery": 9,
+"tactics": 9,
+"defense": 9,
+"magery": 9,
+"stealth": 9,
+"lockpicking": 9,
+"tracking": 9,
+"survival": 9
+}
+passive_id = "adaptable"
+hp_per_level = 20
+speed_mod = 0.7
