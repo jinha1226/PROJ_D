@@ -35,6 +35,7 @@ signal item_slot_pressed(index: int)
 var _pulse_t: float = 0.0
 var _pulsing: bool = false
 var _buff_row: HFlowContainer = null
+var _wound_row: HFlowContainer = null
 var _hp_max_val: int = 1
 
 
@@ -51,6 +52,10 @@ func _ready() -> void:
         _buff_row.add_theme_constant_override("h_separation", 6)
         _buff_row.add_theme_constant_override("v_separation", 2)
         bars.add_child(_buff_row)
+        _wound_row = HFlowContainer.new()
+        _wound_row.add_theme_constant_override("h_separation", 6)
+        _wound_row.add_theme_constant_override("v_separation", 2)
+        bars.add_child(_wound_row)
     for i in item_slots.size():
         var qs = item_slots[i]
         qs.slot_index = i
@@ -174,6 +179,25 @@ func set_buffs(statuses: Dictionary) -> void:
         var label_text: String = info.get("name", sid.capitalize())
         var badge := _make_buff_badge(label_text, turns, col)
         _buff_row.add_child(badge)
+
+
+func set_wounds(wounds: Array) -> void:
+	if _wound_row == null:
+		return
+	for c in _wound_row.get_children():
+		c.queue_free()
+	for entry in wounds:
+		var part_id: String = String(entry[0])
+		var lvl: int = int(entry[1])
+		var label: String = BodyPartSystem.PART_LABELS.get(part_id, part_id)
+		var display: String = "[%s%s]" % [label, "!" if lvl >= 2 else ""]
+		var col: Color = Color(0.9, 0.15, 0.15) if lvl >= 2 else Color(1.0, 0.55, 0.1)
+		# _make_buff_badge formats text as "%s %d" % [label, turns]; override after creation.
+		var badge := _make_buff_badge(display, 0, col)
+		var lbl := badge.get_child(0) as Label
+		if lbl != null:
+			lbl.text = display
+		_wound_row.add_child(badge)
 
 
 func set_runes(player_items: Array) -> void:

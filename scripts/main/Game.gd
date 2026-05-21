@@ -1268,6 +1268,7 @@ func _update_hud() -> void:
 	top_hud.set_turn(TurnManager.turn_number)
 	top_hud.set_turn_budget(ExpeditionState.turns_remaining(), ExpeditionState.turn_budget)
 	top_hud.set_buffs(player.statuses)
+	top_hud.set_wounds(BodyPartSystem.active_wounds(player))
 	top_hud.set_runes(player.items)
 	if bottom_hud != null:
 		var hostile_visible: bool = _monster_in_sight()
