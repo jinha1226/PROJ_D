@@ -26,6 +26,9 @@ var ally_turns_left: int = 0  # 0 = indefinite; > 0 counts down each player turn
 var equipped_weapon_id: String = ""  # weapon the monster is carrying; dropped on death
 var _summoned_once: bool = false      # summoner AI: fires only once per encounter
 
+var body_wounds: Dictionary = {}
+var facing: Vector2i = Vector2i(1, 0)
+
 var _map: DungeonMap
 var _tex: Texture2D = null
 var _font: Font
@@ -92,6 +95,7 @@ func try_move(dir: Vector2i) -> bool:
 	if not _map.is_walkable(target):
 		return false
 	grid_pos = target
+	facing = dir
 	position = _map.grid_to_world(target)
 	return true
 
