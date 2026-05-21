@@ -17,6 +17,9 @@ const INFO: Dictionary = {
 		"ticks_hp": 2, "element": "fire"},
 	"diseased":     {"name": "Diseased",     "color": Color(0.6, 0.8, 0.3),
 		"ticks_hp": 1, "element": "poison", "non_lethal": true},
+	"bleeding":     {"name": "Bleeding",     "color": Color(0.9, 0.25, 0.25),
+		"ticks_hp": 1, "element": ""},
+	"crippled":     {"name": "Crippled",     "color": Color(0.8, 0.45, 0.1)},
 	# Action-denial
 	"frozen":       {"name": "Frozen",       "color": Color(0.55, 0.85, 1.0),
 		"skip_turn": true, "element": "cold"},
