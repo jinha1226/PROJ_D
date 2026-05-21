@@ -1937,7 +1937,7 @@ func _refresh_paperdoll() -> void:
 	queue_redraw()
 
 ## Returns spritesheet column index for an 8-dir horizontal sheet.
-## Actual sheet order (left→right): N, NW, W, SW, S, SE, E, NE
+## Actual sheet order (left→right): N, NE, W, SE, S, SW, E, NW
 func _facing_to_frame() -> int:
 	match facing:
 		Vector2i( 0, -1): return 0  # N
@@ -1957,7 +1957,7 @@ func _draw() -> void:
 			var tw := _base_tex.get_width()
 			var th := _base_tex.get_height()
 			if tw >= th * 4:
-				# 8-direction horizontal spritesheet: N NW W SW S SE E NE
+				# 8-direction horizontal spritesheet: N NE W SE S SW E NW
 				var fw := tw / 8
 				var src := Rect2(_facing_to_frame() * fw, 0, fw, th)
 				draw_texture_rect_region(_base_tex, rect, src)
