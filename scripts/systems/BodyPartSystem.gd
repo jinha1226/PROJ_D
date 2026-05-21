@@ -50,9 +50,9 @@ const DIRECTION_BIAS: Dictionary = {
 
 const PART_LABELS: Dictionary = {
 	"head": "머리", "torso": "몸통",
-	"left_arm": "좌팔", "right_arm": "우팔",
-	"left_leg": "좌다리", "right_leg": "우다리",
-	"body": "몸통", "left_wing": "좌날개", "right_wing": "우날개",
+	"left_arm": "왼팔", "right_arm": "오른팔",
+	"left_leg": "왼다리", "right_leg": "오른다리",
+	"body": "몸통", "left_wing": "왼날개", "right_wing": "오른날개",
 }
 
 ## Called from CombatSystem after final damage is resolved.
