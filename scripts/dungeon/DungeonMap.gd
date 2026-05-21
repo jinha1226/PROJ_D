@@ -27,8 +27,8 @@ var _tex_door_open: Texture2D = null
 ## Depth-banded terrain art. Each band declares its wall + floor tile
 ## paths; picked by pick_atmosphere_for_depth() on generate().
 # Fallback tiles when ZoneManager lookup fails (should not happen with well-formed zones)
-const _FALLBACK_WALL: String = "res://assets/tiles/individual/dngn/wall/catacombs0.png"
-const _FALLBACK_FLOOR: String = "res://assets/tiles/individual/dngn/floor/dirt0.png"
+const _FALLBACK_WALL: String = "res://assets/tiles/individual/dngn/wall/lpc_gray_stone.png"
+const _FALLBACK_FLOOR: String = "res://assets/tiles/individual/dngn/floor/lpc_stone_cobble.png"
 
 var _tex_wall: Texture2D = null
 var _tex_floor: Texture2D = null
