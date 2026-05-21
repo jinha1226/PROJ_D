@@ -192,11 +192,8 @@ func set_wounds(wounds: Array) -> void:
 		var label: String = BodyPartSystem.PART_LABELS.get(part_id, part_id)
 		var display: String = "[%s%s]" % [label, "!" if lvl >= 2 else ""]
 		var col: Color = Color(0.9, 0.15, 0.15) if lvl >= 2 else Color(1.0, 0.55, 0.1)
-		# _make_buff_badge formats text as "%s %d" % [label, turns]; override after creation.
 		var badge := _make_buff_badge(display, 0, col)
-		var lbl := badge.get_child(0) as Label
-		if lbl != null:
-			lbl.text = display
+		(badge.get_child(0) as Label).text = display
 		_wound_row.add_child(badge)
 
 
