@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_mdata")
 id = "giant_wolf_spider"
+body_type = "quadruped"
 display_name = "giant wolf spider"
 tier = 3
 hp = 16

@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_mdata")
 id = "giant_cockroach"
+body_type = "quadruped"
 display_name = "giant cockroach"
 hp = 13
 hd = 2

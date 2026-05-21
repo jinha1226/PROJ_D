@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_mdata")
 id = "vampire_bat"
+body_type = "flying"
 display_name = "vampire bat"
 tier = 2
 hp = 14

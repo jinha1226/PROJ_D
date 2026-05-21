@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_mdata")
 id = "viper_saint"
+body_type = "serpentine"
 display_name = "Viper Saint"
 tier = 3
 hp = 38

@@ -19,7 +19,16 @@ const INFO: Dictionary = {
 		"ticks_hp": 1, "element": "poison", "non_lethal": true},
 	"bleeding":     {"name": "Bleeding",     "color": Color(0.9, 0.25, 0.25),
 		"ticks_hp": 1, "element": ""},
-	"crippled":     {"name": "Crippled",     "color": Color(0.8, 0.45, 0.1)},
+	# Movement-impairing wound statuses. speed_mult is a multiplier on the
+	# action_cost passed to TurnManager.end_player_turn — values > 1.0 make
+	# the actor take longer per action. blind clamps FOV radius to 0 so the
+	# victim sees only their own tile.
+	"slow":         {"name": "Slow",         "color": Color(0.55, 0.65, 0.85),
+		"speed_mult": 1.5},
+	"blind":        {"name": "Blind",        "color": Color(0.4, 0.4, 0.5),
+		"fov_clamp": 0},
+	"crippled":     {"name": "Crippled",     "color": Color(0.8, 0.45, 0.1),
+		"speed_mult": 3.0},
 	# Action-denial
 	"frozen":       {"name": "Frozen",       "color": Color(0.55, 0.85, 1.0),
 		"skip_turn": true, "element": "cold"},
@@ -182,6 +191,33 @@ static func confusion_chance(actor) -> float:
 
 static func is_fleeing(actor) -> bool:
 	return has(actor, "feared")
+
+## Compute combined speed multiplier from all status effects. Returns
+## 1.0 if no slowing statuses are active. Stacking is multiplicative.
+static func speed_mult(actor) -> float:
+	var key: String = _dict_name(actor)
+	if key == "":
+		return 1.0
+	var d: Dictionary = actor.get(key)
+	var mult: float = 1.0
+	for id in d.keys():
+		var info: Dictionary = INFO.get(id, {})
+		if info.has("speed_mult"):
+			mult *= float(info["speed_mult"])
+	return mult
+
+## Returns -1 if no clamp is active. Otherwise returns the clamp radius
+## (e.g., 0 means "only see own tile").
+static func fov_clamp(actor) -> int:
+	var key: String = _dict_name(actor)
+	if key == "":
+		return -1
+	var d: Dictionary = actor.get(key)
+	for id in d.keys():
+		var info: Dictionary = INFO.get(id, {})
+		if info.has("fov_clamp"):
+			return int(info["fov_clamp"])
+	return -1
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 static func display_name(id: String) -> String:

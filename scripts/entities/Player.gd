@@ -208,6 +208,11 @@ const SKILL_REMAP: Dictionary = {
 var _map: DungeonMap
 var _regen_hp_ticker: int = 0
 var _regen_mp_ticker: int = 0
+# Natural light-wound healing. Only progresses when no hostile monster is
+# in FOV — being threatened resets the ticker. Severe (level-2) wounds
+# are NOT auto-cleared; they still require potion_healing / bandage.
+const WOUND_HEAL_INTERVAL_TURNS: int = 25
+var _regen_wound_ticker: int = 0
 
 func _ready() -> void:
 	TurnManager = get_node_or_null("/root/TurnManager")
@@ -261,7 +266,7 @@ func _try_move(dir: Vector2i) -> void:
 	if _map.tile_at(target) == DungeonMap.Tile.DOOR_CLOSED:
 		_map.set_tile(target, DungeonMap.Tile.DOOR_OPEN)
 		emit_signal("moved", grid_pos)  # refresh FOV from current pos
-		TurnManager.end_player_turn(_race_speed_mod())
+		TurnManager.end_player_turn(_race_speed_mod() * Status.speed_mult(self))
 		return
 	if not _map.is_walkable(target):
 		return
@@ -271,7 +276,7 @@ func _try_move(dir: Vector2i) -> void:
 	emit_signal("moved", grid_pos)
 	emit_signal("stats_changed")
 	_auto_pickup()
-	TurnManager.end_player_turn(_race_speed_mod())
+	TurnManager.end_player_turn(_race_speed_mod() * Status.speed_mult(self))
 
 func _monster_at(pos: Vector2i) -> Monster:
 	var tree := get_tree()
@@ -375,11 +380,23 @@ func try_attack_tile(target: Vector2i) -> bool:
 	var monster: Monster = _attack_target_for_tile(target)
 	if monster == null:
 		return false
+	# Face the target before resolving the attack. Without this, in-place
+	# strikes (e.g., the player just turned to attack a side adjacency)
+	# would leave `facing` stale from the last _try_move, breaking
+	# BodyPartSystem DIRECTION_BIAS for any retaliation directed at the
+	# player and giving misleading flank semantics for the outgoing hit.
+	var dir: Vector2i = target - grid_pos
+	if dir.x != 0:
+		dir.x = sign(dir.x)
+	if dir.y != 0:
+		dir.y = sign(dir.y)
+	if dir != Vector2i.ZERO:
+		facing = dir
 	play_bump_anim(target - grid_pos)
 	var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null and equipped_weapon_id != "" else null
 	weapon_attacked.emit(target, weapon_skill_for_item(w))
 	CombatSystem.player_attack_monster(self, monster)
-	TurnManager.end_player_turn(_weapon_action_cost())
+	TurnManager.end_player_turn(_weapon_action_cost() * Status.speed_mult(self))
 	return true
 
 func _weapon_action_cost() -> float:
@@ -965,7 +982,17 @@ func compute_fov() -> Dictionary:
 	if _map == null:
 		return {}
 	var is_opaque := func(p: Vector2i) -> bool: return _map.is_opaque(p)
-	return FieldOfView.compute(grid_pos, SIGHT_RADIUS + fov_radius_bonus, is_opaque)
+	var radius: int = SIGHT_RADIUS + fov_radius_bonus
+	# Blind clamps FOV to a fixed radius (currently 0 → see only own tile).
+	# We special-case clamp_r == 0 here because FieldOfView.compute() always
+	# fills the 3×3 around the origin before shadowcasting, which would
+	# leak vision for a "see-nothing" blind status.
+	var clamp_r: int = Status.fov_clamp(self)
+	if clamp_r >= 0:
+		radius = min(radius, clamp_r)
+		if radius <= 0:
+			return {grid_pos: true}
+	return FieldOfView.compute(grid_pos, radius, is_opaque)
 
 func take_damage(amount: int, source: String = "") -> void:
 	if has_status("invulnerable"):
@@ -1465,9 +1492,53 @@ func tick_statuses() -> void:
 			mp = min(mp_max, mp + 1)
 	else:
 		_regen_mp_ticker = 0
+	# Natural wound healing: only progresses when no hostile monster is in
+	# the player's current FOV. Being threatened resets the ticker. On
+	# threshold, one random level-1 wound is cleared. Level-2 wounds are
+	# untouched here — consumables (potion_healing / bandage) remain the
+	# only path to downgrade severe wounds.
+	if not body_wounds.is_empty():
+		if _no_hostile_in_sight():
+			_regen_wound_ticker += 1
+			if _regen_wound_ticker >= WOUND_HEAL_INTERVAL_TURNS:
+				_regen_wound_ticker = 0
+				_heal_one_light_wound()
+		else:
+			_regen_wound_ticker = 0
+	else:
+		_regen_wound_ticker = 0
 	if not statuses.is_empty() or not expired.is_empty():
 		emit_signal("stats_changed")
 	EssenceSystem.tick(self)
+
+func _heal_one_light_wound() -> void:
+	var light_parts: Array = []
+	for part in body_wounds.keys():
+		if int(body_wounds[part]) == 1:
+			light_parts.append(part)
+	if light_parts.is_empty():
+		return
+	var pick: String = String(light_parts[randi() % light_parts.size()])
+	body_wounds.erase(pick)
+	var label: String = BodyPartSystem.PART_LABELS.get(pick, pick)
+	if CombatLog != null:
+		CombatLog.post("%s 부위 통증이 가라앉습니다." % label, Color(0.6, 0.9, 0.7))
+	emit_signal("stats_changed")
+
+func _no_hostile_in_sight() -> bool:
+	var tree := get_tree()
+	if tree == null:
+		return true
+	if _map == null:
+		return true
+	for n in tree.get_nodes_in_group("monsters"):
+		if not (n is Monster) or n.hp <= 0:
+			continue
+		if n.is_ally:
+			continue
+		if _map.visible_tiles.has(n.grid_pos):
+			return false
+	return true
 
 func hp_regen_period() -> int:
 	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id) if ItemRegistry != null and equipped_armor_id != "" else null

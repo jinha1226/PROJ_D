@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_mdata")
 id = "adder"
+body_type = "serpentine"
 display_name = "adder"
 tier = 2
 hp = 11

@@ -290,7 +290,7 @@ func _handle_tap(screen_pos: Vector2) -> void:
 			_on_branch_enter()
 		else:
 			player.wait_turn()
-			TurnManager.end_player_turn()
+			TurnManager.end_player_turn(Status.speed_mult(player))
 		return
 	# Distant explored tile → auto-walk. Existing visible enemies don't
 	# block the start (DCSS-style travel); a _new_ monster entering FOV
@@ -1558,7 +1558,7 @@ func _on_branch_enter() -> void:
 	_reset_expedition_budget()
 	_center_camera_on_player(true)
 	_update_hud()
-	TurnManager.end_player_turn()
+	TurnManager.end_player_turn(Status.speed_mult(player))
 
 func _on_branch_stairs_down() -> void:
 	var branch_id: String = GameManager.branch_zone
@@ -1566,7 +1566,7 @@ func _on_branch_stairs_down() -> void:
 		return
 	var _floors: int = int(ZoneManager.branch_config(branch_id).get("floors", 4))
 	if GameManager.branch_floor >= _floors:
-		TurnManager.end_player_turn()
+		TurnManager.end_player_turn(Status.speed_mult(player))
 		return
 	_cancel_auto_walk("stairs")
 	_cache_branch_floor(branch_id, GameManager.branch_floor)
@@ -1578,7 +1578,7 @@ func _on_branch_stairs_down() -> void:
 	_center_camera_on_player(true)
 	_update_hud()
 	save_with_cache()
-	TurnManager.end_player_turn()
+	TurnManager.end_player_turn(Status.speed_mult(player))
 
 func _on_branch_stairs_up() -> void:
 	var branch_id: String = GameManager.branch_zone
@@ -1608,7 +1608,7 @@ func _on_branch_stairs_up() -> void:
 	_center_camera_on_player(true)
 	_update_hud()
 	save_with_cache()
-	TurnManager.end_player_turn()
+	TurnManager.end_player_turn(Status.speed_mult(player))
 
 func _on_branch_cleared(branch_id: String) -> void:
 	if GameManager.branches_cleared.has(branch_id):
@@ -2063,7 +2063,7 @@ func _on_stairs_down() -> void:
 	_center_camera_on_player(true)
 	_update_hud()
 	save_with_cache()
-	TurnManager.end_player_turn()
+	TurnManager.end_player_turn(Status.speed_mult(player))
 
 func _on_stairs_up() -> void:
 	if GameManager.branch_zone != "":
@@ -2071,7 +2071,7 @@ func _on_stairs_up() -> void:
 		return
 	if GameManager.depth <= 1:
 		CombatLog.post(LocaleManager.t("LOG_THE_WAY_UP_IS_BLOCKED"), Color(0.7, 0.7, 0.7))
-		TurnManager.end_player_turn()
+		TurnManager.end_player_turn(Status.speed_mult(player))
 		return
 	_cancel_auto_walk("stairs")
 	_floor_lifecycle._cache_current_floor()
@@ -2086,7 +2086,7 @@ func _on_stairs_up() -> void:
 	_center_camera_on_player(true)
 	_update_hud()
 	save_with_cache()
-	TurnManager.end_player_turn()
+	TurnManager.end_player_turn(Status.speed_mult(player))
 
 func _travel_to_floor(target_depth: int) -> void:
 	if target_depth == GameManager.depth:
@@ -2106,7 +2106,7 @@ func _travel_to_floor(target_depth: int) -> void:
 	_center_camera_on_player(true)
 	_update_hud()
 	save_with_cache()
-	TurnManager.end_player_turn()
+	TurnManager.end_player_turn(Status.speed_mult(player))
 
 func _on_item_dropped(entry: Dictionary, at_pos: Vector2i) -> void:
 	var item_id: String = String(entry.get("id", ""))
@@ -2180,7 +2180,7 @@ func _on_rest_pressed() -> void:
 	if _monster_in_sight():
 		# WAIT: single turn pass when enemies are visible
 		player.wait_turn()
-		TurnManager.end_player_turn()
+		TurnManager.end_player_turn(Status.speed_mult(player))
 		return
 	if player.hp >= player.hp_max and player.mp >= player.mp_max:
 		CombatLog.post(LocaleManager.t("LOG_YOU_ARE_ALREADY_FULLY_RESTED"), Color(0.7, 0.9, 0.6))
@@ -2188,7 +2188,7 @@ func _on_rest_pressed() -> void:
 	var ticks: int = 0
 	while ticks < 100 and (player.hp < player.hp_max or player.mp < player.mp_max) and player.hp > 0:
 		player.wait_turn()
-		TurnManager.end_player_turn(1, true)
+		TurnManager.end_player_turn(Status.speed_mult(player), true)
 		ticks += 1
 		if _monster_in_sight():
 			CombatLog.post(LocaleManager.t("LOG_YOU_STOP_RESTING_ENEMY_SPOTTED"), Color(1.0, 0.7, 0.5))
@@ -2221,7 +2221,7 @@ func _on_quickslot_pressed(index: int) -> void:
 		else:
 			var ok: bool = MagicSystem.cast(slot_id, player, self)
 			if ok:
-				TurnManager.end_player_turn()
+				TurnManager.end_player_turn(Status.speed_mult(player))
 		return
 	const _WAND_ELEMENTS := {"wand_fire": "fire", "wand_frost": "cold", "wand_lightning": "lightning"}
 	if _WAND_ELEMENTS.has(slot_id):
@@ -2240,7 +2240,7 @@ func _on_quickslot_pressed(index: int) -> void:
 	var used: bool = player.use_quickslot(index)
 	_refresh_quickslots()
 	if used:
-		TurnManager.end_player_turn()
+		TurnManager.end_player_turn(Status.speed_mult(player))
 
 func _use_targeting_wand(item_id: String, element: String, slot_index: int) -> void:
 	var visible: Dictionary = player.compute_fov()
@@ -2270,7 +2270,7 @@ func _use_targeting_wand(item_id: String, element: String, slot_index: int) -> v
 	CombatLog.post(LocaleManager.t("LOG_THE_WAND_FIRES_AT_THE") % best.data.display_name, Color(1.0, 0.85, 0.4))
 	player.use_quickslot(slot_index)
 	_refresh_quickslots()
-	TurnManager.end_player_turn()
+	TurnManager.end_player_turn(Status.speed_mult(player))
 
 func _on_quickslot_long_pressed(index: int) -> void:
 	if player == null:
@@ -2307,7 +2307,7 @@ func _on_item_slot_pressed(index: int) -> void:
 		if String(player.items[i].get("id", "")) == target_id:
 			player.use_item(i)
 			_refresh_quickslots()
-			TurnManager.end_player_turn()
+			TurnManager.end_player_turn(Status.speed_mult(player))
 			return
 
 func _top_item_bar_ids() -> Array[String]:
@@ -2473,7 +2473,7 @@ func _on_pickup_pressed() -> void:
 		CombatLog.post(LocaleManager.t("LOG_NOTHING_HERE_TO_PICK_UP"), Color(0.6, 0.6, 0.6))
 		return
 	player.pickup(item)
-	TurnManager.end_player_turn()
+	TurnManager.end_player_turn(Status.speed_mult(player))
 
 func _pickup_essence_floor_item(floor_item: FloorItem) -> void:
 	if floor_item == null or floor_item.data == null:

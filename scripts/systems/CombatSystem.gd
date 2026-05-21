@@ -11,6 +11,22 @@ const BACKSTAB_DAGGER_BONUS: float = 0.25
 const BACKSTAB_MAX_BONUS: float = 1.0
 const XP_PACE_MULTIPLIER: float = 2.2
 
+## Updates `actor.facing` to point at `target_pos`. No-op if the actor has
+## no facing field, no grid_pos, or already overlaps the target. Used by
+## the attack entry points so BodyPartSystem.DIRECTION_BIAS sees a
+## meaningful flank classification even for in-place / ranged strikes.
+static func _face_toward(actor, target_pos: Vector2i) -> void:
+	if actor == null or not ("facing" in actor) or not ("grid_pos" in actor):
+		return
+	var dir: Vector2i = target_pos - actor.grid_pos
+	if dir == Vector2i.ZERO:
+		return
+	if dir.x != 0:
+		dir.x = sign(dir.x)
+	if dir.y != 0:
+		dir.y = sign(dir.y)
+	actor.facing = dir
+
 static func _player_attack_profile(player: Player) -> Dictionary:
 	var profile: Dictionary = {
 		"weapon_dmg": UNARMED_DAMAGE,
@@ -103,6 +119,12 @@ static func _player_attack_base_damage(player: Player, monster: Monster, profile
 static func player_attack_monster(player: Player, monster: Monster) -> void:
 	if monster.data == null:
 		return
+	# Face attacker/defender toward each other before damage resolves so
+	# BodyPartSystem DIRECTION_BIAS uses the correct flank classification
+	# for in-place / reach / ranged strikes (player.try_attack_tile sets
+	# player.facing too, but ranged/cleave callers may bypass it).
+	_face_toward(player, monster.grid_pos)
+	_face_toward(monster, player.grid_pos)
 	var profile: Dictionary = _player_attack_profile(player)
 	var weapon: ItemData = profile.weapon
 	var weapon_plus: int = int(profile.weapon_plus)
@@ -376,6 +398,10 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 		ra: Dictionary) -> void:
 	if player.hp <= 0:
 		return
+	# Ranged hits also drive BodyPartSystem; face both ends toward each
+	# other so DIRECTION_BIAS reads the projectile's true approach side.
+	_face_toward(monster, player.grid_pos)
+	_face_toward(player, monster.grid_pos)
 	var dmg_base: int = int(ra.get("damage", 2))
 	var verb: String = String(ra.get("verb", "shoots"))
 	var to_hit_base: int = 15 + monster.data.hd
@@ -409,6 +435,12 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 static func monster_attack_player(monster: Monster, player: Player) -> void:
 	if monster.data == null or player.hp <= 0:
 		return
+	# Update facing on both sides before damage resolves (see notes on
+	# player_attack_monster). Without this, the player's `facing` reflects
+	# their last movement direction, so a monster striking from behind a
+	# turned player still gets classified as "front".
+	_face_toward(monster, player.grid_pos)
+	_face_toward(player, monster.grid_pos)
 	var attack: Dictionary = {}
 	if not monster.data.attacks.is_empty():
 		attack = monster.data.attacks[0]

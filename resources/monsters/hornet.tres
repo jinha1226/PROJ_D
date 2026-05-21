@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_mdata")
 id = "hornet"
+body_type = "flying"
 display_name = "hornet"
 tier = 1
 hp = 33

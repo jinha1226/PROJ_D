@@ -258,7 +258,7 @@ static func _on_cast(spell_id: String, player: Player,
 		var ok: bool = MagicSystem.cast(spell_id, player, game)
 		dlg.close()
 		if ok:
-			TurnManager.end_player_turn()
+			TurnManager.end_player_turn(Status.speed_mult(player))
 		return
 	dlg.close()
 	if game != null and game.has_method("begin_spell_targeting"):
