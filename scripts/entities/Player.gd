@@ -490,11 +490,13 @@ func use_item(index: int) -> void:
 			var heal_amt: int = maxi(1, int(round(float(data.effect_value) * EssenceSystem.potion_heal_mult(self) * FaithSystem.potion_heal_mult(self))))
 			heal_amt += EssenceSystem.potion_heal_bonus(self)
 			heal(heal_amt)
+			BodyPartSystem.reduce_wounds(self, 1)
 			CombatLog.post(LocaleManager.t("LOG_YOU_FEEL_BETTER_HP") % heal_amt,
 				Color(0.6, 1.0, 0.6))
 		"bandage":
 			var heal_amt: int = 6
 			heal(heal_amt)
+			BodyPartSystem.reduce_wounds(self, 1)
 			CombatLog.post(LocaleManager.t("LOG_YOU_BANDAGE_YOUR_WOUNDS_HP") % heal_amt, Color(0.85, 0.9, 0.65))
 		"blink":
 			_blink(data.effect_value)
