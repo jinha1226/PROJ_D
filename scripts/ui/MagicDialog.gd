@@ -219,9 +219,7 @@ static func _armor_spell_mult(player: Player) -> float:
 
 
 static func _compute_power(player: Player, spell: SpellData) -> int:
-	var spellcasting: int = player.get_skill_level("spellcasting")
-	var school_skill: int = player.get_skill_level(player.spell_skill_for(spell))
-	var total_skill: float = float(spellcasting) * 0.5 + float(school_skill)
+	var total_skill: float = float(player.get_skill_level("magery"))
 	return int(float(player.intelligence) * (1.0 + total_skill * 0.06) * _armor_spell_mult(player))
 
 

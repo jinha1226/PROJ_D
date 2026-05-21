@@ -80,7 +80,7 @@ static func _try_cast_spell(game, visible: Array) -> bool:
 		var spell: SpellData = SpellRegistry.get_by_id(String(sid))
 		if spell == null:
 			continue
-		if player.get_skill_level("spellcasting") < spell.spell_level:
+		if player.get_skill_level("magery") < spell.spell_level:
 			continue
 		if player.intelligence < player.int_required_for_spell(spell):
 			continue

@@ -35,31 +35,38 @@ const _DESCRIPTIONS: Dictionary = {
 	"evocations": "Improves wands, scrolls, and magical tools.",
 }
 
-## Per-mastery-category effect description. Numbers come from Player.gd helpers
-## so this mirrors the actual formula — keep in sync if Player tuning changes.
-const _MASTERY_LABELS: Dictionary = {
-	"Melee":   "+%.1f%% melee damage",
-	"Ranged":  "+%.1f%% ranged damage",
-	"Magic":   "+%.1f%% spell power",
-	"Defense": "-%.1f%% damage taken",
-	"Agility": "+%d EV",
-	"Utility": "+%.1f%% scroll/wand/tool effect",
+const _VISIBLE_ORDER: Array = [
+	"weapon_mastery", "archery", "tactics", "defense",
+	"magery", "stealth", "lockpicking", "tracking", "survival",
+]
+
+const _VISIBLE_LABELS: Dictionary = {
+	"weapon_mastery": "Weapon Mastery",
+	"archery": "Archery",
+	"tactics": "Tactics",
+	"defense": "Defense",
+	"magery": "Magery",
+	"stealth": "Stealth",
+	"lockpicking": "Lockpicking",
+	"tracking": "Tracking",
+	"survival": "Survival",
 }
 
-const _MASTERY_CATEGORIES: Array = ["Melee", "Ranged", "Magic", "Defense", "Agility", "Utility"]
-
-## Category → ordered sub-skill list embedded under each mastery card.
-const _CATEGORY_SKILLS: Dictionary = {
-	"Melee":   ["fighting", "unarmed", "short_blades", "long_blades",
-				"maces", "axes", "staves", "polearms"],
-	"Ranged":  ["bows", "crossbows", "slings", "throwing"],
-	"Magic":   ["spellcasting",
-				"conjurations", "hexes", "charms", "summonings",
-				"necromancy", "translocations", "transmutation",
-				"fire", "ice", "air", "earth", "poison"],
-	"Defense": ["armor", "shields"],
-	"Agility": ["dodging", "stealth"],
-	"Utility": ["invocations", "evocations"],
+## Visible skill -> hidden familiarity rows. These rows read player.hidden_skills
+## directly so the current dual-write behavior can be inspected in game.
+const _HIDDEN_BY_VISIBLE: Dictionary = {
+	"weapon_mastery": ["fighting", "unarmed", "short_blades", "long_blades",
+		"maces", "axes", "staves", "polearms"],
+	"archery": ["bows", "crossbows", "slings", "throwing"],
+	"defense": ["armor", "shields"],
+	"magery": ["spellcasting", "conjurations", "hexes", "charms", "summonings",
+		"necromancy", "translocations", "transmutation",
+		"fire", "ice", "air", "earth", "poison", "invocations", "evocations"],
+	"stealth": ["dodging"],
+	"tactics": [],
+	"lockpicking": [],
+	"tracking": [],
+	"survival": [],
 }
 
 static func open(player: Player, parent: Node) -> void:
@@ -84,7 +91,7 @@ static func open(player: Player, parent: Node) -> void:
 	mode_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	body.add_child(mode_lbl)
 
-	# ── content (mastery cards) ──────────────────────────────────────────────
+	# ── content (visible skill cards) ────────────────────────────────────────
 	var content := VBoxContainer.new()
 	content.add_theme_constant_override("separation", GameTheme.PAD_M)
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -100,17 +107,17 @@ static func open(player: Player, parent: Node) -> void:
 		var n: int = player.active_skills.size()
 		if manual_mode[0]:
 			if n == 0:
-				mode_lbl.text = "Manual mode — tap a sub-skill to mark it active."
+				mode_lbl.text = "Manual mode: tap a visible skill to mark it active."
 			else:
-				mode_lbl.text = "Manual mode — kill XP splits across %d active sub-skill%s." \
+				mode_lbl.text = "Manual mode: kill XP splits across %d active visible skill%s." \
 					% [n, "" if n == 1 else "s"]
 			mode_lbl.add_theme_color_override("font_color", Color(0.95, 0.85, 0.35))
 		else:
 			if n == 0:
-				mode_lbl.text = "Auto (action-routed) — each action trains its own skill."
+				mode_lbl.text = "Auto: actions train visible skills and matching hidden familiarity."
 				mode_lbl.add_theme_color_override("font_color", Color(0.6, 0.85, 0.95))
 			else:
-				mode_lbl.text = "Manual: %d active sub-skill%s. Toggle Manual to edit." \
+				mode_lbl.text = "Manual: %d active visible skill%s. Toggle Manual to edit." \
 					% [n, "" if n == 1 else "s"]
 				mode_lbl.add_theme_color_override("font_color", Color(0.95, 0.85, 0.35))
 
@@ -119,9 +126,9 @@ static func open(player: Player, parent: Node) -> void:
 			child.queue_free()
 		var on_change := func() -> void:
 			refresh_banner.call()
-		for cat in _MASTERY_CATEGORIES:
-			content.add_child(_make_mastery_card(cat, player, parent, manual_mode[0], on_change))
-		toggle_btn.text = "◂ Mastery View" if manual_mode[0] else "✱ Manual ▸"
+		for skill_id in _VISIBLE_ORDER:
+			content.add_child(_make_visible_skill_card(skill_id, player, parent, manual_mode[0], on_change))
+		toggle_btn.text = "Done" if manual_mode[0] else "Manual"
 		refresh_banner.call()
 
 	toggle_btn.pressed.connect(func():
@@ -130,92 +137,89 @@ static func open(player: Player, parent: Node) -> void:
 	rebuild.call()
 
 
-## Mastery card.
-## - Auto mode: header + effect + progress bar only (clean, card-style summary).
-## - Manual mode: same + embedded sub-skill rows with checkboxes for toggling
-##   active state. Single tap on a row toggles. Long-press shows description.
-static func _make_mastery_card(category: String, player: Player, parent: Node,
+static func _make_visible_skill_card(skill_id: String, player: Player, parent: Node,
 		manual_mode: bool, on_change: Callable) -> Control:
 	var card := PanelContainer.new()
 	var inner := VBoxContainer.new()
 	inner.add_theme_constant_override("separation", GameTheme.PAD_S)
 	card.add_child(inner)
 
-	# Header row: category name + mastery level
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", GameTheme.PAD_M)
 	inner.add_child(header)
 
+	var active_lbl := Label.new()
+	active_lbl.custom_minimum_size = Vector2(28, 0)
+	active_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
+	active_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	header.add_child(active_lbl)
+
 	var name_lbl := Label.new()
-	var cat_key: String = "MASTERY_NAME_" + category.to_upper()
-	var cat_t: String = LocaleManager.t(cat_key)
-	name_lbl.text = cat_t if cat_t != cat_key else category.to_upper()
+	name_lbl.text = _visible_name(skill_id)
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_SUBTITLE)
 	name_lbl.add_theme_color_override("font_color", Color(0.94, 0.84, 0.42))
 	header.add_child(name_lbl)
 
-	var lv: int = player.get_category_mastery_level(category)
+	var lv: int = player.get_skill_level(skill_id)
 	var lv_lbl := Label.new()
-	lv_lbl.text = "MAX" if lv >= Player.MAX_MASTERY_LEVEL else "Mastery %d / %d" % [lv, Player.MAX_MASTERY_LEVEL]
+	lv_lbl.text = "MAX" if lv >= Player.MAX_SKILL_LEVEL else "Lv.%d / %d" % [lv, Player.MAX_SKILL_LEVEL]
 	lv_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
 	lv_lbl.add_theme_color_override("font_color",
-		Color(1.0, 0.85, 0.2) if lv >= Player.MAX_MASTERY_LEVEL else Color(0.85, 0.85, 0.85))
+		Color(1.0, 0.85, 0.2) if lv >= Player.MAX_SKILL_LEVEL else Color(0.85, 0.85, 0.85))
 	header.add_child(lv_lbl)
 
-	var effect_lbl := Label.new()
-	effect_lbl.text = _format_mastery_effect(category, lv)
-	effect_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
-	effect_lbl.add_theme_color_override("font_color",
-		Color(0.6, 0.75, 0.6) if lv > 0 else Color(0.5, 0.5, 0.55))
-	inner.add_child(effect_lbl)
-
-	# Mastery progress bar
-	var total_xp: float = player.get_category_total_xp(category)
-	var consumed: float = 0.0
-	for i in range(lv):
-		consumed += float(Player.MASTERY_XP_DELTA[i])
-	var into_level: float = total_xp - consumed
-	var next_need: float = float(Player.MASTERY_XP_DELTA[lv]) if lv < Player.MAX_MASTERY_LEVEL else 0.0
+	var xp: float = player.get_skill_xp(skill_id)
+	var next_need: float = float(Player.SKILL_XP_DELTA[lv]) if lv < Player.SKILL_XP_DELTA.size() else 0.0
 	if next_need > 0.0:
 		var bar_row := HBoxContainer.new()
 		bar_row.add_theme_constant_override("separation", GameTheme.PAD_S)
 		inner.add_child(bar_row)
 		var bar := ProgressBar.new()
 		bar.max_value = next_need
-		bar.value = clamp(into_level, 0.0, next_need)
+		bar.value = clamp(xp, 0.0, next_need)
 		bar.show_percentage = false
 		bar.custom_minimum_size = Vector2(0, 10)
 		bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		bar_row.add_child(bar)
 		var bar_lbl := Label.new()
-		bar_lbl.text = "%d/%d" % [int(into_level), int(next_need)]
+		bar_lbl.text = "%d/%d" % [int(xp), int(next_need)]
 		bar_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 		bar_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
 		bar_row.add_child(bar_lbl)
 
-	# Sub-skill rows: only shown in manual mode. Auto stays card-clean.
+	var refresh_header := func() -> void:
+		var is_active: bool = player.is_skill_active(skill_id)
+		active_lbl.text = "X" if is_active else "-"
+		active_lbl.add_theme_color_override("font_color",
+			Color(0.95, 0.85, 0.35) if is_active else Color(0.5, 0.5, 0.55))
+		name_lbl.add_theme_color_override("font_color",
+			Color(0.95, 0.9, 0.7) if is_active else Color(0.94, 0.84, 0.42))
+	refresh_header.call()
+
 	if manual_mode:
+		card.gui_input.connect(func(event: InputEvent) -> void:
+			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+				if player.toggle_skill_active(skill_id):
+					refresh_header.call()
+					if on_change.is_valid():
+						on_change.call())
+
+	var hidden_ids: Array = _HIDDEN_BY_VISIBLE.get(skill_id, [])
+	if not hidden_ids.is_empty():
 		var sep := HSeparator.new()
 		inner.add_child(sep)
 		var sub_list := VBoxContainer.new()
 		sub_list.add_theme_constant_override("separation", 2)
 		inner.add_child(sub_list)
-		var skill_ids: Array = _CATEGORY_SKILLS.get(category, [])
-		for skill_id in skill_ids:
-			sub_list.add_child(_make_subskill_row(skill_id, player, parent, on_change))
+		for hidden_id in hidden_ids:
+			sub_list.add_child(_make_hidden_row(String(hidden_id), player, parent))
 
 	return card
 
 
-## Single sub-skill row inside a mastery card (manual mode only).
-## Use a Button container so a single tap reliably fires `pressed` — earlier
-## Control + gui_input approach failed because Labels default to mouse_filter
-## STOP and absorbed events before the parent saw them. Long-press for
-## description uses gui_input on the same button.
-static func _make_subskill_row(skill_id: String, player: Player, parent: Node,
-		on_change: Callable) -> Control:
-	var s: Dictionary = player.skills.get(skill_id, {"level": 0, "xp": 0.0})
+static func _make_hidden_row(skill_id: String, player: Player, parent: Node) -> Control:
+	var s: Dictionary = player.hidden_skills.get(skill_id, {"level": 0, "xp": 0.0})
 	var level: int = int(s.get("level", 0))
 	var xp: float = float(s.get("xp", 0.0))
 	var needed: int = 0
@@ -236,13 +240,6 @@ static func _make_subskill_row(skill_id: String, player: Player, parent: Node,
 	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE  # let button receive clicks
 	btn.add_child(row)
-
-	var check_lbl := Label.new()
-	check_lbl.custom_minimum_size = Vector2(28, 0)
-	check_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
-	check_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	check_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(check_lbl)
 
 	var name_lbl := Label.new()
 	var sk_key: String = "SKILL_NAME_" + skill_id.to_upper()
@@ -287,27 +284,8 @@ static func _make_subskill_row(skill_id: String, player: Player, parent: Node,
 	pct_lbl.custom_minimum_size = Vector2(40, 0)
 	pct_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	pct_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pct_lbl.text = "%d/%d" % [int(xp), needed] if needed > 0 else ""
 	row.add_child(pct_lbl)
-
-	# Optional thin xp bar overlaid below the row inside a wrapping VBox would
-	# require switching the outer Button to a different layout. We keep the
-	# row clean — sub-skill xp progress is a power-user detail visible via
-	# long-press description. Lv label already shows current progression.
-
-	var refresh_visual := func() -> void:
-		var is_active: bool = player.is_skill_active(skill_id)
-		check_lbl.text = "☑" if is_active else "☐"
-		check_lbl.add_theme_color_override("font_color",
-			Color(0.95, 0.85, 0.35) if is_active else Color(0.5, 0.5, 0.55))
-		name_lbl.add_theme_color_override("font_color",
-			Color(0.95, 0.9, 0.7) if is_active else Color(0.7, 0.7, 0.75))
-		var n: int = player.active_skills.size()
-		if is_active and n > 0:
-			pct_lbl.text = "%d%%" % int(round(100.0 / float(n)))
-			pct_lbl.add_theme_color_override("font_color", Color(0.7, 0.95, 0.7))
-		else:
-			pct_lbl.text = ""
-	refresh_visual.call()
 
 	# Long-press → description popup. Set _long_pressed before any handler may
 	# read it so the closure captures the same array reference.
@@ -330,26 +308,17 @@ static func _make_subskill_row(skill_id: String, player: Player, parent: Node,
 	btn.pressed.connect(func() -> void:
 		if _long_pressed[0]:
 			return
-		if player.toggle_skill_active(skill_id):
-			refresh_visual.call()
-			if on_change.is_valid():
-				on_change.call())
+		_show_desc(skill_id, desc, parent))
 
 	return btn
 
 
-static func _format_mastery_effect(category: String, lv: int) -> String:
-	if lv <= 0:
-		return LocaleManager.t("SKILLS_NO_MASTERY")
-	var key: String = "MASTERY_FMT_" + category.to_upper()
-	var t: String = LocaleManager.t(key)
-	var fmt: String = t if t != key else String(_MASTERY_LABELS.get(category, ""))
-	match category:
-		"Melee", "Ranged", "Magic", "Defense", "Utility":
-			return fmt % (0.5 * float(lv))
-		"Agility":
-			return fmt % (lv / 3)
-	return ""
+static func _visible_name(skill_id: String) -> String:
+	var key: String = "SKILL_NAME_" + skill_id.to_upper()
+	var translated: String = LocaleManager.t(key)
+	if translated != key:
+		return translated
+	return String(_VISIBLE_LABELS.get(skill_id, skill_id.capitalize().replace("_", " ")))
 
 static func _apt_for(id: String, _player: Player) -> int:
 	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id) \

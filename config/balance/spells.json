@@ -1,7 +1,7 @@
 {
-  "version": "balance_v3_split_schools",
+  "version": "balance_v4_proj_g_9skill_dual_tier",
   "magic_skill_model": {
-    "core_skill": "spellcasting",
+    "core_skill": "magery",
     "schools": [
       "elemental",
       "arcane",
@@ -9,7 +9,7 @@
       "necromancy",
       "summoning"
     ],
-    "school_identity_source": "normalized_spell_school_tags",
+    "school_identity_source": "normalized_spell_school_tags_hidden_familiarity",
     "spell_learning": "mage_starts_with_one_school_then_books_and_levelups_expand",
     "int_requirement_formula": "7 + spell_level * 2"
   },

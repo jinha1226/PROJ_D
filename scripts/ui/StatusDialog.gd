@@ -19,6 +19,38 @@ const _RESIST_LABELS: Dictionary = {
 	"necro": "Necro",
 }
 
+const _VISIBLE_SKILLS: Array = [
+	"weapon_mastery", "archery", "tactics", "defense",
+	"magery", "stealth", "lockpicking", "tracking", "survival",
+]
+
+const _VISIBLE_SKILL_LABELS: Dictionary = {
+	"weapon_mastery": "Weapon Mastery",
+	"archery": "Archery",
+	"tactics": "Tactics",
+	"defense": "Defense",
+	"magery": "Magery",
+	"stealth": "Stealth",
+	"lockpicking": "Lockpicking",
+	"tracking": "Tracking",
+	"survival": "Survival",
+}
+
+const _HIDDEN_BY_VISIBLE: Dictionary = {
+	"weapon_mastery": ["fighting", "unarmed", "short_blades", "long_blades",
+		"maces", "axes", "staves", "polearms"],
+	"archery": ["bows", "crossbows", "slings", "throwing"],
+	"defense": ["armor", "shields"],
+	"magery": ["spellcasting", "conjurations", "hexes", "charms", "summonings",
+		"necromancy", "translocations", "transmutation",
+		"fire", "ice", "air", "earth", "poison", "invocations", "evocations"],
+	"stealth": ["dodging"],
+	"tactics": [],
+	"lockpicking": [],
+	"tracking": [],
+	"survival": [],
+}
+
 
 static func open(player: Player, parent: Node) -> void:
 	if player == null or parent == null:
@@ -40,7 +72,7 @@ static func _rebuild_body(dlg: GameDialog, player: Player, parent: Node) -> void
 	body.add_child(_faith_card(player))
 	body.add_child(_stats_card(player))
 	body.add_child(_combat_card(player))
-	body.add_child(_mastery_card(player))
+	body.add_child(_skills_card(player))
 	body.add_child(_equipment_card(player))
 	body.add_child(_resists_card(player))
 	body.add_child(_essence_card(dlg, player, parent))
@@ -101,7 +133,7 @@ static func _vitals_card(player: Player) -> Control:
 	vb.add_child(_resource_bar("MP", player.mp, player.mp_max, Color(0.35, 0.55, 1.0)))
 
 	var hint := Label.new()
-	hint.text = "Max HP rises from level growth, race, endurance, and gear. Max MP rises from magic growth and intellect."
+	hint.text = "Max HP rises from level growth, race, Weapon Mastery, and gear. Max MP rises from magic growth and intellect."
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	hint.add_theme_color_override("font_color", Color(0.75, 0.78, 0.82))
@@ -179,43 +211,29 @@ static func _combat_card(player: Player) -> Control:
 	row.add_child(_kv_row("EV", str(player.ev)))
 	row.add_child(_kv_row("Will", str(player.wl)))
 	row.add_child(_kv_row("Sight", str(Player.SIGHT_RADIUS + player.fov_radius_bonus)))
-	row.add_child(_kv_row("Endurance", str(player.get_skill_level("endurance"))))
-	row.add_child(_kv_row("Spellcasting", str(player.get_skill_level("spellcasting"))))
+	row.add_child(_kv_row("Weapon", str(player.get_skill_level("weapon_mastery"))))
+	row.add_child(_kv_row("Magery", str(player.get_skill_level("magery"))))
 
 	var notes := Label.new()
-	notes.text = "Armor reduces gear penalties, Shield improves blocking, Agility improves evasion, and Endurance grows your maximum HP."
+	notes.text = "Defense covers armor and shield handling. Stealth covers evasion-side growth. Hidden familiarity rows below show exact action training."
 	notes.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	notes.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 	notes.add_theme_color_override("font_color", Color(0.78, 0.76, 0.7))
 	vb.add_child(notes)
 	return card
 
-## Compact mastery overview — 6 categories with level, effect summary, and
-## progress bar. Mirror of SkillsDialog's mastery cards but condensed (no
-## sub-skill rows). Lets the player track build progression without leaving
-## the Status screen.
-const _MASTERY_CATEGORIES_COMPACT: Array = ["Melee", "Ranged", "Magic", "Defense", "Agility", "Utility"]
-
-static func _mastery_card(player: Player) -> Control:
+static func _skills_card(player: Player) -> Control:
 	var card := UICards.card(Color(0.94, 0.84, 0.42))
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", GameTheme.PAD_M)
 	card.add_child(vb)
-	vb.add_child(UICards.section_header("Mastery", GameTheme.TYPO_SUBTITLE))
+	vb.add_child(UICards.section_header("Skills", GameTheme.TYPO_SUBTITLE))
 
-	for cat in _MASTERY_CATEGORIES_COMPACT:
-		vb.add_child(_mastery_row(cat, player))
+	for skill_id in _VISIBLE_SKILLS:
+		vb.add_child(_skill_status_block(String(skill_id), player))
 	return card
 
-static func _mastery_row(category: String, player: Player) -> Control:
-	var lv: int = player.get_category_mastery_level(category)
-	var total_xp: float = player.get_category_total_xp(category)
-	var consumed: float = 0.0
-	for i in range(lv):
-		consumed += float(Player.MASTERY_XP_DELTA[i])
-	var into_level: float = total_xp - consumed
-	var next_need: float = float(Player.MASTERY_XP_DELTA[lv]) if lv < Player.MAX_MASTERY_LEVEL else 0.0
-
+static func _skill_status_block(skill_id: String, player: Player) -> Control:
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 2)
 
@@ -224,49 +242,57 @@ static func _mastery_row(category: String, player: Player) -> Control:
 	vb.add_child(row)
 
 	var name_lbl := Label.new()
-	name_lbl.text = category
+	name_lbl.text = _skill_label(skill_id)
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	name_lbl.add_theme_color_override("font_color", Color(0.94, 0.84, 0.42))
 	row.add_child(name_lbl)
 
+	var lv: int = player.get_skill_level(skill_id)
 	var lv_lbl := Label.new()
-	lv_lbl.text = "MAX" if lv >= Player.MAX_MASTERY_LEVEL else "Lv.%d" % lv
+	lv_lbl.text = "MAX" if lv >= Player.MAX_SKILL_LEVEL else "Lv.%d" % lv
 	lv_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
 	lv_lbl.add_theme_color_override("font_color",
-		Color(1.0, 0.85, 0.2) if lv >= Player.MAX_MASTERY_LEVEL else Color(0.85, 0.85, 0.85))
+		Color(1.0, 0.85, 0.2) if lv >= Player.MAX_SKILL_LEVEL else Color(0.85, 0.85, 0.85))
 	row.add_child(lv_lbl)
 
-	var effect_lbl := Label.new()
-	effect_lbl.text = _mastery_effect_text(category, lv)
-	effect_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
-	effect_lbl.add_theme_color_override("font_color",
-		Color(0.6, 0.75, 0.6) if lv > 0 else Color(0.5, 0.5, 0.55))
-	effect_lbl.custom_minimum_size = Vector2(180, 0)
-	effect_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	row.add_child(effect_lbl)
-
+	var xp: float = player.get_skill_xp(skill_id)
+	var next_need: float = float(Player.SKILL_XP_DELTA[lv]) if lv < Player.SKILL_XP_DELTA.size() else 0.0
 	if next_need > 0.0:
 		var bar := ProgressBar.new()
 		bar.max_value = next_need
-		bar.value = clamp(into_level, 0.0, next_need)
+		bar.value = clamp(xp, 0.0, next_need)
 		bar.show_percentage = false
 		bar.custom_minimum_size = Vector2(0, 4)
 		bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		vb.add_child(bar)
+
+	var hidden_ids: Array = _HIDDEN_BY_VISIBLE.get(skill_id, [])
+	if not hidden_ids.is_empty():
+		var hidden_line := Label.new()
+		hidden_line.text = _hidden_summary(hidden_ids, player)
+		hidden_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		hidden_line.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
+		hidden_line.add_theme_color_override("font_color", Color(0.62, 0.64, 0.7))
+		vb.add_child(hidden_line)
 	return vb
 
-static func _mastery_effect_text(category: String, lv: int) -> String:
-	if lv <= 0:
-		return ""
-	match category:
-		"Melee":   return "+%.1f%% melee dmg" % (0.5 * float(lv))
-		"Ranged":  return "+%.1f%% ranged dmg" % (0.5 * float(lv))
-		"Magic":   return "+%.1f%% spell power" % (0.5 * float(lv))
-		"Defense": return "-%.1f%% dmg taken" % (0.5 * float(lv))
-		"Agility": return "+%d EV" % (lv / 3)
-		"Utility": return "+%.1f%% tool effect" % (0.5 * float(lv))
-	return ""
+static func _hidden_summary(hidden_ids: Array, player: Player) -> String:
+	var parts: Array[String] = []
+	for raw_id in hidden_ids:
+		var sid: String = String(raw_id)
+		var entry: Dictionary = player.hidden_skills.get(sid, {"level": 0, "xp": 0.0})
+		var lv: int = int(entry.get("level", 0))
+		var xp: int = int(float(entry.get("xp", 0.0)))
+		parts.append("%s %d/%d" % [sid.replace("_", " "), lv, xp])
+	return "Hidden: " + ", ".join(parts)
+
+static func _skill_label(skill_id: String) -> String:
+	var key: String = "SKILL_NAME_" + skill_id.to_upper()
+	var translated: String = LocaleManager.t(key)
+	if translated != key:
+		return translated
+	return String(_VISIBLE_SKILL_LABELS.get(skill_id, skill_id.capitalize().replace("_", " ")))
 
 static func _equipment_card(player: Player) -> Control:
 	var card := UICards.card(Color(0.7, 0.7, 0.82))

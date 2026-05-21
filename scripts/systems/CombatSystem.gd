@@ -486,7 +486,7 @@ const DEFENSE_XP_BLOCK: float = 3.0      # shields bonus on successful block
 static func _grant_defense_xp(player: Player, skill_id: String, amount: float) -> void:
 	# Bypass active_skills routing — defensive events should always train
 	# the relevant defensive sub-skill, not the player's chosen actives.
-	if Player.SKILL_IDS.has(skill_id):
+	if Player.SKILL_IDS.has(skill_id) or Player.HIDDEN_SUBSKILL_IDS.has(skill_id):
 		player.grant_skill_xp(skill_id, amount)
 
 static func _try_player_shield_block(player: Player, monster: Monster) -> bool:

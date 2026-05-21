@@ -115,8 +115,10 @@ func _cancel_targeting() -> void:
 		host._targeting_node = null
 
 func _confirm_targeting() -> void:
-	var spell := host._targeting_spell
+	var spell: SpellData = host._targeting_spell
 	_cancel_targeting()
+	if spell == null:
+		return
 	var ok: bool = MagicSystem.cast(spell.id, host.player, host)
 	if ok:
 		TurnManager.end_player_turn()

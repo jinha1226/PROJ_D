@@ -101,7 +101,7 @@ D:\PROJ_D\archive       (forthcoming) ship-time archives
 
 ## Current Working Truths
 - Active progression: XL 20, skill max 9. Long-term balance reference still cites DCSS 27-scale internally where helpful.
-- Active split skill model: fighting, unarmed, blade, hafted, polearm, ranged, spellcasting, elemental, arcane, hex, necromancy, summoning, armor, shield, agility, tool.
+- Active skill model: 9 visible skills (`weapon_mastery`, `archery`, `tactics`, `defense`, `magery`, `stealth`, `lockpicking`, `tracking`, `survival`) plus hidden familiarity sub-skills stored in `hidden_skills`.
 - Resists simplified to 4 types: fire / cold / poison / will. Do not re-expand without explicit decision.
 - Map size: 32×36 (compressed for mobile readability vs Pixel Dungeon ~larger and DCSS ~much larger).
 - Faith and Essence are parallel build axes; `faith_id == ""` is migration-state only after `first_shrine_choice_done == true`.

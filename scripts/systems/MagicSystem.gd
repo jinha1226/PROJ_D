@@ -325,12 +325,11 @@ static func _armor_spell_mult(player: Player) -> float:
 
 
 static func _compute_power(player: Player, spell: SpellData) -> int:
-	var spellcasting: int = player.get_skill_level("spellcasting")
-	var school_skill: int = player.get_skill_level(player.spell_skill_for(spell))
-	var total_skill: float = float(spellcasting) * 0.5 + float(school_skill)
+	var total_skill: float = float(player.get_skill_level("magery"))
 	var base: int = int(float(player.intelligence) * (1.0 + total_skill * 0.06) * _armor_spell_mult(player))
 	var power: int = base + EssenceSystem.spell_power_bonus(player, spell) + player.wizardry_bonus * 4
-	# Magic mastery: category-wide bonus on top of school sub-skill scaling.
+	# Hidden spell-school familiarity is tracked for inspection but does not
+	# affect formulas until the dedicated 80/20 balance pass.
 	return int(float(power) * FaithSystem.spell_damage_mult(player) * player.magic_mastery_power_mult())
 
 
