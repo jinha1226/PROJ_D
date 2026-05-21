@@ -417,6 +417,8 @@ static func _portrait_stack(player: Player) -> Control:
 	_add_portrait_layer(layers, player._body_doll_tex)
 	_add_portrait_layer(layers, player._hand1_doll_tex)
 	_add_portrait_layer(layers, player._hand2_doll_tex)
+	if player != null and "body_wounds" in player:
+		_add_wound_overlay(layers, player.body_wounds)
 	return panel
 
 static func _add_portrait_layer(parent: Control, tex: Texture2D) -> void:
@@ -430,6 +432,27 @@ static func _add_portrait_layer(parent: Control, tex: Texture2D) -> void:
 	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	rect.custom_minimum_size = Vector2(96, 96)
 	parent.add_child(rect)
+
+static func _add_wound_overlay(parent: Control, body_wounds: Dictionary) -> void:
+	const PART_RECTS: Dictionary = {
+		"head":      Rect2(32,  0,  32, 22),
+		"torso":     Rect2(24, 22,  48, 36),
+		"left_arm":  Rect2( 0, 22,  24, 36),
+		"right_arm": Rect2(72, 22,  24, 36),
+		"left_leg":  Rect2(24, 58,  24, 38),
+		"right_leg": Rect2(48, 58,  24, 38),
+	}
+	for part in body_wounds.keys():
+		var lvl: int = int(body_wounds[part])
+		if lvl <= 0 or not PART_RECTS.has(part):
+			continue
+		var r: Rect2 = PART_RECTS[part]
+		var rect := ColorRect.new()
+		rect.position = r.position
+		rect.size = r.size
+		rect.color = Color(0.9, 0.1, 0.1, 0.55) if lvl >= 2 else Color(1.0, 0.55, 0.1, 0.45)
+		rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		parent.add_child(rect)
 
 static func _resource_bar(label_text: String, value: int, max_value: int, tint: Color) -> Control:
 	var vb := VBoxContainer.new()
