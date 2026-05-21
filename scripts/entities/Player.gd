@@ -69,13 +69,13 @@ var _hand1_doll_tex: Texture2D = null
 var _hand2_doll_tex: Texture2D = null
 var _equip_sheets: Array[Texture2D] = []
 
-const _EQUIP_SHEET_SLOTS: Array = [
-	["equipped_armor_id",  "armor"],
-	["equipped_helmet_id", "helmet"],
-	["equipped_gloves_id", "gloves"],
-	["equipped_boots_id",  "boots"],
-	["equipped_weapon_id", "sword"],
-	["equipped_shield_id", "shield"],
+const _EQUIP_SHEET_SLOTS: Array[Array] = [
+	["equipped_armor_id",  "armor_overlay"],
+	["equipped_helmet_id", "helmet_overlay"],
+	["equipped_gloves_id", "gloves_overlay"],
+	["equipped_boots_id",  "boots_overlay"],
+	["equipped_weapon_id", "sword_overlay"],
+	["equipped_shield_id", "shield_overlay"],
 ]
 
 var hp: int = 22
@@ -1924,7 +1924,7 @@ func _refresh_paperdoll() -> void:
 			var slot_val: String = get(pair[0]) if pair[0] in self else ""
 			if slot_val == "":
 				continue
-			var path := sprite_dir + "/" + pair[1] + ".png"
+			var path: String = sprite_dir + "/" + (pair[1] as String) + ".png"
 			if ResourceLoader.exists(path):
 				var tex := load(path) as Texture2D
 				if tex != null:
