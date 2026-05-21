@@ -182,19 +182,19 @@ func set_buffs(statuses: Dictionary) -> void:
 
 
 func set_wounds(wounds: Array) -> void:
-	if _wound_row == null:
-		return
-	for c in _wound_row.get_children():
-		c.queue_free()
-	for entry in wounds:
-		var part_id: String = String(entry[0])
-		var lvl: int = int(entry[1])
-		var label: String = BodyPartSystem.PART_LABELS.get(part_id, part_id)
-		var display: String = "[%s%s]" % [label, "!" if lvl >= 2 else ""]
-		var col: Color = Color(0.9, 0.15, 0.15) if lvl >= 2 else Color(1.0, 0.55, 0.1)
-		var badge := _make_buff_badge(display, 0, col)
-		(badge.get_child(0) as Label).text = display
-		_wound_row.add_child(badge)
+    if _wound_row == null:
+        return
+    for c in _wound_row.get_children():
+        c.queue_free()
+    for entry in wounds:
+        var part_id: String = String(entry[0])
+        var lvl: int = int(entry[1])
+        var label: String = BodyPartSystem.PART_LABELS.get(part_id, part_id)
+        var display: String = "[%s%s]" % [label, "!" if lvl >= 2 else ""]
+        var col: Color = Color(0.9, 0.15, 0.15) if lvl >= 2 else Color(1.0, 0.55, 0.1)
+        var badge := _make_buff_badge(display, 0, col)
+        (badge.get_child(0) as Label).text = display
+        _wound_row.add_child(badge)
 
 
 func set_runes(player_items: Array) -> void:
