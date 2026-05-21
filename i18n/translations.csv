@@ -1134,3 +1134,17 @@ LOG_EXPEDITION_PRESSURE,Expedition pressure: %d turns remain on this floor.,원�
 LOG_EXPEDITION_SAFE_RETURN_ATTEMPT,The dungeon presses in. Attempting safe return (%d%% chance)...,던전이 조여옵니다. 안전 귀환 시도 (%d%% 확률)...
 LOG_EXPEDITION_SAFE_RETURN_OK,You slip back toward town with what you have.,가진 것을 들고 마을로 빠져나옵니다.
 LOG_EXPEDITION_SAFE_RETURN_FAIL,Lost in the dungeon. The expedition fails.,던전에서 길을 잃었습니다. 원정 실패.
+UI_TOWN_BTN_CHARACTER,Character,캐릭터
+UI_TOWN_CHAR_TITLE,Character Info,캐릭터 정보
+UI_TOWN_CHAR_NO_SAVE,No active character.,활동 캐릭터 없음.
+UI_TOWN_CHAR_SEC_IDENTITY,— Identity —,— 정체성 —
+UI_TOWN_CHAR_SEC_VITALS,— Vitals —,— 능력치 —
+UI_TOWN_CHAR_SEC_EQUIP,— Equipment —,— 장비 —
+UI_TOWN_CHAR_SEC_SKILLS,— Skills —,— 스킬 —
+UI_TOWN_CHAR_SEC_ESSENCES,— Essences —,— 에센스 —
+UI_TOWN_CHAR_ESSENCE_INV,Carried,보유
+UI_SHOP_TAB_BUY,Buy,구매
+UI_SHOP_TAB_SELL,Sell,판매
+UI_SHOP_BTN_SELL,Sell,판매
+UI_SHOP_NO_ITEMS_TO_SELL,Nothing to sell.,판매할 아이템이 없습니다.
+UI_SHOP_ITEM_EQUIPPED,(equipped),(장착 중)
