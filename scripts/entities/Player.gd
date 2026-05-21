@@ -91,6 +91,8 @@ var last_killer: String = ""
 var items: Array = []  # [{id: String, plus: int}]
 var known_spells: Array = []  # [String]
 var statuses: Dictionary = {}  # id -> turns_remaining (Status.gd manages)
+var body_wounds: Dictionary = {}   # part_id → 1 (light) or 2 (severe)
+var facing: Vector2i = Vector2i(1, 0)
 ## Resists: element → signed magnitude (positive = resist tier, negative = vulnerability tier).
 ## Status.resist_scale clamps net level to [-3, +3]. Add via add_resist(element, delta).
 var resists: Dictionary = {}
@@ -250,6 +252,9 @@ func _try_move(dir: Vector2i) -> void:
 	var target: Vector2i = grid_pos + dir
 	if try_attack_tile(target):
 		return
+	if Status.has(self, "crippled"):
+		CombatLog.post("심한 부상으로 이동할 수 없습니다!", Color(1.0, 0.55, 0.3))
+		return
 	if _map.tile_at(target) == DungeonMap.Tile.DOOR_CLOSED:
 		_map.set_tile(target, DungeonMap.Tile.DOOR_OPEN)
 		emit_signal("moved", grid_pos)  # refresh FOV from current pos
@@ -258,6 +263,7 @@ func _try_move(dir: Vector2i) -> void:
 	if not _map.is_walkable(target):
 		return
 	grid_pos = target
+	facing = dir
 	position = _map.grid_to_world(grid_pos)
 	emit_signal("moved", grid_pos)
 	emit_signal("stats_changed")
