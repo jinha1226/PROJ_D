@@ -33,6 +33,18 @@ func record_victory(summary: Dictionary) -> void:
 	expedition_count += 1
 	save_state()
 
+func record_safe_return(summary: Dictionary) -> void:
+	last_character_summary = summary.duplicate(true)
+	last_character_summary["victory"] = false
+	last_character_summary["safe_return"] = true
+	# Character stays alive — returned with loot. Inventory persists on
+	# the Player save; TownState just bumps the count.
+	# IMPORTANT: keep current_character_alive = true and the race ID,
+	# because the player can launch another expedition with the same
+	# character. The TownState scene will show them as alive and ready.
+	expedition_count += 1
+	save_state()
+
 func has_last_summary() -> bool:
 	return not last_character_summary.is_empty()
 

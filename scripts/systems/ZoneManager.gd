@@ -132,6 +132,22 @@ func branch_effective_depth(branch_id: String, branch_floor: int) -> int:
 	var mid: int = (int(cfg["entrance_range"][0]) + int(cfg["entrance_range"][1])) / 2
 	return mid + branch_floor
 
+# Turn budget per main floor depth (PROJ_G mobile_skill_balance_rules.md §Turn Budget).
+const MAIN_TURN_BUDGETS: Dictionary = {
+	1: 240,
+	2: 260,
+	3: 270,
+	4: 290,
+	5: 300,
+}
+const BRANCH_TURN_BUDGET: int = 180  # PROJ_G says 170-190; pick middle.
+
+func turn_budget_for_depth(depth: int) -> int:
+	return int(MAIN_TURN_BUDGETS.get(depth, 240))
+
+func turn_budget_for_branch(_branch_id: String) -> int:
+	return BRANCH_TURN_BUDGET
+
 # ── Branch monster pools (DCSS-sourced) ─────────────────────────────────────
 # Monsters are listed roughly weakest-to-strongest within each pool.
 const BRANCH_MONSTER_POOLS: Dictionary = {

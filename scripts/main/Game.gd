@@ -139,10 +139,12 @@ func _ready() -> void:
 		player.set_race_from_id(GameManager.selected_race_id)
 		player.init_skills()
 		player.set_active_skills([])
-		player.refresh_ac_from_equipment()
-		player._refresh_paperdoll()
-		_apply_starter_kit()
-		var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
+			player.refresh_ac_from_equipment()
+			player._refresh_paperdoll()
+			_apply_starter_kit()
+			if GameManager.selected_race_id == "tester":
+				_apply_tester_character_setup()
+			var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
 		var race_name: String = race.display_name if race != null else "adventurer"
 		CombatLog.post(LocaleManager.t("LOG_YOU_START_AS") % [race_name, ""],
 			Color(0.85, 0.9, 1.0))
@@ -153,11 +155,18 @@ func _ready() -> void:
 		_generate_branch_floor(GameManager.branch_zone, GameManager.branch_floor, true)
 	else:
 		_floor_lifecycle._generate_floor(GameManager.depth, _floor_lifecycle._floor_seed(GameManager.depth))
-	_spawn_camera()
-	_spawn_ui()
-	TurnManager.player_turn_started.connect(_on_player_turn_started)
+		_spawn_camera()
+		_spawn_ui()
+		if GameManager.selected_race_id == "tester":
+			_spawn_debug_floor_panel()
+		TurnManager.player_turn_started.connect(_on_player_turn_started)
+	if not ExpeditionState.exhausted.is_connected(_on_turn_budget_exhausted):
+		ExpeditionState.exhausted.connect(_on_turn_budget_exhausted)
 	_update_hud()
 	_refresh_quickslots()
+	# Initialize budget for the floor we just spawned into (covers both fresh
+	# runs and resume-from-save paths).
+	_reset_expedition_budget()
 	CombatLog.post(LocaleManager.t("LOG_B_TAP_A_TILE_OR") \
 			% GameManager.depth, Color(0.7, 0.9, 1.0))
 
@@ -462,6 +471,74 @@ func _apply_starter_kit() -> void:
 	GameManager.selected_faith_id = ""
 	# Consumed; clear so a subsequent new-run starts fresh.
 	GameManager.pending_starter_items = []
+
+func _apply_tester_character_setup() -> void:
+	# Debug-only race. Keep this explicit and easy to remove before release.
+	player.xl = Player.MAX_XL
+	player.xp = 0
+	player.hp_max = max(player.hp_max, 999)
+	player.hp = player.hp_max
+	player.mp_max = max(player.mp_max, 250)
+	player.mp = player.mp_max
+	player.gold = max(player.gold, 9999)
+	GameManager.gold = max(GameManager.gold, 9999)
+	player.strength = max(player.strength, 40)
+	player.dexterity = max(player.dexterity, 40)
+	player.intelligence = max(player.intelligence, 40)
+	player.resists = {"fire": 3, "cold": 3, "poison": 3, "necro": 3}
+
+	for sid in Player.SKILL_IDS:
+		player.skills[String(sid)] = {"level": Player.MAX_SKILL_LEVEL, "xp": 0.0}
+	for sid in Player.HIDDEN_SUBSKILL_IDS:
+		player.hidden_skills[String(sid)] = {"level": Player.MAX_SKILL_LEVEL, "xp": 0.0}
+	player.set_active_skills([])
+
+	player.known_spells.clear()
+	if SpellRegistry != null:
+		for spell in SpellRegistry.all:
+			if spell != null and "id" in spell:
+				var spell_id: String = String(spell.id)
+				if spell_id != "" and not player.known_spells.has(spell_id):
+					player.known_spells.append(spell_id)
+
+	if ItemRegistry != null:
+		for item in ItemRegistry.all:
+			if item == null or not ("id" in item):
+				continue
+			var item_id: String = String(item.id)
+			if item_id == "":
+				continue
+			if String(item.kind) in ["potion", "scroll", "wand", "spellpage"]:
+				player.items.append({"id": item_id, "plus": 0})
+				GameManager.identify(item_id)
+		var practical_gear: Array = [
+			"great_blade", "battle_axe", "longbow", "crossbow", "staff",
+			"plate_mail", "tower_shield", "great_helm", "iron_gauntlets",
+			"iron_greaves", "ring_wizardry", "ring_slaying", "amulet_magic",
+			"rune_swamp", "rune_ice", "rune_infernal", "rune_crypt",
+		]
+		for item_id in practical_gear:
+			if ItemRegistry.get_by_id(String(item_id)) != null:
+				player.items.append({"id": String(item_id), "plus": 9})
+				GameManager.identify(String(item_id))
+
+	player.essence_inventory.clear()
+	for essence_id in EssenceSystem.all_ids():
+		player.essence_inventory.append(String(essence_id))
+	player.essence_slots = ["essence_arcana", "essence_swiftness", "essence_vitality"]
+
+	player.equipped_weapon_id = "great_blade"
+	player.equipped_armor_id = "plate_mail"
+	player.equipped_shield_id = ""
+	player.equipped_helmet_id = "great_helm"
+	player.equipped_gloves_id = "iron_gauntlets"
+	player.equipped_boots_id = "iron_greaves"
+	player.equipped_ring_id = "ring_wizardry"
+	player.equipped_amulet_id = "amulet_magic"
+	player.quickslots = ["fireball", "blink", "haste", "scroll_magic_mapping", "potion_healing", "wand_digging"]
+	player.refresh_ac_from_equipment()
+	player._refresh_paperdoll()
+	CombatLog.post("Tester character initialized: max skills, all spells, all essences, consumables, scrolls, runes, and warp panel.", Color(1.0, 0.85, 0.3))
 
 func _apply_race_mods(race_id: String) -> void:
 	var race: RaceData = RaceRegistry.get_by_id(race_id)
@@ -1349,6 +1426,37 @@ func _try_respawn_monster() -> void:
 		_spawn_service._roll_monster_weapon(m)
 		return
 
+func _reset_expedition_budget() -> void:
+	var depth: int = GameManager.depth
+	var zone_id: String = ZoneManager.zone_id_for_depth(depth)
+	var budget: int = ZoneManager.turn_budget_for_depth(depth)
+	if GameManager.branch_zone != "":
+		zone_id = GameManager.branch_zone
+		budget = ZoneManager.turn_budget_for_branch(zone_id)
+	ExpeditionState.on_floor_enter(zone_id, depth, budget)
+
+func _on_turn_budget_exhausted() -> void:
+	TurnManager.abort_actor_loop()
+	var chance: float = ExpeditionState.safe_return_chance(player, GameManager.depth)
+	CombatLog.post(
+		"The dungeon presses in. Attempting safe return (%d%% chance)..." % int(chance * 100.0),
+		Color(0.9, 0.7, 0.5))
+	if randf() < chance:
+		CombatLog.post("You slip back toward town with what you have.", Color(0.5, 0.95, 0.7))
+		TownState.record_safe_return({
+			"race": GameManager.selected_race_id,
+			"depth_reached": GameManager.depth,
+			"kills": player.kills,
+			"turns": TurnManager.turn_number,
+		})
+		await get_tree().create_timer(2.0).timeout
+		get_tree().change_scene_to_file(TOWN_SCENE_PATH)
+	else:
+		CombatLog.post("Lost in the dungeon. The expedition fails.", Color(1.0, 0.3, 0.3))
+		player.last_killer = "lost in the dungeon"
+		player.hp = 0
+		_on_player_died()
+
 func _on_player_died() -> void:
 	# Stop the in-flight monster loop (audit H8) so subsequent actors don't
 	# keep spamming damage against a corpse.
@@ -1411,6 +1519,7 @@ func _on_branch_enter() -> void:
 	CombatLog.post(LocaleManager.t("LOG_YOU_ENTER_THE") % cfg.get("display_name", branch_id),
 		Color(0.4, 1.0, 0.6))
 	_generate_branch_floor(branch_id, 1, true)
+	_reset_expedition_budget()
 	_center_camera_on_player(true)
 	_update_hud()
 	TurnManager.end_player_turn()
@@ -1429,6 +1538,7 @@ func _on_branch_stairs_down() -> void:
 	CombatLog.post(LocaleManager.t("LOG_B") % [ZoneManager.branch_config(branch_id).get("display_name", branch_id),
 		GameManager.branch_floor], Color(0.4, 1.0, 0.6))
 	_generate_branch_floor(branch_id, GameManager.branch_floor, true)
+	_reset_expedition_budget()
 	_center_camera_on_player(true)
 	_update_hud()
 	save_with_cache()
@@ -1458,6 +1568,7 @@ func _on_branch_stairs_up() -> void:
 		_cache_branch_floor(branch_id, GameManager.branch_floor)
 		GameManager.branch_floor -= 1
 		_generate_branch_floor(branch_id, GameManager.branch_floor, false)
+	_reset_expedition_budget()
 	_center_camera_on_player(true)
 	_update_hud()
 	save_with_cache()
@@ -1912,6 +2023,7 @@ func _on_stairs_down() -> void:
 	_spawn_service._clear_floor_items()
 	_floor_lifecycle._generate_floor(GameManager.depth, _floor_lifecycle._floor_seed(GameManager.depth), true)
 	RacePassiveSystem.on_floor_changed(player)
+	_reset_expedition_budget()
 	_center_camera_on_player(true)
 	_update_hud()
 	save_with_cache()
@@ -1934,6 +2046,7 @@ func _on_stairs_up() -> void:
 	_spawn_service._clear_floor_items()
 	_floor_lifecycle._generate_floor(GameManager.depth, _floor_lifecycle._floor_seed(GameManager.depth), false)
 	RacePassiveSystem.on_floor_changed(player)
+	_reset_expedition_budget()
 	_center_camera_on_player(true)
 	_update_hud()
 	save_with_cache()
@@ -1953,6 +2066,7 @@ func _travel_to_floor(target_depth: int) -> void:
 	CombatLog.post(LocaleManager.t("LOG_YOU_TRAVEL_TO_B") % target_depth, Color(0.7, 0.9, 1.0))
 	_floor_lifecycle._generate_floor(target_depth, _floor_lifecycle._floor_seed(target_depth), going_down)
 	RacePassiveSystem.on_floor_changed(player)
+	_reset_expedition_budget()
 	_center_camera_on_player(true)
 	_update_hud()
 	save_with_cache()
@@ -2660,6 +2774,7 @@ func _debug_warp_to(target_depth: int) -> void:
 	CombatLog.post(LocaleManager.t("LOG_DEBUG_WARP_TO_B") % target_depth, Color(1.0, 0.85, 0.3))
 	_floor_lifecycle._generate_floor(target_depth, _floor_lifecycle._floor_seed(target_depth), true)
 	RacePassiveSystem.on_floor_changed(player)
+	_reset_expedition_budget()
 	_center_camera_on_player(true)
 	_update_hud()
 
@@ -2679,5 +2794,6 @@ func _debug_warp_to_branch(branch_id: String, branch_floor: int) -> void:
 	CombatLog.post(LocaleManager.t("LOG_DEBUG_WARP_TO_F") % [branch_id, branch_floor], Color(1.0, 0.85, 0.3))
 	_generate_branch_floor(branch_id, branch_floor, true)
 	RacePassiveSystem.on_floor_changed(player)
+	_reset_expedition_budget()
 	_center_camera_on_player(true)
 	_update_hud()

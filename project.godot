@@ -35,6 +35,7 @@ RaceRegistry="*res://scripts/systems/RaceRegistry.gd"
 RacePassiveSystem="*res://scripts/systems/RacePassiveSystem.gd"
 ZoneManager="*res://scripts/systems/ZoneManager.gd"
 TownState="*res://scripts/town/TownState.gd"
+ExpeditionState="*res://scripts/town/ExpeditionState.gd"
 
 [display]
 

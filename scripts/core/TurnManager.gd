@@ -31,6 +31,10 @@ func unregister_actor(actor) -> void:
 func end_player_turn(action_cost: float = 1.0, immediate: bool = false) -> void:
 	if _ending_turn or not is_player_turn:
 		return
+	# Tick expedition turn budget BEFORE the monster loop so a player turn
+	# always counts as one unit regardless of monster activity that follows.
+	if ExpeditionState != null:
+		ExpeditionState.tick()
 	_ending_turn = true
 	is_player_turn = false
 	emit_signal("monster_turn_started")

@@ -29,7 +29,12 @@ func _refresh() -> void:
 			var race_data = RaceRegistry.get_by_id(TownState.current_character_race)
 			if race_data != null and race_data.display_name != "":
 				race_name = race_data.display_name
-		_char_status.text = "Active Character: %s\nReady for expedition." % race_name
+		var last_line: String = "Ready for expedition."
+		if not TownState.last_character_summary.is_empty():
+			var s: Dictionary = TownState.last_character_summary
+			if bool(s.get("safe_return", false)):
+				last_line = "Returned safely from B%d." % int(s.get("depth_reached", 0))
+		_char_status.text = "Active Character: %s\n%s" % [race_name, last_line]
 		_start_btn.visible = true
 		_new_char_btn.visible = false
 	else:
