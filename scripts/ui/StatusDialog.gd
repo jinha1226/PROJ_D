@@ -405,16 +405,51 @@ static func _run_card(player: Player) -> Control:
 
 	return card
 
+const _EQUIP_LAYERS: Array = [
+	["equipped_armor_id",   "armor"],
+	["equipped_helmet_id",  "helmet"],
+	["equipped_gloves_id",  "gloves"],
+	["equipped_boots_id",   "boots"],
+	["equipped_weapon_id",  "sword"],
+	["equipped_shield_id",  "shield"],
+]
+
+static func _south_atlas(tex: Texture2D) -> Texture2D:
+	if tex == null:
+		return null
+	var tw := tex.get_width()
+	var th := tex.get_height()
+	if tw >= th * 4:
+		var a := AtlasTexture.new()
+		a.atlas = tex
+		a.region = Rect2(4 * (tw / 8), 0, tw / 8, th)  # frame 4 = S
+		return a
+	return tex
+
 static func _portrait_stack(player: Player) -> Control:
 	var panel := CenterContainer.new()
-	panel.custom_minimum_size = Vector2(120, 120)
+	panel.custom_minimum_size = Vector2(180, 220)
 	var layers := Control.new()
-	layers.custom_minimum_size = Vector2(96, 96)
+	layers.custom_minimum_size = Vector2(160, 200)
 	panel.add_child(layers)
 	_add_portrait_layer(layers, player._base_tex)
-	_add_portrait_layer(layers, player._body_doll_tex)
-	_add_portrait_layer(layers, player._hand1_doll_tex)
-	_add_portrait_layer(layers, player._hand2_doll_tex)
+	var sprite_dir := ""
+	if player._base_tex != null and player._base_tex.resource_path != "":
+		sprite_dir = player._base_tex.resource_path.get_base_dir()
+	if sprite_dir != "":
+		for pair in _EQUIP_LAYERS:
+			var slot_val: String = player.get(pair[0]) if pair[0] in player else ""
+			if slot_val == "":
+				continue
+			var path := sprite_dir + "/" + pair[1] + ".png"
+			if ResourceLoader.exists(path):
+				var tex := load(path) as Texture2D
+				if tex != null:
+					_add_portrait_layer(layers, tex)
+	else:
+		_add_portrait_layer(layers, player._body_doll_tex)
+		_add_portrait_layer(layers, player._hand1_doll_tex)
+		_add_portrait_layer(layers, player._hand2_doll_tex)
 	if player != null and "body_wounds" in player:
 		_add_wound_overlay(layers, player.body_wounds)
 	return panel
@@ -423,12 +458,13 @@ static func _add_portrait_layer(parent: Control, tex: Texture2D) -> void:
 	if parent == null or tex == null:
 		return
 	var rect := TextureRect.new()
-	rect.texture = tex
+	rect.texture = _south_atlas(tex)
+	rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	rect.anchor_right = 1.0
 	rect.anchor_bottom = 1.0
 	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	rect.custom_minimum_size = Vector2(96, 96)
+	rect.custom_minimum_size = Vector2(160, 200)
 	parent.add_child(rect)
 
 static func _add_wound_overlay(parent: Control, body_wounds: Dictionary) -> void:

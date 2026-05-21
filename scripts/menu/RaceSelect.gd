@@ -123,8 +123,21 @@ func _make_portrait(data: RaceData) -> Control:
 func _add_layer(parent: Control, path: String, dim: bool) -> void:
 	if not ResourceLoader.exists(path):
 		return
+	var tex := load(path) as Texture2D
+	if tex == null:
+		return
 	var rect := TextureRect.new()
-	rect.texture = load(path)
+	# Crop to S-facing frame (frame 4) if this is an 8-dir spritesheet
+	var tw := tex.get_width()
+	var th := tex.get_height()
+	if tw >= th * 4:
+		var fw := tw / 8
+		var atlas := AtlasTexture.new()
+		atlas.atlas = tex
+		atlas.region = Rect2(4 * fw, 0, fw, th)
+		rect.texture = atlas
+	else:
+		rect.texture = tex
 	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	rect.anchor_right = 1.0
