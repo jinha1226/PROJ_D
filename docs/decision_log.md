@@ -180,3 +180,26 @@ Additional commits in the same session after the user reviewed the skill model a
 - (6d0bbce1) **Legacy umbrella skill names dropped from SKILL_REMAP**. Removed `blade`, `hafted`, `polearm`, `ranged`, `shield`, `agility`, `tool`, `elemental`, `arcane`, `hex`, `summoning` (11 entries). With class .tres files gone there are no remaining callers using umbrella ids; hidden sub-skill ids (`short_blades`, `polearms`, `fire`, `hexes`, etc.) are now the only legacy keys SKILL_REMAP recognises. CombatSystem `get_skill_level("agility")` (backstab) → `"stealth"`, `get_skill_level("shield")` (block) → `"defense"`, `get_skill_level("blade")` (parry) → `"weapon_mastery"` (item category check on `weapon.category == "blade"` retained — that's a data tag, not a skill id). Dagger swift-strike rewired from dead `skill_id == "blade"` gate to `weapon.category == "dagger"` + `weapon_mastery` level. MonsterAI stealth detection `get_skill_level("agility")` → `"stealth"`. RaceSelect.gd `_make_apt_row` rebuilt: 9-cell visible row aggregating hidden sub-skill aptitudes per race via averaging.
 
 Final Game.gd line count: **2646** (3721 → 2646, -29% over session). Branch `expedition-rework` is 10 commits ahead of main. Deferred items still pending: town hub, turn budget, fixed authored 42×47 maps, character minimap memory, essence slot 1/6/14 unlock progression, race-specific starter shop, d100 combat formula rewrite, balance pass (XP rates, hidden-tier 20% contribution, the four new skills' XP sources).
+
+## 2026-05-21 - Context Reset Handoff: Starting Shop / Essence / Turn Budget
+Current implementation focus is **starting shop, essence loop, and turn budget**. Do not switch to large authored maps yet; keep current small maps until the core loop is verified because short traversal makes skill XP, shop, essence, and turn-budget checks faster.
+
+Recently completed before reset:
+- Skill UI debug pass: `SkillsDialog.gd` now shows 9 visible skills with matching hidden familiarity rows reading `player.hidden_skills` directly. Manual mode toggles visible skills only.
+- Status UI debug pass: `StatusDialog.gd` now shows visible skill levels plus hidden familiarity summaries instead of deprecated mastery rows.
+- Defensive action XP fix: `CombatSystem._grant_defense_xp()` now allows hidden ids (`dodging`, `armor`, `shields`) so these dual-write into visible `stealth`/`defense` and hidden familiarity.
+- Magic scaling fix: `MagicSystem.gd`, `MagicDialog.gd`, and `SimulationBot.gd` use `magery` directly instead of double-counting `spellcasting` + school after remap.
+- Balance metadata updated: `config/balance/spells.json`, `config/balance/core_rules.json`, and `CLAUDE.md` now describe the 9 visible + hidden familiarity model.
+
+Verification already run:
+- `godot --headless --path . --quit` passes.
+- `git diff --check` passes.
+- Search found no direct `get_skill_level("spellcasting")`, `get_skill_level("endurance")`, or `core_skill: spellcasting` references in active scripts/config.
+- Existing unrelated warnings remain: missing identified tile paths for `potion_cancellation` and `ring_bog`.
+
+Next session checklist:
+- Starting shop: new run enters shop, buys/declines/exits correctly, inventory/gold updates, save/load does not duplicate shop state.
+- Essence: pickup, equip, effect application, slot limits/unlocks, faith restrictions, save/load.
+- Turn budget: move, wait, attack, ranged attack, cast, item use, stairs, shop interactions, and forced waits consume the intended amount; UI communicates pressure without making the game feel noisy.
+- Skill verification on small maps: melee raises `weapon_mastery` + weapon hidden id; ranged raises `archery` + hidden ranged id; magic kill raises `magery` + spell school hidden id; defensive events raise `defense`/`stealth` + `armor`/`shields`/`dodging`.
+- Only after the above passes should fixed larger authored maps be applied.

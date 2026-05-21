@@ -6,7 +6,11 @@ class_name EssenceSystem extends RefCounted
 
 
 const SLOT_COUNT: int = 3
-const SLOT_UNLOCK_LEVELS: Array = [1, 8, 16]
+# PROJ_G expedition-count thresholds (replaces prior XL-based unlocks):
+# slot 1 from the start (expedition 0+), slot 2 after 6 completed
+# expeditions, slot 3 after 14. Pair synergies emerge mid-career;
+# triple-slot hybrid builds at late career.
+const SLOT_UNLOCK_EXPEDITION_COUNTS: Array = [0, 6, 14]
 const INVENTORY_CAP: int = 4
 const ESSENCE_ICON_DIR := "res://assets/tiles/individual/item/essence/"
 
@@ -326,9 +330,10 @@ static func all_ids() -> Array:
 static func active_slot_count(player: Player) -> int:
 	if player == null:
 		return 1
+	var exp_count: int = int(TownState.expedition_count)
 	var count: int = 0
-	for needed_xl in SLOT_UNLOCK_LEVELS:
-		if player.xl >= int(needed_xl):
+	for needed in SLOT_UNLOCK_EXPEDITION_COUNTS:
+		if exp_count >= int(needed):
 			count += 1
 	return clampi(count, 1, SLOT_COUNT)
 
