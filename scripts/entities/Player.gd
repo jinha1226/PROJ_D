@@ -1904,18 +1904,18 @@ func _refresh_paperdoll() -> void:
 	queue_redraw()
 
 ## Returns spritesheet column index for an 8-dir horizontal sheet.
-## Expected sheet order (left→right): NW, W, SW, S, SE, E, NE, N
+## Actual sheet order (left→right): N, NW, W, SW, S, SE, E, NE
 func _facing_to_frame() -> int:
 	match facing:
-		Vector2i(-1, -1): return 0  # NW
-		Vector2i(-1,  0): return 1  # W
-		Vector2i(-1,  1): return 2  # SW
-		Vector2i( 0,  1): return 3  # S
-		Vector2i( 1,  1): return 4  # SE
-		Vector2i( 1,  0): return 5  # E
-		Vector2i( 1, -1): return 6  # NE
-		Vector2i( 0, -1): return 7  # N
-	return 3
+		Vector2i( 0, -1): return 0  # N
+		Vector2i(-1, -1): return 1  # NW
+		Vector2i(-1,  0): return 2  # W
+		Vector2i(-1,  1): return 3  # SW
+		Vector2i( 0,  1): return 4  # S
+		Vector2i( 1,  1): return 5  # SE
+		Vector2i( 1,  0): return 6  # E
+		Vector2i( 1, -1): return 7  # NE
+	return 4
 
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
