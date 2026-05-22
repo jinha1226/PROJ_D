@@ -13,16 +13,16 @@ ac = 12
 ev = 2
 sight_range = 9
 attacks = [{
-"damage": 45,
+"damage": 30,
 "flavour": "club"
 }]
 ranged_attack = {
-"damage": 14,
+"damage": 10,
 "range": 8,
 "verb": "hurls a boulder at"
 }
-min_depth = 13
-max_depth = 20
+min_depth = 6
+max_depth = 7
 weight = 5
 xp_value = 60
 tile_path = "res://assets/tiles/individual/mon/humanoids/giants/stone_giant.png"

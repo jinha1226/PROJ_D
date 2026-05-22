@@ -13,10 +13,11 @@ attacks = [{
 "damage": 1,
 "flavour": "hit"
 }]
-max_depth = 5
+max_depth = 3
 weight = 20
 xp_value = 4
 tile_path = "res://assets/tiles/individual/mon/humanoids/goblin.png"
 glyph = "g"
 glyph_color = Color(0.35, 0.7, 0.4, 1)
 description = "A common raider with little durability. Not dangerous alone, but often the first sign of a crowded fight."
+min_depth = 1

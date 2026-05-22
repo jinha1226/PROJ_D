@@ -15,8 +15,8 @@ attacks = [{
 "damage": 27,
 "flavour": "claw"
 }]
-min_depth = 6
-max_depth = 13
+min_depth = 4
+max_depth = 7
 weight = 9
 xp_value = 16
 tile_path = "res://assets/tiles/individual/mon/humanoids/deep_troll.png"

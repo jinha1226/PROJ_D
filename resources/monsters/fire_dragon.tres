@@ -17,8 +17,8 @@ attacks = [{
 "flavour": "bite"
 }]
 resists = ["fire"]
-min_depth = 11
-max_depth = 19
+min_depth = 5
+max_depth = 7
 weight = 5
 xp_value = 28
 tile_path = "res://assets/tiles/individual/mon/dragons/fire_dragon.png"

@@ -16,10 +16,10 @@ attacks = [{
 "flavour": "claw"
 }]
 resists = ["cold"]
-min_depth = 5
-max_depth = 10
+min_depth = 3
+max_depth = 6
 weight = 15
-xp_value = 5
+xp_value = 22
 tile_path = "res://assets/tiles/individual/mon/undead/ghoul.png"
 glyph = "z"
 glyph_color = Color(0.6, 0.75, 0.45, 1)

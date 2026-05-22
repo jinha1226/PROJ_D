@@ -18,8 +18,8 @@ attacks = [{
 "damage": 15,
 "flavour": "hit"
 }]
-min_depth = 7
-max_depth = 12
+min_depth = 4
+max_depth = 7
 weight = 9
 xp_value = 15
 tile_path = "res://assets/tiles/individual/mon/humanoids/two_headed_ogre.png"

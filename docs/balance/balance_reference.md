@@ -1,6 +1,6 @@
 # PocketCrawl — Balance Reference
 
-_Source of truth: actual PROJ_D code as of 2026-05-22_
+_Source of truth: actual PROJ_D code as of 2026-05-23_
 _Extracted from: Player.gd, CombatSystem.gd, EssenceSystem.gd, ItemRegistry.gd, ZoneManager.gd, TurnManager.gd, RaceData.gd_
 
 ---
@@ -277,12 +277,16 @@ Completion bonuses: +35 per branch rune, +120 for all 4.
 
 ### Equipment Tier by Depth
 
+Main floors 1–5. Branch effective depths up to 7 (ice_caves/infernal top out at 6–7).
+
 | Depth | T1 | T2 | T3 | T4 | T5 |
 |---|---|---|---|---|---|
-| 1–2 | 70% | 25% | 5% | — | — |
-| 3–5 | 20% | 50% | 25% | 5% | — |
-| 6–8 | 5% | 20% | 45% | 25% | 5% |
-| 9+ | — | 10% | 25% | 40% | 25% |
+| 1 | 70% | 25% | 5% | — | — |
+| 2 | 30% | 45% | 20% | 5% | — |
+| 3 | 10% | 30% | 40% | 18% | 2% |
+| 4 | — | 15% | 35% | 35% | 15% |
+| 5 | — | 5% | 25% | 45% | 25% |
+| 6+ | — | — | 10% | 40% | 50% |
 
 ### Randart Generation
 ```
@@ -318,6 +322,52 @@ discount range: 0–4 (from arcana/pale_star essences)
 - **XP value** on kill: `xp_value × 2.2` (pace multiplier)
 - Gold drop (humanoids): 30% chance for `randi_range(gold_max/2, gold_max)`
 - Speed default: 10 (faster = < 10 turns per player action, slower = > 10)
+
+### Depth Distribution (min_depth → max_depth)
+
+Main floors depth 1–5. Branch effective depths: crypt 2–4, swamp 3–5, ice_caves 4–6, infernal 5–7.
+
+| Depth | Monsters |
+|---|---|
+| 1–2 (fodder) | rat, jackal, bat, kobold, zombie, goblin, giant_cockroach, hobgoblin, adder |
+| 2–3 | hound, scorpion, vampire_bat, gnoll, gnoll_sergeant, black_bear, crimson_imp, wolf, phantom, wight\*, crypt_zombie\* |
+| 3–4 | orc, orc_warrior, orc_priest, orc_wizard, centaur, gargoyle, giant_wolf_spider, warg, yak, basilisk, steam_dragon, ghoul\*, mummy\*, gnoll_shaman |
+| 4–5 | hornet, ogre, red_devil, two_headed_ogre, fire_elemental, earth_elemental, deep_elf_archer, manticore, troll, wyvern, swamp_dragon, cyclops, deep_troll, ogre_mage, vampire, deep_elf_death_mage, wraith, ice_devil, minotaur |
+| 5–7 | skeletal_warrior\*, vampire_knight, fire_dragon, fire_giant, frost_giant, balrug, ice_dragon, lich\*, shadow_wraith, revenant, iron_golem |
+| 6–7 | executioner, stone_giant, bone_dragon, titan, golden_dragon |
+
+\* = primarily appears in thematic branch (wight/crypt_zombie/mummy/ghoul in crypt, skeletal_warrior in crypt, lich in crypt)
+
+### Bosses (spawned by zone, not pick_by_depth)
+
+| Boss | Depth | HP | Notes |
+|---|---|---|---|
+| gnoll_warlord | 2 | 70 | main path floor 2 |
+| orc_warchief | 3 | 80 | main path floor 3 |
+| bog_serpent | 4 | 78 | swamp branch boss |
+| stone_warden | 4 | 60 | unique, depth 4 |
+| ogre_chieftain | 4 | 95 | main path floor 4 |
+| blood_duke | 5 | 70 | unique, depth 5 |
+| glacial_sovereign | 5 | 75 | ice_caves branch boss |
+| ember_tyrant | 6 | 85 | infernal branch boss |
+| ancient_lich | 6 | 108 | crypt branch boss (HD 18) |
+| sovereign_jelly | 6 | 90 | unique, depth 6 |
+| abyssal_sovereign | 7 | 300 | final boss |
+
+### Stat Outliers Fixed (2026-05-23)
+
+| Monster | What changed |
+|---|---|
+| iron_golem | HP 270→110, AC 24→12, damage 50→30 |
+| earth_elemental | AC 14→8, damage 36→20 |
+| titan | damage 55→35 |
+| stone_giant | damage 45→30, ranged 14→10 |
+| bone_dragon | HP 154→90, AC 18→8 |
+| orc_warchief | HP 45→80 |
+| ancient_lich | HD 27→18 |
+| ghoul | XP 5→22 (bug fix) |
+| storm_hierophant | min_depth 19→4 (never spawned before) |
+| pale_scholar | min_depth 22→5 (never spawned before) |
 
 ---
 

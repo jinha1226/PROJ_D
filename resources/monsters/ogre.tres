@@ -15,8 +15,8 @@ attacks = [{
 "damage": 20,
 "flavour": "smash"
 }]
-min_depth = 7
-max_depth = 14
+min_depth = 4
+max_depth = 7
 xp_value = 25
 tile_path = "res://assets/tiles/individual/mon/humanoids/ogre.png"
 glyph = "O"

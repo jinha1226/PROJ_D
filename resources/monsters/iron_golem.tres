@@ -7,17 +7,17 @@ script = ExtResource("1_mdata")
 id = "iron_golem"
 display_name = "iron golem"
 tier = 5
-hp = 270
-hd = 15
-ac = 24
+hp = 110
+hd = 12
+ac = 12
 ev = 2
 speed = 7
 attacks = [{
-"damage": 50,
+"damage": 30,
 "flavour": "slam"
 }]
-min_depth = 9
-max_depth = 16
+min_depth = 5
+max_depth = 7
 weight = 6
 xp_value = 24
 tile_path = "res://assets/tiles/individual/mon/nonliving/iron_golem.png"

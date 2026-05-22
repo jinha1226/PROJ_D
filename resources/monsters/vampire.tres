@@ -16,8 +16,8 @@ attacks = [{
 "flavour": "bite"
 }]
 resists = ["cold"]
-min_depth = 9
-max_depth = 13
+min_depth = 4
+max_depth = 7
 weight = 8
 xp_value = 17
 tile_path = "res://assets/tiles/individual/mon/undead/vampire.png"

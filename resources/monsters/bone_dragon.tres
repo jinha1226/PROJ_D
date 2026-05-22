@@ -8,17 +8,17 @@ id = "bone_dragon"
 body_type = "flying"
 display_name = "bone dragon"
 tier = 5
-hp = 154
-hd = 20
-ac = 18
+hp = 90
+hd = 14
+ac = 8
 ev = 2
 attacks = [{
 "damage": 30,
 "flavour": "bite"
 }]
 resists = ["cold"]
-min_depth = 13
-max_depth = 20
+min_depth = 6
+max_depth = 7
 weight = 4
 xp_value = 28
 tile_path = "res://assets/tiles/individual/mon/undead/bone_dragon.png"

@@ -15,8 +15,8 @@ attacks = [{
 "damage": 3,
 "flavour": "hit"
 }]
-min_depth = 5
-max_depth = 10
+min_depth = 3
+max_depth = 5
 weight = 12
 xp_value = 9
 tile_path = "res://assets/tiles/individual/mon/humanoids/orcs/orc_priest.png"

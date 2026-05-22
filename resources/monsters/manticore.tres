@@ -22,8 +22,8 @@ ranged_attack = {
 "range": 6,
 "verb": "shoots"
 }
-min_depth = 8
-max_depth = 13
+min_depth = 4
+max_depth = 7
 weight = 8
 xp_value = 15
 tile_path = "res://assets/tiles/individual/mon/animals/manticore.png"

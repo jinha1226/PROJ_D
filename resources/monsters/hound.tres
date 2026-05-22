@@ -16,8 +16,8 @@ attacks = [{
 "damage": 6,
 "flavour": "bite"
 }]
-min_depth = 3
-max_depth = 6
+min_depth = 2
+max_depth = 4
 weight = 20
 xp_value = 2
 tile_path = "res://assets/tiles/individual/mon/animals/hound.png"

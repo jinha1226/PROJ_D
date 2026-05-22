@@ -8,7 +8,7 @@ id = "ancient_lich"
 display_name = "Ancient Lich"
 tier = 5
 hp = 108
-hd = 27
+hd = 18
 ac = 20
 ev = 10
 sight_range = 9
@@ -26,8 +26,8 @@ ranged_attack = {
 "range": 7
 }
 resists = ["necro+++", "cold++", "poison+"]
-min_depth = 13
-max_depth = 15
+min_depth = 6
+max_depth = 6
 weight = 0
 xp_value = 120
 is_boss = true

@@ -17,8 +17,8 @@ attacks = [{
 "flavour": "touch"
 }]
 resists = ["fire"]
-min_depth = 7
-max_depth = 12
+min_depth = 4
+max_depth = 7
 weight = 9
 xp_value = 13
 tile_path = "res://assets/tiles/individual/mon/nonliving/fire_elemental.png"

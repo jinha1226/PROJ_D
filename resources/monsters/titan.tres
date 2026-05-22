@@ -12,11 +12,11 @@ hd = 20
 ac = 10
 ev = 3
 attacks = [{
-"damage": 55,
+"damage": 35,
 "flavour": "hammer"
 }]
-min_depth = 14
-max_depth = 15
+min_depth = 6
+max_depth = 7
 weight = 2
 xp_value = 45
 tile_path = "res://assets/tiles/individual/mon/humanoids/giants/titan.png"

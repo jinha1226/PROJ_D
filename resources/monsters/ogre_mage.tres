@@ -15,8 +15,8 @@ attacks = [{
 "damage": 16,
 "flavour": "hit"
 }]
-min_depth = 9
-max_depth = 13
+min_depth = 4
+max_depth = 7
 weight = 7
 xp_value = 18
 tile_path = "res://assets/tiles/individual/mon/humanoids/ogre_mage.png"

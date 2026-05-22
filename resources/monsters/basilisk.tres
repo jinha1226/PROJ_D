@@ -16,8 +16,8 @@ attacks = [{
 "damage": 20,
 "flavour": "bite"
 }]
-min_depth = 5
-max_depth = 12
+min_depth = 3
+max_depth = 6
 xp_value = 12
 tile_path = "res://assets/tiles/individual/mon/animals/basilisk.png"
 glyph = "l"

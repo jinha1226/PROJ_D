@@ -15,8 +15,8 @@ attacks = [{
 "damage": 6,
 "flavour": "hit"
 }]
-min_depth = 3
-max_depth = 7
+min_depth = 2
+max_depth = 4
 weight = 14
 xp_value = 8
 tile_path = "res://assets/tiles/individual/mon/humanoids/gnoll.png"
