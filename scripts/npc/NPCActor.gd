@@ -59,8 +59,6 @@ func setup(map: DungeonMap, pos: Vector2i) -> void:
 	grid_pos = pos
 	position = map.grid_to_world(pos)
 	queue_redraw()
-	if TurnManager != null:
-		TurnManager.register_actor(self)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_PREDELETE:

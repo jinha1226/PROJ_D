@@ -21,6 +21,11 @@ func _spawn_monsters_layer() -> void:
 	host.monsters_layer.name = "Monsters"
 	host.add_child(host.monsters_layer)
 
+func _spawn_npcs_layer() -> void:
+	host.npcs_layer = Node2D.new()
+	host.npcs_layer.name = "NPCs"
+	host.add_child(host.npcs_layer)
+
 func _spawn_unique_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
 	var unique_data: MonsterData = MonsterRegistry.unique_for_depth(depth)
 	if unique_data == null:
@@ -356,10 +361,48 @@ func _monster_count_for_depth(d: int) -> int:
 		return randi_range(10, 14)
 	return randi_range(9, 13)
 
+func _spawn_npcs_for_floor(count: int = 10) -> void:
+	if not host.get("npcs_layer"):
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = host._floor_lifecycle._floor_seed(GameManager.depth) ^ 0xABCDABCD
+	var placed: int = 0
+	var attempts: int = 0
+	while placed < count and attempts < 800:
+		attempts += 1
+		var p: Vector2i = host.map.random_floor_tile(rng)
+		if not host.map.is_walkable(p):
+			continue
+		if p == host.player.grid_pos:
+			continue
+		if host._chebyshev(p, host.player.grid_pos) < 5:
+			continue
+		if host._monster_at(p) != null:
+			continue
+		var npc := ExplorerNPC.new()
+		host.npcs_layer.add_child(npc)
+		npc.setup(host.map, p)
+		npc.died.connect(_on_npc_died.bind(npc))
+		TurnManager.register_actor(npc)
+		placed += 1
+
+func _on_npc_died(npc: NPCActor) -> void:
+	TurnManager.unregister_actor(npc)
+	npc.remove_from_group("npcs")
+	var tw := npc.create_tween()
+	tw.tween_property(npc, "modulate:a", 0.0, 0.15)
+	tw.tween_callback(npc.queue_free)
+
 func _clear_monsters() -> void:
 	for n in host.get_tree().get_nodes_in_group("monsters"):
 		TurnManager.unregister_actor(n)
 		n.remove_from_group("monsters")
+		n.queue_free()
+
+func _clear_npcs() -> void:
+	for n in host.get_tree().get_nodes_in_group("npcs"):
+		TurnManager.unregister_actor(n)
+		n.remove_from_group("npcs")
 		n.queue_free()
 
 func _clear_floor_items() -> void:

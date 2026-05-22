@@ -2,6 +2,7 @@ extends Node2D
 
 const DungeonMapScene = preload("res://scripts/dungeon/DungeonMap.gd")
 const PlayerScene = preload("res://scripts/entities/Player.gd")
+const CompanionScene = preload("res://scripts/entities/Companion.gd")
 const MonsterScene = preload("res://scripts/entities/Monster.gd")
 const FloorItemScene = preload("res://scripts/entities/FloorItem.gd")
 const TopHUDScene = preload("res://scenes/ui/TopHUD.tscn")
@@ -59,8 +60,10 @@ var _effects_layer: EffectsLayer
 var _spell_targeting: SpellTargeting
 var map: DungeonMap
 var player: Player
+var _companions: Array = []  # Array[Companion] — active in-dungeon nodes
 var items_layer: Node2D
 var monsters_layer: Node2D
+var npcs_layer: Node2D
 var camera: Camera2D
 var ui_layer: CanvasLayer
 var top_hud: TopHUD
@@ -72,6 +75,7 @@ var _targeting_spell: SpellData = null
 var _targeting_tiles: Array = []
 var _targeting_node: SpellTargetOverlay = null
 var _targeting_monster: Monster = null
+var _targeting_throw_entry: Dictionary = {}
 var _pending_essence_pickups: Array = []
 var _essence_pickup_popup_open: bool = false
 
@@ -126,9 +130,12 @@ func _ready() -> void:
 	_spell_targeting.setup(self)
 	if not GameManager.run_in_progress:
 		GameManager.start_new_run()
+	PartyManager.on_run_start(GameManager.depth)
 	_spawn_map()
 	_spawn_service._spawn_items_layer()
 	_spawn_service._spawn_monsters_layer()
+	_spawn_service._spawn_npcs_layer()
+	_spawn_service._spawn_npcs_for_floor(10)
 	_spawn_path_overlay()
 	_spawn_player()
 	if not GameManager.pending_player_state.is_empty():
@@ -155,6 +162,7 @@ func _ready() -> void:
 		_generate_branch_floor(GameManager.branch_zone, GameManager.branch_floor, true)
 	else:
 		_floor_lifecycle._generate_floor(GameManager.depth, _floor_lifecycle._floor_seed(GameManager.depth))
+		_spawn_companions()
 		_spawn_camera()
 		_spawn_ui()
 		if GameManager.selected_race_id == "tester":
@@ -205,11 +213,17 @@ func _unhandled_input(event: InputEvent) -> void:
 			var screen_pos: Vector2 = event.position
 			if not _auto_path.is_empty() or _auto_exploring:
 				_cancel_auto_walk("tapped")
-			if _targeting_spell != null:
+			if _targeting_spell != null or not _targeting_throw_entry.is_empty():
 				var canvas_tf: Transform2D = get_viewport().get_canvas_transform()
 				var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
 				var tile: Vector2i = map.world_to_grid(world_pos)
-				if _targeting_monster != null and tile == _targeting_monster.grid_pos:
+				if not _targeting_throw_entry.is_empty():
+					if _targeting_tiles.has(tile):
+						_confirm_throw(tile)
+					else:
+						_cancel_throw()
+						CombatLog.post("Throw cancelled.", Color(0.65, 0.65, 0.65))
+				elif _targeting_monster != null and tile == _targeting_monster.grid_pos:
 					_spell_targeting._confirm_targeting()
 				elif _targeting_monster == null and _targeting_tiles.has(tile):
 					_spell_targeting._confirm_targeting()
@@ -245,11 +259,17 @@ func _unhandled_input(event: InputEvent) -> void:
 			var screen_pos: Vector2 = event.position
 			if not _auto_path.is_empty() or _auto_exploring:
 				_cancel_auto_walk("tapped")
-			if _targeting_spell != null:
+			if _targeting_spell != null or not _targeting_throw_entry.is_empty():
 				var canvas_tf: Transform2D = get_viewport().get_canvas_transform()
 				var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
 				var tile: Vector2i = map.world_to_grid(world_pos)
-				if _targeting_monster != null and tile == _targeting_monster.grid_pos:
+				if not _targeting_throw_entry.is_empty():
+					if _targeting_tiles.has(tile):
+						_confirm_throw(tile)
+					else:
+						_cancel_throw()
+						CombatLog.post("Throw cancelled.", Color(0.65, 0.65, 0.65))
+				elif _targeting_monster != null and tile == _targeting_monster.grid_pos:
 					_spell_targeting._confirm_targeting()
 				elif _targeting_monster == null and _targeting_tiles.has(tile):
 					_spell_targeting._confirm_targeting()
@@ -726,6 +746,57 @@ func _spawn_player() -> void:
 	player.damaged.connect(_on_player_damaged)
 	player.weapon_attacked.connect(_on_player_weapon_attacked)
 
+
+func _spawn_companions() -> void:
+	if map == null or player == null:
+		return
+	for cdata in PartyManager.get_active_companions():
+		var companion := CompanionScene.new()
+		companion.name = "Companion_" + cdata.id
+		add_child(companion)
+		var spawn_pos: Vector2i = _find_companion_spawn_pos(player.grid_pos)
+		companion.setup(cdata, map, spawn_pos)
+		_companions.append(companion)
+		TurnManager.register_actor(companion)
+
+
+func _despawn_companions() -> void:
+	for c in _companions:
+		if is_instance_valid(c):
+			TurnManager.unregister_actor(c)
+			c.sync_to_data()
+			c.queue_free()
+	_companions.clear()
+
+
+func _find_companion_spawn_pos(near: Vector2i) -> Vector2i:
+	var offsets: Array = [
+		Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1),
+		Vector2i(1, 1), Vector2i(-1, 1), Vector2i(1, -1), Vector2i(-1, -1),
+	]
+	for off in offsets:
+		var candidate: Vector2i = near + off
+		if map != null and map.is_walkable(candidate) and _tile_free_of_actors(candidate):
+			return candidate
+	return near  # fallback: overlap (rare)
+
+
+func _tile_free_of_actors(pos: Vector2i) -> bool:
+	if player != null and player.grid_pos == pos:
+		return false
+	for c in _companions:
+		if is_instance_valid(c) and c.grid_pos == pos:
+			return false
+	return true
+
+
+func _on_companion_died(companion_node: Companion) -> void:
+	TurnManager.unregister_actor(companion_node)
+	_companions.erase(companion_node)
+	if companion_node.data != null:
+		CombatLog.post(companion_node.data.display_name + "이(가) 쓰러졌습니다!",
+			Color(1.0, 0.4, 0.4))
+
 func _queue_essence_pickup(essence_id: String, floor_item: FloorItem = null) -> void:
 	if player == null or essence_id == "":
 		return
@@ -854,6 +925,8 @@ func _spawn_ui() -> void:
 	bottom_hud.quickslot_swap_requested.connect(_on_quickslot_swap_requested)
 	if bottom_hud.has_signal("menu_pressed"):
 		bottom_hud.menu_pressed.connect(_on_menu_button_pressed)
+	if bottom_hud.has_signal("party_pressed"):
+		bottom_hud.party_pressed.connect(_on_party_pressed)
 	if top_hud.has_signal("zoom_in_pressed"):
 		top_hud.zoom_in_pressed.connect(func(): _zoom_by(ZOOM_STEP))
 	if top_hud.has_signal("zoom_out_pressed"):
@@ -1486,6 +1559,7 @@ func _on_turn_budget_exhausted() -> void:
 		if player != null:
 			player.grant_skill_xp("survival", 15.0)
 		CombatLog.post(LocaleManager.t("LOG_EXPEDITION_SAFE_RETURN_OK"), Color(0.5, 0.95, 0.7))
+		PartyManager.on_run_complete()
 		TownState.record_safe_return({
 			"race": GameManager.selected_race_id,
 			"depth_reached": GameManager.depth,
@@ -1505,6 +1579,7 @@ func _on_player_died() -> void:
 	# keep spamming damage against a corpse.
 	TurnManager.abort_actor_loop()
 	CombatLog.post(LocaleManager.t("LOG_YOU_DIED"), Color(1.0, 0.3, 0.3))
+	PartyManager.on_run_failed()
 	GameManager.end_run("death")
 	TownState.record_death({
 		"race": GameManager.selected_race_id,
@@ -1561,7 +1636,9 @@ func _on_branch_enter() -> void:
 	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
 	CombatLog.post(LocaleManager.t("LOG_YOU_ENTER_THE") % cfg.get("display_name", branch_id),
 		Color(0.4, 1.0, 0.6))
+	_despawn_companions()
 	_generate_branch_floor(branch_id, 1, true)
+	_spawn_companions()
 	_reset_expedition_budget()
 	_center_camera_on_player(true)
 	_update_hud()
@@ -1580,7 +1657,9 @@ func _on_branch_stairs_down() -> void:
 	GameManager.branch_floor += 1
 	CombatLog.post(LocaleManager.t("LOG_B") % [ZoneManager.branch_config(branch_id).get("display_name", branch_id),
 		GameManager.branch_floor], Color(0.4, 1.0, 0.6))
+	_despawn_companions()
 	_generate_branch_floor(branch_id, GameManager.branch_floor, true)
+	_spawn_companions()
 	_reset_expedition_budget()
 	_center_camera_on_player(true)
 	_update_hud()
@@ -1592,6 +1671,7 @@ func _on_branch_stairs_up() -> void:
 	if branch_id == "":
 		return
 	_cancel_auto_walk("stairs")
+	_despawn_companions()
 	if GameManager.branch_floor <= 1:
 		# Exit branch back to main path
 		_cache_branch_floor(branch_id, 1)
@@ -1611,6 +1691,7 @@ func _on_branch_stairs_up() -> void:
 		_cache_branch_floor(branch_id, GameManager.branch_floor)
 		GameManager.branch_floor -= 1
 		_generate_branch_floor(branch_id, GameManager.branch_floor, false)
+	_spawn_companions()
 	_reset_expedition_budget()
 	_center_camera_on_player(true)
 	_update_hud()
@@ -1675,6 +1756,7 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 		# Restore monsters
 		_spawn_service._clear_monsters()
 		_spawn_service._clear_floor_items()
+		_spawn_service._clear_npcs()
 		for entry in state.get("monsters", []):
 			var md: MonsterData = MonsterRegistry.get_by_id(String(entry.get("id", "")))
 			if md == null: continue
@@ -1729,6 +1811,7 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 	player.bind_map(map, arrival_pos)
 	_spawn_service._clear_monsters()
 	_spawn_service._clear_floor_items()
+	_spawn_service._clear_npcs()
 	if is_boss_floor:
 		_spawn_branch_boss(branch_id)
 	else:
@@ -2030,6 +2113,7 @@ func save_with_cache() -> void:
 
 func _on_dungeon_cleared() -> void:
 	CombatLog.post(LocaleManager.t("LOG_YOU_HAVE_CLEARED_THE_DUNGEON"), Color(1.0, 0.9, 0.2))
+	PartyManager.on_run_complete()
 	GameManager.end_run("victory")
 	TownState.record_victory({
 		"race": GameManager.selected_race_id,
@@ -2062,9 +2146,12 @@ func _on_stairs_down() -> void:
 		_on_dungeon_cleared()
 		return
 	CombatLog.post(LocaleManager.t("LOG_YOU_DESCEND_TO_B") % GameManager.depth, Color(0.6, 1.0, 1.0))
+	_despawn_companions()
 	_spawn_service._clear_monsters()
 	_spawn_service._clear_floor_items()
+	_spawn_service._clear_npcs()
 	_floor_lifecycle._generate_floor(GameManager.depth, _floor_lifecycle._floor_seed(GameManager.depth), true)
+	_spawn_companions()
 	RacePassiveSystem.on_floor_changed(player)
 	_reset_expedition_budget()
 	_center_camera_on_player(true)
@@ -2085,9 +2172,12 @@ func _on_stairs_up() -> void:
 	GameManager.ascend()
 	CombatLog.post(LocaleManager.t("LOG_YOU_CLIMB_TO_B") % GameManager.depth,
 		Color(0.85, 1.0, 0.85))
+	_despawn_companions()
 	_spawn_service._clear_monsters()
 	_spawn_service._clear_floor_items()
+	_spawn_service._clear_npcs()
 	_floor_lifecycle._generate_floor(GameManager.depth, _floor_lifecycle._floor_seed(GameManager.depth), false)
+	_spawn_companions()
 	RacePassiveSystem.on_floor_changed(player)
 	_reset_expedition_budget()
 	_center_camera_on_player(true)
@@ -2104,6 +2194,7 @@ func _travel_to_floor(target_depth: int) -> void:
 	_floor_lifecycle._cache_current_floor()
 	_spawn_service._clear_monsters()
 	_spawn_service._clear_floor_items()
+	_spawn_service._clear_npcs()
 	var going_down: bool = target_depth > GameManager.depth
 	GameManager.travel_to(target_depth)
 	CombatLog.post(LocaleManager.t("LOG_YOU_TRAVEL_TO_B") % target_depth, Color(0.7, 0.9, 1.0))
@@ -2170,6 +2261,53 @@ func _on_status_pressed() -> void:
 		return
 	StatusDialog.open(player, self)
 
+
+func _on_party_pressed() -> void:
+	_open_party_dialog()
+
+
+func _open_party_dialog() -> void:
+	var active := PartyManager.get_active_companions()
+	if active.is_empty():
+		CombatLog.post("동료가 없습니다.", Color(0.7, 0.7, 0.7))
+		return
+	var dlg: GameDialog = GameDialog.create_ratio("파티", 0.9, 0.85)
+	add_child(dlg)
+	var body: VBoxContainer = dlg.get_body()
+	for cdata in active:
+		var companion_btn := Button.new()
+		companion_btn.text = cdata.display_name + "  XL" + str(cdata.xl) + \
+			("  [장기]" if cdata.is_long_term else "")
+		companion_btn.pressed.connect(func() -> void:
+			CompanionUI.open(cdata, player, self))
+		body.add_child(companion_btn)
+	# Hire button — show if can recruit and pool is not empty
+	if PartyManager.can_recruit() and not PartyManager.hireable_pool.is_empty():
+		var sep := HSeparator.new()
+		body.add_child(sep)
+		var hire_lbl := Label.new()
+		hire_lbl.text = "고용 가능"
+		hire_lbl.add_theme_color_override("font_color", Color(0.8, 0.9, 0.6))
+		body.add_child(hire_lbl)
+		for cdata in PartyManager.hireable_pool:
+			var hire_btn := Button.new()
+			hire_btn.text = "[고용] " + cdata.display_name + " (" + _job_display(cdata.job_id) + ")"
+			hire_btn.pressed.connect(func() -> void:
+				if PartyManager.recruit(cdata):
+					_spawn_companions()
+					dlg.close()
+					_open_party_dialog())
+			body.add_child(hire_btn)
+
+
+func _job_display(job_id: String) -> String:
+	match job_id:
+		"fighter": return "전사"
+		"ranger": return "궁수"
+		"mage": return "마법사"
+	return job_id
+
+
 func _on_bestiary_pressed() -> void:
 	if player == null:
 		return
@@ -2180,6 +2318,35 @@ func begin_spell_targeting(spell: SpellData, p: Player) -> void:
 
 func begin_spell_targeting_auto(spell: SpellData, p: Player) -> void:
 	_spell_targeting.begin_spell_targeting_auto(spell, p)
+
+func begin_throw_targeting(entry: Dictionary) -> void:
+	if player == null or map == null:
+		return
+	_spell_targeting._cancel_targeting()
+	_targeting_throw_entry = entry.duplicate()
+	var visible: Dictionary = player.compute_fov()
+	_targeting_tiles = []
+	for tile: Vector2i in visible.keys():
+		var d: int = max(abs(tile.x - player.grid_pos.x), abs(tile.y - player.grid_pos.y))
+		if d > 0 and d <= ThrowSystem.THROW_RANGE:
+			_targeting_tiles.append(tile)
+	_targeting_node = SpellTargetOverlay.new()
+	_effect_layer.add_child(_targeting_node)
+	_targeting_node.init(null, player, _targeting_tiles)
+	CombatLog.post("Select a tile to throw to (tap again to cancel).", Color(0.85, 0.85, 0.5))
+
+func _confirm_throw(tile: Vector2i) -> void:
+	var entry: Dictionary = _targeting_throw_entry.duplicate()
+	_cancel_throw()
+	ThrowSystem.resolve(entry, tile, player, self)
+	TurnManager.end_player_turn(Status.speed_mult(player))
+
+func _cancel_throw() -> void:
+	_targeting_throw_entry = {}
+	_targeting_tiles = []
+	if _targeting_node != null:
+		_targeting_node.queue_free()
+		_targeting_node = null
 
 func _on_rest_pressed() -> void:
 	if player == null or player.hp <= 0 or not TurnManager.is_player_turn:
@@ -2799,6 +2966,7 @@ func _debug_warp_to(target_depth: int) -> void:
 	_floor_lifecycle._cache_current_floor()
 	_spawn_service._clear_monsters()
 	_spawn_service._clear_floor_items()
+	_spawn_service._clear_npcs()
 	GameManager.travel_to(target_depth)
 	CombatLog.post(LocaleManager.t("LOG_DEBUG_WARP_TO_B") % target_depth, Color(1.0, 0.85, 0.3))
 	_floor_lifecycle._generate_floor(target_depth, _floor_lifecycle._floor_seed(target_depth), true)
@@ -2813,6 +2981,7 @@ func _debug_warp_to_branch(branch_id: String, branch_floor: int) -> void:
 	_floor_lifecycle._cache_current_floor()
 	_spawn_service._clear_monsters()
 	_spawn_service._clear_floor_items()
+	_spawn_service._clear_npcs()
 	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
 	var entry_depth: int = int(cfg.get("entrance_range", [1, 1])[1])
 	GameManager.branch_zone = branch_id
