@@ -282,11 +282,23 @@ func _unhandled_input(event: InputEvent) -> void:
 			_handle_tap(screen_pos)
 			get_viewport().set_input_as_handled()
 
+func _npc_at(pos: Vector2i) -> NPCActor:
+	for n in get_tree().get_nodes_in_group("npcs"):
+		if n is NPCActor and n.grid_pos == pos:
+			return n
+	return null
+
 func _handle_tap(screen_pos: Vector2) -> void:
 	# Convert screen → world via canvas transform (camera-aware).
 	var canvas_tf: Transform2D = get_viewport().get_canvas_transform()
 	var world_pos: Vector2 = canvas_tf.affine_inverse() * screen_pos
 	var target: Vector2i = map.world_to_grid(world_pos)
+	# NPC info — show before attack check so tapping an allied NPC opens info
+	# rather than attacking (NPCs are not currently attackable by the player).
+	var tapped_npc: NPCActor = _npc_at(target)
+	if tapped_npc != null and target != player.grid_pos:
+		NPCInfoDialog.show_for(tapped_npc, self)
+		return
 	if player.can_attack_tile(target):
 		var w_id: String = player.equipped_weapon_id
 		var w: ItemData = ItemRegistry.get_by_id(w_id) if ItemRegistry != null and w_id != "" else null

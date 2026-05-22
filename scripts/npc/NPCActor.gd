@@ -182,6 +182,20 @@ func _has_potential_ally() -> bool:
 			return true
 	return false
 
+## Returns true if pos is occupied by any actor (monster, player, or NPC).
+## Used by movement actions to prevent overlap.
+func _is_pos_occupied(pos: Vector2i) -> bool:
+	for node in get_tree().get_nodes_in_group("monsters"):
+		if is_instance_valid(node) and node.grid_pos == pos:
+			return true
+	for node in get_tree().get_nodes_in_group("player"):
+		if is_instance_valid(node) and node.grid_pos == pos:
+			return true
+	for node in get_tree().get_nodes_in_group("npcs"):
+		if node != self and is_instance_valid(node) and node.grid_pos == pos:
+			return true
+	return false
+
 # ── Actor hook overrides ──────────────────────────────────────────────────────
 
 func _on_take_damage_visual() -> void:

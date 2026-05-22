@@ -28,6 +28,6 @@ func _step_toward(actor: NPCActor, target: Vector2i) -> Vector2i:
 		if step == Vector2i.ZERO:
 			continue
 		var pos := actor.grid_pos + step
-		if actor._map.in_bounds(pos) and actor._map.is_walkable(pos):
+		if actor._map.in_bounds(pos) and actor._map.is_walkable(pos) and not actor._is_pos_occupied(pos):
 			return step
 	return Vector2i.ZERO

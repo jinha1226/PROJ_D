@@ -14,7 +14,7 @@ func execute(actor: NPCActor) -> bool:
 	var candidates := _flee_candidates(away)
 	for step: Vector2i in candidates:
 		var pos := actor.grid_pos + step
-		if actor._map.in_bounds(pos) and actor._map.is_walkable(pos):
+		if actor._map.in_bounds(pos) and actor._map.is_walkable(pos) and not actor._is_pos_occupied(pos):
 			actor.grid_pos = pos
 			actor.position = actor._map.grid_to_world(pos)
 			actor.facing = step
