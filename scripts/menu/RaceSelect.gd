@@ -117,7 +117,14 @@ func _make_portrait(data: RaceData) -> Control:
 	else:
 		if data.base_sprite_path != "" and ResourceLoader.exists(data.base_sprite_path):
 			_add_layer(cont, data.base_sprite_path, dim)
-		_add_layer(cont, _DEFAULT_BODY, dim)
+			# Always-on overlays (head, hair) from same sprite dir
+			var sprite_dir: String = data.base_sprite_path.get_base_dir()
+			for fname in Player._BASE_OVERLAY_FILES:
+				var overlay_path: String = sprite_dir + "/" + fname + ".png"
+				if ResourceLoader.exists(overlay_path):
+					_add_layer(cont, overlay_path, dim)
+		else:
+			_add_layer(cont, _DEFAULT_BODY, dim)
 	return cont
 
 func _add_layer(parent: Control, path: String, dim: bool) -> void:
@@ -127,14 +134,20 @@ func _add_layer(parent: Control, path: String, dim: bool) -> void:
 	if tex == null:
 		return
 	var rect := TextureRect.new()
-	# Crop to S-facing frame (frame 4) if this is an 8-dir spritesheet
 	var tw := tex.get_width()
 	var th := tex.get_height()
+	var atlas := AtlasTexture.new()
+	atlas.atlas = tex
 	if tw >= th * 4:
+		# 8-dir horizontal: frame 4 = S
 		var fw := tw / 8
-		var atlas := AtlasTexture.new()
-		atlas.atlas = tex
 		atlas.region = Rect2(4 * fw, 0, fw, th)
+		rect.texture = atlas
+	elif tw * 4 == th * 9 and th % 4 == 0:
+		# ULPC 4-dir vertical: row 2 = S, frame 0
+		var fw := tw / 9
+		var fh := th / 4
+		atlas.region = Rect2(0, 2 * fh, fw, fh)
 		rect.texture = atlas
 	else:
 		rect.texture = tex

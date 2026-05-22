@@ -1,0 +1,205 @@
+{
+  "image": "temple_sheet.png",
+  "raw_image": "temple_raw.png",
+  "tile_size": 32,
+  "columns": 17,
+  "rows": 3,
+  "counts": {
+    "floor": 1,
+    "wall": 1,
+    "object": 17,
+    "total": 19
+  },
+  "frames": [
+    {
+      "index": 0,
+      "role": "override_floor",
+      "row_type": "floor",
+      "source": "assets/tiles/individual/dngn/floor/mosaic0.png",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 1,
+      "role": "override_wall",
+      "row_type": "wall",
+      "source": "assets/tiles/individual/dngn/wall/marble_wall1.png",
+      "x": 0,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 2,
+      "role": "faith_altar:war",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/trog.png",
+      "x": 0,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 3,
+      "role": "faith_altar:arcana",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/sif_muna1.png",
+      "x": 32,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 4,
+      "role": "faith_altar:trickery",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/dithmenos1.png",
+      "x": 64,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 5,
+      "role": "faith_altar:death",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/yredelemnul.png",
+      "x": 96,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 6,
+      "role": "faith_altar:essence",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/gozag0.png",
+      "x": 128,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 7,
+      "role": "broken_altar_variant",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/ashenzari.png",
+      "x": 160,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 8,
+      "role": "broken_altar_variant",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/beogh.png",
+      "x": 192,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 9,
+      "role": "broken_altar_variant",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/cheibriados.png",
+      "x": 224,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 10,
+      "role": "broken_altar_variant",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/elyvilon.png",
+      "x": 256,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 11,
+      "role": "broken_altar_variant",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/fedhas.png",
+      "x": 288,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 12,
+      "role": "broken_altar_variant",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/gozag0.png",
+      "x": 320,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 13,
+      "role": "broken_altar_variant",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/ru.png",
+      "x": 352,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 14,
+      "role": "broken_altar_variant",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/shining_one.png",
+      "x": 384,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 15,
+      "role": "broken_altar_variant",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/uskayaw.png",
+      "x": 416,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 16,
+      "role": "broken_altar_variant",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/vehumet1.png",
+      "x": 448,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 17,
+      "role": "broken_altar_variant",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/xom0.png",
+      "x": 480,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 18,
+      "role": "broken_altar_variant",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/altars/zin1.png",
+      "x": 512,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    }
+  ]
+}

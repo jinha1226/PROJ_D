@@ -16,6 +16,7 @@ dex_mod = 2
 int_mod = 4
 hp_mod = -2
 mp_mod = 2
+size_score = 9
 skill_aptitudes = {
 "fighting": -2,
 "unarmed": -2,

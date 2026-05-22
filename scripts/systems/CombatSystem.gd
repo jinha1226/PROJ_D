@@ -11,6 +11,164 @@ const BACKSTAB_DAGGER_BONUS: float = 0.25
 const BACKSTAB_MAX_BONUS: float = 1.0
 const XP_PACE_MULTIPLIER: float = 2.2
 
+# d100 balance adapter. Existing content still stores compact roguelike values
+# (EV, AC, HD, skill 0-9), but contested rolls resolve as explicit percent
+# chances so tuning can be reasoned about on a 1-100 scale.
+const D100_MIN_HIT_CHANCE: int = 10
+const D100_MAX_HIT_CHANCE: int = 92
+const D100_MIN_BLOCK_CHANCE: int = 3
+const D100_MAX_BLOCK_CHANCE: int = 75
+const D100_PLAYER_BASE_ACCURACY: int = 72
+const D100_MONSTER_BASE_ACCURACY: int = 68
+const D100_STAT_POINT_PCT: int = 2
+const D100_SKILL_LEVEL_PCT: int = 4
+const D100_PLUS_PCT: int = 3
+const D100_SLAY_PCT: int = 4
+const D100_EV_POINT_PCT: int = 3
+const D100_HD_POINT_PCT: int = 3
+const D100_STATUS_HIT_PENALTY_PCT: int = 5
+
+const _DAMAGE_DICE_BY_WEAPON_ID: Dictionary = {
+	"dagger": [1, 4, 1],
+	"frost_dagger": [1, 4, 1],
+	"venom_dagger": [1, 4, 1],
+	"stiletto": [1, 4, 1],
+	"dirk": [1, 4, 2],
+	"quick_blade": [1, 4, 2],
+	"assassin_blade": [1, 6, 1],
+	"short_sword": [1, 6, 0],
+	"arming_sword": [1, 8, 0],
+	"long_sword": [1, 8, 0],
+	"flaming_sword": [1, 8, 0],
+	"bastard_sword": [1, 10, 0],
+	"great_blade": [2, 6, 0],
+	"mace": [1, 6, 1],
+	"shock_mace": [1, 6, 1],
+	"battle_axe": [1, 8, 1],
+	"spear": [1, 6, 0],
+	"javelin": [1, 6, 0],
+	"shortbow": [1, 6, 0],
+	"longbow": [1, 8, 0],
+	"crossbow": [1, 8, 1],
+	"staff": [1, 6, 0],
+}
+
+static func _clamp_pct(value: int, lo: int = 0, hi: int = 100) -> int:
+	return clampi(value, lo, hi)
+
+static func _roll_pct(chance: int) -> bool:
+	return randi_range(1, 100) <= _clamp_pct(chance)
+
+static func _d100_hit_chance(accuracy_pct: int, ev_score_pct: int) -> int:
+	return _clamp_pct(
+		accuracy_pct - ev_score_pct,
+		D100_MIN_HIT_CHANCE,
+		D100_MAX_HIT_CHANCE
+	)
+
+static func _player_accuracy_pct(player: Player, profile: Dictionary) -> int:
+	var stat_source: int = int(profile.stat_source)
+	var skill_level: int = int(profile.skill_level)
+	var weapon_plus: int = int(profile.weapon_plus)
+	var req_hit_pen: int = int(profile.req_hit_pen)
+	var skill_id: String = String(profile.skill_id)
+	var acc: int = D100_PLAYER_BASE_ACCURACY
+	acc += (stat_source - 10) * D100_STAT_POINT_PCT
+	acc += skill_level * D100_SKILL_LEVEL_PCT
+	acc += weapon_plus * D100_PLUS_PCT
+	acc += player.slay_bonus * D100_SLAY_PCT
+	acc += req_hit_pen * D100_STATUS_HIT_PENALTY_PCT
+	if String(Player.SKILL_REMAP.get(skill_id, "")) == "weapon_mastery":
+		acc += player.get_skill_level("weapon_mastery") * 2
+	acc -= Status.hit_penalty(player) * D100_STATUS_HIT_PENALTY_PCT
+	return acc
+
+static func _monster_accuracy_pct(monster: Monster) -> int:
+	var acc: int = D100_MONSTER_BASE_ACCURACY
+	acc += monster.data.hd * D100_HD_POINT_PCT
+	acc -= Status.hit_penalty(monster) * D100_STATUS_HIT_PENALTY_PCT
+	return acc
+
+static func _ev_score_pct(evasion: int) -> int:
+	return max(0, evasion) * D100_EV_POINT_PCT
+
+static func _roll_dice(count: int, sides: int, flat: int = 0) -> int:
+	var total: int = flat
+	for _i in range(max(0, count)):
+		total += randi_range(1, max(1, sides))
+	return total
+
+static func _weapon_damage_dice(weapon: ItemData) -> Array:
+	if weapon == null:
+		return [1, 3, 0]
+	if _DAMAGE_DICE_BY_WEAPON_ID.has(weapon.id):
+		return _DAMAGE_DICE_BY_WEAPON_ID[weapon.id]
+	var dmg: int = max(1, weapon.damage)
+	if dmg <= 4:
+		return [1, 4, 0]
+	if dmg <= 6:
+		return [1, 6, 0]
+	if dmg <= 8:
+		return [1, 6, 1]
+	if dmg <= 10:
+		return [1, 8, 0]
+	if dmg <= 12:
+		return [1, 10, 0]
+	if dmg <= 15:
+		return [2, 6, 1]
+	return [2, 8, 0]
+
+static func _player_size_score(player: Player) -> int:
+	var game_manager = player.GameManager if player != null else null
+	var race_registry = null
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree != null:
+		race_registry = tree.root.get_node_or_null("RaceRegistry")
+	if game_manager == null or race_registry == null:
+		return 10
+	var race: RaceData = race_registry.get_by_id(game_manager.selected_race_id)
+	return race.size_score if race != null else 10
+
+static func _damage_modifier_from_score(score: int) -> int:
+	if score <= 12:
+		return -1
+	if score <= 20:
+		return 0
+	if score <= 28:
+		return 1
+	if score <= 36:
+		return 2
+	return 3
+
+static func _player_damage_modifier(player: Player, profile: Dictionary) -> int:
+	var stat_source: int = int(profile.stat_source)
+	var size_score: int = _player_size_score(player)
+	return _damage_modifier_from_score(stat_source + size_score)
+
+static func _skill_damage_step(skill_level: int) -> int:
+	if skill_level >= 9:
+		return 3
+	if skill_level >= 6:
+		return 2
+	if skill_level >= 3:
+		return 1
+	return 0
+
+static func _armor_soak_roll(ac_score: int) -> int:
+	if ac_score <= 0:
+		return 0
+	if ac_score <= 1:
+		return randi_range(0, 1)
+	if ac_score <= 2:
+		return randi_range(1, 2)
+	if ac_score <= 4:
+		return randi_range(1, 3)
+	if ac_score <= 6:
+		return randi_range(2, 4)
+	if ac_score <= 8:
+		return randi_range(3, 5)
+	return randi_range(4, 7) + max(0, ac_score - 10) / 3
+
 ## Updates `actor.facing` to point at `target_pos`. No-op if the actor has
 ## no facing field, no grid_pos, or already overlaps the target. Used by
 ## the attack entry points so BodyPartSystem.DIRECTION_BIAS sees a
@@ -69,53 +227,32 @@ static func _player_attack_profile(player: Player) -> Dictionary:
 	return profile
 
 static func _player_attack_hits(player: Player, monster: Monster, profile: Dictionary) -> bool:
-	var stat_source: int = int(profile.stat_source)
-	var weapon_plus: int = int(profile.weapon_plus)
-	var req_hit_pen: int = int(profile.req_hit_pen)
-	var skill_level: int = int(profile.skill_level)
-	var stat_bonus: int = stat_source / 2
-	var to_hit_base: int = 15 + stat_bonus + weapon_plus + req_hit_pen + player.slay_bonus
-	to_hit_base += randi_range(0, skill_level * 2) if skill_level > 0 else 0
-	var skill_id: String = String(profile.skill_id)
-	# Weapon Mastery grants accuracy bonus to all melee attacks. Use SKILL_REMAP
-	# to identify melee under the dual-tier model: any sub-skill that maps to
-	# weapon_mastery counts as melee.
-	if String(Player.SKILL_REMAP.get(skill_id, "")) == "weapon_mastery":
-		to_hit_base += player.get_skill_level("weapon_mastery") / 2
-	# Status penalties: blind attacker swings wildly; blind defender dodges less.
-	to_hit_base = max(1, to_hit_base - Status.hit_penalty(player))
-	var to_hit_roll: int = randi_range(0, max(1, to_hit_base))
 	var eff_ev: int = max(0, monster.data.ev - (2 if Status.has(monster, "drained") else 0) - Status.ev_penalty(monster))
-	var ev_roll: int = (randi_range(0, eff_ev * 2) + randi_range(0, eff_ev * 2)) / 2
-	var luck: int = randi_range(0, 19)
-	if luck == 0:
-		ev_roll = 0
-	elif luck == 1:
-		ev_roll = 9999
-	return to_hit_roll >= ev_roll
+	var accuracy_pct: int = _player_accuracy_pct(player, profile)
+	var ev_score_pct: int = _ev_score_pct(eff_ev)
+	var hit_chance: int = _d100_hit_chance(accuracy_pct, ev_score_pct)
+	return _roll_pct(hit_chance)
 
 static func _player_attack_base_damage(player: Player, monster: Monster, profile: Dictionary) -> int:
-	var weapon_dmg: int = int(profile.weapon_dmg)
-	var stat_source: int = int(profile.stat_source)
-	var stat_scale: float = float(profile.stat_scale)
+	var weapon: ItemData = profile.weapon
 	var req_dmg_pct: float = float(profile.req_dmg_pct)
-	var raw: int = weapon_dmg + int(float(stat_source) * stat_scale) + randi_range(0, 3) + player.slay_bonus
+	var skill_level: int = int(profile.skill_level)
+	var dice: Array = _weapon_damage_dice(weapon)
+	var raw: int = _roll_dice(int(dice[0]), int(dice[1]), int(dice[2]))
+	raw += _player_damage_modifier(player, profile)
+	raw += _skill_damage_step(skill_level)
+	raw += int(profile.weapon_plus)
+	raw += player.slay_bonus
 	if "body_wounds" in player:
 		var arm_penalty: int = (int(player.body_wounds.get("left_arm", 0))
 				+ int(player.body_wounds.get("right_arm", 0))) * 2
 		raw = max(1, raw - arm_penalty)
-	var skill_id: String = String(profile.skill_id)
-	# Any melee sub-skill (canonical bucket = weapon_mastery) gets the
-	# fighting-style flat damage add. Previously hard-coded list; now
-	# uses SKILL_REMAP so new ids work without editing CombatSystem.
-	if String(Player.SKILL_REMAP.get(skill_id, "")) == "weapon_mastery":
-		raw += player.get_skill_level("weapon_mastery") / 4
 	if req_dmg_pct < 1.0:
 		raw = max(1, int(float(raw) * req_dmg_pct))
 	if Status.has(player, "damage_boost"):
 		raw += randi_range(1, 4)
 	var eff_ac: int = max(0, monster.data.ac - (2 if Status.has(monster, "corroded") else 0))
-	var soak: int = randi_range(0, eff_ac + 1)
+	var soak: int = _armor_soak_roll(eff_ac)
 	return max(1, raw - soak)
 
 static func player_attack_monster(player: Player, monster: Monster) -> void:
@@ -142,11 +279,9 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	# All flats sum into one accumulator; all mults compose into one factor; brand
 	# is applied last because it is already resist-scaled and not subject to player mults.
 	var flat_bonus: int = 0
-	flat_bonus += skill_level / 2
-	flat_bonus += randi_range(0, skill_level / 3)
 	flat_bonus += RacePassiveSystem.melee_damage_bonus(player)
 	flat_bonus += backstab_bonus
-	var mult: float = 1.0 + float(skill_level) * 0.04
+	var mult: float = 1.0
 	# Faith/essence damage hooks routed by canonical bucket. Mastery mults
 	# stubbed to 1.0 under the dual-tier model — left in chain so future
 	# wiring of the 20% hidden-familiarity bonus can replace them in place.
@@ -230,17 +365,18 @@ static func _cleave_hit(player: Player, primary: Monster, base_dmg: int) -> void
 static func _dagger_swift_strike(player: Player, monster: Monster) -> void:
 	if monster.hp <= 0 or monster.data == null:
 		return
-	var weapon_dmg: int = UNARMED_DAMAGE
+	var weapon_item: ItemData = null
 	if player.equipped_weapon_id != "":
 		var w: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
 		if w != null:
-			var entry: Dictionary = player.equipped_weapon_entry()
-			var wplus: int = int(entry.get("plus", 0))
-			weapon_dmg = max(UNARMED_DAMAGE, w.damage + wplus)
-	var stat_bonus: int = player.dexterity / 3
-	var raw: int = weapon_dmg + randi_range(0, 2)
+			weapon_item = w
+	var dice: Array = _weapon_damage_dice(weapon_item)
+	var raw: int = _roll_dice(int(dice[0]), int(dice[1]), int(dice[2]))
+	raw += _damage_modifier_from_score(player.dexterity + _player_size_score(player))
+	raw += _skill_damage_step(player.get_skill_level("weapon_mastery"))
+	raw += randi_range(0, 1)
 	var eff_ac2: int = max(0, monster.data.ac - (2 if Status.has(monster, "corroded") else 0))
-	var soak: int = randi_range(0, eff_ac2 + 1)
+	var soak: int = _armor_soak_roll(eff_ac2)
 	var final: int = max(1, raw - soak)
 	CombatLog.hit(LocaleManager.t("LOG_YOU_HIT_THE_FOR") % [monster.data.display_name, final])
 	var was_alive: bool = monster.hp > 0
@@ -248,7 +384,6 @@ static func _dagger_swift_strike(player: Player, monster: Monster) -> void:
 	monster.become_aware(player.grid_pos)
 	if was_alive and monster.hp <= 0:
 		CombatLog.hit(LocaleManager.t("LOG_YOU_KILL_THE") % monster.data.display_name)
-		var weapon_item: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if (player.equipped_weapon_id != "" and ItemRegistry != null) else null
 		_apply_player_kill_rewards(player, monster, Player.weapon_skill_for_item(weapon_item))
 
 static func _apply_player_kill_rewards(player: Player, monster: Monster, skill_id: String) -> void:
@@ -406,10 +541,12 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	_face_toward(player, monster.grid_pos)
 	var dmg_base: int = int(ra.get("damage", 2))
 	var verb: String = String(ra.get("verb", "shoots"))
-	var to_hit_base: int = max(1, 15 + monster.data.hd - Status.hit_penalty(monster))
-	var to_hit_roll: int = randi_range(0, to_hit_base)
 	var eff_player_ev: int = max(0, player.ev - Status.ev_penalty(player))
-	if to_hit_roll < eff_player_ev:
+	var hit_chance: int = _d100_hit_chance(
+		_monster_accuracy_pct(monster),
+		_ev_score_pct(eff_player_ev)
+	)
+	if not _roll_pct(hit_chance):
 		CombatLog.miss(LocaleManager.t("LOG_THE_AT_YOU_AND_MISSES") \
 				% [monster.data.display_name, verb])
 		_grant_defense_xp(player, "dodging", DEFENSE_XP_DODGE)
@@ -422,7 +559,7 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	if player.equipped_shield_id != "" and not player.has_two_handed_weapon():
 		_grant_defense_xp(player, "shields", DEFENSE_XP_HIT_TAKEN)
 	var raw: int = randi_range(1, max(1, dmg_base))
-	var soak: int = randi_range(0, player.ac + 1)
+	var soak: int = _armor_soak_roll(player.ac)
 	var final: int = max(1, raw - soak)
 	final = max(1, final - EssenceSystem.incoming_damage_reduction(player))
 	# Defense mastery: small multiplicative DR after flat soak/reduction.
@@ -455,20 +592,15 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 			dmg_base += witem.damage / 2
 
 	var eff_ev: int = max(0, player.ev + (3 if Status.has(player, "blur") else 0) - Status.ev_penalty(player))
-	# DCSS monster to-hit: random2(15 + hd + 1); reduced if monster is blind.
-	var to_hit_roll: int = randi_range(0, max(1, 15 + monster.data.hd - Status.hit_penalty(monster)))
-	# Player EV roll: average of two random2(ev*2)
-	var ev_roll: int = (randi_range(0, eff_ev * 2) + randi_range(0, eff_ev * 2)) / 2
-	var luck: int = randi_range(0, 19)
-	if luck == 0:
-		ev_roll = 0
-	elif luck == 1:
-		ev_roll = 9999
 	# Defensive skill XP. Constants live in DEFENSE_XP_PER_EVENT.
 	# A successful dodge (miss) trains dodging. A hit landing trains armor (if
 	# armor-equipped) and shields (if shield-equipped — practice gain even
 	# without a block). A successful block grants extra shields XP below.
-	if to_hit_roll < ev_roll:
+	var hit_chance: int = _d100_hit_chance(
+		_monster_accuracy_pct(monster),
+		_ev_score_pct(eff_ev)
+	)
+	if not _roll_pct(hit_chance):
 		CombatLog.miss(LocaleManager.t("LOG_THE_MISSES_YOU") % monster.data.display_name)
 		_grant_defense_xp(player, "dodging", DEFENSE_XP_DODGE)
 		return
@@ -490,7 +622,7 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	var dmg_lo: int = max(1, dmg_base * 3 / 5)
 	var dmg_hi: int = max(dmg_lo, dmg_base * 3 / 2)
 	var raw: int = randi_range(dmg_lo, dmg_hi) + monster.data.hd / 2
-	var soak: int = randi_range(0, player.ac + 1)
+	var soak: int = _armor_soak_roll(player.ac)
 	if Status.has(player, "stoneskin"):
 		soak += randi_range(2, 5)
 	var final: int = max(1, raw - soak)
@@ -545,10 +677,12 @@ static func _try_player_shield_block(player: Player, monster: Monster) -> bool:
 		return false
 	var shield_skill: int = player.get_skill_level("defense")
 	var missing: int = max(0, shield.required_skill - shield_skill)
-	var block_pct: float = float(shield.effect_value) / 100.0 \
-		+ shield_skill * 0.03 \
-		- missing * 0.04
-	if randf() >= block_pct:
+	var block_pct: int = _clamp_pct(
+		shield.effect_value + shield_skill * 3 - missing * 4,
+		D100_MIN_BLOCK_CHANCE,
+		D100_MAX_BLOCK_CHANCE
+	)
+	if not _roll_pct(block_pct):
 		return false
 	CombatLog.miss(LocaleManager.t("LOG_YOU_BLOCK_THE_S_ATTACK") % monster.data.display_name)
 	return true

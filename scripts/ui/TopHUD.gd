@@ -21,15 +21,15 @@ signal item_slot_pressed(index: int)
 @onready var zoom_out_button: Button = $MainMargin/MainVBox/TopRow/Bars/StatsRow/ZoomOutButton
 @onready var rune_row: HBoxContainer = $MainMargin/MainVBox/RuneRow
 @onready var item_slots: Array = [
-    $MainMargin/MainVBox/ItemRow/ItemSlot0,
-    $MainMargin/MainVBox/ItemRow/ItemSlot1,
-    $MainMargin/MainVBox/ItemRow/ItemSlot2,
-    $MainMargin/MainVBox/ItemRow/ItemSlot3,
-    $MainMargin/MainVBox/ItemRow/ItemSlot4,
-    $MainMargin/MainVBox/ItemRow/ItemSlot5,
-    $MainMargin/MainVBox/ItemRow/ItemSlot6,
-    $MainMargin/MainVBox/ItemRow/ItemSlot7,
-    $MainMargin/MainVBox/ItemRow/ItemSlot8,
+	$MainMargin/MainVBox/ItemRow/ItemSlot0,
+	$MainMargin/MainVBox/ItemRow/ItemSlot1,
+	$MainMargin/MainVBox/ItemRow/ItemSlot2,
+	$MainMargin/MainVBox/ItemRow/ItemSlot3,
+	$MainMargin/MainVBox/ItemRow/ItemSlot4,
+	$MainMargin/MainVBox/ItemRow/ItemSlot5,
+	$MainMargin/MainVBox/ItemRow/ItemSlot6,
+	$MainMargin/MainVBox/ItemRow/ItemSlot7,
+	$MainMargin/MainVBox/ItemRow/ItemSlot8,
 ]
 
 var _pulse_t: float = 0.0
@@ -40,67 +40,67 @@ var _hp_max_val: int = 1
 
 
 func _ready() -> void:
-    if minimap_button != null:
-        minimap_button.pressed.connect(func(): minimap_pressed.emit())
-    if zoom_in_button != null:
-        zoom_in_button.pressed.connect(func(): zoom_in_pressed.emit())
-    if zoom_out_button != null:
-        zoom_out_button.pressed.connect(func(): zoom_out_pressed.emit())
-    var bars: VBoxContainer = get_node_or_null("MainMargin/MainVBox/TopRow/Bars")
-    if bars != null:
-        _buff_row = HFlowContainer.new()
-        _buff_row.add_theme_constant_override("h_separation", 6)
-        _buff_row.add_theme_constant_override("v_separation", 2)
-        bars.add_child(_buff_row)
-        _wound_row = HFlowContainer.new()
-        _wound_row.add_theme_constant_override("h_separation", 6)
-        _wound_row.add_theme_constant_override("v_separation", 2)
-        bars.add_child(_wound_row)
-    for i in item_slots.size():
-        var qs = item_slots[i]
-        qs.slot_index = i
-        if qs.has_signal("pressed_slot"):
-            qs.pressed_slot.connect(func(idx): item_slot_pressed.emit(idx))
+	if minimap_button != null:
+		minimap_button.pressed.connect(func(): minimap_pressed.emit())
+	if zoom_in_button != null:
+		zoom_in_button.pressed.connect(func(): zoom_in_pressed.emit())
+	if zoom_out_button != null:
+		zoom_out_button.pressed.connect(func(): zoom_out_pressed.emit())
+	var bars: VBoxContainer = get_node_or_null("MainMargin/MainVBox/TopRow/Bars")
+	if bars != null:
+		_buff_row = HFlowContainer.new()
+		_buff_row.add_theme_constant_override("h_separation", 6)
+		_buff_row.add_theme_constant_override("v_separation", 2)
+		bars.add_child(_buff_row)
+		_wound_row = HFlowContainer.new()
+		_wound_row.add_theme_constant_override("h_separation", 6)
+		_wound_row.add_theme_constant_override("v_separation", 2)
+		bars.add_child(_wound_row)
+	for i in item_slots.size():
+		var qs = item_slots[i]
+		qs.slot_index = i
+		if qs.has_signal("pressed_slot"):
+			qs.pressed_slot.connect(func(idx): item_slot_pressed.emit(idx))
 
 
 func _process(delta: float) -> void:
-    if _pulsing:
-        _pulse_t += delta * 6.0
-        var a: float = 0.6 + 0.4 * sin(_pulse_t)
-        hp_bar.modulate = Color(1, a, a, 1)
-    else:
-        hp_bar.modulate = Color.WHITE
+	if _pulsing:
+		_pulse_t += delta * 6.0
+		var a: float = 0.6 + 0.4 * sin(_pulse_t)
+		hp_bar.modulate = Color(1, a, a, 1)
+	else:
+		hp_bar.modulate = Color.WHITE
 
 
 func set_hp(cur: int, max_: int) -> void:
-    _hp_max_val = max(1, max_)
-    hp_bar.max_value = _hp_max_val
-    hp_bar.value = cur
-    if hp_label:
-        hp_label.text = "HP %d/%d" % [cur, max_]
-    var ratio: float = float(cur) / float(_hp_max_val)
-    _pulsing = ratio < 0.3
+	_hp_max_val = max(1, max_)
+	hp_bar.max_value = _hp_max_val
+	hp_bar.value = cur
+	if hp_label:
+		hp_label.text = "HP %d/%d" % [cur, max_]
+	var ratio: float = float(cur) / float(_hp_max_val)
+	_pulsing = ratio < 0.3
 
 
 func set_mp(cur: int, max_: int) -> void:
-    mp_bar.max_value = max(1, max_)
-    mp_bar.value = cur
-    if mp_label:
-        mp_label.text = "MP %d/%d" % [cur, max_]
+	mp_bar.max_value = max(1, max_)
+	mp_bar.value = cur
+	if mp_label:
+		mp_label.text = "MP %d/%d" % [cur, max_]
 
 
 func set_xp(cur: int, to_next: int, level: int) -> void:
-    xp_bar.max_value = max(1, to_next)
-    xp_bar.value = cur
-    if xp_label:
-        xp_label.text = "XP %d/%d" % [cur, to_next]
-    if level_label:
-        level_label.text = "Lv.%d" % level
+	xp_bar.max_value = max(1, to_next)
+	xp_bar.value = cur
+	if xp_label:
+		xp_label.text = "XP %d/%d" % [cur, to_next]
+	if level_label:
+		level_label.text = "Lv.%d" % level
 
 
 func set_gold(g: int) -> void:
-    if gold_label:
-        gold_label.text = "%dg" % g
+	if gold_label:
+		gold_label.text = "%dg" % g
 
 
 var _last_turn: int = 0
@@ -108,150 +108,150 @@ var _budget_remaining: int = -1
 var _budget_total: int = 0
 
 func set_turn(t: int) -> void:
-    _last_turn = t
-    _refresh_turn_label()
+	_last_turn = t
+	_refresh_turn_label()
 
 func set_turn_budget(remaining: int, total: int) -> void:
-    _budget_remaining = remaining
-    _budget_total = total
-    _refresh_turn_label()
+	_budget_remaining = remaining
+	_budget_total = total
+	_refresh_turn_label()
 
 func _refresh_turn_label() -> void:
-    if turn_label == null:
-        return
-    if _budget_total > 0:
-        turn_label.text = "T:%d  ⏳%d/%d" % [_last_turn, _budget_remaining, _budget_total]
-        # Color the budget red when low; orange when warning; normal otherwise.
-        var ratio: float = float(_budget_remaining) / float(_budget_total)
-        if ratio <= 0.0:
-            turn_label.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35))
-        elif ratio <= 0.10:
-            turn_label.add_theme_color_override("font_color", Color(1.0, 0.45, 0.35))
-        elif ratio <= 0.25:
-            turn_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
-        else:
-            turn_label.remove_theme_color_override("font_color")
-    else:
-        turn_label.text = "T:%d" % _last_turn
-        turn_label.remove_theme_color_override("font_color")
+	if turn_label == null:
+		return
+	if _budget_total > 0:
+		turn_label.text = "T:%d  ⏳%d/%d" % [_last_turn, _budget_remaining, _budget_total]
+		# Color the budget red when low; orange when warning; normal otherwise.
+		var ratio: float = float(_budget_remaining) / float(_budget_total)
+		if ratio <= 0.0:
+			turn_label.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35))
+		elif ratio <= 0.10:
+			turn_label.add_theme_color_override("font_color", Color(1.0, 0.45, 0.35))
+		elif ratio <= 0.25:
+			turn_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
+		else:
+			turn_label.remove_theme_color_override("font_color")
+	else:
+		turn_label.text = "T:%d" % _last_turn
+		turn_label.remove_theme_color_override("font_color")
 
 
 func set_depth(d: int) -> void:
-    _update_depth_label(d)
+	_update_depth_label(d)
 
 
 func set_branch(label: String) -> void:
-    _update_depth_label(-1, label)
+	_update_depth_label(-1, label)
 
 
 func set_location(branch_label: String, d: int) -> void:
-    _update_depth_label(d, branch_label)
+	_update_depth_label(d, branch_label)
 
 
 func _update_depth_label(d: int = -1, branch: String = "") -> void:
-    if depth_label == null:
-        return
-    var b := branch if branch != "" else depth_label.text.split(":")[0]
-    if b == "":
-        b = "Dungeon"
-    if d >= 0:
-        depth_label.text = "%s:%d" % [b, d]
-    else:
-        depth_label.text = b
+	if depth_label == null:
+		return
+	var b := branch if branch != "" else depth_label.text.split(":")[0]
+	if b == "":
+		b = "Dungeon"
+	if d >= 0:
+		depth_label.text = "%s:%d" % [b, d]
+	else:
+		depth_label.text = b
 
 
 func set_minimap_texture(tex: Texture2D) -> void:
-    if minimap_button:
-        minimap_button.icon = tex
+	if minimap_button:
+		minimap_button.icon = tex
 
 
 func set_buffs(statuses: Dictionary) -> void:
-    if _buff_row == null:
-        return
-    for c in _buff_row.get_children():
-        c.queue_free()
-    for sid in statuses.keys():
-        var turns: int = int(statuses[sid])
-        if turns <= 0:
-            continue
-        var info: Dictionary = Status.INFO.get(sid, {})
-        var col: Color = info.get("color", Color(0.7, 0.7, 0.8))
-        var label_text: String = info.get("name", sid.capitalize())
-        var badge := _make_buff_badge(label_text, turns, col)
-        _buff_row.add_child(badge)
+	if _buff_row == null:
+		return
+	for c in _buff_row.get_children():
+		c.queue_free()
+	for sid in statuses.keys():
+		var turns: int = int(statuses[sid])
+		if turns <= 0:
+			continue
+		var info: Dictionary = Status.INFO.get(sid, {})
+		var col: Color = info.get("color", Color(0.7, 0.7, 0.8))
+		var label_text: String = info.get("name", sid.capitalize())
+		var badge := _make_buff_badge(label_text, turns, col)
+		_buff_row.add_child(badge)
 
 
 func set_wounds(wounds: Array) -> void:
-    if _wound_row == null:
-        return
-    for c in _wound_row.get_children():
-        c.queue_free()
-    for entry in wounds:
-        var part_id: String = String(entry[0])
-        var lvl: int = int(entry[1])
-        var label: String = BodyPartSystem.PART_LABELS.get(part_id, part_id)
-        var display: String = "[%s%s]" % [label, "!" if lvl >= 2 else ""]
-        var col: Color = Color(0.9, 0.15, 0.15) if lvl >= 2 else Color(1.0, 0.55, 0.1)
-        var badge := _make_buff_badge(display, 0, col)
-        (badge.get_child(0) as Label).text = display
-        _wound_row.add_child(badge)
+	if _wound_row == null:
+		return
+	for c in _wound_row.get_children():
+		c.queue_free()
+	for entry in wounds:
+		var part_id: String = String(entry[0])
+		var lvl: int = int(entry[1])
+		var label: String = BodyPartSystem.PART_LABELS.get(part_id, part_id)
+		var display: String = "[%s%s]" % [label, "!" if lvl >= 2 else ""]
+		var col: Color = Color(0.9, 0.15, 0.15) if lvl >= 2 else Color(1.0, 0.55, 0.1)
+		var badge := _make_buff_badge(display, 0, col)
+		(badge.get_child(0) as Label).text = display
+		_wound_row.add_child(badge)
 
 
 func set_runes(player_items: Array) -> void:
-    if rune_row == null:
-        return
-    for c in rune_row.get_children():
-        c.queue_free()
-    var rune_entries: Array = []
-    for entry in player_items:
-        var d = ItemRegistry.get_by_id(String(entry.get("id", ""))) if ItemRegistry != null else null
-        if d != null and d.kind == "rune":
-            rune_entries.append(d)
-    rune_row.visible = not rune_entries.is_empty()
-    for d in rune_entries:
-        var container := Control.new()
-        container.custom_minimum_size = Vector2(32, 32)
-        if d.tile_path != "" and ResourceLoader.exists(d.tile_path):
-            var rect := TextureRect.new()
-            rect.texture = load(d.tile_path) as Texture2D
-            rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-            rect.anchor_right = 1.0
-            rect.anchor_bottom = 1.0
-            rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-            container.add_child(rect)
-        var tooltip_lbl := Label.new()
-        tooltip_lbl.text = d.display_name
-        tooltip_lbl.tooltip_text = d.display_name
-        tooltip_lbl.visible = false
-        container.add_child(tooltip_lbl)
-        rune_row.add_child(container)
+	if rune_row == null:
+		return
+	for c in rune_row.get_children():
+		c.queue_free()
+	var rune_entries: Array = []
+	for entry in player_items:
+		var d = ItemRegistry.get_by_id(String(entry.get("id", ""))) if ItemRegistry != null else null
+		if d != null and d.kind == "rune":
+			rune_entries.append(d)
+	rune_row.visible = not rune_entries.is_empty()
+	for d in rune_entries:
+		var container := Control.new()
+		container.custom_minimum_size = Vector2(32, 32)
+		if d.tile_path != "" and ResourceLoader.exists(d.tile_path):
+			var rect := TextureRect.new()
+			rect.texture = load(d.tile_path) as Texture2D
+			rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			rect.anchor_right = 1.0
+			rect.anchor_bottom = 1.0
+			rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			container.add_child(rect)
+		var tooltip_lbl := Label.new()
+		tooltip_lbl.text = d.display_name
+		tooltip_lbl.tooltip_text = d.display_name
+		tooltip_lbl.visible = false
+		container.add_child(tooltip_lbl)
+		rune_row.add_child(container)
 
 
 func set_item_slot(i: int, icon: Texture2D, text: String) -> void:
-    if i >= 0 and i < item_slots.size():
-        item_slots[i].set_item(icon, text)
+	if i >= 0 and i < item_slots.size():
+		item_slots[i].set_item(icon, text)
 
 
 func set_item_slot_display(i: int, txt: String, color: Color) -> void:
-    if i >= 0 and i < item_slots.size():
-        item_slots[i].set_slot_display(txt, color)
+	if i >= 0 and i < item_slots.size():
+		item_slots[i].set_slot_display(txt, color)
 
 
 static func _make_buff_badge(label: String, turns: int, col: Color) -> Control:
-    var panel := PanelContainer.new()
-    var style := StyleBoxFlat.new()
-    style.bg_color = Color(col.r, col.g, col.b, 0.25)
-    style.border_color = col
-    style.set_border_width_all(1)
-    style.set_corner_radius_all(4)
-    panel.add_theme_stylebox_override("panel", style)
-    var lbl := Label.new()
-    lbl.text = "%s %d" % [label, turns]
-    lbl.add_theme_font_size_override("font_size", 15)
-    lbl.add_theme_color_override("font_color", col)
-    panel.add_child(lbl)
-    return panel
+	var panel := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(col.r, col.g, col.b, 0.25)
+	style.border_color = col
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(4)
+	panel.add_theme_stylebox_override("panel", style)
+	var lbl := Label.new()
+	lbl.text = "%s %d" % [label, turns]
+	lbl.add_theme_font_size_override("font_size", 15)
+	lbl.add_theme_color_override("font_color", col)
+	panel.add_child(lbl)
+	return panel
 
 
 func set_weapon_skill_info(_a: String, _b: int, _c: float, _d: float) -> void:
-    pass
+	pass

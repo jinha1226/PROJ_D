@@ -1,0 +1,434 @@
+{
+  "source": [
+    "scripts/systems/ZoneManager.gd",
+    "scripts/dungeon/DungeonMap.gd"
+  ],
+  "note": "Currently referenced dngn terrain/object tiles, grouped by runtime concept.",
+  "concepts": {
+    "abyss": {
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      },
+      "tiles": [
+        {
+          "role": "configured_floor",
+          "category": "floor",
+          "row_type": "floor",
+          "path": "assets/tiles/individual/dngn/floor/lpc_dark_hex.png",
+          "exists": true
+        },
+        {
+          "role": "configured_wall",
+          "category": "wall",
+          "row_type": "wall",
+          "path": "assets/tiles/individual/dngn/wall/lpc_dark_stone.png",
+          "exists": true
+        }
+      ]
+    },
+    "crypt": {
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 1,
+        "total": 3
+      },
+      "tiles": [
+        {
+          "role": "configured_floor",
+          "category": "floor",
+          "row_type": "floor",
+          "path": "assets/tiles/individual/dngn/floor/necro_squares00.png",
+          "exists": true
+        },
+        {
+          "role": "configured_wall",
+          "category": "wall",
+          "row_type": "wall",
+          "path": "assets/tiles/individual/dngn/wall/wall_stone_necropolis_1.png",
+          "exists": true
+        },
+        {
+          "role": "branch_entrance",
+          "category": "gateways",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/gateways/necropolis_portal.png",
+          "exists": true
+        }
+      ]
+    },
+    "dungeon": {
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      },
+      "tiles": [
+        {
+          "role": "configured_floor",
+          "category": "floor",
+          "row_type": "floor",
+          "path": "assets/tiles/individual/dngn/floor/lpc_stone_cobble.png",
+          "exists": true
+        },
+        {
+          "role": "configured_wall",
+          "category": "wall",
+          "row_type": "wall",
+          "path": "assets/tiles/individual/dngn/wall/lpc_gray_stone.png",
+          "exists": true
+        }
+      ]
+    },
+    "elven_halls": {
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      },
+      "tiles": [
+        {
+          "role": "configured_floor",
+          "category": "floor",
+          "row_type": "floor",
+          "path": "assets/tiles/individual/dngn/floor/lpc_cream_tile.png",
+          "exists": true
+        },
+        {
+          "role": "configured_wall",
+          "category": "wall",
+          "row_type": "wall",
+          "path": "assets/tiles/individual/dngn/wall/lpc_beige_stone.png",
+          "exists": true
+        }
+      ]
+    },
+    "ice_caves": {
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 1,
+        "total": 3
+      },
+      "tiles": [
+        {
+          "role": "configured_floor",
+          "category": "floor",
+          "row_type": "floor",
+          "path": "assets/tiles/individual/dngn/floor/ice0.png",
+          "exists": true
+        },
+        {
+          "role": "configured_wall",
+          "category": "wall",
+          "row_type": "wall",
+          "path": "assets/tiles/individual/dngn/wall/ice_wall0.png",
+          "exists": true
+        },
+        {
+          "role": "branch_entrance",
+          "category": "gateways",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/gateways/ice_cave_portal.png",
+          "exists": true
+        }
+      ]
+    },
+    "infernal": {
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 1,
+        "total": 3
+      },
+      "tiles": [
+        {
+          "role": "configured_floor",
+          "category": "floor",
+          "row_type": "floor",
+          "path": "assets/tiles/individual/dngn/floor/lava00.png",
+          "exists": true
+        },
+        {
+          "role": "configured_wall",
+          "category": "wall",
+          "row_type": "wall",
+          "path": "assets/tiles/individual/dngn/wall/volcanic_wall0.png",
+          "exists": true
+        },
+        {
+          "role": "branch_entrance",
+          "category": "gateways",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/gateways/enter_hell1.png",
+          "exists": true
+        }
+      ]
+    },
+    "lair": {
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      },
+      "tiles": [
+        {
+          "role": "configured_floor",
+          "category": "floor",
+          "row_type": "floor",
+          "path": "assets/tiles/individual/dngn/floor/lpc_dirt.png",
+          "exists": true
+        },
+        {
+          "role": "configured_wall",
+          "category": "wall",
+          "row_type": "wall",
+          "path": "assets/tiles/individual/dngn/wall/lpc_dark_cobble.png",
+          "exists": true
+        }
+      ]
+    },
+    "orc_mines": {
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      },
+      "tiles": [
+        {
+          "role": "configured_floor",
+          "category": "floor",
+          "row_type": "floor",
+          "path": "assets/tiles/individual/dngn/floor/lpc_dark_brick.png",
+          "exists": true
+        },
+        {
+          "role": "configured_wall",
+          "category": "wall",
+          "row_type": "wall",
+          "path": "assets/tiles/individual/dngn/wall/lpc_red_brick.png",
+          "exists": true
+        }
+      ]
+    },
+    "shared_features": {
+      "counts": {
+        "floor": 0,
+        "wall": 0,
+        "object": 4,
+        "total": 4
+      },
+      "tiles": [
+        {
+          "role": "door_closed",
+          "category": "doors",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/doors/closed_door.png",
+          "exists": true
+        },
+        {
+          "role": "door_open",
+          "category": "doors",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/doors/open_door.png",
+          "exists": true
+        },
+        {
+          "role": "stairs_down",
+          "category": "gateways",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/gateways/metal_stairs_down.png",
+          "exists": true
+        },
+        {
+          "role": "stairs_up",
+          "category": "gateways",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/gateways/metal_stairs_up.png",
+          "exists": true
+        }
+      ]
+    },
+    "swamp": {
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 1,
+        "total": 3
+      },
+      "tiles": [
+        {
+          "role": "configured_floor",
+          "category": "floor",
+          "row_type": "floor",
+          "path": "assets/tiles/individual/dngn/floor/swamp0.png",
+          "exists": true
+        },
+        {
+          "role": "configured_wall",
+          "category": "wall",
+          "row_type": "wall",
+          "path": "assets/tiles/individual/dngn/wall/wall_vines0.png",
+          "exists": true
+        },
+        {
+          "role": "branch_entrance",
+          "category": "gateways",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/gateways/enter_swamp.png",
+          "exists": true
+        }
+      ]
+    },
+    "temple": {
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 17,
+        "total": 19
+      },
+      "tiles": [
+        {
+          "role": "override_floor",
+          "category": "floor",
+          "row_type": "floor",
+          "path": "assets/tiles/individual/dngn/floor/mosaic0.png",
+          "exists": true
+        },
+        {
+          "role": "override_wall",
+          "category": "wall",
+          "row_type": "wall",
+          "path": "assets/tiles/individual/dngn/wall/marble_wall1.png",
+          "exists": true
+        },
+        {
+          "role": "faith_altar:war",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/trog.png",
+          "exists": true
+        },
+        {
+          "role": "faith_altar:arcana",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/sif_muna1.png",
+          "exists": true
+        },
+        {
+          "role": "faith_altar:trickery",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/dithmenos1.png",
+          "exists": true
+        },
+        {
+          "role": "faith_altar:death",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/yredelemnul.png",
+          "exists": true
+        },
+        {
+          "role": "faith_altar:essence",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/gozag0.png",
+          "exists": true
+        },
+        {
+          "role": "broken_altar_variant",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/ashenzari.png",
+          "exists": true
+        },
+        {
+          "role": "broken_altar_variant",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/beogh.png",
+          "exists": true
+        },
+        {
+          "role": "broken_altar_variant",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/cheibriados.png",
+          "exists": true
+        },
+        {
+          "role": "broken_altar_variant",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/elyvilon.png",
+          "exists": true
+        },
+        {
+          "role": "broken_altar_variant",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/fedhas.png",
+          "exists": true
+        },
+        {
+          "role": "broken_altar_variant",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/gozag0.png",
+          "exists": true
+        },
+        {
+          "role": "broken_altar_variant",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/ru.png",
+          "exists": true
+        },
+        {
+          "role": "broken_altar_variant",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/shining_one.png",
+          "exists": true
+        },
+        {
+          "role": "broken_altar_variant",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/uskayaw.png",
+          "exists": true
+        },
+        {
+          "role": "broken_altar_variant",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/vehumet1.png",
+          "exists": true
+        },
+        {
+          "role": "broken_altar_variant",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/xom0.png",
+          "exists": true
+        },
+        {
+          "role": "broken_altar_variant",
+          "category": "altars",
+          "row_type": "object",
+          "path": "assets/tiles/individual/dngn/altars/zin1.png",
+          "exists": true
+        }
+      ]
+    }
+  }
+}

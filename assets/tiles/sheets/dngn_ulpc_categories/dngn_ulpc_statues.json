@@ -1,0 +1,630 @@
+{
+  "image": "dngn_ulpc_statues.png",
+  "category": "statues",
+  "tile_size": 32,
+  "columns": 32,
+  "rows": 2,
+  "count": 62,
+  "frames": [
+    {
+      "index": 0,
+      "original_index": 952,
+      "name": "crumbled_column_1",
+      "source": "assets/tiles/individual/dngn/statues/crumbled_column_1.png",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 1,
+      "original_index": 953,
+      "name": "crumbled_column_2",
+      "source": "assets/tiles/individual/dngn/statues/crumbled_column_2.png",
+      "x": 32,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 2,
+      "original_index": 954,
+      "name": "crumbled_column_3",
+      "source": "assets/tiles/individual/dngn/statues/crumbled_column_3.png",
+      "x": 64,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 3,
+      "original_index": 955,
+      "name": "crumbled_column_4",
+      "source": "assets/tiles/individual/dngn/statues/crumbled_column_4.png",
+      "x": 96,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 4,
+      "original_index": 956,
+      "name": "crumbled_column_5",
+      "source": "assets/tiles/individual/dngn/statues/crumbled_column_5.png",
+      "x": 128,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 5,
+      "original_index": 957,
+      "name": "crumbled_column_6",
+      "source": "assets/tiles/individual/dngn/statues/crumbled_column_6.png",
+      "x": 160,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 6,
+      "original_index": 958,
+      "name": "depths_column",
+      "source": "assets/tiles/individual/dngn/statues/depths_column.png",
+      "x": 192,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 7,
+      "original_index": 959,
+      "name": "depths_crumbled_column",
+      "source": "assets/tiles/individual/dngn/statues/depths_crumbled_column.png",
+      "x": 224,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 8,
+      "original_index": 960,
+      "name": "metal_statue",
+      "source": "assets/tiles/individual/dngn/statues/metal_statue.png",
+      "x": 256,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 9,
+      "original_index": 961,
+      "name": "orcish_idol",
+      "source": "assets/tiles/individual/dngn/statues/orcish_idol.png",
+      "x": 288,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 10,
+      "original_index": 962,
+      "name": "statue_ancient_evil",
+      "source": "assets/tiles/individual/dngn/statues/statue_ancient_evil.png",
+      "x": 320,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 11,
+      "original_index": 963,
+      "name": "statue_ancient_hero",
+      "source": "assets/tiles/individual/dngn/statues/statue_ancient_hero.png",
+      "x": 352,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 12,
+      "original_index": 964,
+      "name": "statue_angel",
+      "source": "assets/tiles/individual/dngn/statues/statue_angel.png",
+      "x": 384,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 13,
+      "original_index": 965,
+      "name": "statue_archer",
+      "source": "assets/tiles/individual/dngn/statues/statue_archer.png",
+      "x": 416,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 14,
+      "original_index": 966,
+      "name": "statue_axe",
+      "source": "assets/tiles/individual/dngn/statues/statue_axe.png",
+      "x": 448,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 15,
+      "original_index": 967,
+      "name": "statue_cat",
+      "source": "assets/tiles/individual/dngn/statues/statue_cat.png",
+      "x": 480,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 16,
+      "original_index": 968,
+      "name": "statue_centaur",
+      "source": "assets/tiles/individual/dngn/statues/statue_centaur.png",
+      "x": 512,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 17,
+      "original_index": 969,
+      "name": "statue_cerebov",
+      "source": "assets/tiles/individual/dngn/statues/statue_cerebov.png",
+      "x": 544,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 18,
+      "original_index": 970,
+      "name": "statue_demonic_bust",
+      "source": "assets/tiles/individual/dngn/statues/statue_demonic_bust.png",
+      "x": 576,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 19,
+      "original_index": 971,
+      "name": "statue_depths_asmodeus",
+      "source": "assets/tiles/individual/dngn/statues/statue_depths_asmodeus.png",
+      "x": 608,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 20,
+      "original_index": 972,
+      "name": "statue_depths_fangs",
+      "source": "assets/tiles/individual/dngn/statues/statue_depths_fangs.png",
+      "x": 640,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 21,
+      "original_index": 973,
+      "name": "statue_depths_seraph",
+      "source": "assets/tiles/individual/dngn/statues/statue_depths_seraph.png",
+      "x": 672,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 22,
+      "original_index": 974,
+      "name": "statue_depths_spriggan",
+      "source": "assets/tiles/individual/dngn/statues/statue_depths_spriggan.png",
+      "x": 704,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 23,
+      "original_index": 975,
+      "name": "statue_depths_tengu",
+      "source": "assets/tiles/individual/dngn/statues/statue_depths_tengu.png",
+      "x": 736,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 24,
+      "original_index": 976,
+      "name": "statue_depths_tomes",
+      "source": "assets/tiles/individual/dngn/statues/statue_depths_tomes.png",
+      "x": 768,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 25,
+      "original_index": 977,
+      "name": "statue_depths_zot_ancient_evil",
+      "source": "assets/tiles/individual/dngn/statues/statue_depths_zot_ancient_evil.png",
+      "x": 800,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 26,
+      "original_index": 978,
+      "name": "statue_depths_zot_angel",
+      "source": "assets/tiles/individual/dngn/statues/statue_depths_zot_angel.png",
+      "x": 832,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 27,
+      "original_index": 979,
+      "name": "statue_depths_zot_cerebov",
+      "source": "assets/tiles/individual/dngn/statues/statue_depths_zot_cerebov.png",
+      "x": 864,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 28,
+      "original_index": 980,
+      "name": "statue_depths_zot_devil",
+      "source": "assets/tiles/individual/dngn/statues/statue_depths_zot_devil.png",
+      "x": 896,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 29,
+      "original_index": 981,
+      "name": "statue_depths_zot_dragon",
+      "source": "assets/tiles/individual/dngn/statues/statue_depths_zot_dragon.png",
+      "x": 928,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 30,
+      "original_index": 982,
+      "name": "statue_depths_zot_lich",
+      "source": "assets/tiles/individual/dngn/statues/statue_depths_zot_lich.png",
+      "x": 960,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 31,
+      "original_index": 983,
+      "name": "statue_depths_zot_orb_guardian",
+      "source": "assets/tiles/individual/dngn/statues/statue_depths_zot_orb_guardian.png",
+      "x": 992,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 32,
+      "original_index": 984,
+      "name": "statue_depths_zot_tentacles",
+      "source": "assets/tiles/individual/dngn/statues/statue_depths_zot_tentacles.png",
+      "x": 0,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 33,
+      "original_index": 985,
+      "name": "statue_dragon",
+      "source": "assets/tiles/individual/dngn/statues/statue_dragon.png",
+      "x": 32,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 34,
+      "original_index": 986,
+      "name": "statue_dwarf",
+      "source": "assets/tiles/individual/dngn/statues/statue_dwarf.png",
+      "x": 64,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 35,
+      "original_index": 987,
+      "name": "statue_elephant",
+      "source": "assets/tiles/individual/dngn/statues/statue_elephant.png",
+      "x": 96,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 36,
+      "original_index": 988,
+      "name": "statue_hydra",
+      "source": "assets/tiles/individual/dngn/statues/statue_hydra.png",
+      "x": 128,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 37,
+      "original_index": 989,
+      "name": "statue_imp",
+      "source": "assets/tiles/individual/dngn/statues/statue_imp.png",
+      "x": 160,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 38,
+      "original_index": 990,
+      "name": "statue_iron",
+      "source": "assets/tiles/individual/dngn/statues/statue_iron.png",
+      "x": 192,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 39,
+      "original_index": 991,
+      "name": "statue_maw",
+      "source": "assets/tiles/individual/dngn/statues/statue_maw.png",
+      "x": 224,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 40,
+      "original_index": 992,
+      "name": "statue_mermaid",
+      "source": "assets/tiles/individual/dngn/statues/statue_mermaid.png",
+      "x": 256,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 41,
+      "original_index": 993,
+      "name": "statue_naga",
+      "source": "assets/tiles/individual/dngn/statues/statue_naga.png",
+      "x": 288,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 42,
+      "original_index": 994,
+      "name": "statue_orb",
+      "source": "assets/tiles/individual/dngn/statues/statue_orb.png",
+      "x": 320,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 43,
+      "original_index": 995,
+      "name": "statue_orb_guardian",
+      "source": "assets/tiles/individual/dngn/statues/statue_orb_guardian.png",
+      "x": 352,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 44,
+      "original_index": 996,
+      "name": "statue_polearm",
+      "source": "assets/tiles/individual/dngn/statues/statue_polearm.png",
+      "x": 384,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 45,
+      "original_index": 997,
+      "name": "statue_princess",
+      "source": "assets/tiles/individual/dngn/statues/statue_princess.png",
+      "x": 416,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 46,
+      "original_index": 998,
+      "name": "statue_sigmund",
+      "source": "assets/tiles/individual/dngn/statues/statue_sigmund.png",
+      "x": 448,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 47,
+      "original_index": 999,
+      "name": "statue_snail",
+      "source": "assets/tiles/individual/dngn/statues/statue_snail.png",
+      "x": 480,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 48,
+      "original_index": 1000,
+      "name": "statue_sword",
+      "source": "assets/tiles/individual/dngn/statues/statue_sword.png",
+      "x": 512,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 49,
+      "original_index": 1001,
+      "name": "statue_tengu",
+      "source": "assets/tiles/individual/dngn/statues/statue_tengu.png",
+      "x": 544,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 50,
+      "original_index": 1002,
+      "name": "statue_tentacles",
+      "source": "assets/tiles/individual/dngn/statues/statue_tentacles.png",
+      "x": 576,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 51,
+      "original_index": 1003,
+      "name": "statue_triangle",
+      "source": "assets/tiles/individual/dngn/statues/statue_triangle.png",
+      "x": 608,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 52,
+      "original_index": 1004,
+      "name": "statue_twins",
+      "source": "assets/tiles/individual/dngn/statues/statue_twins.png",
+      "x": 640,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 53,
+      "original_index": 1005,
+      "name": "statue_wraith",
+      "source": "assets/tiles/individual/dngn/statues/statue_wraith.png",
+      "x": 672,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 54,
+      "original_index": 1006,
+      "name": "statue_zot_old_guardian",
+      "source": "assets/tiles/individual/dngn/statues/statue_zot_old_guardian.png",
+      "x": 704,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 55,
+      "original_index": 1007,
+      "name": "statue_zot_oldest_guardian",
+      "source": "assets/tiles/individual/dngn/statues/statue_zot_oldest_guardian.png",
+      "x": 736,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 56,
+      "original_index": 1008,
+      "name": "statue_zot_orb",
+      "source": "assets/tiles/individual/dngn/statues/statue_zot_orb.png",
+      "x": 768,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 57,
+      "original_index": 1009,
+      "name": "statue_zot_serpent",
+      "source": "assets/tiles/individual/dngn/statues/statue_zot_serpent.png",
+      "x": 800,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 58,
+      "original_index": 1010,
+      "name": "statue_zot_tornado",
+      "source": "assets/tiles/individual/dngn/statues/statue_zot_tornado.png",
+      "x": 832,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 59,
+      "original_index": 1011,
+      "name": "zot_entropy_orb_statue",
+      "source": "assets/tiles/individual/dngn/statues/zot_entropy_orb_statue.png",
+      "x": 864,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 60,
+      "original_index": 1012,
+      "name": "zot_fire_orb_statue",
+      "source": "assets/tiles/individual/dngn/statues/zot_fire_orb_statue.png",
+      "x": 896,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 61,
+      "original_index": 1013,
+      "name": "zot_winter_orb_statue",
+      "source": "assets/tiles/individual/dngn/statues/zot_winter_orb_statue.png",
+      "x": 928,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    }
+  ]
+}

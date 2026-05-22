@@ -1,0 +1,45 @@
+{
+  "image": "crypt_sheet.png",
+  "raw_image": "crypt_raw.png",
+  "tile_size": 32,
+  "columns": 1,
+  "rows": 3,
+  "counts": {
+    "floor": 1,
+    "wall": 1,
+    "object": 1,
+    "total": 3
+  },
+  "frames": [
+    {
+      "index": 0,
+      "role": "configured_floor",
+      "row_type": "floor",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares00.png",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 1,
+      "role": "configured_wall",
+      "row_type": "wall",
+      "source": "assets/tiles/individual/dngn/wall/wall_stone_necropolis_1.png",
+      "x": 0,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 2,
+      "role": "branch_entrance",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/gateways/necropolis_portal.png",
+      "x": 0,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    }
+  ]
+}

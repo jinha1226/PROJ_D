@@ -13,6 +13,7 @@ unlock_trigger_id = "gargoyle"
 str_mod = 3
 dex_mod = -3
 hp_mod = -2
+size_score = 10
 resist_mods = ["poison+", "fire+", "electric+"]
 skill_aptitudes = {
 "fighting": 1,

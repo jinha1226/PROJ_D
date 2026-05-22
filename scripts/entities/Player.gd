@@ -67,15 +67,18 @@ var _base_tex: Texture2D = DEFAULT_BASE_TEX
 var _body_doll_tex: Texture2D = null
 var _hand1_doll_tex: Texture2D = null
 var _hand2_doll_tex: Texture2D = null
-var _equip_sheets: Array[Texture2D] = []
+var _base_sheets: Array[Texture2D] = []   # always-on race overlays: head, hair
+var _equip_sheets: Array[Texture2D] = []  # equipment-conditional overlays
+
+const _BASE_OVERLAY_FILES: Array[String] = ["head", "hair"]
 
 const _EQUIP_SHEET_SLOTS: Array[Array] = [
-	["equipped_armor_id",  "armor_overlay"],
-	["equipped_helmet_id", "helmet_overlay"],
-	["equipped_gloves_id", "gloves_overlay"],
-	["equipped_boots_id",  "boots_overlay"],
-	["equipped_weapon_id", "sword_overlay"],
-	["equipped_shield_id", "shield_overlay"],
+	["equipped_armor_id",  "armor"],
+	["equipped_helmet_id", "helmet"],
+	["equipped_gloves_id", "gloves"],
+	["equipped_boots_id",  "boots"],
+	["equipped_weapon_id", "sword"],
+	["equipped_shield_id", "shield"],
 ]
 
 var hp: int = 22
@@ -1916,9 +1919,17 @@ func _refresh_paperdoll() -> void:
 		var path: String = String(DOLL_HAND2_MAP[shield_base_id])
 		if ResourceLoader.exists(path):
 			_hand2_doll_tex = load(path) as Texture2D
-	# Load 8-dir equipment sheets from race sprite folder
-	_equip_sheets.clear()
+	# Load always-on race base overlays (head, hair) from sprite folder
+	_base_sheets.clear()
 	var sprite_dir := _get_sprite_dir()
+	for fname in _BASE_OVERLAY_FILES:
+		var bpath: String = sprite_dir + "/" + fname + ".png"
+		if sprite_dir != "" and ResourceLoader.exists(bpath):
+			var btex := load(bpath) as Texture2D
+			if btex != null:
+				_base_sheets.append(btex)
+	# Load equipment-conditional sheets from race sprite folder
+	_equip_sheets.clear()
 	for pair in _EQUIP_SHEET_SLOTS:
 		var slot_val: String = get(pair[0]) if pair[0] in self else ""
 		if slot_val == "":
@@ -1936,35 +1947,69 @@ func _refresh_paperdoll() -> void:
 				_equip_sheets.append(tex)
 	queue_redraw()
 
-## Returns spritesheet column index for an 8-dir horizontal sheet.
+## Returns row index for ULPC 4-dir vertical sheet (N=0, W=1, S=2, E=3).
+## Diagonals map to nearest cardinal.
+func _facing_to_row() -> int:
+	match facing:
+		Vector2i( 0, -1): return 0  # N
+		Vector2i(-1, -1): return 1  # NW → W
+		Vector2i(-1,  0): return 1  # W
+		Vector2i(-1,  1): return 2  # SW → S
+		Vector2i( 0,  1): return 2  # S
+		Vector2i( 1,  1): return 2  # SE → S
+		Vector2i( 1,  0): return 3  # E
+		Vector2i( 1, -1): return 3  # NE → E
+	return 2  # default S
+
+## Returns column index for an 8-dir horizontal sheet (legacy).
 ## Actual sheet order (left→right): N, NE, W, SE, S, SW, E, NW
 func _facing_to_frame() -> int:
 	match facing:
 		Vector2i( 0, -1): return 0  # N
-		Vector2i(-1, -1): return 7  # NW  (sheet col 7 = NW visual)
+		Vector2i(-1, -1): return 7  # NW
 		Vector2i(-1,  0): return 2  # W
-		Vector2i(-1,  1): return 5  # SW  (sheet col 5 = SW visual)
+		Vector2i(-1,  1): return 5  # SW
 		Vector2i( 0,  1): return 4  # S
-		Vector2i( 1,  1): return 3  # SE  (sheet col 3 = SE visual)
+		Vector2i( 1,  1): return 3  # SE
 		Vector2i( 1,  0): return 6  # E
-		Vector2i( 1, -1): return 1  # NE  (sheet col 1 = NE visual)
+		Vector2i( 1, -1): return 1  # NE
 	return 4
 
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
 	if GameManager.use_tiles:
+		var row := _facing_to_row()
+		var frame := _facing_to_frame()
 		if _base_tex != null:
 			var tw := _base_tex.get_width()
 			var th := _base_tex.get_height()
 			if tw >= th * 4:
-				# 8-direction horizontal spritesheet: N NE W SE S SW E NW
+				# 8-dir horizontal sheet: N NE W SE S SW E NW
 				var fw := tw / 8
-				var src := Rect2(_facing_to_frame() * fw, 0, fw, th)
-				draw_texture_rect_region(_base_tex, rect, src)
+				draw_texture_rect_region(_base_tex, rect, Rect2(frame * fw, 0, fw, th))
+			elif tw * 4 == th * 9 and th % 4 == 0:
+				# ULPC 4-dir vertical sheet: rows N/W/S/E, 9 cols of 64px
+				var fw := tw / 9
+				var fh := th / 4
+				draw_texture_rect_region(_base_tex, rect, Rect2(0, row * fh, fw, fh))
 			else:
 				draw_texture_rect(_base_tex, rect, false)
-		# 8-dir equipment sheets (drawn over base, same frame selection)
-		var frame := _facing_to_frame()
+		# Always-on base overlays (head, hair) drawn over body
+		for btex in _base_sheets:
+			if btex == null:
+				continue
+			var btw := btex.get_width()
+			var bth := btex.get_height()
+			if btw >= bth * 4:
+				var bfw := btw / 8
+				draw_texture_rect_region(btex, rect, Rect2(frame * bfw, 0, bfw, bth))
+			elif btw * 4 == bth * 9 and bth % 4 == 0:
+				var bfw := btw / 9
+				var bfh := bth / 4
+				draw_texture_rect_region(btex, rect, Rect2(0, row * bfh, bfw, bfh))
+			else:
+				draw_texture_rect(btex, rect, false)
+		# Equipment overlay sheets drawn on top
 		for etex in _equip_sheets:
 			if etex == null:
 				continue
@@ -1973,9 +2018,13 @@ func _draw() -> void:
 			if etw >= eth * 4:
 				var efw := etw / 8
 				draw_texture_rect_region(etex, rect, Rect2(frame * efw, 0, efw, eth))
+			elif etw * 4 == eth * 9 and eth % 4 == 0:
+				var efw := etw / 9
+				var efh := eth / 4
+				draw_texture_rect_region(etex, rect, Rect2(0, row * efh, efw, efh))
 			else:
 				draw_texture_rect(etex, rect, false)
-		# Legacy single-frame paperdoll fallback (no 8-dir sheet available)
+		# Legacy single-frame paperdoll fallback
 		if _equip_sheets.is_empty():
 			if _body_doll_tex != null:
 				draw_texture_rect(_body_doll_tex, rect, false)

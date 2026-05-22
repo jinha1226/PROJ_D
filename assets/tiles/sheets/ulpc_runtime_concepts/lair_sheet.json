@@ -1,0 +1,35 @@
+{
+  "image": "lair_sheet.png",
+  "raw_image": "lair_raw.png",
+  "tile_size": 32,
+  "columns": 1,
+  "rows": 2,
+  "counts": {
+    "floor": 1,
+    "wall": 1,
+    "object": 0,
+    "total": 2
+  },
+  "frames": [
+    {
+      "index": 0,
+      "role": "configured_floor",
+      "row_type": "floor",
+      "source": "assets/tiles/individual/dngn/floor/lpc_dirt.png",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 1,
+      "role": "configured_wall",
+      "row_type": "wall",
+      "source": "assets/tiles/individual/dngn/wall/lpc_dark_cobble.png",
+      "x": 0,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    }
+  ]
+}

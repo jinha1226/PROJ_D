@@ -1,0 +1,1180 @@
+{
+  "image": "dngn_ulpc_water.png",
+  "category": "water",
+  "tile_size": 32,
+  "columns": 32,
+  "rows": 4,
+  "count": 117,
+  "frames": [
+    {
+      "index": 0,
+      "original_index": 2152,
+      "name": "deep_water",
+      "source": "assets/tiles/individual/dngn/water/deep_water.png",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 1,
+      "original_index": 2153,
+      "name": "deep_water2",
+      "source": "assets/tiles/individual/dngn/water/deep_water2.png",
+      "x": 32,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 2,
+      "original_index": 2154,
+      "name": "deep_water_murky",
+      "source": "assets/tiles/individual/dngn/water/deep_water_murky.png",
+      "x": 64,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 3,
+      "original_index": 2155,
+      "name": "deep_water_murky2",
+      "source": "assets/tiles/individual/dngn/water/deep_water_murky2.png",
+      "x": 96,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 4,
+      "original_index": 2156,
+      "name": "deep_water_wave_E1",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_E1.png",
+      "x": 128,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 5,
+      "original_index": 2157,
+      "name": "deep_water_wave_E2",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_E2.png",
+      "x": 160,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 6,
+      "original_index": 2158,
+      "name": "deep_water_wave_N1",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_N1.png",
+      "x": 192,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 7,
+      "original_index": 2159,
+      "name": "deep_water_wave_N2",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_N2.png",
+      "x": 224,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 8,
+      "original_index": 2160,
+      "name": "deep_water_wave_S1",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_S1.png",
+      "x": 256,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 9,
+      "original_index": 2161,
+      "name": "deep_water_wave_S2",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_S2.png",
+      "x": 288,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 10,
+      "original_index": 2162,
+      "name": "deep_water_wave_W1",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_W1.png",
+      "x": 320,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 11,
+      "original_index": 2163,
+      "name": "deep_water_wave_W2",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_W2.png",
+      "x": 352,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 12,
+      "original_index": 2164,
+      "name": "deep_water_wave_corner_NE1",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_corner_NE1.png",
+      "x": 384,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 13,
+      "original_index": 2165,
+      "name": "deep_water_wave_corner_NE2",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_corner_NE2.png",
+      "x": 416,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 14,
+      "original_index": 2166,
+      "name": "deep_water_wave_corner_NW1",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_corner_NW1.png",
+      "x": 448,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 15,
+      "original_index": 2167,
+      "name": "deep_water_wave_corner_NW2",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_corner_NW2.png",
+      "x": 480,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 16,
+      "original_index": 2168,
+      "name": "deep_water_wave_corner_SE1",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_corner_SE1.png",
+      "x": 512,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 17,
+      "original_index": 2169,
+      "name": "deep_water_wave_corner_SE2",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_corner_SE2.png",
+      "x": 544,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 18,
+      "original_index": 2170,
+      "name": "deep_water_wave_corner_SW1",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_corner_SW1.png",
+      "x": 576,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 19,
+      "original_index": 2171,
+      "name": "deep_water_wave_corner_SW2",
+      "source": "assets/tiles/individual/dngn/water/deep_water_wave_corner_SW2.png",
+      "x": 608,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 20,
+      "original_index": 2172,
+      "name": "grey_dirt_bb",
+      "source": "assets/tiles/individual/dngn/water/grey_dirt_bb.png",
+      "x": 640,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 21,
+      "original_index": 2173,
+      "name": "grey_dirt_bcl",
+      "source": "assets/tiles/individual/dngn/water/grey_dirt_bcl.png",
+      "x": 672,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 22,
+      "original_index": 2174,
+      "name": "grey_dirt_bcr",
+      "source": "assets/tiles/individual/dngn/water/grey_dirt_bcr.png",
+      "x": 704,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 23,
+      "original_index": 2175,
+      "name": "grey_dirt_bl",
+      "source": "assets/tiles/individual/dngn/water/grey_dirt_bl.png",
+      "x": 736,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 24,
+      "original_index": 2176,
+      "name": "grey_dirt_br",
+      "source": "assets/tiles/individual/dngn/water/grey_dirt_br.png",
+      "x": 768,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 25,
+      "original_index": 2177,
+      "name": "ink_full",
+      "source": "assets/tiles/individual/dngn/water/ink_full.png",
+      "x": 800,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 26,
+      "original_index": 2178,
+      "name": "ink_wave_E",
+      "source": "assets/tiles/individual/dngn/water/ink_wave_E.png",
+      "x": 832,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 27,
+      "original_index": 2179,
+      "name": "ink_wave_N",
+      "source": "assets/tiles/individual/dngn/water/ink_wave_N.png",
+      "x": 864,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 28,
+      "original_index": 2180,
+      "name": "ink_wave_S",
+      "source": "assets/tiles/individual/dngn/water/ink_wave_S.png",
+      "x": 896,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 29,
+      "original_index": 2181,
+      "name": "ink_wave_W",
+      "source": "assets/tiles/individual/dngn/water/ink_wave_W.png",
+      "x": 928,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 30,
+      "original_index": 2182,
+      "name": "ink_wave_corner_NE",
+      "source": "assets/tiles/individual/dngn/water/ink_wave_corner_NE.png",
+      "x": 960,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 31,
+      "original_index": 2183,
+      "name": "ink_wave_corner_NW",
+      "source": "assets/tiles/individual/dngn/water/ink_wave_corner_NW.png",
+      "x": 992,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 32,
+      "original_index": 2184,
+      "name": "ink_wave_corner_SE",
+      "source": "assets/tiles/individual/dngn/water/ink_wave_corner_SE.png",
+      "x": 0,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 33,
+      "original_index": 2185,
+      "name": "ink_wave_corner_SW",
+      "source": "assets/tiles/individual/dngn/water/ink_wave_corner_SW.png",
+      "x": 32,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 34,
+      "original_index": 2186,
+      "name": "liquefaction1",
+      "source": "assets/tiles/individual/dngn/water/liquefaction1.png",
+      "x": 64,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 35,
+      "original_index": 2187,
+      "name": "liquefaction2",
+      "source": "assets/tiles/individual/dngn/water/liquefaction2.png",
+      "x": 96,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 36,
+      "original_index": 2188,
+      "name": "murky_bord_bl",
+      "source": "assets/tiles/individual/dngn/water/murky_bord_bl.png",
+      "x": 128,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 37,
+      "original_index": 2189,
+      "name": "murky_bord_br",
+      "source": "assets/tiles/individual/dngn/water/murky_bord_br.png",
+      "x": 160,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 38,
+      "original_index": 2190,
+      "name": "murky_bord_btm",
+      "source": "assets/tiles/individual/dngn/water/murky_bord_btm.png",
+      "x": 192,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 39,
+      "original_index": 2191,
+      "name": "murky_bord_lft",
+      "source": "assets/tiles/individual/dngn/water/murky_bord_lft.png",
+      "x": 224,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 40,
+      "original_index": 2192,
+      "name": "murky_bord_rgt",
+      "source": "assets/tiles/individual/dngn/water/murky_bord_rgt.png",
+      "x": 256,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 41,
+      "original_index": 2193,
+      "name": "murky_bord_tl",
+      "source": "assets/tiles/individual/dngn/water/murky_bord_tl.png",
+      "x": 288,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 42,
+      "original_index": 2194,
+      "name": "murky_bord_top",
+      "source": "assets/tiles/individual/dngn/water/murky_bord_top.png",
+      "x": 320,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 43,
+      "original_index": 2195,
+      "name": "murky_bord_tr",
+      "source": "assets/tiles/individual/dngn/water/murky_bord_tr.png",
+      "x": 352,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 44,
+      "original_index": 2196,
+      "name": "open_sea",
+      "source": "assets/tiles/individual/dngn/water/open_sea.png",
+      "x": 384,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 45,
+      "original_index": 2197,
+      "name": "open_sea2",
+      "source": "assets/tiles/individual/dngn/water/open_sea2.png",
+      "x": 416,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 46,
+      "original_index": 2198,
+      "name": "shallow_bord_bl",
+      "source": "assets/tiles/individual/dngn/water/shallow_bord_bl.png",
+      "x": 448,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 47,
+      "original_index": 2199,
+      "name": "shallow_bord_br",
+      "source": "assets/tiles/individual/dngn/water/shallow_bord_br.png",
+      "x": 480,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 48,
+      "original_index": 2200,
+      "name": "shallow_bord_btm",
+      "source": "assets/tiles/individual/dngn/water/shallow_bord_btm.png",
+      "x": 512,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 49,
+      "original_index": 2201,
+      "name": "shallow_bord_lft",
+      "source": "assets/tiles/individual/dngn/water/shallow_bord_lft.png",
+      "x": 544,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 50,
+      "original_index": 2202,
+      "name": "shallow_bord_rgt",
+      "source": "assets/tiles/individual/dngn/water/shallow_bord_rgt.png",
+      "x": 576,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 51,
+      "original_index": 2203,
+      "name": "shallow_bord_tl",
+      "source": "assets/tiles/individual/dngn/water/shallow_bord_tl.png",
+      "x": 608,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 52,
+      "original_index": 2204,
+      "name": "shallow_bord_top",
+      "source": "assets/tiles/individual/dngn/water/shallow_bord_top.png",
+      "x": 640,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 53,
+      "original_index": 2205,
+      "name": "shallow_bord_tr",
+      "source": "assets/tiles/individual/dngn/water/shallow_bord_tr.png",
+      "x": 672,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 54,
+      "original_index": 2206,
+      "name": "shallow_water",
+      "source": "assets/tiles/individual/dngn/water/shallow_water.png",
+      "x": 704,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 55,
+      "original_index": 2207,
+      "name": "shallow_water2",
+      "source": "assets/tiles/individual/dngn/water/shallow_water2.png",
+      "x": 736,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 56,
+      "original_index": 2208,
+      "name": "shallow_water_disturbance",
+      "source": "assets/tiles/individual/dngn/water/shallow_water_disturbance.png",
+      "x": 768,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 57,
+      "original_index": 2209,
+      "name": "shallow_water_disturbance2",
+      "source": "assets/tiles/individual/dngn/water/shallow_water_disturbance2.png",
+      "x": 800,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 58,
+      "original_index": 2210,
+      "name": "shallow_water_murky",
+      "source": "assets/tiles/individual/dngn/water/shallow_water_murky.png",
+      "x": 832,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 59,
+      "original_index": 2211,
+      "name": "shallow_water_murky2",
+      "source": "assets/tiles/individual/dngn/water/shallow_water_murky2.png",
+      "x": 864,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 60,
+      "original_index": 2212,
+      "name": "shallow_water_murky_disturbance",
+      "source": "assets/tiles/individual/dngn/water/shallow_water_murky_disturbance.png",
+      "x": 896,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 61,
+      "original_index": 2213,
+      "name": "shallow_water_murky_disturbance2",
+      "source": "assets/tiles/individual/dngn/water/shallow_water_murky_disturbance2.png",
+      "x": 928,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 62,
+      "original_index": 2214,
+      "name": "shallow_water_wave_E",
+      "source": "assets/tiles/individual/dngn/water/shallow_water_wave_E.png",
+      "x": 960,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 63,
+      "original_index": 2215,
+      "name": "shallow_water_wave_N",
+      "source": "assets/tiles/individual/dngn/water/shallow_water_wave_N.png",
+      "x": 992,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 64,
+      "original_index": 2216,
+      "name": "shallow_water_wave_S",
+      "source": "assets/tiles/individual/dngn/water/shallow_water_wave_S.png",
+      "x": 0,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 65,
+      "original_index": 2217,
+      "name": "shallow_water_wave_W",
+      "source": "assets/tiles/individual/dngn/water/shallow_water_wave_W.png",
+      "x": 32,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 66,
+      "original_index": 2218,
+      "name": "shallow_water_wave_corner_NE",
+      "source": "assets/tiles/individual/dngn/water/shallow_water_wave_corner_NE.png",
+      "x": 64,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 67,
+      "original_index": 2219,
+      "name": "shallow_water_wave_corner_NW",
+      "source": "assets/tiles/individual/dngn/water/shallow_water_wave_corner_NW.png",
+      "x": 96,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 68,
+      "original_index": 2220,
+      "name": "shallow_water_wave_corner_SE",
+      "source": "assets/tiles/individual/dngn/water/shallow_water_wave_corner_SE.png",
+      "x": 128,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 69,
+      "original_index": 2221,
+      "name": "shallow_water_wave_corner_SW",
+      "source": "assets/tiles/individual/dngn/water/shallow_water_wave_corner_SW.png",
+      "x": 160,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 70,
+      "original_index": 2222,
+      "name": "shoals_deep_water0",
+      "source": "assets/tiles/individual/dngn/water/shoals_deep_water0.png",
+      "x": 192,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 71,
+      "original_index": 2223,
+      "name": "shoals_deep_water1",
+      "source": "assets/tiles/individual/dngn/water/shoals_deep_water1.png",
+      "x": 224,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 72,
+      "original_index": 2224,
+      "name": "shoals_deep_water10",
+      "source": "assets/tiles/individual/dngn/water/shoals_deep_water10.png",
+      "x": 256,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 73,
+      "original_index": 2225,
+      "name": "shoals_deep_water11",
+      "source": "assets/tiles/individual/dngn/water/shoals_deep_water11.png",
+      "x": 288,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 74,
+      "original_index": 2226,
+      "name": "shoals_deep_water2",
+      "source": "assets/tiles/individual/dngn/water/shoals_deep_water2.png",
+      "x": 320,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 75,
+      "original_index": 2227,
+      "name": "shoals_deep_water3",
+      "source": "assets/tiles/individual/dngn/water/shoals_deep_water3.png",
+      "x": 352,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 76,
+      "original_index": 2228,
+      "name": "shoals_deep_water4",
+      "source": "assets/tiles/individual/dngn/water/shoals_deep_water4.png",
+      "x": 384,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 77,
+      "original_index": 2229,
+      "name": "shoals_deep_water5",
+      "source": "assets/tiles/individual/dngn/water/shoals_deep_water5.png",
+      "x": 416,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 78,
+      "original_index": 2230,
+      "name": "shoals_deep_water6",
+      "source": "assets/tiles/individual/dngn/water/shoals_deep_water6.png",
+      "x": 448,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 79,
+      "original_index": 2231,
+      "name": "shoals_deep_water7",
+      "source": "assets/tiles/individual/dngn/water/shoals_deep_water7.png",
+      "x": 480,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 80,
+      "original_index": 2232,
+      "name": "shoals_deep_water8",
+      "source": "assets/tiles/individual/dngn/water/shoals_deep_water8.png",
+      "x": 512,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 81,
+      "original_index": 2233,
+      "name": "shoals_deep_water9",
+      "source": "assets/tiles/individual/dngn/water/shoals_deep_water9.png",
+      "x": 544,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 82,
+      "original_index": 2234,
+      "name": "shoals_shallow_water0",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water0.png",
+      "x": 576,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 83,
+      "original_index": 2235,
+      "name": "shoals_shallow_water1",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water1.png",
+      "x": 608,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 84,
+      "original_index": 2236,
+      "name": "shoals_shallow_water10",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water10.png",
+      "x": 640,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 85,
+      "original_index": 2237,
+      "name": "shoals_shallow_water11",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water11.png",
+      "x": 672,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 86,
+      "original_index": 2238,
+      "name": "shoals_shallow_water2",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water2.png",
+      "x": 704,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 87,
+      "original_index": 2239,
+      "name": "shoals_shallow_water3",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water3.png",
+      "x": 736,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 88,
+      "original_index": 2240,
+      "name": "shoals_shallow_water4",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water4.png",
+      "x": 768,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 89,
+      "original_index": 2241,
+      "name": "shoals_shallow_water5",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water5.png",
+      "x": 800,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 90,
+      "original_index": 2242,
+      "name": "shoals_shallow_water6",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water6.png",
+      "x": 832,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 91,
+      "original_index": 2243,
+      "name": "shoals_shallow_water7",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water7.png",
+      "x": 864,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 92,
+      "original_index": 2244,
+      "name": "shoals_shallow_water8",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water8.png",
+      "x": 896,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 93,
+      "original_index": 2245,
+      "name": "shoals_shallow_water9",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water9.png",
+      "x": 928,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 94,
+      "original_index": 2246,
+      "name": "shoals_shallow_water_disturbance1",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water_disturbance1.png",
+      "x": 960,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 95,
+      "original_index": 2247,
+      "name": "shoals_shallow_water_disturbance2",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water_disturbance2.png",
+      "x": 992,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 96,
+      "original_index": 2248,
+      "name": "shoals_shallow_water_disturbance3",
+      "source": "assets/tiles/individual/dngn/water/shoals_shallow_water_disturbance3.png",
+      "x": 0,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 97,
+      "original_index": 2249,
+      "name": "starwater_00",
+      "source": "assets/tiles/individual/dngn/water/starwater_00.png",
+      "x": 32,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 98,
+      "original_index": 2250,
+      "name": "starwater_01",
+      "source": "assets/tiles/individual/dngn/water/starwater_01.png",
+      "x": 64,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 99,
+      "original_index": 2251,
+      "name": "starwater_02",
+      "source": "assets/tiles/individual/dngn/water/starwater_02.png",
+      "x": 96,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 100,
+      "original_index": 2252,
+      "name": "starwater_03",
+      "source": "assets/tiles/individual/dngn/water/starwater_03.png",
+      "x": 128,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 101,
+      "original_index": 2253,
+      "name": "starwater_04",
+      "source": "assets/tiles/individual/dngn/water/starwater_04.png",
+      "x": 160,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 102,
+      "original_index": 2254,
+      "name": "starwater_05",
+      "source": "assets/tiles/individual/dngn/water/starwater_05.png",
+      "x": 192,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 103,
+      "original_index": 2255,
+      "name": "starwater_06",
+      "source": "assets/tiles/individual/dngn/water/starwater_06.png",
+      "x": 224,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 104,
+      "original_index": 2256,
+      "name": "starwater_07",
+      "source": "assets/tiles/individual/dngn/water/starwater_07.png",
+      "x": 256,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 105,
+      "original_index": 2257,
+      "name": "starwater_08",
+      "source": "assets/tiles/individual/dngn/water/starwater_08.png",
+      "x": 288,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 106,
+      "original_index": 2258,
+      "name": "starwater_09",
+      "source": "assets/tiles/individual/dngn/water/starwater_09.png",
+      "x": 320,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 107,
+      "original_index": 2259,
+      "name": "starwater_10",
+      "source": "assets/tiles/individual/dngn/water/starwater_10.png",
+      "x": 352,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 108,
+      "original_index": 2260,
+      "name": "starwater_11",
+      "source": "assets/tiles/individual/dngn/water/starwater_11.png",
+      "x": 384,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 109,
+      "original_index": 2261,
+      "name": "toxic_bog1",
+      "source": "assets/tiles/individual/dngn/water/toxic_bog1.png",
+      "x": 416,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 110,
+      "original_index": 2262,
+      "name": "toxic_bog2",
+      "source": "assets/tiles/individual/dngn/water/toxic_bog2.png",
+      "x": 448,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 111,
+      "original_index": 2263,
+      "name": "toxic_bog3",
+      "source": "assets/tiles/individual/dngn/water/toxic_bog3.png",
+      "x": 480,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 112,
+      "original_index": 2264,
+      "name": "toxic_bog4",
+      "source": "assets/tiles/individual/dngn/water/toxic_bog4.png",
+      "x": 512,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 113,
+      "original_index": 2265,
+      "name": "toxic_bog5",
+      "source": "assets/tiles/individual/dngn/water/toxic_bog5.png",
+      "x": 544,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 114,
+      "original_index": 2266,
+      "name": "toxic_bog6",
+      "source": "assets/tiles/individual/dngn/water/toxic_bog6.png",
+      "x": 576,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 115,
+      "original_index": 2267,
+      "name": "toxic_bog7",
+      "source": "assets/tiles/individual/dngn/water/toxic_bog7.png",
+      "x": 608,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 116,
+      "original_index": 2268,
+      "name": "toxic_bog8",
+      "source": "assets/tiles/individual/dngn/water/toxic_bog8.png",
+      "x": 640,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "tile_size": 32,
+  "chroma_key": "#ff00ff",
+  "source_inventory": "assets/tiles/sheets/ulpc_concepts/used_dngn_tile_inventory.json",
+  "concepts": [
+    {
+      "slug": "abyss",
+      "image": "abyss_sheet.png",
+      "manifest": "abyss_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      }
+    },
+    {
+      "slug": "crypt",
+      "image": "crypt_sheet.png",
+      "manifest": "crypt_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 1,
+        "total": 3
+      }
+    },
+    {
+      "slug": "dungeon",
+      "image": "dungeon_sheet.png",
+      "manifest": "dungeon_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      }
+    },
+    {
+      "slug": "elven_halls",
+      "image": "elven_halls_sheet.png",
+      "manifest": "elven_halls_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      }
+    },
+    {
+      "slug": "ice_caves",
+      "image": "ice_caves_sheet.png",
+      "manifest": "ice_caves_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 1,
+        "total": 3
+      }
+    },
+    {
+      "slug": "infernal",
+      "image": "infernal_sheet.png",
+      "manifest": "infernal_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 1,
+        "total": 3
+      }
+    },
+    {
+      "slug": "lair",
+      "image": "lair_sheet.png",
+      "manifest": "lair_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      }
+    },
+    {
+      "slug": "orc_mines",
+      "image": "orc_mines_sheet.png",
+      "manifest": "orc_mines_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      }
+    },
+    {
+      "slug": "shared_features",
+      "image": "shared_features_sheet.png",
+      "manifest": "shared_features_sheet.json",
+      "counts": {
+        "floor": 0,
+        "wall": 0,
+        "object": 4,
+        "total": 4
+      }
+    },
+    {
+      "slug": "swamp",
+      "image": "swamp_sheet.png",
+      "manifest": "swamp_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 1,
+        "total": 3
+      }
+    },
+    {
+      "slug": "temple",
+      "image": "temple_sheet.png",
+      "manifest": "temple_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 17,
+        "total": 19
+      }
+    }
+  ]
+}

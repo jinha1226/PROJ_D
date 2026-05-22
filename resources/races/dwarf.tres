@@ -13,6 +13,7 @@ unlock_trigger_id = "deep_dwarf"
 str_mod = 2
 dex_mod = -3
 hp_mod = 1
+size_score = 9
 resist_mods = ["poison+", "fire+"]
 skill_aptitudes = {
 "fighting": 1,

@@ -7,13 +7,14 @@ script = ExtResource("1_rdata")
 id = "tester"
 display_name = "Tester"
 description = "Debug-only test character. Starts with max skills, all spells, all essences, consumables, scrolls, and map warp access."
-base_sprite_path = "res://assets/tiles/individual/player/human_8dir/base.png"
+base_sprite_path = "res://assets/tiles/individual/player/human_lpc/base.png"
 unlocked = true
 str_mod = 30
 dex_mod = 30
 int_mod = 30
 hp_mod = 250
 mp_mod = 120
+size_score = 12
 resist_mods = ["fire+++", "cold+++", "poison+++", "necromancy+++"]
 skill_aptitudes = {
 "weapon_mastery": 9,

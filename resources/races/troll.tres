@@ -16,6 +16,7 @@ dex_mod = -3
 int_mod = -4
 hp_mod = 3
 mp_mod = -1
+size_score = 18
 resist_mods = ["fire-", "cold+"]
 skill_aptitudes = {
 "fighting": -2,

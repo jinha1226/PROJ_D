@@ -11,6 +11,10 @@
     "survival": "expedition endurance, recovery, and hazard tolerance"
   },
   "rules": {
+    "resolution_model": "d100_adapter_v1",
+    "resolution_notes": "Compact roguelike stats remain in data, but contested combat rolls convert accuracy, evasion, shield block, and status penalties into explicit 0-100 percent chances.",
+    "damage_model": "brp_weapon_dice_soak_v1",
+    "damage_notes": "Physical damage uses BRP-style weapon dice plus STR+race size modifier and skill step bonuses, then subtracts armor soak. Existing item damage/ac fields are adapted through CombatSystem tables.",
     "spell_failure": false,
     "skill_model": "8_visible_plus_hidden_familiarity",
     "skill_xp_source": "action_routed_visible_with_hidden_dual_write",

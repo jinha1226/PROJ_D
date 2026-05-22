@@ -406,12 +406,12 @@ static func _run_card(player: Player) -> Control:
 	return card
 
 const _EQUIP_LAYERS: Array[Array] = [
-	["equipped_armor_id",   "armor_overlay"],
-	["equipped_helmet_id",  "helmet_overlay"],
-	["equipped_gloves_id",  "gloves_overlay"],
-	["equipped_boots_id",   "boots_overlay"],
-	["equipped_weapon_id",  "sword_overlay"],
-	["equipped_shield_id",  "shield_overlay"],
+	["equipped_armor_id",   "armor"],
+	["equipped_helmet_id",  "helmet"],
+	["equipped_gloves_id",  "gloves"],
+	["equipped_boots_id",   "boots"],
+	["equipped_weapon_id",  "sword"],
+	["equipped_shield_id",  "shield"],
 ]
 
 static func _south_atlas(tex: Texture2D) -> Texture2D:
@@ -419,12 +419,19 @@ static func _south_atlas(tex: Texture2D) -> Texture2D:
 		return null
 	var tw := tex.get_width()
 	var th := tex.get_height()
+	var a := AtlasTexture.new()
+	a.atlas = tex
 	if tw >= th * 4:
-		var a := AtlasTexture.new()
-		a.atlas = tex
-		a.region = Rect2(4 * (tw / 8), 0, tw / 8, th)  # frame 4 = S
-		return a
-	return tex
+		# 8-dir horizontal: frame 4 (S)
+		a.region = Rect2(4 * (tw / 8), 0, tw / 8, th)
+	elif tw * 4 == th * 9 and th % 4 == 0:
+		# ULPC 4-dir vertical: row 2 (S), frame 0
+		var fw := tw / 9
+		var fh := th / 4
+		a.region = Rect2(0, 2 * fh, fw, fh)
+	else:
+		return tex
+	return a
 
 static func _portrait_stack(player: Player) -> Control:
 	var panel := CenterContainer.new()
@@ -437,6 +444,14 @@ static func _portrait_stack(player: Player) -> Control:
 	if player._base_tex != null and player._base_tex.resource_path != "":
 		sprite_dir = player._base_tex.resource_path.get_base_dir()
 	if sprite_dir != "":
+		# Always-on base overlays (head, hair)
+		for fname in Player._BASE_OVERLAY_FILES:
+			var bpath: String = sprite_dir + "/" + fname + ".png"
+			if ResourceLoader.exists(bpath):
+				var btex := load(bpath) as Texture2D
+				if btex != null:
+					_add_portrait_layer(layers, btex)
+		# Equipment-conditional overlays
 		for pair in _EQUIP_LAYERS:
 			var slot_val: String = player.get(pair[0]) if pair[0] in player else ""
 			if slot_val == "":

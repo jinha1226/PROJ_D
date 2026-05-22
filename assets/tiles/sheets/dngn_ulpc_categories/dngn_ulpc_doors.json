@@ -1,0 +1,920 @@
+{
+  "image": "dngn_ulpc_doors.png",
+  "category": "doors",
+  "tile_size": 32,
+  "columns": 32,
+  "rows": 3,
+  "count": 91,
+  "frames": [
+    {
+      "index": 0,
+      "original_index": 103,
+      "name": "broken_clear_door",
+      "source": "assets/tiles/individual/dngn/doors/broken_clear_door.png",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 1,
+      "original_index": 104,
+      "name": "broken_door",
+      "source": "assets/tiles/individual/dngn/doors/broken_door.png",
+      "x": 32,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 2,
+      "original_index": 105,
+      "name": "broken_door_crypt",
+      "source": "assets/tiles/individual/dngn/doors/broken_door_crypt.png",
+      "x": 64,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 3,
+      "original_index": 106,
+      "name": "closed_clear_door",
+      "source": "assets/tiles/individual/dngn/doors/closed_clear_door.png",
+      "x": 96,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 4,
+      "original_index": 107,
+      "name": "closed_door",
+      "source": "assets/tiles/individual/dngn/doors/closed_door.png",
+      "x": 128,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 5,
+      "original_index": 108,
+      "name": "closed_door_crypt",
+      "source": "assets/tiles/individual/dngn/doors/closed_door_crypt.png",
+      "x": 160,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 6,
+      "original_index": 109,
+      "name": "gate_broken_clear_left",
+      "source": "assets/tiles/individual/dngn/doors/gate_broken_clear_left.png",
+      "x": 192,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 7,
+      "original_index": 110,
+      "name": "gate_broken_clear_middle",
+      "source": "assets/tiles/individual/dngn/doors/gate_broken_clear_middle.png",
+      "x": 224,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 8,
+      "original_index": 111,
+      "name": "gate_broken_clear_right",
+      "source": "assets/tiles/individual/dngn/doors/gate_broken_clear_right.png",
+      "x": 256,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 9,
+      "original_index": 112,
+      "name": "gate_broken_left",
+      "source": "assets/tiles/individual/dngn/doors/gate_broken_left.png",
+      "x": 288,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 10,
+      "original_index": 113,
+      "name": "gate_broken_left_crypt",
+      "source": "assets/tiles/individual/dngn/doors/gate_broken_left_crypt.png",
+      "x": 320,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 11,
+      "original_index": 114,
+      "name": "gate_broken_middle",
+      "source": "assets/tiles/individual/dngn/doors/gate_broken_middle.png",
+      "x": 352,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 12,
+      "original_index": 115,
+      "name": "gate_broken_middle_crypt",
+      "source": "assets/tiles/individual/dngn/doors/gate_broken_middle_crypt.png",
+      "x": 384,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 13,
+      "original_index": 116,
+      "name": "gate_broken_right",
+      "source": "assets/tiles/individual/dngn/doors/gate_broken_right.png",
+      "x": 416,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 14,
+      "original_index": 117,
+      "name": "gate_broken_right_crypt",
+      "source": "assets/tiles/individual/dngn/doors/gate_broken_right_crypt.png",
+      "x": 448,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 15,
+      "original_index": 118,
+      "name": "gate_closed_clear_left",
+      "source": "assets/tiles/individual/dngn/doors/gate_closed_clear_left.png",
+      "x": 480,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 16,
+      "original_index": 119,
+      "name": "gate_closed_clear_middle",
+      "source": "assets/tiles/individual/dngn/doors/gate_closed_clear_middle.png",
+      "x": 512,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 17,
+      "original_index": 120,
+      "name": "gate_closed_clear_right",
+      "source": "assets/tiles/individual/dngn/doors/gate_closed_clear_right.png",
+      "x": 544,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 18,
+      "original_index": 121,
+      "name": "gate_closed_left",
+      "source": "assets/tiles/individual/dngn/doors/gate_closed_left.png",
+      "x": 576,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 19,
+      "original_index": 122,
+      "name": "gate_closed_left_crypt",
+      "source": "assets/tiles/individual/dngn/doors/gate_closed_left_crypt.png",
+      "x": 608,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 20,
+      "original_index": 123,
+      "name": "gate_closed_middle",
+      "source": "assets/tiles/individual/dngn/doors/gate_closed_middle.png",
+      "x": 640,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 21,
+      "original_index": 124,
+      "name": "gate_closed_middle_crypt",
+      "source": "assets/tiles/individual/dngn/doors/gate_closed_middle_crypt.png",
+      "x": 672,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 22,
+      "original_index": 125,
+      "name": "gate_closed_right",
+      "source": "assets/tiles/individual/dngn/doors/gate_closed_right.png",
+      "x": 704,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 23,
+      "original_index": 126,
+      "name": "gate_closed_right_crypt",
+      "source": "assets/tiles/individual/dngn/doors/gate_closed_right_crypt.png",
+      "x": 736,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 24,
+      "original_index": 127,
+      "name": "gate_open_clear_left",
+      "source": "assets/tiles/individual/dngn/doors/gate_open_clear_left.png",
+      "x": 768,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 25,
+      "original_index": 128,
+      "name": "gate_open_clear_middle",
+      "source": "assets/tiles/individual/dngn/doors/gate_open_clear_middle.png",
+      "x": 800,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 26,
+      "original_index": 129,
+      "name": "gate_open_clear_right",
+      "source": "assets/tiles/individual/dngn/doors/gate_open_clear_right.png",
+      "x": 832,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 27,
+      "original_index": 130,
+      "name": "gate_open_left",
+      "source": "assets/tiles/individual/dngn/doors/gate_open_left.png",
+      "x": 864,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 28,
+      "original_index": 131,
+      "name": "gate_open_left_crypt",
+      "source": "assets/tiles/individual/dngn/doors/gate_open_left_crypt.png",
+      "x": 896,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 29,
+      "original_index": 132,
+      "name": "gate_open_middle",
+      "source": "assets/tiles/individual/dngn/doors/gate_open_middle.png",
+      "x": 928,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 30,
+      "original_index": 133,
+      "name": "gate_open_middle_crypt",
+      "source": "assets/tiles/individual/dngn/doors/gate_open_middle_crypt.png",
+      "x": 960,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 31,
+      "original_index": 134,
+      "name": "gate_open_right",
+      "source": "assets/tiles/individual/dngn/doors/gate_open_right.png",
+      "x": 992,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 32,
+      "original_index": 135,
+      "name": "gate_open_right_crypt",
+      "source": "assets/tiles/individual/dngn/doors/gate_open_right_crypt.png",
+      "x": 0,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 33,
+      "original_index": 136,
+      "name": "gate_runed_clear_left",
+      "source": "assets/tiles/individual/dngn/doors/gate_runed_clear_left.png",
+      "x": 32,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 34,
+      "original_index": 137,
+      "name": "gate_runed_clear_middle",
+      "source": "assets/tiles/individual/dngn/doors/gate_runed_clear_middle.png",
+      "x": 64,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 35,
+      "original_index": 138,
+      "name": "gate_runed_clear_right",
+      "source": "assets/tiles/individual/dngn/doors/gate_runed_clear_right.png",
+      "x": 96,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 36,
+      "original_index": 139,
+      "name": "gate_runed_left",
+      "source": "assets/tiles/individual/dngn/doors/gate_runed_left.png",
+      "x": 128,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 37,
+      "original_index": 140,
+      "name": "gate_runed_middle",
+      "source": "assets/tiles/individual/dngn/doors/gate_runed_middle.png",
+      "x": 160,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 38,
+      "original_index": 141,
+      "name": "gate_runed_right",
+      "source": "assets/tiles/individual/dngn/doors/gate_runed_right.png",
+      "x": 192,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 39,
+      "original_index": 142,
+      "name": "gate_sealed_clear_left",
+      "source": "assets/tiles/individual/dngn/doors/gate_sealed_clear_left.png",
+      "x": 224,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 40,
+      "original_index": 143,
+      "name": "gate_sealed_clear_middle",
+      "source": "assets/tiles/individual/dngn/doors/gate_sealed_clear_middle.png",
+      "x": 256,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 41,
+      "original_index": 144,
+      "name": "gate_sealed_clear_right",
+      "source": "assets/tiles/individual/dngn/doors/gate_sealed_clear_right.png",
+      "x": 288,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 42,
+      "original_index": 145,
+      "name": "gate_sealed_left",
+      "source": "assets/tiles/individual/dngn/doors/gate_sealed_left.png",
+      "x": 320,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 43,
+      "original_index": 146,
+      "name": "gate_sealed_middle",
+      "source": "assets/tiles/individual/dngn/doors/gate_sealed_middle.png",
+      "x": 352,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 44,
+      "original_index": 147,
+      "name": "gate_sealed_right",
+      "source": "assets/tiles/individual/dngn/doors/gate_sealed_right.png",
+      "x": 384,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 45,
+      "original_index": 148,
+      "name": "open_clear_door",
+      "source": "assets/tiles/individual/dngn/doors/open_clear_door.png",
+      "x": 416,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 46,
+      "original_index": 149,
+      "name": "open_door",
+      "source": "assets/tiles/individual/dngn/doors/open_door.png",
+      "x": 448,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 47,
+      "original_index": 150,
+      "name": "open_door_crypt",
+      "source": "assets/tiles/individual/dngn/doors/open_door_crypt.png",
+      "x": 480,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 48,
+      "original_index": 151,
+      "name": "runed_clear_door",
+      "source": "assets/tiles/individual/dngn/doors/runed_clear_door.png",
+      "x": 512,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 49,
+      "original_index": 152,
+      "name": "runed_door",
+      "source": "assets/tiles/individual/dngn/doors/runed_door.png",
+      "x": 544,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 50,
+      "original_index": 153,
+      "name": "sealed_clear_door",
+      "source": "assets/tiles/individual/dngn/doors/sealed_clear_door.png",
+      "x": 576,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 51,
+      "original_index": 154,
+      "name": "sealed_door",
+      "source": "assets/tiles/individual/dngn/doors/sealed_door.png",
+      "x": 608,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 52,
+      "original_index": 155,
+      "name": "vgate_broken_clear_down",
+      "source": "assets/tiles/individual/dngn/doors/vgate_broken_clear_down.png",
+      "x": 640,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 53,
+      "original_index": 156,
+      "name": "vgate_broken_clear_middle",
+      "source": "assets/tiles/individual/dngn/doors/vgate_broken_clear_middle.png",
+      "x": 672,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 54,
+      "original_index": 157,
+      "name": "vgate_broken_clear_up",
+      "source": "assets/tiles/individual/dngn/doors/vgate_broken_clear_up.png",
+      "x": 704,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 55,
+      "original_index": 158,
+      "name": "vgate_broken_down",
+      "source": "assets/tiles/individual/dngn/doors/vgate_broken_down.png",
+      "x": 736,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 56,
+      "original_index": 159,
+      "name": "vgate_broken_down_crypt",
+      "source": "assets/tiles/individual/dngn/doors/vgate_broken_down_crypt.png",
+      "x": 768,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 57,
+      "original_index": 160,
+      "name": "vgate_broken_middle",
+      "source": "assets/tiles/individual/dngn/doors/vgate_broken_middle.png",
+      "x": 800,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 58,
+      "original_index": 161,
+      "name": "vgate_broken_middle_crypt",
+      "source": "assets/tiles/individual/dngn/doors/vgate_broken_middle_crypt.png",
+      "x": 832,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 59,
+      "original_index": 162,
+      "name": "vgate_broken_up",
+      "source": "assets/tiles/individual/dngn/doors/vgate_broken_up.png",
+      "x": 864,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 60,
+      "original_index": 163,
+      "name": "vgate_broken_up_crypt",
+      "source": "assets/tiles/individual/dngn/doors/vgate_broken_up_crypt.png",
+      "x": 896,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 61,
+      "original_index": 164,
+      "name": "vgate_closed_clear_down",
+      "source": "assets/tiles/individual/dngn/doors/vgate_closed_clear_down.png",
+      "x": 928,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 62,
+      "original_index": 165,
+      "name": "vgate_closed_clear_middle",
+      "source": "assets/tiles/individual/dngn/doors/vgate_closed_clear_middle.png",
+      "x": 960,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 63,
+      "original_index": 166,
+      "name": "vgate_closed_clear_up",
+      "source": "assets/tiles/individual/dngn/doors/vgate_closed_clear_up.png",
+      "x": 992,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 64,
+      "original_index": 167,
+      "name": "vgate_closed_down",
+      "source": "assets/tiles/individual/dngn/doors/vgate_closed_down.png",
+      "x": 0,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 65,
+      "original_index": 168,
+      "name": "vgate_closed_down_crypt",
+      "source": "assets/tiles/individual/dngn/doors/vgate_closed_down_crypt.png",
+      "x": 32,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 66,
+      "original_index": 169,
+      "name": "vgate_closed_middle",
+      "source": "assets/tiles/individual/dngn/doors/vgate_closed_middle.png",
+      "x": 64,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 67,
+      "original_index": 170,
+      "name": "vgate_closed_middle_crypt",
+      "source": "assets/tiles/individual/dngn/doors/vgate_closed_middle_crypt.png",
+      "x": 96,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 68,
+      "original_index": 171,
+      "name": "vgate_closed_up",
+      "source": "assets/tiles/individual/dngn/doors/vgate_closed_up.png",
+      "x": 128,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 69,
+      "original_index": 172,
+      "name": "vgate_closed_up_crypt",
+      "source": "assets/tiles/individual/dngn/doors/vgate_closed_up_crypt.png",
+      "x": 160,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 70,
+      "original_index": 173,
+      "name": "vgate_open_clear_down",
+      "source": "assets/tiles/individual/dngn/doors/vgate_open_clear_down.png",
+      "x": 192,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 71,
+      "original_index": 174,
+      "name": "vgate_open_clear_middle",
+      "source": "assets/tiles/individual/dngn/doors/vgate_open_clear_middle.png",
+      "x": 224,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 72,
+      "original_index": 175,
+      "name": "vgate_open_clear_up",
+      "source": "assets/tiles/individual/dngn/doors/vgate_open_clear_up.png",
+      "x": 256,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 73,
+      "original_index": 176,
+      "name": "vgate_open_down",
+      "source": "assets/tiles/individual/dngn/doors/vgate_open_down.png",
+      "x": 288,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 74,
+      "original_index": 177,
+      "name": "vgate_open_down_crypt",
+      "source": "assets/tiles/individual/dngn/doors/vgate_open_down_crypt.png",
+      "x": 320,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 75,
+      "original_index": 178,
+      "name": "vgate_open_middle",
+      "source": "assets/tiles/individual/dngn/doors/vgate_open_middle.png",
+      "x": 352,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 76,
+      "original_index": 179,
+      "name": "vgate_open_middle_crypt",
+      "source": "assets/tiles/individual/dngn/doors/vgate_open_middle_crypt.png",
+      "x": 384,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 77,
+      "original_index": 180,
+      "name": "vgate_open_up",
+      "source": "assets/tiles/individual/dngn/doors/vgate_open_up.png",
+      "x": 416,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 78,
+      "original_index": 181,
+      "name": "vgate_open_up_crypt",
+      "source": "assets/tiles/individual/dngn/doors/vgate_open_up_crypt.png",
+      "x": 448,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 79,
+      "original_index": 182,
+      "name": "vgate_runed_clear_down",
+      "source": "assets/tiles/individual/dngn/doors/vgate_runed_clear_down.png",
+      "x": 480,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 80,
+      "original_index": 183,
+      "name": "vgate_runed_clear_middle",
+      "source": "assets/tiles/individual/dngn/doors/vgate_runed_clear_middle.png",
+      "x": 512,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 81,
+      "original_index": 184,
+      "name": "vgate_runed_clear_up",
+      "source": "assets/tiles/individual/dngn/doors/vgate_runed_clear_up.png",
+      "x": 544,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 82,
+      "original_index": 185,
+      "name": "vgate_runed_down",
+      "source": "assets/tiles/individual/dngn/doors/vgate_runed_down.png",
+      "x": 576,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 83,
+      "original_index": 186,
+      "name": "vgate_runed_middle",
+      "source": "assets/tiles/individual/dngn/doors/vgate_runed_middle.png",
+      "x": 608,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 84,
+      "original_index": 187,
+      "name": "vgate_runed_up",
+      "source": "assets/tiles/individual/dngn/doors/vgate_runed_up.png",
+      "x": 640,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 85,
+      "original_index": 188,
+      "name": "vgate_sealed_clear_down",
+      "source": "assets/tiles/individual/dngn/doors/vgate_sealed_clear_down.png",
+      "x": 672,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 86,
+      "original_index": 189,
+      "name": "vgate_sealed_clear_middle",
+      "source": "assets/tiles/individual/dngn/doors/vgate_sealed_clear_middle.png",
+      "x": 704,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 87,
+      "original_index": 190,
+      "name": "vgate_sealed_clear_up",
+      "source": "assets/tiles/individual/dngn/doors/vgate_sealed_clear_up.png",
+      "x": 736,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 88,
+      "original_index": 191,
+      "name": "vgate_sealed_down",
+      "source": "assets/tiles/individual/dngn/doors/vgate_sealed_down.png",
+      "x": 768,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 89,
+      "original_index": 192,
+      "name": "vgate_sealed_middle",
+      "source": "assets/tiles/individual/dngn/doors/vgate_sealed_middle.png",
+      "x": 800,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 90,
+      "original_index": 193,
+      "name": "vgate_sealed_up",
+      "source": "assets/tiles/individual/dngn/doors/vgate_sealed_up.png",
+      "x": 832,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    }
+  ]
+}

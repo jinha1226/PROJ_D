@@ -1,0 +1,420 @@
+{
+  "image": "dngn_ulpc_traps.png",
+  "category": "traps",
+  "tile_size": 32,
+  "columns": 32,
+  "rows": 2,
+  "count": 41,
+  "frames": [
+    {
+      "index": 0,
+      "original_index": 1017,
+      "name": "alarm",
+      "source": "assets/tiles/individual/dngn/traps/alarm.png",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 1,
+      "original_index": 1018,
+      "name": "archmage",
+      "source": "assets/tiles/individual/dngn/traps/archmage.png",
+      "x": 32,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 2,
+      "original_index": 1019,
+      "name": "binding_sigil",
+      "source": "assets/tiles/individual/dngn/traps/binding_sigil.png",
+      "x": 64,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 3,
+      "original_index": 1020,
+      "name": "bolt",
+      "source": "assets/tiles/individual/dngn/traps/bolt.png",
+      "x": 96,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 4,
+      "original_index": 1021,
+      "name": "cobweb_E",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_E.png",
+      "x": 128,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 5,
+      "original_index": 1022,
+      "name": "cobweb_ES",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_ES.png",
+      "x": 160,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 6,
+      "original_index": 1023,
+      "name": "cobweb_ESW",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_ESW.png",
+      "x": 192,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 7,
+      "original_index": 1024,
+      "name": "cobweb_EW",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_EW.png",
+      "x": 224,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 8,
+      "original_index": 1025,
+      "name": "cobweb_N",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_N.png",
+      "x": 256,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 9,
+      "original_index": 1026,
+      "name": "cobweb_NE",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_NE.png",
+      "x": 288,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 10,
+      "original_index": 1027,
+      "name": "cobweb_NES",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_NES.png",
+      "x": 320,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 11,
+      "original_index": 1028,
+      "name": "cobweb_NESW",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_NESW.png",
+      "x": 352,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 12,
+      "original_index": 1029,
+      "name": "cobweb_NEW",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_NEW.png",
+      "x": 384,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 13,
+      "original_index": 1030,
+      "name": "cobweb_NS",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_NS.png",
+      "x": 416,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 14,
+      "original_index": 1031,
+      "name": "cobweb_NSW",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_NSW.png",
+      "x": 448,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 15,
+      "original_index": 1032,
+      "name": "cobweb_NW",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_NW.png",
+      "x": 480,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 16,
+      "original_index": 1033,
+      "name": "cobweb_S",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_S.png",
+      "x": 512,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 17,
+      "original_index": 1034,
+      "name": "cobweb_SW",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_SW.png",
+      "x": 544,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 18,
+      "original_index": 1035,
+      "name": "cobweb_W",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_W.png",
+      "x": 576,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 19,
+      "original_index": 1036,
+      "name": "cobweb_none_0",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_none_0.png",
+      "x": 608,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 20,
+      "original_index": 1037,
+      "name": "cobweb_none_1",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_none_1.png",
+      "x": 640,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 21,
+      "original_index": 1038,
+      "name": "cobweb_none_2",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_none_2.png",
+      "x": 672,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 22,
+      "original_index": 1039,
+      "name": "cobweb_none_3",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_none_3.png",
+      "x": 704,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 23,
+      "original_index": 1040,
+      "name": "cobweb_none_4",
+      "source": "assets/tiles/individual/dngn/traps/cobweb_none_4.png",
+      "x": 736,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 24,
+      "original_index": 1041,
+      "name": "devourer",
+      "source": "assets/tiles/individual/dngn/traps/devourer.png",
+      "x": 768,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 25,
+      "original_index": 1042,
+      "name": "dispersal",
+      "source": "assets/tiles/individual/dngn/traps/dispersal.png",
+      "x": 800,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 26,
+      "original_index": 1043,
+      "name": "dispersal_inactive",
+      "source": "assets/tiles/individual/dngn/traps/dispersal_inactive.png",
+      "x": 832,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 27,
+      "original_index": 1044,
+      "name": "harlequin0",
+      "source": "assets/tiles/individual/dngn/traps/harlequin0.png",
+      "x": 864,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 28,
+      "original_index": 1045,
+      "name": "harlequin1",
+      "source": "assets/tiles/individual/dngn/traps/harlequin1.png",
+      "x": 896,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 29,
+      "original_index": 1046,
+      "name": "harlequin2",
+      "source": "assets/tiles/individual/dngn/traps/harlequin2.png",
+      "x": 928,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 30,
+      "original_index": 1047,
+      "name": "harlequin3",
+      "source": "assets/tiles/individual/dngn/traps/harlequin3.png",
+      "x": 960,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 31,
+      "original_index": 1048,
+      "name": "harlequin4",
+      "source": "assets/tiles/individual/dngn/traps/harlequin4.png",
+      "x": 992,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 32,
+      "original_index": 1049,
+      "name": "net",
+      "source": "assets/tiles/individual/dngn/traps/net.png",
+      "x": 0,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 33,
+      "original_index": 1050,
+      "name": "passage_of_golubria",
+      "source": "assets/tiles/individual/dngn/traps/passage_of_golubria.png",
+      "x": 32,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 34,
+      "original_index": 1051,
+      "name": "pressure_plate",
+      "source": "assets/tiles/individual/dngn/traps/pressure_plate.png",
+      "x": 64,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 35,
+      "original_index": 1052,
+      "name": "shaft",
+      "source": "assets/tiles/individual/dngn/traps/shaft.png",
+      "x": 96,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 36,
+      "original_index": 1053,
+      "name": "spear",
+      "source": "assets/tiles/individual/dngn/traps/spear.png",
+      "x": 128,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 37,
+      "original_index": 1054,
+      "name": "teleport",
+      "source": "assets/tiles/individual/dngn/traps/teleport.png",
+      "x": 160,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 38,
+      "original_index": 1055,
+      "name": "teleport_permanent",
+      "source": "assets/tiles/individual/dngn/traps/teleport_permanent.png",
+      "x": 192,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 39,
+      "original_index": 1056,
+      "name": "tyrant",
+      "source": "assets/tiles/individual/dngn/traps/tyrant.png",
+      "x": 224,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 40,
+      "original_index": 1057,
+      "name": "zot",
+      "source": "assets/tiles/individual/dngn/traps/zot.png",
+      "x": 256,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    }
+  ]
+}

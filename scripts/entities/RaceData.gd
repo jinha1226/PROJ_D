@@ -25,6 +25,10 @@ class_name RaceData extends Resource
 @export var hp_mod: int = 0
 @export var mp_mod: int = 0
 
+## Internal BRP-style size score used with STR for physical damage bonus.
+## UI intentionally does not expose this as a player-facing stat.
+@export var size_score: int = 10
+
 ## Racial resistance entries appended to Player.resists on class-apply.
 ## Format: Status.gd — ["fire+", "cold++", "necromancy+"], etc.
 @export var resist_mods: Array = []

@@ -1,0 +1,220 @@
+{
+  "image": "dngn_ulpc_decor.png",
+  "category": "decor",
+  "tile_size": 32,
+  "columns": 32,
+  "rows": 1,
+  "count": 21,
+  "frames": [
+    {
+      "index": 0,
+      "original_index": 82,
+      "name": "blood_fountain",
+      "source": "assets/tiles/individual/dngn/decor/blood_fountain.png",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 1,
+      "original_index": 83,
+      "name": "blood_fountain2",
+      "source": "assets/tiles/individual/dngn/decor/blood_fountain2.png",
+      "x": 32,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 2,
+      "original_index": 84,
+      "name": "blue_fountain",
+      "source": "assets/tiles/individual/dngn/decor/blue_fountain.png",
+      "x": 64,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 3,
+      "original_index": 85,
+      "name": "blue_fountain2",
+      "source": "assets/tiles/individual/dngn/decor/blue_fountain2.png",
+      "x": 96,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 4,
+      "original_index": 86,
+      "name": "cache_of_baked_goods_1",
+      "source": "assets/tiles/individual/dngn/decor/cache_of_baked_goods_1.png",
+      "x": 128,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 5,
+      "original_index": 87,
+      "name": "cache_of_baked_goods_2",
+      "source": "assets/tiles/individual/dngn/decor/cache_of_baked_goods_2.png",
+      "x": 160,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 6,
+      "original_index": 88,
+      "name": "cache_of_fruit_0",
+      "source": "assets/tiles/individual/dngn/decor/cache_of_fruit_0.png",
+      "x": 192,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 7,
+      "original_index": 89,
+      "name": "cache_of_fruit_1",
+      "source": "assets/tiles/individual/dngn/decor/cache_of_fruit_1.png",
+      "x": 224,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 8,
+      "original_index": 90,
+      "name": "cache_of_fruit_2",
+      "source": "assets/tiles/individual/dngn/decor/cache_of_fruit_2.png",
+      "x": 256,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 9,
+      "original_index": 91,
+      "name": "cache_of_meat_0",
+      "source": "assets/tiles/individual/dngn/decor/cache_of_meat_0.png",
+      "x": 288,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 10,
+      "original_index": 92,
+      "name": "cache_of_meat_1",
+      "source": "assets/tiles/individual/dngn/decor/cache_of_meat_1.png",
+      "x": 320,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 11,
+      "original_index": 93,
+      "name": "decorative_floor",
+      "source": "assets/tiles/individual/dngn/decor/decorative_floor.png",
+      "x": 352,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 12,
+      "original_index": 94,
+      "name": "dry_fountain",
+      "source": "assets/tiles/individual/dngn/decor/dry_fountain.png",
+      "x": 384,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 13,
+      "original_index": 95,
+      "name": "eyes_fountain",
+      "source": "assets/tiles/individual/dngn/decor/eyes_fountain.png",
+      "x": 416,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 14,
+      "original_index": 96,
+      "name": "flower_patch_0",
+      "source": "assets/tiles/individual/dngn/decor/flower_patch_0.png",
+      "x": 448,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 15,
+      "original_index": 97,
+      "name": "flower_patch_1",
+      "source": "assets/tiles/individual/dngn/decor/flower_patch_1.png",
+      "x": 480,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 16,
+      "original_index": 98,
+      "name": "flower_patch_2",
+      "source": "assets/tiles/individual/dngn/decor/flower_patch_2.png",
+      "x": 512,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 17,
+      "original_index": 99,
+      "name": "flower_patch_3",
+      "source": "assets/tiles/individual/dngn/decor/flower_patch_3.png",
+      "x": 544,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 18,
+      "original_index": 100,
+      "name": "garden_patch",
+      "source": "assets/tiles/individual/dngn/decor/garden_patch.png",
+      "x": 576,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 19,
+      "original_index": 101,
+      "name": "sparkling_fountain",
+      "source": "assets/tiles/individual/dngn/decor/sparkling_fountain.png",
+      "x": 608,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 20,
+      "original_index": 102,
+      "name": "sparkling_fountain2",
+      "source": "assets/tiles/individual/dngn/decor/sparkling_fountain2.png",
+      "x": 640,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    }
+  ]
+}

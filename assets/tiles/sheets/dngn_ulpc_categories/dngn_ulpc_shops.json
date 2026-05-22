@@ -1,0 +1,130 @@
+{
+  "image": "dngn_ulpc_shops.png",
+  "category": "shops",
+  "tile_size": 32,
+  "columns": 32,
+  "rows": 1,
+  "count": 12,
+  "frames": [
+    {
+      "index": 0,
+      "original_index": 940,
+      "name": "abandoned_shop",
+      "source": "assets/tiles/individual/dngn/shops/abandoned_shop.png",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 1,
+      "original_index": 941,
+      "name": "enter_shop",
+      "source": "assets/tiles/individual/dngn/shops/enter_shop.png",
+      "x": 32,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 2,
+      "original_index": 942,
+      "name": "shop_armour",
+      "source": "assets/tiles/individual/dngn/shops/shop_armour.png",
+      "x": 64,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 3,
+      "original_index": 943,
+      "name": "shop_books",
+      "source": "assets/tiles/individual/dngn/shops/shop_books.png",
+      "x": 96,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 4,
+      "original_index": 944,
+      "name": "shop_food",
+      "source": "assets/tiles/individual/dngn/shops/shop_food.png",
+      "x": 128,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 5,
+      "original_index": 945,
+      "name": "shop_gadgets",
+      "source": "assets/tiles/individual/dngn/shops/shop_gadgets.png",
+      "x": 160,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 6,
+      "original_index": 946,
+      "name": "shop_general",
+      "source": "assets/tiles/individual/dngn/shops/shop_general.png",
+      "x": 192,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 7,
+      "original_index": 947,
+      "name": "shop_jewellery",
+      "source": "assets/tiles/individual/dngn/shops/shop_jewellery.png",
+      "x": 224,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 8,
+      "original_index": 948,
+      "name": "shop_potions",
+      "source": "assets/tiles/individual/dngn/shops/shop_potions.png",
+      "x": 256,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 9,
+      "original_index": 949,
+      "name": "shop_scrolls",
+      "source": "assets/tiles/individual/dngn/shops/shop_scrolls.png",
+      "x": 288,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 10,
+      "original_index": 950,
+      "name": "shop_wands",
+      "source": "assets/tiles/individual/dngn/shops/shop_wands.png",
+      "x": 320,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 11,
+      "original_index": 951,
+      "name": "shop_weapon",
+      "source": "assets/tiles/individual/dngn/shops/shop_weapon.png",
+      "x": 352,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    }
+  ]
+}

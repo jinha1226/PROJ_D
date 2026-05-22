@@ -1,0 +1,55 @@
+{
+  "image": "shared_features_sheet.png",
+  "raw_image": "shared_features_raw.png",
+  "tile_size": 32,
+  "columns": 4,
+  "rows": 1,
+  "counts": {
+    "floor": 0,
+    "wall": 0,
+    "object": 4,
+    "total": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "role": "door_closed",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/doors/closed_door.png",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 1,
+      "role": "door_open",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/doors/open_door.png",
+      "x": 32,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 2,
+      "role": "stairs_down",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/gateways/metal_stairs_down.png",
+      "x": 64,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 3,
+      "role": "stairs_up",
+      "row_type": "object",
+      "source": "assets/tiles/individual/dngn/gateways/metal_stairs_up.png",
+      "x": 96,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    }
+  ]
+}

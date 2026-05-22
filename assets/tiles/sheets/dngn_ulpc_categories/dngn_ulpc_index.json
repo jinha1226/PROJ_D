@@ -1,0 +1,120 @@
+{
+  "source_image": "dngn_ulpc_sheet.png",
+  "source_manifest": "dngn_ulpc_sheet.json",
+  "tile_size": 32,
+  "columns": 32,
+  "categories": [
+    {
+      "category": "altars",
+      "image": "dngn_ulpc_altars.png",
+      "manifest": "dngn_ulpc_altars.json",
+      "count": 82,
+      "columns": 32,
+      "rows": 3
+    },
+    {
+      "category": "decor",
+      "image": "dngn_ulpc_decor.png",
+      "manifest": "dngn_ulpc_decor.json",
+      "count": 21,
+      "columns": 32,
+      "rows": 1
+    },
+    {
+      "category": "doors",
+      "image": "dngn_ulpc_doors.png",
+      "manifest": "dngn_ulpc_doors.json",
+      "count": 91,
+      "columns": 32,
+      "rows": 3
+    },
+    {
+      "category": "floor",
+      "image": "dngn_ulpc_floor.png",
+      "manifest": "dngn_ulpc_floor.json",
+      "count": 604,
+      "columns": 32,
+      "rows": 19
+    },
+    {
+      "category": "gateways",
+      "image": "dngn_ulpc_gateways.png",
+      "manifest": "dngn_ulpc_gateways.json",
+      "count": 124,
+      "columns": 32,
+      "rows": 4
+    },
+    {
+      "category": "misc",
+      "image": "dngn_ulpc_misc.png",
+      "manifest": "dngn_ulpc_misc.json",
+      "count": 5,
+      "columns": 32,
+      "rows": 1
+    },
+    {
+      "category": "path",
+      "image": "dngn_ulpc_path.png",
+      "manifest": "dngn_ulpc_path.json",
+      "count": 17,
+      "columns": 32,
+      "rows": 1
+    },
+    {
+      "category": "shops",
+      "image": "dngn_ulpc_shops.png",
+      "manifest": "dngn_ulpc_shops.json",
+      "count": 12,
+      "columns": 32,
+      "rows": 1
+    },
+    {
+      "category": "statues",
+      "image": "dngn_ulpc_statues.png",
+      "manifest": "dngn_ulpc_statues.json",
+      "count": 62,
+      "columns": 32,
+      "rows": 2
+    },
+    {
+      "category": "traps",
+      "image": "dngn_ulpc_traps.png",
+      "manifest": "dngn_ulpc_traps.json",
+      "count": 41,
+      "columns": 32,
+      "rows": 2
+    },
+    {
+      "category": "trees",
+      "image": "dngn_ulpc_trees.png",
+      "manifest": "dngn_ulpc_trees.json",
+      "count": 57,
+      "columns": 32,
+      "rows": 2
+    },
+    {
+      "category": "vaults",
+      "image": "dngn_ulpc_vaults.png",
+      "manifest": "dngn_ulpc_vaults.json",
+      "count": 131,
+      "columns": 32,
+      "rows": 5
+    },
+    {
+      "category": "wall",
+      "image": "dngn_ulpc_wall.png",
+      "manifest": "dngn_ulpc_wall.json",
+      "count": 905,
+      "columns": 32,
+      "rows": 29
+    },
+    {
+      "category": "water",
+      "image": "dngn_ulpc_water.png",
+      "manifest": "dngn_ulpc_water.json",
+      "count": 117,
+      "columns": 32,
+      "rows": 4
+    }
+  ]
+}

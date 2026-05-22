@@ -1,0 +1,6050 @@
+{
+  "image": "dngn_ulpc_floor.png",
+  "category": "floor",
+  "tile_size": 32,
+  "columns": 32,
+  "rows": 19,
+  "count": 604,
+  "frames": [
+    {
+      "index": 0,
+      "original_index": 194,
+      "name": "acidic_floor0",
+      "source": "assets/tiles/individual/dngn/floor/acidic_floor0.png",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 1,
+      "original_index": 195,
+      "name": "acidic_floor1",
+      "source": "assets/tiles/individual/dngn/floor/acidic_floor1.png",
+      "x": 32,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 2,
+      "original_index": 196,
+      "name": "acidic_floor2",
+      "source": "assets/tiles/individual/dngn/floor/acidic_floor2.png",
+      "x": 64,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 3,
+      "original_index": 197,
+      "name": "acidic_floor3",
+      "source": "assets/tiles/individual/dngn/floor/acidic_floor3.png",
+      "x": 96,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 4,
+      "original_index": 198,
+      "name": "black_cobalt01",
+      "source": "assets/tiles/individual/dngn/floor/black_cobalt01.png",
+      "x": 128,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 5,
+      "original_index": 199,
+      "name": "black_cobalt02",
+      "source": "assets/tiles/individual/dngn/floor/black_cobalt02.png",
+      "x": 160,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 6,
+      "original_index": 200,
+      "name": "black_cobalt03",
+      "source": "assets/tiles/individual/dngn/floor/black_cobalt03.png",
+      "x": 192,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 7,
+      "original_index": 201,
+      "name": "black_cobalt04",
+      "source": "assets/tiles/individual/dngn/floor/black_cobalt04.png",
+      "x": 224,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 8,
+      "original_index": 202,
+      "name": "black_cobalt05",
+      "source": "assets/tiles/individual/dngn/floor/black_cobalt05.png",
+      "x": 256,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 9,
+      "original_index": 203,
+      "name": "black_cobalt06",
+      "source": "assets/tiles/individual/dngn/floor/black_cobalt06.png",
+      "x": 288,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 10,
+      "original_index": 204,
+      "name": "black_cobalt07",
+      "source": "assets/tiles/individual/dngn/floor/black_cobalt07.png",
+      "x": 320,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 11,
+      "original_index": 205,
+      "name": "black_cobalt08",
+      "source": "assets/tiles/individual/dngn/floor/black_cobalt08.png",
+      "x": 352,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 12,
+      "original_index": 206,
+      "name": "black_cobalt09",
+      "source": "assets/tiles/individual/dngn/floor/black_cobalt09.png",
+      "x": 384,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 13,
+      "original_index": 207,
+      "name": "black_cobalt10",
+      "source": "assets/tiles/individual/dngn/floor/black_cobalt10.png",
+      "x": 416,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 14,
+      "original_index": 208,
+      "name": "black_cobalt11",
+      "source": "assets/tiles/individual/dngn/floor/black_cobalt11.png",
+      "x": 448,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 15,
+      "original_index": 209,
+      "name": "black_cobalt12",
+      "source": "assets/tiles/individual/dngn/floor/black_cobalt12.png",
+      "x": 480,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 16,
+      "original_index": 210,
+      "name": "blade_floor0",
+      "source": "assets/tiles/individual/dngn/floor/blade_floor0.png",
+      "x": 512,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 17,
+      "original_index": 211,
+      "name": "blade_floor1",
+      "source": "assets/tiles/individual/dngn/floor/blade_floor1.png",
+      "x": 544,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 18,
+      "original_index": 212,
+      "name": "blade_floor2",
+      "source": "assets/tiles/individual/dngn/floor/blade_floor2.png",
+      "x": 576,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 19,
+      "original_index": 213,
+      "name": "blade_floor3",
+      "source": "assets/tiles/individual/dngn/floor/blade_floor3.png",
+      "x": 608,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 20,
+      "original_index": 214,
+      "name": "bmaus_floor0",
+      "source": "assets/tiles/individual/dngn/floor/bmaus_floor0.png",
+      "x": 640,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 21,
+      "original_index": 215,
+      "name": "bmaus_floor1",
+      "source": "assets/tiles/individual/dngn/floor/bmaus_floor1.png",
+      "x": 672,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 22,
+      "original_index": 216,
+      "name": "bmaus_floor2",
+      "source": "assets/tiles/individual/dngn/floor/bmaus_floor2.png",
+      "x": 704,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 23,
+      "original_index": 217,
+      "name": "bmaus_floor3",
+      "source": "assets/tiles/individual/dngn/floor/bmaus_floor3.png",
+      "x": 736,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 24,
+      "original_index": 218,
+      "name": "bog_green0",
+      "source": "assets/tiles/individual/dngn/floor/bog_green0.png",
+      "x": 768,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 25,
+      "original_index": 219,
+      "name": "bog_green1",
+      "source": "assets/tiles/individual/dngn/floor/bog_green1.png",
+      "x": 800,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 26,
+      "original_index": 220,
+      "name": "bog_green2",
+      "source": "assets/tiles/individual/dngn/floor/bog_green2.png",
+      "x": 832,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 27,
+      "original_index": 221,
+      "name": "bog_green3",
+      "source": "assets/tiles/individual/dngn/floor/bog_green3.png",
+      "x": 864,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 28,
+      "original_index": 222,
+      "name": "cage0",
+      "source": "assets/tiles/individual/dngn/floor/cage0.png",
+      "x": 896,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 29,
+      "original_index": 223,
+      "name": "cage1",
+      "source": "assets/tiles/individual/dngn/floor/cage1.png",
+      "x": 928,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 30,
+      "original_index": 224,
+      "name": "cage2",
+      "source": "assets/tiles/individual/dngn/floor/cage2.png",
+      "x": 960,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 31,
+      "original_index": 225,
+      "name": "cage3",
+      "source": "assets/tiles/individual/dngn/floor/cage3.png",
+      "x": 992,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 32,
+      "original_index": 226,
+      "name": "cage4",
+      "source": "assets/tiles/individual/dngn/floor/cage4.png",
+      "x": 0,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 33,
+      "original_index": 227,
+      "name": "cage5",
+      "source": "assets/tiles/individual/dngn/floor/cage5.png",
+      "x": 32,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 34,
+      "original_index": 228,
+      "name": "cobble_blood1",
+      "source": "assets/tiles/individual/dngn/floor/cobble_blood1.png",
+      "x": 64,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 35,
+      "original_index": 229,
+      "name": "cobble_blood10",
+      "source": "assets/tiles/individual/dngn/floor/cobble_blood10.png",
+      "x": 96,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 36,
+      "original_index": 230,
+      "name": "cobble_blood11",
+      "source": "assets/tiles/individual/dngn/floor/cobble_blood11.png",
+      "x": 128,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 37,
+      "original_index": 231,
+      "name": "cobble_blood12",
+      "source": "assets/tiles/individual/dngn/floor/cobble_blood12.png",
+      "x": 160,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 38,
+      "original_index": 232,
+      "name": "cobble_blood2",
+      "source": "assets/tiles/individual/dngn/floor/cobble_blood2.png",
+      "x": 192,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 39,
+      "original_index": 233,
+      "name": "cobble_blood3",
+      "source": "assets/tiles/individual/dngn/floor/cobble_blood3.png",
+      "x": 224,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 40,
+      "original_index": 234,
+      "name": "cobble_blood4",
+      "source": "assets/tiles/individual/dngn/floor/cobble_blood4.png",
+      "x": 256,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 41,
+      "original_index": 235,
+      "name": "cobble_blood5",
+      "source": "assets/tiles/individual/dngn/floor/cobble_blood5.png",
+      "x": 288,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 42,
+      "original_index": 236,
+      "name": "cobble_blood6",
+      "source": "assets/tiles/individual/dngn/floor/cobble_blood6.png",
+      "x": 320,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 43,
+      "original_index": 237,
+      "name": "cobble_blood7",
+      "source": "assets/tiles/individual/dngn/floor/cobble_blood7.png",
+      "x": 352,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 44,
+      "original_index": 238,
+      "name": "cobble_blood8",
+      "source": "assets/tiles/individual/dngn/floor/cobble_blood8.png",
+      "x": 384,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 45,
+      "original_index": 239,
+      "name": "cobble_blood9",
+      "source": "assets/tiles/individual/dngn/floor/cobble_blood9.png",
+      "x": 416,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 46,
+      "original_index": 240,
+      "name": "crypt0",
+      "source": "assets/tiles/individual/dngn/floor/crypt0.png",
+      "x": 448,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 47,
+      "original_index": 241,
+      "name": "crypt1",
+      "source": "assets/tiles/individual/dngn/floor/crypt1.png",
+      "x": 480,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 48,
+      "original_index": 242,
+      "name": "crypt10",
+      "source": "assets/tiles/individual/dngn/floor/crypt10.png",
+      "x": 512,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 49,
+      "original_index": 243,
+      "name": "crypt11",
+      "source": "assets/tiles/individual/dngn/floor/crypt11.png",
+      "x": 544,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 50,
+      "original_index": 244,
+      "name": "crypt2",
+      "source": "assets/tiles/individual/dngn/floor/crypt2.png",
+      "x": 576,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 51,
+      "original_index": 245,
+      "name": "crypt3",
+      "source": "assets/tiles/individual/dngn/floor/crypt3.png",
+      "x": 608,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 52,
+      "original_index": 246,
+      "name": "crypt4",
+      "source": "assets/tiles/individual/dngn/floor/crypt4.png",
+      "x": 640,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 53,
+      "original_index": 247,
+      "name": "crypt5",
+      "source": "assets/tiles/individual/dngn/floor/crypt5.png",
+      "x": 672,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 54,
+      "original_index": 248,
+      "name": "crypt6",
+      "source": "assets/tiles/individual/dngn/floor/crypt6.png",
+      "x": 704,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 55,
+      "original_index": 249,
+      "name": "crypt7",
+      "source": "assets/tiles/individual/dngn/floor/crypt7.png",
+      "x": 736,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 56,
+      "original_index": 250,
+      "name": "crypt8",
+      "source": "assets/tiles/individual/dngn/floor/crypt8.png",
+      "x": 768,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 57,
+      "original_index": 251,
+      "name": "crypt9",
+      "source": "assets/tiles/individual/dngn/floor/crypt9.png",
+      "x": 800,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 58,
+      "original_index": 252,
+      "name": "crypt_domino_1a",
+      "source": "assets/tiles/individual/dngn/floor/crypt_domino_1a.png",
+      "x": 832,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 59,
+      "original_index": 253,
+      "name": "crypt_domino_1b",
+      "source": "assets/tiles/individual/dngn/floor/crypt_domino_1b.png",
+      "x": 864,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 60,
+      "original_index": 254,
+      "name": "crypt_domino_2a",
+      "source": "assets/tiles/individual/dngn/floor/crypt_domino_2a.png",
+      "x": 896,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 61,
+      "original_index": 255,
+      "name": "crypt_domino_3a",
+      "source": "assets/tiles/individual/dngn/floor/crypt_domino_3a.png",
+      "x": 928,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 62,
+      "original_index": 256,
+      "name": "crypt_domino_4a",
+      "source": "assets/tiles/individual/dngn/floor/crypt_domino_4a.png",
+      "x": 960,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 63,
+      "original_index": 257,
+      "name": "crypt_domino_4b",
+      "source": "assets/tiles/individual/dngn/floor/crypt_domino_4b.png",
+      "x": 992,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 64,
+      "original_index": 258,
+      "name": "crypt_domino_5a",
+      "source": "assets/tiles/individual/dngn/floor/crypt_domino_5a.png",
+      "x": 0,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 65,
+      "original_index": 259,
+      "name": "crypt_domino_6a",
+      "source": "assets/tiles/individual/dngn/floor/crypt_domino_6a.png",
+      "x": 32,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 66,
+      "original_index": 260,
+      "name": "crypt_domino_7a",
+      "source": "assets/tiles/individual/dngn/floor/crypt_domino_7a.png",
+      "x": 64,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 67,
+      "original_index": 261,
+      "name": "crypt_domino_8a",
+      "source": "assets/tiles/individual/dngn/floor/crypt_domino_8a.png",
+      "x": 96,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 68,
+      "original_index": 262,
+      "name": "crystal0",
+      "source": "assets/tiles/individual/dngn/floor/crystal0.png",
+      "x": 128,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 69,
+      "original_index": 263,
+      "name": "crystal1",
+      "source": "assets/tiles/individual/dngn/floor/crystal1.png",
+      "x": 160,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 70,
+      "original_index": 264,
+      "name": "crystal2",
+      "source": "assets/tiles/individual/dngn/floor/crystal2.png",
+      "x": 192,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 71,
+      "original_index": 265,
+      "name": "crystal3",
+      "source": "assets/tiles/individual/dngn/floor/crystal3.png",
+      "x": 224,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 72,
+      "original_index": 266,
+      "name": "crystal_floor0",
+      "source": "assets/tiles/individual/dngn/floor/crystal_floor0.png",
+      "x": 256,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 73,
+      "original_index": 267,
+      "name": "crystal_floor1",
+      "source": "assets/tiles/individual/dngn/floor/crystal_floor1.png",
+      "x": 288,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 74,
+      "original_index": 268,
+      "name": "crystal_floor2",
+      "source": "assets/tiles/individual/dngn/floor/crystal_floor2.png",
+      "x": 320,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 75,
+      "original_index": 269,
+      "name": "crystal_floor3",
+      "source": "assets/tiles/individual/dngn/floor/crystal_floor3.png",
+      "x": 352,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 76,
+      "original_index": 270,
+      "name": "crystal_floor4",
+      "source": "assets/tiles/individual/dngn/floor/crystal_floor4.png",
+      "x": 384,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 77,
+      "original_index": 271,
+      "name": "crystal_floor5",
+      "source": "assets/tiles/individual/dngn/floor/crystal_floor5.png",
+      "x": 416,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 78,
+      "original_index": 272,
+      "name": "demonic_red1",
+      "source": "assets/tiles/individual/dngn/floor/demonic_red1.png",
+      "x": 448,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 79,
+      "original_index": 273,
+      "name": "demonic_red2",
+      "source": "assets/tiles/individual/dngn/floor/demonic_red2.png",
+      "x": 480,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 80,
+      "original_index": 274,
+      "name": "demonic_red3",
+      "source": "assets/tiles/individual/dngn/floor/demonic_red3.png",
+      "x": 512,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 81,
+      "original_index": 275,
+      "name": "demonic_red4",
+      "source": "assets/tiles/individual/dngn/floor/demonic_red4.png",
+      "x": 544,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 82,
+      "original_index": 276,
+      "name": "demonic_red5",
+      "source": "assets/tiles/individual/dngn/floor/demonic_red5.png",
+      "x": 576,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 83,
+      "original_index": 277,
+      "name": "demonic_red6",
+      "source": "assets/tiles/individual/dngn/floor/demonic_red6.png",
+      "x": 608,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 84,
+      "original_index": 278,
+      "name": "demonic_red7",
+      "source": "assets/tiles/individual/dngn/floor/demonic_red7.png",
+      "x": 640,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 85,
+      "original_index": 279,
+      "name": "demonic_red8",
+      "source": "assets/tiles/individual/dngn/floor/demonic_red8.png",
+      "x": 672,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 86,
+      "original_index": 280,
+      "name": "demonic_red9",
+      "source": "assets/tiles/individual/dngn/floor/demonic_red9.png",
+      "x": 704,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 87,
+      "original_index": 281,
+      "name": "depthstone_floor0",
+      "source": "assets/tiles/individual/dngn/floor/depthstone_floor0.png",
+      "x": 736,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 88,
+      "original_index": 282,
+      "name": "depthstone_floor1",
+      "source": "assets/tiles/individual/dngn/floor/depthstone_floor1.png",
+      "x": 768,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 89,
+      "original_index": 283,
+      "name": "depthstone_floor2",
+      "source": "assets/tiles/individual/dngn/floor/depthstone_floor2.png",
+      "x": 800,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 90,
+      "original_index": 284,
+      "name": "depthstone_floor3",
+      "source": "assets/tiles/individual/dngn/floor/depthstone_floor3.png",
+      "x": 832,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 91,
+      "original_index": 285,
+      "name": "depthstone_floor4",
+      "source": "assets/tiles/individual/dngn/floor/depthstone_floor4.png",
+      "x": 864,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 92,
+      "original_index": 286,
+      "name": "dirt0",
+      "source": "assets/tiles/individual/dngn/floor/dirt0.png",
+      "x": 896,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 93,
+      "original_index": 287,
+      "name": "dirt1",
+      "source": "assets/tiles/individual/dngn/floor/dirt1.png",
+      "x": 928,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 94,
+      "original_index": 288,
+      "name": "dirt2",
+      "source": "assets/tiles/individual/dngn/floor/dirt2.png",
+      "x": 960,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 95,
+      "original_index": 289,
+      "name": "dirt_e",
+      "source": "assets/tiles/individual/dngn/floor/dirt_e.png",
+      "x": 992,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 96,
+      "original_index": 290,
+      "name": "dirt_full",
+      "source": "assets/tiles/individual/dngn/floor/dirt_full.png",
+      "x": 0,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 97,
+      "original_index": 291,
+      "name": "dirt_n",
+      "source": "assets/tiles/individual/dngn/floor/dirt_n.png",
+      "x": 32,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 98,
+      "original_index": 292,
+      "name": "dirt_ne",
+      "source": "assets/tiles/individual/dngn/floor/dirt_ne.png",
+      "x": 64,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 99,
+      "original_index": 293,
+      "name": "dirt_nw",
+      "source": "assets/tiles/individual/dngn/floor/dirt_nw.png",
+      "x": 96,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 100,
+      "original_index": 294,
+      "name": "dirt_s",
+      "source": "assets/tiles/individual/dngn/floor/dirt_s.png",
+      "x": 128,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 101,
+      "original_index": 295,
+      "name": "dirt_se",
+      "source": "assets/tiles/individual/dngn/floor/dirt_se.png",
+      "x": 160,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 102,
+      "original_index": 296,
+      "name": "dirt_sw",
+      "source": "assets/tiles/individual/dngn/floor/dirt_sw.png",
+      "x": 192,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 103,
+      "original_index": 297,
+      "name": "dirt_w",
+      "source": "assets/tiles/individual/dngn/floor/dirt_w.png",
+      "x": 224,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 104,
+      "original_index": 298,
+      "name": "endless_salt0",
+      "source": "assets/tiles/individual/dngn/floor/endless_salt0.png",
+      "x": 256,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 105,
+      "original_index": 299,
+      "name": "endless_salt1",
+      "source": "assets/tiles/individual/dngn/floor/endless_salt1.png",
+      "x": 288,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 106,
+      "original_index": 300,
+      "name": "endless_salt2",
+      "source": "assets/tiles/individual/dngn/floor/endless_salt2.png",
+      "x": 320,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 107,
+      "original_index": 301,
+      "name": "endless_salt3",
+      "source": "assets/tiles/individual/dngn/floor/endless_salt3.png",
+      "x": 352,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 108,
+      "original_index": 302,
+      "name": "etched0",
+      "source": "assets/tiles/individual/dngn/floor/etched0.png",
+      "x": 384,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 109,
+      "original_index": 303,
+      "name": "etched1",
+      "source": "assets/tiles/individual/dngn/floor/etched1.png",
+      "x": 416,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 110,
+      "original_index": 304,
+      "name": "etched2",
+      "source": "assets/tiles/individual/dngn/floor/etched2.png",
+      "x": 448,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 111,
+      "original_index": 305,
+      "name": "etched3",
+      "source": "assets/tiles/individual/dngn/floor/etched3.png",
+      "x": 480,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 112,
+      "original_index": 306,
+      "name": "etched4",
+      "source": "assets/tiles/individual/dngn/floor/etched4.png",
+      "x": 512,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 113,
+      "original_index": 307,
+      "name": "etched5",
+      "source": "assets/tiles/individual/dngn/floor/etched5.png",
+      "x": 544,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 114,
+      "original_index": 308,
+      "name": "floor_nerves0",
+      "source": "assets/tiles/individual/dngn/floor/floor_nerves0.png",
+      "x": 576,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 115,
+      "original_index": 309,
+      "name": "floor_nerves1",
+      "source": "assets/tiles/individual/dngn/floor/floor_nerves1.png",
+      "x": 608,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 116,
+      "original_index": 310,
+      "name": "floor_nerves2",
+      "source": "assets/tiles/individual/dngn/floor/floor_nerves2.png",
+      "x": 640,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 117,
+      "original_index": 311,
+      "name": "floor_nerves3",
+      "source": "assets/tiles/individual/dngn/floor/floor_nerves3.png",
+      "x": 672,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 118,
+      "original_index": 312,
+      "name": "floor_nerves4",
+      "source": "assets/tiles/individual/dngn/floor/floor_nerves4.png",
+      "x": 704,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 119,
+      "original_index": 313,
+      "name": "floor_nerves5",
+      "source": "assets/tiles/individual/dngn/floor/floor_nerves5.png",
+      "x": 736,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 120,
+      "original_index": 314,
+      "name": "floor_nerves6",
+      "source": "assets/tiles/individual/dngn/floor/floor_nerves6.png",
+      "x": 768,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 121,
+      "original_index": 315,
+      "name": "floor_vines0",
+      "source": "assets/tiles/individual/dngn/floor/floor_vines0.png",
+      "x": 800,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 122,
+      "original_index": 316,
+      "name": "floor_vines1",
+      "source": "assets/tiles/individual/dngn/floor/floor_vines1.png",
+      "x": 832,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 123,
+      "original_index": 317,
+      "name": "floor_vines2",
+      "source": "assets/tiles/individual/dngn/floor/floor_vines2.png",
+      "x": 864,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 124,
+      "original_index": 318,
+      "name": "floor_vines3",
+      "source": "assets/tiles/individual/dngn/floor/floor_vines3.png",
+      "x": 896,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 125,
+      "original_index": 319,
+      "name": "floor_vines4",
+      "source": "assets/tiles/individual/dngn/floor/floor_vines4.png",
+      "x": 928,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 126,
+      "original_index": 320,
+      "name": "floor_vines5",
+      "source": "assets/tiles/individual/dngn/floor/floor_vines5.png",
+      "x": 960,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 127,
+      "original_index": 321,
+      "name": "floor_vines6",
+      "source": "assets/tiles/individual/dngn/floor/floor_vines6.png",
+      "x": 992,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 128,
+      "original_index": 322,
+      "name": "frozen0",
+      "source": "assets/tiles/individual/dngn/floor/frozen0.png",
+      "x": 0,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 129,
+      "original_index": 323,
+      "name": "frozen1",
+      "source": "assets/tiles/individual/dngn/floor/frozen1.png",
+      "x": 32,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 130,
+      "original_index": 324,
+      "name": "frozen10",
+      "source": "assets/tiles/individual/dngn/floor/frozen10.png",
+      "x": 64,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 131,
+      "original_index": 325,
+      "name": "frozen11",
+      "source": "assets/tiles/individual/dngn/floor/frozen11.png",
+      "x": 96,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 132,
+      "original_index": 326,
+      "name": "frozen12",
+      "source": "assets/tiles/individual/dngn/floor/frozen12.png",
+      "x": 128,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 133,
+      "original_index": 327,
+      "name": "frozen2",
+      "source": "assets/tiles/individual/dngn/floor/frozen2.png",
+      "x": 160,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 134,
+      "original_index": 328,
+      "name": "frozen3",
+      "source": "assets/tiles/individual/dngn/floor/frozen3.png",
+      "x": 192,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 135,
+      "original_index": 329,
+      "name": "frozen4",
+      "source": "assets/tiles/individual/dngn/floor/frozen4.png",
+      "x": 224,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 136,
+      "original_index": 330,
+      "name": "frozen5",
+      "source": "assets/tiles/individual/dngn/floor/frozen5.png",
+      "x": 256,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 137,
+      "original_index": 331,
+      "name": "frozen6",
+      "source": "assets/tiles/individual/dngn/floor/frozen6.png",
+      "x": 288,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 138,
+      "original_index": 332,
+      "name": "frozen7",
+      "source": "assets/tiles/individual/dngn/floor/frozen7.png",
+      "x": 320,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 139,
+      "original_index": 333,
+      "name": "frozen8",
+      "source": "assets/tiles/individual/dngn/floor/frozen8.png",
+      "x": 352,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 140,
+      "original_index": 334,
+      "name": "frozen9",
+      "source": "assets/tiles/individual/dngn/floor/frozen9.png",
+      "x": 384,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 141,
+      "original_index": 335,
+      "name": "gauntlet0",
+      "source": "assets/tiles/individual/dngn/floor/gauntlet0.png",
+      "x": 416,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 142,
+      "original_index": 336,
+      "name": "gauntlet1",
+      "source": "assets/tiles/individual/dngn/floor/gauntlet1.png",
+      "x": 448,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 143,
+      "original_index": 337,
+      "name": "gauntlet2",
+      "source": "assets/tiles/individual/dngn/floor/gauntlet2.png",
+      "x": 480,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 144,
+      "original_index": 338,
+      "name": "gauntlet3",
+      "source": "assets/tiles/individual/dngn/floor/gauntlet3.png",
+      "x": 512,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 145,
+      "original_index": 339,
+      "name": "grass-dark0",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-dark0.png",
+      "x": 544,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 146,
+      "original_index": 340,
+      "name": "grass-dark1",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-dark1.png",
+      "x": 576,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 147,
+      "original_index": 341,
+      "name": "grass-dark2",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-dark2.png",
+      "x": 608,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 148,
+      "original_index": 342,
+      "name": "grass-dark3",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-dark3.png",
+      "x": 640,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 149,
+      "original_index": 343,
+      "name": "grass-dark4",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-dark4.png",
+      "x": 672,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 150,
+      "original_index": 344,
+      "name": "grass-dark5",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-dark5.png",
+      "x": 704,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 151,
+      "original_index": 345,
+      "name": "grass-dark_flowers0",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-dark_flowers0.png",
+      "x": 736,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 152,
+      "original_index": 346,
+      "name": "grass-dark_flowers1",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-dark_flowers1.png",
+      "x": 768,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 153,
+      "original_index": 347,
+      "name": "grass-dark_flowers2",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-dark_flowers2.png",
+      "x": 800,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 154,
+      "original_index": 348,
+      "name": "grass-dark_flowers3",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-dark_flowers3.png",
+      "x": 832,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 155,
+      "original_index": 349,
+      "name": "grass-dark_flowers4",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-dark_flowers4.png",
+      "x": 864,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 156,
+      "original_index": 350,
+      "name": "grass-dark_flowers5",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-dark_flowers5.png",
+      "x": 896,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 157,
+      "original_index": 351,
+      "name": "grass-pedestal_e",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-pedestal_e.png",
+      "x": 928,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 158,
+      "original_index": 352,
+      "name": "grass-pedestal_n",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-pedestal_n.png",
+      "x": 960,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 159,
+      "original_index": 353,
+      "name": "grass-pedestal_ne",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-pedestal_ne.png",
+      "x": 992,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 160,
+      "original_index": 354,
+      "name": "grass-pedestal_nw",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-pedestal_nw.png",
+      "x": 0,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 161,
+      "original_index": 355,
+      "name": "grass-pedestal_s",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-pedestal_s.png",
+      "x": 32,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 162,
+      "original_index": 356,
+      "name": "grass-pedestal_se",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-pedestal_se.png",
+      "x": 64,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 163,
+      "original_index": 357,
+      "name": "grass-pedestal_sw",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-pedestal_sw.png",
+      "x": 96,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 164,
+      "original_index": 358,
+      "name": "grass-pedestal_w",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass-pedestal_w.png",
+      "x": 128,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 165,
+      "original_index": 359,
+      "name": "grass0",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass0.png",
+      "x": 160,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 166,
+      "original_index": 360,
+      "name": "grass1",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass1.png",
+      "x": 192,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 167,
+      "original_index": 361,
+      "name": "grass2",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass2.png",
+      "x": 224,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 168,
+      "original_index": 362,
+      "name": "grass3",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass3.png",
+      "x": 256,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 169,
+      "original_index": 363,
+      "name": "grass4",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass4.png",
+      "x": 288,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 170,
+      "original_index": 364,
+      "name": "grass5",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass5.png",
+      "x": 320,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 171,
+      "original_index": 365,
+      "name": "grass_e",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_e.png",
+      "x": 352,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 172,
+      "original_index": 366,
+      "name": "grass_flowers0",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_flowers0.png",
+      "x": 384,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 173,
+      "original_index": 367,
+      "name": "grass_flowers1",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_flowers1.png",
+      "x": 416,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 174,
+      "original_index": 368,
+      "name": "grass_flowers2",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_flowers2.png",
+      "x": 448,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 175,
+      "original_index": 369,
+      "name": "grass_flowers3",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_flowers3.png",
+      "x": 480,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 176,
+      "original_index": 370,
+      "name": "grass_flowers4",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_flowers4.png",
+      "x": 512,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 177,
+      "original_index": 371,
+      "name": "grass_flowers5",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_flowers5.png",
+      "x": 544,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 178,
+      "original_index": 372,
+      "name": "grass_full",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_full.png",
+      "x": 576,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 179,
+      "original_index": 373,
+      "name": "grass_n",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_n.png",
+      "x": 608,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 180,
+      "original_index": 374,
+      "name": "grass_ne",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_ne.png",
+      "x": 640,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 181,
+      "original_index": 375,
+      "name": "grass_nw",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_nw.png",
+      "x": 672,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 182,
+      "original_index": 376,
+      "name": "grass_s",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_s.png",
+      "x": 704,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 183,
+      "original_index": 377,
+      "name": "grass_se",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_se.png",
+      "x": 736,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 184,
+      "original_index": 378,
+      "name": "grass_sw",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_sw.png",
+      "x": 768,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 185,
+      "original_index": 379,
+      "name": "grass_w",
+      "source": "assets/tiles/individual/dngn/floor/grass/grass_w.png",
+      "x": 800,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 186,
+      "original_index": 380,
+      "name": "green_bones01",
+      "source": "assets/tiles/individual/dngn/floor/green_bones01.png",
+      "x": 832,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 187,
+      "original_index": 381,
+      "name": "green_bones02",
+      "source": "assets/tiles/individual/dngn/floor/green_bones02.png",
+      "x": 864,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 188,
+      "original_index": 382,
+      "name": "green_bones03",
+      "source": "assets/tiles/individual/dngn/floor/green_bones03.png",
+      "x": 896,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 189,
+      "original_index": 383,
+      "name": "green_bones04",
+      "source": "assets/tiles/individual/dngn/floor/green_bones04.png",
+      "x": 928,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 190,
+      "original_index": 384,
+      "name": "green_bones05",
+      "source": "assets/tiles/individual/dngn/floor/green_bones05.png",
+      "x": 960,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 191,
+      "original_index": 385,
+      "name": "green_bones06",
+      "source": "assets/tiles/individual/dngn/floor/green_bones06.png",
+      "x": 992,
+      "y": 160,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 192,
+      "original_index": 386,
+      "name": "green_bones07",
+      "source": "assets/tiles/individual/dngn/floor/green_bones07.png",
+      "x": 0,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 193,
+      "original_index": 387,
+      "name": "green_bones08",
+      "source": "assets/tiles/individual/dngn/floor/green_bones08.png",
+      "x": 32,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 194,
+      "original_index": 388,
+      "name": "green_bones09",
+      "source": "assets/tiles/individual/dngn/floor/green_bones09.png",
+      "x": 64,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 195,
+      "original_index": 389,
+      "name": "green_bones10",
+      "source": "assets/tiles/individual/dngn/floor/green_bones10.png",
+      "x": 96,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 196,
+      "original_index": 390,
+      "name": "green_bones11",
+      "source": "assets/tiles/individual/dngn/floor/green_bones11.png",
+      "x": 128,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 197,
+      "original_index": 391,
+      "name": "green_bones12",
+      "source": "assets/tiles/individual/dngn/floor/green_bones12.png",
+      "x": 160,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 198,
+      "original_index": 392,
+      "name": "grey_dirt0",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt0.png",
+      "x": 192,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 199,
+      "original_index": 393,
+      "name": "grey_dirt1",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt1.png",
+      "x": 224,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 200,
+      "original_index": 394,
+      "name": "grey_dirt2",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt2.png",
+      "x": 256,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 201,
+      "original_index": 395,
+      "name": "grey_dirt3",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt3.png",
+      "x": 288,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 202,
+      "original_index": 396,
+      "name": "grey_dirt4",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt4.png",
+      "x": 320,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 203,
+      "original_index": 397,
+      "name": "grey_dirt5",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt5.png",
+      "x": 352,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 204,
+      "original_index": 398,
+      "name": "grey_dirt6",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt6.png",
+      "x": 384,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 205,
+      "original_index": 399,
+      "name": "grey_dirt7",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt7.png",
+      "x": 416,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 206,
+      "original_index": 400,
+      "name": "grey_dirt_b_0",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt_b_0.png",
+      "x": 448,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 207,
+      "original_index": 401,
+      "name": "grey_dirt_b_1",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt_b_1.png",
+      "x": 480,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 208,
+      "original_index": 402,
+      "name": "grey_dirt_b_2",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt_b_2.png",
+      "x": 512,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 209,
+      "original_index": 403,
+      "name": "grey_dirt_b_3",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt_b_3.png",
+      "x": 544,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 210,
+      "original_index": 404,
+      "name": "grey_dirt_b_4",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt_b_4.png",
+      "x": 576,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 211,
+      "original_index": 405,
+      "name": "grey_dirt_b_5",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt_b_5.png",
+      "x": 608,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 212,
+      "original_index": 406,
+      "name": "grey_dirt_b_6",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt_b_6.png",
+      "x": 640,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 213,
+      "original_index": 407,
+      "name": "grey_dirt_b_7",
+      "source": "assets/tiles/individual/dngn/floor/grey_dirt_b_7.png",
+      "x": 672,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 214,
+      "original_index": 408,
+      "name": "ice0",
+      "source": "assets/tiles/individual/dngn/floor/ice0.png",
+      "x": 704,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 215,
+      "original_index": 409,
+      "name": "ice1",
+      "source": "assets/tiles/individual/dngn/floor/ice1.png",
+      "x": 736,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 216,
+      "original_index": 410,
+      "name": "ice2",
+      "source": "assets/tiles/individual/dngn/floor/ice2.png",
+      "x": 768,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 217,
+      "original_index": 411,
+      "name": "ice3",
+      "source": "assets/tiles/individual/dngn/floor/ice3.png",
+      "x": 800,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 218,
+      "original_index": 412,
+      "name": "ice_overlay_E",
+      "source": "assets/tiles/individual/dngn/floor/ice_overlay_E.png",
+      "x": 832,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 219,
+      "original_index": 413,
+      "name": "ice_overlay_N",
+      "source": "assets/tiles/individual/dngn/floor/ice_overlay_N.png",
+      "x": 864,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 220,
+      "original_index": 414,
+      "name": "ice_overlay_NE",
+      "source": "assets/tiles/individual/dngn/floor/ice_overlay_NE.png",
+      "x": 896,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 221,
+      "original_index": 415,
+      "name": "ice_overlay_NW",
+      "source": "assets/tiles/individual/dngn/floor/ice_overlay_NW.png",
+      "x": 928,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 222,
+      "original_index": 416,
+      "name": "ice_overlay_S",
+      "source": "assets/tiles/individual/dngn/floor/ice_overlay_S.png",
+      "x": 960,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 223,
+      "original_index": 417,
+      "name": "ice_overlay_SE",
+      "source": "assets/tiles/individual/dngn/floor/ice_overlay_SE.png",
+      "x": 992,
+      "y": 192,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 224,
+      "original_index": 418,
+      "name": "ice_overlay_SW",
+      "source": "assets/tiles/individual/dngn/floor/ice_overlay_SW.png",
+      "x": 0,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 225,
+      "original_index": 419,
+      "name": "ice_overlay_W",
+      "source": "assets/tiles/individual/dngn/floor/ice_overlay_W.png",
+      "x": 32,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 226,
+      "original_index": 420,
+      "name": "icy_floor0",
+      "source": "assets/tiles/individual/dngn/floor/icy_floor0.png",
+      "x": 64,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 227,
+      "original_index": 421,
+      "name": "icy_floor1",
+      "source": "assets/tiles/individual/dngn/floor/icy_floor1.png",
+      "x": 96,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 228,
+      "original_index": 422,
+      "name": "icy_floor2",
+      "source": "assets/tiles/individual/dngn/floor/icy_floor2.png",
+      "x": 128,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 229,
+      "original_index": 423,
+      "name": "icy_floor3",
+      "source": "assets/tiles/individual/dngn/floor/icy_floor3.png",
+      "x": 160,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 230,
+      "original_index": 424,
+      "name": "infernal01",
+      "source": "assets/tiles/individual/dngn/floor/infernal01.png",
+      "x": 192,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 231,
+      "original_index": 425,
+      "name": "infernal02",
+      "source": "assets/tiles/individual/dngn/floor/infernal02.png",
+      "x": 224,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 232,
+      "original_index": 426,
+      "name": "infernal03",
+      "source": "assets/tiles/individual/dngn/floor/infernal03.png",
+      "x": 256,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 233,
+      "original_index": 427,
+      "name": "infernal04",
+      "source": "assets/tiles/individual/dngn/floor/infernal04.png",
+      "x": 288,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 234,
+      "original_index": 428,
+      "name": "infernal05",
+      "source": "assets/tiles/individual/dngn/floor/infernal05.png",
+      "x": 320,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 235,
+      "original_index": 429,
+      "name": "infernal06",
+      "source": "assets/tiles/individual/dngn/floor/infernal06.png",
+      "x": 352,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 236,
+      "original_index": 430,
+      "name": "infernal07",
+      "source": "assets/tiles/individual/dngn/floor/infernal07.png",
+      "x": 384,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 237,
+      "original_index": 431,
+      "name": "infernal08",
+      "source": "assets/tiles/individual/dngn/floor/infernal08.png",
+      "x": 416,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 238,
+      "original_index": 432,
+      "name": "infernal09",
+      "source": "assets/tiles/individual/dngn/floor/infernal09.png",
+      "x": 448,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 239,
+      "original_index": 433,
+      "name": "infernal10",
+      "source": "assets/tiles/individual/dngn/floor/infernal10.png",
+      "x": 480,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 240,
+      "original_index": 434,
+      "name": "infernal11",
+      "source": "assets/tiles/individual/dngn/floor/infernal11.png",
+      "x": 512,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 241,
+      "original_index": 435,
+      "name": "infernal12",
+      "source": "assets/tiles/individual/dngn/floor/infernal12.png",
+      "x": 544,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 242,
+      "original_index": 436,
+      "name": "infernal13",
+      "source": "assets/tiles/individual/dngn/floor/infernal13.png",
+      "x": 576,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 243,
+      "original_index": 437,
+      "name": "infernal14",
+      "source": "assets/tiles/individual/dngn/floor/infernal14.png",
+      "x": 608,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 244,
+      "original_index": 438,
+      "name": "infernal15",
+      "source": "assets/tiles/individual/dngn/floor/infernal15.png",
+      "x": 640,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 245,
+      "original_index": 439,
+      "name": "infernal_blank",
+      "source": "assets/tiles/individual/dngn/floor/infernal_blank.png",
+      "x": 672,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 246,
+      "original_index": 440,
+      "name": "iron0",
+      "source": "assets/tiles/individual/dngn/floor/iron0.png",
+      "x": 704,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 247,
+      "original_index": 441,
+      "name": "iron1",
+      "source": "assets/tiles/individual/dngn/floor/iron1.png",
+      "x": 736,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 248,
+      "original_index": 442,
+      "name": "iron2",
+      "source": "assets/tiles/individual/dngn/floor/iron2.png",
+      "x": 768,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 249,
+      "original_index": 443,
+      "name": "iron3",
+      "source": "assets/tiles/individual/dngn/floor/iron3.png",
+      "x": 800,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 250,
+      "original_index": 444,
+      "name": "iron4",
+      "source": "assets/tiles/individual/dngn/floor/iron4.png",
+      "x": 832,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 251,
+      "original_index": 445,
+      "name": "iron5",
+      "source": "assets/tiles/individual/dngn/floor/iron5.png",
+      "x": 864,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 252,
+      "original_index": 446,
+      "name": "lair0",
+      "source": "assets/tiles/individual/dngn/floor/lair0.png",
+      "x": 896,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 253,
+      "original_index": 447,
+      "name": "lair1",
+      "source": "assets/tiles/individual/dngn/floor/lair1.png",
+      "x": 928,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 254,
+      "original_index": 448,
+      "name": "lair10",
+      "source": "assets/tiles/individual/dngn/floor/lair10.png",
+      "x": 960,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 255,
+      "original_index": 449,
+      "name": "lair11",
+      "source": "assets/tiles/individual/dngn/floor/lair11.png",
+      "x": 992,
+      "y": 224,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 256,
+      "original_index": 450,
+      "name": "lair12",
+      "source": "assets/tiles/individual/dngn/floor/lair12.png",
+      "x": 0,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 257,
+      "original_index": 451,
+      "name": "lair13",
+      "source": "assets/tiles/individual/dngn/floor/lair13.png",
+      "x": 32,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 258,
+      "original_index": 452,
+      "name": "lair14",
+      "source": "assets/tiles/individual/dngn/floor/lair14.png",
+      "x": 64,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 259,
+      "original_index": 453,
+      "name": "lair15",
+      "source": "assets/tiles/individual/dngn/floor/lair15.png",
+      "x": 96,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 260,
+      "original_index": 454,
+      "name": "lair2",
+      "source": "assets/tiles/individual/dngn/floor/lair2.png",
+      "x": 128,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 261,
+      "original_index": 455,
+      "name": "lair3",
+      "source": "assets/tiles/individual/dngn/floor/lair3.png",
+      "x": 160,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 262,
+      "original_index": 456,
+      "name": "lair4",
+      "source": "assets/tiles/individual/dngn/floor/lair4.png",
+      "x": 192,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 263,
+      "original_index": 457,
+      "name": "lair5",
+      "source": "assets/tiles/individual/dngn/floor/lair5.png",
+      "x": 224,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 264,
+      "original_index": 458,
+      "name": "lair6",
+      "source": "assets/tiles/individual/dngn/floor/lair6.png",
+      "x": 256,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 265,
+      "original_index": 459,
+      "name": "lair7",
+      "source": "assets/tiles/individual/dngn/floor/lair7.png",
+      "x": 288,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 266,
+      "original_index": 460,
+      "name": "lair8",
+      "source": "assets/tiles/individual/dngn/floor/lair8.png",
+      "x": 320,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 267,
+      "original_index": 461,
+      "name": "lair9",
+      "source": "assets/tiles/individual/dngn/floor/lair9.png",
+      "x": 352,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 268,
+      "original_index": 462,
+      "name": "lava00",
+      "source": "assets/tiles/individual/dngn/floor/lava00.png",
+      "x": 384,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 269,
+      "original_index": 463,
+      "name": "lava01",
+      "source": "assets/tiles/individual/dngn/floor/lava01.png",
+      "x": 416,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 270,
+      "original_index": 464,
+      "name": "lava02",
+      "source": "assets/tiles/individual/dngn/floor/lava02.png",
+      "x": 448,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 271,
+      "original_index": 465,
+      "name": "lava03",
+      "source": "assets/tiles/individual/dngn/floor/lava03.png",
+      "x": 480,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 272,
+      "original_index": 466,
+      "name": "lava04",
+      "source": "assets/tiles/individual/dngn/floor/lava04.png",
+      "x": 512,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 273,
+      "original_index": 467,
+      "name": "lava05",
+      "source": "assets/tiles/individual/dngn/floor/lava05.png",
+      "x": 544,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 274,
+      "original_index": 468,
+      "name": "lava06",
+      "source": "assets/tiles/individual/dngn/floor/lava06.png",
+      "x": 576,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 275,
+      "original_index": 469,
+      "name": "lava07",
+      "source": "assets/tiles/individual/dngn/floor/lava07.png",
+      "x": 608,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 276,
+      "original_index": 470,
+      "name": "lava08",
+      "source": "assets/tiles/individual/dngn/floor/lava08.png",
+      "x": 640,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 277,
+      "original_index": 471,
+      "name": "lava09",
+      "source": "assets/tiles/individual/dngn/floor/lava09.png",
+      "x": 672,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 278,
+      "original_index": 472,
+      "name": "lava10",
+      "source": "assets/tiles/individual/dngn/floor/lava10.png",
+      "x": 704,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 279,
+      "original_index": 473,
+      "name": "lava11",
+      "source": "assets/tiles/individual/dngn/floor/lava11.png",
+      "x": 736,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 280,
+      "original_index": 474,
+      "name": "lava_sea0000",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0000.png",
+      "x": 768,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 281,
+      "original_index": 475,
+      "name": "lava_sea0001",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0001.png",
+      "x": 800,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 282,
+      "original_index": 476,
+      "name": "lava_sea0002",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0002.png",
+      "x": 832,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 283,
+      "original_index": 477,
+      "name": "lava_sea0003",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0003.png",
+      "x": 864,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 284,
+      "original_index": 478,
+      "name": "lava_sea0004",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0004.png",
+      "x": 896,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 285,
+      "original_index": 479,
+      "name": "lava_sea0005",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0005.png",
+      "x": 928,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 286,
+      "original_index": 480,
+      "name": "lava_sea0006",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0006.png",
+      "x": 960,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 287,
+      "original_index": 481,
+      "name": "lava_sea0007",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0007.png",
+      "x": 992,
+      "y": 256,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 288,
+      "original_index": 482,
+      "name": "lava_sea0008",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0008.png",
+      "x": 0,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 289,
+      "original_index": 483,
+      "name": "lava_sea0009",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0009.png",
+      "x": 32,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 290,
+      "original_index": 484,
+      "name": "lava_sea0010",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0010.png",
+      "x": 64,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 291,
+      "original_index": 485,
+      "name": "lava_sea0011",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0011.png",
+      "x": 96,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 292,
+      "original_index": 486,
+      "name": "lava_sea0012",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0012.png",
+      "x": 128,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 293,
+      "original_index": 487,
+      "name": "lava_sea0013",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0013.png",
+      "x": 160,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 294,
+      "original_index": 488,
+      "name": "lava_sea0014",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0014.png",
+      "x": 192,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 295,
+      "original_index": 489,
+      "name": "lava_sea0015",
+      "source": "assets/tiles/individual/dngn/floor/lava_sea0015.png",
+      "x": 224,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 296,
+      "original_index": 490,
+      "name": "limestone0",
+      "source": "assets/tiles/individual/dngn/floor/limestone0.png",
+      "x": 256,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 297,
+      "original_index": 491,
+      "name": "limestone1",
+      "source": "assets/tiles/individual/dngn/floor/limestone1.png",
+      "x": 288,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 298,
+      "original_index": 492,
+      "name": "limestone2",
+      "source": "assets/tiles/individual/dngn/floor/limestone2.png",
+      "x": 320,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 299,
+      "original_index": 493,
+      "name": "limestone3",
+      "source": "assets/tiles/individual/dngn/floor/limestone3.png",
+      "x": 352,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 300,
+      "original_index": 494,
+      "name": "limestone4",
+      "source": "assets/tiles/individual/dngn/floor/limestone4.png",
+      "x": 384,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 301,
+      "original_index": 495,
+      "name": "limestone5",
+      "source": "assets/tiles/individual/dngn/floor/limestone5.png",
+      "x": 416,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 302,
+      "original_index": 496,
+      "name": "limestone6",
+      "source": "assets/tiles/individual/dngn/floor/limestone6.png",
+      "x": 448,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 303,
+      "original_index": 497,
+      "name": "limestone7",
+      "source": "assets/tiles/individual/dngn/floor/limestone7.png",
+      "x": 480,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 304,
+      "original_index": 498,
+      "name": "limestone8",
+      "source": "assets/tiles/individual/dngn/floor/limestone8.png",
+      "x": 512,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 305,
+      "original_index": 499,
+      "name": "limestone9",
+      "source": "assets/tiles/individual/dngn/floor/limestone9.png",
+      "x": 544,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 306,
+      "original_index": 500,
+      "name": "lpc_cream_tile",
+      "source": "assets/tiles/individual/dngn/floor/lpc_cream_tile.png",
+      "x": 576,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 307,
+      "original_index": 501,
+      "name": "lpc_dark_brick",
+      "source": "assets/tiles/individual/dngn/floor/lpc_dark_brick.png",
+      "x": 608,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 308,
+      "original_index": 502,
+      "name": "lpc_dark_hex",
+      "source": "assets/tiles/individual/dngn/floor/lpc_dark_hex.png",
+      "x": 640,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 309,
+      "original_index": 503,
+      "name": "lpc_dirt",
+      "source": "assets/tiles/individual/dngn/floor/lpc_dirt.png",
+      "x": 672,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 310,
+      "original_index": 504,
+      "name": "lpc_stone_cobble",
+      "source": "assets/tiles/individual/dngn/floor/lpc_stone_cobble.png",
+      "x": 704,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 311,
+      "original_index": 505,
+      "name": "marble_floor1",
+      "source": "assets/tiles/individual/dngn/floor/marble_floor1.png",
+      "x": 736,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 312,
+      "original_index": 506,
+      "name": "marble_floor2",
+      "source": "assets/tiles/individual/dngn/floor/marble_floor2.png",
+      "x": 768,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 313,
+      "original_index": 507,
+      "name": "marble_floor3",
+      "source": "assets/tiles/individual/dngn/floor/marble_floor3.png",
+      "x": 800,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 314,
+      "original_index": 508,
+      "name": "marble_floor4",
+      "source": "assets/tiles/individual/dngn/floor/marble_floor4.png",
+      "x": 832,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 315,
+      "original_index": 509,
+      "name": "marble_floor5",
+      "source": "assets/tiles/individual/dngn/floor/marble_floor5.png",
+      "x": 864,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 316,
+      "original_index": 510,
+      "name": "marble_floor6",
+      "source": "assets/tiles/individual/dngn/floor/marble_floor6.png",
+      "x": 896,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 317,
+      "original_index": 511,
+      "name": "mesh0",
+      "source": "assets/tiles/individual/dngn/floor/mesh0.png",
+      "x": 928,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 318,
+      "original_index": 512,
+      "name": "mesh1",
+      "source": "assets/tiles/individual/dngn/floor/mesh1.png",
+      "x": 960,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 319,
+      "original_index": 513,
+      "name": "mesh2",
+      "source": "assets/tiles/individual/dngn/floor/mesh2.png",
+      "x": 992,
+      "y": 288,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 320,
+      "original_index": 514,
+      "name": "mesh3",
+      "source": "assets/tiles/individual/dngn/floor/mesh3.png",
+      "x": 0,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 321,
+      "original_index": 515,
+      "name": "metal_gold0",
+      "source": "assets/tiles/individual/dngn/floor/metal_gold0.png",
+      "x": 32,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 322,
+      "original_index": 516,
+      "name": "metal_gold1",
+      "source": "assets/tiles/individual/dngn/floor/metal_gold1.png",
+      "x": 64,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 323,
+      "original_index": 517,
+      "name": "metal_gold2",
+      "source": "assets/tiles/individual/dngn/floor/metal_gold2.png",
+      "x": 96,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 324,
+      "original_index": 518,
+      "name": "metal_gold3",
+      "source": "assets/tiles/individual/dngn/floor/metal_gold3.png",
+      "x": 128,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 325,
+      "original_index": 519,
+      "name": "metal_infernal0",
+      "source": "assets/tiles/individual/dngn/floor/metal_infernal0.png",
+      "x": 160,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 326,
+      "original_index": 520,
+      "name": "metal_infernal1",
+      "source": "assets/tiles/individual/dngn/floor/metal_infernal1.png",
+      "x": 192,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 327,
+      "original_index": 521,
+      "name": "metal_infernal2",
+      "source": "assets/tiles/individual/dngn/floor/metal_infernal2.png",
+      "x": 224,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 328,
+      "original_index": 522,
+      "name": "metal_infernal3",
+      "source": "assets/tiles/individual/dngn/floor/metal_infernal3.png",
+      "x": 256,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 329,
+      "original_index": 523,
+      "name": "metal_silver0",
+      "source": "assets/tiles/individual/dngn/floor/metal_silver0.png",
+      "x": 288,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 330,
+      "original_index": 524,
+      "name": "metal_silver1",
+      "source": "assets/tiles/individual/dngn/floor/metal_silver1.png",
+      "x": 320,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 331,
+      "original_index": 525,
+      "name": "metal_silver2",
+      "source": "assets/tiles/individual/dngn/floor/metal_silver2.png",
+      "x": 352,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 332,
+      "original_index": 526,
+      "name": "metal_silver3",
+      "source": "assets/tiles/individual/dngn/floor/metal_silver3.png",
+      "x": 384,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 333,
+      "original_index": 527,
+      "name": "mosaic0",
+      "source": "assets/tiles/individual/dngn/floor/mosaic0.png",
+      "x": 416,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 334,
+      "original_index": 528,
+      "name": "mosaic1",
+      "source": "assets/tiles/individual/dngn/floor/mosaic1.png",
+      "x": 448,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 335,
+      "original_index": 529,
+      "name": "mosaic10",
+      "source": "assets/tiles/individual/dngn/floor/mosaic10.png",
+      "x": 480,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 336,
+      "original_index": 530,
+      "name": "mosaic11",
+      "source": "assets/tiles/individual/dngn/floor/mosaic11.png",
+      "x": 512,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 337,
+      "original_index": 531,
+      "name": "mosaic12",
+      "source": "assets/tiles/individual/dngn/floor/mosaic12.png",
+      "x": 544,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 338,
+      "original_index": 532,
+      "name": "mosaic13",
+      "source": "assets/tiles/individual/dngn/floor/mosaic13.png",
+      "x": 576,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 339,
+      "original_index": 533,
+      "name": "mosaic14",
+      "source": "assets/tiles/individual/dngn/floor/mosaic14.png",
+      "x": 608,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 340,
+      "original_index": 534,
+      "name": "mosaic15",
+      "source": "assets/tiles/individual/dngn/floor/mosaic15.png",
+      "x": 640,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 341,
+      "original_index": 535,
+      "name": "mosaic2",
+      "source": "assets/tiles/individual/dngn/floor/mosaic2.png",
+      "x": 672,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 342,
+      "original_index": 536,
+      "name": "mosaic3",
+      "source": "assets/tiles/individual/dngn/floor/mosaic3.png",
+      "x": 704,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 343,
+      "original_index": 537,
+      "name": "mosaic4",
+      "source": "assets/tiles/individual/dngn/floor/mosaic4.png",
+      "x": 736,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 344,
+      "original_index": 538,
+      "name": "mosaic5",
+      "source": "assets/tiles/individual/dngn/floor/mosaic5.png",
+      "x": 768,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 345,
+      "original_index": 539,
+      "name": "mosaic6",
+      "source": "assets/tiles/individual/dngn/floor/mosaic6.png",
+      "x": 800,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 346,
+      "original_index": 540,
+      "name": "mosaic7",
+      "source": "assets/tiles/individual/dngn/floor/mosaic7.png",
+      "x": 832,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 347,
+      "original_index": 541,
+      "name": "mosaic8",
+      "source": "assets/tiles/individual/dngn/floor/mosaic8.png",
+      "x": 864,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 348,
+      "original_index": 542,
+      "name": "mosaic9",
+      "source": "assets/tiles/individual/dngn/floor/mosaic9.png",
+      "x": 896,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 349,
+      "original_index": 543,
+      "name": "moss0",
+      "source": "assets/tiles/individual/dngn/floor/moss0.png",
+      "x": 928,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 350,
+      "original_index": 544,
+      "name": "moss1",
+      "source": "assets/tiles/individual/dngn/floor/moss1.png",
+      "x": 960,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 351,
+      "original_index": 545,
+      "name": "moss2",
+      "source": "assets/tiles/individual/dngn/floor/moss2.png",
+      "x": 992,
+      "y": 320,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 352,
+      "original_index": 546,
+      "name": "moss3",
+      "source": "assets/tiles/individual/dngn/floor/moss3.png",
+      "x": 0,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 353,
+      "original_index": 547,
+      "name": "mud0",
+      "source": "assets/tiles/individual/dngn/floor/mud0.png",
+      "x": 32,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 354,
+      "original_index": 548,
+      "name": "mud1",
+      "source": "assets/tiles/individual/dngn/floor/mud1.png",
+      "x": 64,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 355,
+      "original_index": 549,
+      "name": "mud2",
+      "source": "assets/tiles/individual/dngn/floor/mud2.png",
+      "x": 96,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 356,
+      "original_index": 550,
+      "name": "mud3",
+      "source": "assets/tiles/individual/dngn/floor/mud3.png",
+      "x": 128,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 357,
+      "original_index": 551,
+      "name": "mystic_chasm0",
+      "source": "assets/tiles/individual/dngn/floor/mystic_chasm0.png",
+      "x": 160,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 358,
+      "original_index": 552,
+      "name": "mystic_chasm1",
+      "source": "assets/tiles/individual/dngn/floor/mystic_chasm1.png",
+      "x": 192,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 359,
+      "original_index": 553,
+      "name": "mystic_chasm2",
+      "source": "assets/tiles/individual/dngn/floor/mystic_chasm2.png",
+      "x": 224,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 360,
+      "original_index": 554,
+      "name": "mystic_chasm3",
+      "source": "assets/tiles/individual/dngn/floor/mystic_chasm3.png",
+      "x": 256,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 361,
+      "original_index": 555,
+      "name": "mystic_chasm4",
+      "source": "assets/tiles/individual/dngn/floor/mystic_chasm4.png",
+      "x": 288,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 362,
+      "original_index": 556,
+      "name": "mystic_chasm5",
+      "source": "assets/tiles/individual/dngn/floor/mystic_chasm5.png",
+      "x": 320,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 363,
+      "original_index": 557,
+      "name": "mystic_chasm6",
+      "source": "assets/tiles/individual/dngn/floor/mystic_chasm6.png",
+      "x": 352,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 364,
+      "original_index": 558,
+      "name": "mystic_chasm7",
+      "source": "assets/tiles/individual/dngn/floor/mystic_chasm7.png",
+      "x": 384,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 365,
+      "original_index": 559,
+      "name": "necro_squares00",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares00.png",
+      "x": 416,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 366,
+      "original_index": 560,
+      "name": "necro_squares01",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares01.png",
+      "x": 448,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 367,
+      "original_index": 561,
+      "name": "necro_squares02",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares02.png",
+      "x": 480,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 368,
+      "original_index": 562,
+      "name": "necro_squares03",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares03.png",
+      "x": 512,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 369,
+      "original_index": 563,
+      "name": "necro_squares04",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares04.png",
+      "x": 544,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 370,
+      "original_index": 564,
+      "name": "necro_squares05",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares05.png",
+      "x": 576,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 371,
+      "original_index": 565,
+      "name": "necro_squares06",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares06.png",
+      "x": 608,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 372,
+      "original_index": 566,
+      "name": "necro_squares07",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares07.png",
+      "x": 640,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 373,
+      "original_index": 567,
+      "name": "necro_squares08",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares08.png",
+      "x": 672,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 374,
+      "original_index": 568,
+      "name": "necro_squares09",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares09.png",
+      "x": 704,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 375,
+      "original_index": 569,
+      "name": "necro_squares10",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares10.png",
+      "x": 736,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 376,
+      "original_index": 570,
+      "name": "necro_squares11",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares11.png",
+      "x": 768,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 377,
+      "original_index": 571,
+      "name": "necro_squares12",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares12.png",
+      "x": 800,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 378,
+      "original_index": 572,
+      "name": "necro_squares13",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares13.png",
+      "x": 832,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 379,
+      "original_index": 573,
+      "name": "necro_squares14",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares14.png",
+      "x": 864,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 380,
+      "original_index": 574,
+      "name": "necro_squares15",
+      "source": "assets/tiles/individual/dngn/floor/necro_squares15.png",
+      "x": 896,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 381,
+      "original_index": 575,
+      "name": "necropolis_grass_1",
+      "source": "assets/tiles/individual/dngn/floor/necropolis_grass_1.png",
+      "x": 928,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 382,
+      "original_index": 576,
+      "name": "necropolis_grass_2",
+      "source": "assets/tiles/individual/dngn/floor/necropolis_grass_2.png",
+      "x": 960,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 383,
+      "original_index": 577,
+      "name": "necropolis_grass_3",
+      "source": "assets/tiles/individual/dngn/floor/necropolis_grass_3.png",
+      "x": 992,
+      "y": 352,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 384,
+      "original_index": 578,
+      "name": "necropolis_grass_4",
+      "source": "assets/tiles/individual/dngn/floor/necropolis_grass_4.png",
+      "x": 0,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 385,
+      "original_index": 579,
+      "name": "necropolis_square_grass_1",
+      "source": "assets/tiles/individual/dngn/floor/necropolis_square_grass_1.png",
+      "x": 32,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 386,
+      "original_index": 580,
+      "name": "necropolis_square_grass_2",
+      "source": "assets/tiles/individual/dngn/floor/necropolis_square_grass_2.png",
+      "x": 64,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 387,
+      "original_index": 581,
+      "name": "necropolis_square_grass_3",
+      "source": "assets/tiles/individual/dngn/floor/necropolis_square_grass_3.png",
+      "x": 96,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 388,
+      "original_index": 582,
+      "name": "necropolis_square_grass_4",
+      "source": "assets/tiles/individual/dngn/floor/necropolis_square_grass_4.png",
+      "x": 128,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 389,
+      "original_index": 583,
+      "name": "necropolis_squares_1",
+      "source": "assets/tiles/individual/dngn/floor/necropolis_squares_1.png",
+      "x": 160,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 390,
+      "original_index": 584,
+      "name": "necropolis_squares_2",
+      "source": "assets/tiles/individual/dngn/floor/necropolis_squares_2.png",
+      "x": 192,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 391,
+      "original_index": 585,
+      "name": "necropolis_squares_3",
+      "source": "assets/tiles/individual/dngn/floor/necropolis_squares_3.png",
+      "x": 224,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 392,
+      "original_index": 586,
+      "name": "necropolis_squares_4",
+      "source": "assets/tiles/individual/dngn/floor/necropolis_squares_4.png",
+      "x": 256,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 393,
+      "original_index": 587,
+      "name": "necropolis_tile_grass_2",
+      "source": "assets/tiles/individual/dngn/floor/necropolis_tile_grass_2.png",
+      "x": 288,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 394,
+      "original_index": 588,
+      "name": "necropolis_tile_grass_3",
+      "source": "assets/tiles/individual/dngn/floor/necropolis_tile_grass_3.png",
+      "x": 320,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 395,
+      "original_index": 589,
+      "name": "orc0",
+      "source": "assets/tiles/individual/dngn/floor/orc0.png",
+      "x": 352,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 396,
+      "original_index": 590,
+      "name": "orc1",
+      "source": "assets/tiles/individual/dngn/floor/orc1.png",
+      "x": 384,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 397,
+      "original_index": 591,
+      "name": "orc2",
+      "source": "assets/tiles/individual/dngn/floor/orc2.png",
+      "x": 416,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 398,
+      "original_index": 592,
+      "name": "orc3",
+      "source": "assets/tiles/individual/dngn/floor/orc3.png",
+      "x": 448,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 399,
+      "original_index": 593,
+      "name": "orc4",
+      "source": "assets/tiles/individual/dngn/floor/orc4.png",
+      "x": 480,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 400,
+      "original_index": 594,
+      "name": "orc5",
+      "source": "assets/tiles/individual/dngn/floor/orc5.png",
+      "x": 512,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 401,
+      "original_index": 595,
+      "name": "orc6",
+      "source": "assets/tiles/individual/dngn/floor/orc6.png",
+      "x": 544,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 402,
+      "original_index": 596,
+      "name": "orc7",
+      "source": "assets/tiles/individual/dngn/floor/orc7.png",
+      "x": 576,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 403,
+      "original_index": 597,
+      "name": "pebble_brown0",
+      "source": "assets/tiles/individual/dngn/floor/pebble_brown0.png",
+      "x": 608,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 404,
+      "original_index": 598,
+      "name": "pebble_brown1",
+      "source": "assets/tiles/individual/dngn/floor/pebble_brown1.png",
+      "x": 640,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 405,
+      "original_index": 599,
+      "name": "pebble_brown2",
+      "source": "assets/tiles/individual/dngn/floor/pebble_brown2.png",
+      "x": 672,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 406,
+      "original_index": 600,
+      "name": "pebble_brown3",
+      "source": "assets/tiles/individual/dngn/floor/pebble_brown3.png",
+      "x": 704,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 407,
+      "original_index": 601,
+      "name": "pebble_brown4",
+      "source": "assets/tiles/individual/dngn/floor/pebble_brown4.png",
+      "x": 736,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 408,
+      "original_index": 602,
+      "name": "pebble_brown5",
+      "source": "assets/tiles/individual/dngn/floor/pebble_brown5.png",
+      "x": 768,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 409,
+      "original_index": 603,
+      "name": "pebble_brown6",
+      "source": "assets/tiles/individual/dngn/floor/pebble_brown6.png",
+      "x": 800,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 410,
+      "original_index": 604,
+      "name": "pebble_brown7",
+      "source": "assets/tiles/individual/dngn/floor/pebble_brown7.png",
+      "x": 832,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 411,
+      "original_index": 605,
+      "name": "pebble_brown8",
+      "source": "assets/tiles/individual/dngn/floor/pebble_brown8.png",
+      "x": 864,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 412,
+      "original_index": 606,
+      "name": "pedestal_e",
+      "source": "assets/tiles/individual/dngn/floor/pedestal_e.png",
+      "x": 896,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 413,
+      "original_index": 607,
+      "name": "pedestal_full",
+      "source": "assets/tiles/individual/dngn/floor/pedestal_full.png",
+      "x": 928,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 414,
+      "original_index": 608,
+      "name": "pedestal_n",
+      "source": "assets/tiles/individual/dngn/floor/pedestal_n.png",
+      "x": 960,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 415,
+      "original_index": 609,
+      "name": "pedestal_ne",
+      "source": "assets/tiles/individual/dngn/floor/pedestal_ne.png",
+      "x": 992,
+      "y": 384,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 416,
+      "original_index": 610,
+      "name": "pedestal_nw",
+      "source": "assets/tiles/individual/dngn/floor/pedestal_nw.png",
+      "x": 0,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 417,
+      "original_index": 611,
+      "name": "pedestal_s",
+      "source": "assets/tiles/individual/dngn/floor/pedestal_s.png",
+      "x": 32,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 418,
+      "original_index": 612,
+      "name": "pedestal_se",
+      "source": "assets/tiles/individual/dngn/floor/pedestal_se.png",
+      "x": 64,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 419,
+      "original_index": 613,
+      "name": "pedestal_sw",
+      "source": "assets/tiles/individual/dngn/floor/pedestal_sw.png",
+      "x": 96,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 420,
+      "original_index": 614,
+      "name": "pedestal_w",
+      "source": "assets/tiles/individual/dngn/floor/pedestal_w.png",
+      "x": 128,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 421,
+      "original_index": 615,
+      "name": "rect_gray0",
+      "source": "assets/tiles/individual/dngn/floor/rect_gray0.png",
+      "x": 160,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 422,
+      "original_index": 616,
+      "name": "rect_gray1",
+      "source": "assets/tiles/individual/dngn/floor/rect_gray1.png",
+      "x": 192,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 423,
+      "original_index": 617,
+      "name": "rect_gray2",
+      "source": "assets/tiles/individual/dngn/floor/rect_gray2.png",
+      "x": 224,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 424,
+      "original_index": 618,
+      "name": "rect_gray3",
+      "source": "assets/tiles/individual/dngn/floor/rect_gray3.png",
+      "x": 256,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 425,
+      "original_index": 619,
+      "name": "rough_red0",
+      "source": "assets/tiles/individual/dngn/floor/rough_red0.png",
+      "x": 288,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 426,
+      "original_index": 620,
+      "name": "rough_red1",
+      "source": "assets/tiles/individual/dngn/floor/rough_red1.png",
+      "x": 320,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 427,
+      "original_index": 621,
+      "name": "rough_red2",
+      "source": "assets/tiles/individual/dngn/floor/rough_red2.png",
+      "x": 352,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 428,
+      "original_index": 622,
+      "name": "rough_red3",
+      "source": "assets/tiles/individual/dngn/floor/rough_red3.png",
+      "x": 384,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 429,
+      "original_index": 623,
+      "name": "runelight0",
+      "source": "assets/tiles/individual/dngn/floor/runelight0.png",
+      "x": 416,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 430,
+      "original_index": 624,
+      "name": "runelight1",
+      "source": "assets/tiles/individual/dngn/floor/runelight1.png",
+      "x": 448,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 431,
+      "original_index": 625,
+      "name": "runelight2",
+      "source": "assets/tiles/individual/dngn/floor/runelight2.png",
+      "x": 480,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 432,
+      "original_index": 626,
+      "name": "runelight3",
+      "source": "assets/tiles/individual/dngn/floor/runelight3.png",
+      "x": 512,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 433,
+      "original_index": 627,
+      "name": "salt0",
+      "source": "assets/tiles/individual/dngn/floor/salt0.png",
+      "x": 544,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 434,
+      "original_index": 628,
+      "name": "salt1",
+      "source": "assets/tiles/individual/dngn/floor/salt1.png",
+      "x": 576,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 435,
+      "original_index": 629,
+      "name": "salt2",
+      "source": "assets/tiles/individual/dngn/floor/salt2.png",
+      "x": 608,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 436,
+      "original_index": 630,
+      "name": "salt3",
+      "source": "assets/tiles/individual/dngn/floor/salt3.png",
+      "x": 640,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 437,
+      "original_index": 631,
+      "name": "salt4",
+      "source": "assets/tiles/individual/dngn/floor/salt4.png",
+      "x": 672,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 438,
+      "original_index": 632,
+      "name": "salt5",
+      "source": "assets/tiles/individual/dngn/floor/salt5.png",
+      "x": 704,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 439,
+      "original_index": 633,
+      "name": "sand1",
+      "source": "assets/tiles/individual/dngn/floor/sand1.png",
+      "x": 736,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 440,
+      "original_index": 634,
+      "name": "sand2",
+      "source": "assets/tiles/individual/dngn/floor/sand2.png",
+      "x": 768,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 441,
+      "original_index": 635,
+      "name": "sand3",
+      "source": "assets/tiles/individual/dngn/floor/sand3.png",
+      "x": 800,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 442,
+      "original_index": 636,
+      "name": "sand4",
+      "source": "assets/tiles/individual/dngn/floor/sand4.png",
+      "x": 832,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 443,
+      "original_index": 637,
+      "name": "sand5",
+      "source": "assets/tiles/individual/dngn/floor/sand5.png",
+      "x": 864,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 444,
+      "original_index": 638,
+      "name": "sand6",
+      "source": "assets/tiles/individual/dngn/floor/sand6.png",
+      "x": 896,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 445,
+      "original_index": 639,
+      "name": "sand7",
+      "source": "assets/tiles/individual/dngn/floor/sand7.png",
+      "x": 928,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 446,
+      "original_index": 640,
+      "name": "sand8",
+      "source": "assets/tiles/individual/dngn/floor/sand8.png",
+      "x": 960,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 447,
+      "original_index": 641,
+      "name": "sandstone_floor0",
+      "source": "assets/tiles/individual/dngn/floor/sandstone_floor0.png",
+      "x": 992,
+      "y": 416,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 448,
+      "original_index": 642,
+      "name": "sandstone_floor1",
+      "source": "assets/tiles/individual/dngn/floor/sandstone_floor1.png",
+      "x": 0,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 449,
+      "original_index": 643,
+      "name": "sandstone_floor2",
+      "source": "assets/tiles/individual/dngn/floor/sandstone_floor2.png",
+      "x": 32,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 450,
+      "original_index": 644,
+      "name": "sandstone_floor3",
+      "source": "assets/tiles/individual/dngn/floor/sandstone_floor3.png",
+      "x": 64,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 451,
+      "original_index": 645,
+      "name": "sandstone_floor4",
+      "source": "assets/tiles/individual/dngn/floor/sandstone_floor4.png",
+      "x": 96,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 452,
+      "original_index": 646,
+      "name": "sandstone_floor5",
+      "source": "assets/tiles/individual/dngn/floor/sandstone_floor5.png",
+      "x": 128,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 453,
+      "original_index": 647,
+      "name": "sandstone_floor6",
+      "source": "assets/tiles/individual/dngn/floor/sandstone_floor6.png",
+      "x": 160,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 454,
+      "original_index": 648,
+      "name": "sandstone_floor7",
+      "source": "assets/tiles/individual/dngn/floor/sandstone_floor7.png",
+      "x": 192,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 455,
+      "original_index": 649,
+      "name": "sandstone_floor8",
+      "source": "assets/tiles/individual/dngn/floor/sandstone_floor8.png",
+      "x": 224,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 456,
+      "original_index": 650,
+      "name": "sandstone_floor9",
+      "source": "assets/tiles/individual/dngn/floor/sandstone_floor9.png",
+      "x": 256,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 457,
+      "original_index": 651,
+      "name": "seismorock0",
+      "source": "assets/tiles/individual/dngn/floor/seismorock0.png",
+      "x": 288,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 458,
+      "original_index": 652,
+      "name": "seismorock1",
+      "source": "assets/tiles/individual/dngn/floor/seismorock1.png",
+      "x": 320,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 459,
+      "original_index": 653,
+      "name": "seismorock2",
+      "source": "assets/tiles/individual/dngn/floor/seismorock2.png",
+      "x": 352,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 460,
+      "original_index": 654,
+      "name": "seismorock3",
+      "source": "assets/tiles/individual/dngn/floor/seismorock3.png",
+      "x": 384,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 461,
+      "original_index": 655,
+      "name": "sigil_Y_E",
+      "source": "assets/tiles/individual/dngn/floor/sigil_Y_E.png",
+      "x": 416,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 462,
+      "original_index": 656,
+      "name": "sigil_Y_N",
+      "source": "assets/tiles/individual/dngn/floor/sigil_Y_N.png",
+      "x": 448,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 463,
+      "original_index": 657,
+      "name": "sigil_Y_S",
+      "source": "assets/tiles/individual/dngn/floor/sigil_Y_S.png",
+      "x": 480,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 464,
+      "original_index": 658,
+      "name": "sigil_Y_W",
+      "source": "assets/tiles/individual/dngn/floor/sigil_Y_W.png",
+      "x": 512,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 465,
+      "original_index": 659,
+      "name": "sigil_Y_left",
+      "source": "assets/tiles/individual/dngn/floor/sigil_Y_left.png",
+      "x": 544,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 466,
+      "original_index": 660,
+      "name": "sigil_Y_right",
+      "source": "assets/tiles/individual/dngn/floor/sigil_Y_right.png",
+      "x": 576,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 467,
+      "original_index": 661,
+      "name": "sigil_algiz_left",
+      "source": "assets/tiles/individual/dngn/floor/sigil_algiz_left.png",
+      "x": 608,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 468,
+      "original_index": 662,
+      "name": "sigil_algiz_right",
+      "source": "assets/tiles/individual/dngn/floor/sigil_algiz_right.png",
+      "x": 640,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 469,
+      "original_index": 663,
+      "name": "sigil_circle",
+      "source": "assets/tiles/individual/dngn/floor/sigil_circle.png",
+      "x": 672,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 470,
+      "original_index": 664,
+      "name": "sigil_cross",
+      "source": "assets/tiles/individual/dngn/floor/sigil_cross.png",
+      "x": 704,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 471,
+      "original_index": 665,
+      "name": "sigil_curve_N_E",
+      "source": "assets/tiles/individual/dngn/floor/sigil_curve_N_E.png",
+      "x": 736,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 472,
+      "original_index": 666,
+      "name": "sigil_curve_N_W",
+      "source": "assets/tiles/individual/dngn/floor/sigil_curve_N_W.png",
+      "x": 768,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 473,
+      "original_index": 667,
+      "name": "sigil_curve_S_E",
+      "source": "assets/tiles/individual/dngn/floor/sigil_curve_S_E.png",
+      "x": 800,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 474,
+      "original_index": 668,
+      "name": "sigil_curve_S_W",
+      "source": "assets/tiles/individual/dngn/floor/sigil_curve_S_W.png",
+      "x": 832,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 475,
+      "original_index": 669,
+      "name": "sigil_rhombus",
+      "source": "assets/tiles/individual/dngn/floor/sigil_rhombus.png",
+      "x": 864,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 476,
+      "original_index": 670,
+      "name": "sigil_sharp_E_NE",
+      "source": "assets/tiles/individual/dngn/floor/sigil_sharp_E_NE.png",
+      "x": 896,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 477,
+      "original_index": 671,
+      "name": "sigil_sharp_W_SW",
+      "source": "assets/tiles/individual/dngn/floor/sigil_sharp_W_SW.png",
+      "x": 928,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 478,
+      "original_index": 672,
+      "name": "sigil_straight_E_NE_SW",
+      "source": "assets/tiles/individual/dngn/floor/sigil_straight_E_NE_SW.png",
+      "x": 960,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 479,
+      "original_index": 673,
+      "name": "sigil_straight_E_W",
+      "source": "assets/tiles/individual/dngn/floor/sigil_straight_E_W.png",
+      "x": 992,
+      "y": 448,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 480,
+      "original_index": 674,
+      "name": "sigil_straight_E_W_NE_NW",
+      "source": "assets/tiles/individual/dngn/floor/sigil_straight_E_W_NE_NW.png",
+      "x": 0,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 481,
+      "original_index": 675,
+      "name": "sigil_straight_NE_SW",
+      "source": "assets/tiles/individual/dngn/floor/sigil_straight_NE_SW.png",
+      "x": 32,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 482,
+      "original_index": 676,
+      "name": "sigil_straight_NW_SE",
+      "source": "assets/tiles/individual/dngn/floor/sigil_straight_NW_SE.png",
+      "x": 64,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 483,
+      "original_index": 677,
+      "name": "sigil_straight_N_S",
+      "source": "assets/tiles/individual/dngn/floor/sigil_straight_N_S.png",
+      "x": 96,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 484,
+      "original_index": 678,
+      "name": "sigil_wide_E_NW",
+      "source": "assets/tiles/individual/dngn/floor/sigil_wide_E_NW.png",
+      "x": 128,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 485,
+      "original_index": 679,
+      "name": "sigil_wide_E_SW",
+      "source": "assets/tiles/individual/dngn/floor/sigil_wide_E_SW.png",
+      "x": 160,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 486,
+      "original_index": 680,
+      "name": "sigil_wide_N_SE",
+      "source": "assets/tiles/individual/dngn/floor/sigil_wide_N_SE.png",
+      "x": 192,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 487,
+      "original_index": 681,
+      "name": "sigil_wide_N_SW",
+      "source": "assets/tiles/individual/dngn/floor/sigil_wide_N_SW.png",
+      "x": 224,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 488,
+      "original_index": 682,
+      "name": "sigil_wide_S_NE",
+      "source": "assets/tiles/individual/dngn/floor/sigil_wide_S_NE.png",
+      "x": 256,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 489,
+      "original_index": 683,
+      "name": "sigil_wide_S_NW",
+      "source": "assets/tiles/individual/dngn/floor/sigil_wide_S_NW.png",
+      "x": 288,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 490,
+      "original_index": 684,
+      "name": "sigil_wide_W_NE",
+      "source": "assets/tiles/individual/dngn/floor/sigil_wide_W_NE.png",
+      "x": 320,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 491,
+      "original_index": 685,
+      "name": "sigil_wide_W_SE",
+      "source": "assets/tiles/individual/dngn/floor/sigil_wide_W_SE.png",
+      "x": 352,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 492,
+      "original_index": 686,
+      "name": "slime_overlay_E",
+      "source": "assets/tiles/individual/dngn/floor/slime_overlay_E.png",
+      "x": 384,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 493,
+      "original_index": 687,
+      "name": "slime_overlay_N",
+      "source": "assets/tiles/individual/dngn/floor/slime_overlay_N.png",
+      "x": 416,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 494,
+      "original_index": 688,
+      "name": "slime_overlay_NE",
+      "source": "assets/tiles/individual/dngn/floor/slime_overlay_NE.png",
+      "x": 448,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 495,
+      "original_index": 689,
+      "name": "slime_overlay_NW",
+      "source": "assets/tiles/individual/dngn/floor/slime_overlay_NW.png",
+      "x": 480,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 496,
+      "original_index": 690,
+      "name": "slime_overlay_S",
+      "source": "assets/tiles/individual/dngn/floor/slime_overlay_S.png",
+      "x": 512,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 497,
+      "original_index": 691,
+      "name": "slime_overlay_SE",
+      "source": "assets/tiles/individual/dngn/floor/slime_overlay_SE.png",
+      "x": 544,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 498,
+      "original_index": 692,
+      "name": "slime_overlay_SW",
+      "source": "assets/tiles/individual/dngn/floor/slime_overlay_SW.png",
+      "x": 576,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 499,
+      "original_index": 693,
+      "name": "slime_overlay_W",
+      "source": "assets/tiles/individual/dngn/floor/slime_overlay_W.png",
+      "x": 608,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 500,
+      "original_index": 694,
+      "name": "snake-a0",
+      "source": "assets/tiles/individual/dngn/floor/snake-a0.png",
+      "x": 640,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 501,
+      "original_index": 695,
+      "name": "snake-a1",
+      "source": "assets/tiles/individual/dngn/floor/snake-a1.png",
+      "x": 672,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 502,
+      "original_index": 696,
+      "name": "snake-a2",
+      "source": "assets/tiles/individual/dngn/floor/snake-a2.png",
+      "x": 704,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 503,
+      "original_index": 697,
+      "name": "snake-a3",
+      "source": "assets/tiles/individual/dngn/floor/snake-a3.png",
+      "x": 736,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 504,
+      "original_index": 698,
+      "name": "snake-c0",
+      "source": "assets/tiles/individual/dngn/floor/snake-c0.png",
+      "x": 768,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 505,
+      "original_index": 699,
+      "name": "snake-c1",
+      "source": "assets/tiles/individual/dngn/floor/snake-c1.png",
+      "x": 800,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 506,
+      "original_index": 700,
+      "name": "snake-c2",
+      "source": "assets/tiles/individual/dngn/floor/snake-c2.png",
+      "x": 832,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 507,
+      "original_index": 701,
+      "name": "snake-c3",
+      "source": "assets/tiles/individual/dngn/floor/snake-c3.png",
+      "x": 864,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 508,
+      "original_index": 702,
+      "name": "snake-d0",
+      "source": "assets/tiles/individual/dngn/floor/snake-d0.png",
+      "x": 896,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 509,
+      "original_index": 703,
+      "name": "snake-d1",
+      "source": "assets/tiles/individual/dngn/floor/snake-d1.png",
+      "x": 928,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 510,
+      "original_index": 704,
+      "name": "snake-d2",
+      "source": "assets/tiles/individual/dngn/floor/snake-d2.png",
+      "x": 960,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 511,
+      "original_index": 705,
+      "name": "snake-d3",
+      "source": "assets/tiles/individual/dngn/floor/snake-d3.png",
+      "x": 992,
+      "y": 480,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 512,
+      "original_index": 706,
+      "name": "spider00",
+      "source": "assets/tiles/individual/dngn/floor/spider00.png",
+      "x": 0,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 513,
+      "original_index": 707,
+      "name": "spider01",
+      "source": "assets/tiles/individual/dngn/floor/spider01.png",
+      "x": 32,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 514,
+      "original_index": 708,
+      "name": "spider02",
+      "source": "assets/tiles/individual/dngn/floor/spider02.png",
+      "x": 64,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 515,
+      "original_index": 709,
+      "name": "spider03",
+      "source": "assets/tiles/individual/dngn/floor/spider03.png",
+      "x": 96,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 516,
+      "original_index": 710,
+      "name": "spider04",
+      "source": "assets/tiles/individual/dngn/floor/spider04.png",
+      "x": 128,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 517,
+      "original_index": 711,
+      "name": "spider05",
+      "source": "assets/tiles/individual/dngn/floor/spider05.png",
+      "x": 160,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 518,
+      "original_index": 712,
+      "name": "spider06",
+      "source": "assets/tiles/individual/dngn/floor/spider06.png",
+      "x": 192,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 519,
+      "original_index": 713,
+      "name": "spider07",
+      "source": "assets/tiles/individual/dngn/floor/spider07.png",
+      "x": 224,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 520,
+      "original_index": 714,
+      "name": "spider08",
+      "source": "assets/tiles/individual/dngn/floor/spider08.png",
+      "x": 256,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 521,
+      "original_index": 715,
+      "name": "spider09",
+      "source": "assets/tiles/individual/dngn/floor/spider09.png",
+      "x": 288,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 522,
+      "original_index": 716,
+      "name": "spider10",
+      "source": "assets/tiles/individual/dngn/floor/spider10.png",
+      "x": 320,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 523,
+      "original_index": 717,
+      "name": "spider11",
+      "source": "assets/tiles/individual/dngn/floor/spider11.png",
+      "x": 352,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 524,
+      "original_index": 718,
+      "name": "sprouting_ruin00",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_ruin00.png",
+      "x": 384,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 525,
+      "original_index": 719,
+      "name": "sprouting_ruin01",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_ruin01.png",
+      "x": 416,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 526,
+      "original_index": 720,
+      "name": "sprouting_ruin02",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_ruin02.png",
+      "x": 448,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 527,
+      "original_index": 721,
+      "name": "sprouting_ruin03",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_ruin03.png",
+      "x": 480,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 528,
+      "original_index": 722,
+      "name": "sprouting_ruin04",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_ruin04.png",
+      "x": 512,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 529,
+      "original_index": 723,
+      "name": "sprouting_ruin05",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_ruin05.png",
+      "x": 544,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 530,
+      "original_index": 724,
+      "name": "sprouting_ruin06",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_ruin06.png",
+      "x": 576,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 531,
+      "original_index": 725,
+      "name": "sprouting_ruin07",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_ruin07.png",
+      "x": 608,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 532,
+      "original_index": 726,
+      "name": "sprouting_ruin08",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_ruin08.png",
+      "x": 640,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 533,
+      "original_index": 727,
+      "name": "sprouting_ruin09",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_ruin09.png",
+      "x": 672,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 534,
+      "original_index": 728,
+      "name": "sprouting_ruin10",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_ruin10.png",
+      "x": 704,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 535,
+      "original_index": 729,
+      "name": "sprouting_ruin11",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_ruin11.png",
+      "x": 736,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 536,
+      "original_index": 730,
+      "name": "sprouting_squares00",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_squares00.png",
+      "x": 768,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 537,
+      "original_index": 731,
+      "name": "sprouting_squares01",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_squares01.png",
+      "x": 800,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 538,
+      "original_index": 732,
+      "name": "sprouting_squares02",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_squares02.png",
+      "x": 832,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 539,
+      "original_index": 733,
+      "name": "sprouting_squares03",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_squares03.png",
+      "x": 864,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 540,
+      "original_index": 734,
+      "name": "sprouting_squares04",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_squares04.png",
+      "x": 896,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 541,
+      "original_index": 735,
+      "name": "sprouting_squares05",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_squares05.png",
+      "x": 928,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 542,
+      "original_index": 736,
+      "name": "sprouting_squares06",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_squares06.png",
+      "x": 960,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 543,
+      "original_index": 737,
+      "name": "sprouting_squares07",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_squares07.png",
+      "x": 992,
+      "y": 512,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 544,
+      "original_index": 738,
+      "name": "sprouting_squares08",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_squares08.png",
+      "x": 0,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 545,
+      "original_index": 739,
+      "name": "sprouting_squares09",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_squares09.png",
+      "x": 32,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 546,
+      "original_index": 740,
+      "name": "sprouting_squares10",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_squares10.png",
+      "x": 64,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 547,
+      "original_index": 741,
+      "name": "sprouting_squares11",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_squares11.png",
+      "x": 96,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 548,
+      "original_index": 742,
+      "name": "sprouting_stone00",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_stone00.png",
+      "x": 128,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 549,
+      "original_index": 743,
+      "name": "sprouting_stone01",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_stone01.png",
+      "x": 160,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 550,
+      "original_index": 744,
+      "name": "sprouting_stone02",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_stone02.png",
+      "x": 192,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 551,
+      "original_index": 745,
+      "name": "sprouting_stone03",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_stone03.png",
+      "x": 224,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 552,
+      "original_index": 746,
+      "name": "sprouting_stone04",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_stone04.png",
+      "x": 256,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 553,
+      "original_index": 747,
+      "name": "sprouting_stone05",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_stone05.png",
+      "x": 288,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 554,
+      "original_index": 748,
+      "name": "sprouting_stone06",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_stone06.png",
+      "x": 320,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 555,
+      "original_index": 749,
+      "name": "sprouting_stone07",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_stone07.png",
+      "x": 352,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 556,
+      "original_index": 750,
+      "name": "sprouting_stone08",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_stone08.png",
+      "x": 384,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 557,
+      "original_index": 751,
+      "name": "sprouting_stone09",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_stone09.png",
+      "x": 416,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 558,
+      "original_index": 752,
+      "name": "sprouting_stone10",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_stone10.png",
+      "x": 448,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 559,
+      "original_index": 753,
+      "name": "sprouting_stone11",
+      "source": "assets/tiles/individual/dngn/floor/sprouting_stone11.png",
+      "x": 480,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 560,
+      "original_index": 754,
+      "name": "studio0",
+      "source": "assets/tiles/individual/dngn/floor/studio0.png",
+      "x": 512,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 561,
+      "original_index": 755,
+      "name": "studio1",
+      "source": "assets/tiles/individual/dngn/floor/studio1.png",
+      "x": 544,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 562,
+      "original_index": 756,
+      "name": "studio2",
+      "source": "assets/tiles/individual/dngn/floor/studio2.png",
+      "x": 576,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 563,
+      "original_index": 757,
+      "name": "studio3",
+      "source": "assets/tiles/individual/dngn/floor/studio3.png",
+      "x": 608,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 564,
+      "original_index": 758,
+      "name": "studio4",
+      "source": "assets/tiles/individual/dngn/floor/studio4.png",
+      "x": 640,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 565,
+      "original_index": 759,
+      "name": "studio5",
+      "source": "assets/tiles/individual/dngn/floor/studio5.png",
+      "x": 672,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 566,
+      "original_index": 760,
+      "name": "studio6",
+      "source": "assets/tiles/individual/dngn/floor/studio6.png",
+      "x": 704,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 567,
+      "original_index": 761,
+      "name": "studio7",
+      "source": "assets/tiles/individual/dngn/floor/studio7.png",
+      "x": 736,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 568,
+      "original_index": 762,
+      "name": "studio8",
+      "source": "assets/tiles/individual/dngn/floor/studio8.png",
+      "x": 768,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 569,
+      "original_index": 763,
+      "name": "studio9",
+      "source": "assets/tiles/individual/dngn/floor/studio9.png",
+      "x": 800,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 570,
+      "original_index": 764,
+      "name": "swamp0",
+      "source": "assets/tiles/individual/dngn/floor/swamp0.png",
+      "x": 832,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 571,
+      "original_index": 765,
+      "name": "swamp1",
+      "source": "assets/tiles/individual/dngn/floor/swamp1.png",
+      "x": 864,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 572,
+      "original_index": 766,
+      "name": "swamp2",
+      "source": "assets/tiles/individual/dngn/floor/swamp2.png",
+      "x": 896,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 573,
+      "original_index": 767,
+      "name": "swamp3",
+      "source": "assets/tiles/individual/dngn/floor/swamp3.png",
+      "x": 928,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 574,
+      "original_index": 768,
+      "name": "tomb0",
+      "source": "assets/tiles/individual/dngn/floor/tomb0.png",
+      "x": 960,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 575,
+      "original_index": 769,
+      "name": "tomb1",
+      "source": "assets/tiles/individual/dngn/floor/tomb1.png",
+      "x": 992,
+      "y": 544,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 576,
+      "original_index": 770,
+      "name": "tomb2",
+      "source": "assets/tiles/individual/dngn/floor/tomb2.png",
+      "x": 0,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 577,
+      "original_index": 771,
+      "name": "tomb3",
+      "source": "assets/tiles/individual/dngn/floor/tomb3.png",
+      "x": 32,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 578,
+      "original_index": 772,
+      "name": "tutorial_pad",
+      "source": "assets/tiles/individual/dngn/floor/tutorial_pad.png",
+      "x": 64,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 579,
+      "original_index": 773,
+      "name": "volcanic_floor0",
+      "source": "assets/tiles/individual/dngn/floor/volcanic_floor0.png",
+      "x": 96,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 580,
+      "original_index": 774,
+      "name": "volcanic_floor1",
+      "source": "assets/tiles/individual/dngn/floor/volcanic_floor1.png",
+      "x": 128,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 581,
+      "original_index": 775,
+      "name": "volcanic_floor2",
+      "source": "assets/tiles/individual/dngn/floor/volcanic_floor2.png",
+      "x": 160,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 582,
+      "original_index": 776,
+      "name": "volcanic_floor3",
+      "source": "assets/tiles/individual/dngn/floor/volcanic_floor3.png",
+      "x": 192,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 583,
+      "original_index": 777,
+      "name": "volcanic_floor4",
+      "source": "assets/tiles/individual/dngn/floor/volcanic_floor4.png",
+      "x": 224,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 584,
+      "original_index": 778,
+      "name": "volcanic_floor5",
+      "source": "assets/tiles/individual/dngn/floor/volcanic_floor5.png",
+      "x": 256,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 585,
+      "original_index": 779,
+      "name": "volcanic_floor6",
+      "source": "assets/tiles/individual/dngn/floor/volcanic_floor6.png",
+      "x": 288,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 586,
+      "original_index": 780,
+      "name": "white_marble0",
+      "source": "assets/tiles/individual/dngn/floor/white_marble0.png",
+      "x": 320,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 587,
+      "original_index": 781,
+      "name": "white_marble1",
+      "source": "assets/tiles/individual/dngn/floor/white_marble1.png",
+      "x": 352,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 588,
+      "original_index": 782,
+      "name": "white_marble2",
+      "source": "assets/tiles/individual/dngn/floor/white_marble2.png",
+      "x": 384,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 589,
+      "original_index": 783,
+      "name": "white_marble3",
+      "source": "assets/tiles/individual/dngn/floor/white_marble3.png",
+      "x": 416,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 590,
+      "original_index": 784,
+      "name": "white_marble4",
+      "source": "assets/tiles/individual/dngn/floor/white_marble4.png",
+      "x": 448,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 591,
+      "original_index": 785,
+      "name": "white_marble5",
+      "source": "assets/tiles/individual/dngn/floor/white_marble5.png",
+      "x": 480,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 592,
+      "original_index": 786,
+      "name": "white_marble6",
+      "source": "assets/tiles/individual/dngn/floor/white_marble6.png",
+      "x": 512,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 593,
+      "original_index": 787,
+      "name": "white_marble7",
+      "source": "assets/tiles/individual/dngn/floor/white_marble7.png",
+      "x": 544,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 594,
+      "original_index": 788,
+      "name": "white_marble8",
+      "source": "assets/tiles/individual/dngn/floor/white_marble8.png",
+      "x": 576,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 595,
+      "original_index": 789,
+      "name": "white_marble9",
+      "source": "assets/tiles/individual/dngn/floor/white_marble9.png",
+      "x": 608,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 596,
+      "original_index": 790,
+      "name": "zot_diamonds0",
+      "source": "assets/tiles/individual/dngn/floor/zot_diamonds0.png",
+      "x": 640,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 597,
+      "original_index": 791,
+      "name": "zot_diamonds1",
+      "source": "assets/tiles/individual/dngn/floor/zot_diamonds1.png",
+      "x": 672,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 598,
+      "original_index": 792,
+      "name": "zot_diamonds2",
+      "source": "assets/tiles/individual/dngn/floor/zot_diamonds2.png",
+      "x": 704,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 599,
+      "original_index": 793,
+      "name": "zot_diamonds3",
+      "source": "assets/tiles/individual/dngn/floor/zot_diamonds3.png",
+      "x": 736,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 600,
+      "original_index": 794,
+      "name": "zot_diamonds4",
+      "source": "assets/tiles/individual/dngn/floor/zot_diamonds4.png",
+      "x": 768,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 601,
+      "original_index": 795,
+      "name": "zot_diamonds5",
+      "source": "assets/tiles/individual/dngn/floor/zot_diamonds5.png",
+      "x": 800,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 602,
+      "original_index": 796,
+      "name": "zot_diamonds6",
+      "source": "assets/tiles/individual/dngn/floor/zot_diamonds6.png",
+      "x": 832,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 603,
+      "original_index": 797,
+      "name": "zot_diamonds7",
+      "source": "assets/tiles/individual/dngn/floor/zot_diamonds7.png",
+      "x": 864,
+      "y": 576,
+      "w": 32,
+      "h": 32
+    }
+  ]
+}

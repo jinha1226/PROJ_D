@@ -1,0 +1,736 @@
+{
+  "image": "ulpc_runtime_dungeon_master.png",
+  "tile_size": 32,
+  "chroma_key": "#ff00ff",
+  "width": 544,
+  "height": 832,
+  "concepts": [
+    {
+      "slug": "abyss",
+      "image": "abyss_sheet.png",
+      "manifest": "abyss_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      },
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 64,
+      "frames": [
+        {
+          "index": 0,
+          "role": "configured_floor",
+          "row_type": "floor",
+          "source": "assets/tiles/individual/dngn/floor/lpc_dark_hex.png",
+          "x": 0,
+          "y": 0,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 0
+        },
+        {
+          "index": 1,
+          "role": "configured_wall",
+          "row_type": "wall",
+          "source": "assets/tiles/individual/dngn/wall/lpc_dark_stone.png",
+          "x": 0,
+          "y": 32,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 32
+        }
+      ]
+    },
+    {
+      "slug": "crypt",
+      "image": "crypt_sheet.png",
+      "manifest": "crypt_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 1,
+        "total": 3
+      },
+      "x": 0,
+      "y": 64,
+      "w": 32,
+      "h": 96,
+      "frames": [
+        {
+          "index": 0,
+          "role": "configured_floor",
+          "row_type": "floor",
+          "source": "assets/tiles/individual/dngn/floor/necro_squares00.png",
+          "x": 0,
+          "y": 0,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 64
+        },
+        {
+          "index": 1,
+          "role": "configured_wall",
+          "row_type": "wall",
+          "source": "assets/tiles/individual/dngn/wall/wall_stone_necropolis_1.png",
+          "x": 0,
+          "y": 32,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 96
+        },
+        {
+          "index": 2,
+          "role": "branch_entrance",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/gateways/necropolis_portal.png",
+          "x": 0,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 128
+        }
+      ]
+    },
+    {
+      "slug": "dungeon",
+      "image": "dungeon_sheet.png",
+      "manifest": "dungeon_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      },
+      "x": 0,
+      "y": 160,
+      "w": 32,
+      "h": 64,
+      "frames": [
+        {
+          "index": 0,
+          "role": "configured_floor",
+          "row_type": "floor",
+          "source": "assets/tiles/individual/dngn/floor/lpc_stone_cobble.png",
+          "x": 0,
+          "y": 0,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 160
+        },
+        {
+          "index": 1,
+          "role": "configured_wall",
+          "row_type": "wall",
+          "source": "assets/tiles/individual/dngn/wall/lpc_gray_stone.png",
+          "x": 0,
+          "y": 32,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 192
+        }
+      ]
+    },
+    {
+      "slug": "elven_halls",
+      "image": "elven_halls_sheet.png",
+      "manifest": "elven_halls_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      },
+      "x": 0,
+      "y": 224,
+      "w": 32,
+      "h": 64,
+      "frames": [
+        {
+          "index": 0,
+          "role": "configured_floor",
+          "row_type": "floor",
+          "source": "assets/tiles/individual/dngn/floor/lpc_cream_tile.png",
+          "x": 0,
+          "y": 0,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 224
+        },
+        {
+          "index": 1,
+          "role": "configured_wall",
+          "row_type": "wall",
+          "source": "assets/tiles/individual/dngn/wall/lpc_beige_stone.png",
+          "x": 0,
+          "y": 32,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 256
+        }
+      ]
+    },
+    {
+      "slug": "ice_caves",
+      "image": "ice_caves_sheet.png",
+      "manifest": "ice_caves_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 1,
+        "total": 3
+      },
+      "x": 0,
+      "y": 288,
+      "w": 32,
+      "h": 96,
+      "frames": [
+        {
+          "index": 0,
+          "role": "configured_floor",
+          "row_type": "floor",
+          "source": "assets/tiles/individual/dngn/floor/ice0.png",
+          "x": 0,
+          "y": 0,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 288
+        },
+        {
+          "index": 1,
+          "role": "configured_wall",
+          "row_type": "wall",
+          "source": "assets/tiles/individual/dngn/wall/ice_wall0.png",
+          "x": 0,
+          "y": 32,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 320
+        },
+        {
+          "index": 2,
+          "role": "branch_entrance",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/gateways/ice_cave_portal.png",
+          "x": 0,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 352
+        }
+      ]
+    },
+    {
+      "slug": "infernal",
+      "image": "infernal_sheet.png",
+      "manifest": "infernal_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 1,
+        "total": 3
+      },
+      "x": 0,
+      "y": 384,
+      "w": 32,
+      "h": 96,
+      "frames": [
+        {
+          "index": 0,
+          "role": "configured_floor",
+          "row_type": "floor",
+          "source": "assets/tiles/individual/dngn/floor/lava00.png",
+          "x": 0,
+          "y": 0,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 384
+        },
+        {
+          "index": 1,
+          "role": "configured_wall",
+          "row_type": "wall",
+          "source": "assets/tiles/individual/dngn/wall/volcanic_wall0.png",
+          "x": 0,
+          "y": 32,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 416
+        },
+        {
+          "index": 2,
+          "role": "branch_entrance",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/gateways/enter_hell1.png",
+          "x": 0,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 448
+        }
+      ]
+    },
+    {
+      "slug": "lair",
+      "image": "lair_sheet.png",
+      "manifest": "lair_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      },
+      "x": 0,
+      "y": 480,
+      "w": 32,
+      "h": 64,
+      "frames": [
+        {
+          "index": 0,
+          "role": "configured_floor",
+          "row_type": "floor",
+          "source": "assets/tiles/individual/dngn/floor/lpc_dirt.png",
+          "x": 0,
+          "y": 0,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 480
+        },
+        {
+          "index": 1,
+          "role": "configured_wall",
+          "row_type": "wall",
+          "source": "assets/tiles/individual/dngn/wall/lpc_dark_cobble.png",
+          "x": 0,
+          "y": 32,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 512
+        }
+      ]
+    },
+    {
+      "slug": "orc_mines",
+      "image": "orc_mines_sheet.png",
+      "manifest": "orc_mines_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 0,
+        "total": 2
+      },
+      "x": 0,
+      "y": 544,
+      "w": 32,
+      "h": 64,
+      "frames": [
+        {
+          "index": 0,
+          "role": "configured_floor",
+          "row_type": "floor",
+          "source": "assets/tiles/individual/dngn/floor/lpc_dark_brick.png",
+          "x": 0,
+          "y": 0,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 544
+        },
+        {
+          "index": 1,
+          "role": "configured_wall",
+          "row_type": "wall",
+          "source": "assets/tiles/individual/dngn/wall/lpc_red_brick.png",
+          "x": 0,
+          "y": 32,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 576
+        }
+      ]
+    },
+    {
+      "slug": "shared_features",
+      "image": "shared_features_sheet.png",
+      "manifest": "shared_features_sheet.json",
+      "counts": {
+        "floor": 0,
+        "wall": 0,
+        "object": 4,
+        "total": 4
+      },
+      "x": 0,
+      "y": 608,
+      "w": 128,
+      "h": 32,
+      "frames": [
+        {
+          "index": 0,
+          "role": "door_closed",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/doors/closed_door.png",
+          "x": 0,
+          "y": 0,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 608
+        },
+        {
+          "index": 1,
+          "role": "door_open",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/doors/open_door.png",
+          "x": 32,
+          "y": 0,
+          "w": 32,
+          "h": 32,
+          "global_x": 32,
+          "global_y": 608
+        },
+        {
+          "index": 2,
+          "role": "stairs_down",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/gateways/metal_stairs_down.png",
+          "x": 64,
+          "y": 0,
+          "w": 32,
+          "h": 32,
+          "global_x": 64,
+          "global_y": 608
+        },
+        {
+          "index": 3,
+          "role": "stairs_up",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/gateways/metal_stairs_up.png",
+          "x": 96,
+          "y": 0,
+          "w": 32,
+          "h": 32,
+          "global_x": 96,
+          "global_y": 608
+        }
+      ]
+    },
+    {
+      "slug": "swamp",
+      "image": "swamp_sheet.png",
+      "manifest": "swamp_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 1,
+        "total": 3
+      },
+      "x": 0,
+      "y": 640,
+      "w": 32,
+      "h": 96,
+      "frames": [
+        {
+          "index": 0,
+          "role": "configured_floor",
+          "row_type": "floor",
+          "source": "assets/tiles/individual/dngn/floor/swamp0.png",
+          "x": 0,
+          "y": 0,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 640
+        },
+        {
+          "index": 1,
+          "role": "configured_wall",
+          "row_type": "wall",
+          "source": "assets/tiles/individual/dngn/wall/wall_vines0.png",
+          "x": 0,
+          "y": 32,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 672
+        },
+        {
+          "index": 2,
+          "role": "branch_entrance",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/gateways/enter_swamp.png",
+          "x": 0,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 704
+        }
+      ]
+    },
+    {
+      "slug": "temple",
+      "image": "temple_sheet.png",
+      "manifest": "temple_sheet.json",
+      "counts": {
+        "floor": 1,
+        "wall": 1,
+        "object": 17,
+        "total": 19
+      },
+      "x": 0,
+      "y": 736,
+      "w": 544,
+      "h": 96,
+      "frames": [
+        {
+          "index": 0,
+          "role": "override_floor",
+          "row_type": "floor",
+          "source": "assets/tiles/individual/dngn/floor/mosaic0.png",
+          "x": 0,
+          "y": 0,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 736
+        },
+        {
+          "index": 1,
+          "role": "override_wall",
+          "row_type": "wall",
+          "source": "assets/tiles/individual/dngn/wall/marble_wall1.png",
+          "x": 0,
+          "y": 32,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 768
+        },
+        {
+          "index": 2,
+          "role": "faith_altar:war",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/trog.png",
+          "x": 0,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 0,
+          "global_y": 800
+        },
+        {
+          "index": 3,
+          "role": "faith_altar:arcana",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/sif_muna1.png",
+          "x": 32,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 32,
+          "global_y": 800
+        },
+        {
+          "index": 4,
+          "role": "faith_altar:trickery",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/dithmenos1.png",
+          "x": 64,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 64,
+          "global_y": 800
+        },
+        {
+          "index": 5,
+          "role": "faith_altar:death",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/yredelemnul.png",
+          "x": 96,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 96,
+          "global_y": 800
+        },
+        {
+          "index": 6,
+          "role": "faith_altar:essence",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/gozag0.png",
+          "x": 128,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 128,
+          "global_y": 800
+        },
+        {
+          "index": 7,
+          "role": "broken_altar_variant",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/ashenzari.png",
+          "x": 160,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 160,
+          "global_y": 800
+        },
+        {
+          "index": 8,
+          "role": "broken_altar_variant",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/beogh.png",
+          "x": 192,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 192,
+          "global_y": 800
+        },
+        {
+          "index": 9,
+          "role": "broken_altar_variant",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/cheibriados.png",
+          "x": 224,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 224,
+          "global_y": 800
+        },
+        {
+          "index": 10,
+          "role": "broken_altar_variant",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/elyvilon.png",
+          "x": 256,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 256,
+          "global_y": 800
+        },
+        {
+          "index": 11,
+          "role": "broken_altar_variant",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/fedhas.png",
+          "x": 288,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 288,
+          "global_y": 800
+        },
+        {
+          "index": 12,
+          "role": "broken_altar_variant",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/gozag0.png",
+          "x": 320,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 320,
+          "global_y": 800
+        },
+        {
+          "index": 13,
+          "role": "broken_altar_variant",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/ru.png",
+          "x": 352,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 352,
+          "global_y": 800
+        },
+        {
+          "index": 14,
+          "role": "broken_altar_variant",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/shining_one.png",
+          "x": 384,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 384,
+          "global_y": 800
+        },
+        {
+          "index": 15,
+          "role": "broken_altar_variant",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/uskayaw.png",
+          "x": 416,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 416,
+          "global_y": 800
+        },
+        {
+          "index": 16,
+          "role": "broken_altar_variant",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/vehumet1.png",
+          "x": 448,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 448,
+          "global_y": 800
+        },
+        {
+          "index": 17,
+          "role": "broken_altar_variant",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/xom0.png",
+          "x": 480,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 480,
+          "global_y": 800
+        },
+        {
+          "index": 18,
+          "role": "broken_altar_variant",
+          "row_type": "object",
+          "source": "assets/tiles/individual/dngn/altars/zin1.png",
+          "x": 512,
+          "y": 64,
+          "w": 32,
+          "h": 32,
+          "global_x": 512,
+          "global_y": 800
+        }
+      ]
+    }
+  ]
+}

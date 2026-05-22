@@ -1,0 +1,1320 @@
+{
+  "image": "dngn_ulpc_vaults.png",
+  "category": "vaults",
+  "tile_size": 32,
+  "columns": 32,
+  "rows": 5,
+  "count": 131,
+  "frames": [
+    {
+      "index": 0,
+      "original_index": 1116,
+      "name": "alchemical_conduit_0",
+      "source": "assets/tiles/individual/dngn/vaults/alchemical_conduit_0.png",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 1,
+      "original_index": 1117,
+      "name": "alchemical_conduit_1",
+      "source": "assets/tiles/individual/dngn/vaults/alchemical_conduit_1.png",
+      "x": 32,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 2,
+      "original_index": 1118,
+      "name": "alchemical_conduit_2",
+      "source": "assets/tiles/individual/dngn/vaults/alchemical_conduit_2.png",
+      "x": 64,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 3,
+      "original_index": 1119,
+      "name": "alchemical_conduit_3",
+      "source": "assets/tiles/individual/dngn/vaults/alchemical_conduit_3.png",
+      "x": 96,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 4,
+      "original_index": 1120,
+      "name": "arcane_conduit_0",
+      "source": "assets/tiles/individual/dngn/vaults/arcane_conduit_0.png",
+      "x": 128,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 5,
+      "original_index": 1121,
+      "name": "arcane_conduit_1",
+      "source": "assets/tiles/individual/dngn/vaults/arcane_conduit_1.png",
+      "x": 160,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 6,
+      "original_index": 1122,
+      "name": "arcane_conduit_2",
+      "source": "assets/tiles/individual/dngn/vaults/arcane_conduit_2.png",
+      "x": 192,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 7,
+      "original_index": 1123,
+      "name": "arcane_conduit_3",
+      "source": "assets/tiles/individual/dngn/vaults/arcane_conduit_3.png",
+      "x": 224,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 8,
+      "original_index": 1124,
+      "name": "bedevilled_crystal_abyss_0",
+      "source": "assets/tiles/individual/dngn/vaults/bedevilled_crystal_abyss_0.png",
+      "x": 256,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 9,
+      "original_index": 1125,
+      "name": "bedevilled_crystal_abyss_1",
+      "source": "assets/tiles/individual/dngn/vaults/bedevilled_crystal_abyss_1.png",
+      "x": 288,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 10,
+      "original_index": 1126,
+      "name": "bedevilled_crystal_coc_0",
+      "source": "assets/tiles/individual/dngn/vaults/bedevilled_crystal_coc_0.png",
+      "x": 320,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 11,
+      "original_index": 1127,
+      "name": "bedevilled_crystal_coc_1",
+      "source": "assets/tiles/individual/dngn/vaults/bedevilled_crystal_coc_1.png",
+      "x": 352,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 12,
+      "original_index": 1128,
+      "name": "bedevilled_crystal_dis_0",
+      "source": "assets/tiles/individual/dngn/vaults/bedevilled_crystal_dis_0.png",
+      "x": 384,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 13,
+      "original_index": 1129,
+      "name": "bedevilled_crystal_dis_1",
+      "source": "assets/tiles/individual/dngn/vaults/bedevilled_crystal_dis_1.png",
+      "x": 416,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 14,
+      "original_index": 1130,
+      "name": "bedevilled_crystal_geh_0",
+      "source": "assets/tiles/individual/dngn/vaults/bedevilled_crystal_geh_0.png",
+      "x": 448,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 15,
+      "original_index": 1131,
+      "name": "bedevilled_crystal_geh_1",
+      "source": "assets/tiles/individual/dngn/vaults/bedevilled_crystal_geh_1.png",
+      "x": 480,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 16,
+      "original_index": 1132,
+      "name": "bedevilled_crystal_pan_0",
+      "source": "assets/tiles/individual/dngn/vaults/bedevilled_crystal_pan_0.png",
+      "x": 512,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 17,
+      "original_index": 1133,
+      "name": "bedevilled_crystal_pan_1",
+      "source": "assets/tiles/individual/dngn/vaults/bedevilled_crystal_pan_1.png",
+      "x": 544,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 18,
+      "original_index": 1134,
+      "name": "bedevilled_crystal_pan_2",
+      "source": "assets/tiles/individual/dngn/vaults/bedevilled_crystal_pan_2.png",
+      "x": 576,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 19,
+      "original_index": 1135,
+      "name": "bedevilled_crystal_pan_3",
+      "source": "assets/tiles/individual/dngn/vaults/bedevilled_crystal_pan_3.png",
+      "x": 608,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 20,
+      "original_index": 1136,
+      "name": "bedevilled_crystal_tar_0",
+      "source": "assets/tiles/individual/dngn/vaults/bedevilled_crystal_tar_0.png",
+      "x": 640,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 21,
+      "original_index": 1137,
+      "name": "bedevilled_crystal_tar_1",
+      "source": "assets/tiles/individual/dngn/vaults/bedevilled_crystal_tar_1.png",
+      "x": 672,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 22,
+      "original_index": 1138,
+      "name": "bottled_spirits",
+      "source": "assets/tiles/individual/dngn/vaults/bottled_spirits.png",
+      "x": 704,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 23,
+      "original_index": 1139,
+      "name": "brick_dark_eyes",
+      "source": "assets/tiles/individual/dngn/vaults/brick_dark_eyes.png",
+      "x": 736,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 24,
+      "original_index": 1140,
+      "name": "brick_dark_leak",
+      "source": "assets/tiles/individual/dngn/vaults/brick_dark_leak.png",
+      "x": 768,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 25,
+      "original_index": 1141,
+      "name": "brick_dark_skeleton",
+      "source": "assets/tiles/individual/dngn/vaults/brick_dark_skeleton.png",
+      "x": 800,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 26,
+      "original_index": 1142,
+      "name": "cigotuvi_door_closed",
+      "source": "assets/tiles/individual/dngn/vaults/cigotuvi_door_closed.png",
+      "x": 832,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 27,
+      "original_index": 1143,
+      "name": "cigotuvi_door_open",
+      "source": "assets/tiles/individual/dngn/vaults/cigotuvi_door_open.png",
+      "x": 864,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 28,
+      "original_index": 1144,
+      "name": "cigotuvi_door_ruined",
+      "source": "assets/tiles/individual/dngn/vaults/cigotuvi_door_ruined.png",
+      "x": 896,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 29,
+      "original_index": 1145,
+      "name": "dimension_edge",
+      "source": "assets/tiles/individual/dngn/vaults/dimension_edge.png",
+      "x": 928,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 30,
+      "original_index": 1146,
+      "name": "dimensional_conduit_0",
+      "source": "assets/tiles/individual/dngn/vaults/dimensional_conduit_0.png",
+      "x": 960,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 31,
+      "original_index": 1147,
+      "name": "dimensional_conduit_1",
+      "source": "assets/tiles/individual/dngn/vaults/dimensional_conduit_1.png",
+      "x": 992,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 32,
+      "original_index": 1148,
+      "name": "dimensional_conduit_2",
+      "source": "assets/tiles/individual/dngn/vaults/dimensional_conduit_2.png",
+      "x": 0,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 33,
+      "original_index": 1149,
+      "name": "dimensional_conduit_3",
+      "source": "assets/tiles/individual/dngn/vaults/dimensional_conduit_3.png",
+      "x": 32,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 34,
+      "original_index": 1150,
+      "name": "disco_ball",
+      "source": "assets/tiles/individual/dngn/vaults/disco_ball.png",
+      "x": 64,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 35,
+      "original_index": 1151,
+      "name": "djembe_set",
+      "source": "assets/tiles/individual/dngn/vaults/djembe_set.png",
+      "x": 96,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 36,
+      "original_index": 1152,
+      "name": "earthen_conduit_0",
+      "source": "assets/tiles/individual/dngn/vaults/earthen_conduit_0.png",
+      "x": 128,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 37,
+      "original_index": 1153,
+      "name": "earthen_conduit_1",
+      "source": "assets/tiles/individual/dngn/vaults/earthen_conduit_1.png",
+      "x": 160,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 38,
+      "original_index": 1154,
+      "name": "earthen_conduit_2",
+      "source": "assets/tiles/individual/dngn/vaults/earthen_conduit_2.png",
+      "x": 192,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 39,
+      "original_index": 1155,
+      "name": "earthen_conduit_3",
+      "source": "assets/tiles/individual/dngn/vaults/earthen_conduit_3.png",
+      "x": 224,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 40,
+      "original_index": 1156,
+      "name": "enigmatic_dynamo",
+      "source": "assets/tiles/individual/dngn/vaults/enigmatic_dynamo.png",
+      "x": 256,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 41,
+      "original_index": 1157,
+      "name": "ensign_beogh",
+      "source": "assets/tiles/individual/dngn/vaults/ensign_beogh.png",
+      "x": 288,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 42,
+      "original_index": 1158,
+      "name": "ensign_dark",
+      "source": "assets/tiles/individual/dngn/vaults/ensign_dark.png",
+      "x": 320,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 43,
+      "original_index": 1159,
+      "name": "ensign_gehenna",
+      "source": "assets/tiles/individual/dngn/vaults/ensign_gehenna.png",
+      "x": 352,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 44,
+      "original_index": 1160,
+      "name": "fiery_conduit_0",
+      "source": "assets/tiles/individual/dngn/vaults/fiery_conduit_0.png",
+      "x": 384,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 45,
+      "original_index": 1161,
+      "name": "fiery_conduit_1",
+      "source": "assets/tiles/individual/dngn/vaults/fiery_conduit_1.png",
+      "x": 416,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 46,
+      "original_index": 1162,
+      "name": "fiery_conduit_2",
+      "source": "assets/tiles/individual/dngn/vaults/fiery_conduit_2.png",
+      "x": 448,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 47,
+      "original_index": 1163,
+      "name": "fiery_conduit_3",
+      "source": "assets/tiles/individual/dngn/vaults/fiery_conduit_3.png",
+      "x": 480,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 48,
+      "original_index": 1164,
+      "name": "flower_pot_1",
+      "source": "assets/tiles/individual/dngn/vaults/flower_pot_1.png",
+      "x": 512,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 49,
+      "original_index": 1165,
+      "name": "flower_pot_2",
+      "source": "assets/tiles/individual/dngn/vaults/flower_pot_2.png",
+      "x": 544,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 50,
+      "original_index": 1166,
+      "name": "flower_pot_broken_1",
+      "source": "assets/tiles/individual/dngn/vaults/flower_pot_broken_1.png",
+      "x": 576,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 51,
+      "original_index": 1167,
+      "name": "flower_pot_broken_2",
+      "source": "assets/tiles/individual/dngn/vaults/flower_pot_broken_2.png",
+      "x": 608,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 52,
+      "original_index": 1168,
+      "name": "fountain_double_decker",
+      "source": "assets/tiles/individual/dngn/vaults/fountain_double_decker.png",
+      "x": 640,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 53,
+      "original_index": 1169,
+      "name": "fountain_octopode",
+      "source": "assets/tiles/individual/dngn/vaults/fountain_octopode.png",
+      "x": 672,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 54,
+      "original_index": 1170,
+      "name": "fountain_stone_lantern",
+      "source": "assets/tiles/individual/dngn/vaults/fountain_stone_lantern.png",
+      "x": 704,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 55,
+      "original_index": 1171,
+      "name": "fountain_xom",
+      "source": "assets/tiles/individual/dngn/vaults/fountain_xom.png",
+      "x": 736,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 56,
+      "original_index": 1172,
+      "name": "gilded_reliquary",
+      "source": "assets/tiles/individual/dngn/vaults/gilded_reliquary.png",
+      "x": 768,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 57,
+      "original_index": 1173,
+      "name": "golden_iron_statue",
+      "source": "assets/tiles/individual/dngn/vaults/golden_iron_statue.png",
+      "x": 800,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 58,
+      "original_index": 1174,
+      "name": "golden_statue_1",
+      "source": "assets/tiles/individual/dngn/vaults/golden_statue_1.png",
+      "x": 832,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 59,
+      "original_index": 1175,
+      "name": "golden_statue_2",
+      "source": "assets/tiles/individual/dngn/vaults/golden_statue_2.png",
+      "x": 864,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 60,
+      "original_index": 1176,
+      "name": "gravestone_blank",
+      "source": "assets/tiles/individual/dngn/vaults/gravestone_blank.png",
+      "x": 896,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 61,
+      "original_index": 1177,
+      "name": "gravestone_writing1",
+      "source": "assets/tiles/individual/dngn/vaults/gravestone_writing1.png",
+      "x": 928,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 62,
+      "original_index": 1178,
+      "name": "gravestone_writing2",
+      "source": "assets/tiles/individual/dngn/vaults/gravestone_writing2.png",
+      "x": 960,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 63,
+      "original_index": 1179,
+      "name": "icy_conduit_0",
+      "source": "assets/tiles/individual/dngn/vaults/icy_conduit_0.png",
+      "x": 992,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 64,
+      "original_index": 1180,
+      "name": "icy_conduit_1",
+      "source": "assets/tiles/individual/dngn/vaults/icy_conduit_1.png",
+      "x": 0,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 65,
+      "original_index": 1181,
+      "name": "icy_conduit_2",
+      "source": "assets/tiles/individual/dngn/vaults/icy_conduit_2.png",
+      "x": 32,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 66,
+      "original_index": 1182,
+      "name": "icy_conduit_3",
+      "source": "assets/tiles/individual/dngn/vaults/icy_conduit_3.png",
+      "x": 64,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 67,
+      "original_index": 1183,
+      "name": "lectern",
+      "source": "assets/tiles/individual/dngn/vaults/lectern.png",
+      "x": 96,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 68,
+      "original_index": 1184,
+      "name": "misfortune_conduit_0",
+      "source": "assets/tiles/individual/dngn/vaults/misfortune_conduit_0.png",
+      "x": 128,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 69,
+      "original_index": 1185,
+      "name": "misfortune_conduit_1",
+      "source": "assets/tiles/individual/dngn/vaults/misfortune_conduit_1.png",
+      "x": 160,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 70,
+      "original_index": 1186,
+      "name": "misfortune_conduit_2",
+      "source": "assets/tiles/individual/dngn/vaults/misfortune_conduit_2.png",
+      "x": 192,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 71,
+      "original_index": 1187,
+      "name": "misfortune_conduit_3",
+      "source": "assets/tiles/individual/dngn/vaults/misfortune_conduit_3.png",
+      "x": 224,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 72,
+      "original_index": 1188,
+      "name": "mop_1",
+      "source": "assets/tiles/individual/dngn/vaults/mop_1.png",
+      "x": 256,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 73,
+      "original_index": 1189,
+      "name": "mop_2",
+      "source": "assets/tiles/individual/dngn/vaults/mop_2.png",
+      "x": 288,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 74,
+      "original_index": 1190,
+      "name": "mystic_cage_0",
+      "source": "assets/tiles/individual/dngn/vaults/mystic_cage_0.png",
+      "x": 320,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 75,
+      "original_index": 1191,
+      "name": "mystic_cage_1",
+      "source": "assets/tiles/individual/dngn/vaults/mystic_cage_1.png",
+      "x": 352,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 76,
+      "original_index": 1192,
+      "name": "mystic_cage_2",
+      "source": "assets/tiles/individual/dngn/vaults/mystic_cage_2.png",
+      "x": 384,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 77,
+      "original_index": 1193,
+      "name": "nascence_circuit",
+      "source": "assets/tiles/individual/dngn/vaults/nascence_circuit.png",
+      "x": 416,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 78,
+      "original_index": 1194,
+      "name": "necropolis_gravestone_0",
+      "source": "assets/tiles/individual/dngn/vaults/necropolis_gravestone_0.png",
+      "x": 448,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 79,
+      "original_index": 1195,
+      "name": "necropolis_gravestone_1",
+      "source": "assets/tiles/individual/dngn/vaults/necropolis_gravestone_1.png",
+      "x": 480,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 80,
+      "original_index": 1196,
+      "name": "necropolis_gravestone_2",
+      "source": "assets/tiles/individual/dngn/vaults/necropolis_gravestone_2.png",
+      "x": 512,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 81,
+      "original_index": 1197,
+      "name": "oka_iron_statue_1",
+      "source": "assets/tiles/individual/dngn/vaults/oka_iron_statue_1.png",
+      "x": 544,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 82,
+      "original_index": 1198,
+      "name": "oka_iron_statue_2",
+      "source": "assets/tiles/individual/dngn/vaults/oka_iron_statue_2.png",
+      "x": 576,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 83,
+      "original_index": 1199,
+      "name": "orb_dais",
+      "source": "assets/tiles/individual/dngn/vaults/orb_dais.png",
+      "x": 608,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 84,
+      "original_index": 1200,
+      "name": "sarcophagus_pedestal_left",
+      "source": "assets/tiles/individual/dngn/vaults/sarcophagus_pedestal_left.png",
+      "x": 640,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 85,
+      "original_index": 1201,
+      "name": "sarcophagus_pedestal_right",
+      "source": "assets/tiles/individual/dngn/vaults/sarcophagus_pedestal_right.png",
+      "x": 672,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 86,
+      "original_index": 1202,
+      "name": "sarcophagus_sealed",
+      "source": "assets/tiles/individual/dngn/vaults/sarcophagus_sealed.png",
+      "x": 704,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 87,
+      "original_index": 1203,
+      "name": "scintillating_statue_0",
+      "source": "assets/tiles/individual/dngn/vaults/scintillating_statue_0.png",
+      "x": 736,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 88,
+      "original_index": 1204,
+      "name": "scintillating_statue_1",
+      "source": "assets/tiles/individual/dngn/vaults/scintillating_statue_1.png",
+      "x": 768,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 89,
+      "original_index": 1205,
+      "name": "scintillating_statue_2",
+      "source": "assets/tiles/individual/dngn/vaults/scintillating_statue_2.png",
+      "x": 800,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 90,
+      "original_index": 1206,
+      "name": "scintillating_statue_3",
+      "source": "assets/tiles/individual/dngn/vaults/scintillating_statue_3.png",
+      "x": 832,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 91,
+      "original_index": 1207,
+      "name": "scintillating_statue_4",
+      "source": "assets/tiles/individual/dngn/vaults/scintillating_statue_4.png",
+      "x": 864,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 92,
+      "original_index": 1208,
+      "name": "silver_statue_0",
+      "source": "assets/tiles/individual/dngn/vaults/silver_statue_0.png",
+      "x": 896,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 93,
+      "original_index": 1209,
+      "name": "silver_statue_1",
+      "source": "assets/tiles/individual/dngn/vaults/silver_statue_1.png",
+      "x": 928,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 94,
+      "original_index": 1210,
+      "name": "silver_statue_2",
+      "source": "assets/tiles/individual/dngn/vaults/silver_statue_2.png",
+      "x": 960,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 95,
+      "original_index": 1211,
+      "name": "skull_pike_1",
+      "source": "assets/tiles/individual/dngn/vaults/skull_pike_1.png",
+      "x": 992,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 96,
+      "original_index": 1212,
+      "name": "skull_pike_2",
+      "source": "assets/tiles/individual/dngn/vaults/skull_pike_2.png",
+      "x": 0,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 97,
+      "original_index": 1213,
+      "name": "soul_conduit_0",
+      "source": "assets/tiles/individual/dngn/vaults/soul_conduit_0.png",
+      "x": 32,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 98,
+      "original_index": 1214,
+      "name": "soul_conduit_1",
+      "source": "assets/tiles/individual/dngn/vaults/soul_conduit_1.png",
+      "x": 64,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 99,
+      "original_index": 1215,
+      "name": "soul_conduit_2",
+      "source": "assets/tiles/individual/dngn/vaults/soul_conduit_2.png",
+      "x": 96,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 100,
+      "original_index": 1216,
+      "name": "soul_conduit_3",
+      "source": "assets/tiles/individual/dngn/vaults/soul_conduit_3.png",
+      "x": 128,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 101,
+      "original_index": 1217,
+      "name": "stacked_books_1",
+      "source": "assets/tiles/individual/dngn/vaults/stacked_books_1.png",
+      "x": 160,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 102,
+      "original_index": 1218,
+      "name": "stacked_books_2",
+      "source": "assets/tiles/individual/dngn/vaults/stacked_books_2.png",
+      "x": 192,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 103,
+      "original_index": 1219,
+      "name": "stacked_books_3",
+      "source": "assets/tiles/individual/dngn/vaults/stacked_books_3.png",
+      "x": 224,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 104,
+      "original_index": 1220,
+      "name": "statue_elephant_jade",
+      "source": "assets/tiles/individual/dngn/vaults/statue_elephant_jade.png",
+      "x": 256,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 105,
+      "original_index": 1221,
+      "name": "statue_iron_golem",
+      "source": "assets/tiles/individual/dngn/vaults/statue_iron_golem.png",
+      "x": 288,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 106,
+      "original_index": 1222,
+      "name": "stone_smooth_beogh_0",
+      "source": "assets/tiles/individual/dngn/vaults/stone_smooth_beogh_0.png",
+      "x": 320,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 107,
+      "original_index": 1223,
+      "name": "stone_smooth_beogh_1",
+      "source": "assets/tiles/individual/dngn/vaults/stone_smooth_beogh_1.png",
+      "x": 352,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 108,
+      "original_index": 1224,
+      "name": "storm_conduit_0",
+      "source": "assets/tiles/individual/dngn/vaults/storm_conduit_0.png",
+      "x": 384,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 109,
+      "original_index": 1225,
+      "name": "storm_conduit_1",
+      "source": "assets/tiles/individual/dngn/vaults/storm_conduit_1.png",
+      "x": 416,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 110,
+      "original_index": 1226,
+      "name": "storm_conduit_2",
+      "source": "assets/tiles/individual/dngn/vaults/storm_conduit_2.png",
+      "x": 448,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 111,
+      "original_index": 1227,
+      "name": "storm_conduit_3",
+      "source": "assets/tiles/individual/dngn/vaults/storm_conduit_3.png",
+      "x": 480,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 112,
+      "original_index": 1228,
+      "name": "teleporter_ice_cave",
+      "source": "assets/tiles/individual/dngn/vaults/teleporter_ice_cave.png",
+      "x": 512,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 113,
+      "original_index": 1229,
+      "name": "wall_banner_beogh",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_banner_beogh.png",
+      "x": 544,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 114,
+      "original_index": 1230,
+      "name": "wall_banner_dithmenos",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_banner_dithmenos.png",
+      "x": 576,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 115,
+      "original_index": 1231,
+      "name": "wall_banner_tso_1",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_banner_tso_1.png",
+      "x": 608,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 116,
+      "original_index": 1232,
+      "name": "wall_banner_tso_2",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_banner_tso_2.png",
+      "x": 640,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 117,
+      "original_index": 1233,
+      "name": "wall_banner_wu_jian",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_banner_wu_jian.png",
+      "x": 672,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 118,
+      "original_index": 1234,
+      "name": "wall_icon_beogh",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_icon_beogh.png",
+      "x": 704,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 119,
+      "original_index": 1235,
+      "name": "wall_icon_chei",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_icon_chei.png",
+      "x": 736,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 120,
+      "original_index": 1236,
+      "name": "wall_icon_makhleb",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_icon_makhleb.png",
+      "x": 768,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 121,
+      "original_index": 1237,
+      "name": "wall_icon_tso",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_icon_tso.png",
+      "x": 800,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 122,
+      "original_index": 1238,
+      "name": "wall_icon_zin",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_icon_zin.png",
+      "x": 832,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 123,
+      "original_index": 1239,
+      "name": "wall_painting_eustachio",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_painting_eustachio.png",
+      "x": 864,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 124,
+      "original_index": 1240,
+      "name": "wall_painting_xom_1",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_painting_xom_1.png",
+      "x": 896,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 125,
+      "original_index": 1241,
+      "name": "wall_painting_xom_2",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_painting_xom_2.png",
+      "x": 928,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 126,
+      "original_index": 1242,
+      "name": "wall_sword_corrupted",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_sword_corrupted.png",
+      "x": 960,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 127,
+      "original_index": 1243,
+      "name": "wall_sword_gold",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_sword_gold.png",
+      "x": 992,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 128,
+      "original_index": 1244,
+      "name": "wall_yak_skull",
+      "source": "assets/tiles/individual/dngn/vaults/wall/wall_yak_skull.png",
+      "x": 0,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 129,
+      "original_index": 1245,
+      "name": "yak_fur",
+      "source": "assets/tiles/individual/dngn/vaults/yak_fur.png",
+      "x": 32,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "index": 130,
+      "original_index": 1246,
+      "name": "zshrine",
+      "source": "assets/tiles/individual/dngn/vaults/zshrine.png",
+      "x": 64,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    }
+  ]
+}
