@@ -8,6 +8,12 @@ PocketCrawl is a Godot/GDScript mobile-leaning roguelike. **Post-reboot (2026-04
 - [Current state snapshot](pocketcrawl_state.md) — built systems, architecture decisions, file map. Predates 2026-05-05 audit.
 - [Pending backlog (4-27)](backlog_pocketcrawl.md) — task list with header note pointing to audit baseline.
 
+## NPC system
+- [GOAP NPC social system (2026-05-22)](npc_system.md) — scripts/npc/ file map, GOAP world state keys, relations dict, spawn flow, known bugs fixed, next steps.
+
+## Sprite system
+- [ULPC 4-dir sprite system (2026-05-22)](sprite_system_ulpc.md) — human_lpc folder structure, walk animation, equipment overlay mapping, draw rect math, StatusDialog/RaceSelect integration.
+
 ## Decision log
 - [Clean-room reboot decision (2026-04-25)](reboot_decision.md) — historical record of why oldproject/ exists and what current code must avoid.
 

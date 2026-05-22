@@ -4,6 +4,22 @@ description: Roadmap for the next PROJ_D sessions after the 2026-05-05 environme
 type: project
 originSessionId: cfaf6ab0-f8e3-4cfe-9656-25c538ea3e05
 ---
+## 2026-05-22 추가 완료 사항
+
+### Actor.gd 추출 (Player.gd 리팩토링 에이전트 작업)
+`scripts/entities/Actor.gd` — 스탯/장비/스킬 변수 + 순수 로직 ~400줄. Player.gd가 extends Actor. 훅 `_on_equipment_changed()`, `_on_take_damage_visual()` 추가.
+
+### NPC 소셜 시스템 (scripts/npc/)
+GOAP 기반 AI + 소셜 relations 시스템 구현 완료. ExplorerNPC 10명/층 스폰. 탭 → 정보창 + Attack 버튼. 상세 내용은 [[npc-system]] 메모리 참조.
+
+**현재 미완성:**
+- NPC 전투 CombatSystem 미통합 (주사위 공식 사용 중)
+- ExplorerNPC 시작 장비 없음
+- NPC item_picked_up 시그널 Game.gd 미연결
+- Actor.gd 추출 + Mastery 시스템 F5 스모크 검증 미실시
+
+---
+
 ## 컨텍스트
 
 2026-05-05 PROJ_SS 세션에서 환경 큐레이션 완료. PROJ_D는 깨끗한 baseline(새 CLAUDE.md, 모듈 CLAUDE.md 5개, 감사 리포트, 갱신된 refactoring_todo.md)에서 출발할 수 있는 상태. 같은 날 다른 창에서 Phase 0(시체 시스템)도 완료됨 — `tile::corpsify` GDScript 포팅 + 핏자국 합성. audit L1도 부수적으로 해결.
