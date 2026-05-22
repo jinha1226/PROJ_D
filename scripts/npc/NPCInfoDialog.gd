@@ -9,6 +9,15 @@ static func show_for(npc: NPCActor, player: Player, game_node: Node) -> void:
 	game_node.add_child(dlg)
 	var body: VBoxContainer = dlg.body()
 
+	# Race row (shown when the NPC exposes race_id, e.g. ExplorerNPC)
+	if "race_id" in npc and npc.race_id != "":
+		var race_label := Label.new()
+		var race_display: String = _race_display_name(npc.race_id)
+		race_label.text = "Race:  %s" % race_display
+		race_label.add_theme_color_override("font_color", Color(0.75, 0.85, 1.0))
+		race_label.add_theme_font_size_override("font_size", 20)
+		body.add_child(race_label)
+
 	# HP bar
 	var hp_label := Label.new()
 	hp_label.text = "HP  %d / %d" % [npc.hp, npc.hp_max]
@@ -137,3 +146,17 @@ static func _do_recruit(npc: NPCActor, player: Player, game_node: Node) -> void:
 			"%s가 거절했습니다." % npc.npc_name,
 			Color(0.65, 0.65, 0.65))
 	TurnManager.end_player_turn(Status.speed_mult(player))
+
+static func _race_display_name(race_id: String) -> String:
+	const NAMES: Dictionary = {
+		"human":    "Human",
+		"elf":      "High Elf",
+		"dwarf":    "Dwarf",
+		"hill_orc": "Hill Orc",
+		"troll":    "Troll",
+		"merfolk":  "Merfolk",
+		"naga":     "Naga",
+		"felid":    "Felid",
+		"kobold":   "Kobold",
+	}
+	return String(NAMES.get(race_id, race_id.capitalize()))

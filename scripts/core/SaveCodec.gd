@@ -89,6 +89,10 @@ static func dec_bytes(s) -> PackedByteArray:
 ## or Game._cache_branch_floor) into a JSON-safe dict.
 static func encode_floor_state(state: Dictionary) -> Dictionary:
 	var out: Dictionary = {}
+	if state.has("grid_w"):
+		out["grid_w"] = int(state["grid_w"])
+	if state.has("grid_h"):
+		out["grid_h"] = int(state["grid_h"])
 	if state.has("tiles"):
 		out["tiles"] = enc_bytes(state["tiles"])
 	if state.has("explored"):
@@ -131,6 +135,10 @@ static func encode_floor_state(state: Dictionary) -> Dictionary:
 
 static func decode_floor_state(data: Dictionary) -> Dictionary:
 	var out: Dictionary = {}
+	if data.has("grid_w"):
+		out["grid_w"] = int(data["grid_w"])
+	if data.has("grid_h"):
+		out["grid_h"] = int(data["grid_h"])
 	if data.has("tiles"):
 		out["tiles"] = dec_bytes(data["tiles"])
 	if data.has("explored"):

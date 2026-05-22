@@ -3,6 +3,11 @@ class_name ExplorerNPC extends NPCActor
 ## A dungeon explorer NPC rendered with a randomly chosen ULPC sprite.
 ## Appearance is seeded per-instance so it stays consistent until the NPC dies.
 
+## Melee weapon pool (tier 1-2). Picked at spawn.
+const WEAPON_POOL: Array = ["dagger", "short_sword", "mace", "spear", "arming_sword"]
+## Armor pool (tier 1-2). Picked at spawn.
+const ARMOR_POOL: Array  = ["leather_armor", "robe", "ring_mail"]
+
 const NAMES: Array = [
 	"Aldric", "Vera", "Jorim", "Solen", "Mira",
 	"Thane", "Cass", "Elun", "Brek", "Fiona",
@@ -30,6 +35,9 @@ var _anim_frame: int = 0
 var _anim_timer: float = 0.0
 var _font: Font = null
 
+## Race chosen at spawn. Stored so NPCInfoDialog can display it.
+var race_id: String = "human"
+
 
 func _ready() -> void:
 	super._ready()
@@ -49,6 +57,7 @@ func _ready() -> void:
 	skills["tactics"] = 2
 	skills["defense"] = 2
 	_randomize_appearance()
+	_assign_starter_equipment()
 
 
 func _process(delta: float) -> void:
@@ -64,6 +73,7 @@ func _randomize_appearance() -> void:
 	rng.seed = hash(npc_name) ^ get_instance_id()
 
 	var race: String = _NPC_RACES[rng.randi() % _NPC_RACES.size()]
+	race_id = race
 
 	var body_path := PlayerRenderer.race_body_path(race)
 	_body_tex = PlayerRenderer.load_ulpc_tex(body_path)
@@ -86,6 +96,22 @@ func _randomize_appearance() -> void:
 				_head_textures.append(ht)
 
 	queue_redraw()
+
+
+func _assign_starter_equipment() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(npc_name) ^ get_instance_id() ^ 0xE901
+
+	equipped_weapon_id = WEAPON_POOL[rng.randi() % WEAPON_POOL.size()]
+	equipped_armor_id  = ARMOR_POOL[rng.randi() % ARMOR_POOL.size()]
+
+	# Apply base AC from armor.
+	var armor_ac: Dictionary = {
+		"leather_armor": 3,
+		"robe":          1,
+		"ring_mail":     5,
+	}
+	ac = armor_ac.get(equipped_armor_id, 2)
 
 
 func _draw() -> void:

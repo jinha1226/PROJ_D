@@ -45,6 +45,10 @@ var _known_enemy = null
 ## Last perceived loot tile in FOV.
 var _known_loot_tile: Vector2i = Vector2i(-1, -1)
 
+## Exploration target: frontier tile adjacent to unexplored area.
+## Picked when idle; cleared when reached or invalidated.
+var _explore_target: Vector2i = Vector2i(-1, -1)
+
 # ── lifecycle ─────────────────────────────────────────────────────────────────
 
 func _ready() -> void:
@@ -193,7 +197,7 @@ func to_companion_data() -> CompanionData:
 	var c := CompanionData.new()
 	c.id = "npc_" + str(get_instance_id())
 	c.display_name = npc_name
-	c.race_id = "human"
+	c.race_id = get("race_id") if "race_id" in self else "human"
 	c.job_id = "fighter"
 	c.hp_max = hp_max
 	c.mp_max = mp_max
@@ -215,21 +219,88 @@ func to_companion_data() -> CompanionData:
 	c.equipped_amulet_id = equipped_amulet_id
 	return c
 
-## Random adjacent move when idle (no goal). ~33% chance per turn.
+## Exploration and wandering when idle (no GOAP goal).
+## Actively seeks frontier tiles (explored tiles adjacent to unexplored floor).
 func _wander() -> void:
-	if randi() % 3 != 0:
+	# 25% chance to skip entirely — prevents mechanical-looking constant movement.
+	if randi() % 4 == 0:
 		return
+
+	# Validate or clear stale explore target.
+	if _explore_target != Vector2i(-1, -1):
+		if not _map.in_bounds(_explore_target) or not _map.is_walkable(_explore_target):
+			_explore_target = Vector2i(-1, -1)
+		elif _map.explored.has(_explore_target):
+			_explore_target = Vector2i(-1, -1)  # already explored, pick new one
+
+	# Pick a new frontier target when we don't have one.
+	if _explore_target == Vector2i(-1, -1):
+		_explore_target = _find_explore_frontier()
+
+	# Move toward explore target.
+	if _explore_target != Vector2i(-1, -1):
+		var step := _greedy_step_toward(_explore_target)
+		if step != Vector2i.ZERO:
+			_do_move(step)
+			return
+		# Blocked — abandon target and fall through to random wander.
+		_explore_target = Vector2i(-1, -1)
+
+	# Fallback: random adjacent step.
 	var dirs := [Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1, 0),
 				 Vector2i(1, 1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(-1, -1)]
 	dirs.shuffle()
 	for d: Vector2i in dirs:
 		var p := grid_pos + d
 		if _map.in_bounds(p) and _map.is_walkable(p) and not _is_pos_occupied(p):
-			grid_pos = p
-			position = _map.grid_to_world(p)
-			facing = d
-			emit_signal("moved", p)
+			_do_move(d)
 			return
+
+## Move one step in direction d and emit signal.
+func _do_move(d: Vector2i) -> void:
+	var p := grid_pos + d
+	grid_pos = p
+	position = _map.grid_to_world(p)
+	facing = d
+	emit_signal("moved", p)
+
+## Greedy single step toward target (diagonal preferred).
+func _greedy_step_toward(target: Vector2i) -> Vector2i:
+	var dx: int = sign(target.x - grid_pos.x)
+	var dy: int = sign(target.y - grid_pos.y)
+	for step in [Vector2i(dx, dy), Vector2i(dx, 0), Vector2i(0, dy)]:
+		if step == Vector2i.ZERO:
+			continue
+		var pos := grid_pos + step
+		if _map.in_bounds(pos) and _map.is_walkable(pos) and not _is_pos_occupied(pos):
+			return step
+	return Vector2i.ZERO
+
+## Find a frontier tile: a walkable explored tile adjacent to an unexplored floor tile.
+## Returns the farthest candidate to spread NPC exploration.
+func _find_explore_frontier() -> Vector2i:
+	if _map == null:
+		return Vector2i(-1, -1)
+	var best: Vector2i = Vector2i(-1, -1)
+	var best_dist: int = -1
+	const DIRS := [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1)]
+	for pos: Vector2i in _map.explored.keys():
+		if not _map.is_walkable(pos):
+			continue
+		var is_frontier := false
+		for d: Vector2i in DIRS:
+			var n: Vector2i = pos + d
+			if _map.in_bounds(n) and not _map.explored.has(n) \
+					and _map.tile_at(n) != DungeonMap.Tile.WALL:
+				is_frontier = true
+				break
+		if not is_frontier:
+			continue
+		var dist: int = _chebyshev(pos, grid_pos)
+		if dist > best_dist:
+			best_dist = dist
+			best = pos
+	return best
 
 ## Returns true if pos is occupied by any actor (monster, player, or NPC).
 ## Used by movement actions to prevent overlap.
