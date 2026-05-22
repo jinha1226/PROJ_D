@@ -54,7 +54,7 @@ const _VISIBLE_LABELS: Dictionary = {
 ## Visible skill -> hidden familiarity rows. These rows read player.hidden_skills
 ## directly so the current dual-write behavior can be inspected in game.
 const _HIDDEN_BY_VISIBLE: Dictionary = {
-	"weapon_mastery": ["fighting", "unarmed", "short_blades", "long_blades",
+	"weapon_mastery": ["unarmed", "short_blades", "long_blades",
 		"maces", "axes", "staves", "polearms"],
 	"archery": ["bows", "crossbows", "slings", "throwing"],
 	"defense": ["armor", "shields"],

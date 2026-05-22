@@ -74,6 +74,10 @@ var _walk_anim_t: float = 0.0             # time accumulator for walk animation
 var _walk_anim_active: bool = false
 const _WALK_FPS: float = 18.0             # 9 frames / 18 fps ≈ 0.5s per step
 
+# ULPC 64x64 frame: character occupies y=14(head)..61(feet) = 48px
+const _ULPC_CHAR_TOP: float = 14.0
+const _ULPC_CHAR_H: float = 48.0
+
 const _BASE_OVERLAY_FILES: Array[String] = ["head", "hair"]
 
 const _EQUIP_SHEET_SLOTS: Array[Array] = [
@@ -1954,6 +1958,17 @@ func _refresh_paperdoll() -> void:
 				_equip_sheets.append(tex)
 	queue_redraw()
 
+## Destination Rect2 that scales a ULPC 64x64 frame so the character
+## fills the tile cell from head-top to foot-bottom.
+func _ulpc_draw_rect() -> Rect2:
+	var cs: float = float(DungeonMap.CELL_SIZE)
+	var scale: float = cs / _ULPC_CHAR_H       # 32/48 ≈ 0.667
+	var draw_sz: float = 64.0 * scale           # ~42.7px
+	var x_off: float = (cs - draw_sz) * 0.5    # center horizontally (~-5.3)
+	var y_off: float = -_ULPC_CHAR_TOP * scale  # shift head to y=0 (~-9.3)
+	return Rect2(x_off, y_off, draw_sz, draw_sz)
+
+
 ## Returns row index for ULPC 4-dir vertical sheet (N=0, W=1, S=2, E=3).
 ## Diagonals map to nearest cardinal.
 func _facing_to_row() -> int:
@@ -2001,6 +2016,7 @@ func _draw() -> void:
 	if GameManager.use_tiles:
 		var row := _facing_to_row()
 		var frame := _facing_to_frame()
+		var ulpc_rect := _ulpc_draw_rect()
 		if _base_tex != null:
 			var tw := _base_tex.get_width()
 			var th := _base_tex.get_height()
@@ -2009,10 +2025,10 @@ func _draw() -> void:
 				var fw := tw / 8
 				draw_texture_rect_region(_base_tex, rect, Rect2(frame * fw, 0, fw, th))
 			elif tw * 4 == th * 9 and th % 4 == 0:
-				# ULPC 4-dir vertical sheet: rows N/W/S/E, 9 cols of 64px
+				# ULPC 4-dir: scale so character fills cell head-to-toe
 				var fw := tw / 9
 				var fh := th / 4
-				draw_texture_rect_region(_base_tex, rect, Rect2(_walk_frame * fw, row * fh, fw, fh))
+				draw_texture_rect_region(_base_tex, ulpc_rect, Rect2(_walk_frame * fw, row * fh, fw, fh))
 			else:
 				draw_texture_rect(_base_tex, rect, false)
 		# Always-on base overlays (head, hair) drawn over body
@@ -2027,7 +2043,7 @@ func _draw() -> void:
 			elif btw * 4 == bth * 9 and bth % 4 == 0:
 				var bfw := btw / 9
 				var bfh := bth / 4
-				draw_texture_rect_region(btex, rect, Rect2(_walk_frame * bfw, row * bfh, bfw, bfh))
+				draw_texture_rect_region(btex, ulpc_rect, Rect2(_walk_frame * bfw, row * bfh, bfw, bfh))
 			else:
 				draw_texture_rect(btex, rect, false)
 		# Equipment overlay sheets drawn on top
@@ -2042,7 +2058,7 @@ func _draw() -> void:
 			elif etw * 4 == eth * 9 and eth % 4 == 0:
 				var efw := etw / 9
 				var efh := eth / 4
-				draw_texture_rect_region(etex, rect, Rect2(_walk_frame * efw, row * efh, efw, efh))
+				draw_texture_rect_region(etex, ulpc_rect, Rect2(_walk_frame * efw, row * efh, efw, efh))
 			else:
 				draw_texture_rect(etex, rect, false)
 		# Legacy single-frame paperdoll fallback
