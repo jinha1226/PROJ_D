@@ -613,33 +613,50 @@ func pick_equipment_weighted(depth: int) -> ItemData:
 	return candidates[candidates.size() - 1]
 
 func _tier_weight(tier: int, depth: int) -> int:
-	if depth <= 2:
+	# Main floors 1-5, branch effective depths up to 7.
+	# Depth 1: dungeon. 2: lair/crypt-1F. 3: orc/crypt-2F/swamp-1F.
+	# 4: elf/swamp-2F/ice-1F. 5: abyss/swamp-3F/ice-2F/infernal-1F.
+	# 6+: ice-3F, infernal-2F/3F.
+	if depth <= 1:
 		match tier:
 			1: return 70
 			2: return 25
 			3: return 5
 		return 0
-	elif depth <= 5:
+	elif depth <= 2:
 		match tier:
-			1: return 20
-			2: return 50
-			3: return 25
+			1: return 30
+			2: return 45
+			3: return 20
 			4: return 5
 		return 0
-	elif depth <= 8:
+	elif depth <= 3:
 		match tier:
-			1: return 5
-			2: return 20
-			3: return 45
-			4: return 25
-			5: return 5
+			1: return 10
+			2: return 30
+			3: return 40
+			4: return 18
+			5: return 2
+		return 0
+	elif depth <= 4:
+		match tier:
+			2: return 15
+			3: return 35
+			4: return 35
+			5: return 15
+		return 0
+	elif depth <= 5:
+		match tier:
+			2: return 5
+			3: return 25
+			4: return 45
+			5: return 25
 		return 0
 	else:
 		match tier:
-			2: return 10
-			3: return 25
+			3: return 10
 			4: return 40
-			5: return 25
+			5: return 50
 		return 0
 
 func _pick_weighted(depth: int, kinds: Array[String]) -> ItemData:

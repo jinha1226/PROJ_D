@@ -1024,7 +1024,7 @@ func _generate_shop_inventory() -> void:
 
 	if _shop_is_special:
 		# Special shop: premium equipment (boosted depth for higher tiers) + consumables.
-		var boosted_depth: int = min(depth + 4, 20)
+		var boosted_depth: int = min(depth + 3, 7)
 		var eq_count: int = randi_range(3, 4)
 		for _i in range(eq_count):
 			var base_item: ItemData = ItemRegistry.pick_equipment_weighted(boosted_depth)
@@ -1168,7 +1168,7 @@ func spawn_monster_at(monster_id: String, pos: Vector2i) -> bool:
 ## Orc treasure room: for floors 7-9 pick a room away from player and stairs,
 ## scatter gold piles and bonus equipment inside it.
 func _spawn_orc_treasure_room(depth: int, rng: RandomNumberGenerator) -> void:
-	if depth < 7 or depth > 9:
+	if depth != 3:
 		return
 	if map == null or map.rooms.is_empty():
 		return
