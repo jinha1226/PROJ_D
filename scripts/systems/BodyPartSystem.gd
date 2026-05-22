@@ -65,7 +65,14 @@ static func process_hit(defender, final_damage: int, attacker_pos: Vector2i) -> 
 	var part: String = _weighted_part(bt, side)
 	if part == "":
 		return
-	var wound_chance: float = float(final_damage) / float(max(1, int(defender.hp_max)))
+	var _max_hp: int
+	if "hp_max" in defender:
+		_max_hp = int(defender.hp_max)
+	elif "data" in defender and defender.data != null:
+		_max_hp = int(defender.data.hp)
+	else:
+		_max_hp = max(1, int(defender.hp))
+	var wound_chance: float = float(final_damage) / float(max(1, _max_hp))
 	if randf() >= wound_chance:
 		return
 	var wounds: Dictionary = defender.body_wounds if "body_wounds" in defender else {}

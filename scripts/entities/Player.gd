@@ -69,6 +69,10 @@ var _hand1_doll_tex: Texture2D = null
 var _hand2_doll_tex: Texture2D = null
 var _base_sheets: Array[Texture2D] = []   # always-on race overlays: head, hair
 var _equip_sheets: Array[Texture2D] = []  # equipment-conditional overlays
+var _walk_frame: int = 0                  # current column in ULPC walk cycle (0-8)
+var _walk_anim_t: float = 0.0             # time accumulator for walk animation
+var _walk_anim_active: bool = false
+const _WALK_FPS: float = 18.0             # 9 frames / 18 fps ≈ 0.5s per step
 
 const _BASE_OVERLAY_FILES: Array[String] = ["head", "hair"]
 
@@ -285,6 +289,9 @@ func _try_move(dir: Vector2i) -> void:
 		return
 	grid_pos = target
 	facing = dir
+	if not _walk_anim_active:
+		_walk_anim_t = 0.0
+	_walk_anim_active = true
 	position = _map.grid_to_world(grid_pos)
 	queue_redraw()
 	emit_signal("moved", grid_pos)
@@ -1975,6 +1982,20 @@ func _facing_to_frame() -> int:
 		Vector2i( 1, -1): return 1  # NE
 	return 4
 
+func _process(delta: float) -> void:
+	if not _walk_anim_active:
+		return
+	_walk_anim_t += delta
+	var new_frame := int(_walk_anim_t * _WALK_FPS)
+	if new_frame >= 9:
+		_walk_anim_active = false
+		_walk_frame = 0
+		queue_redraw()
+	elif new_frame != _walk_frame:
+		_walk_frame = new_frame
+		queue_redraw()
+
+
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
 	if GameManager.use_tiles:
@@ -1991,7 +2012,7 @@ func _draw() -> void:
 				# ULPC 4-dir vertical sheet: rows N/W/S/E, 9 cols of 64px
 				var fw := tw / 9
 				var fh := th / 4
-				draw_texture_rect_region(_base_tex, rect, Rect2(0, row * fh, fw, fh))
+				draw_texture_rect_region(_base_tex, rect, Rect2(_walk_frame * fw, row * fh, fw, fh))
 			else:
 				draw_texture_rect(_base_tex, rect, false)
 		# Always-on base overlays (head, hair) drawn over body
@@ -2006,7 +2027,7 @@ func _draw() -> void:
 			elif btw * 4 == bth * 9 and bth % 4 == 0:
 				var bfw := btw / 9
 				var bfh := bth / 4
-				draw_texture_rect_region(btex, rect, Rect2(0, row * bfh, bfw, bfh))
+				draw_texture_rect_region(btex, rect, Rect2(_walk_frame * bfw, row * bfh, bfw, bfh))
 			else:
 				draw_texture_rect(btex, rect, false)
 		# Equipment overlay sheets drawn on top
@@ -2021,7 +2042,7 @@ func _draw() -> void:
 			elif etw * 4 == eth * 9 and eth % 4 == 0:
 				var efw := etw / 9
 				var efh := eth / 4
-				draw_texture_rect_region(etex, rect, Rect2(0, row * efh, efw, efh))
+				draw_texture_rect_region(etex, rect, Rect2(_walk_frame * efw, row * efh, efw, efh))
 			else:
 				draw_texture_rect(etex, rect, false)
 		# Legacy single-frame paperdoll fallback
