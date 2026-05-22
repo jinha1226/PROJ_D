@@ -20,7 +20,7 @@ func execute(actor: NPCActor) -> bool:
 	# Simple damage roll: 1–6 + slay_bonus. Full weapon-item lookup can be
 	# wired once CombatSystem has an actor-vs-actor path.
 	var dmg: int = randi_range(1, 6) + actor.slay_bonus
-	target.take_damage(dmg, actor.npc_name)
+	target.take_damage(dmg)
 
 	if actor.CombatLog != null:
 		actor.CombatLog.post(
