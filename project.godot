@@ -36,6 +36,7 @@ RacePassiveSystem="*res://scripts/systems/RacePassiveSystem.gd"
 ZoneManager="*res://scripts/systems/ZoneManager.gd"
 TownState="*res://scripts/town/TownState.gd"
 ExpeditionState="*res://scripts/town/ExpeditionState.gd"
+PartyManager="*res://scripts/systems/PartyManager.gd"
 
 [display]
 

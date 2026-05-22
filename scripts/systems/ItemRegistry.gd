@@ -104,6 +104,17 @@ const _POTION_RESISTANCE: Resource = preload("res://resources/items/potion_resis
 const _POTION_CANCELLATION: Resource = preload("res://resources/items/potion_cancellation.tres")
 const _SCROLL_IMMOLATION: Resource = preload("res://resources/items/scroll_immolation.tres")
 const _SCROLL_NOISE: Resource = preload("res://resources/items/scroll_noise.tres")
+# Negative potions
+const _POTION_POISON: Resource = preload("res://resources/items/potion_poison.tres")
+const _POTION_CONFUSION: Resource = preload("res://resources/items/potion_confusion.tres")
+const _POTION_DEGENERATION: Resource = preload("res://resources/items/potion_degeneration.tres")
+const _POTION_PARALYSIS: Resource = preload("res://resources/items/potion_paralysis.tres")
+const _POTION_TOXIC_GAS: Resource = preload("res://resources/items/potion_toxic_gas.tres")
+const _POTION_LIQUID_FLAME: Resource = preload("res://resources/items/potion_liquid_flame.tres")
+# Negative scrolls
+const _SCROLL_CURSE: Resource = preload("res://resources/items/scroll_curse.tres")
+const _SCROLL_TORMENT: Resource = preload("res://resources/items/scroll_torment.tres")
+const _SCROLL_VULNERABILITY: Resource = preload("res://resources/items/scroll_vulnerability.tres")
 # Resistance rings
 const _RING_POISON_RESIST: Resource = preload("res://resources/items/ring_poison_resist.tres")
 const _RING_COLD_RESIST: Resource = preload("res://resources/items/ring_cold_resist.tres")
@@ -239,21 +250,21 @@ const _ALL_ITEMS: Array = [
 	_LEATHER_ARMOR, _ROBE, _CHAIN_MAIL, _RING_MAIL, _SCALE_MAIL, _PLATE_MAIL, _TROLL_LEATHER,
 	_POTION_HEALING, _POTION_MIGHT, _POTION_CURE_POISON, _POTION_MAGIC,
 	_POTION_BERSERK, _BANDAGE, _STAFF,
-	_POTION_HASTE, _POTION_INVISIBLE, _POTION_AGILITY,
-	_POTION_BRILLIANCE, _POTION_EXPERIENCE,
+	_POTION_HASTE, _POTION_INVISIBLE,
 	_SCROLL_BLINKING, _SCROLL_MAGIC_MAPPING, _SCROLL_TELEPORT,
 	_SCROLL_ENCHANT_WEAPON, _SCROLL_ENCHANT_ARMOR, _SCROLL_IDENTIFY,
-	_SCROLL_SHROUDING,
-	_SCROLL_FEAR, _SCROLL_UPGRADE, _SCROLL_FOG, _SCROLL_BRAND, _SCROLL_SILENCE,
+	_SCROLL_FEAR, _SCROLL_BRAND, _SCROLL_IMMOLATION,
 	_BOOK_FIRE, _BOOK_COLD, _BOOK_AIR, _BOOK_EARTH,
 	_BOOK_NECROMANCY, _BOOK_HEXES, _BOOK_TRANSLOCATION, _BOOK_SUMMONING,
 	_GOLD_PILE,
 	_WAND_FIRE, _WAND_FROST, _WAND_LIGHTNING, _WAND_TELEPORT,
 	_WAND_FEAR, _WAND_HASTE, _WAND_DIGGING,
 	_THROWING_KNIFE, _JAVELIN, _BOMB, _POISON_FLASK, _SMOKE_BOMB,
-	_POTION_RESISTANCE, _POTION_CANCELLATION,
-	_SCROLL_IMMOLATION, _SCROLL_NOISE,
-	_SCROLL_BRAND_VENOM, _SCROLL_BRAND_FREEZING, _SCROLL_BRAND_FLAMING, _SCROLL_BRAND_DRAIN,
+	_POTION_RESISTANCE,
+	_SCROLL_NOISE,
+	_POTION_POISON, _POTION_CONFUSION, _POTION_DEGENERATION,
+	_POTION_PARALYSIS, _POTION_TOXIC_GAS, _POTION_LIQUID_FLAME,
+	_SCROLL_CURSE, _SCROLL_TORMENT, _SCROLL_VULNERABILITY,
 	_RING_POISON_RESIST, _RING_COLD_RESIST, _RING_FIRE_RESIST, _RING_NECRO_RESIST,
 	_RING_BOG, _RING_GLACIER, _RING_EMBER, _RING_UNDEATH,
 	_ESSENCE_SHARD,

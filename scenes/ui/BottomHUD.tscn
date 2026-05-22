@@ -18,7 +18,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = -148.0
 offset_bottom = 0.0
-color = Color(0.08, 0.08, 0.1, 0.92)
+color = Color(0.17, 0.19, 0.17, 0.94)
 mouse_filter = 2
 
 [node name="BottomMargin" type="MarginContainer" parent="."]
@@ -94,12 +94,6 @@ custom_minimum_size = Vector2(0, 64)
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "BAG"
-
-[node name="PickupButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
-custom_minimum_size = Vector2(0, 64)
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
-text = "PICK"
 
 [node name="SkillsButton" type="Button" parent="BottomMargin/MainVBox/MenuRow"]
 custom_minimum_size = Vector2(0, 64)

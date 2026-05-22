@@ -48,6 +48,9 @@ static func create_ratio(title: String, width_ratio: float = 0.92,
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_window.theme = GameTheme.create()
+	GameTheme.apply_panel_style(_window)
+	GameTheme.apply_button_style(_close_button)
 	_dim.gui_input.connect(_on_dim_input)
 	_close_button.pressed.connect(close)
 	if has_meta("_pending_title"):

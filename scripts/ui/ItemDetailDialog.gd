@@ -456,6 +456,14 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 				detail_dlg.close()
 				bag_dlg.close()
 				TurnManager.end_player_turn(Status.speed_mult(player)))
+		"throwing":
+			action_btn.text = "던지기"
+			action_btn.pressed.connect(func():
+				detail_dlg.close()
+				bag_dlg.close()
+				var game: Node = player.get_tree().current_scene if player.get_tree() != null else null
+				if game != null and game.has_method("begin_throw_targeting"):
+					game.begin_throw_targeting(entry))
 		_:
 			action_btn.text = LocaleManager.t("ITEM_ACTION_USE")
 			action_btn.pressed.connect(func():
@@ -465,6 +473,22 @@ static func _build_buttons(entry: Dictionary, data: ItemData, player: Player,
 				bag_dlg.close()
 				TurnManager.end_player_turn(Status.speed_mult(player)))
 	row.add_child(action_btn)
+
+	# Throw button for potions
+	if data.kind == "potion":
+		var throw_btn := Button.new()
+		throw_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		throw_btn.custom_minimum_size = Vector2(0, 72)
+		throw_btn.add_theme_font_size_override("font_size", GameTheme.TYPO_SUBTITLE)
+		throw_btn.text = "던지기"
+		throw_btn.add_theme_color_override("font_color", Color(1.0, 0.8, 0.4))
+		throw_btn.pressed.connect(func():
+			detail_dlg.close()
+			bag_dlg.close()
+			var game: Node = player.get_tree().current_scene if player.get_tree() != null else null
+			if game != null and game.has_method("begin_throw_targeting"):
+				game.begin_throw_targeting(entry))
+		row.add_child(throw_btn)
 
 	var drop_btn := Button.new()
 	drop_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL

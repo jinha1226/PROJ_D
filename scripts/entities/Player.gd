@@ -1,313 +1,22 @@
-class_name Player extends Node2D
+class_name Player extends Actor
 
 var TurnManager = null
-var CombatLog = null
-var GameManager = null
-var ItemRegistry = null
+var _renderer: PlayerRenderer = null
 
-signal stats_changed
-signal moved(new_pos: Vector2i)
-signal died
 signal item_dropped(entry: Dictionary, at_pos: Vector2i)
-signal damaged(amount: int)
-signal weapon_attacked(target: Vector2i, weapon_skill: String)
 
-@export var grid_pos: Vector2i = Vector2i(1, 1)
 
-const SIGHT_RADIUS: int = 6
-const DEFAULT_BASE_TEX: Texture2D = preload(
-	"res://assets/tiles/individual/player/base/human_m.png")
-
-# 2026-05-06 compression: sum ~17,000 (91% reduction from prior ~183,000) so
-# MAX_XL=20 is reachable in long runs. Tuning targets:
-#   no-branch 14F → XL 12-13, 1-branch 18F → XL 14-15, full 4-branch 30F → XL 19-20.
-# Rune pickups grant entry_depth × 100 bonus XP to keep deep branches rewarding.
-const XP_CURVE: Array = [0, 10, 25, 50, 90, 150, 230, 320, 420, 540,
-	650, 800, 980, 1190, 1430, 1700, 2000, 2330, 2690, 3080]
-
-## Paper-doll layer lookup tables. When equipped item id matches a key,
-## the corresponding sprite is drawn on top of the base race sprite.
-const DOLL_BODY_MAP: Dictionary = {
-	"leather_armor": "res://assets/tiles/individual/player/body/leather_armour.png",
-	"chain_mail": "res://assets/tiles/individual/player/body/chainmail.png",
-	"robe": "res://assets/tiles/individual/player/body/robe_blue.png",
-}
-
-const DOLL_HAND2_MAP: Dictionary = {
-	"buckler": "res://assets/tiles/individual/player/hand2/buckler_round.png",
-	"round_shield": "res://assets/tiles/individual/player/hand2/doll_only/kite_shield_round1.png",
-	"tower_shield": "res://assets/tiles/individual/player/hand2/tower_shield_teal.png",
-}
-
-const DOLL_HAND1_MAP: Dictionary = {
-	"short_sword": "res://assets/tiles/individual/player/hand1/short_sword.png",
-	"dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
-	"mace": "res://assets/tiles/individual/player/hand1/mace.png",
-	"long_sword": "res://assets/tiles/individual/player/hand1/long_sword_slant.png",
-	"arming_sword": "res://assets/tiles/individual/player/hand1/long_sword_slant2.png",
-	"bastard_sword": "res://assets/tiles/individual/player/hand1/heavy_sword.png",
-	"great_blade": "res://assets/tiles/individual/player/hand1/great_sword_slant.png",
-	"battle_axe": "res://assets/tiles/individual/player/hand1/battleaxe.png",
-	"spear": "res://assets/tiles/individual/player/hand1/spear.png",
-	"shortbow": "res://assets/tiles/individual/player/hand1/shortbow.png",
-	"longbow": "res://assets/tiles/individual/player/hand1/great_bow.png",
-	"crossbow": "res://assets/tiles/individual/player/hand1/arbalest.png",
-	"staff": "res://assets/tiles/individual/player/hand1/staff.png",
-	"flaming_sword": "res://assets/tiles/individual/player/hand1/short_sword.png",
-	"frost_dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
-	"venom_dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
-	"shock_mace": "res://assets/tiles/individual/player/hand1/mace.png",
-	"dirk": "res://assets/tiles/individual/player/hand1/athame.png",
-	"stiletto": "res://assets/tiles/individual/player/hand1/dagger.png",
-	"quick_blade": "res://assets/tiles/individual/player/hand1/sword_thief.png",
-	"assassin_blade": "res://assets/tiles/individual/player/hand1/dagger.png",
-}
-
-var _base_tex: Texture2D = DEFAULT_BASE_TEX
-var _body_doll_tex: Texture2D = null
-var _hand1_doll_tex: Texture2D = null
-var _hand2_doll_tex: Texture2D = null
-var _base_sheets: Array[Texture2D] = []   # always-on race overlays: head, hair
-var _equip_sheets: Array[Texture2D] = []  # equipment-conditional overlays
-var _walk_frame: int = 0                  # current column in ULPC walk cycle (0-8)
-var _walk_anim_t: float = 0.0             # time accumulator for walk animation
-var _walk_anim_active: bool = false
-const _WALK_FPS: float = 18.0             # 9 frames / 18 fps ≈ 0.5s per step
-
-var _attack_frame: int = 0
-var _attack_anim_t: float = 0.0
-var _attack_anim_active: bool = false
-var _attack_anim_type: String = "slash"   # "slash" | "thrust" | "spellcast"
-var _atk_base: Dictionary = {}            # {anim: Texture2D}
-var _atk_sheets: Dictionary = {}          # {anim: Array[Texture2D]} (head+hair+equip)
-
-const _ATTACK_FPS: float = 14.0
-const _ATTACK_FRAMES: Dictionary = {"slash": 6, "thrust": 8, "spellcast": 7}
-## Weapon base_id → attack animation type. Unlisted weapons default to "slash".
-const _WEAPON_ATTACK_ANIM: Dictionary = {
-	"mace": "thrust", "shock_mace": "thrust",
-	"spear": "thrust", "javelin": "thrust", "staff": "thrust",
-}
-
-# ULPC 64x64 frame: character occupies y=14(head)..61(feet) = 48px
-const _ULPC_CHAR_TOP: float = 14.0
-const _ULPC_CHAR_H: float = 48.0
-
-const _ULPC_ROOT: String = "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/"
-
-# Per-race body sheet (relative to _ULPC_ROOT).
-const _RACE_BODY_MAP: Dictionary = {
-	"human":    "body/bodies/male/walk.png",
-	"elf":      "body/bodies/teen/walk.png",
-	"dwarf":    "body/bodies/male/walk.png",
-	"hill_orc": "body/bodies/muscular/walk.png",
-	"troll":    "body/bodies/muscular/walk.png",
-	"vampire":  "body/bodies/male/walk.png",
-	"minotaur": "body/bodies/muscular/walk.png",
-	"kobold":   "body/bodies/child/walk.png",
-	"spriggan": "body/bodies/child/walk.png",
-	"gargoyle": "body/bodies/male/walk.png",
-}
-
-# Per-race always-on overlays: head, ears, hair (relative to _ULPC_ROOT).
-const _RACE_HEAD_OVERLAYS: Dictionary = {
-	"human": [
-		"head/heads/human/male/walk.png",
-		"hair/plain/adult/walk/ash.png",
-	],
-	"elf": [
-		"head/heads/human/male/walk.png",
-		"head/ears/elven/adult/walk.png",
-		"hair/plain/adult/walk/ash.png",
-	],
-	"dwarf": [
-		"head/heads/human/male/walk.png",
-		"hair/plain/adult/walk/ash.png",
-	],
-	"hill_orc": [
-		"head/heads/orc/male/walk.png",
-	],
-	"troll": [
-		"head/heads/troll/adult/walk.png",
-	],
-	"vampire": [
-		"head/heads/vampire/adult/walk.png",
-		"hair/plain/adult/walk/ash.png",
-	],
-	"minotaur": [
-		"head/heads/minotaur/male/walk.png",
-	],
-	"kobold": [
-		"head/heads/goblin/adult/walk.png",
-	],
-	"spriggan": [
-		"head/heads/human/child/walk.png",
-		"hair/plain/adult/walk/ash.png",
-	],
-	"gargoyle": [
-		"head/heads/lizard/male/walk.png",
-		"body/wings/bat/lizard/adult/bg/walk.png",
-	],
-}
-
-const _WEAPON_OVERLAY_MAP: Dictionary = {
-	"dagger":         "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
-	"dirk":           "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
-	"stiletto":       "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
-	"venom_dagger":   "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
-	"frost_dagger":   "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
-	"assassin_blade": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
-	"throwing_knife": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
-	"quick_blade":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
-	"short_sword":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/longsword/walk/longsword.png",
-	"arming_sword":   "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/arming/universal/fg/walk/brass.png",
-	"long_sword":     "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/longsword/walk/longsword.png",
-	"flaming_sword":  "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/longsword/walk/longsword.png",
-	"bastard_sword":  "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/longsword/walk/longsword.png",
-	"great_blade":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/longsword/walk/longsword.png",
-	"mace":           "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/blunt/mace/walk/mace.png",
-	"shock_mace":     "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/blunt/mace/walk/mace.png",
-	"battle_axe":     "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/blunt/waraxe/walk/waraxe.png",
-	"staff":          "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/magic/simple/foreground/walk/simple.png",
-	"spear":          "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/polearm/spear/foreground/walk/iron.png",
-	"javelin":        "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/polearm/spear/foreground/walk/iron.png",
-	"crossbow":       "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/ranged/crossbow/foreground/walk/crossbow.png",
-}
-const _ARMOR_OVERLAY_MAP: Dictionary = {
-	"leather_armor": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/torso/armour/leather/male/walk.png",
-	"troll_leather": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/torso/armour/leather/male/walk.png",
-	"ring_mail":     "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/torso/armour/leather/male/walk.png",
-	"scale_mail":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/torso/armour/leather/male/walk.png",
-	"chain_mail":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/torso/chainmail/male/walk.png",
-	"plate_mail":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/torso/armour/plate/male/walk.png",
-	"robe":          "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/torso/clothes/robe/female/walk/black.png",
-}
-const _LEGS_OVERLAY_MAP: Dictionary = {
-	"leather_armor": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/legs/hose/male/walk/black.png",
-	"troll_leather": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/legs/hose/male/walk/black.png",
-	"ring_mail":     "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/legs/hose/male/walk/black.png",
-	"scale_mail":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/legs/hose/male/walk/black.png",
-	"chain_mail":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/legs/hose/male/walk/black.png",
-	"plate_mail":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/legs/armour/plate/male/walk.png",
-	"robe":          "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/legs/pantaloons/male/walk/black.png",
-}
-const _HELMET_OVERLAY_MAP: Dictionary = {
-	"leather_cap":  "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/hat/cloth/leather_cap/adult/walk/base.png",
-	"leather_helm": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/hat/cloth/leather_cap/adult/walk/base.png",
-	"iron_helm":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/hat/helmet/bascinet/adult/walk/iron.png",
-	"great_helm":   "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/hat/helmet/bascinet/adult/walk/iron.png",
-}
-const _GLOVES_OVERLAY_MAP: Dictionary = {
-	"leather_gloves": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/arms/gloves/male/walk/leather.png",
-	"iron_gauntlets": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/arms/gloves/male/walk/iron.png",
-}
-const _BOOTS_OVERLAY_MAP: Dictionary = {
-	"leather_boots": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/feet/boots/basic/male/walk/iron.png",
-	"iron_greaves":  "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/feet/boots/basic/male/walk/iron.png",
-}
-const _SHIELD_OVERLAY_MAP: Dictionary = {
-	"buckler":      "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/shield/crusader/fg/male/walk/crusader.png",
-	"round_shield": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/shield/crusader/fg/male/walk/crusader.png",
-	"kite_shield":  "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/shield/crusader/fg/male/walk/crusader.png",
-	"tower_shield": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/shield/crusader/fg/male/walk/crusader.png",
-}
-
-const _EQUIP_SHEET_SLOTS: Array[Array] = [
-	["equipped_armor_id",  "armor"],
-	["equipped_helmet_id", "helmet"],
-	["equipped_gloves_id", "gloves"],
-	["equipped_boots_id",  "boots"],
-	["equipped_weapon_id", "sword"],
-	["equipped_shield_id", "shield"],
-]
-
-var hp: int = 22
-var hp_max: int = 22
-var _dead: bool = false
-var mp: int = 5
-var mp_max: int = 6
-var ac: int = 0
-var ev: int = 5
-var wl: int = 0
-var slay_bonus: int = 0
-var wizardry_bonus: int = 0
-var fov_radius_bonus: int = 0
-var strength: int = 10
-var dexterity: int = 10
-var intelligence: int = 10
-var xl: int = 1
-var xp: int = 0
 var gold: int = 0
 var kills: int = 0
 var items_collected: int = 0
 var last_killer: String = ""
 var items: Array = []  # [{id: String, plus: int}]
 var known_spells: Array = []  # [String]
-var statuses: Dictionary = {}  # id -> turns_remaining (Status.gd manages)
-var body_wounds: Dictionary = {}   # part_id → 1 (light) or 2 (severe)
-var facing: Vector2i = Vector2i(1, 0)
-## Resists: element → signed magnitude (positive = resist tier, negative = vulnerability tier).
-## Status.resist_scale clamps net level to [-3, +3]. Add via add_resist(element, delta).
-var resists: Dictionary = {}
-var skills: Dictionary = {}  # skill_id -> {"level": int, "xp": float}  (visible 9-skill tier)
-# Hidden familiarity XP banks (DCSS-style sub-skills). Same shape as `skills`
-# but only stores hidden ids. UI never reads from this; only the future
-# balance pass / debug tools do. Dual-write keeps both tiers in sync.
-var hidden_skills: Dictionary = {}
-var active_skills: Array = []  # active visible skill ids receiving kill XP
 var quickslots: Array = ["", "", "", "", "", ""]  # item/spell ids, index = slot
-var equipped_weapon_id: String = ""
-var equipped_armor_id: String = ""
-var equipped_ring_id: String = ""
-var equipped_amulet_id: String = ""
-var equipped_shield_id: String = ""
-var equipped_helmet_id: String = ""
-var equipped_gloves_id: String = ""
-var equipped_boots_id: String = ""
-var essence_slots: Array = ["", "", ""]   # equipped essence ids (max 3)
-var essence_inventory: Array = []         # collected but unequipped essence ids
-var faith_id: String = ""                 # active faith: "war"/"arcana"/"trickery"/"death"/"essence"
-var first_shrine_choice_done: bool = false
 
-const MAX_XL: int = 20
-# PROJ_G visible 9-skill set. These are the ONLY skills shown in UI,
-# save files, tutorials, and the character sheet. Each represents 80%
-# of player performance in its domain after the balance pass.
-const SKILL_IDS: Array = [
-	"weapon_mastery", "archery", "tactics", "defense",
-	"magery", "stealth", "tracking", "survival",
-]
-const SKILL_XP_DELTA: Array = [12, 28, 55, 95, 150, 230, 340, 490, 700]
-const MAX_SKILL_LEVEL: int = 9
 # Name retained for DCSS "general combat fitness" semantics; the gate is now
 # tactics (the fighting hidden subskill moved tactics→ in 2026-05-21).
 const FIGHTING_HP_PER_LEVEL: int = 5
-
-# Hidden familiarity tier — DCSS sub-skills retained as silent XP banks.
-# UI never displays them. XP grants dual-write to BOTH the hidden id and
-# the canonical visible bucket. Reserved for the balance pass which will
-# wire 20% narrow bonuses (e.g., dagger familiarity boosts only dagger
-# attacks). Until then, hidden buckets accrue data but contribute 0 to
-# combat formulas.
-const HIDDEN_SUBSKILL_IDS: Array = [
-	# Melee subskills
-	"fighting", "unarmed",
-	"short_blades", "long_blades",
-	"maces", "axes", "staves", "polearms",
-	# Ranged subskills
-	"bows", "crossbows", "slings", "throwing",
-	# Defense subskills
-	"armor", "shields",
-	# Stealth subskills
-	"dodging",
-	# Magic subskills
-	"spellcasting",
-	"conjurations", "hexes", "charms", "summonings",
-	"necromancy", "translocations", "transmutation",
-	"fire", "ice", "air", "earth", "poison",
-	# Utility subskills
-	"invocations", "evocations",
-]
 
 # Deprecated DCSS mastery system. Constants kept as empty/identity so UI
 # files referencing them don't crash; mastery getters return 0/identity.
@@ -330,42 +39,6 @@ const SKILL_CATEGORIES: Dictionary = {
 	"stealth": "Utility", "tracking": "Utility", "survival": "Utility",
 }
 
-# Translation: any legacy/sub-skill id → canonical visible bucket.
-# When external code asks for "fighting" / "polearms" / "fire" / etc.,
-# this routes them to the right one of the 9. Includes identity entries
-# for the new ids so direct-name lookups also work.
-const SKILL_REMAP: Dictionary = {
-	# Combat → tactics (general fitness) / weapon_mastery (specific weapons)
-	"fighting": "tactics",
-	"unarmed": "weapon_mastery",
-	"short_blades": "weapon_mastery", "long_blades": "weapon_mastery",
-	"maces": "weapon_mastery", "axes": "weapon_mastery", "staves": "weapon_mastery",
-	"polearms": "weapon_mastery",
-	# Combat → archery
-	"bows": "archery", "crossbows": "archery", "slings": "archery", "throwing": "archery",
-	# Defense
-	"armor": "defense", "shields": "defense",
-	# Stealth
-	"dodging": "stealth",
-	# Magic → magery (hidden sub-skills only; umbrella names removed 2026-05-21)
-	"spellcasting": "magery", "conjurations": "magery", "hexes": "magery", "charms": "magery",
-	"summonings": "magery", "necromancy": "magery", "translocations": "magery", "transmutation": "magery",
-	"fire": "magery", "ice": "magery", "air": "magery", "earth": "magery", "poison": "magery",
-	"invocations": "magery", "evocations": "magery",
-	# Identity (new ids resolve to themselves)
-	"weapon_mastery": "weapon_mastery", "archery": "archery", "tactics": "tactics",
-	"defense": "defense", "magery": "magery", "stealth": "stealth",
-	"tracking": "tracking", "survival": "survival",
-}
-
-var _map: DungeonMap
-var _regen_hp_ticker: int = 0
-var _regen_mp_ticker: int = 0
-# Natural light-wound healing. Only progresses when no hostile monster is
-# in FOV — being threatened resets the ticker. Severe (level-2) wounds
-# are NOT auto-cleared; they still require potion_healing / bandage.
-const WOUND_HEAL_INTERVAL_TURNS: int = 25
-var _regen_wound_ticker: int = 0
 
 func _ready() -> void:
 	TurnManager = get_node_or_null("/root/TurnManager")
@@ -373,13 +46,16 @@ func _ready() -> void:
 	GameManager = get_node_or_null("/root/GameManager")
 	ItemRegistry = get_node_or_null("/root/ItemRegistry")
 	add_to_group("player")
+	_renderer = PlayerRenderer.new()
+	_renderer.name = "Renderer"
+	add_child(_renderer)
 
 func bind_map(map: DungeonMap, spawn: Vector2i) -> void:
 	_map = map
 	grid_pos = spawn
 	position = _map.grid_to_world(grid_pos)
-	_refresh_paperdoll()
-	queue_redraw()
+	if _renderer != null:
+		_renderer.refresh_equipment(self)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _map == null or hp <= 0:
@@ -426,11 +102,9 @@ func _try_move(dir: Vector2i) -> void:
 		return
 	grid_pos = target
 	facing = dir
-	if not _walk_anim_active:
-		_walk_anim_t = 0.0
-	_walk_anim_active = true
+	if _renderer != null:
+		_renderer.start_walk_anim()
 	position = _map.grid_to_world(grid_pos)
-	queue_redraw()
 	emit_signal("moved", grid_pos)
 	emit_signal("stats_changed")
 	_auto_pickup()
@@ -550,7 +224,8 @@ func try_attack_tile(target: Vector2i) -> bool:
 		dir.y = sign(dir.y)
 	if dir != Vector2i.ZERO:
 		facing = dir
-		queue_redraw()
+		if _renderer != null:
+			_renderer.queue_redraw()
 	play_bump_anim(target - grid_pos)
 	play_attack_anim(equipped_weapon_id)
 	var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null and equipped_weapon_id != "" else null
@@ -636,6 +311,18 @@ func _find_entry_index(entry: Dictionary) -> int:
 		if String(it.get("id", "")) == id and int(it.get("plus", 0)) == plus:
 			return i
 	return -1
+
+## Remove one item from a stack for throwing. Does not trigger use effects.
+func remove_thrown_item(entry: Dictionary) -> void:
+	var idx: int = _find_entry_index(entry)
+	if idx < 0:
+		return
+	var count: int = int(items[idx].get("count", 1))
+	if count > 1:
+		items[idx]["count"] = count - 1
+	else:
+		items.remove_at(idx)
+	stats_changed.emit()
 
 func use_item_by_entry(entry: Dictionary) -> bool:
 	var idx: int = _find_entry_index(entry)
@@ -784,6 +471,60 @@ func use_item(index: int) -> void:
 						if ent != self and ent.has_method("alert"):
 							ent.alert(grid_pos)
 			CombatLog.post(LocaleManager.t("LOG_A_LOUD_NOISE_ECHOES_THROUGH"), Color(1.0, 0.8, 0.4))
+		# --- Negative potion effects (drinking) ---
+		"drink_poison":
+			apply_status("poison", data.effect_value)
+			CombatLog.post("The liquid burns like acid — you've been poisoned!", Color(0.3, 1.0, 0.3))
+		"drink_confusion":
+			apply_status("confusion", data.effect_value)
+			CombatLog.post("Your thoughts dissolve into chaos.", Color(0.8, 0.5, 1.0))
+		"drink_degeneration":
+			apply_status("weak", data.effect_value)
+			CombatLog.post("You feel your strength drain away.", Color(0.6, 0.6, 0.4))
+		"drink_paralysis":
+			apply_status("paralyzed", data.effect_value)
+			CombatLog.post("Your body locks up completely!", Color(0.85, 0.85, 0.9))
+		"drink_toxic_gas":
+			apply_status("poison", data.effect_value)
+			if _map != null:
+				ThrowSystem._splash_cloud(grid_pos, 1, "poison", 5, get_tree().current_scene)
+			CombatLog.post("A noxious cloud erupts around you!", Color(0.3, 1.0, 0.3))
+		"drink_liquid_flame":
+			take_damage(randi_range(6, 12), "fire")
+			apply_status("burning", 4)
+			if _map != null:
+				ThrowSystem._splash_cloud(grid_pos, 1, "fire", 4, get_tree().current_scene)
+			CombatLog.post("Liquid fire scorches your throat and everything nearby!", Color(1.0, 0.4, 0.1))
+		# --- New negative scroll effects ---
+		"curse_equipment":
+			var cursed_count: int = 0
+			for slot_id in ["equipped_weapon_id", "equipped_armor_id", "equipped_shield_id",
+					"equipped_helmet_id", "equipped_gloves_id", "equipped_boots_id"]:
+				if get(slot_id) != "":
+					apply_status("cursed_" + slot_id, 999)
+					cursed_count += 1
+			if cursed_count > 0:
+				CombatLog.post("A dark energy binds your equipment to you!", Color(0.5, 0.3, 0.8))
+			else:
+				CombatLog.post("Nothing happens.", Color(0.7, 0.7, 0.7))
+				had_effect = false
+		"torment":
+			var dmg: int = maxi(1, hp / 2)
+			take_damage(dmg)
+			CombatLog.post("Agony courses through every living thing on the floor!", Color(0.8, 0.2, 0.2))
+			var game_t: Node = get_tree().current_scene if get_tree() != null else null
+			if game_t != null:
+				for n in game_t.get_tree().get_nodes_in_group("monsters"):
+					if n is Monster:
+						n.take_damage(maxi(1, n.hp / 2))
+		"vulnerability":
+			apply_status("vulnerable", data.effect_value)
+			CombatLog.post("Your defences crumble!", Color(1.0, 0.5, 0.5))
+			var game_v: Node = get_tree().current_scene if get_tree() != null else null
+			if game_v != null:
+				for n in game_v.get_tree().get_nodes_in_group("monsters"):
+					if n is Monster:
+						Status.apply(n, "vulnerable", data.effect_value)
 		"resistance":
 			apply_status("resist_fire", data.effect_value)
 			apply_status("resist_cold", data.effect_value)
@@ -1138,35 +879,17 @@ func _break_enemy_awareness(radius: int) -> void:
 		n.last_known_player_pos = Vector2i(-1, -1)
 		n.lose_awareness()
 
-func compute_fov() -> Dictionary:
-	if _map == null:
-		return {}
-	var is_opaque := func(p: Vector2i) -> bool: return _map.is_opaque(p)
-	var radius: int = SIGHT_RADIUS + fov_radius_bonus
-	# Blind clamps FOV to a fixed radius (currently 0 → see only own tile).
-	# We special-case clamp_r == 0 here because FieldOfView.compute() always
-	# fills the 3×3 around the origin before shadowcasting, which would
-	# leak vision for a "see-nothing" blind status.
-	var clamp_r: int = Status.fov_clamp(self)
-	if clamp_r >= 0:
-		radius = min(radius, clamp_r)
-		if radius <= 0:
-			return {grid_pos: true}
-	return FieldOfView.compute(grid_pos, radius, is_opaque)
-
 func take_damage(amount: int, source: String = "") -> void:
-	if has_status("invulnerable"):
-		CombatLog.post(LocaleManager.t("LOG_YOU_ARE_INVULNERABLE"), Color(1.0, 0.95, 0.5))
-		return
-	hp = max(0, hp - amount)
 	if source != "":
 		last_killer = source
-	emit_signal("damaged", amount)
-	emit_signal("stats_changed")
+	super.take_damage(amount, source)
+
+func _on_take_damage_visual() -> void:
 	play_hit_anim()
-	if hp <= 0 and not _dead:
-		_dead = true
-		emit_signal("died")
+
+func _on_equipment_changed() -> void:
+	if _renderer != null:
+		_renderer.refresh_equipment(self)
 
 func play_bump_anim(dir: Vector2i) -> void:
 	var origin: Vector2 = position
@@ -1176,28 +899,12 @@ func play_bump_anim(dir: Vector2i) -> void:
 	tw.tween_property(self, "position", origin, 0.07)
 
 func play_attack_anim(weapon_id: String) -> void:
-	if not GameManager.use_tiles:
-		return
-	var base_id := ItemRegistry.base_id_of(weapon_id) if ItemRegistry != null and weapon_id != "" else weapon_id
-	var anim: String = String(_WEAPON_ATTACK_ANIM.get(base_id, "slash"))
-	if not (_atk_base.has(anim) and _atk_base[anim] != null):
-		return
-	_attack_anim_type = anim
-	_attack_frame = 0
-	_attack_anim_t = 0.0
-	_attack_anim_active = true
-	queue_redraw()
+	if _renderer != null:
+		_renderer.play_attack_anim(weapon_id)
 
 func play_spellcast_anim() -> void:
-	if not GameManager.use_tiles:
-		return
-	if not (_atk_base.has("spellcast") and _atk_base["spellcast"] != null):
-		return
-	_attack_anim_type = "spellcast"
-	_attack_frame = 0
-	_attack_anim_t = 0.0
-	_attack_anim_active = true
-	queue_redraw()
+	if _renderer != null:
+		_renderer.play_spellcast_anim()
 
 func play_hit_anim() -> void:
 	var origin: Vector2 = position
@@ -1210,12 +917,6 @@ func play_hit_anim() -> void:
 
 func register_kill() -> void:
 	kills += 1
-
-func strength_hp_bonus_for_value(value: int) -> int:
-	return value / 2
-
-func compute_starting_hp(base_hp: int, base_str: int) -> int:
-	return max(1, base_hp + strength_hp_bonus_for_value(base_str))
 
 func _apply_max_hp_gain(amount: int, source: String = "") -> void:
 	if amount == 0:
@@ -1242,53 +943,6 @@ func _fighting_hp_gain() -> int:
 
 func _level_up_mp_gain() -> int:
 	return 1 + intelligence / 3
-
-func heal(amount: int) -> void:
-	hp = min(hp_max, hp + amount)
-	emit_signal("stats_changed")
-
-func init_skills() -> void:
-	# active_skills stays empty by default — XP is action-routed (the action's own
-	# skill receives full XP). Players opt into manual proportional split via
-	# SkillsDialog Manual mode (toggle_skill_active).
-	for id in SKILL_IDS:
-		if not skills.has(id):
-			skills[id] = {"level": 0, "xp": 0.0}
-	for id in HIDDEN_SUBSKILL_IDS:
-		if not hidden_skills.has(id):
-			hidden_skills[id] = {"level": 0, "xp": 0.0}
-
-func _canonical_skill(id: String) -> String:
-	return String(SKILL_REMAP.get(id, ""))
-
-func is_skill_active(id: String) -> bool:
-	var canon: String = _canonical_skill(id)
-	if canon == "":
-		return false
-	return active_skills.has(canon)
-
-func set_active_skills(ids: Array) -> void:
-	# Empty array is a valid state (= action-routed mode). Do not auto-fill.
-	# Translate legacy ids through SKILL_REMAP so callers passing sub-skill ids
-	# still resolve to a valid visible bucket.
-	active_skills.clear()
-	for id in ids:
-		var canon: String = _canonical_skill(String(id))
-		if canon != "" and SKILL_IDS.has(canon) and not active_skills.has(canon):
-			active_skills.append(canon)
-	emit_signal("stats_changed")
-
-func toggle_skill_active(id: String) -> bool:
-	# Allows emptying the list — empty = action-routed (auto) mode.
-	var canon: String = _canonical_skill(id)
-	if canon == "" or not SKILL_IDS.has(canon):
-		return false
-	if active_skills.has(canon):
-		active_skills.erase(canon)
-	else:
-		active_skills.append(canon)
-	emit_signal("stats_changed")
-	return true
 
 func grant_kill_skill_xp(amount: float, action_skill: String = "") -> void:
 	# Route kill XP through grant_skill_xp so dual-write to hidden tier
@@ -1343,13 +997,6 @@ func get_category_total_xp(_category: String) -> float:
 
 func get_category_mastery_level(_category: String) -> int:
 	return 0
-
-func get_skill_level(id: String) -> int:
-	var canon: String = _canonical_skill(id)
-	if canon == "":
-		return 0
-	var entry: Dictionary = skills.get(canon, {"level": 0})
-	return int(entry.get("level", 0))
 
 func get_skill_xp(id: String) -> float:
 	var canon: String = _canonical_skill(id)
@@ -1443,7 +1090,7 @@ func spell_skill_for(spell: SpellData) -> String:
 static func aptitude_for(race: RaceData, skill_id: String) -> int:
 	if race == null:
 		return 0
-	var canon: String = String(SKILL_REMAP.get(skill_id, ""))
+	var canon: String = String(Actor.SKILL_REMAP.get(skill_id, ""))
 	if canon == "":
 		return 0
 	var apts: Dictionary = race.skill_aptitudes if race.skill_aptitudes != null else {}
@@ -1453,7 +1100,7 @@ static func aptitude_for(race: RaceData, skill_id: String) -> int:
 	var total: float = 0.0
 	var count: int = 0
 	for old_id in apts.keys():
-		if String(SKILL_REMAP.get(old_id, "")) == canon:
+		if String(Actor.SKILL_REMAP.get(old_id, "")) == canon:
 			total += float(apts[old_id])
 			count += 1
 	if count == 0:
@@ -1631,111 +1278,6 @@ func int_required_for_spell(spell: SpellData) -> int:
 		return 99
 	return max(5, 7 + spell.spell_level * 2 - EssenceSystem.spell_int_discount(self) - wizardry_bonus)
 
-func _chebyshev(a: Vector2i, b: Vector2i) -> int:
-	return max(abs(a.x - b.x), abs(a.y - b.y))
-
-func wait_turn() -> void:
-	if hp < hp_max:
-		hp = min(hp_max, hp + 1)
-	if mp < mp_max:
-		mp = min(mp_max, mp + 1)
-	emit_signal("stats_changed")
-
-func apply_status(id: String, turns: int) -> void:
-	Status.apply(self, id, turns)
-	emit_signal("stats_changed")
-
-func has_status(id: String) -> bool:
-	return Status.has(self, id)
-
-func is_wet() -> bool:
-	return has_status("wet")
-
-func apply_wet(turns: int = 4) -> void:
-	apply_status("wet", turns)
-	if CombatLog != null:
-		CombatLog.post(LocaleManager.t("LOG_WATER_SOAKS_YOU"), Color(0.55, 0.8, 1.0))
-
-func tick_statuses() -> void:
-	var expired: Array = Status.tick_actor(self)
-	for id in expired:
-		CombatLog.post(LocaleManager.t("LOG_YOUR_WEARS_OFF") % Status.display_name(id),
-			Color(0.75, 0.8, 0.9))
-	# Passive regen
-	if hp < hp_max:
-		_regen_hp_ticker += 1
-		if _regen_hp_ticker >= hp_regen_period():
-			_regen_hp_ticker = 0
-			hp = min(hp_max, hp + 1)
-	else:
-		_regen_hp_ticker = 0
-	if mp < mp_max:
-		_regen_mp_ticker += 1
-		if _regen_mp_ticker >= mp_regen_period():
-			_regen_mp_ticker = 0
-			mp = min(mp_max, mp + 1)
-	else:
-		_regen_mp_ticker = 0
-	# Natural wound healing: only progresses when no hostile monster is in
-	# the player's current FOV. Being threatened resets the ticker. On
-	# threshold, one random level-1 wound is cleared. Level-2 wounds are
-	# untouched here — consumables (potion_healing / bandage) remain the
-	# only path to downgrade severe wounds.
-	if not body_wounds.is_empty():
-		if _no_hostile_in_sight():
-			_regen_wound_ticker += 1
-			if _regen_wound_ticker >= WOUND_HEAL_INTERVAL_TURNS:
-				_regen_wound_ticker = 0
-				_heal_one_light_wound()
-		else:
-			_regen_wound_ticker = 0
-	else:
-		_regen_wound_ticker = 0
-	if not statuses.is_empty() or not expired.is_empty():
-		emit_signal("stats_changed")
-	EssenceSystem.tick(self)
-
-func _heal_one_light_wound() -> void:
-	var light_parts: Array = []
-	for part in body_wounds.keys():
-		if int(body_wounds[part]) == 1:
-			light_parts.append(part)
-	if light_parts.is_empty():
-		return
-	var pick: String = String(light_parts[randi() % light_parts.size()])
-	body_wounds.erase(pick)
-	var label: String = BodyPartSystem.PART_LABELS.get(pick, pick)
-	if CombatLog != null:
-		CombatLog.post("%s 부위 통증이 가라앉습니다." % label, Color(0.6, 0.9, 0.7))
-	emit_signal("stats_changed")
-
-func _no_hostile_in_sight() -> bool:
-	var tree := get_tree()
-	if tree == null:
-		return true
-	if _map == null:
-		return true
-	for n in tree.get_nodes_in_group("monsters"):
-		if not (n is Monster) or n.hp <= 0:
-			continue
-		if n.is_ally:
-			continue
-		if _map.visible_tiles.has(n.grid_pos):
-			return false
-	return true
-
-func hp_regen_period() -> int:
-	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id) if ItemRegistry != null and equipped_armor_id != "" else null
-	var base: int = 3 if armor != null and armor.brand == "regen" else 5
-	# Survival shortens the regen period (faster HP recovery). Floor at 2 so the
-	# bonus stays meaningful but never trivialises healing.
-	var survival_lv: int = get_skill_level("survival")
-	var reduced: int = base - int(floor(float(survival_lv) / 3.0))
-	return max(2, reduced)
-
-func mp_regen_period() -> int:
-	return 6
-
 func equip_essence(slot: int, essence_id: String) -> void:
 	if slot < 0 or slot >= essence_slots.size():
 		return
@@ -1793,35 +1335,11 @@ func replace_inventory_essence(old_id: String, new_id: String) -> bool:
 	emit_signal("stats_changed")
 	return true
 
-func apply_berserk(turns: int) -> void:
-	Status.apply(self, "berserk", turns)
-	CombatLog.post(LocaleManager.t("LOG_YOU_ENTER_A_BERSERK_RAGE"),
-		Color(1.0, 0.55, 0.35))
-	emit_signal("stats_changed")
-
-func set_race_from_id(race_id: String) -> void:
-	var race: RaceData = RaceRegistry.get_by_id(race_id)
-	if race != null and race.base_sprite_path != "" \
-			and ResourceLoader.exists(race.base_sprite_path):
-		_base_tex = load(race.base_sprite_path) as Texture2D
-	else:
-		_base_tex = DEFAULT_BASE_TEX
-	_refresh_paperdoll()
-
-func _get_sprite_dir() -> String:
-	if _base_tex != null and _base_tex.resource_path != "":
-		return _base_tex.resource_path.get_base_dir()
-	return ""
-
-func _ulpc_overlay_path(slot: String, base_id: String) -> String:
-	match slot:
-		"sword":  return _WEAPON_OVERLAY_MAP.get(base_id, "")
-		"armor":  return _ARMOR_OVERLAY_MAP.get(base_id, "")
-		"helmet": return _HELMET_OVERLAY_MAP.get(base_id, "")
-		"gloves": return _GLOVES_OVERLAY_MAP.get(base_id, "")
-		"boots":  return _BOOTS_OVERLAY_MAP.get(base_id, "")
-		"shield": return _SHIELD_OVERLAY_MAP.get(base_id, "")
-	return ""
+func set_race_from_id(_race_id: String) -> void:
+	# Race visuals are handled by PlayerRenderer.
+	# GameManager.selected_race_id is already updated before this is called.
+	if _renderer != null:
+		_renderer.refresh_equipment(self)
 
 func set_equipped_weapon(id: String) -> void:
 	if equipped_weapon_id != "":
@@ -1904,21 +1422,6 @@ func set_equipped_boots(id: String) -> void:
 		_apply_entry_affixes(equipped_boots_entry())
 	_refresh_paperdoll()
 	refresh_ac_from_equipment()
-
-## Item ids that are two-handed despite their category being a 1H one (e.g.,
-## "blade"). Add new explicit two-handers here so shield/cleave/combat checks
-## stay in sync.
-const _TWO_HANDED_IDS: Array = ["great_blade"]
-
-func has_two_handed_weapon() -> bool:
-	if equipped_weapon_id == "":
-		return false
-	var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null else null
-	if w == null:
-		return false
-	if w.category == "axe" or w.category == "polearm":
-		return true
-	return _TWO_HANDED_IDS.has(w.id)
 
 func _apply_accessory_stat(id: String) -> void:
 	var d: ItemData = ItemRegistry.get_by_id(id) if ItemRegistry != null else null
@@ -2068,295 +1571,7 @@ static func resists_from_tags(tags: Array) -> Dictionary:
 			out.erase(k)
 	return out
 
-## Signed-magnitude resist mutator. delta > 0 raises resist tier, delta < 0 lowers it
-## (or adds vulnerability tier). Erases the key when net is 0 to keep the dict tidy.
-func add_resist(element: String, delta: int) -> void:
-	if element == "" or delta == 0:
-		return
-	var net: int = clamp(int(resists.get(element, 0)) + delta, -3, 3)
-	if net == 0:
-		resists.erase(element)
-	else:
-		resists[element] = net
-
-static func _race_body_path(race_id: String) -> String:
-	var rel: String = _RACE_BODY_MAP.get(race_id, "body/bodies/male/walk.png")
-	return _ULPC_ROOT + rel
-
-static func _race_head_overlays(race_id: String) -> Array:
-	return _RACE_HEAD_OVERLAYS.get(race_id, _RACE_HEAD_OVERLAYS["human"])
-
-## Load a PNG from the ULPC generator folder without needing Godot .import metadata.
-static func _load_ulpc_tex(res_path: String) -> Texture2D:
-	var abs_path := ProjectSettings.globalize_path(res_path)
-	var img := Image.load_from_file(abs_path)
-	if img == null:
-		return null
-	return ImageTexture.create_from_image(img)
-
-static func _ulpc_file_exists(res_path: String) -> bool:
-	return FileAccess.file_exists(ProjectSettings.globalize_path(res_path))
-
-## Derive the attack-animation sheet path from a walk sheet path.
-## Handles two ULPC path patterns:
-##   .../walk.png          → .../slash.png  (single-sheet animations, torso/head)
-##   .../walk/{color}.png  → .../slash/{color}.png  (or .../slash.png fallback, hair/gloves)
-static func _ulpc_attack_path(walk_path: String, anim: String) -> String:
-	if not walk_path.begins_with(_ULPC_ROOT):
-		return ""
-	var rel := walk_path.substr(_ULPC_ROOT.length())
-	if rel.ends_with("/walk.png"):
-		var candidate := _ULPC_ROOT + rel.trim_suffix("walk.png") + anim + ".png"
-		if _ulpc_file_exists(candidate):
-			return candidate
-	elif "/walk/" in rel:
-		var parts := rel.split("/walk/", false, 1)
-		if parts.size() == 2:
-			# Try color-specific: .../slash/iron.png
-			var candidate := _ULPC_ROOT + parts[0] + "/" + anim + "/" + parts[1]
-			if _ulpc_file_exists(candidate):
-				return candidate
-			# Fall back to merged sheet: .../slash.png  (hair, gloves)
-			candidate = _ULPC_ROOT + parts[0] + "/" + anim + ".png"
-			if _ulpc_file_exists(candidate):
-				return candidate
-	return ""
-
+## Stub for backward-compatibility. Forwards to _renderer.refresh_equipment().
 func _refresh_paperdoll() -> void:
-	_body_doll_tex = null
-	_hand1_doll_tex = null
-	_hand2_doll_tex = null
-	# Load ULPC body base — race-specific
-	var race_id: String = GameManager.selected_race_id if GameManager != null else "human"
-	var body_rel: String = _RACE_BODY_MAP.get(race_id, "body/bodies/male/walk.png")
-	_base_tex = _load_ulpc_tex(_ULPC_ROOT + body_rel)
-	var armor_base_id: String = ItemRegistry.base_id_of(equipped_armor_id) if ItemRegistry != null else equipped_armor_id
-	if DOLL_BODY_MAP.has(armor_base_id):
-		var body_path: String = String(DOLL_BODY_MAP[armor_base_id])
-		if ResourceLoader.exists(body_path):
-			_body_doll_tex = load(body_path) as Texture2D
-	var weapon_base_id: String = ItemRegistry.base_id_of(equipped_weapon_id) if ItemRegistry != null else equipped_weapon_id
-	if DOLL_HAND1_MAP.has(weapon_base_id):
-		var path: String = String(DOLL_HAND1_MAP[weapon_base_id])
-		if ResourceLoader.exists(path):
-			_hand1_doll_tex = load(path) as Texture2D
-	var shield_base_id: String = ItemRegistry.base_id_of(equipped_shield_id) if ItemRegistry != null else equipped_shield_id
-	if DOLL_HAND2_MAP.has(shield_base_id):
-		var path: String = String(DOLL_HAND2_MAP[shield_base_id])
-		if ResourceLoader.exists(path):
-			_hand2_doll_tex = load(path) as Texture2D
-	# Load always-on base overlays (head, hair) — race-specific
-	_base_sheets.clear()
-	var head_overlays: Array = _RACE_HEAD_OVERLAYS.get(race_id, _RACE_HEAD_OVERLAYS["human"])
-	for rel in head_overlays:
-		var btex := _load_ulpc_tex(_ULPC_ROOT + rel)
-		if btex != null:
-			_base_sheets.append(btex)
-	# Load equipment overlays from ULPC generator
-	_equip_sheets.clear()
-	for pair in _EQUIP_SHEET_SLOTS:
-		var slot_val: String = get(pair[0]) if pair[0] in self else ""
-		if slot_val == "":
-			continue
-		var base_id: String = ItemRegistry.base_id_of(slot_val) if ItemRegistry != null else slot_val
-		var item_data: ItemData = ItemRegistry.get_by_id(slot_val) if ItemRegistry != null else null
-		var path: String = ""
-		if item_data != null and item_data.equip_overlay_path != "":
-			path = item_data.equip_overlay_path
-		else:
-			path = _ulpc_overlay_path(pair[1] as String, base_id)
-		if path != "":
-			var tex := _load_ulpc_tex(path)
-			if tex != null:
-				_equip_sheets.append(tex)
-	# Armor slot also adds matching legs overlay
-	if equipped_armor_id != "":
-		var armor_base: String = ItemRegistry.base_id_of(equipped_armor_id) if ItemRegistry != null else equipped_armor_id
-		var legs_path: String = _LEGS_OVERLAY_MAP.get(armor_base, "")
-		if legs_path != "":
-			var tex := _load_ulpc_tex(legs_path)
-			if tex != null:
-				_equip_sheets.append(tex)
-	# Preload attack animation sheets (slash / thrust / spellcast) for body + all overlays
-	_atk_base.clear()
-	_atk_sheets.clear()
-	var body_walk_path := _ULPC_ROOT + body_rel
-	for anim in ["slash", "thrust", "spellcast"]:
-		var bp := _ulpc_attack_path(body_walk_path, anim)
-		_atk_base[anim] = _load_ulpc_tex(bp) if bp != "" else null
-		var sheets: Array[Texture2D] = []
-		for rel2 in head_overlays:
-			var ap := _ulpc_attack_path(_ULPC_ROOT + rel2, anim)
-			if ap != "":
-				var t := _load_ulpc_tex(ap)
-				if t != null:
-					sheets.append(t)
-		for pair in _EQUIP_SHEET_SLOTS:
-			var slot_val: String = get(pair[0]) if pair[0] in self else ""
-			if slot_val == "":
-				continue
-			var bid: String = ItemRegistry.base_id_of(slot_val) if ItemRegistry != null else slot_val
-			var wpath := _ulpc_overlay_path(pair[1] as String, bid)
-			if wpath == "":
-				continue
-			var ap := _ulpc_attack_path(wpath, anim)
-			if ap != "":
-				var t := _load_ulpc_tex(ap)
-				if t != null:
-					sheets.append(t)
-		if equipped_armor_id != "":
-			var armor_base2: String = ItemRegistry.base_id_of(equipped_armor_id) if ItemRegistry != null else equipped_armor_id
-			var lw := _LEGS_OVERLAY_MAP.get(armor_base2, "")
-			if lw != "":
-				var ap := _ulpc_attack_path(lw, anim)
-				if ap != "":
-					var t := _load_ulpc_tex(ap)
-					if t != null:
-						sheets.append(t)
-		_atk_sheets[anim] = sheets
-	queue_redraw()
-
-## Destination Rect2 that scales a ULPC 64x64 frame so the character
-## fills the tile cell from head-top to foot-bottom.
-func _ulpc_draw_rect() -> Rect2:
-	var cs: float = float(DungeonMap.CELL_SIZE)
-	var scale: float = cs / _ULPC_CHAR_H       # 32/48 ≈ 0.667
-	var draw_sz: float = 64.0 * scale           # ~42.7px
-	var x_off: float = (cs - draw_sz) * 0.5    # center horizontally (~-5.3)
-	var y_off: float = -_ULPC_CHAR_TOP * scale  # shift head to y=0 (~-9.3)
-	return Rect2(x_off, y_off, draw_sz, draw_sz)
-
-
-## Returns row index for ULPC 4-dir vertical sheet (N=0, W=1, S=2, E=3).
-## Diagonals map to nearest cardinal.
-func _facing_to_row() -> int:
-	match facing:
-		Vector2i( 0, -1): return 0  # N
-		Vector2i(-1, -1): return 1  # NW → W
-		Vector2i(-1,  0): return 1  # W
-		Vector2i(-1,  1): return 2  # SW → S
-		Vector2i( 0,  1): return 2  # S
-		Vector2i( 1,  1): return 2  # SE → S
-		Vector2i( 1,  0): return 3  # E
-		Vector2i( 1, -1): return 3  # NE → E
-	return 2  # default S
-
-## Returns column index for an 8-dir horizontal sheet (legacy).
-## Actual sheet order (left→right): N, NE, W, SE, S, SW, E, NW
-func _facing_to_frame() -> int:
-	match facing:
-		Vector2i( 0, -1): return 0  # N
-		Vector2i(-1, -1): return 7  # NW
-		Vector2i(-1,  0): return 2  # W
-		Vector2i(-1,  1): return 5  # SW
-		Vector2i( 0,  1): return 4  # S
-		Vector2i( 1,  1): return 3  # SE
-		Vector2i( 1,  0): return 6  # E
-		Vector2i( 1, -1): return 1  # NE
-	return 4
-
-func _process(delta: float) -> void:
-	if _attack_anim_active:
-		_attack_anim_t += delta
-		var cols: int = int(_ATTACK_FRAMES.get(_attack_anim_type, 6))
-		var new_frame := int(_attack_anim_t * _ATTACK_FPS)
-		if new_frame >= cols:
-			_attack_anim_active = false
-			_attack_frame = 0
-			queue_redraw()
-		elif new_frame != _attack_frame:
-			_attack_frame = new_frame
-			queue_redraw()
-	if not _walk_anim_active:
-		return
-	_walk_anim_t += delta
-	var new_frame := int(_walk_anim_t * _WALK_FPS)
-	if new_frame >= 9:
-		_walk_anim_active = false
-		_walk_frame = 0
-		queue_redraw()
-	elif new_frame != _walk_frame:
-		_walk_frame = new_frame
-		queue_redraw()
-
-
-func _draw_ulpc4(tex: Texture2D, urect: Rect2, col: int, total_cols: int, row: int) -> void:
-	var fw := tex.get_width() / total_cols
-	var fh := tex.get_height() / 4
-	draw_texture_rect_region(tex, urect, Rect2(col * fw, row * fh, fw, fh))
-
-func _draw() -> void:
-	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
-	if GameManager.use_tiles:
-		var row := _facing_to_row()
-		var frame := _facing_to_frame()
-		var ulpc_rect := _ulpc_draw_rect()
-		# ── Attack animation ─────────────────────────────────────────────────
-		if _attack_anim_active and _atk_base.has(_attack_anim_type):
-			var cols: int = int(_ATTACK_FRAMES.get(_attack_anim_type, 6))
-			var atk_tex: Texture2D = _atk_base.get(_attack_anim_type)
-			if atk_tex != null:
-				_draw_ulpc4(atk_tex, ulpc_rect, _attack_frame, cols, row)
-			var atk_list: Array = _atk_sheets.get(_attack_anim_type, [])
-			for atex in atk_list:
-				if atex != null:
-					_draw_ulpc4(atex, ulpc_rect, _attack_frame, cols, row)
-			return
-		# ── Walk / idle ──────────────────────────────────────────────────────
-		if _base_tex != null:
-			var tw := _base_tex.get_width()
-			var th := _base_tex.get_height()
-			if tw >= th * 4:
-				# 8-dir horizontal sheet: N NE W SE S SW E NW
-				var fw := tw / 8
-				draw_texture_rect_region(_base_tex, rect, Rect2(frame * fw, 0, fw, th))
-			elif tw * 4 == th * 9 and th % 4 == 0:
-				# ULPC 4-dir walk (9 cols × 4 rows)
-				var fw := tw / 9
-				var fh := th / 4
-				draw_texture_rect_region(_base_tex, ulpc_rect, Rect2(_walk_frame * fw, row * fh, fw, fh))
-			else:
-				draw_texture_rect(_base_tex, rect, false)
-		# Always-on base overlays (head, hair) drawn over body
-		for btex in _base_sheets:
-			if btex == null:
-				continue
-			var btw := btex.get_width()
-			var bth := btex.get_height()
-			if btw >= bth * 4:
-				var bfw := btw / 8
-				draw_texture_rect_region(btex, rect, Rect2(frame * bfw, 0, bfw, bth))
-			elif btw * 4 == bth * 9 and bth % 4 == 0:
-				var bfw := btw / 9
-				var bfh := bth / 4
-				draw_texture_rect_region(btex, ulpc_rect, Rect2(_walk_frame * bfw, row * bfh, bfw, bfh))
-			else:
-				draw_texture_rect(btex, rect, false)
-		# Equipment overlay sheets drawn on top
-		for etex in _equip_sheets:
-			if etex == null:
-				continue
-			var etw := etex.get_width()
-			var eth := etex.get_height()
-			if etw >= eth * 4:
-				var efw := etw / 8
-				draw_texture_rect_region(etex, rect, Rect2(frame * efw, 0, efw, eth))
-			elif etw * 4 == eth * 9 and eth % 4 == 0:
-				var efw := etw / 9
-				var efh := eth / 4
-				draw_texture_rect_region(etex, ulpc_rect, Rect2(_walk_frame * efw, row * efh, efw, efh))
-			else:
-				draw_texture_rect(etex, rect, false)
-		# Legacy single-frame paperdoll fallback
-		if _equip_sheets.is_empty():
-			if _body_doll_tex != null:
-				draw_texture_rect(_body_doll_tex, rect, false)
-			if _hand1_doll_tex != null:
-				draw_texture_rect(_hand1_doll_tex, rect, false)
-			if _hand2_doll_tex != null:
-				draw_texture_rect(_hand2_doll_tex, rect, false)
-	else:
-		draw_string(ThemeDB.fallback_font,
-			Vector2(6, DungeonMap.CELL_SIZE - 6),
-			"@", HORIZONTAL_ALIGNMENT_LEFT, -1, DungeonMap.CELL_SIZE - 6,
-			Color(1.0, 0.95, 0.5))
+	if _renderer != null:
+		_renderer.refresh_equipment(self)

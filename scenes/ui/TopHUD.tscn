@@ -1,7 +1,6 @@
-[gd_scene format=3 uid="uid://btophudroot1" load_steps=5]
+[gd_scene format=3 uid="uid://btophudroot1" load_steps=4]
 
 [ext_resource type="Script" path="res://scripts/ui/TopHUD.gd" id="1_tophud"]
-[ext_resource type="PackedScene" uid="uid://bquickslot01" path="res://scenes/ui/QuickSlot.tscn" id="2_qs"]
 
 [sub_resource type="StyleBoxFlat" id="SB_HP"]
 bg_color = Color(0.752941, 0.188235, 0.188235, 1)
@@ -20,7 +19,7 @@ script = ExtResource("1_tophud")
 [node name="BG" type="ColorRect" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.08, 0.08, 0.1, 0.9)
+color = Color(0.16, 0.18, 0.16, 0.92)
 
 [node name="MainMargin" type="MarginContainer" parent="."]
 anchor_right = 1.0
@@ -147,43 +146,3 @@ size_flags_horizontal = 3
 alignment = 1
 theme_override_constants/separation = 8
 visible = false
-
-[node name="ItemRow" type="HBoxContainer" parent="MainMargin/MainVBox"]
-size_flags_horizontal = 3
-theme_override_constants/separation = 6
-
-[node name="ItemSlot0" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
-custom_minimum_size = Vector2(70, 56)
-size_flags_horizontal = 3
-
-[node name="ItemSlot1" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
-custom_minimum_size = Vector2(70, 56)
-size_flags_horizontal = 3
-
-[node name="ItemSlot2" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
-custom_minimum_size = Vector2(70, 56)
-size_flags_horizontal = 3
-
-[node name="ItemSlot3" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
-custom_minimum_size = Vector2(70, 56)
-size_flags_horizontal = 3
-
-[node name="ItemSlot4" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
-custom_minimum_size = Vector2(70, 56)
-size_flags_horizontal = 3
-
-[node name="ItemSlot5" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
-custom_minimum_size = Vector2(70, 56)
-size_flags_horizontal = 3
-
-[node name="ItemSlot6" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
-custom_minimum_size = Vector2(70, 56)
-size_flags_horizontal = 3
-
-[node name="ItemSlot7" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
-custom_minimum_size = Vector2(70, 56)
-size_flags_horizontal = 3
-
-[node name="ItemSlot8" type="Button" parent="MainMargin/MainVBox/ItemRow" instance=ExtResource("2_qs")]
-custom_minimum_size = Vector2(70, 56)
-size_flags_horizontal = 3

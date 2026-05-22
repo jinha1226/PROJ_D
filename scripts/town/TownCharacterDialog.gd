@@ -9,6 +9,7 @@ signal closed
 var _save_data: Dictionary = {}
 
 func _ready() -> void:
+	theme = GameTheme.create()
 	_title.text = LocaleManager.t("UI_TOWN_CHAR_TITLE")
 	_close_btn.text = LocaleManager.t("UI_SHOP_BTN_DONE")
 	_close_btn.pressed.connect(_on_close)

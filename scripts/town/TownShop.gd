@@ -46,6 +46,7 @@ static func sell_price_for(item_id: String) -> int:
 	return SELL_FALLBACK_PRICE
 
 func _ready() -> void:
+	theme = GameTheme.create()
 	_title.text = LocaleManager.t("UI_SHOP_TITLE")
 	_close_btn.text = LocaleManager.t("UI_SHOP_BTN_DONE")
 	_close_btn.pressed.connect(_on_close)

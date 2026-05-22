@@ -20,17 +20,7 @@ signal item_slot_pressed(index: int)
 @onready var zoom_in_button: Button = $MainMargin/MainVBox/TopRow/Bars/StatsRow/ZoomInButton
 @onready var zoom_out_button: Button = $MainMargin/MainVBox/TopRow/Bars/StatsRow/ZoomOutButton
 @onready var rune_row: HBoxContainer = $MainMargin/MainVBox/RuneRow
-@onready var item_slots: Array = [
-	$MainMargin/MainVBox/ItemRow/ItemSlot0,
-	$MainMargin/MainVBox/ItemRow/ItemSlot1,
-	$MainMargin/MainVBox/ItemRow/ItemSlot2,
-	$MainMargin/MainVBox/ItemRow/ItemSlot3,
-	$MainMargin/MainVBox/ItemRow/ItemSlot4,
-	$MainMargin/MainVBox/ItemRow/ItemSlot5,
-	$MainMargin/MainVBox/ItemRow/ItemSlot6,
-	$MainMargin/MainVBox/ItemRow/ItemSlot7,
-	$MainMargin/MainVBox/ItemRow/ItemSlot8,
-]
+var item_slots: Array = []
 
 var _pulse_t: float = 0.0
 var _pulsing: bool = false
@@ -40,6 +30,7 @@ var _hp_max_val: int = 1
 
 
 func _ready() -> void:
+	theme = GameTheme.create()
 	if minimap_button != null:
 		minimap_button.pressed.connect(func(): minimap_pressed.emit())
 	if zoom_in_button != null:

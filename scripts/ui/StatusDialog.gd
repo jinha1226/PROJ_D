@@ -439,39 +439,34 @@ static func _portrait_stack(player: Player) -> Control:
 	var layers := Control.new()
 	layers.custom_minimum_size = Vector2(160, 200)
 	panel.add_child(layers)
-	_add_portrait_layer(layers, player._base_tex)
-	var sprite_dir := ""
-	if player._base_tex != null and player._base_tex.resource_path != "":
-		sprite_dir = player._base_tex.resource_path.get_base_dir()
-	if sprite_dir != "":
-		# Always-on base overlays (head, hair)
-		for fname in Player._BASE_OVERLAY_FILES:
-			var bpath: String = sprite_dir + "/" + fname + ".png"
-			if ResourceLoader.exists(bpath):
-				var btex := load(bpath) as Texture2D
-				if btex != null:
-					_add_portrait_layer(layers, btex)
-		# Equipment-conditional overlays
-		for pair in _EQUIP_LAYERS:
-			var slot_val: String = player.get(pair[0]) if pair[0] in player else ""
-			if slot_val == "":
-				continue
-			var slot_name: String = pair[1] as String
-			var base_id: String = ItemRegistry.base_id_of(slot_val) if ItemRegistry != null else slot_val
-			var mapped: String = ""
-			if slot_name == "sword":
-				mapped = Player._WEAPON_OVERLAY_MAP.get(base_id, "")
-			elif slot_name == "armor":
-				mapped = Player._ARMOR_OVERLAY_MAP.get(base_id, "")
-			var path: String = sprite_dir + "/" + (mapped if mapped != "" else slot_name) + ".png"
-			if ResourceLoader.exists(path):
-				var tex := load(path) as Texture2D
-				if tex != null:
-					_add_portrait_layer(layers, tex)
-	else:
-		_add_portrait_layer(layers, player._body_doll_tex)
-		_add_portrait_layer(layers, player._hand1_doll_tex)
-		_add_portrait_layer(layers, player._hand2_doll_tex)
+	# Body base — race-correct via PlayerRenderer static helpers
+	var race_id: String = GameManager.selected_race_id if GameManager != null else "human"
+	var body_tex := PlayerRenderer.load_ulpc_tex(PlayerRenderer.race_body_path(race_id))
+	_add_portrait_layer(layers, body_tex)
+	# Always-on overlays (head, ears, hair) — race-specific
+	for full_path in PlayerRenderer.race_head_overlays(race_id):
+		var btex := PlayerRenderer.load_ulpc_tex(full_path)
+		if btex != null:
+			_add_portrait_layer(layers, btex)
+	# Equipment-conditional overlays
+	for pair in _EQUIP_LAYERS:
+		var slot_val: String = player.get(pair[0]) if pair[0] in player else ""
+		if slot_val == "":
+			continue
+		var base_id: String = ItemRegistry.base_id_of(slot_val) if ItemRegistry != null else slot_val
+		var path: String = PlayerRenderer.ulpc_overlay_path(pair[1] as String, base_id)
+		if path != "":
+			var tex := PlayerRenderer.load_ulpc_tex(path)
+			if tex != null:
+				_add_portrait_layer(layers, tex)
+	# Armor legs overlay
+	if player.equipped_armor_id != "":
+		var armor_base: String = ItemRegistry.base_id_of(player.equipped_armor_id) if ItemRegistry != null else player.equipped_armor_id
+		var legs_path: String = PlayerRenderer.ulpc_overlay_path("legs", armor_base)
+		if legs_path != "":
+			var tex := PlayerRenderer.load_ulpc_tex(legs_path)
+			if tex != null:
+				_add_portrait_layer(layers, tex)
 	if player != null and "body_wounds" in player:
 		_add_wound_overlay(layers, player.body_wounds)
 	return panel

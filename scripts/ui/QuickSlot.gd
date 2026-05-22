@@ -25,6 +25,7 @@ var _dragged: bool = false
 
 func _ready() -> void:
 	add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+	GameTheme.apply_slot_style(self)
 	button_down.connect(_on_button_down)
 	button_up.connect(_on_button_up)
 	pressed.connect(_on_pressed)
@@ -79,6 +80,8 @@ func set_item(icon: Texture2D, text: String) -> void:
 	if label:
 		label.text = text
 	self.text = "" if icon != null else "+"
+	remove_theme_color_override("font_color")
+	self_modulate = Color(1, 1, 1, 1)
 
 
 ## New API used for consumable quickslots: show a short label tinted with
@@ -91,6 +94,8 @@ func set_slot_display(txt: String, color: Color) -> void:
 	if txt == "":
 		text = "+"
 		self_modulate = Color(1, 1, 1, 1)
+		remove_theme_color_override("font_color")
 	else:
 		text = txt
-		self_modulate = Color(color.r, color.g, color.b, 1.0).lerp(Color(1, 1, 1, 1), 0.3)
+		self_modulate = Color(1, 1, 1, 1)
+		add_theme_color_override("font_color", Color(color.r, color.g, color.b, 1.0).lerp(Color.WHITE, 0.2))

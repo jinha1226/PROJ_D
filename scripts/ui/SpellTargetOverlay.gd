@@ -16,6 +16,8 @@ func set_target(pos: Vector2i) -> void:
 	queue_redraw()
 
 func _compute_hit_tiles(spell: SpellData, player: Player, valid: Array) -> Array:
+	if spell == null:
+		return []
 	match spell.effect:
 		"aoe_damage":
 			var result := []
@@ -66,6 +68,8 @@ func _draw() -> void:
 				Color(1.0, 0.95, 0.0, 1.0), false, 2.5)
 
 func _effect_color() -> Color:
+	if _spell == null:
+		return Color(1.0, 0.85, 0.3)  # throw: warm yellow
 	match _spell.effect:
 		"damage":       return Color(0.5, 0.7, 1.0)
 		"multi_damage": return Color(0.75, 0.55, 1.0)

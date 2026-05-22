@@ -115,22 +115,21 @@ func _make_portrait(data: RaceData) -> Control:
 	if data.menu_portrait_path != "" and ResourceLoader.exists(data.menu_portrait_path):
 		_add_layer(cont, data.menu_portrait_path, dim)
 	else:
-		if data.base_sprite_path != "" and ResourceLoader.exists(data.base_sprite_path):
-			_add_layer(cont, data.base_sprite_path, dim)
-			# Always-on overlays (head, hair) from same sprite dir
-			var sprite_dir: String = data.base_sprite_path.get_base_dir()
-			for fname in Player._BASE_OVERLAY_FILES:
-				var overlay_path: String = sprite_dir + "/" + fname + ".png"
-				if ResourceLoader.exists(overlay_path):
-					_add_layer(cont, overlay_path, dim)
-		else:
-			_add_layer(cont, _DEFAULT_BODY, dim)
+		# ULPC-based portrait: body + race-specific head/hair overlays
+		_add_layer_ulpc(cont, PlayerRenderer.race_body_path(data.id), dim)
+		for full_path in PlayerRenderer.race_head_overlays(data.id):
+			_add_layer_ulpc(cont, full_path, dim)
 	return cont
+
+func _add_layer_ulpc(parent: Control, path: String, dim: bool) -> void:
+	_apply_layer(parent, PlayerRenderer.load_ulpc_tex(path), dim)
 
 func _add_layer(parent: Control, path: String, dim: bool) -> void:
 	if not ResourceLoader.exists(path):
 		return
-	var tex := load(path) as Texture2D
+	_apply_layer(parent, load(path) as Texture2D, dim)
+
+func _apply_layer(parent: Control, tex: Texture2D, dim: bool) -> void:
 	if tex == null:
 		return
 	var rect := TextureRect.new()

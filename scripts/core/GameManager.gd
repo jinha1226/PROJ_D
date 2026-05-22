@@ -146,6 +146,10 @@ func load_run() -> bool:
 		branch_floor_cache = SaveCodec.decode_cache_dict(bfc_raw, false)
 	else:
 		branch_floor_cache.clear()
+	# Party state.
+	var party_raw = data.get("party", null)
+	if party_raw is Dictionary:
+		PartyManager.load_state(party_raw)
 	run_in_progress = true
 	return true
 
