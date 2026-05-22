@@ -351,7 +351,8 @@ func tick_statuses() -> void:
 		_regen_wound_ticker = 0
 	if not statuses.is_empty() or not expired.is_empty():
 		emit_signal("stats_changed")
-	EssenceSystem.tick(self)
+	if self is Player:
+		EssenceSystem.tick(self)
 
 func _heal_one_light_wound() -> void:
 	var light_parts: Array = []
