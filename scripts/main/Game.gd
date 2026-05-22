@@ -801,6 +801,22 @@ func _tile_free_of_actors(pos: Vector2i) -> bool:
 	return true
 
 
+## Called by NPCInfoDialog when the player successfully recruits an NPC.
+## Converts the NPCActor into a Companion node in-place and removes the NPC.
+func spawn_recruited_companion(npc: NPCActor) -> void:
+	var cdata: CompanionData = npc.to_companion_data()
+	PartyManager.recruit(cdata)
+	var companion := CompanionScene.new()
+	companion.name = "Companion_" + cdata.id
+	add_child(companion)
+	companion.setup(cdata, map, npc.grid_pos)
+	_companions.append(companion)
+	TurnManager.register_actor(companion)
+	TurnManager.unregister_actor(npc)
+	npc.remove_from_group("npcs")
+	npc.queue_free()
+
+
 func _on_companion_died(companion_node: Companion) -> void:
 	TurnManager.unregister_actor(companion_node)
 	_companions.erase(companion_node)
@@ -1255,6 +1271,8 @@ func _refresh_entity_visibility() -> void:
 	for n in get_tree().get_nodes_in_group("monsters"):
 		if n is Monster:
 			n.visible = map.visible_tiles.has(n.grid_pos)
+	for n in get_tree().get_nodes_in_group("npcs"):
+		n.visible = map.visible_tiles.has(n.grid_pos)
 	for n in get_tree().get_nodes_in_group("floor_items"):
 		if n is FloorItem:
 			n.visible = map.explored.has(n.grid_pos)

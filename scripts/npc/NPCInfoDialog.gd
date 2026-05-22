@@ -60,10 +60,26 @@ static func show_for(npc: NPCActor, player: Player, game_node: Node) -> void:
 
 	body.add_child(HSeparator.new())
 
-	# Attack button — only shown when player is adjacent
+	# Buttons — only shown when player is adjacent
 	var dist: int = max(abs(npc.grid_pos.x - player.grid_pos.x),
 						abs(npc.grid_pos.y - player.grid_pos.y))
 	if dist <= 1:
+		# Recruit button — trust >= 0 and party not full
+		var trust: float = npc._relation_trust(player)
+		var pm: Node = npc.get_node_or_null("/root/PartyManager")
+		if trust >= 0.0 and pm != null and pm.can_recruit():
+			var chance_pct: int = int(min(100.0, (0.5 + trust) * 100.0))
+			var rec_btn := Button.new()
+			rec_btn.text = "Recruit (%d%%)" % chance_pct
+			rec_btn.add_theme_color_override("font_color", Color(0.4, 1.0, 0.5))
+			rec_btn.add_theme_font_size_override("font_size", 22)
+			rec_btn.pressed.connect(func():
+				dlg.close()
+				_do_recruit(npc, player, game_node)
+			)
+			body.add_child(rec_btn)
+
+		# Attack button
 		var atk_btn := Button.new()
 		atk_btn.text = "Attack"
 		atk_btn.add_theme_color_override("font_color", Color(1.0, 0.4, 0.3))
@@ -100,4 +116,23 @@ static func _do_attack(npc: NPCActor, player: Player, game_node: Node) -> void:
 		npc.set_relation(player, -1.0, 0.8)
 		npc._current_plan = []  # force replan toward new goal
 
+	TurnManager.end_player_turn(Status.speed_mult(player))
+
+## Attempt to recruit the NPC as a companion.
+## Probability: trust=0 → 50%, each +0.1 trust → +10% (caps at 100% at trust≥0.5).
+static func _do_recruit(npc: NPCActor, player: Player, game_node: Node) -> void:
+	if not is_instance_valid(npc) or npc.hp <= 0:
+		return
+	var trust: float = npc._relation_trust(player)
+	var chance: float = min(1.0, 0.5 + trust)
+	if randf() < chance:
+		if game_node.has_method("spawn_recruited_companion"):
+			game_node.spawn_recruited_companion(npc)
+		CombatLog.post(
+			"%s가 동료로 합류했습니다!" % npc.npc_name,
+			Color(0.4, 1.0, 0.5))
+	else:
+		CombatLog.post(
+			"%s가 거절했습니다." % npc.npc_name,
+			Color(0.65, 0.65, 0.65))
 	TurnManager.end_player_turn(Status.speed_mult(player))

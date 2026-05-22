@@ -75,6 +75,7 @@ func take_turn() -> void:
 	var world_state := _build_world_state()
 	var goal := goal_selector.select_goal(world_state)
 	if goal.is_empty():
+		_wander()
 		return
 	# Replan when goal shifts or current plan is exhausted / invalidated
 	if _current_plan.is_empty() or goal != _current_goal:
@@ -109,13 +110,13 @@ func _update_perception() -> void:
 		if _known_enemy == null or _chebyshev(node.grid_pos, grid_pos) < _chebyshev(_known_enemy.grid_pos, grid_pos):
 			_known_enemy = node
 
-	# Player — treat as enemy if trust is negative
+	# Player — always overrides monster target when trust is sufficiently negative.
+	# Ensures counter-attack fires even when monsters are in FOV.
 	for node in get_tree().get_nodes_in_group("player"):
 		if not is_instance_valid(node) or not fov.has(node.grid_pos):
 			continue
 		if _relation_trust(node) < -0.3:
-			if _known_enemy == null:
-				_known_enemy = node
+			_known_enemy = node
 
 	# Nearest floor item in FOV (duck-typed: needs grid_pos)
 	for node in get_tree().get_nodes_in_group("floor_items"):
@@ -181,6 +182,50 @@ func _has_potential_ally() -> bool:
 		if node is NPCActor and _relation_trust(node) >= 0.0:
 			return true
 	return false
+
+## Build a CompanionData snapshot from this NPC's current stats and equipment.
+## Used when the player successfully recruits this NPC as a companion.
+func to_companion_data() -> CompanionData:
+	var c := CompanionData.new()
+	c.id = "npc_" + str(get_instance_id())
+	c.display_name = npc_name
+	c.race_id = "human"
+	c.job_id = "fighter"
+	c.hp_max = hp_max
+	c.mp_max = mp_max
+	c.strength = strength
+	c.dexterity = dexterity
+	c.intelligence = intelligence
+	c.ac = ac
+	c.ev = ev
+	c.xl = xl
+	c.xp = xp
+	c.skills = skills.duplicate(true)
+	c.equipped_weapon_id = equipped_weapon_id
+	c.equipped_armor_id = equipped_armor_id
+	c.equipped_shield_id = equipped_shield_id
+	c.equipped_helmet_id = equipped_helmet_id
+	c.equipped_gloves_id = equipped_gloves_id
+	c.equipped_boots_id = equipped_boots_id
+	c.equipped_ring_id = equipped_ring_id
+	c.equipped_amulet_id = equipped_amulet_id
+	return c
+
+## Random adjacent move when idle (no goal). ~33% chance per turn.
+func _wander() -> void:
+	if randi() % 3 != 0:
+		return
+	var dirs := [Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1, 0),
+				 Vector2i(1, 1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(-1, -1)]
+	dirs.shuffle()
+	for d: Vector2i in dirs:
+		var p := grid_pos + d
+		if _map.in_bounds(p) and _map.is_walkable(p) and not _is_pos_occupied(p):
+			grid_pos = p
+			position = _map.grid_to_world(p)
+			facing = d
+			emit_signal("moved", p)
+			return
 
 ## Returns true if pos is occupied by any actor (monster, player, or NPC).
 ## Used by movement actions to prevent overlap.
