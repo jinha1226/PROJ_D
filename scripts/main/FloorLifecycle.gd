@@ -49,7 +49,13 @@ func _generate_floor(depth: int, map_seed: int,
 			already_cleared = GameManager.branches_cleared.has(bid)
 		var zone: Dictionary = ZoneManager.zone_for_depth(depth)
 		var zone_style: String = "temple" if depth == 3 else String(zone.get("map_style", "bsp"))
-		host.map.generate(map_seed, has_branch and not already_cleared, zone_style)
+		var fixed_path: String = _fixed_map_path_for_depth(depth)
+		var used_fixed: bool = false
+		if fixed_path != "":
+			used_fixed = host.map.generate_fixed_from_file(
+					fixed_path, depth, has_branch and not already_cleared)
+		if not used_fixed:
+			host.map.generate(map_seed, has_branch and not already_cleared, zone_style)
 		if has_branch and not already_cleared:
 			var ecfg: Dictionary = ZoneManager.branch_config(bid)
 			var etex_path: String = String(ecfg.get("entrance_tile", ""))
@@ -66,7 +72,9 @@ func _generate_floor(depth: int, map_seed: int,
 		else:
 			host._spawn_service._spawn_monsters_for_floor(depth)
 			host._spawn_service._spawn_npcs_for_floor(10)
-		host._scatter_hazard_tiles(zone.get("env", ""))
+		# Fixed maps author hazard tiles via ASCII (~, ^) — skip scatter to avoid overwrite.
+		if not used_fixed:
+			host._scatter_hazard_tiles(zone.get("env", ""))
 		# Shop placement — reset each new floor, then conditionally place.
 		host._shop_items = []
 		host._shop_tile_pos = Vector2i(-1, -1)
@@ -80,6 +88,8 @@ func _cache_current_floor() -> void:
 		return
 	var state: Dictionary = {
 		"tiles": PackedByteArray(host.map.tiles),
+		"grid_w": host.map.GRID_W,
+		"grid_h": host.map.GRID_H,
 		"explored": host.map.explored.duplicate(true),
 		"spawn_pos": host.map.spawn_pos,
 		"stairs_down_pos": host.map.stairs_down_pos,
@@ -130,6 +140,8 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 	host._spawn_service._clear_monsters()
 	host._spawn_service._clear_floor_items()
 	var state: Dictionary = GameManager.floor_cache[depth]
+	host.map.GRID_W = int(state.get("grid_w", DungeonMap.DEFAULT_GRID_W))
+	host.map.GRID_H = int(state.get("grid_h", DungeonMap.DEFAULT_GRID_H))
 	host.map.tiles = state.tiles
 	host.map.explored = state.explored.duplicate(true)
 	host.map.spawn_pos = state.spawn_pos
@@ -250,3 +262,15 @@ func _top_up_monsters_to_target(depth: int) -> void:
 		TurnManager.register_actor(m)
 		host._spawn_service._roll_monster_weapon(m)
 		current += 1
+
+## Returns path to the authored ASCII map for a main-dungeon depth, or "" to use procedural.
+## Branch floors are handled separately in Game._generate_branch_floor().
+func _fixed_map_path_for_depth(depth: int) -> String:
+	const MAIN_MAPS: Dictionary = {
+		1: "res://resources/maps/ascii/main_catacombs.txt",
+		2: "res://resources/maps/ascii/main_lair.txt",
+		3: "res://resources/maps/ascii/main_orc_mines.txt",
+		4: "res://resources/maps/ascii/main_elven_halls.txt",
+		5: "res://resources/maps/ascii/main_abyss.txt",
+	}
+	return String(MAIN_MAPS.get(depth, ""))

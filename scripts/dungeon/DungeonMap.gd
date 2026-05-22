@@ -13,9 +13,11 @@ enum Tile {
 	SHOP = 7,
 }
 
-const GRID_W: int = 42
-const GRID_H: int = 47
+var GRID_W: int = 42
+var GRID_H: int = 47
 const CELL_SIZE: int = 32
+const DEFAULT_GRID_W: int = 42
+const DEFAULT_GRID_H: int = 47
 
 const TEX_STAIRS_UP: Texture2D = preload(
 	"res://assets/tiles/individual/dngn/gateways/metal_stairs_up.png")
@@ -244,6 +246,45 @@ func generate(map_seed: int = -1, branch_entrance: bool = false, style: String =
 	_load_atmosphere(GameManager.depth)
 	queue_redraw()
 
+## Load a fixed layout from an authored ASCII map file.
+## Returns false if file cannot be opened (caller should fall back to generate()).
+func generate_fixed_from_file(file_path: String, depth: int,
+		branch_entrance: bool = false) -> bool:
+	var f := FileAccess.open(file_path, FileAccess.READ)
+	if f == null:
+		push_warning("DungeonMap: fixed map not found: %s" % file_path)
+		return false
+	var lines: PackedStringArray = []
+	while not f.eof_reached():
+		var line: String = f.get_line()
+		lines.append(line)
+	f.close()
+	var result: Dictionary = MapGen.generate_fixed(lines, branch_entrance)
+	if result.is_empty():
+		return false
+	GRID_W = result["width"]
+	GRID_H = result["height"]
+	tiles = result["tiles"]
+	spawn_pos = result["spawn"]
+	stairs_down_pos = result["stairs_down"]
+	extra_stairs_down_positions.assign(result.get("extra_stairs_down", []))
+	stairs_up_pos = result["stairs_up"]
+	rooms = result["rooms"]
+	altar_map.clear()
+	broken_altar_positions.clear()
+	preset_faith_altar_positions.clear()
+	altar_active = false
+	visible_tiles.clear()
+	explored.clear()
+	fog_tiles.clear()
+	corpses.clear()
+	# Inject ASCII-authored hazard tiles (~ = bog, ^ = lava).
+	hazard_tiles = result.get("hazard_tiles", {})
+	cloud_tiles.clear()
+	_load_atmosphere(depth)
+	queue_redraw()
+	return true
+
 func activate_altars() -> void:
 	altar_active = true
 	queue_redraw()
@@ -281,21 +322,27 @@ func find_spawn() -> Vector2i:
 func random_floor_tile(rng: RandomNumberGenerator = null) -> Vector2i:
 	if rooms.is_empty():
 		return spawn_pos
-	var room_idx: int
-	if rng != null:
-		room_idx = rng.randi_range(0, rooms.size() - 1)
-	else:
-		room_idx = randi_range(0, rooms.size() - 1)
-	var room: Rect2i = rooms[room_idx]
-	var x: int
-	var y: int
-	if rng != null:
-		x = rng.randi_range(room.position.x, room.position.x + room.size.x - 1)
-		y = rng.randi_range(room.position.y, room.position.y + room.size.y - 1)
-	else:
-		x = randi_range(room.position.x, room.position.x + room.size.x - 1)
-		y = randi_range(room.position.y, room.position.y + room.size.y - 1)
-	return Vector2i(x, y)
+	var attempts: int = 0
+	while attempts < 64:
+		attempts += 1
+		var room_idx: int
+		if rng != null:
+			room_idx = rng.randi_range(0, rooms.size() - 1)
+		else:
+			room_idx = randi_range(0, rooms.size() - 1)
+		var room: Rect2i = rooms[room_idx]
+		var x: int
+		var y: int
+		if rng != null:
+			x = rng.randi_range(room.position.x, room.position.x + room.size.x - 1)
+			y = rng.randi_range(room.position.y, room.position.y + room.size.y - 1)
+		else:
+			x = randi_range(room.position.x, room.position.x + room.size.x - 1)
+			y = randi_range(room.position.y, room.position.y + room.size.y - 1)
+		var p := Vector2i(x, y)
+		if is_walkable(p):
+			return p
+	return spawn_pos
 
 func set_fov(new_visible: Dictionary) -> int:
 	# Returns the count of tiles that transitioned from unexplored → explored

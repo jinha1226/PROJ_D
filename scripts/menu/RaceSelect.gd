@@ -156,7 +156,7 @@ func _apply_layer(parent: Control, tex: Texture2D, dim: bool, tint: Color = Colo
 	rect.anchor_right = 1.0
 	rect.anchor_bottom = 1.0
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	rect.modulate = dim ? Color(0.4, 0.4, 0.45, 1) : tint
+	rect.modulate = Color(0.4, 0.4, 0.45, 1) if dim else tint
 	parent.add_child(rect)
 
 # 9-skill visible aptitude row. Each cell aggregates the race's

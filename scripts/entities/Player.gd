@@ -819,8 +819,8 @@ func _teleport_far() -> void:
 		return
 	for _i in range(80):
 		var p := Vector2i(
-			randi_range(1, DungeonMap.GRID_W - 2),
-			randi_range(1, DungeonMap.GRID_H - 2))
+			randi_range(1, _map.GRID_W - 2),
+			randi_range(1, _map.GRID_H - 2))
 		if not _map.is_walkable(p):
 			continue
 		if _monster_at(p) != null:
@@ -837,8 +837,8 @@ func _teleport_far() -> void:
 func _reveal_map() -> void:
 	if _map == null:
 		return
-	for y in range(DungeonMap.GRID_H):
-		for x in range(DungeonMap.GRID_W):
+	for y in range(_map.GRID_H):
+		for x in range(_map.GRID_W):
 			var p := Vector2i(x, y)
 			if _map.tile_at(p) != DungeonMap.Tile.WALL:
 				_map.explored[p] = true

@@ -9,19 +9,21 @@ const SCALE: int = 2
 
 static func render_from_state(state: Dictionary, scale_override: int = -1) -> ImageTexture:
 	var scale: int = scale_override if scale_override > 0 else SCALE
-	var w: int = DungeonMap.GRID_W * scale
-	var h: int = DungeonMap.GRID_H * scale
+	var gw: int = int(state.get("grid_w", DungeonMap.DEFAULT_GRID_W))
+	var gh: int = int(state.get("grid_h", DungeonMap.DEFAULT_GRID_H))
+	var w: int = gw * scale
+	var h: int = gh * scale
 	var img: Image = Image.create(w, h, false, Image.FORMAT_RGBA8)
 	img.fill(Color(0, 0, 0, 0))
 	var tiles: PackedByteArray = state.get("tiles", PackedByteArray())
 	var explored: Dictionary = state.get("explored", {})
 	if tiles.size() > 0:
-		for y in range(DungeonMap.GRID_H):
-			for x in range(DungeonMap.GRID_W):
+		for y in range(gh):
+			for x in range(gw):
 				var pos := Vector2i(x, y)
 				if not explored.has(pos):
 					continue
-				var t: int = tiles[y * DungeonMap.GRID_W + x]
+				var t: int = tiles[y * gw + x]
 				_plot(img, x * scale, y * scale, scale, _tile_color(t, false))
 	return ImageTexture.create_from_image(img)
 
@@ -29,13 +31,13 @@ static func render_from_state(state: Dictionary, scale_override: int = -1) -> Im
 static func render(map: DungeonMap, player: Player, game: Node,
 		scale_override: int = -1) -> ImageTexture:
 	var scale: int = scale_override if scale_override > 0 else SCALE
-	var w: int = DungeonMap.GRID_W * scale
-	var h: int = DungeonMap.GRID_H * scale
+	var w: int = map.GRID_W * scale
+	var h: int = map.GRID_H * scale
 	var img: Image = Image.create(w, h, false, Image.FORMAT_RGBA8)
 	img.fill(Color(0, 0, 0, 0))
 
-	for y in range(DungeonMap.GRID_H):
-		for x in range(DungeonMap.GRID_W):
+	for y in range(map.GRID_H):
+		for x in range(map.GRID_W):
 			var pos := Vector2i(x, y)
 			if not map.explored.has(pos):
 				continue

@@ -675,3 +675,151 @@ static func _farthest_floor(origin: Vector2i, tiles: PackedByteArray,
 			dist[n] = d + 1
 			frontier.append(n)
 	return farthest
+
+
+# ── Fixed ASCII map loader ─────────────────────────────────────────────────
+
+## Parse an authored ASCII map into the same dict format as generate_styled().
+## Supported legend chars:
+##   # = WALL   . , = FLOOR   ~ = bog (FLOOR + hazard)   ^ = lava (FLOOR + hazard)
+##   + = DOOR_CLOSED   / = DOOR_OPEN   < = STAIRS_UP (spawn)
+##   > = STAIRS_DOWN   B = BRANCH_DOWN   S = SHOP   space = WALL
+static func generate_fixed(lines: PackedStringArray,
+		branch_entrance: bool = false) -> Dictionary:
+	# Determine map dimensions from the content.
+	var height: int = 0
+	var width: int = 0
+	for line in lines:
+		if line.length() > 0:
+			height += 1
+			width = max(width, line.length())
+	if width <= 0 or height <= 0:
+		return {}
+
+	var tiles := PackedByteArray()
+	tiles.resize(width * height)
+	for i in tiles.size():
+		tiles[i] = DungeonMap.Tile.WALL
+
+	var hazard_tiles: Dictionary = {}
+	var spawn: Vector2i = Vector2i(1, 1)
+	var stairs_down: Vector2i = Vector2i(width - 2, height - 2)
+	var extra_stairs_down: Array[Vector2i] = []
+	var branch_pos: Vector2i = Vector2i(-1, -1)
+	var found_spawn: bool = false
+	var found_down: bool = false
+
+	var y: int = 0
+	for line in lines:
+		if line.length() == 0:
+			y += 1
+			continue
+		for x in line.length():
+			var ch: String = line[x]
+			var idx: int = y * width + x
+			match ch:
+				"#", " ":
+					tiles[idx] = DungeonMap.Tile.WALL
+				".", ",":
+					tiles[idx] = DungeonMap.Tile.FLOOR
+				"~":
+					tiles[idx] = DungeonMap.Tile.FLOOR
+					hazard_tiles[Vector2i(x, y)] = "shallow_water"
+				"^":
+					tiles[idx] = DungeonMap.Tile.FLOOR
+					hazard_tiles[Vector2i(x, y)] = "lava"
+				"+":
+					tiles[idx] = DungeonMap.Tile.DOOR_CLOSED
+				"/":
+					tiles[idx] = DungeonMap.Tile.DOOR_OPEN
+				"<":
+					tiles[idx] = DungeonMap.Tile.STAIRS_UP
+					if not found_spawn:
+						spawn = Vector2i(x, y)
+						found_spawn = true
+				">":
+					tiles[idx] = DungeonMap.Tile.STAIRS_DOWN
+					if not found_down:
+						stairs_down = Vector2i(x, y)
+						found_down = true
+					else:
+						extra_stairs_down.append(Vector2i(x, y))
+				"B":
+					if branch_entrance:
+						tiles[idx] = DungeonMap.Tile.BRANCH_DOWN
+					else:
+						tiles[idx] = DungeonMap.Tile.FLOOR
+					branch_pos = Vector2i(x, y)
+				"S":
+					tiles[idx] = DungeonMap.Tile.SHOP
+				_:
+					tiles[idx] = DungeonMap.Tile.FLOOR
+		y += 1
+
+	var rooms: Array[Rect2i] = _extract_rooms_from_fixed(tiles, width, height)
+
+	return {
+		"tiles": tiles,
+		"width": width,
+		"height": height,
+		"spawn": spawn,
+		"stairs_down": stairs_down,
+		"extra_stairs_down": extra_stairs_down,
+		"stairs_up": spawn,
+		"rooms": rooms,
+		"branch_pos": branch_pos,
+		"hazard_tiles": hazard_tiles,
+	}
+
+
+## Flood-fill floor regions into approximate rectangular rooms for spawn use.
+## Caps at MAX_ROOMS to keep the rooms array small.
+static func _extract_rooms_from_fixed(tiles: PackedByteArray,
+		width: int, height: int) -> Array[Rect2i]:
+	const MAX_ROOMS: int = 32
+	const MIN_REGION_SIZE: int = 6
+	var visited := PackedByteArray()
+	visited.resize(width * height)
+
+	var rooms: Array[Rect2i] = []
+
+	for sy in height:
+		for sx in width:
+			var si: int = sy * width + sx
+			if visited[si] != 0:
+				continue
+			if tiles[si] == DungeonMap.Tile.WALL:
+				continue
+			# BFS to collect this connected floor region.
+			var cells: Array[Vector2i] = []
+			var frontier: Array[Vector2i] = [Vector2i(sx, sy)]
+			visited[si] = 1
+			while not frontier.is_empty():
+				var p: Vector2i = frontier.pop_back()
+				cells.append(p)
+				for step in [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1)]:
+					var n: Vector2i = p + step
+					if n.x < 0 or n.y < 0 or n.x >= width or n.y >= height:
+						continue
+					var ni: int = n.y * width + n.x
+					if visited[ni] != 0:
+						continue
+					visited[ni] = 1
+					if tiles[ni] != DungeonMap.Tile.WALL:
+						frontier.append(n)
+			if cells.size() < MIN_REGION_SIZE:
+				continue
+			# Compute bounding rect of this region.
+			var min_x: int = cells[0].x
+			var min_y: int = cells[0].y
+			var max_x: int = cells[0].x
+			var max_y: int = cells[0].y
+			for c in cells:
+				min_x = min(min_x, c.x)
+				min_y = min(min_y, c.y)
+				max_x = max(max_x, c.x)
+				max_y = max(max_y, c.y)
+			rooms.append(Rect2i(min_x, min_y, max_x - min_x + 1, max_y - min_y + 1))
+			if rooms.size() >= MAX_ROOMS:
+				return rooms
+	return rooms

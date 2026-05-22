@@ -1117,11 +1117,11 @@ func _spawn_final_boss_floor() -> void:
 		push_error("abyssal_sovereign MonsterData not found!")
 		return
 	# Place boss in center of map, away from spawn
-	var center := Vector2i(DungeonMap.GRID_W / 2, DungeonMap.GRID_H / 2)
+	var center := Vector2i(map.GRID_W / 2, map.GRID_H / 2)
 	var best := center
 	var best_d: int = 0
-	for y in range(DungeonMap.GRID_H):
-		for x in range(DungeonMap.GRID_W):
+	for y in range(map.GRID_H):
+		for x in range(map.GRID_W):
 			var p := Vector2i(x, y)
 			if map.tile_at(p) != DungeonMap.Tile.FLOOR:
 				continue
@@ -1145,8 +1145,8 @@ func _spawn_final_boss_floor() -> void:
 	for attempt in range(40):
 		if spawned >= 4:
 			break
-		var rx: int = randi_range(1, DungeonMap.GRID_W - 2)
-		var ry: int = randi_range(1, DungeonMap.GRID_H - 2)
+		var rx: int = randi_range(1, map.GRID_W - 2)
+		var ry: int = randi_range(1, map.GRID_H - 2)
 		var gp := Vector2i(rx, ry)
 		if map.tile_at(gp) != DungeonMap.Tile.FLOOR:
 			continue
@@ -1330,8 +1330,8 @@ func _on_minimap_tapped() -> void:
 		if local_pos.x < 0 or local_pos.y < 0 \
 				or local_pos.x >= disp.x or local_pos.y >= disp.y:
 			return
-		var gx := int(local_pos.x * DungeonMap.GRID_W / disp.x)
-		var gy := int(local_pos.y * DungeonMap.GRID_H / disp.y)
+		var gx := int(local_pos.x * map.GRID_W / disp.x)
+		var gy := int(local_pos.y * map.GRID_H / disp.y)
 		var nav_target := Vector2i(gx, gy)
 		if not map.in_bounds(nav_target) or not map.explored.has(nav_target) \
 				or not map.is_walkable(nav_target) or nav_target == player.grid_pos:
@@ -1749,6 +1749,8 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 	var cache_key: String = "%s_%d" % [branch_id, branch_floor]
 	if GameManager.branch_floor_cache.has(cache_key):
 		var state: Dictionary = GameManager.branch_floor_cache[cache_key]
+		map.GRID_W = int(state.get("grid_w", DungeonMap.DEFAULT_GRID_W))
+		map.GRID_H = int(state.get("grid_h", DungeonMap.DEFAULT_GRID_H))
 		map.tiles = state["tiles"]
 		map.explored = state["explored"].duplicate(true)
 		map.spawn_pos = state["spawn_pos"]
@@ -1827,7 +1829,14 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 	var cfg: Dictionary = ZoneManager.branch_config(branch_id)
 	var is_boss_floor: bool = (branch_floor >= int(cfg.get("floors", 4)))
 	var map_style: String = String(cfg.get("map_style", "bsp"))
-	map.generate(branch_seed, not is_boss_floor, map_style)
+	var branch_fixed_path: String = _fixed_branch_map_path(branch_id)
+	var branch_used_fixed: bool = false
+	if branch_fixed_path != "":
+		branch_used_fixed = map.generate_fixed_from_file(
+				branch_fixed_path, ZoneManager.branch_effective_depth(branch_id, branch_floor),
+				not is_boss_floor)
+	if not branch_used_fixed:
+		map.generate(branch_seed, not is_boss_floor, map_style)
 	# Boss floor: remove down stairs so player can't descend further.
 	# _on_branch_boss_died will later convert stairs_down_pos → STAIRS_UP.
 	if is_boss_floor:
@@ -1849,8 +1858,19 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 		_spawn_service._spawn_items_for_floor(eff_depth)
 		if branch_floor == 1:
 			_spawn_branch_resistance_hint(branch_id)
-	_scatter_hazard_tiles(cfg.get("env", ""))
+	if not branch_used_fixed:
+		_scatter_hazard_tiles(cfg.get("env", ""))
 	_refresh_fov()
+
+## Returns path to the authored ASCII map for a branch, or "" to use procedural.
+func _fixed_branch_map_path(branch_id: String) -> String:
+	const BRANCH_MAPS: Dictionary = {
+		"crypt":      "res://resources/maps/ascii/branch_crypt.txt",
+		"swamp":      "res://resources/maps/ascii/branch_swamp.txt",
+		"ice_caves":  "res://resources/maps/ascii/branch_ice_caves.txt",
+		"infernal":   "res://resources/maps/ascii/branch_infernal.txt",
+	}
+	return String(BRANCH_MAPS.get(branch_id, ""))
 
 ## Scatter persistent hazard tiles based on branch environment.
 func _scatter_hazard_tiles(env: String) -> void:
@@ -1868,8 +1888,8 @@ func _scatter_hazard_tiles(env: String) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = GameManager.seed ^ env.hash()
 	var floor_tiles: Array = []
-	for y in range(DungeonMap.GRID_H):
-		for x in range(DungeonMap.GRID_W):
+	for y in range(map.GRID_H):
+		for x in range(map.GRID_W):
 			var p := Vector2i(x, y)
 			if map.tile_at(p) == DungeonMap.Tile.FLOOR \
 					and not _is_reserved_map_feature(p):
@@ -1884,8 +1904,8 @@ func _scatter_hazard_tiles(env: String) -> void:
 func _spawn_abyss_floor(depth: int) -> void:
 	_abyss_turn_counter = 0
 	# Remove up stairs — no escape from the Abyss
-	for y in range(DungeonMap.GRID_H):
-		for x in range(DungeonMap.GRID_W):
+	for y in range(map.GRID_H):
+		for x in range(map.GRID_W):
 			var p := Vector2i(x, y)
 			if map.tile_at(p) == DungeonMap.Tile.STAIRS_UP:
 				map.set_tile(p, DungeonMap.Tile.FLOOR)
@@ -1926,8 +1946,8 @@ func _tick_abyss() -> void:
 	# Collect shiftable tiles (floor/wall, not player, not stairs, not monsters)
 	var occupied: Dictionary = {}
 	occupied[player.grid_pos] = true
-	for y in range(DungeonMap.GRID_H):
-		for x in range(DungeonMap.GRID_W):
+	for y in range(map.GRID_H):
+		for x in range(map.GRID_W):
 			var p := Vector2i(x, y)
 			var t: int = map.tile_at(p)
 			if t == DungeonMap.Tile.STAIRS_DOWN or t == DungeonMap.Tile.STAIRS_UP:
@@ -1937,8 +1957,8 @@ func _tick_abyss() -> void:
 			occupied[(node as Monster).grid_pos] = true
 	var visible_candidates: Array = []
 	var distant_candidates: Array = []
-	for y in range(1, DungeonMap.GRID_H - 1):
-		for x in range(1, DungeonMap.GRID_W - 1):
+	for y in range(1, map.GRID_H - 1):
+		for x in range(1, map.GRID_W - 1):
 			var p := Vector2i(x, y)
 			if occupied.has(p):
 				continue
@@ -1966,8 +1986,8 @@ func _tick_abyss() -> void:
 	var new_exit: Vector2i = _abyss_find_new_exit()
 	if new_exit != Vector2i(-1, -1):
 		# Clear old exits
-		for y in range(DungeonMap.GRID_H):
-			for x in range(DungeonMap.GRID_W):
+		for y in range(map.GRID_H):
+			for x in range(map.GRID_W):
 				if map.tile_at(Vector2i(x, y)) == DungeonMap.Tile.STAIRS_DOWN:
 					map.set_tile(Vector2i(x, y), DungeonMap.Tile.FLOOR)
 		map.stairs_down_pos = new_exit
@@ -2101,6 +2121,8 @@ func _cache_branch_floor(branch_id: String, branch_floor: int) -> void:
 	var cache_key: String = "%s_%d" % [branch_id, branch_floor]
 	var state: Dictionary = {
 		"tiles": PackedByteArray(map.tiles),
+		"grid_w": map.GRID_W,
+		"grid_h": map.GRID_H,
 		"explored": map.explored.duplicate(true),
 		"spawn_pos": map.spawn_pos,
 		"stairs_down_pos": map.stairs_down_pos,
