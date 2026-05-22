@@ -20,8 +20,8 @@ func execute(actor: NPCActor) -> bool:
 	return true
 
 func _step_toward(actor: NPCActor, target: Vector2i) -> Vector2i:
-	var dx := sign(target.x - actor.grid_pos.x)
-	var dy := sign(target.y - actor.grid_pos.y)
+	var dx: int = sign(target.x - actor.grid_pos.x)
+	var dy: int = sign(target.y - actor.grid_pos.y)
 	var candidates := [Vector2i(dx, dy), Vector2i(dx, 0), Vector2i(0, dy)]
 	for step: Vector2i in candidates:
 		if step == Vector2i.ZERO:
