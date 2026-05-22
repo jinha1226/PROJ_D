@@ -80,7 +80,7 @@ D:\PROJ_D\archive       (forthcoming) ship-time archives
 - `docs/audits/2026-05-05-codebase-audit.md` — full audit (Critical 4 / High 9 / Medium 11 / Low 5 + patterns)
 - `docs/refactoring_todo.md`
 - `docs/doc_update_protocol.md`
-- `docs/balance/expedition_balance_reference.md` — **current** balance spec (9-skill, 10-race, expedition model). Source: `/mnt/d/proj_g/expedition_roguelike_proto/scripts/systems/Expedition*Rules.gd`
+- `docs/balance/balance_reference.md` — **current** balance reference (current code as-is: 9-skill 0–9 scale, 10 races, 15 essences, 5 zones+4 branches)
 - `docs/balance/archive_pre_expedition/` — old 5-skill/class-system docs, do not consult
 - `docs/clean_room_reboot_guide.md` — historical, why oldproject/ exists
 - `docs/decision_log.md`
