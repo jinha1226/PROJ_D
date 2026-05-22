@@ -80,12 +80,8 @@ D:\PROJ_D\archive       (forthcoming) ship-time archives
 - `docs/audits/2026-05-05-codebase-audit.md` — full audit (Critical 4 / High 9 / Medium 11 / Low 5 + patterns)
 - `docs/refactoring_todo.md`
 - `docs/doc_update_protocol.md`
-- `docs/balance/claude_code_balance_handoff.md`
-- `docs/balance/claude_code_drop_table_handoff.md`
-- `docs/balance/claude_code_essence_and_resistance_handoff.md`
-- `docs/balance/claude_code_faith_and_essence_handoff.md`
-- `docs/balance/claude_code_first_boss_shrine_faith_flow.md`
-- `docs/balance/claude_code_ui_help_and_bestiary_handoff.md`
+- `docs/balance/expedition_balance_reference.md` — **current** balance spec (9-skill, 10-race, expedition model). Source: `/mnt/d/proj_g/expedition_roguelike_proto/scripts/systems/Expedition*Rules.gd`
+- `docs/balance/archive_pre_expedition/` — old 5-skill/class-system docs, do not consult
 - `docs/clean_room_reboot_guide.md` — historical, why oldproject/ exists
 - `docs/decision_log.md`
 - `docs/guides/` — workspace methodology guides (delegation, context, harness, skills)
