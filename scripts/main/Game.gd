@@ -1432,7 +1432,11 @@ func _try_respawn_monster() -> void:
 	if map == null or player == null or player.hp <= 0:
 		return
 	var current: int = get_tree().get_nodes_in_group("monsters").size()
-	var max_count: int = _spawn_service._monster_count_for_depth(GameManager.depth)
+	var branch_id: String = GameManager.branch_zone
+	var eff_depth: int = GameManager.depth
+	if branch_id != "":
+		eff_depth = ZoneManager.branch_effective_depth(branch_id, GameManager.branch_floor)
+	var max_count: int = _spawn_service._monster_count_for_depth(eff_depth)
 	if current >= max_count:
 		return
 	var attempts: int = 0
@@ -1445,7 +1449,11 @@ func _try_respawn_monster() -> void:
 			continue
 		if _monster_at(p) != null:
 			continue
-		var data: MonsterData = MonsterRegistry.pick_by_depth(GameManager.depth)
+		var data: MonsterData
+		if branch_id != "":
+			data = MonsterRegistry.pick_by_branch(branch_id, eff_depth)
+		else:
+			data = MonsterRegistry.pick_by_depth(eff_depth)
 		if data == null:
 			return
 		var m: Monster = MonsterScene.new()
