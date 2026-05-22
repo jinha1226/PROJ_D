@@ -93,6 +93,8 @@ func _input(event: InputEvent) -> void:
 		var dy: float = pos.y - _drag_start_y
 		if not _is_dragging and abs(dy) > DRAG_THRESHOLD_PX:
 			_is_dragging = true
+			# Cancel immediately so hold-timers don't fire after scroll.
+			_cancel_button_presses(_scroll)
 		if _is_dragging:
 			_scroll.scroll_vertical = _drag_start_scroll - int(dy)
 			get_viewport().set_input_as_handled()
@@ -120,5 +122,9 @@ func _cancel_button_presses(root: Node) -> void:
 		if child is BaseButton:
 			if child.button_pressed and not child.toggle_mode:
 				child.button_pressed = false
+			# Stop any hold-timers (long-press) inside the button.
+			for grandchild in child.get_children():
+				if grandchild is Timer:
+					grandchild.stop()
 		if child.get_child_count() > 0:
 			_cancel_button_presses(child)
