@@ -1,4 +1,4 @@
-class_name NPCInfoDialog
+class_name NPCInfoDialog extends RefCounted
 
 ## Opens a GameDialog showing an NPC's name, HP, and equipped items.
 ## Call NPCInfoDialog.show_for(npc, game_node) from _handle_tap.
