@@ -7,7 +7,7 @@ class_name CompanionAI extends RefCounted
 ##   3. Follow player if no enemies visible within FOLLOW_RANGE
 ##   4. Stay idle if already close enough to player
 
-const FOLLOW_RANGE: int = 3   # stop following once within this Chebyshev dist
+const FOLLOW_RANGE: int = 1   # stop following once adjacent to player
 const SIGHT_RANGE: int = 6    # companion's effective threat detection range
 
 

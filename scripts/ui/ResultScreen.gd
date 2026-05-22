@@ -55,9 +55,3 @@ func show_result(data: Dictionary) -> void:
 
 func _on_retry_pressed() -> void:
 	retry_pressed.emit()
-	# Fresh run — depth/identified/pseudonyms reset. Class selection is held in
-	# GameManager across the reload (Menu sets it before this screen shows).
-	var gm = get_node_or_null("/root/GameManager")
-	if gm != null:
-		gm.start_new_run()
-	get_tree().reload_current_scene()

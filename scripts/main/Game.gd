@@ -1639,6 +1639,7 @@ func _show_result_screen(victory: bool) -> void:
 func _on_result_retry(res: Node) -> void:
 	if is_instance_valid(res):
 		res.queue_free()
+	GameManager.start_new_run()
 	GameManager.selected_race_id = ""
 	get_tree().change_scene_to_file(TOWN_SCENE_PATH)
 

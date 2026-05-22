@@ -64,10 +64,10 @@ static func show_for(npc: NPCActor, player: Player, game_node: Node) -> void:
 	var dist: int = max(abs(npc.grid_pos.x - player.grid_pos.x),
 						abs(npc.grid_pos.y - player.grid_pos.y))
 	if dist <= 1:
-		# Recruit button — trust >= 0 and party not full
+		# Recruit button — trust >= 0, party not full, no prior failed attempt this floor
 		var trust: float = npc._relation_trust(player)
 		var pm: Node = npc.get_node_or_null("/root/PartyManager")
-		if trust >= 0.0 and pm != null and pm.can_recruit():
+		if trust >= 0.0 and pm != null and pm.can_recruit() and not npc.recruit_attempted:
 			var chance_pct: int = int(min(100.0, (0.5 + trust) * 100.0))
 			var rec_btn := Button.new()
 			rec_btn.text = "Recruit (%d%%)" % chance_pct
@@ -132,6 +132,7 @@ static func _do_recruit(npc: NPCActor, player: Player, game_node: Node) -> void:
 			"%s가 동료로 합류했습니다!" % npc.npc_name,
 			Color(0.4, 1.0, 0.5))
 	else:
+		npc.recruit_attempted = true
 		CombatLog.post(
 			"%s가 거절했습니다." % npc.npc_name,
 			Color(0.65, 0.65, 0.65))

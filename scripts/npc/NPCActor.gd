@@ -30,6 +30,10 @@ signal item_picked_up(entry: Dictionary, at_pos: Vector2i)
 ## Swap in a custom subclass of NPCGoalSelector to change personality.
 var goal_selector: NPCGoalSelector = null
 
+## Set to true after a failed recruit attempt. Hides the Recruit button for
+## the rest of this floor (resets automatically when the NPC is cleared on descent).
+var recruit_attempted: bool = false
+
 # ── internal AI state ─────────────────────────────────────────────────────────
 
 var _current_plan: Array = []   # Array of NPCAction
