@@ -116,20 +116,21 @@ func _make_portrait(data: RaceData) -> Control:
 		_add_layer(cont, data.menu_portrait_path, dim)
 	else:
 		# ULPC-based portrait: body + race-specific head/hair overlays
-		_add_layer_ulpc(cont, PlayerRenderer.race_body_path(data.id), dim)
+		var body_color: Color = PlayerRenderer.race_body_color(data.id)
+		_add_layer_ulpc(cont, PlayerRenderer.race_body_path(data.id), dim, body_color)
 		for full_path in PlayerRenderer.race_head_overlays(data.id):
-			_add_layer_ulpc(cont, full_path, dim)
+			_add_layer_ulpc(cont, full_path, dim, body_color)
 	return cont
 
-func _add_layer_ulpc(parent: Control, path: String, dim: bool) -> void:
-	_apply_layer(parent, PlayerRenderer.load_ulpc_tex(path), dim)
+func _add_layer_ulpc(parent: Control, path: String, dim: bool, tint: Color = Color.WHITE) -> void:
+	_apply_layer(parent, PlayerRenderer.load_ulpc_tex(path), dim, tint)
 
 func _add_layer(parent: Control, path: String, dim: bool) -> void:
 	if not ResourceLoader.exists(path):
 		return
 	_apply_layer(parent, load(path) as Texture2D, dim)
 
-func _apply_layer(parent: Control, tex: Texture2D, dim: bool) -> void:
+func _apply_layer(parent: Control, tex: Texture2D, dim: bool, tint: Color = Color.WHITE) -> void:
 	if tex == null:
 		return
 	var rect := TextureRect.new()
@@ -155,8 +156,7 @@ func _apply_layer(parent: Control, tex: Texture2D, dim: bool) -> void:
 	rect.anchor_right = 1.0
 	rect.anchor_bottom = 1.0
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if dim:
-		rect.modulate = Color(0.4, 0.4, 0.45, 1)
+	rect.modulate = dim ? Color(0.4, 0.4, 0.45, 1) : tint
 	parent.add_child(rect)
 
 # 9-skill visible aptitude row. Each cell aggregates the race's

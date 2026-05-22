@@ -8,6 +8,7 @@ var data: CompanionData
 var pending_energy: float = 0.0  # TurnManager energy accumulator
 
 var _body_tex: Texture2D = null
+var _body_color: Color = Color.WHITE
 var _head_textures: Array = []  # Array[Texture2D]
 var _anim_frame: int = 0
 var _anim_timer: float = 0.0
@@ -139,10 +140,10 @@ func _draw() -> void:
 	var dst_rect := Rect2(0.0, 0.0, cs, cs)
 
 	if _body_tex != null:
-		draw_texture_rect_region(_body_tex, dst_rect, src_rect)
+		draw_texture_rect_region(_body_tex, dst_rect, src_rect, _body_color)
 	for htex: Texture2D in _head_textures:
 		if htex != null:
-			draw_texture_rect_region(htex, dst_rect, src_rect)
+			draw_texture_rect_region(htex, dst_rect, src_rect, _body_color)
 
 	# Subtle green name label below the sprite
 	if data != null and _font != null:
@@ -168,6 +169,7 @@ func _load_ulpc_textures() -> void:
 		return
 	var body_path: String = PlayerRenderer.race_body_path(data.race_id)
 	_body_tex = PlayerRenderer.load_ulpc_tex(body_path)
+	_body_color = PlayerRenderer.race_body_color(data.race_id)
 	var head_overlays: Array = PlayerRenderer.race_head_overlays(data.race_id)
 	_head_textures.clear()
 	for hp_path in head_overlays:

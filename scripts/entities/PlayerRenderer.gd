@@ -357,6 +357,21 @@ static func race_head_overlays(race_id: String) -> Array:
 		result.append(_ULPC_ROOT + rel)
 	return result
 
+## Build a full res:// path for a hair color variant (plain style, adult walk).
+## Returns "" if the file does not exist.
+static func hair_plain_path(color: String) -> String:
+	var p := _ULPC_ROOT + "hair/plain/adult/walk/" + color + ".png"
+	return p if ulpc_file_exists(p) else ""
+
+## Skin/body tint for races that differ from the default human tone.
+## hill_orc and troll use the muscular body sheet tinted green.
+static func race_body_color(race_id: String) -> Color:
+	match race_id:
+		"hill_orc", "troll":
+			return Color(0.55, 0.88, 0.45)
+		_:
+			return Color.WHITE
+
 ## Load a PNG from the ULPC generator folder without needing Godot .import metadata.
 static func load_ulpc_tex(res_path: String) -> Texture2D:
 	var abs_path := ProjectSettings.globalize_path(res_path)
