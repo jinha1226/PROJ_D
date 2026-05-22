@@ -80,6 +80,35 @@ const _ULPC_CHAR_H: float = 48.0
 
 const _BASE_OVERLAY_FILES: Array[String] = ["head", "hair"]
 
+# Maps item base_id → overlay path relative to race sprite dir (no .png extension).
+# Checked before the generic slot fallback so each weapon/armor type gets its own look.
+const _WEAPON_OVERLAY_MAP: Dictionary = {
+	"dagger": "weapons/dagger",
+	"dirk": "weapons/dagger",
+	"stiletto": "weapons/dagger",
+	"venom_dagger": "weapons/dagger",
+	"frost_dagger": "weapons/dagger",
+	"assassin_blade": "weapons/dagger",
+	"throwing_knife": "weapons/dagger",
+	"arming_sword": "weapons/longsword",
+	"long_sword": "weapons/longsword",
+	"flaming_sword": "weapons/longsword",
+	"mace": "weapons/longsword",
+	"bastard_sword": "weapons/greatsword",
+	"great_blade": "weapons/greatsword",
+	"battle_axe": "weapons/axe",
+	"staff": "weapons/staff",
+	"javelin": "weapons/staff",
+	"longbow": "weapons/staff",
+	"crossbow": "weapons/staff",
+}
+const _ARMOR_OVERLAY_MAP: Dictionary = {
+	"leather_armor": "armor/leather",
+	"troll_leather": "armor/leather",
+	"chain_mail": "armor/chainmail",
+	"plate_mail": "armor/plate",
+}
+
 const _EQUIP_SHEET_SLOTS: Array[Array] = [
 	["equipped_armor_id",  "armor"],
 	["equipped_helmet_id", "helmet"],
@@ -1945,13 +1974,20 @@ func _refresh_paperdoll() -> void:
 		var slot_val: String = get(pair[0]) if pair[0] in self else ""
 		if slot_val == "":
 			continue
-		# Prefer per-item overlay path if the item defines one.
 		var path: String = ""
 		var item_data: ItemData = ItemRegistry.get_by_id(slot_val) if ItemRegistry != null else null
 		if item_data != null and item_data.equip_overlay_path != "":
+			# Per-item explicit overlay wins.
 			path = item_data.equip_overlay_path
 		elif sprite_dir != "":
-			path = sprite_dir + "/" + (pair[1] as String) + ".png"
+			var base_id: String = ItemRegistry.base_id_of(slot_val) if ItemRegistry != null else slot_val
+			var slot_name: String = pair[1] as String
+			var mapped: String = ""
+			if slot_name == "sword":
+				mapped = _WEAPON_OVERLAY_MAP.get(base_id, "")
+			elif slot_name == "armor":
+				mapped = _ARMOR_OVERLAY_MAP.get(base_id, "")
+			path = sprite_dir + "/" + (mapped if mapped != "" else slot_name) + ".png"
 		if path != "" and ResourceLoader.exists(path):
 			var tex := load(path) as Texture2D
 			if tex != null:

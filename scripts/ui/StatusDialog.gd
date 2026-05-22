@@ -456,7 +456,14 @@ static func _portrait_stack(player: Player) -> Control:
 			var slot_val: String = player.get(pair[0]) if pair[0] in player else ""
 			if slot_val == "":
 				continue
-			var path: String = sprite_dir + "/" + (pair[1] as String) + ".png"
+			var slot_name: String = pair[1] as String
+			var base_id: String = ItemRegistry.base_id_of(slot_val) if ItemRegistry != null else slot_val
+			var mapped: String = ""
+			if slot_name == "sword":
+				mapped = Player._WEAPON_OVERLAY_MAP.get(base_id, "")
+			elif slot_name == "armor":
+				mapped = Player._ARMOR_OVERLAY_MAP.get(base_id, "")
+			var path: String = sprite_dir + "/" + (mapped if mapped != "" else slot_name) + ".png"
 			if ResourceLoader.exists(path):
 				var tex := load(path) as Texture2D
 				if tex != null:
