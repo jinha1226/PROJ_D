@@ -24,4 +24,4 @@ effect = ""
 effect_value = 0
 plus = 0
 description = "Full plate from an age that expected sieges. Superb protection, but it taxes movement and punishes untrained spellcasting."
-equip_overlay_path = "res://assets/tiles/individual/player/human_8dir/armor_plate_overlay.png"
+equip_overlay_path = ""

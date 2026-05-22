@@ -23,4 +23,4 @@ effect = ""
 effect_value = 0
 plus = 0
 description = "A simple robe with room enough for movement and thought. Little protection, no EV penalty, and a slight sympathy for spell power."
-equip_overlay_path = "res://assets/tiles/individual/player/human_8dir/armor_robe_overlay.png"
+equip_overlay_path = ""
