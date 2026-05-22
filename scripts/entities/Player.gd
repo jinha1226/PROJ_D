@@ -74,39 +74,142 @@ var _walk_anim_t: float = 0.0             # time accumulator for walk animation
 var _walk_anim_active: bool = false
 const _WALK_FPS: float = 18.0             # 9 frames / 18 fps ≈ 0.5s per step
 
+var _attack_frame: int = 0
+var _attack_anim_t: float = 0.0
+var _attack_anim_active: bool = false
+var _attack_anim_type: String = "slash"   # "slash" | "thrust" | "spellcast"
+var _atk_base: Dictionary = {}            # {anim: Texture2D}
+var _atk_sheets: Dictionary = {}          # {anim: Array[Texture2D]} (head+hair+equip)
+
+const _ATTACK_FPS: float = 14.0
+const _ATTACK_FRAMES: Dictionary = {"slash": 6, "thrust": 8, "spellcast": 7}
+## Weapon base_id → attack animation type. Unlisted weapons default to "slash".
+const _WEAPON_ATTACK_ANIM: Dictionary = {
+	"mace": "thrust", "shock_mace": "thrust",
+	"spear": "thrust", "javelin": "thrust", "staff": "thrust",
+}
+
 # ULPC 64x64 frame: character occupies y=14(head)..61(feet) = 48px
 const _ULPC_CHAR_TOP: float = 14.0
 const _ULPC_CHAR_H: float = 48.0
 
-const _BASE_OVERLAY_FILES: Array[String] = ["head", "hair"]
+const _ULPC_ROOT: String = "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/"
 
-# Maps item base_id → overlay path relative to race sprite dir (no .png extension).
-# Checked before the generic slot fallback so each weapon/armor type gets its own look.
+# Per-race body sheet (relative to _ULPC_ROOT).
+const _RACE_BODY_MAP: Dictionary = {
+	"human":    "body/bodies/male/walk.png",
+	"elf":      "body/bodies/teen/walk.png",
+	"dwarf":    "body/bodies/male/walk.png",
+	"hill_orc": "body/bodies/muscular/walk.png",
+	"troll":    "body/bodies/muscular/walk.png",
+	"vampire":  "body/bodies/male/walk.png",
+	"minotaur": "body/bodies/muscular/walk.png",
+	"kobold":   "body/bodies/child/walk.png",
+	"spriggan": "body/bodies/child/walk.png",
+	"gargoyle": "body/bodies/male/walk.png",
+}
+
+# Per-race always-on overlays: head, ears, hair (relative to _ULPC_ROOT).
+const _RACE_HEAD_OVERLAYS: Dictionary = {
+	"human": [
+		"head/heads/human/male/walk.png",
+		"hair/plain/adult/walk/ash.png",
+	],
+	"elf": [
+		"head/heads/human/male/walk.png",
+		"head/ears/elven/adult/walk.png",
+		"hair/plain/adult/walk/ash.png",
+	],
+	"dwarf": [
+		"head/heads/human/male/walk.png",
+		"hair/plain/adult/walk/ash.png",
+	],
+	"hill_orc": [
+		"head/heads/orc/male/walk.png",
+	],
+	"troll": [
+		"head/heads/troll/adult/walk.png",
+	],
+	"vampire": [
+		"head/heads/vampire/adult/walk.png",
+		"hair/plain/adult/walk/ash.png",
+	],
+	"minotaur": [
+		"head/heads/minotaur/male/walk.png",
+	],
+	"kobold": [
+		"head/heads/goblin/adult/walk.png",
+	],
+	"spriggan": [
+		"head/heads/human/child/walk.png",
+		"hair/plain/adult/walk/ash.png",
+	],
+	"gargoyle": [
+		"head/heads/lizard/male/walk.png",
+		"body/wings/bat/lizard/adult/bg/walk.png",
+	],
+}
+
 const _WEAPON_OVERLAY_MAP: Dictionary = {
-	"dagger": "weapons/dagger",
-	"dirk": "weapons/dagger",
-	"stiletto": "weapons/dagger",
-	"venom_dagger": "weapons/dagger",
-	"frost_dagger": "weapons/dagger",
-	"assassin_blade": "weapons/dagger",
-	"throwing_knife": "weapons/dagger",
-	"arming_sword": "weapons/longsword",
-	"long_sword": "weapons/longsword",
-	"flaming_sword": "weapons/longsword",
-	"mace": "weapons/longsword",
-	"bastard_sword": "weapons/greatsword",
-	"great_blade": "weapons/greatsword",
-	"battle_axe": "weapons/axe",
-	"staff": "weapons/staff",
-	"javelin": "weapons/staff",
-	"longbow": "weapons/staff",
-	"crossbow": "weapons/staff",
+	"dagger":         "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
+	"dirk":           "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
+	"stiletto":       "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
+	"venom_dagger":   "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
+	"frost_dagger":   "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
+	"assassin_blade": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
+	"throwing_knife": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
+	"quick_blade":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/dagger/walk/dagger.png",
+	"short_sword":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/longsword/walk/longsword.png",
+	"arming_sword":   "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/arming/universal/fg/walk/brass.png",
+	"long_sword":     "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/longsword/walk/longsword.png",
+	"flaming_sword":  "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/longsword/walk/longsword.png",
+	"bastard_sword":  "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/longsword/walk/longsword.png",
+	"great_blade":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/longsword/walk/longsword.png",
+	"mace":           "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/blunt/mace/walk/mace.png",
+	"shock_mace":     "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/blunt/mace/walk/mace.png",
+	"battle_axe":     "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/blunt/waraxe/walk/waraxe.png",
+	"staff":          "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/magic/simple/foreground/walk/simple.png",
+	"spear":          "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/polearm/spear/foreground/walk/iron.png",
+	"javelin":        "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/polearm/spear/foreground/walk/iron.png",
+	"crossbow":       "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/ranged/crossbow/foreground/walk/crossbow.png",
 }
 const _ARMOR_OVERLAY_MAP: Dictionary = {
-	"leather_armor": "armor/leather",
-	"troll_leather": "armor/leather",
-	"chain_mail": "armor/chainmail",
-	"plate_mail": "armor/plate",
+	"leather_armor": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/torso/armour/leather/male/walk.png",
+	"troll_leather": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/torso/armour/leather/male/walk.png",
+	"ring_mail":     "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/torso/armour/leather/male/walk.png",
+	"scale_mail":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/torso/armour/leather/male/walk.png",
+	"chain_mail":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/torso/chainmail/male/walk.png",
+	"plate_mail":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/torso/armour/plate/male/walk.png",
+	"robe":          "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/torso/clothes/robe/female/walk/black.png",
+}
+const _LEGS_OVERLAY_MAP: Dictionary = {
+	"leather_armor": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/legs/hose/male/walk/black.png",
+	"troll_leather": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/legs/hose/male/walk/black.png",
+	"ring_mail":     "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/legs/hose/male/walk/black.png",
+	"scale_mail":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/legs/hose/male/walk/black.png",
+	"chain_mail":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/legs/hose/male/walk/black.png",
+	"plate_mail":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/legs/armour/plate/male/walk.png",
+	"robe":          "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/legs/pantaloons/male/walk/black.png",
+}
+const _HELMET_OVERLAY_MAP: Dictionary = {
+	"leather_cap":  "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/hat/cloth/leather_cap/adult/walk/base.png",
+	"leather_helm": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/hat/cloth/leather_cap/adult/walk/base.png",
+	"iron_helm":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/hat/helmet/bascinet/adult/walk/iron.png",
+	"great_helm":   "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/hat/helmet/bascinet/adult/walk/iron.png",
+}
+const _GLOVES_OVERLAY_MAP: Dictionary = {
+	"leather_gloves": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/arms/gloves/male/walk/leather.png",
+	"iron_gauntlets": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/arms/gloves/male/walk/iron.png",
+}
+const _BOOTS_OVERLAY_MAP: Dictionary = {
+	"leather_boots": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/feet/boots/basic/male/walk/iron.png",
+	"iron_greaves":  "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/feet/boots/basic/male/walk/iron.png",
+}
+const _SHIELD_OVERLAY_MAP: Dictionary = {
+	"buckler":      "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/shield/crusader/fg/male/walk/crusader.png",
+	"round_shield": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/shield/crusader/fg/male/walk/crusader.png",
+	"kite_shield":  "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/shield/crusader/fg/male/walk/crusader.png",
+	"tower_shield": "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/shield/crusader/fg/male/walk/crusader.png",
 }
 
 const _EQUIP_SHEET_SLOTS: Array[Array] = [
@@ -275,6 +378,7 @@ func bind_map(map: DungeonMap, spawn: Vector2i) -> void:
 	_map = map
 	grid_pos = spawn
 	position = _map.grid_to_world(grid_pos)
+	_refresh_paperdoll()
 	queue_redraw()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -448,6 +552,7 @@ func try_attack_tile(target: Vector2i) -> bool:
 		facing = dir
 		queue_redraw()
 	play_bump_anim(target - grid_pos)
+	play_attack_anim(equipped_weapon_id)
 	var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null and equipped_weapon_id != "" else null
 	weapon_attacked.emit(target, weapon_skill_for_item(w))
 	CombatSystem.player_attack_monster(self, monster)
@@ -1070,6 +1175,30 @@ func play_bump_anim(dir: Vector2i) -> void:
 	tw.tween_property(self, "position", origin + bump_offset, 0.07)
 	tw.tween_property(self, "position", origin, 0.07)
 
+func play_attack_anim(weapon_id: String) -> void:
+	if not GameManager.use_tiles:
+		return
+	var base_id := ItemRegistry.base_id_of(weapon_id) if ItemRegistry != null and weapon_id != "" else weapon_id
+	var anim: String = String(_WEAPON_ATTACK_ANIM.get(base_id, "slash"))
+	if not (_atk_base.has(anim) and _atk_base[anim] != null):
+		return
+	_attack_anim_type = anim
+	_attack_frame = 0
+	_attack_anim_t = 0.0
+	_attack_anim_active = true
+	queue_redraw()
+
+func play_spellcast_anim() -> void:
+	if not GameManager.use_tiles:
+		return
+	if not (_atk_base.has("spellcast") and _atk_base["spellcast"] != null):
+		return
+	_attack_anim_type = "spellcast"
+	_attack_frame = 0
+	_attack_anim_t = 0.0
+	_attack_anim_active = true
+	queue_redraw()
+
 func play_hit_anim() -> void:
 	var origin: Vector2 = position
 	var tw := create_tween()
@@ -1684,6 +1813,16 @@ func _get_sprite_dir() -> String:
 		return _base_tex.resource_path.get_base_dir()
 	return ""
 
+func _ulpc_overlay_path(slot: String, base_id: String) -> String:
+	match slot:
+		"sword":  return _WEAPON_OVERLAY_MAP.get(base_id, "")
+		"armor":  return _ARMOR_OVERLAY_MAP.get(base_id, "")
+		"helmet": return _HELMET_OVERLAY_MAP.get(base_id, "")
+		"gloves": return _GLOVES_OVERLAY_MAP.get(base_id, "")
+		"boots":  return _BOOTS_OVERLAY_MAP.get(base_id, "")
+		"shield": return _SHIELD_OVERLAY_MAP.get(base_id, "")
+	return ""
+
 func set_equipped_weapon(id: String) -> void:
 	if equipped_weapon_id != "":
 		_remove_entry_affixes(equipped_weapon_entry())
@@ -1940,10 +2079,57 @@ func add_resist(element: String, delta: int) -> void:
 	else:
 		resists[element] = net
 
+static func _race_body_path(race_id: String) -> String:
+	var rel: String = _RACE_BODY_MAP.get(race_id, "body/bodies/male/walk.png")
+	return _ULPC_ROOT + rel
+
+static func _race_head_overlays(race_id: String) -> Array:
+	return _RACE_HEAD_OVERLAYS.get(race_id, _RACE_HEAD_OVERLAYS["human"])
+
+## Load a PNG from the ULPC generator folder without needing Godot .import metadata.
+static func _load_ulpc_tex(res_path: String) -> Texture2D:
+	var abs_path := ProjectSettings.globalize_path(res_path)
+	var img := Image.load_from_file(abs_path)
+	if img == null:
+		return null
+	return ImageTexture.create_from_image(img)
+
+static func _ulpc_file_exists(res_path: String) -> bool:
+	return FileAccess.file_exists(ProjectSettings.globalize_path(res_path))
+
+## Derive the attack-animation sheet path from a walk sheet path.
+## Handles two ULPC path patterns:
+##   .../walk.png          → .../slash.png  (single-sheet animations, torso/head)
+##   .../walk/{color}.png  → .../slash/{color}.png  (or .../slash.png fallback, hair/gloves)
+static func _ulpc_attack_path(walk_path: String, anim: String) -> String:
+	if not walk_path.begins_with(_ULPC_ROOT):
+		return ""
+	var rel := walk_path.substr(_ULPC_ROOT.length())
+	if rel.ends_with("/walk.png"):
+		var candidate := _ULPC_ROOT + rel.trim_suffix("walk.png") + anim + ".png"
+		if _ulpc_file_exists(candidate):
+			return candidate
+	elif "/walk/" in rel:
+		var parts := rel.split("/walk/", false, 1)
+		if parts.size() == 2:
+			# Try color-specific: .../slash/iron.png
+			var candidate := _ULPC_ROOT + parts[0] + "/" + anim + "/" + parts[1]
+			if _ulpc_file_exists(candidate):
+				return candidate
+			# Fall back to merged sheet: .../slash.png  (hair, gloves)
+			candidate = _ULPC_ROOT + parts[0] + "/" + anim + ".png"
+			if _ulpc_file_exists(candidate):
+				return candidate
+	return ""
+
 func _refresh_paperdoll() -> void:
 	_body_doll_tex = null
 	_hand1_doll_tex = null
 	_hand2_doll_tex = null
+	# Load ULPC body base — race-specific
+	var race_id: String = GameManager.selected_race_id if GameManager != null else "human"
+	var body_rel: String = _RACE_BODY_MAP.get(race_id, "body/bodies/male/walk.png")
+	_base_tex = _load_ulpc_tex(_ULPC_ROOT + body_rel)
 	var armor_base_id: String = ItemRegistry.base_id_of(equipped_armor_id) if ItemRegistry != null else equipped_armor_id
 	if DOLL_BODY_MAP.has(armor_base_id):
 		var body_path: String = String(DOLL_BODY_MAP[armor_base_id])
@@ -1959,39 +2145,75 @@ func _refresh_paperdoll() -> void:
 		var path: String = String(DOLL_HAND2_MAP[shield_base_id])
 		if ResourceLoader.exists(path):
 			_hand2_doll_tex = load(path) as Texture2D
-	# Load always-on race base overlays (head, hair) from sprite folder
+	# Load always-on base overlays (head, hair) — race-specific
 	_base_sheets.clear()
-	var sprite_dir := _get_sprite_dir()
-	for fname in _BASE_OVERLAY_FILES:
-		var bpath: String = sprite_dir + "/" + fname + ".png"
-		if sprite_dir != "" and ResourceLoader.exists(bpath):
-			var btex := load(bpath) as Texture2D
-			if btex != null:
-				_base_sheets.append(btex)
-	# Load equipment-conditional sheets from race sprite folder
+	var head_overlays: Array = _RACE_HEAD_OVERLAYS.get(race_id, _RACE_HEAD_OVERLAYS["human"])
+	for rel in head_overlays:
+		var btex := _load_ulpc_tex(_ULPC_ROOT + rel)
+		if btex != null:
+			_base_sheets.append(btex)
+	# Load equipment overlays from ULPC generator
 	_equip_sheets.clear()
 	for pair in _EQUIP_SHEET_SLOTS:
 		var slot_val: String = get(pair[0]) if pair[0] in self else ""
 		if slot_val == "":
 			continue
-		var path: String = ""
+		var base_id: String = ItemRegistry.base_id_of(slot_val) if ItemRegistry != null else slot_val
 		var item_data: ItemData = ItemRegistry.get_by_id(slot_val) if ItemRegistry != null else null
+		var path: String = ""
 		if item_data != null and item_data.equip_overlay_path != "":
-			# Per-item explicit overlay wins.
 			path = item_data.equip_overlay_path
-		elif sprite_dir != "":
-			var base_id: String = ItemRegistry.base_id_of(slot_val) if ItemRegistry != null else slot_val
-			var slot_name: String = pair[1] as String
-			var mapped: String = ""
-			if slot_name == "sword":
-				mapped = _WEAPON_OVERLAY_MAP.get(base_id, "")
-			elif slot_name == "armor":
-				mapped = _ARMOR_OVERLAY_MAP.get(base_id, "")
-			path = sprite_dir + "/" + (mapped if mapped != "" else slot_name) + ".png"
-		if path != "" and ResourceLoader.exists(path):
-			var tex := load(path) as Texture2D
+		else:
+			path = _ulpc_overlay_path(pair[1] as String, base_id)
+		if path != "":
+			var tex := _load_ulpc_tex(path)
 			if tex != null:
 				_equip_sheets.append(tex)
+	# Armor slot also adds matching legs overlay
+	if equipped_armor_id != "":
+		var armor_base: String = ItemRegistry.base_id_of(equipped_armor_id) if ItemRegistry != null else equipped_armor_id
+		var legs_path: String = _LEGS_OVERLAY_MAP.get(armor_base, "")
+		if legs_path != "":
+			var tex := _load_ulpc_tex(legs_path)
+			if tex != null:
+				_equip_sheets.append(tex)
+	# Preload attack animation sheets (slash / thrust / spellcast) for body + all overlays
+	_atk_base.clear()
+	_atk_sheets.clear()
+	var body_walk_path := _ULPC_ROOT + body_rel
+	for anim in ["slash", "thrust", "spellcast"]:
+		var bp := _ulpc_attack_path(body_walk_path, anim)
+		_atk_base[anim] = _load_ulpc_tex(bp) if bp != "" else null
+		var sheets: Array[Texture2D] = []
+		for rel2 in head_overlays:
+			var ap := _ulpc_attack_path(_ULPC_ROOT + rel2, anim)
+			if ap != "":
+				var t := _load_ulpc_tex(ap)
+				if t != null:
+					sheets.append(t)
+		for pair in _EQUIP_SHEET_SLOTS:
+			var slot_val: String = get(pair[0]) if pair[0] in self else ""
+			if slot_val == "":
+				continue
+			var bid: String = ItemRegistry.base_id_of(slot_val) if ItemRegistry != null else slot_val
+			var wpath := _ulpc_overlay_path(pair[1] as String, bid)
+			if wpath == "":
+				continue
+			var ap := _ulpc_attack_path(wpath, anim)
+			if ap != "":
+				var t := _load_ulpc_tex(ap)
+				if t != null:
+					sheets.append(t)
+		if equipped_armor_id != "":
+			var armor_base2: String = ItemRegistry.base_id_of(equipped_armor_id) if ItemRegistry != null else equipped_armor_id
+			var lw := _LEGS_OVERLAY_MAP.get(armor_base2, "")
+			if lw != "":
+				var ap := _ulpc_attack_path(lw, anim)
+				if ap != "":
+					var t := _load_ulpc_tex(ap)
+					if t != null:
+						sheets.append(t)
+		_atk_sheets[anim] = sheets
 	queue_redraw()
 
 ## Destination Rect2 that scales a ULPC 64x64 frame so the character
@@ -2034,6 +2256,17 @@ func _facing_to_frame() -> int:
 	return 4
 
 func _process(delta: float) -> void:
+	if _attack_anim_active:
+		_attack_anim_t += delta
+		var cols: int = int(_ATTACK_FRAMES.get(_attack_anim_type, 6))
+		var new_frame := int(_attack_anim_t * _ATTACK_FPS)
+		if new_frame >= cols:
+			_attack_anim_active = false
+			_attack_frame = 0
+			queue_redraw()
+		elif new_frame != _attack_frame:
+			_attack_frame = new_frame
+			queue_redraw()
 	if not _walk_anim_active:
 		return
 	_walk_anim_t += delta
@@ -2047,12 +2280,29 @@ func _process(delta: float) -> void:
 		queue_redraw()
 
 
+func _draw_ulpc4(tex: Texture2D, urect: Rect2, col: int, total_cols: int, row: int) -> void:
+	var fw := tex.get_width() / total_cols
+	var fh := tex.get_height() / 4
+	draw_texture_rect_region(tex, urect, Rect2(col * fw, row * fh, fw, fh))
+
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
 	if GameManager.use_tiles:
 		var row := _facing_to_row()
 		var frame := _facing_to_frame()
 		var ulpc_rect := _ulpc_draw_rect()
+		# ── Attack animation ─────────────────────────────────────────────────
+		if _attack_anim_active and _atk_base.has(_attack_anim_type):
+			var cols: int = int(_ATTACK_FRAMES.get(_attack_anim_type, 6))
+			var atk_tex: Texture2D = _atk_base.get(_attack_anim_type)
+			if atk_tex != null:
+				_draw_ulpc4(atk_tex, ulpc_rect, _attack_frame, cols, row)
+			var atk_list: Array = _atk_sheets.get(_attack_anim_type, [])
+			for atex in atk_list:
+				if atex != null:
+					_draw_ulpc4(atex, ulpc_rect, _attack_frame, cols, row)
+			return
+		# ── Walk / idle ──────────────────────────────────────────────────────
 		if _base_tex != null:
 			var tw := _base_tex.get_width()
 			var th := _base_tex.get_height()
@@ -2061,7 +2311,7 @@ func _draw() -> void:
 				var fw := tw / 8
 				draw_texture_rect_region(_base_tex, rect, Rect2(frame * fw, 0, fw, th))
 			elif tw * 4 == th * 9 and th % 4 == 0:
-				# ULPC 4-dir: scale so character fills cell head-to-toe
+				# ULPC 4-dir walk (9 cols × 4 rows)
 				var fw := tw / 9
 				var fh := th / 4
 				draw_texture_rect_region(_base_tex, ulpc_rect, Rect2(_walk_frame * fw, row * fh, fw, fh))

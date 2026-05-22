@@ -121,4 +121,6 @@ func _confirm_targeting() -> void:
 		return
 	var ok: bool = MagicSystem.cast(spell.id, host.player, host)
 	if ok:
+		if host.player != null:
+			host.player.play_spellcast_anim()
 		TurnManager.end_player_turn(Status.speed_mult(host.player))

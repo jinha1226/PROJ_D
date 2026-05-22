@@ -281,6 +281,8 @@ func _handle_tap(screen_pos: Vector2) -> void:
 			player.try_attack_tile(target)
 		return
 	if target == player.grid_pos:
+		if _pickup_current_tile():
+			return
 		var tile: int = map.tile_at(player.grid_pos)
 		if tile == DungeonMap.Tile.STAIRS_DOWN:
 			_on_stairs_down()
@@ -845,8 +847,6 @@ func _spawn_ui() -> void:
 	bottom_hud.status_pressed.connect(_on_status_pressed)
 	bottom_hud.rest_pressed.connect(_on_rest_pressed)
 	bottom_hud.act_pressed.connect(_on_act_pressed)
-	if bottom_hud.has_signal("pickup_pressed"):
-		bottom_hud.pickup_pressed.connect(_on_pickup_pressed)
 	bottom_hud.skills_pressed.connect(_on_skills_pressed)
 	bottom_hud.magic_pressed.connect(_on_magic_pressed)
 	bottom_hud.quickslot_pressed.connect(_on_quickslot_pressed)
@@ -854,7 +854,6 @@ func _spawn_ui() -> void:
 	bottom_hud.quickslot_swap_requested.connect(_on_quickslot_swap_requested)
 	if bottom_hud.has_signal("menu_pressed"):
 		bottom_hud.menu_pressed.connect(_on_menu_button_pressed)
-	top_hud.item_slot_pressed.connect(_on_item_slot_pressed)
 	if top_hud.has_signal("zoom_in_pressed"):
 		top_hud.zoom_in_pressed.connect(func(): _zoom_by(ZOOM_STEP))
 	if top_hud.has_signal("zoom_out_pressed"):
@@ -2229,6 +2228,7 @@ func _on_quickslot_pressed(index: int) -> void:
 		else:
 			var ok: bool = MagicSystem.cast(slot_id, player, self)
 			if ok:
+				player.play_spellcast_anim()
 				TurnManager.end_player_turn(Status.speed_mult(player))
 		return
 	const _WAND_ELEMENTS := {"wand_fire": "fire", "wand_frost": "cold", "wand_lightning": "lightning"}
@@ -2334,31 +2334,13 @@ func _top_item_bar_ids() -> Array[String]:
 			continue
 		seen[id] = true
 		result.append(id)
-		if result.size() >= 9:
+		if result.size() >= 4:
 			break
 	return result
 
 func _refresh_quickslots() -> void:
 	if player == null:
 		return
-	if top_hud != null:
-		var item_ids: Array[String] = _top_item_bar_ids()
-		for i in range(9):
-			if i >= item_ids.size():
-				top_hud.set_item_slot(i, null, "")
-				continue
-			var item_id: String = item_ids[i]
-			var data: ItemData = ItemRegistry.get_by_id(item_id) if ItemRegistry != null else null
-			if data == null:
-				top_hud.set_item_slot(i, null, "")
-				continue
-			var count: int = player.count_item(item_id)
-			var count_text: String = ("x%d" % count) if count > 1 else ""
-			if GameManager.use_tiles and data.tile_path != "":
-				var top_tex: Texture2D = _make_item_icon(data)
-				top_hud.set_item_slot(i, top_tex, count_text)
-			else:
-				top_hud.set_item_slot_display(i, data.glyph, data.glyph_color)
 	if bottom_hud == null:
 		return
 	for i in range(player.quickslots.size()):
@@ -2473,15 +2455,15 @@ func _on_act_pressed() -> void:
 		_start_auto_explore()
 
 
-func _on_pickup_pressed() -> void:
+func _pickup_current_tile() -> bool:
 	if player == null or player.hp <= 0 or not TurnManager.is_player_turn:
-		return
+		return false
 	var item: FloorItem = _item_at(player.grid_pos)
 	if item == null:
-		CombatLog.post(LocaleManager.t("LOG_NOTHING_HERE_TO_PICK_UP"), Color(0.6, 0.6, 0.6))
-		return
+		return false
 	player.pickup(item)
 	TurnManager.end_player_turn(Status.speed_mult(player))
+	return true
 
 func _pickup_essence_floor_item(floor_item: FloorItem) -> void:
 	if floor_item == null or floor_item.data == null:
