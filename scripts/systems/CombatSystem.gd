@@ -314,6 +314,8 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	monster.take_damage(final)
 	BodyPartSystem.process_hit(monster, final, player.grid_pos)
 	monster.become_aware(player.grid_pos)
+	# Tactics XP on every successful hit — positioning and timing awareness.
+	player.grant_skill_xp("tactics", 1.5)
 	if brand != "" and brand_extra > 0 and monster.hp > 0:
 		_apply_brand_status(monster, brand)
 		if brand == "drain" and brand_extra > 0:

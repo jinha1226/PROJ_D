@@ -15,9 +15,5 @@ func execute(actor: NPCActor) -> bool:
 			continue
 		# Notify Game via signal so it can remove the floor item node
 		actor.emit_signal("item_picked_up", node.entry if node.get("entry") != null else {}, actor.grid_pos)
-		if actor.CombatLog != null:
-			actor.CombatLog.post(
-				"%s picks up an item." % actor.npc_name,
-				Color(0.7, 0.85, 0.7))
 		return true
 	return false

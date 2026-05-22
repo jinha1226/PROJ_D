@@ -498,6 +498,14 @@ func _apply_starter_kit() -> void:
 				break
 	player.refresh_ac_from_equipment()
 	player._refresh_paperdoll()
+	# Auto-study any books in the starter kit so mages begin with their spells.
+	var _bi: int = player.items.size() - 1
+	while _bi >= 0:
+		var _bentry: Dictionary = player.items[_bi]
+		var _bdata = ItemRegistry.get_by_id(String(_bentry.get("id", ""))) if ItemRegistry != null else null
+		if _bdata != null and String(_bdata.effect) == "study":
+			player.use_item(_bi)
+		_bi -= 1
 	GameManager.selected_starting_weapon_id = ""
 	GameManager.selected_starting_school_id = ""
 	GameManager.selected_starting_essence_id = ""

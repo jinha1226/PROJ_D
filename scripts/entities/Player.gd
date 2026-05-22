@@ -1072,7 +1072,7 @@ static func weapon_skill_for_item(item: ItemData) -> String:
 				return "throwing"
 			return "bows"
 		"staff":
-			return "spellcasting"  # TODO: route to "staves" once items mark combat staff vs magical staff
+			return "weapon_mastery"
 	return "unarmed"
 
 func spell_skill_for(spell: SpellData) -> String:
