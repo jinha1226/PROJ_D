@@ -135,7 +135,6 @@ func _ready() -> void:
 	_spawn_service._spawn_items_layer()
 	_spawn_service._spawn_monsters_layer()
 	_spawn_service._spawn_npcs_layer()
-	_spawn_service._spawn_npcs_for_floor(10)
 	_spawn_path_overlay()
 	_spawn_player()
 	if not GameManager.pending_player_state.is_empty():

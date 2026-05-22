@@ -65,6 +65,7 @@ func _generate_floor(depth: int, map_seed: int,
 				host._spawn_final_boss_floor()
 		else:
 			host._spawn_service._spawn_monsters_for_floor(depth)
+			host._spawn_service._spawn_npcs_for_floor(10)
 		host._scatter_hazard_tiles(zone.get("env", ""))
 		# Shop placement — reset each new floor, then conditionally place.
 		host._shop_items = []
