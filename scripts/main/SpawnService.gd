@@ -364,6 +364,9 @@ func _monster_count_for_depth(d: int) -> int:
 func _spawn_npcs_for_floor(count: int = 10) -> void:
 	if not host.get("npcs_layer"):
 		return
+	# Only spawn on real dungeon floors — skip shop, town, and branch 1F
+	if GameManager.depth < 1 or GameManager.branch_zone != "":
+		return
 	var rng := RandomNumberGenerator.new()
 	rng.seed = host._floor_lifecycle._floor_seed(GameManager.depth) ^ 0xABCDABCD
 	var placed: int = 0
