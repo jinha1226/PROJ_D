@@ -10,7 +10,7 @@ func execute(actor: NPCActor) -> bool:
 	if actor._known_enemy == null or actor._map == null:
 		return false
 	# Move away from the known enemy: invert the step-toward direction
-	var away := (actor.grid_pos - actor._known_enemy.grid_pos).sign()
+	var away: Vector2i = (actor.grid_pos - actor._known_enemy.grid_pos).sign()
 	var candidates := _flee_candidates(away)
 	for step: Vector2i in candidates:
 		var pos := actor.grid_pos + step
