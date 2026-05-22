@@ -10,7 +10,7 @@ func execute(actor: NPCActor) -> bool:
 	var target = actor._known_enemy
 	if target == null or target.hp <= 0:
 		return false
-	var dist := max(abs(target.grid_pos.x - actor.grid_pos.x),
+	var dist: int = max(abs(target.grid_pos.x - actor.grid_pos.x),
 					abs(target.grid_pos.y - actor.grid_pos.y))
 	if dist > 1:
 		return false
