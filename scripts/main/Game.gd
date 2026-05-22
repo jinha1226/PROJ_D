@@ -297,7 +297,7 @@ func _handle_tap(screen_pos: Vector2) -> void:
 	# rather than attacking (NPCs are not currently attackable by the player).
 	var tapped_npc: NPCActor = _npc_at(target)
 	if tapped_npc != null and target != player.grid_pos:
-		NPCInfoDialog.show_for(tapped_npc, self)
+		NPCInfoDialog.show_for(tapped_npc, player, self)
 		return
 	if player.can_attack_tile(target):
 		var w_id: String = player.equipped_weapon_id
