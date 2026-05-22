@@ -251,14 +251,14 @@ func _wander() -> void:
 				 Vector2i(1, 1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(-1, -1)]
 	dirs.shuffle()
 	for d: Vector2i in dirs:
-		var p := grid_pos + d
+		var p: Vector2i = grid_pos + d
 		if _map.in_bounds(p) and _map.is_walkable(p) and not _is_pos_occupied(p):
 			_do_move(d)
 			return
 
 ## Move one step in direction d and emit signal.
 func _do_move(d: Vector2i) -> void:
-	var p := grid_pos + d
+	var p: Vector2i = grid_pos + d
 	grid_pos = p
 	position = _map.grid_to_world(p)
 	facing = d
@@ -268,10 +268,10 @@ func _do_move(d: Vector2i) -> void:
 func _greedy_step_toward(target: Vector2i) -> Vector2i:
 	var dx: int = sign(target.x - grid_pos.x)
 	var dy: int = sign(target.y - grid_pos.y)
-	for step in [Vector2i(dx, dy), Vector2i(dx, 0), Vector2i(0, dy)]:
+	for step: Vector2i in [Vector2i(dx, dy), Vector2i(dx, 0), Vector2i(0, dy)]:
 		if step == Vector2i.ZERO:
 			continue
-		var pos := grid_pos + step
+		var pos: Vector2i = grid_pos + step
 		if _map.in_bounds(pos) and _map.is_walkable(pos) and not _is_pos_occupied(pos):
 			return step
 	return Vector2i.ZERO
@@ -287,7 +287,7 @@ func _find_explore_frontier() -> Vector2i:
 	for pos: Vector2i in _map.explored.keys():
 		if not _map.is_walkable(pos):
 			continue
-		var is_frontier := false
+		var is_frontier: bool = false
 		for d: Vector2i in DIRS:
 			var n: Vector2i = pos + d
 			if _map.in_bounds(n) and not _map.explored.has(n) \
