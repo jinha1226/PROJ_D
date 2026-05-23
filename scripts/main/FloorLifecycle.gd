@@ -81,6 +81,8 @@ func _generate_floor(depth: int, map_seed: int,
 		host._shop_is_special = false
 		if _is_shop_floor(depth):
 			host._place_shop_tile()
+		# Scatter thematic props for this zone.
+		PropPlacer.scatter(host.map, zone_id, map_seed)
 	host._refresh_fov()
 
 ## Pick a random walkable floor tile away from stairs/branch entrance.
@@ -130,6 +132,7 @@ func _cache_current_floor() -> void:
 		"cloud_tiles": host.map.cloud_tiles.duplicate(true),
 		"hazard_tiles": host.map.hazard_tiles.duplicate(true),
 		"fog_tiles": host.map.fog_tiles.duplicate(true),
+		"prop_tile_paths": host.map.prop_tile_paths.duplicate(true),
 		"shop_items": host._shop_items.duplicate(true),
 		"shop_is_special": host._shop_is_special,
 		"shop_tile_pos": host._shop_tile_pos,
@@ -200,6 +203,8 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 	host.map.cloud_tiles = state.get("cloud_tiles", {}).duplicate(true)
 	host.map.hazard_tiles = state.get("hazard_tiles", {}).duplicate(true)
 	host.map.fog_tiles = state.get("fog_tiles", {}).duplicate(true)
+	host.map.prop_tile_paths = state.get("prop_tile_paths", {}).duplicate(true)
+	PropPlacer.restore_textures(host.map)
 	# Restore shop state.
 	host._shop_items = state.get("shop_items", []).duplicate(true)
 	host._shop_is_special = bool(state.get("shop_is_special", false))

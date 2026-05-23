@@ -1797,6 +1797,8 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 		map.cloud_tiles = state.get("cloud_tiles", {}).duplicate(true)
 		map.hazard_tiles = state.get("hazard_tiles", {}).duplicate(true)
 		map.fog_tiles = state.get("fog_tiles", {}).duplicate(true)
+		map.prop_tile_paths = state.get("prop_tile_paths", {}).duplicate(true)
+		PropPlacer.restore_textures(map)
 		var cfg: Dictionary = ZoneManager.branch_config(branch_id)
 		map._tex_wall = load(cfg.get("wall", "")) as Texture2D
 		map._tex_floor = load(cfg.get("floor", "")) as Texture2D
@@ -1878,6 +1880,7 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 			_spawn_branch_resistance_hint(branch_id)
 	if not branch_used_fixed:
 		_scatter_hazard_tiles(cfg.get("env", ""))
+	PropPlacer.scatter(map, branch_id, branch_seed)
 	# Restore previously explored tiles from persistent memory (survives expeditions).
 	if GameManager.persistent_branch_explored.has(cache_key):
 		map.explored.merge(GameManager.persistent_branch_explored[cache_key], true)
@@ -2156,6 +2159,7 @@ func _cache_branch_floor(branch_id: String, branch_floor: int) -> void:
 		"cloud_tiles": map.cloud_tiles.duplicate(true),
 		"hazard_tiles": map.hazard_tiles.duplicate(true),
 		"fog_tiles": map.fog_tiles.duplicate(true),
+		"prop_tile_paths": map.prop_tile_paths.duplicate(true),
 	}
 	for n in get_tree().get_nodes_in_group("floor_items"):
 		if n is FloorItem and n.data != null:

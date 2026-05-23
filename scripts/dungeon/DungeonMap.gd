@@ -73,6 +73,10 @@ var cloud_tiles: Dictionary = {}
 ## type: "lava" | "shallow_water"
 var hazard_tiles: Dictionary = {}
 
+## Decorative props: Vector2i → Texture2D (runtime). Paths kept in prop_tile_paths for caching.
+var prop_tiles: Dictionary = {}
+var prop_tile_paths: Dictionary = {}  # Vector2i → String res:// path
+
 const CLOUD_COLORS: Dictionary = {
 	"fire":        Color(1.0,  0.45, 0.1,  0.55),
 	"poison":      Color(0.35, 0.85, 0.25, 0.50),
@@ -244,6 +248,8 @@ func generate(map_seed: int = -1, branch_entrance: bool = false, style: String =
 	explored.clear()
 	fog_tiles.clear()
 	corpses.clear()
+	prop_tiles.clear()
+	prop_tile_paths.clear()
 	_load_atmosphere(GameManager.depth)
 	queue_redraw()
 
@@ -279,6 +285,8 @@ func generate_fixed_from_file(file_path: String, depth: int,
 	explored.clear()
 	fog_tiles.clear()
 	corpses.clear()
+	prop_tiles.clear()
+	prop_tile_paths.clear()
 	# Inject ASCII-authored hazard tiles (~ = bog, ^ = lava).
 	hazard_tiles = result.get("hazard_tiles", {})
 	cloud_tiles.clear()
@@ -387,6 +395,21 @@ func _draw() -> void:
 			draw_string(ThemeDB.fallback_font,
 				Vector2(x * CELL_SIZE + 6, y * CELL_SIZE + CELL_SIZE - 6),
 				glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, CELL_SIZE - 6, glyph_color)
+
+	# Decorative props — visual only, drawn above floor but below entities
+	if use_tiles and not prop_tiles.is_empty():
+		for ppos: Vector2i in prop_tiles.keys():
+			var is_vis: bool = reveal_all or visible_tiles.has(ppos)
+			var was_explored: bool = reveal_all or explored.has(ppos)
+			if not is_vis and not was_explored:
+				continue
+			var ptex: Texture2D = prop_tiles[ppos]
+			if ptex == null:
+				continue
+			var pmod: Color = Color.WHITE if is_vis else Color(0.45, 0.45, 0.55)
+			draw_texture_rect(ptex,
+				Rect2(Vector2(ppos.x * CELL_SIZE, ppos.y * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE)),
+				false, pmod)
 
 	# Broken decorative altars — always dim regardless of altar_active
 	for bpos in broken_altar_positions:

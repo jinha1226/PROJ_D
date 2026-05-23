@@ -131,6 +131,8 @@ static func encode_floor_state(state: Dictionary) -> Dictionary:
 		out["hazard_tiles"] = enc_vec_dict(state["hazard_tiles"])
 	if state.has("fog_tiles"):
 		out["fog_tiles"] = enc_vec_dict(state["fog_tiles"])
+	if state.has("prop_tile_paths"):
+		out["prop_tile_paths"] = enc_vec_dict(state["prop_tile_paths"])
 	return out
 
 static func decode_floor_state(data: Dictionary) -> Dictionary:
@@ -177,6 +179,8 @@ static func decode_floor_state(data: Dictionary) -> Dictionary:
 		out["hazard_tiles"] = dec_vec_dict(data["hazard_tiles"])
 	if data.has("fog_tiles"):
 		out["fog_tiles"] = dec_vec_dict(data["fog_tiles"])
+	if data.has("prop_tile_paths"):
+		out["prop_tile_paths"] = dec_vec_dict(data["prop_tile_paths"])
 	return out
 
 ## Encode/decode the persistent explored map: Dict[String, Dict[Vector2i, bool]]
