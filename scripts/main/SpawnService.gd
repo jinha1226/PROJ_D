@@ -59,37 +59,123 @@ func _spawn_unique_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
 		CombatLog.post(LocaleManager.t("LOG_A_DANGEROUS_PRESENCE_LURKS_ON"), Color(1.0, 0.75, 0.3))
 		return
 
+## Spawns floor monsters using two-axis placement:
+##   • Difficulty gradient — rooms farther from the entry get stronger themes.
+##   • Room coherence    — 80 % of monsters in a room share the same theme type.
+##
+## Flow: sort rooms by distance → assign zone (near/mid/far) → pick one
+## "theme" MonsterData per room (zone-appropriate strength) → fill each room.
 func _spawn_monsters_for_floor(depth: int) -> void:
 	var count: int = _monster_count_for_depth(depth)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = host._floor_lifecycle._floor_seed(depth) ^ 0x5A5A5A5A
 	_spawn_unique_for_floor(depth, rng)
-	var placed: int = 0
-	var attempts: int = 0
-	while placed < count and attempts < 800:
-		attempts += 1
-		var p: Vector2i = host.map.random_floor_tile(rng)
-		if not host.map.is_walkable(p):
+	if count == 0 or host.map.rooms.is_empty():
+		return
+
+	# ── 1. Sort rooms by Chebyshev distance from spawn (entry) ───────────────
+	var entry: Vector2i = host.map.spawn_pos
+	var sorted_rooms: Array = host.map.rooms.duplicate()
+	sorted_rooms.sort_custom(func(a: Rect2i, b: Rect2i) -> bool:
+		return host._chebyshev(a.get_center(), entry) < \
+			   host._chebyshev(b.get_center(), entry))
+	var n_rooms: int = sorted_rooms.size()
+
+	# ── 2. Assign a zone and a theme monster to each room ─────────────────────
+	# zone 0 = near entry (weak), zone 1 = mid, zone 2 = far exit (strong).
+	var room_themes: Array = []   # MonsterData or null per room
+	for ri in range(n_rooms):
+		var zone: int = (ri * 3) / n_rooms           # 0, 1, or 2
+		var theme_seed: int = host._floor_lifecycle._floor_seed(depth) \
+				^ (ri * 0x7777 + depth * 0x1234)
+		room_themes.append(_pick_theme_for_zone(depth, zone, theme_seed))
+
+	# ── 3. Distribute monster budget proportional to room area ───────────────
+	var total_area: float = 0.0
+	for room in sorted_rooms:
+		total_area += float(room.get_area())
+	var room_budgets: Array = []
+	var distributed: int = 0
+	for ri in range(n_rooms):
+		var frac: float = float(sorted_rooms[ri].get_area()) / max(1.0, total_area)
+		var budget: int = max(0, int(round(float(count) * frac)))
+		room_budgets.append(budget)
+		distributed += budget
+	# Assign leftovers to the farthest rooms first (they get the strongest monsters).
+	var leftover: int = count - distributed
+	var ri_left: int = n_rooms - 1
+	while leftover > 0 and ri_left >= 0:
+		room_budgets[ri_left] += 1
+		leftover -= 1
+		ri_left -= 1
+
+	# ── 4. Place monsters room by room ───────────────────────────────────────
+	for ri in range(n_rooms):
+		var room: Rect2i = sorted_rooms[ri]
+		var theme: MonsterData = room_themes[ri]
+		var need: int = room_budgets[ri]
+		if need == 0:
 			continue
-		if p == host.player.grid_pos:
-			continue
-		if host._chebyshev(p, host.player.grid_pos) < 3:
-			continue
-		if host._monster_at(p) != null:
-			continue
+		var placed: int = 0
+		var attempts: int = 0
+		while placed < need and attempts < 300:
+			attempts += 1
+			var px: int = rng.randi_range(room.position.x,
+					room.position.x + room.size.x - 1)
+			var py: int = rng.randi_range(room.position.y,
+					room.position.y + room.size.y - 1)
+			var p := Vector2i(px, py)
+			if not host.map.is_walkable(p):
+				continue
+			if p == host.player.grid_pos:
+				continue
+			if host._chebyshev(p, host.player.grid_pos) < 3:
+				continue
+			if host._monster_at(p) != null:
+				continue
+			# 80 % theme coherence, 20 % wildcard for variety.
+			var use_theme: bool = theme != null and rng.randf() < 0.8
+			var data: MonsterData = theme if use_theme \
+					else MonsterRegistry.pick_by_depth(depth)
+			if data == null:
+				continue
+			_do_place_monster(data, p)
+			placed += 1
+
+## Picks one representative MonsterData for a room zone.
+## zone 0 → prefers weak monsters (xp ≤ 2)
+## zone 1 → prefers medium monsters (xp 3–4)
+## zone 2 → prefers strong monsters (xp ≥ 5)
+## Falls back to any depth-appropriate monster if the zone filter yields nothing.
+func _pick_theme_for_zone(depth: int, zone: int, seed: int) -> MonsterData:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed
+	var best: MonsterData = null
+	for _i in range(8):
 		var data: MonsterData = MonsterRegistry.pick_by_depth(depth)
 		if data == null:
-			return
-		var m: Monster = host.MonsterScene.new()
-		host.monsters_layer.add_child(m)
-		m.setup(data, host.map, p)
-		m.hit_taken.connect(host._on_monster_hit.bind(m))
-		if m.has_signal("awareness_changed"):
-			m.awareness_changed.connect(host._on_monster_awareness_changed)
-		m.died.connect(host._on_monster_died)
-		TurnManager.register_actor(m)
-		_roll_monster_weapon(m)
-		placed += 1
+			continue
+		var fits: bool
+		match zone:
+			0: fits = data.xp_value <= 2
+			1: fits = data.xp_value >= 3 and data.xp_value <= 4
+			_: fits = data.xp_value >= 5
+		if fits:
+			return data       # first match wins; seeded rng gives deterministic variety
+		if best == null:
+			best = data       # keep first candidate as fallback
+	return best               # fallback if no zone-appropriate monster found
+
+func _do_place_monster(data: MonsterData, p: Vector2i) -> void:
+	var m: Monster = host.MonsterScene.new()
+	host.monsters_layer.add_child(m)
+	m.setup(data, host.map, p)
+	m.hit_taken.connect(host._on_monster_hit.bind(m))
+	if m.has_signal("awareness_changed"):
+		m.awareness_changed.connect(host._on_monster_awareness_changed)
+	m.died.connect(host._on_monster_died)
+	TurnManager.register_actor(m)
+	_roll_monster_weapon(m)
 
 func _spawn_items_for_floor(depth: int) -> void:
 	var rng := RandomNumberGenerator.new()

@@ -161,14 +161,24 @@ func _ready() -> void:
 		_generate_branch_floor(GameManager.branch_zone, GameManager.branch_floor, true)
 	else:
 		_floor_lifecycle._generate_floor(GameManager.depth, _floor_lifecycle._floor_seed(GameManager.depth))
-		_spawn_companions()
-		_spawn_camera()
-		_spawn_ui()
-		if GameManager.selected_race_id == "tester":
-			_spawn_debug_floor_panel()
+	# Camera, HUD, and companions must be spawned after floor generation so
+	# companion positions resolve against real walkable tiles.
+	# Previously these were inside the else-branch only, so loading a save made
+	# inside a branch left camera/ui_layer/top_hud null — minimap never updated
+	# and _show_result_screen crashed on ui_layer.add_child (death bug).
+	_spawn_companions()
+	_spawn_camera()
+	_spawn_ui()
+	if GameManager.selected_race_id == "tester":
+		_spawn_debug_floor_panel()
+	if not TurnManager.player_turn_started.is_connected(_on_player_turn_started):
 		TurnManager.player_turn_started.connect(_on_player_turn_started)
 	if not ExpeditionState.exhausted.is_connected(_on_turn_budget_exhausted):
 		ExpeditionState.exhausted.connect(_on_turn_budget_exhausted)
+	# Refresh FOV after UI is spawned so the minimap gets its first texture
+	# even when resuming from a branch save (where _refresh_fov inside
+	# _generate_branch_floor fired before top_hud existed).
+	_refresh_fov()
 	_update_hud()
 	_refresh_quickslots()
 	# Initialize budget for the floor we just spawned into (covers both fresh
