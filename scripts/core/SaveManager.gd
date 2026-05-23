@@ -104,6 +104,7 @@ func save_run(player, game_manager) -> bool:
 		# state of every visited floor (audit C1).
 		"floor_cache": SaveCodec.encode_cache_dict(game_manager.floor_cache),
 		"branch_floor_cache": SaveCodec.encode_cache_dict(game_manager.branch_floor_cache),
+		"persistent_branch_explored": SaveCodec.encode_explored_map(game_manager.persistent_branch_explored),
 		"party": PartyManager.save_state(),
 	}
 	return save(data)

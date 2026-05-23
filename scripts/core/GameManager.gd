@@ -58,6 +58,11 @@ var branch_entry_depth: int = 0    # main-path depth where branch was entered
 var branch_floor_cache: Dictionary = {}  # branch_zone+floor -> floor state
 var branches_cleared: Array = []   # branch ids cleared this run
 
+# Explored tiles that survive across expeditions — cleared only on death,
+# not on start_new_run. Key: "branch_id_floor" (e.g. "swamp_1").
+# Value: Dictionary[Vector2i, bool].
+var persistent_branch_explored: Dictionary = {}
+
 # Display / meta state (persisted).
 var use_tiles: bool = true
 var titles: Array = []  # earned title strings
@@ -109,6 +114,7 @@ func end_run(result: String) -> void:
 	run_in_progress = false
 	floor_cache.clear()
 	if result == "death":
+		persistent_branch_explored.clear()
 		SaveManager.delete_save()
 	emit_signal("run_ended", result)
 
@@ -146,6 +152,11 @@ func load_run() -> bool:
 		branch_floor_cache = SaveCodec.decode_cache_dict(bfc_raw, false)
 	else:
 		branch_floor_cache.clear()
+	var pbe_raw = data.get("persistent_branch_explored", null)
+	if pbe_raw is Dictionary:
+		persistent_branch_explored = SaveCodec.decode_explored_map(pbe_raw)
+	else:
+		pass  # keep existing in-memory value (cross-expedition persistence)
 	# Party state.
 	var party_raw = data.get("party", null)
 	if party_raw is Dictionary:

@@ -1878,6 +1878,9 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 			_spawn_branch_resistance_hint(branch_id)
 	if not branch_used_fixed:
 		_scatter_hazard_tiles(cfg.get("env", ""))
+	# Restore previously explored tiles from persistent memory (survives expeditions).
+	if GameManager.persistent_branch_explored.has(cache_key):
+		map.explored.merge(GameManager.persistent_branch_explored[cache_key], true)
 	_refresh_fov()
 
 ## Returns path to the authored ASCII map for a branch, or "" to use procedural.
@@ -2168,6 +2171,10 @@ func _cache_branch_floor(branch_id: String, branch_floor: int) -> void:
 			if "_ability_charge" in n: msnap["_ability_charge"] = n._ability_charge
 			state.monsters.append(msnap)
 	GameManager.branch_floor_cache[cache_key] = state
+	# Merge into persistent explored so it survives the next expedition.
+	if not GameManager.persistent_branch_explored.has(cache_key):
+		GameManager.persistent_branch_explored[cache_key] = {}
+	GameManager.persistent_branch_explored[cache_key].merge(map.explored, true)
 
 # Single source of truth for persisting a run — caches the current floor
 # (main or branch) before writing the save, so mid-floor saves include

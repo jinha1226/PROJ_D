@@ -179,6 +179,22 @@ static func decode_floor_state(data: Dictionary) -> Dictionary:
 		out["fog_tiles"] = dec_vec_dict(data["fog_tiles"])
 	return out
 
+## Encode/decode the persistent explored map: Dict[String, Dict[Vector2i, bool]]
+## Used for persistent_branch_explored which survives across expeditions.
+static func encode_explored_map(m: Dictionary) -> Dictionary:
+	var out: Dictionary = {}
+	for k in m.keys():
+		out[str(k)] = enc_vec_dict(m[k])
+	return out
+
+static func decode_explored_map(data) -> Dictionary:
+	var out: Dictionary = {}
+	if typeof(data) != TYPE_DICTIONARY:
+		return out
+	for k in data.keys():
+		out[str(k)] = dec_vec_dict(data[k])
+	return out
+
 ## Encode a {depth: state} or {key: state} dict.
 static func encode_cache_dict(cache: Dictionary) -> Dictionary:
 	var out: Dictionary = {}
