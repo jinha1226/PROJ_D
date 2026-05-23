@@ -105,9 +105,5 @@ static func _make_box(name: String, margin: int, content: Vector4) -> StyleBoxTe
 static func _load_pixel_texture(path: String) -> Texture2D:
 	if ResourceLoader.exists(path):
 		return load(path) as Texture2D
-	var image := Image.new()
-	var err := image.load(ProjectSettings.globalize_path(path))
-	if err != OK:
-		push_warning("Pixel UI texture missing: %s" % path)
-		return null
-	return ImageTexture.create_from_image(image)
+	push_warning("Pixel UI texture missing: %s" % path)
+	return null
