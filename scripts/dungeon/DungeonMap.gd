@@ -25,6 +25,7 @@ const TEX_STAIRS_DOWN: Texture2D = preload(
 	"res://assets/tiles/individual/dngn/gateways/metal_stairs_down.png")
 var _tex_door_closed: Texture2D = null
 var _tex_door_open: Texture2D = null
+var _tex_shop: Texture2D = null
 
 ## Depth-banded terrain art. Each band declares its wall + floor tile
 ## paths; picked by pick_atmosphere_for_depth() on generate().
@@ -293,6 +294,7 @@ func _ready() -> void:
 	GameManager = get_node_or_null("/root/GameManager")
 	_tex_door_closed = load("res://assets/tiles/individual/dngn/doors/closed_door.png") as Texture2D
 	_tex_door_open = load("res://assets/tiles/individual/dngn/doors/open_door.png") as Texture2D
+	_tex_shop = load("res://assets/tiles/individual/dngn/shops/enter_shop.png") as Texture2D
 	add_to_group("dungeon_map")
 
 func _load_atmosphere(depth: int) -> void:
@@ -497,6 +499,8 @@ func _texture_for(t: int) -> Texture2D:
 			return _tex_door_open
 		Tile.BRANCH_DOWN:
 			return _tex_branch_entrance if _tex_branch_entrance != null else TEX_STAIRS_DOWN
+		Tile.SHOP:
+			return _tex_shop
 	return null
 
 func _glyph_for(t: int) -> String:

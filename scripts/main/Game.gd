@@ -2966,7 +2966,7 @@ func _spawn_debug_floor_panel() -> void:
 	vb.add_theme_constant_override("separation", 6)
 	scroll.add_child(vb)
 
-	# Main floors 1-16
+	# Main floors 1-5
 	var hdr := Label.new()
 	hdr.text = "── Main Dungeon ──"
 	hdr.add_theme_font_size_override("font_size", 20)
@@ -2979,7 +2979,7 @@ func _spawn_debug_floor_panel() -> void:
 	grid.add_theme_constant_override("h_separation", 6)
 	grid.add_theme_constant_override("v_separation", 6)
 	vb.add_child(grid)
-	for d in range(1, 17):
+	for d in range(1, 6):
 		var btn := Button.new()
 		btn.text = "B%d" % d
 		btn.custom_minimum_size = Vector2(72, 48)
