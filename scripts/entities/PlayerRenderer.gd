@@ -222,108 +222,16 @@ var _atk_sheets: Dictionary = {}          # {anim: Array[Texture2D]} (head+hair+
 
 # ── Public API ─────────────────────────────────────────────────────────────────
 
-## Rebuild all paperdoll/ULPC textures from the player's current equipment and race.
+## Load the DCSS race tile for in-dungeon rendering.
 ## Called by Player._on_equipment_changed() and set_race_from_id().
-func refresh_equipment(player: Player) -> void:
-	_body_doll_tex = null
-	_hand1_doll_tex = null
-	_hand2_doll_tex = null
-	var ItemRegistry = get_node_or_null("/root/ItemRegistry")
+func refresh_equipment(_player: Player) -> void:
 	var GameManager = get_node_or_null("/root/GameManager")
 	var race_id: String = GameManager.selected_race_id if GameManager != null else "human"
-	# Load DCSS race tile for in-dungeon rendering.
 	var dcss_path: String = String(_RACE_DCSS_MAP.get(race_id, _RACE_DCSS_MAP["human"]))
 	if ResourceLoader.exists(dcss_path):
 		_dcss_tile = load(dcss_path) as Texture2D
 	else:
 		_dcss_tile = DEFAULT_BASE_TEX
-	# Load ULPC body base — race-specific
-	var body_rel: String = _RACE_BODY_MAP.get(race_id, "body/bodies/male/walk.png")
-	_base_tex = load_ulpc_tex(_ULPC_ROOT + body_rel)
-	var armor_base_id: String = ItemRegistry.base_id_of(player.equipped_armor_id) if ItemRegistry != null else player.equipped_armor_id
-	if DOLL_BODY_MAP.has(armor_base_id):
-		var body_path: String = String(DOLL_BODY_MAP[armor_base_id])
-		if ResourceLoader.exists(body_path):
-			_body_doll_tex = load(body_path) as Texture2D
-	var weapon_base_id: String = ItemRegistry.base_id_of(player.equipped_weapon_id) if ItemRegistry != null else player.equipped_weapon_id
-	if DOLL_HAND1_MAP.has(weapon_base_id):
-		var path: String = String(DOLL_HAND1_MAP[weapon_base_id])
-		if ResourceLoader.exists(path):
-			_hand1_doll_tex = load(path) as Texture2D
-	var shield_base_id: String = ItemRegistry.base_id_of(player.equipped_shield_id) if ItemRegistry != null else player.equipped_shield_id
-	if DOLL_HAND2_MAP.has(shield_base_id):
-		var path: String = String(DOLL_HAND2_MAP[shield_base_id])
-		if ResourceLoader.exists(path):
-			_hand2_doll_tex = load(path) as Texture2D
-	# Load always-on base overlays (head, hair) — race-specific
-	_base_sheets.clear()
-	var head_overlays: Array = _RACE_HEAD_OVERLAYS.get(race_id, _RACE_HEAD_OVERLAYS["human"])
-	for rel in head_overlays:
-		var btex := load_ulpc_tex(_ULPC_ROOT + rel)
-		if btex != null:
-			_base_sheets.append(btex)
-	# Load equipment overlays from ULPC generator
-	_equip_sheets.clear()
-	for pair in _EQUIP_SHEET_SLOTS:
-		var slot_val: String = player.get(pair[0]) if pair[0] in player else ""
-		if slot_val == "":
-			continue
-		var base_id: String = ItemRegistry.base_id_of(slot_val) if ItemRegistry != null else slot_val
-		var item_data: ItemData = ItemRegistry.get_by_id(slot_val) if ItemRegistry != null else null
-		var path: String = ""
-		if item_data != null and item_data.equip_overlay_path != "":
-			path = item_data.equip_overlay_path
-		else:
-			path = ulpc_overlay_path(pair[1] as String, base_id)
-		if path != "":
-			var tex := load_ulpc_tex(path)
-			if tex != null:
-				_equip_sheets.append(tex)
-	# Armor slot also adds matching legs overlay
-	if player.equipped_armor_id != "":
-		var armor_base: String = ItemRegistry.base_id_of(player.equipped_armor_id) if ItemRegistry != null else player.equipped_armor_id
-		var legs_path: String = _LEGS_OVERLAY_MAP.get(armor_base, "")
-		if legs_path != "":
-			var tex := load_ulpc_tex(legs_path)
-			if tex != null:
-				_equip_sheets.append(tex)
-	# Preload attack animation sheets (slash / thrust / spellcast) for body + all overlays
-	_atk_base.clear()
-	_atk_sheets.clear()
-	var body_walk_path := _ULPC_ROOT + body_rel
-	for anim in ["slash", "thrust", "spellcast"]:
-		var bp := ulpc_attack_path(body_walk_path, anim)
-		_atk_base[anim] = load_ulpc_tex(bp) if bp != "" else null
-		var sheets: Array[Texture2D] = []
-		for rel2 in head_overlays:
-			var ap := ulpc_attack_path(_ULPC_ROOT + rel2, anim)
-			if ap != "":
-				var t := load_ulpc_tex(ap)
-				if t != null:
-					sheets.append(t)
-		for pair in _EQUIP_SHEET_SLOTS:
-			var slot_val: String = player.get(pair[0]) if pair[0] in player else ""
-			if slot_val == "":
-				continue
-			var bid: String = ItemRegistry.base_id_of(slot_val) if ItemRegistry != null else slot_val
-			var wpath := ulpc_overlay_path(pair[1] as String, bid)
-			if wpath == "":
-				continue
-			var ap := ulpc_attack_path(wpath, anim)
-			if ap != "":
-				var t := load_ulpc_tex(ap)
-				if t != null:
-					sheets.append(t)
-		if player.equipped_armor_id != "":
-			var armor_base2: String = ItemRegistry.base_id_of(player.equipped_armor_id) if ItemRegistry != null else player.equipped_armor_id
-			var lw: String = _LEGS_OVERLAY_MAP.get(armor_base2, "")
-			if lw != "":
-				var ap := ulpc_attack_path(lw, anim)
-				if ap != "":
-					var t := load_ulpc_tex(ap)
-					if t != null:
-						sheets.append(t)
-		_atk_sheets[anim] = sheets
 	queue_redraw()
 
 
