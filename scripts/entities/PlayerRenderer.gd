@@ -7,6 +7,20 @@ class_name PlayerRenderer extends Node2D
 const DEFAULT_BASE_TEX: Texture2D = preload(
 	"res://assets/tiles/individual/player/base/human_m.png")
 
+## DCSS per-race player tile (static, no animation).
+const _RACE_DCSS_MAP: Dictionary = {
+	"human":    "res://assets/tiles/individual/player/base/human_m.png",
+	"elf":      "res://assets/tiles/individual/player/base/elf_m.png",
+	"dwarf":    "res://assets/tiles/individual/player/base/dwarf_m.png",
+	"hill_orc": "res://assets/tiles/individual/player/base/orc_m.png",
+	"troll":    "res://assets/tiles/individual/player/base/troll_m.png",
+	"vampire":  "res://assets/tiles/individual/player/base/vampire_m.png",
+	"minotaur": "res://assets/tiles/individual/player/base/minotaur_m.png",
+	"kobold":   "res://assets/tiles/individual/player/base/kobold_m.png",
+	"spriggan": "res://assets/tiles/individual/player/base/spriggan_m.png",
+	"gargoyle": "res://assets/tiles/individual/player/base/gargoyle_m.png",
+}
+
 ## Paper-doll layer lookup tables. When equipped item id matches a key,
 ## the corresponding sprite is drawn on top of the base race sprite.
 const DOLL_BODY_MAP: Dictionary = {
@@ -188,6 +202,7 @@ const _EQUIP_SHEET_SLOTS: Array[Array] = [
 
 # ── Runtime state ──────────────────────────────────────────────────────────────
 
+var _dcss_tile: Texture2D = DEFAULT_BASE_TEX  # current race DCSS tile
 var _base_tex: Texture2D = DEFAULT_BASE_TEX
 var _body_doll_tex: Texture2D = null
 var _hand1_doll_tex: Texture2D = null
@@ -215,8 +230,14 @@ func refresh_equipment(player: Player) -> void:
 	_hand2_doll_tex = null
 	var ItemRegistry = get_node_or_null("/root/ItemRegistry")
 	var GameManager = get_node_or_null("/root/GameManager")
-	# Load ULPC body base — race-specific
 	var race_id: String = GameManager.selected_race_id if GameManager != null else "human"
+	# Load DCSS race tile for in-dungeon rendering.
+	var dcss_path: String = String(_RACE_DCSS_MAP.get(race_id, _RACE_DCSS_MAP["human"]))
+	if ResourceLoader.exists(dcss_path):
+		_dcss_tile = load(dcss_path) as Texture2D
+	else:
+		_dcss_tile = DEFAULT_BASE_TEX
+	# Load ULPC body base — race-specific
 	var body_rel: String = _RACE_BODY_MAP.get(race_id, "body/bodies/male/walk.png")
 	_base_tex = load_ulpc_tex(_ULPC_ROOT + body_rel)
 	var armor_base_id: String = ItemRegistry.base_id_of(player.equipped_armor_id) if ItemRegistry != null else player.equipped_armor_id
@@ -471,29 +492,8 @@ func _draw_ulpc4(tex: Texture2D, urect: Rect2, col: int, total_cols: int, row: i
 
 # ── _process / _draw ──────────────────────────────────────────────────────────
 
-func _process(delta: float) -> void:
-	if _attack_anim_active:
-		_attack_anim_t += delta
-		var cols: int = int(_ATTACK_FRAMES.get(_attack_anim_type, 6))
-		var new_frame := int(_attack_anim_t * _ATTACK_FPS)
-		if new_frame >= cols:
-			_attack_anim_active = false
-			_attack_frame = 0
-			queue_redraw()
-		elif new_frame != _attack_frame:
-			_attack_frame = new_frame
-			queue_redraw()
-	if not _walk_anim_active:
-		return
-	_walk_anim_t += delta
-	var new_frame := int(_walk_anim_t * _WALK_FPS)
-	if new_frame >= 9:
-		_walk_anim_active = false
-		_walk_frame = 0
-		queue_redraw()
-	elif new_frame != _walk_frame:
-		_walk_frame = new_frame
-		queue_redraw()
+func _process(_delta: float) -> void:
+	pass  # No animation in DCSS tile mode.
 
 
 func _draw() -> void:
@@ -503,73 +503,13 @@ func _draw() -> void:
 	var GameManager = get_node_or_null("/root/GameManager")
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
 	if GameManager != null and GameManager.use_tiles:
-		var row := _facing_to_row(player.facing)
-		var frame := _facing_to_frame(player.facing)
-		var ulpc_rect := _ulpc_draw_rect()
-		# ── Attack animation ─────────────────────────────────────────────────
-		if _attack_anim_active and _atk_base.has(_attack_anim_type):
-			var cols: int = int(_ATTACK_FRAMES.get(_attack_anim_type, 6))
-			var atk_tex: Texture2D = _atk_base.get(_attack_anim_type)
-			if atk_tex != null:
-				_draw_ulpc4(atk_tex, ulpc_rect, _attack_frame, cols, row)
-			var atk_list: Array = _atk_sheets.get(_attack_anim_type, [])
-			for atex in atk_list:
-				if atex != null:
-					_draw_ulpc4(atex, ulpc_rect, _attack_frame, cols, row)
-			return
-		# ── Walk / idle ──────────────────────────────────────────────────────
-		if _base_tex != null:
-			var tw := _base_tex.get_width()
-			var th := _base_tex.get_height()
-			if tw >= th * 4:
-				# 8-dir horizontal sheet: N NE W SE S SW E NW
-				var fw := tw / 8
-				draw_texture_rect_region(_base_tex, rect, Rect2(frame * fw, 0, fw, th))
-			elif tw * 4 == th * 9 and th % 4 == 0:
-				# ULPC 4-dir walk (9 cols × 4 rows)
-				var fw := tw / 9
-				var fh := th / 4
-				draw_texture_rect_region(_base_tex, ulpc_rect, Rect2(_walk_frame * fw, row * fh, fw, fh))
-			else:
-				draw_texture_rect(_base_tex, rect, false)
-		# Always-on base overlays (head, hair) drawn over body
-		for btex in _base_sheets:
-			if btex == null:
-				continue
-			var btw := btex.get_width()
-			var bth := btex.get_height()
-			if btw >= bth * 4:
-				var bfw := btw / 8
-				draw_texture_rect_region(btex, rect, Rect2(frame * bfw, 0, bfw, bth))
-			elif btw * 4 == bth * 9 and bth % 4 == 0:
-				var bfw := btw / 9
-				var bfh := bth / 4
-				draw_texture_rect_region(btex, ulpc_rect, Rect2(_walk_frame * bfw, row * bfh, bfw, bfh))
-			else:
-				draw_texture_rect(btex, rect, false)
-		# Equipment overlay sheets drawn on top
-		for etex in _equip_sheets:
-			if etex == null:
-				continue
-			var etw := etex.get_width()
-			var eth := etex.get_height()
-			if etw >= eth * 4:
-				var efw := etw / 8
-				draw_texture_rect_region(etex, rect, Rect2(frame * efw, 0, efw, eth))
-			elif etw * 4 == eth * 9 and eth % 4 == 0:
-				var efw := etw / 9
-				var efh := eth / 4
-				draw_texture_rect_region(etex, ulpc_rect, Rect2(_walk_frame * efw, row * efh, efw, efh))
-			else:
-				draw_texture_rect(etex, rect, false)
-		# Legacy single-frame paperdoll fallback
-		if _equip_sheets.is_empty():
-			if _body_doll_tex != null:
-				draw_texture_rect(_body_doll_tex, rect, false)
-			if _hand1_doll_tex != null:
-				draw_texture_rect(_hand1_doll_tex, rect, false)
-			if _hand2_doll_tex != null:
-				draw_texture_rect(_hand2_doll_tex, rect, false)
+		if _dcss_tile != null:
+			draw_texture_rect(_dcss_tile, rect, false)
+		else:
+			draw_string(ThemeDB.fallback_font,
+				Vector2(6, DungeonMap.CELL_SIZE - 6),
+				"@", HORIZONTAL_ALIGNMENT_LEFT, -1, DungeonMap.CELL_SIZE - 6,
+				Color(1.0, 0.95, 0.5))
 	else:
 		draw_string(ThemeDB.fallback_font,
 			Vector2(6, DungeonMap.CELL_SIZE - 6),
