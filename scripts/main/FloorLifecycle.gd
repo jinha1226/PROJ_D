@@ -88,7 +88,7 @@ func _generate_floor(depth: int, map_seed: int,
 ## Pick a random walkable floor tile away from stairs/branch entrance.
 ## Falls back to spawn_pos if no suitable tile found.
 func _random_start_pos(seed_hint: int) -> Vector2i:
-	var map := host.map
+	var map: DungeonMap = host.map as DungeonMap
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_hint ^ 0xBEEF1234
 	# Collect forbidden positions (stairs, branch entrance).

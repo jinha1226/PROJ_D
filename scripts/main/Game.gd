@@ -508,13 +508,30 @@ func _apply_starter_kit() -> void:
 				break
 	player.refresh_ac_from_equipment()
 	player._refresh_paperdoll()
-	# Auto-study any books in the starter kit so mages begin with their spells.
+	# Auto-study any books in the starter kit — bypass int requirement so
+	# new mages always receive their starting spells regardless of race stats.
 	var _bi: int = player.items.size() - 1
 	while _bi >= 0:
 		var _bentry: Dictionary = player.items[_bi]
 		var _bdata = ItemRegistry.get_by_id(String(_bentry.get("id", ""))) if ItemRegistry != null else null
 		if _bdata != null and String(_bdata.effect) == "study":
-			player.use_item(_bi)
+			var _spell_ids: Array = []
+			var _entry_ids = _bentry.get("grants_spell_ids", [])
+			if _entry_ids is Array and not (_entry_ids as Array).is_empty():
+				for _sid in (_entry_ids as Array):
+					_spell_ids.append(String(_sid))
+			else:
+				if String(_bdata.grants_spell_id) != "":
+					_spell_ids.append(String(_bdata.grants_spell_id))
+				for _sid in _bdata.grants_spell_ids:
+					_spell_ids.append(String(_sid))
+			for _sid in _spell_ids:
+				if _sid != "" and not player.known_spells.has(_sid):
+					player.known_spells.append(_sid)
+					var _sp = SpellRegistry.get_by_id(_sid) if SpellRegistry != null else null
+					if _sp != null:
+						CombatLog.post(LocaleManager.t("LOG_YOU_MEMORIZE") % _sp.display_name, Color(0.7, 0.95, 1.0))
+			player.items.remove_at(_bi)
 		_bi -= 1
 	GameManager.selected_starting_weapon_id = ""
 	GameManager.selected_starting_school_id = ""
