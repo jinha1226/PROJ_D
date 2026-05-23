@@ -131,6 +131,7 @@ func _make_portrait(data: RaceData) -> Control:
 	if portrait_path == "" or not ResourceLoader.exists(portrait_path):
 		portrait_path = String(_RACE_PORTRAIT_MAP.get(data.id, _RACE_PORTRAIT_MAP["human"]))
 	_add_layer(cont, portrait_path, dim)
+	_add_layer(cont, _DEFAULT_BODY, dim)
 	return cont
 
 func _add_layer(parent: Control, path: String, dim: bool) -> void:

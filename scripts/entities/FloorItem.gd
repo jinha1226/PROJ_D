@@ -32,6 +32,8 @@ func setup(item_data: ItemData, map: DungeonMap, pos: Vector2i, plus_val: int = 
 		# Entry-level tile_path takes priority (used by partial books and overrides).
 		var entry_tile: String = String(entry.get("tile_path", ""))
 		var resolved_tile: String = entry_tile if entry_tile != "" else data.tile_path
+		if data.kind == "potion" and GameManager != null:
+			resolved_tile = GameManager.potion_color_tile(data.id)
 		if resolved_tile != "":
 			_base_tex = load(resolved_tile) as Texture2D
 	if data.identified_tile_path != "":
