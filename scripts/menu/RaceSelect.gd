@@ -107,56 +107,48 @@ func _make_card(data: RaceData) -> Control:
 
 const _DEFAULT_BODY: String = "res://assets/tiles/individual/player/body/leather_armour.png"
 
+## DCSS per-race portrait tile (player/base/race_m.png).
+const _RACE_PORTRAIT_MAP: Dictionary = {
+	"human":    "res://assets/tiles/individual/player/base/human_m.png",
+	"elf":      "res://assets/tiles/individual/player/base/elf_m.png",
+	"dwarf":    "res://assets/tiles/individual/player/base/dwarf_m.png",
+	"hill_orc": "res://assets/tiles/individual/player/base/orc_m.png",
+	"troll":    "res://assets/tiles/individual/player/base/troll_m.png",
+	"vampire":  "res://assets/tiles/individual/player/base/vampire_m.png",
+	"minotaur": "res://assets/tiles/individual/player/base/minotaur_m.png",
+	"kobold":   "res://assets/tiles/individual/player/base/kobold_m.png",
+	"spriggan": "res://assets/tiles/individual/player/base/spriggan_m.png",
+	"gargoyle": "res://assets/tiles/individual/player/base/gargoyle_m.png",
+}
+
 func _make_portrait(data: RaceData) -> Control:
 	var cont := Control.new()
 	cont.custom_minimum_size = Vector2(96, 120)
 	cont.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var dim: bool = not RaceRegistry.is_unlocked(data.id)
-	if data.menu_portrait_path != "" and ResourceLoader.exists(data.menu_portrait_path):
-		_add_layer(cont, data.menu_portrait_path, dim)
-	else:
-		# ULPC-based portrait: body + race-specific head/hair overlays
-		var body_color: Color = PlayerRenderer.race_body_color(data.id)
-		_add_layer_ulpc(cont, PlayerRenderer.race_body_path(data.id), dim, body_color)
-		for full_path in PlayerRenderer.race_head_overlays(data.id):
-			_add_layer_ulpc(cont, full_path, dim, body_color)
+	# Prefer explicit menu portrait, then DCSS race tile.
+	var portrait_path: String = data.menu_portrait_path
+	if portrait_path == "" or not ResourceLoader.exists(portrait_path):
+		portrait_path = String(_RACE_PORTRAIT_MAP.get(data.id, _RACE_PORTRAIT_MAP["human"]))
+	_add_layer(cont, portrait_path, dim)
 	return cont
-
-func _add_layer_ulpc(parent: Control, path: String, dim: bool, tint: Color = Color.WHITE) -> void:
-	_apply_layer(parent, PlayerRenderer.load_ulpc_tex(path), dim, tint)
 
 func _add_layer(parent: Control, path: String, dim: bool) -> void:
 	if not ResourceLoader.exists(path):
 		return
 	_apply_layer(parent, load(path) as Texture2D, dim)
 
-func _apply_layer(parent: Control, tex: Texture2D, dim: bool, tint: Color = Color.WHITE) -> void:
+func _apply_layer(parent: Control, tex: Texture2D, dim: bool) -> void:
 	if tex == null:
 		return
 	var rect := TextureRect.new()
-	var tw := tex.get_width()
-	var th := tex.get_height()
-	var atlas := AtlasTexture.new()
-	atlas.atlas = tex
-	if tw >= th * 4:
-		# 8-dir horizontal: frame 4 = S
-		var fw := tw / 8
-		atlas.region = Rect2(4 * fw, 0, fw, th)
-		rect.texture = atlas
-	elif tw * 4 == th * 9 and th % 4 == 0:
-		# ULPC 4-dir vertical: row 2 = S, frame 0
-		var fw := tw / 9
-		var fh := th / 4
-		atlas.region = Rect2(0, 2 * fh, fw, fh)
-		rect.texture = atlas
-	else:
-		rect.texture = tex
+	rect.texture = tex
 	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	rect.anchor_right = 1.0
 	rect.anchor_bottom = 1.0
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	rect.modulate = Color(0.4, 0.4, 0.45, 1) if dim else tint
+	rect.modulate = Color(0.4, 0.4, 0.45, 1) if dim else Color.WHITE
 	parent.add_child(rect)
 
 # 9-skill visible aptitude row. Each cell aggregates the race's

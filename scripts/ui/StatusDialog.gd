@@ -433,42 +433,37 @@ static func _south_atlas(tex: Texture2D) -> Texture2D:
 		return tex
 	return a
 
+const _RACE_PORTRAIT_MAP: Dictionary = {
+	"human":    "res://assets/tiles/individual/player/base/human_m.png",
+	"elf":      "res://assets/tiles/individual/player/base/elf_m.png",
+	"dwarf":    "res://assets/tiles/individual/player/base/dwarf_m.png",
+	"hill_orc": "res://assets/tiles/individual/player/base/orc_m.png",
+	"troll":    "res://assets/tiles/individual/player/base/troll_m.png",
+	"vampire":  "res://assets/tiles/individual/player/base/vampire_m.png",
+	"minotaur": "res://assets/tiles/individual/player/base/minotaur_m.png",
+	"kobold":   "res://assets/tiles/individual/player/base/kobold_m.png",
+	"spriggan": "res://assets/tiles/individual/player/base/spriggan_m.png",
+	"gargoyle": "res://assets/tiles/individual/player/base/gargoyle_m.png",
+}
+
 static func _portrait_stack(player: Player) -> Control:
 	var panel := CenterContainer.new()
 	panel.custom_minimum_size = Vector2(180, 220)
-	var layers := Control.new()
-	layers.custom_minimum_size = Vector2(160, 200)
-	panel.add_child(layers)
-	# Body base — race-correct via PlayerRenderer static helpers
 	var race_id: String = GameManager.selected_race_id if GameManager != null else "human"
-	var body_tex := PlayerRenderer.load_ulpc_tex(PlayerRenderer.race_body_path(race_id))
-	_add_portrait_layer(layers, body_tex)
-	# Always-on overlays (head, ears, hair) — race-specific
-	for full_path in PlayerRenderer.race_head_overlays(race_id):
-		var btex := PlayerRenderer.load_ulpc_tex(full_path)
-		if btex != null:
-			_add_portrait_layer(layers, btex)
-	# Equipment-conditional overlays
-	for pair in _EQUIP_LAYERS:
-		var slot_val: String = player.get(pair[0]) if pair[0] in player else ""
-		if slot_val == "":
-			continue
-		var base_id: String = ItemRegistry.base_id_of(slot_val) if ItemRegistry != null else slot_val
-		var path: String = PlayerRenderer.ulpc_overlay_path(pair[1] as String, base_id)
-		if path != "":
-			var tex := PlayerRenderer.load_ulpc_tex(path)
-			if tex != null:
-				_add_portrait_layer(layers, tex)
-	# Armor legs overlay
-	if player.equipped_armor_id != "":
-		var armor_base: String = ItemRegistry.base_id_of(player.equipped_armor_id) if ItemRegistry != null else player.equipped_armor_id
-		var legs_path: String = PlayerRenderer.ulpc_overlay_path("legs", armor_base)
-		if legs_path != "":
-			var tex := PlayerRenderer.load_ulpc_tex(legs_path)
-			if tex != null:
-				_add_portrait_layer(layers, tex)
+	var tile_path: String = String(_RACE_PORTRAIT_MAP.get(race_id, _RACE_PORTRAIT_MAP["human"]))
+	if ResourceLoader.exists(tile_path):
+		var rect := TextureRect.new()
+		rect.texture = load(tile_path) as Texture2D
+		rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		rect.custom_minimum_size = Vector2(160, 200)
+		panel.add_child(rect)
 	if player != null and "body_wounds" in player:
-		_add_wound_overlay(layers, player.body_wounds)
+		var dummy := Control.new()
+		dummy.custom_minimum_size = Vector2(160, 200)
+		panel.add_child(dummy)
+		_add_wound_overlay(dummy, player.body_wounds)
 	return panel
 
 static func _add_portrait_layer(parent: Control, tex: Texture2D) -> void:

@@ -9,20 +9,20 @@ const MAIN_ZONES: Array = [
 	# 15-floor PROJ_D layout compressed to 5 PROJ_G themed floors (2026-05-21).
 	# Original ranges retained in comments for migration reference.
 	{"id": "dungeon",     "from": 1, "to": 1, "env": "",      "map_style": "bsp",       # was depths 1-3 (Catacombs)
-		"wall":  "res://assets/tiles/individual/dngn/wall/lpc_gray_stone.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/lpc_stone_cobble.png"},
+		"wall":  "res://assets/tiles/individual/dngn/wall/brick_gray0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/pebble_brown0.png"},
 	{"id": "lair",        "from": 2, "to": 2, "env": "",      "map_style": "cave",      # was depths 4-6 (Lair)
-		"wall":  "res://assets/tiles/individual/dngn/wall/lpc_dark_cobble.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/lpc_dirt.png"},
+		"wall":  "res://assets/tiles/individual/dngn/wall/bmaus_stone_wall0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/lair0.png"},
 	{"id": "orc_mines",   "from": 3, "to": 3, "env": "",      "map_style": "bsp",       # was depths 7-9 (Orc Mines)
-		"wall":  "res://assets/tiles/individual/dngn/wall/lpc_red_brick.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/lpc_dark_brick.png"},
+		"wall":  "res://assets/tiles/individual/dngn/wall/brick_brown0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/orc0.png"},
 	{"id": "elven_halls", "from": 4, "to": 4, "env": "",      "map_style": "bsp_large", # was depths 10-12 (Elven Halls)
-		"wall":  "res://assets/tiles/individual/dngn/wall/lpc_beige_stone.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/lpc_cream_tile.png"},
+		"wall":  "res://assets/tiles/individual/dngn/wall/marble_wall1.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/mosaic0.png"},
 	{"id": "abyss",       "from": 5, "to": 5, "env": "abyss", "map_style": "cave",      # was depths 13-14 (Abyss + final boss)
-		"wall":  "res://assets/tiles/individual/dngn/wall/lpc_dark_stone.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/lpc_dark_hex.png"},
+		"wall":  "res://assets/tiles/individual/dngn/wall/abyss/abyss0.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/demonic_red1.png"},
 ]
 
 # ── Branch configs ───────────────────────────────────────────────────────────
