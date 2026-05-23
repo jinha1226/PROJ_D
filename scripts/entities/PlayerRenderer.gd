@@ -222,17 +222,29 @@ var _atk_sheets: Dictionary = {}          # {anim: Array[Texture2D]} (head+hair+
 
 # ── Public API ─────────────────────────────────────────────────────────────────
 
-## Load the DCSS race tile for in-dungeon rendering.
+## Load the DCSS race tile + equipment doll overlays for in-dungeon rendering.
 ## Called by Player._on_equipment_changed() and set_race_from_id().
-func refresh_equipment(_player: Player) -> void:
+func refresh_equipment(p: Player) -> void:
 	var GameManager = get_node_or_null("/root/GameManager")
 	var race_id: String = GameManager.selected_race_id if GameManager != null else "human"
 	var dcss_path: String = String(_RACE_DCSS_MAP.get(race_id, _RACE_DCSS_MAP["human"]))
-	if ResourceLoader.exists(dcss_path):
-		_dcss_tile = load(dcss_path) as Texture2D
-	else:
-		_dcss_tile = DEFAULT_BASE_TEX
+	_dcss_tile = load(dcss_path) as Texture2D if ResourceLoader.exists(dcss_path) else DEFAULT_BASE_TEX
+
+	var ItemRegistry = get_node_or_null("/root/ItemRegistry")
+	_body_doll_tex = _load_doll_tex(p.equipped_armor_id, DOLL_BODY_MAP, ItemRegistry)
+	_hand2_doll_tex = _load_doll_tex(p.equipped_shield_id, DOLL_HAND2_MAP, ItemRegistry)
+	_hand1_doll_tex = _load_doll_tex(p.equipped_weapon_id, DOLL_HAND1_MAP, ItemRegistry)
 	queue_redraw()
+
+
+static func _load_doll_tex(item_id: String, doll_map: Dictionary, item_reg) -> Texture2D:
+	if item_id == "":
+		return null
+	var base_id: String = item_reg.base_id_of(item_id) if item_reg != null else item_id
+	var path: String = String(doll_map.get(base_id, ""))
+	if path == "" or not ResourceLoader.exists(path):
+		return null
+	return load(path) as Texture2D
 
 
 ## Called by Player._try_move() when a step begins. Resets or resumes walk cycle.
@@ -413,6 +425,12 @@ func _draw() -> void:
 	if GameManager != null and GameManager.use_tiles:
 		if _dcss_tile != null:
 			draw_texture_rect(_dcss_tile, rect, false)
+			if _body_doll_tex != null:
+				draw_texture_rect(_body_doll_tex, rect, false)
+			if _hand2_doll_tex != null:
+				draw_texture_rect(_hand2_doll_tex, rect, false)
+			if _hand1_doll_tex != null:
+				draw_texture_rect(_hand1_doll_tex, rect, false)
 		else:
 			draw_string(ThemeDB.fallback_font,
 				Vector2(6, DungeonMap.CELL_SIZE - 6),

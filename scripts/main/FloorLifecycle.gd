@@ -71,7 +71,7 @@ func _generate_floor(depth: int, map_seed: int,
 				host._spawn_final_boss_floor()
 		else:
 			host._spawn_service._spawn_monsters_for_floor(depth)
-			host._spawn_service._spawn_npcs_for_floor(10)
+			# host._spawn_service._spawn_npcs_for_floor(10)  # disabled for testing
 		# Fixed maps author hazard tiles via ASCII (~, ^) — skip scatter to avoid overwrite.
 		if not used_fixed:
 			host._scatter_hazard_tiles(zone.get("env", ""))

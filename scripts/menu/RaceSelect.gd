@@ -160,8 +160,8 @@ const _APT_ORDER: Array = [
 	"magery", "stealth", "tracking", "survival",
 ]
 const _APT_LABELS: Dictionary = {
-	"weapon_mastery": "Melee", "archery": "Bow", "tactics": "Tac", "defense": "Def",
-	"magery": "Mag", "stealth": "Sth", "tracking": "Trk", "survival": "Surv",
+	"weapon_mastery": "Wpn", "archery": "Arc", "tactics": "Tac", "defense": "Def",
+	"magery": "Mag", "stealth": "Sth", "tracking": "Trk", "survival": "Srv",
 }
 
 func _aggregate_aptitude(data: RaceData, visible_id: String) -> int:
