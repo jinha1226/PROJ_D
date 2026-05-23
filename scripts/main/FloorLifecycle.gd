@@ -62,7 +62,7 @@ func _generate_floor(depth: int, map_seed: int,
 			host.map._tex_branch_entrance = load(etex_path) as Texture2D if etex_path != "" else null
 		else:
 			host.map._tex_branch_entrance = null
-		host.player.bind_map(host.map, host.map.spawn_pos)
+		host.player.bind_map(host.map, _random_start_pos(map_seed))
 		host._spawn_service._spawn_items_for_floor(depth)
 		var zone_id := String(zone.get("id", ""))
 		if zone_id == "abyss":
@@ -82,6 +82,31 @@ func _generate_floor(depth: int, map_seed: int,
 		if _is_shop_floor(depth):
 			host._place_shop_tile()
 	host._refresh_fov()
+
+## Pick a random walkable floor tile away from stairs/branch entrance.
+## Falls back to spawn_pos if no suitable tile found.
+func _random_start_pos(seed_hint: int) -> Vector2i:
+	var map := host.map
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_hint ^ 0xBEEF1234
+	# Collect forbidden positions (stairs, branch entrance).
+	var forbidden: Dictionary = {}
+	forbidden[map.spawn_pos] = true
+	forbidden[map.stairs_down_pos] = true
+	forbidden[map.stairs_up_pos] = true
+	for p in map.extra_stairs_down_positions:
+		forbidden[p] = true
+	# Gather candidate tiles from all rooms.
+	var candidates: Array = []
+	for room in map.rooms:
+		for ry in range(room.position.y, room.position.y + room.size.y):
+			for rx in range(room.position.x, room.position.x + room.size.x):
+				var p := Vector2i(rx, ry)
+				if map.is_walkable(p) and not forbidden.has(p):
+					candidates.append(p)
+	if candidates.is_empty():
+		return map.spawn_pos
+	return candidates[rng.randi() % candidates.size()]
 
 func _cache_current_floor() -> void:
 	if host.map == null or GameManager == null:
