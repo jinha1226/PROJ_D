@@ -61,6 +61,13 @@ func set_act_label(monster_in_sight: bool) -> void:
 		act_button.text = "ATK" if monster_in_sight else "AUTO"
 
 
+func set_rt_mode(enabled: bool) -> void:
+	if rest_button != null:
+		rest_button.text = "회피" if enabled else "REST"
+	if act_button != null:
+		act_button.text = "막기" if enabled else "AUTO"
+
+
 func set_quickslot(i: int, icon: Texture2D, text: String) -> void:
 	if i >= 0 and i < quick_slots.size():
 		quick_slots[i].set_item(icon, text)

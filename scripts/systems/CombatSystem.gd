@@ -540,6 +540,9 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 		ra: Dictionary) -> void:
 	if player.hp <= 0:
 		return
+	if player.rt_dodge_active:
+		CombatLog.post("회피!", Color(0.3, 0.9, 1.0))
+		return
 	# Ranged hits also drive BodyPartSystem; face both ends toward each
 	# other so DIRECTION_BIAS reads the projectile's true approach side.
 	_face_toward(monster, player.grid_pos)
@@ -580,6 +583,18 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 static func monster_attack_player(monster: Monster, player: Player) -> void:
 	if monster.data == null or player.hp <= 0:
 		return
+	# RT dodge: full invulnerability during dodge window.
+	if player.rt_dodge_active:
+		CombatLog.post("회피!", Color(0.3, 0.9, 1.0))
+		return
+	# RT parry: block frontal melee hit and consume the parry window.
+	if player.rt_parry_active:
+		var atk_vec: Vector2i = monster.grid_pos - player.grid_pos
+		var dot: int = player.facing.x * sign(atk_vec.x) + player.facing.y * sign(atk_vec.y)
+		if dot >= 1:
+			CombatLog.post("막기 성공!", Color(1.0, 0.85, 0.3))
+			player.rt_parry_active = false
+			return
 	# Update facing on both sides before damage resolves (see notes on
 	# player_attack_monster). Without this, the player's `facing` reflects
 	# their last movement direction, so a monster striking from behind a

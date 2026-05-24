@@ -58,6 +58,7 @@ var _floor_lifecycle: FloorLifecycle
 var _spawn_service: SpawnService
 var _effects_layer: EffectsLayer
 var _spell_targeting: SpellTargeting
+var _rt_controller: RealTimeController
 var map: DungeonMap
 var player: Player
 var _companions: Array = []  # Array[Companion] — active in-dungeon nodes
@@ -128,7 +129,7 @@ func _ready() -> void:
 	_spell_targeting.name = "SpellTargeting"
 	add_child(_spell_targeting)
 	_spell_targeting.setup(self)
-	var _rt_controller := RealTimeController.new()
+	_rt_controller = RealTimeController.new()
 	_rt_controller.name = "RealTimeController"
 	add_child(_rt_controller)
 	_rt_controller.setup(self)
@@ -1441,6 +1442,10 @@ func _center_camera_on_player(snap: bool = false) -> void:
 	if snap:
 		camera.reset_smoothing()
 
+func on_rt_mode_changed(enabled: bool) -> void:
+	if bottom_hud != null and bottom_hud.has_method("set_rt_mode"):
+		bottom_hud.set_rt_mode(enabled)
+
 func _update_hud() -> void:
 	if top_hud == null or player == null:
 		return
@@ -2486,6 +2491,10 @@ func _cancel_throw() -> void:
 		_targeting_node = null
 
 func _on_rest_pressed() -> void:
+	if TurnManager.rt_mode:
+		if _rt_controller != null:
+			_rt_controller.trigger_dodge()
+		return
 	if player == null or player.hp <= 0 or not TurnManager.is_player_turn:
 		return
 	if _monster_in_sight():
@@ -2740,6 +2749,10 @@ func _item_at(pos: Vector2i) -> FloorItem:
 
 
 func _on_act_pressed() -> void:
+	if TurnManager.rt_mode:
+		if _rt_controller != null:
+			_rt_controller.trigger_parry()
+		return
 	if player == null or player.hp <= 0 or not TurnManager.is_player_turn:
 		return
 	if _auto_exploring:

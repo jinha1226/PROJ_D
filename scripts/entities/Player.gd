@@ -10,6 +10,8 @@ var gold: int = 0
 var kills: int = 0
 var items_collected: int = 0
 var last_killer: String = ""
+var rt_dodge_active: bool = false
+var rt_parry_active: bool = false
 var items: Array = []  # [{id: String, plus: int}]
 var known_spells: Array = []  # [String]
 var quickslots: Array = ["", "", "", "", "", ""]  # item/spell ids, index = slot
