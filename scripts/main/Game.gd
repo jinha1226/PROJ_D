@@ -617,6 +617,10 @@ func _apply_race_mods(race_id: String) -> void:
 	player.intelligence = max(1, player.intelligence + race.int_mod)
 	player._apply_max_hp_gain(race.hp_mod)
 	player.hp = player.hp_max
+	# Base MP from intelligence (already includes race.int_mod above).
+	# Mirrors _level_up_mp_gain so the first level gain is consistent.
+	player.mp_max = max(1, player.intelligence / 3)
+	player.mp = player.mp_max
 	player._apply_max_mp_gain(race.mp_mod)
 	player.mp = player.mp_max
 	player.resists = Player.resists_from_tags(race.resist_mods)
