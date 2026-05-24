@@ -105,6 +105,8 @@ func _process(delta: float) -> void:
 	var player: Player = _game.player
 	if player == null or player.hp <= 0:
 		return
+	if _game.is_blocking_popup_open():
+		return
 
 	_tick_timers(delta, player)
 	_tick_monsters(delta, tm, player)

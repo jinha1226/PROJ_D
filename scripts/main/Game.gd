@@ -1454,6 +1454,9 @@ func _center_camera_on_player(snap: bool = false) -> void:
 	if snap:
 		camera.reset_smoothing()
 
+func is_blocking_popup_open() -> bool:
+	return _essence_pickup_popup_open
+
 func on_rt_mode_changed(enabled: bool) -> void:
 	if bottom_hud != null and bottom_hud.has_method("set_rt_mode"):
 		bottom_hud.set_rt_mode(enabled)
@@ -1542,6 +1545,8 @@ func _on_player_turn_started() -> void:
 					n.die()
 	if TurnManager.turn_number % _RESPAWN_INTERVAL == 0:
 		_try_respawn_monster()
+	if _essence_pickup_popup_open:
+		return
 	if not _auto_path.is_empty():
 		if _new_monster_in_sight():
 			_cancel_auto_walk("new enemy")
