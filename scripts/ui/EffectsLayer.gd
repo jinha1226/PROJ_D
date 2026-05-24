@@ -18,6 +18,7 @@ const _BOLT_TILES: Dictionary = {
 	"poison":    "res://assets/tiles/effects/bolt/poison_bolt.png",
 	"death":     "res://assets/tiles/effects/bolt/death_bolt.png",
 	"drain":     "res://assets/tiles/effects/bolt/drain_bolt.png",
+	"arrow":     "res://assets/tiles/effects/bolt/arrow_bolt.png",
 	"":          "res://assets/tiles/effects/bolt/magic_dart.png",
 }
 const _HIT_TILES: Dictionary = {

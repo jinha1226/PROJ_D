@@ -317,7 +317,7 @@ func _handle_tap(screen_pos: Vector2) -> void:
 			var cs: float = DungeonMap.CELL_SIZE
 			var world_start := player.position + Vector2(cs * 0.5, cs * 0.5)
 			var world_end := map.grid_to_world(target) + Vector2(cs * 0.5, cs * 0.5)
-			spawn_spell_bolt(world_start, world_end, "", func(): player.try_attack_tile(target))
+			spawn_spell_bolt(world_start, world_end, "arrow", func(): player.try_attack_tile(target))
 		else:
 			player.try_attack_tile(target)
 		return
@@ -1448,6 +1448,8 @@ func _update_hud() -> void:
 	else:
 		top_hud.set_depth(GameManager.depth)
 	top_hud.set_gold(player.gold)
+	top_hud.set_combat_stats(player.display_attack_power(), player.ac,
+			player.display_move_speed(), player.display_attack_speed())
 	top_hud.set_turn(TurnManager.turn_number)
 	top_hud.set_turn_budget(ExpeditionState.turns_remaining(), ExpeditionState.turn_budget)
 	top_hud.set_buffs(player.statuses)
@@ -1567,7 +1569,7 @@ func _tick_hazard_damage_player() -> void:
 		return
 	match htype:
 		"lava":
-			player.take_damage(8, "lava")
+			player.take_damage(Status.elemental_damage_scale(8, player, "fire"), "lava")
 			CombatLog.damage_taken(LocaleManager.t("LOG_THE_LAVA_SCORCHES_YOU_FOR"))
 		"shallow_water":
 			player.apply_wet(3)
@@ -1575,11 +1577,13 @@ func _tick_hazard_damage_player() -> void:
 static func _cloud_damage(type: String, target_player, target_monster) -> int:
 	var target = target_player if target_player != null else target_monster
 	match type:
-		"fire":        return randi_range(2, 4)
+		"fire":        return Status.elemental_damage_scale(randi_range(2, 4), target, "fire")
 		"poison":      return 1
-		"cold":        return randi_range(1, 3)
-		"electricity": return Status.wet_lightning_scale(randi_range(1, 3), target, type)
-		"lava":        return randi_range(6, 10)
+		"cold":
+			Status.apply_elemental_reaction(target, "cold")
+			return randi_range(1, 3)
+		"electricity": return Status.elemental_damage_scale(randi_range(1, 3), target, type)
+		"lava":        return Status.elemental_damage_scale(randi_range(6, 10), target, "fire")
 	return 0
 
 func _try_respawn_monster() -> void:
@@ -2561,7 +2565,7 @@ func _use_targeting_wand(item_id: String, element: String, slot_index: int) -> v
 		CombatLog.post(LocaleManager.t("LOG_NO_TARGETS_IN_RANGE"), Color(0.75, 0.75, 0.75))
 		return
 	var dmg: int = 8 + randi_range(0, 8)
-	dmg = Status.wet_lightning_scale(dmg, best, element)
+	dmg = Status.elemental_damage_scale(dmg, best, element)
 	var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
 	var ws: Vector2 = map.grid_to_world(player.grid_pos) + half
 	var we: Vector2 = map.grid_to_world(best.grid_pos) + half
