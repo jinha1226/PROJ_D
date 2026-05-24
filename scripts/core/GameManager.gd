@@ -65,6 +65,7 @@ var persistent_branch_explored: Dictionary = {}
 
 # Display / meta state (persisted).
 var use_tiles: bool = true
+var use_rt_mode: bool = false
 var titles: Array = []  # earned title strings
 
 ## Permanent unlock registry — race / class ids the player has earned
@@ -224,6 +225,11 @@ func toggle_tiles() -> void:
 	_save_settings()
 	emit_signal("settings_changed")
 
+func toggle_rt_mode() -> void:
+	use_rt_mode = not use_rt_mode
+	_save_settings()
+	emit_signal("settings_changed")
+
 func unlock(id: String) -> bool:
 	if id == "":
 		return false
@@ -275,6 +281,7 @@ func _load_settings() -> void:
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return
 	use_tiles = bool(parsed.get("use_tiles", use_tiles))
+	use_rt_mode = bool(parsed.get("use_rt_mode", use_rt_mode))
 	var saved_titles = parsed.get("titles", null)
 	if saved_titles is Array:
 		titles = saved_titles
@@ -293,6 +300,7 @@ func earn_title(title: String) -> void:
 func _save_settings() -> void:
 	var data := {
 		"use_tiles": use_tiles,
+		"use_rt_mode": use_rt_mode,
 		"unlocks": unlocks,
 		"kill_counts": kill_counts,
 		"titles": titles,

@@ -35,6 +35,27 @@ static func _populate(dlg: GameDialog, on_locale_changed: Callable) -> void:
 			if on_locale_changed.is_valid():
 				on_locale_changed.call())
 
+	# ── Combat mode section ──────────────────────────────────────────────
+	body.add_child(_section_header("전투 방식"))
+	var mode_row := HBoxContainer.new()
+	mode_row.add_theme_constant_override("separation", GameTheme.PAD_M)
+	body.add_child(mode_row)
+	for mode_info in [["턴제", false], ["실시간", true]]:
+		var mode_label: String = String(mode_info[0])
+		var mode_val: bool = bool(mode_info[1])
+		var mbtn := Button.new()
+		mbtn.text = mode_label
+		mbtn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		mbtn.custom_minimum_size = Vector2(0, GameTheme.TAP_MIN_HEIGHT)
+		mbtn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY_LARGE)
+		if GameManager.use_rt_mode == mode_val:
+			mbtn.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		mode_row.add_child(mbtn)
+		mbtn.pressed.connect(func() -> void:
+			if GameManager.use_rt_mode != mode_val:
+				GameManager.toggle_rt_mode()
+			_populate(dlg, on_locale_changed))
+
 	# ── Font section ─────────────────────────────────────────────────────
 	body.add_child(_section_header(TranslationServer.translate("OPTIONS_FONT")))
 	for font_def in FontManager.FONTS:

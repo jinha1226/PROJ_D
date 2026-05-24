@@ -69,6 +69,9 @@ func _input(event: InputEvent) -> void:
 func _toggle_rt_mode() -> void:
 	var tm: Node = get_node("/root/TurnManager")
 	tm.rt_mode = not tm.rt_mode
+	var gm: Node = get_node_or_null("/root/GameManager")
+	if gm != null and gm.use_rt_mode != tm.rt_mode:
+		gm.toggle_rt_mode()
 	var label: String = "[실시간]" if tm.rt_mode else "[턴제]"
 	get_node("/root/CombatLog").post(label + " 모드 (F2 전환)", Color(0.6, 1.0, 0.5))
 	for actor in tm.actors:

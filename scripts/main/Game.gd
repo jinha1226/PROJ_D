@@ -189,6 +189,10 @@ func _ready() -> void:
 	# Initialize budget for the floor we just spawned into (covers both fresh
 	# runs and resume-from-save paths).
 	_reset_expedition_budget()
+	# Apply saved combat mode preference.
+	if GameManager.use_rt_mode and not TurnManager.rt_mode:
+		if _rt_controller != null:
+			_rt_controller._toggle_rt_mode()
 	CombatLog.post(LocaleManager.t("LOG_B_TAP_A_TILE_OR") \
 			% GameManager.depth, Color(0.7, 0.9, 1.0))
 
