@@ -11,7 +11,7 @@ const _VISIBLE_EQUIP_SLOTS: Array = [
 	["EQUIP_AMULET", "amulet"],
 ]
 
-const _RESIST_ELEMENTS: Array = ["fire", "cold", "poison", "necro"]
+const _RESIST_ELEMENTS: Array = ["fire", "cold", "poison", "necro", "lightning", "corr"]
 const _RESIST_LABELS: Dictionary = {
 	"fire": "Fire",
 	"cold": "Cold",

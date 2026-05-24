@@ -1148,6 +1148,9 @@ func grant_skill_xp(id: String, amount: float) -> void:
 	var canon: String = _canonical_skill(id)
 	if canon == "":
 		return  # unknown id, silent no-op
+	var scaled_amount: float = amount * _skill_challenge_xp_mult(canon)
+	if scaled_amount <= 0.0:
+		return
 	# ── Visible tier ─────────────────────────────────────────────────────
 	if active_skills.size() > 0 and not active_skills.has(canon):
 		# Visible bucket filtered out by manual-mode selection. Hidden tier
@@ -1158,7 +1161,7 @@ func grant_skill_xp(id: String, amount: float) -> void:
 		if not skills.has(canon):
 			skills[canon] = {"level": 0, "xp": 0.0}
 		var v_entry: Dictionary = skills[canon]
-		v_entry["xp"] = float(v_entry.get("xp", 0.0)) + amount * _skill_apt_mult(canon)
+		v_entry["xp"] = float(v_entry.get("xp", 0.0)) + scaled_amount * _skill_apt_mult(canon)
 		while int(v_entry.get("level", 0)) < MAX_SKILL_LEVEL:
 			var lv: int = int(v_entry["level"])
 			var need: float = float(SKILL_XP_DELTA[lv]) if lv < SKILL_XP_DELTA.size() else 99999.0
@@ -1173,7 +1176,7 @@ func grant_skill_xp(id: String, amount: float) -> void:
 		if not hidden_skills.has(id):
 			hidden_skills[id] = {"level": 0, "xp": 0.0}
 		var h_entry: Dictionary = hidden_skills[id]
-		h_entry["xp"] = float(h_entry.get("xp", 0.0)) + amount
+		h_entry["xp"] = float(h_entry.get("xp", 0.0)) + scaled_amount
 		while int(h_entry.get("level", 0)) < MAX_SKILL_LEVEL:
 			var lv2: int = int(h_entry["level"])
 			var need2: float = float(SKILL_XP_DELTA[lv2]) if lv2 < SKILL_XP_DELTA.size() else 99999.0
@@ -1184,6 +1187,45 @@ func grant_skill_xp(id: String, amount: float) -> void:
 			# silent — no log, no stat side effect
 		hidden_skills[id] = h_entry
 	emit_signal("stats_changed")
+
+func _skill_challenge_xp_mult(canonical_id: String) -> float:
+	var skill_level: int = get_skill_level(canonical_id)
+	var challenge_depth: int = _current_challenge_depth()
+	var over: int = skill_level - challenge_depth
+	if over >= 3:
+		return 0.0
+	if over == 2:
+		return 0.25
+	if over == 1:
+		return 0.5
+	return 1.0
+
+func monster_xp_award(monster, base_amount: int) -> int:
+	if monster == null or monster.data == null or base_amount <= 0:
+		return 0
+	var tier: int = max(1, int(monster.data.tier))
+	var over: int = xl - tier
+	var mult: float = 1.0
+	if over >= 5:
+		mult = 0.0
+	elif over == 4:
+		mult = 0.25
+	elif over == 3:
+		mult = 0.5
+	if mult <= 0.0:
+		return 0
+	return max(1, int(round(float(base_amount) * mult)))
+
+func _current_challenge_depth() -> int:
+	var depth: int = 1
+	if GameManager != null:
+		depth = int(GameManager.depth)
+		var branch_id: String = String(GameManager.branch_zone)
+		if branch_id != "":
+			var zm = get_node_or_null("/root/ZoneManager")
+			if zm != null:
+				depth = int(zm.branch_effective_depth(branch_id, int(GameManager.branch_floor)))
+	return max(1, depth)
 
 ## Rune pickup bonus: entry_depth × 150, where entry_depth = top of the branch
 ## entrance range. Encourages deeper branch attempts (swamp 900, ice 1350,
@@ -1455,6 +1497,10 @@ func _apply_accessory_stat(id: String) -> void:
 			add_resist("fire", 1)
 		"resist_necro":
 			add_resist("necro", 1)
+		"resist_lightning":
+			add_resist("lightning", 1)
+		"resist_corr":
+			add_resist("corr", 1)
 		"slay_bonus":
 			slay_bonus += d.effect_value
 		"wizardry":
@@ -1485,6 +1531,10 @@ func _remove_accessory_stat(id: String) -> void:
 			add_resist("fire", -1)
 		"resist_necro":
 			add_resist("necro", -1)
+		"resist_lightning":
+			add_resist("lightning", -1)
+		"resist_corr":
+			add_resist("corr", -1)
 		"slay_bonus":
 			slay_bonus -= d.effect_value
 		"wizardry":
@@ -1535,6 +1585,10 @@ func _apply_affix_value(mod_type: String, value: int) -> void:
 			_apply_resist_mod("poison", value)
 		"resist_necro":
 			_apply_resist_mod("necro", value)
+		"resist_lightning":
+			_apply_resist_mod("lightning", value)
+		"resist_corr":
+			_apply_resist_mod("corr", value)
 
 func _apply_resist_mod(kind: String, value: int) -> void:
 	add_resist(kind, value)
