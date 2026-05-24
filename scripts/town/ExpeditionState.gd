@@ -39,7 +39,7 @@ func tick() -> void:
 	if tree != null:
 		var p = tree.get_first_node_in_group("player")
 		if p != null and p.has_method("grant_skill_xp"):
-			p.grant_skill_xp("survival", 0.05)
+			p.grant_skill_xp("survival", 0.01)
 	var remaining: int = turns_remaining()
 	for thr in WARNING_THRESHOLDS:
 		var t: int = int(thr)

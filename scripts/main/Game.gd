@@ -1621,7 +1621,7 @@ func _on_turn_budget_exhausted() -> void:
 	if randf() < chance:
 		# Survival XP: successful safe return is a major endurance milestone.
 		if player != null:
-			player.grant_skill_xp("survival", 15.0)
+			player.grant_skill_xp("survival", 5.0)
 		CombatLog.post(LocaleManager.t("LOG_EXPEDITION_SAFE_RETURN_OK"), Color(0.5, 0.95, 0.7))
 		PartyManager.on_run_complete()
 		TownState.record_safe_return({
@@ -2068,6 +2068,9 @@ func _spawn_branch_monsters(branch_id: String, eff_depth: int) -> void:
 	var count: int = _spawn_service._monster_count_for_depth(eff_depth)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = _floor_lifecycle._floor_seed(eff_depth) ^ 0xBBAACC11
+	if not MapDistrictRules.districts(branch_id).is_empty():
+		_spawn_service._spawn_monsters_for_districts(eff_depth, branch_id, count, rng, true)
+		return
 	var placed: int = 0
 	var attempts: int = 0
 	while placed < count and attempts < 800:
@@ -2931,7 +2934,7 @@ func _on_player_damaged(amount: int) -> void:
 		return
 	# Survival XP: endurance gained from taking hits (while still alive).
 	if amount > 0 and player.hp > 0:
-		player.grant_skill_xp("survival", float(amount) * 0.3)
+		player.grant_skill_xp("survival", float(amount) * 0.1)
 	var cell_size: float = DungeonMap.CELL_SIZE
 	var world_pos: Vector2 = player.position + Vector2(cell_size * 0.5, 0.0)
 	spawn_damage_number(world_pos, amount, Color(1.0, 0.35, 0.35))
@@ -3034,7 +3037,7 @@ func _spawn_debug_floor_panel() -> void:
 
 	# Branch sections
 	var branches: Dictionary = {
-		"swamp": "Swamp", "ice_caves": "Crystal Caves",
+		"swamp": "Swamp", "ice_caves": "Ice Caves",
 		"infernal": "Infernal", "crypt": "Crypt",
 	}
 	for branch_id in branches.keys():

@@ -69,6 +69,10 @@ func _refresh() -> void:
 		_char_btn.visible = false
 
 func _on_start() -> void:
+	# Restore player state and floor caches from the save file so the second
+	# expedition (and beyond) starts with the same character that returned.
+	# load_run() is a no-op if no save exists (brand new character path).
+	GameManager.load_run()
 	get_tree().change_scene_to_file(GAME_SCENE_PATH)
 
 func _on_new_char() -> void:

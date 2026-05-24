@@ -27,6 +27,8 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 	player.emit_signal("stats_changed")
 	var power: int = _compute_power(player, spell)
 	_cast_effect(spell, player, game, power)
+	# Grant magery XP on every cast — higher-level spells give more.
+	player.grant_skill_xp("magery", 1.0 + float(spell.spell_level))
 	return true
 
 static func _cast_effect(spell: SpellData, player: Player, game: Node, power: int) -> void:
