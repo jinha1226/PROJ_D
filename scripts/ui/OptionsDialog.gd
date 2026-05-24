@@ -55,7 +55,7 @@ static func _populate(dlg: GameDialog, on_locale_changed: Callable) -> void:
 			if GameManager.use_rt_mode != mode_val:
 				GameManager.toggle_rt_mode()
 				# Apply immediately if a RealTimeController exists in the running scene.
-				var scene := Engine.get_main_loop().current_scene
+				var scene: Node = Engine.get_main_loop().current_scene
 				var rt_ctrl: Node = scene.get_node_or_null("RealTimeController") if scene != null else null
 				if rt_ctrl != null and rt_ctrl.has_method("_toggle_rt_mode"):
 					rt_ctrl._toggle_rt_mode()
