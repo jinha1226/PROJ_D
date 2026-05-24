@@ -365,11 +365,6 @@ func use_item(index: int) -> void:
 	var data: ItemData = ItemRegistry.get_by_id(entry_id) if ItemRegistry != null and entry_id != "" else null
 	if data == null:
 		return
-	# Utility XP: wands and scrolls train evocations on use. Books and potions
-	# don't (potions are consumables, books grant spells which already train
-	# spellcasting via cast events).
-	if data.kind == "wand" or data.kind == "scroll":
-		grant_skill_xp("spellcasting", 4.0)
 	var had_effect: bool = true
 	match data.effect:
 		"heal":
@@ -769,6 +764,7 @@ func refresh_ac_from_equipment() -> void:
 
 	if has_status("mage_armor"):
 		ac = max(ac, 13 + dexterity / 2)
+	ac += get_skill_level("defense")
 	ac += EssenceSystem.bonus_ac(self)
 	ev += EssenceSystem.bonus_ev(self)
 	ev += agility_mastery_ev_bonus()

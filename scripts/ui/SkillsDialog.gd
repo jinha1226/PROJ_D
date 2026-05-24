@@ -50,7 +50,7 @@ const _VISIBLE_EFFECTS: Dictionary = {
 	"weapon_mastery": "+2 accuracy, +damage, +3% parry per level",
 	"archery": "+ranged accuracy and damage per level",
 	"tactics": "+5 max HP per level",
-	"defense": "+3% shield block chance per level",
+	"defense": "+1 AC and +3% shield block chance per level",
 	"magery": "+6% spell power per level (via Intelligence)",
 	"stealth": "+1 EV, reduced detection range per level",
 	"tracking": "Lv 3+: auto-records monsters seen in FOV",
