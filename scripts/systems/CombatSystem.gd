@@ -306,6 +306,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		var brand_element: String = brand_element_of(brand)
 		var roll: int = _brand_damage_roll(brand)
 		brand_extra = Status.resist_scale(roll, monster.data.resists, brand_element)
+		brand_extra = Status.wet_lightning_scale(brand_extra, monster, brand_element)
 		if brand_element == "necro":
 			brand_extra = max(1, int(round(float(brand_extra) * FaithSystem.necrotic_damage_mult(player))))
 		final += brand_extra
@@ -393,7 +394,7 @@ static func _apply_player_kill_rewards(player: Player, monster: Monster, skill_i
 	player.grant_xp(xp_award)
 	player.grant_kill_skill_xp(float(xp_award), skill_id)
 	# Tracking XP: flat per-kill grant for hunting any creature.
-	player.grant_skill_xp("tracking", 1.0)
+	player.grant_skill_xp("tracking", 0.5)
 	player.register_kill()
 	GameManager.try_kill_unlock(monster.data.id)
 	RacePassiveSystem.on_player_killed_monster(player)

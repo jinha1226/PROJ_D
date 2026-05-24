@@ -1021,6 +1021,19 @@ func _place_shop_tile() -> void:
 		chosen_room.position.x + chosen_room.size.x / 2,
 		chosen_room.position.y + chosen_room.size.y / 2
 	)
+	if map.prop_tile_paths.has(shop_pos) or not map.is_walkable(shop_pos):
+		var found_open_tile: bool = false
+		for ry in range(chosen_room.position.y + 1, chosen_room.position.y + chosen_room.size.y - 1):
+			for rx in range(chosen_room.position.x + 1, chosen_room.position.x + chosen_room.size.x - 1):
+				var candidate := Vector2i(rx, ry)
+				if map.is_walkable(candidate) and not map.prop_tile_paths.has(candidate):
+					shop_pos = candidate
+					found_open_tile = true
+					break
+			if found_open_tile:
+				break
+		if not found_open_tile:
+			return
 	map.set_tile(shop_pos, DungeonMap.Tile.SHOP)
 	_shop_tile_pos = shop_pos
 	_shop_items = []  # generated lazily on first visit
@@ -1270,7 +1283,7 @@ func _refresh_fov() -> void:
 		return
 	var newly_revealed: int = map.set_fov(player.compute_fov(), player.grid_pos, player.facing)
 	if newly_revealed > 0:
-		player.grant_skill_xp("tracking", float(newly_revealed) * 0.2)
+		player.grant_skill_xp("tracking", float(newly_revealed) * 0.05)
 	_grant_sight_bestiary_unlocks()
 	_update_minimap()
 	_refresh_entity_visibility()
@@ -1560,11 +1573,12 @@ func _tick_hazard_damage_player() -> void:
 			player.apply_wet(3)
 
 static func _cloud_damage(type: String, target_player, target_monster) -> int:
+	var target = target_player if target_player != null else target_monster
 	match type:
 		"fire":        return randi_range(2, 4)
 		"poison":      return 1
 		"cold":        return randi_range(1, 3)
-		"electricity": return randi_range(1, 3)
+		"electricity": return Status.wet_lightning_scale(randi_range(1, 3), target, type)
 		"lava":        return randi_range(6, 10)
 	return 0
 
@@ -1893,6 +1907,7 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 	var eff_depth: int = ZoneManager.branch_effective_depth(branch_id, branch_floor)
 	map._tex_wall = load(cfg.get("wall", "")) as Texture2D
 	map._tex_floor = load(cfg.get("floor", "")) as Texture2D
+	PropPlacer.scatter(map, branch_id, branch_seed)
 	map.queue_redraw()
 	var arrival_pos: Vector2i = map.spawn_pos if arrive_from_above else map.stairs_down_pos
 	player.bind_map(map, arrival_pos)
@@ -1908,7 +1923,6 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 			_spawn_branch_resistance_hint(branch_id)
 	if not branch_used_fixed:
 		_scatter_hazard_tiles(cfg.get("env", ""))
-	PropPlacer.scatter(map, branch_id, branch_seed)
 	# Restore previously explored tiles from persistent memory (survives expeditions).
 	if GameManager.persistent_branch_explored.has(cache_key):
 		map.explored.merge(GameManager.persistent_branch_explored[cache_key], true)
@@ -1944,7 +1958,8 @@ func _scatter_hazard_tiles(env: String) -> void:
 		for x in range(map.GRID_W):
 			var p := Vector2i(x, y)
 			if map.tile_at(p) == DungeonMap.Tile.FLOOR \
-					and not _is_reserved_map_feature(p):
+					and not _is_reserved_map_feature(p) \
+					and not map.prop_tile_paths.has(p):
 				floor_tiles.append(p)
 	var count: int = int(floor_tiles.size() * density)
 	for i in range(count):
@@ -2546,6 +2561,7 @@ func _use_targeting_wand(item_id: String, element: String, slot_index: int) -> v
 		CombatLog.post(LocaleManager.t("LOG_NO_TARGETS_IN_RANGE"), Color(0.75, 0.75, 0.75))
 		return
 	var dmg: int = 8 + randi_range(0, 8)
+	dmg = Status.wet_lightning_scale(dmg, best, element)
 	var half := Vector2(DungeonMap.CELL_SIZE * 0.5, DungeonMap.CELL_SIZE * 0.5)
 	var ws: Vector2 = map.grid_to_world(player.grid_pos) + half
 	var we: Vector2 = map.grid_to_world(best.grid_pos) + half

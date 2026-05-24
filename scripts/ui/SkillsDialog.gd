@@ -51,6 +51,19 @@ const _VISIBLE_LABELS: Dictionary = {
 	"survival": "Survival",
 }
 
+## Short effect description shown next to each visible skill's current level.
+## Based on actual formulas in the codebase.
+const _VISIBLE_EFFECTS: Dictionary = {
+	"weapon_mastery": "+2 accuracy, +damage, +3% parry per level",
+	"archery": "+ranged accuracy and damage per level",
+	"tactics": "+5 max HP per level",
+	"defense": "+3% shield block chance per level",
+	"magery": "+6% spell power per level (via Intelligence)",
+	"stealth": "+1 EV, reduced detection range per level",
+	"tracking": "Lv 3+: auto-records monsters seen in FOV",
+	"survival": "+3% healing efficiency, improves safe-return chance",
+}
+
 ## Visible skill -> hidden familiarity rows. These rows read player.hidden_skills
 ## directly so the current dual-write behavior can be inspected in game.
 const _HIDDEN_BY_VISIBLE: Dictionary = {
@@ -186,6 +199,16 @@ static func _make_visible_skill_card(skill_id: String, player: Player, parent: N
 		bar_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
 		bar_row.add_child(bar_lbl)
 
+	# Current level effect description.
+	var effect_text: String = String(_VISIBLE_EFFECTS.get(skill_id, ""))
+	if effect_text != "":
+		var effect_lbl := Label.new()
+		effect_lbl.text = effect_text
+		effect_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
+		effect_lbl.add_theme_color_override("font_color", Color(0.65, 0.85, 0.65))
+		effect_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		inner.add_child(effect_lbl)
+
 	var refresh_header := func() -> void:
 		var is_active: bool = player.is_skill_active(skill_id)
 		active_lbl.text = "X" if is_active else "-"
@@ -203,15 +226,32 @@ static func _make_visible_skill_card(skill_id: String, player: Player, parent: N
 					if on_change.is_valid():
 						on_change.call())
 
+	# Collapsible sub-skills section.
 	var hidden_ids: Array = _HIDDEN_BY_VISIBLE.get(skill_id, [])
 	if not hidden_ids.is_empty():
 		var sep := HSeparator.new()
 		inner.add_child(sep)
+
+		# Sub-skill list (hidden by default).
 		var sub_list := VBoxContainer.new()
 		sub_list.add_theme_constant_override("separation", 2)
+		sub_list.visible = false
 		inner.add_child(sub_list)
 		for hidden_id in hidden_ids:
 			sub_list.add_child(_make_hidden_row(String(hidden_id), player, parent))
+
+		# Toggle button to expand/collapse.
+		var toggle := Button.new()
+		toggle.flat = true
+		toggle.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
+		toggle.add_theme_color_override("font_color", Color(0.55, 0.65, 0.85))
+		toggle.custom_minimum_size = Vector2(0, GameTheme.TAP_MIN_HEIGHT * 0.7)
+		toggle.text = "▶ Sub-skills (%d)" % hidden_ids.size()
+		toggle.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		inner.add_child(toggle)
+		toggle.pressed.connect(func() -> void:
+			sub_list.visible = not sub_list.visible
+			toggle.text = ("▼ Sub-skills (%d)" if sub_list.visible else "▶ Sub-skills (%d)") % hidden_ids.size())
 
 	return card
 

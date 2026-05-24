@@ -28,7 +28,7 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 	var power: int = _compute_power(player, spell)
 	_cast_effect(spell, player, game, power)
 	# Grant magery XP on every cast — higher-level spells give more.
-	player.grant_skill_xp("magery", 1.0 + float(spell.spell_level))
+	player.grant_skill_xp("magery", 2.0 * (1.0 + float(spell.spell_level)))
 	return true
 
 static func _cast_effect(spell: SpellData, player: Player, game: Node, power: int) -> void:
@@ -336,10 +336,10 @@ static func _compute_power(player: Player, spell: SpellData) -> int:
 
 
 static func _apply_element_bonus(spell: SpellData, target: Monster, dmg: int) -> int:
-	if spell.element == "lightning" and target.is_wet():
+	var boosted: int = Status.wet_lightning_scale(dmg, target, spell.element)
+	if boosted > dmg:
 		CombatLog.post(LocaleManager.t("LOG_SOAKED_LIGHTNING_SURGES_FOR_EXTRA"), Color(0.6, 0.85, 1.0))
-		return int(ceil(dmg * 1.5))
-	return dmg
+	return boosted
 
 
 static func _element_status(element: String) -> Array:
