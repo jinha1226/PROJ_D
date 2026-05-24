@@ -37,6 +37,7 @@ const _BOOK_NECROMANCY: Resource = preload("res://resources/items/book_necromanc
 const _BOOK_HEXES: Resource = preload("res://resources/items/book_hexes.tres")
 const _BOOK_TRANSLOCATION: Resource = preload("res://resources/items/book_translocation.tres")
 const _BOOK_SUMMONING: Resource = preload("res://resources/items/book_summoning.tres")
+const _BOOK_CONJURATION: Resource = preload("res://resources/items/book_conjuration.tres")
 const _SPEAR: Resource = preload("res://resources/items/spear.tres")
 const _RING_STR: Resource = preload("res://resources/items/ring_str.tres")
 const _RING_INT: Resource = preload("res://resources/items/ring_int.tres")
@@ -255,7 +256,7 @@ const _ALL_ITEMS: Array = [
 	_SCROLL_ENCHANT_WEAPON, _SCROLL_ENCHANT_ARMOR, _SCROLL_IDENTIFY,
 	_SCROLL_FEAR, _SCROLL_BRAND, _SCROLL_IMMOLATION,
 	_BOOK_FIRE, _BOOK_COLD, _BOOK_AIR, _BOOK_EARTH,
-	_BOOK_NECROMANCY, _BOOK_HEXES, _BOOK_TRANSLOCATION, _BOOK_SUMMONING,
+	_BOOK_NECROMANCY, _BOOK_HEXES, _BOOK_TRANSLOCATION, _BOOK_SUMMONING, _BOOK_CONJURATION,
 	_GOLD_PILE,
 	_WAND_FIRE, _WAND_FROST, _WAND_LIGHTNING, _WAND_TELEPORT,
 	_WAND_FEAR, _WAND_HASTE, _WAND_DIGGING,

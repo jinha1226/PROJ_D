@@ -1630,6 +1630,9 @@ func _on_turn_budget_exhausted() -> void:
 			"kills": player.kills,
 			"turns": TurnManager.turn_number,
 		})
+		# Save before leaving so persistent_branch_explored and floor cache
+		# survive across the town visit (and any app restart between expeditions).
+		save_with_cache()
 		await get_tree().create_timer(2.0).timeout
 		get_tree().change_scene_to_file(TOWN_SCENE_PATH)
 	else:
@@ -1858,6 +1861,10 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 			var d: ItemData = ItemRegistry.get_by_id(String(item_entry.get("id", ""))) if ItemRegistry != null else null
 			if d == null: continue
 			_spawn_service._spawn_floor_item(d, entry.get("pos", Vector2i.ZERO), int(item_entry.get("plus", 0)), item_entry)
+		# Merge any persistent exploration (e.g. from a previous expedition where
+		# we cached on stair-exit but the cache path only has that snapshot).
+		if GameManager.persistent_branch_explored.has(cache_key):
+			map.explored.merge(GameManager.persistent_branch_explored[cache_key], true)
 		_refresh_fov()
 		return
 
@@ -3027,7 +3034,7 @@ func _spawn_debug_floor_panel() -> void:
 
 	# Branch sections
 	var branches: Dictionary = {
-		"swamp": "Swamp", "ice_caves": "Ice Caves",
+		"swamp": "Swamp", "ice_caves": "Crystal Caves",
 		"infernal": "Infernal", "crypt": "Crypt",
 	}
 	for branch_id in branches.keys():
