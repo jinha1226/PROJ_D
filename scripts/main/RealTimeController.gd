@@ -1,8 +1,11 @@
 extends Node
 class_name RealTimeController
 
-# Seconds per "action" at action_cost == 1.0 and speed == 10.
+# Seconds per player action at action_cost == 1.0.
 const BASE_TICK_SEC: float = 0.15
+# Monster action interval at speed == 10. Higher = slower monsters.
+# Decoupled from player so enemies feel readable, not overwhelming.
+const MONSTER_BASE_SEC: float = 0.70
 
 # Dodge: brief invulnerability dash.
 const DODGE_WINDOW_SEC: float = 0.30
@@ -208,7 +211,7 @@ func _tick_monsters(delta: float, tm: Node, player: Player) -> void:
 		var spd: float = 10.0
 		if actor.get("data") != null:
 			spd = float(actor.data.speed)
-		actor.pending_energy += delta * spd / 10.0 / BASE_TICK_SEC
+		actor.pending_energy += delta * spd / 10.0 / MONSTER_BASE_SEC
 		while actor.pending_energy >= 1.0 and is_instance_valid(actor):
 			actor.pending_energy -= 1.0
 			if actor.has_method("take_turn"):
