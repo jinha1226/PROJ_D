@@ -1,75 +1,54 @@
 extends Control
 class_name RTControlOverlay
 
-const BTN: int = 90
-const HUD_H: int = 148
-const PAD: int = 20
-const ACTION_W: int = 116
-const ACTION_H: int = 90
-const ACTION_GAP: int = 14
+const JOY_BASE_R: float  = 80.0   # outer ring radius
+const JOY_KNOB_R: float  = 32.0   # draggable knob radius
+const JOY_DEAD: float    = 14.0   # dead zone
+const ACTION_W: int      = 110
+const ACTION_H: int      = 88
+const ACTION_GAP: int    = 14
+const HUD_H: int         = 148
+const PAD: int           = 20
 
 var _rt: RealTimeController
-var _dpad_root: Control
 var _dodge_btn: Button
 var _parry_btn: Button
+
+# Joystick touch state
+var _joy_active: bool   = false
+var _joy_finger: int    = -1
+var _joy_base: Vector2  = Vector2.ZERO
+var _joy_knob: Vector2  = Vector2.ZERO
+
+# ── Setup ─────────────────────────────────────────────────────────────────────
 
 func setup(rt_controller: RealTimeController) -> void:
 	_rt = rt_controller
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_build_dpad()
 	_build_action_buttons()
-	_reposition()
+
+func _vp_size() -> Vector2:
+	return get_viewport().get_visible_rect().size
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED or what == NOTIFICATION_VISIBILITY_CHANGED:
-		_reposition()
+		call_deferred("_reposition")   # deferred so viewport size is ready
 
 func _reposition() -> void:
-	if size == Vector2.ZERO:
+	var sz := _vp_size()
+	if sz == Vector2.ZERO:
 		return
-	if _dpad_root:
-		_dpad_root.position = Vector2(PAD, size.y - HUD_H - BTN * 3 - PAD)
 	if _dodge_btn:
-		_dodge_btn.position = Vector2(size.x - PAD - ACTION_W,
-				size.y - HUD_H - ACTION_GAP - ACTION_H * 2)
+		_dodge_btn.position = Vector2(sz.x - PAD - ACTION_W,
+				sz.y - HUD_H - ACTION_GAP - ACTION_H * 2)
 		_dodge_btn.size = Vector2(ACTION_W, ACTION_H)
 	if _parry_btn:
-		_parry_btn.position = Vector2(size.x - PAD - ACTION_W,
-				size.y - HUD_H - ACTION_H)
+		_parry_btn.position = Vector2(sz.x - PAD - ACTION_W,
+				sz.y - HUD_H - ACTION_H)
 		_parry_btn.size = Vector2(ACTION_W, ACTION_H)
 
-func _build_dpad() -> void:
-	_dpad_root = Control.new()
-	_dpad_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_dpad_root.custom_minimum_size = Vector2(BTN * 3, BTN * 3)
-	_dpad_root.size = Vector2(BTN * 3, BTN * 3)
-	add_child(_dpad_root)
-
-	var dirs: Array = [
-		[1, 0, Vector2i( 0, -1), "▲"],
-		[0, 1, Vector2i(-1,  0), "◀"],
-		[2, 1, Vector2i( 1,  0), "▶"],
-		[1, 2, Vector2i( 0,  1), "▼"],
-	]
-	for d in dirs:
-		var col: int = d[0]; var row: int = d[1]
-		var dir: Vector2i = d[2]; var sym: String = d[3]
-		var btn := _make_dpad_btn(sym)
-		btn.position = Vector2(col * BTN, row * BTN)
-		btn.size = Vector2(BTN, BTN)
-		_dpad_root.add_child(btn)
-		btn.button_down.connect(func(): _rt.touch_dir = dir)
-		btn.button_up.connect(func():
-			if _rt.touch_dir == dir:
-				_rt.touch_dir = Vector2i.ZERO)
-
-func _make_dpad_btn(sym: String) -> Button:
-	var btn := Button.new()
-	btn.text = sym
-	btn.add_theme_font_size_override("font_size", 28)
-	btn.modulate = Color(1, 1, 1, 0.72)
-	return btn
+# ── Action buttons ────────────────────────────────────────────────────────────
 
 func _build_action_buttons() -> void:
 	_dodge_btn = _make_action_btn("회피", Color(0.3, 0.85, 1.0))
@@ -87,3 +66,83 @@ func _make_action_btn(label: String, col: Color) -> Button:
 	btn.add_theme_color_override("font_color", col)
 	btn.modulate = Color(1, 1, 1, 0.82)
 	return btn
+
+# ── Joystick input ────────────────────────────────────────────────────────────
+
+func _input(event: InputEvent) -> void:
+	if not visible or _rt == null:
+		return
+	var left_edge: float = _vp_size().x * 0.5
+
+	if event is InputEventScreenTouch:
+		if event.pressed and event.position.x < left_edge:
+			_joy_active = true
+			_joy_finger = event.index
+			_joy_base   = event.position
+			_joy_knob   = event.position
+			_rt.touch_dir = Vector2i.ZERO
+			queue_redraw()
+			get_viewport().set_input_as_handled()
+		elif not event.pressed and event.index == _joy_finger:
+			_joy_end()
+
+	elif event is InputEventScreenDrag and event.index == _joy_finger and _joy_active:
+		_joy_update(event.position)
+
+	# ── Mouse fallback (desktop F5 test) ──────────────────────────────────
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed and event.position.x < left_edge:
+			_joy_active = true
+			_joy_finger = 0
+			_joy_base   = event.position
+			_joy_knob   = event.position
+			_rt.touch_dir = Vector2i.ZERO
+			queue_redraw()
+		elif not event.pressed:
+			_joy_end()
+
+	elif event is InputEventMouseMotion and _joy_active and _joy_finger == 0:
+		_joy_update(event.position)
+
+func _joy_update(pos: Vector2) -> void:
+	var offset: Vector2 = pos - _joy_base
+	_joy_knob = _joy_base + offset.limit_length(JOY_BASE_R)
+	if offset.length() > JOY_DEAD:
+		_rt.touch_dir = _angle_to_dir(offset.angle())
+	else:
+		_rt.touch_dir = Vector2i.ZERO
+	queue_redraw()
+	get_viewport().set_input_as_handled()
+
+func _joy_end() -> void:
+	_joy_active = false
+	_joy_finger = -1
+	_rt.touch_dir = Vector2i.ZERO
+	queue_redraw()
+
+func _angle_to_dir(angle: float) -> Vector2i:
+	# Map continuous angle to nearest of 8 tile directions.
+	# fposmod normalises to [0, 2PI) so sector arithmetic is always positive.
+	var sector: int = int(round(fposmod(angle, TAU) / (PI / 4.0))) % 8
+	match sector:
+		0: return Vector2i( 1,  0)
+		1: return Vector2i( 1,  1)
+		2: return Vector2i( 0,  1)
+		3: return Vector2i(-1,  1)
+		4: return Vector2i(-1,  0)
+		5: return Vector2i(-1, -1)
+		6: return Vector2i( 0, -1)
+		7: return Vector2i( 1, -1)
+	return Vector2i( 1,  0)
+
+# ── Visual ────────────────────────────────────────────────────────────────────
+
+func _draw() -> void:
+	if not _joy_active:
+		return
+	# Outer ring
+	draw_arc(_joy_base, JOY_BASE_R, 0.0, TAU, 40, Color(1, 1, 1, 0.28), 3.0)
+	# Knob fill
+	draw_circle(_joy_knob, JOY_KNOB_R, Color(1, 1, 1, 0.42))
+	# Knob ring
+	draw_arc(_joy_knob, JOY_KNOB_R, 0.0, TAU, 24, Color(1, 1, 1, 0.70), 2.0)
