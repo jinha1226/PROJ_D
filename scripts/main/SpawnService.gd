@@ -70,7 +70,13 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = host._floor_lifecycle._floor_seed(depth) ^ 0x5A5A5A5A
 	_spawn_unique_for_floor(depth, rng)
-	if count == 0 or host.map.rooms.is_empty():
+	if count == 0:
+		return
+	var zone_id: String = ZoneManager.zone_id_for_depth(depth)
+	if not MapDistrictRules.districts(zone_id).is_empty():
+		_spawn_monsters_for_districts(depth, zone_id, count, rng, false)
+		return
+	if host.map.rooms.is_empty():
 		return
 
 	# ── 1. Sort rooms by Chebyshev distance from spawn (entry) ───────────────
@@ -141,6 +147,74 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 				continue
 			_do_place_monster(data, p)
 			placed += 1
+
+func _spawn_monsters_for_districts(depth: int, zone_id: String, count: int,
+		rng: RandomNumberGenerator, branch_pool: bool = false) -> void:
+	var districts: Array = MapDistrictRules.districts(zone_id)
+	var weighted: Array = []
+	var total_weight: int = 0
+	for d in districts:
+		var role: String = String(d.get("role", ""))
+		var weight: int = _district_monster_weight(role)
+		if weight <= 0:
+			continue
+		weighted.append([d, weight])
+		total_weight += weight
+	if weighted.is_empty():
+		return
+	var placed: int = 0
+	var attempts: int = 0
+	while placed < count and attempts < count * 120:
+		attempts += 1
+		var district: Dictionary = _weighted_district_pick(weighted, total_weight, rng)
+		var role: String = String(district.get("role", ""))
+		var p: Vector2i = MapDistrictRules.pick_tile(host.map, zone_id, [role], rng)
+		if p == Vector2i(-1, -1):
+			continue
+		if not host.map.is_walkable(p):
+			continue
+		if p == host.player.grid_pos:
+			continue
+		if host._chebyshev(p, host.player.grid_pos) < 3:
+			continue
+		if host._monster_at(p) != null:
+			continue
+		var data: MonsterData = MonsterRegistry.pick_by_branch(zone_id, depth) if branch_pool \
+				else _pick_theme_for_zone(depth, _district_threat_zone(role), rng.randi())
+		if data == null:
+			continue
+		_do_place_monster(data, p)
+		placed += 1
+
+func _district_monster_weight(role: String) -> int:
+	match role:
+		"entry":
+			return 1
+		"skill", "reward":
+			return 2
+		"pressure", "hazard", "branch", "exit":
+			return 4
+		_:
+			return 2
+
+func _district_threat_zone(role: String) -> int:
+	match role:
+		"entry":
+			return 0
+		"skill", "reward":
+			return 1
+		_:
+			return 2
+
+func _weighted_district_pick(weighted: Array, total_weight: int,
+		rng: RandomNumberGenerator) -> Dictionary:
+	var roll: int = rng.randi_range(0, total_weight - 1)
+	var acc: int = 0
+	for entry in weighted:
+		acc += int(entry[1])
+		if roll < acc:
+			return entry[0]
+	return weighted[-1][0]
 
 ## Picks one representative MonsterData for a room zone.
 ## zone 0 → prefers weak monsters (xp ≤ 2)
@@ -238,80 +312,77 @@ func _spawn_items_for_floor(depth: int) -> void:
 			var wd: ItemData = ItemRegistry.pick_kind(depth, "wand") if ItemRegistry != null else null
 			if wd != null: to_place.append(wd)
 
-	# ── Place all items on random floor tiles ───────────────────────────
+	# ── Place all items on district-biased floor tiles ──────────────────
+	var zone_id: String = ZoneManager.zone_id_for_depth(depth)
 	for item in to_place:
 		if item == null:
 			continue
-		var attempts: int = 0
-		while attempts < 40:
-			attempts += 1
-			var p: Vector2i = host.map.random_floor_tile(rng)
-			if not host.map.is_walkable(p):
-				continue
-			if p == host.player.grid_pos:
-				continue
-			if host._item_at(p) != null:
-				continue
+		var p: Vector2i = _pick_item_tile(rng, zone_id, _preferred_item_roles(item))
+		if p != Vector2i(-1, -1):
 			var entry_override: Dictionary = ItemRegistry.make_entry(item.id, depth, 0) if ItemRegistry != null else {"id": item.id, "plus": 0}
 			_spawn_floor_item(item, p, 0, entry_override)
-			break
 	for essence_id in essence_to_place:
-		var attempts: int = 0
-		while attempts < 40:
-			attempts += 1
-			var p: Vector2i = host.map.random_floor_tile(rng)
-			if not host.map.is_walkable(p):
-				continue
-			if p == host.player.grid_pos:
-				continue
-			if host._item_at(p) != null:
-				continue
+		var p: Vector2i = _pick_item_tile(rng, zone_id, ["reward", "skill", "branch"])
+		if p != Vector2i(-1, -1):
 			_spawn_essence_floor_item(String(essence_id), p)
-			break
 	for partial_entry in partial_books_to_place:
-		var attempts: int = 0
-		while attempts < 40:
-			attempts += 1
-			var p: Vector2i = host.map.random_floor_tile(rng)
-			if not host.map.is_walkable(p):
-				continue
-			if p == host.player.grid_pos:
-				continue
-			if host._item_at(p) != null:
-				continue
+		var p: Vector2i = _pick_item_tile(rng, zone_id, ["reward", "skill", "exit"])
+		if p != Vector2i(-1, -1):
 			_spawn_partial_book_floor_item(partial_entry, p)
-			break
 	for sp_data in spellpages_to_place:
-		var attempts: int = 0
-		while attempts < 40:
-			attempts += 1
-			var p: Vector2i = host.map.random_floor_tile(rng)
-			if not host.map.is_walkable(p):
-				continue
-			if p == host.player.grid_pos:
-				continue
-			if host._item_at(p) != null:
-				continue
+		var p: Vector2i = _pick_item_tile(rng, zone_id, ["reward", "skill", "exit"])
+		if p != Vector2i(-1, -1):
 			var sp_entry: Dictionary = {"id": sp_data.id, "plus": 0}
 			_spawn_floor_item(sp_data, p, 0, sp_entry)
-			break
 
 	# ── Gold scatter: 1-3 piles per floor ─────────────────────────────
 	var gold_count: int = rng.randi_range(1, 3)
 	for _gi in range(gold_count):
-		var attempts: int = 0
-		while attempts < 40:
-			attempts += 1
-			var p: Vector2i = host.map.random_floor_tile(rng)
-			if not host.map.is_walkable(p):
-				continue
-			if p == host.player.grid_pos:
-				continue
+		var p: Vector2i = _pick_item_tile(rng, zone_id, ["reward", "skill"])
+		if p != Vector2i(-1, -1):
 			_spawn_gold_pile(p, rng.randi_range(5, 10 + depth * 2))
-			break
 
 	# ── Orc treasure room for depths 7-9 ──────────────────────────────
 	host._spawn_orc_treasure_room(depth, rng)
+
+func _preferred_item_roles(item: ItemData) -> Array:
+	match item.kind:
+		"weapon", "armor", "shield", "wand", "book":
+			return ["reward", "skill", "exit"]
+		"scroll":
+			if item.effect in ["enchant_weapon", "enchant_armor", "upgrade"]:
+				return ["reward", "skill"]
+			return ["skill", "reward", "entry"]
+		"potion":
+			return ["entry", "skill", "reward"]
+		_:
+			return ["reward", "skill", "pressure"]
+
+func _pick_item_tile(rng: RandomNumberGenerator, zone_id: String,
+		preferred_roles: Array) -> Vector2i:
+	var forbidden: Dictionary = {}
+	if host.player != null:
+		forbidden[host.player.grid_pos] = true
+	for p in host.map.prop_tile_paths.keys():
+		forbidden[p] = true
+	for _i in range(50):
+		var p: Vector2i = MapDistrictRules.pick_tile(host.map, zone_id,
+				preferred_roles, rng, forbidden)
+		if p == Vector2i(-1, -1):
+			break
+		if host._item_at(p) == null:
+			return p
+		forbidden[p] = true
+	for _i in range(40):
+		var p: Vector2i = host.map.random_floor_tile(rng)
+		if not host.map.is_walkable(p):
+			continue
+		if forbidden.has(p):
+			continue
+		if host._item_at(p) != null:
+			continue
+		return p
+	return Vector2i(-1, -1)
 
 func spawn_ally(monster_id: String, near_pos: Vector2i, turns: int) -> bool:
 	if host.map == null or host.monsters_layer == null:

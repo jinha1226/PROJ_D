@@ -8,7 +8,7 @@ id = "goblin"
 display_name = "goblin"
 tier = 2
 hp = 4
-ev = 12
+ev = 10
 attacks = [{
 "damage": 1,
 "flavour": "hit"

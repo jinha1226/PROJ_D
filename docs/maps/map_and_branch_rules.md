@@ -134,7 +134,20 @@ First branch set inherited from `PROJ_D`:
   - fixed entrance: Orc Mines ice gate
   - unlock: after reaching Main Floor 3
   - reward: `essence_glacial`
-  - pressure: cold, burst damage, slow terrain
+  - pressure: cold, reflective sightlines, brittle cover, slow terrain
+
+## Clean-Room Dungeon Inspirations
+
+External dungeon wikis are useful as structural references, not as source material to copy. For this game, use the following transferable patterns:
+
+- A floor is not just a tileset. Each floor needs a spatial identity, a traversal rule, a pressure source, and a reward promise.
+- Named sub-areas should read like places on a mental map: entry shelf, flooded basin, archive shelf, pay office, mirror court, final gate.
+- Branches should have a clear physical entrance and a sharper rule set than the parent floor.
+- Repeat visits should preserve major geometry so player knowledge matters, while monsters, loot, and temporary hazards vary.
+- High-value rooms should be visible or hinted before they are reachable, creating route decisions instead of random reward discovery.
+- Environmental hazards should be local and legible: long sightlines, thin ice crossings, bog channels, crusher lanes, time-slip pockets.
+
+Do not reuse another work's proper nouns, lore explanations, boss names, or exact floor layouts. Translate only the design function into PocketCrawl's own themes.
 
 - Infernal Gate
   - source: `infernal`

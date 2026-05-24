@@ -116,7 +116,7 @@ Tile/prop notes:
 
 ## Branch - Ice / Crystal
 
-Sub-regions: frozen lake, crystal archive, rime pillar field, sealed armory, boss cave.
+Sub-regions: frozen lake, reflective archive, rime pillar field, sealed armory, boss cave.
 
 Tile/prop notes:
 - Use ice/block/rime pillar statue assets, blue/sparkling fountains, crystal/gem item dressing.

@@ -62,7 +62,7 @@ _Extracted from: Player.gd, CombatSystem.gd, EssenceSystem.gd, ItemRegistry.gd, 
 
 ### Hit Chance
 ```
-player_acc = 72 + (stat - 10)×2 + skill_lv×4 + weapon_plus×3 + slay_bonus×4
+player_acc = 84 + (stat - 10)×2 + skill_lv×4 + weapon_plus×3 + slay_bonus×4
            + req_hit_pen×5 - status_hit_penalty×5
 monster_ev  = evasion × 3  (percent deduction)
 hit_chance  = clamp(player_acc - monster_ev, 10, 92)  %

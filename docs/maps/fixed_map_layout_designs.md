@@ -330,20 +330,23 @@ Tiles:
 
 Floor beats:
 
-- frozen tunnels
+- frozen breach tunnels
+- reflective ice archive
 - thin ice bridge
 - glacial throne
 
 Core structure:
 
 - lower-right entry from mine breach
-- middle thin-ice crossing
+- middle thin-ice crossing with brittle ice cover
+- side archive loops with long sightlines
 - upper-left boss chamber
 
 Skills:
 
 - Defense helps absorb giant burst pressure.
 - Survival identifies shelter points and cold-safe paths.
+- Tactics marks reflective lanes where ranged enemies have advantage.
 
 ### Infernal Gate
 

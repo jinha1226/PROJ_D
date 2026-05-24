@@ -12,6 +12,8 @@ const _D  := "res://assets/tiles/individual/dngn/decor/"
 const _S  := "res://assets/tiles/individual/dngn/statues/"
 const _T  := "res://assets/tiles/individual/dngn/trees/"
 const _TR := "res://assets/tiles/individual/dngn/traps/"
+const _V  := "res://assets/tiles/individual/dngn/vaults/"
+const _I  := "res://assets/tiles/individual/item/"
 
 const ZONE_THEMES: Dictionary = {
 	# Catacombs — stone ruins, dust, cobwebs
@@ -100,14 +102,15 @@ const ZONE_THEMES: Dictionary = {
 		],
 	},
 	"ice_caves": {
-		"density": 0.06,
+		"density": 0.08,
 		"props": [
 			[_D + "blue_fountain.png",         4],
 			[_D + "blue_fountain2.png",        4],
-			[_S + "crumbled_column_1.png",     3],
-			[_S + "crumbled_column_2.png",     3],
+			[_V + "bedevilled_crystal_coc_0.png", 4],
+			[_V + "bedevilled_crystal_coc_1.png", 4],
+			[_V + "bedevilled_crystal_dis_0.png", 2],
+			[_V + "bedevilled_crystal_dis_1.png", 2],
 			[_S + "depths_column.png",         2],
-			[_T + "tree_demonic1.png",         1],
 		],
 	},
 	"infernal": {
@@ -188,6 +191,13 @@ static func scatter(map: DungeonMap, zone_id: String, seed_val: int) -> void:
 					candidates.append(p)
 
 	if candidates.is_empty():
+		for y in range(map.GRID_H):
+			for x in range(map.GRID_W):
+				var p := Vector2i(x, y)
+				if map.is_walkable(p) and not forbidden.has(p):
+					candidates.append(p)
+	if candidates.is_empty():
+		_place_district_landmarks(map, zone_id, rng)
 		return
 
 	candidates.shuffle()  # use GDScript built-in shuffle (not seeded, but just order)
@@ -209,10 +219,174 @@ static func scatter(map: DungeonMap, zone_id: String, seed_val: int) -> void:
 			continue
 		map.prop_tile_paths[pos] = path
 		map.prop_tiles[pos] = load(path) as Texture2D
+	_place_district_landmarks(map, zone_id, rng)
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+static func _place_district_landmarks(map: DungeonMap, zone_id: String,
+		rng: RandomNumberGenerator) -> void:
+	for district in MapDistrictRules.districts(zone_id):
+		var profile: String = String(district.get("profile", ""))
+		var role: String = String(district.get("role", ""))
+		var paths: Array = _district_profile_props(profile) + _district_role_props(role)
+		if paths.is_empty():
+			continue
+		var count: int = _district_prop_count(district)
+		var forbidden: Dictionary = map.prop_tile_paths.duplicate()
+		forbidden[map.spawn_pos] = true
+		forbidden[map.stairs_down_pos] = true
+		forbidden[map.stairs_up_pos] = true
+		for p in map.extra_stairs_down_positions:
+			forbidden[p] = true
+		for _i in range(count):
+			var pos: Vector2i = _pick_tile_in_district(map, district, rng, forbidden)
+			if pos == Vector2i(-1, -1):
+				break
+			var path: String = String(paths[rng.randi_range(0, paths.size() - 1)])
+			if not ResourceLoader.exists(path):
+				forbidden[pos] = true
+				continue
+			map.prop_tile_paths[pos] = path
+			map.prop_tiles[pos] = load(path) as Texture2D
+			forbidden[pos] = true
+
+static func _pick_tile_in_district(map: DungeonMap, district: Dictionary,
+		rng: RandomNumberGenerator, forbidden: Dictionary) -> Vector2i:
+	var rect: Rect2i = MapDistrictRules.rect_for(district)
+	var candidates: Array[Vector2i] = []
+	for y in range(rect.position.y, rect.end.y):
+		for x in range(rect.position.x, rect.end.x):
+			var p := Vector2i(x, y)
+			if forbidden.has(p):
+				continue
+			if map.in_bounds(p) and map.is_walkable(p):
+				candidates.append(p)
+	if candidates.is_empty():
+		return Vector2i(-1, -1)
+	return candidates[rng.randi_range(0, candidates.size() - 1)]
+
+static func _district_prop_count(district: Dictionary) -> int:
+	var role: String = String(district.get("role", ""))
+	var rect: Rect2i = MapDistrictRules.rect_for(district)
+	var area_bonus: int = clampi(rect.get_area() / 180, 0, 3)
+	match role:
+		"entry":
+			return 3 + area_bonus
+		"pressure", "hazard":
+			return 6 + area_bonus
+		"reward", "skill":
+			return 5 + area_bonus
+		"branch", "exit":
+			return 4 + area_bonus
+		_:
+			return 4 + area_bonus
+
+static func _district_profile_props(profile: String) -> Array:
+	match profile:
+		"ruin":
+			return [_S + "crumbled_column_1.png", _S + "crumbled_column_3.png",
+					_S + "crumbled_column_4.png", _D + "dry_fountain.png",
+					_V + "brick_dark_leak.png", _V + "brick_dark_skeleton.png"]
+		"bones":
+			return [_TR + "cobweb_none_0.png", _TR + "cobweb_none_1.png",
+					_TR + "cobweb_none_2.png", _D + "dry_fountain.png",
+					_S + "statue_ancient_evil.png", _V + "brick_dark_skeleton.png"]
+		"cache":
+			return [_D + "cache_of_meat_0.png", _D + "cache_of_meat_1.png",
+					_D + "cache_of_baked_goods_1.png", _D + "cache_of_fruit_0.png",
+					_D + "cache_of_fruit_2.png"]
+		"locked":
+			return [_S + "metal_statue.png", _S + "depths_column.png",
+					_S + "statue_depths_tomes.png", _TR + "pressure_plate.png"]
+		"shrine", "sanctum":
+			return [_D + "sparkling_fountain.png", _D + "sparkling_fountain2.png",
+					_S + "statue_ancient_hero.png", _S + "statue_angel.png",
+					_TR + "binding_sigil.png"]
+		"roots":
+			return [_T + "tree1.png", _T + "tree2.png", _T + "tree5.png",
+					_T + "mangrove1.png", _T + "mangrove2.png",
+					_D + "flower_patch_0.png"]
+		"water":
+			return [_D + "blue_fountain.png", _D + "blue_fountain2.png",
+					_T + "mangrove1.png", _T + "mangrove3.png",
+					_D + "flower_patch_1.png"]
+		"fungus":
+			return [_D + "flower_patch_1.png", _D + "flower_patch_2.png",
+					_D + "flower_patch_3.png", _D + "garden_patch.png",
+					_T + "tree_petrified1.png"]
+		"gate":
+			return [_S + "depths_column.png", _S + "statue_depths_fangs.png",
+					_S + "statue_depths_zot_orb_guardian.png", _V + "dimensional_conduit_0.png",
+					_V + "dimensional_conduit_1.png"]
+		"roost":
+			return [_S + "statue_archer.png", _S + "statue_centaur.png",
+					_S + "statue_tengu.png", _T + "tree_dead1.png"]
+		"mine", "ore":
+			return [_S + "orcish_idol.png", _S + "statue_axe.png",
+					_S + "statue_dwarf.png", _V + "earthen_conduit_0.png",
+					_V + "earthen_conduit_1.png", _D + "cache_of_meat_0.png"]
+		"machinery":
+			return [_S + "statue_iron.png", _S + "depths_column.png",
+					_TR + "pressure_plate.png", _TR + "spear.png",
+					_V + "earthen_conduit_2.png", _V + "earthen_conduit_3.png"]
+		"gold":
+			return [_I + "gold/10.png", _I + "gold/16.png", _I + "gold/23.png",
+					_I + "gem/orc_found_whole.png", _D + "cache_of_baked_goods_2.png"]
+		"armory":
+			return [_I + "weapon/long_sword1.png", _I + "weapon/mace1.png",
+					_I + "weapon/battle_axe1.png", _I + "armour/plate1.png",
+					_I + "armour/chain_mail1.png", _S + "statue_sword.png"]
+		"gallery", "mirror":
+			return [_D + "sparkling_fountain2.png", _S + "statue_archer.png",
+					_S + "statue_princess.png", _S + "statue_sword.png",
+					_V + "arcane_conduit_0.png", _V + "arcane_conduit_1.png"]
+		"garden":
+			return [_D + "flower_patch_0.png", _D + "flower_patch_2.png",
+					_D + "flower_patch_3.png", _D + "garden_patch.png",
+					_T + "tree_fall1.png", _T + "tree_fall3.png"]
+		"library", "memory":
+			return [_I + "book/manual1.png", _I + "book/manual2.png",
+					_I + "book/parchment.png", _I + "scroll/scroll.png",
+					_I + "parchment/parchment_single_conj.png", _S + "statue_depths_tomes.png"]
+		"stable":
+			return [_S + "crumbled_column_2.png", _S + "crumbled_column_5.png",
+					_D + "dry_fountain.png", _D + "decorative_floor.png"]
+		"void", "weird", "shift":
+			return [_D + "eyes_fountain.png", _S + "statue_depths_zot_tentacles.png",
+					_S + "statue_zot_orb.png", _S + "zot_entropy_orb_statue.png",
+					_TR + "teleport.png", _TR + "dispersal.png",
+					_V + "dimension_edge.png", _V + "dimensional_conduit_2.png"]
+		"ice":
+			return [_V + "bedevilled_crystal_coc_0.png", _V + "bedevilled_crystal_coc_1.png",
+					_V + "bedevilled_crystal_dis_0.png", _V + "bedevilled_crystal_dis_1.png",
+					_V + "teleporter_ice_cave.png", _D + "blue_fountain.png"]
+		_:
+			return []
+
+static func _district_role_props(role: String) -> Array:
+	match role:
+		"entry":
+			return [_S + "crumbled_column_1.png", _D + "dry_fountain.png"]
+		"pressure":
+			return [_TR + "alarm.png", _TR + "net.png", _TR + "pressure_plate.png"]
+		"hazard":
+			return [_TR + "dispersal.png", _TR + "shaft.png", _TR + "teleport.png"]
+		"reward":
+			return [_I + "gold/16.png", _I + "gem/generic_unfound.png",
+					_D + "cache_of_baked_goods_1.png"]
+		"skill":
+			return [_TR + "binding_sigil.png", _I + "scroll/scroll.png",
+					_I + "book/manual1.png"]
+		"branch":
+			return [_V + "dimensional_conduit_0.png", _V + "dimensional_conduit_3.png",
+					_S + "depths_column.png"]
+		"exit":
+			return [_S + "statue_ancient_hero.png", _S + "depths_column.png",
+					_D + "sparkling_fountain.png"]
+		_:
+			return []
 
 static func _weighted_pick(paths: Array, weights: Array, total: int,
 		rng: RandomNumberGenerator) -> String:
