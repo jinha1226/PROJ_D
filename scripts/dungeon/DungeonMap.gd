@@ -42,6 +42,8 @@ var tiles: PackedByteArray = PackedByteArray()
 var visible_tiles: Dictionary = {}
 var explored: Dictionary = {}
 var reveal_all: bool = false
+var _player_pos: Vector2i = Vector2i.ZERO
+var _player_facing: Vector2i = Vector2i(1, 0)
 var fog_tiles: Dictionary = {}  # Vector2i -> turns_remaining
 
 var spawn_pos: Vector2i = Vector2i(1, 1)
@@ -354,10 +356,12 @@ func random_floor_tile(rng: RandomNumberGenerator = null) -> Vector2i:
 			return p
 	return spawn_pos
 
-func set_fov(new_visible: Dictionary) -> int:
+func set_fov(new_visible: Dictionary, p_pos: Vector2i = Vector2i.ZERO, p_facing: Vector2i = Vector2i(1, 0)) -> int:
 	# Returns the count of tiles that transitioned from unexplored → explored
 	# this update so callers (e.g. Game._refresh_fov) can reward Tracking XP.
 	visible_tiles = new_visible
+	_player_pos = p_pos
+	_player_facing = p_facing
 	var newly_revealed: int = 0
 	for pos in new_visible.keys():
 		if not explored.has(pos):
@@ -366,9 +370,20 @@ func set_fov(new_visible: Dictionary) -> int:
 	queue_redraw()
 	return newly_revealed
 
+func _directional_bright(pos: Vector2i) -> Color:
+	# Tiles in the player's facing direction are fully lit; tiles behind are
+	# slightly dimmer. Uses dot product mapped to [0.65, 1.0] brightness.
+	if _player_facing == Vector2i.ZERO:
+		return Color.WHITE
+	var delta: Vector2i = pos - _player_pos
+	if delta == Vector2i.ZERO:
+		return Color.WHITE
+	var dot: float = Vector2(_player_facing).normalized().dot(Vector2(delta).normalized())
+	var b: float = clampf(0.825 + 0.175 * dot, 0.65, 1.0)
+	return Color(b, b, b, 1.0)
+
 func _draw() -> void:
 	var dim: Color = Color(0.45, 0.45, 0.55, 1.0)
-	var bright: Color = Color.WHITE
 	var use_tiles: bool = GameManager.use_tiles
 	var bg: Color = Color(0.06, 0.06, 0.08, 1.0)
 	for y in range(GRID_H):
@@ -379,7 +394,7 @@ func _draw() -> void:
 			if not is_vis and not was_explored:
 				continue
 			var t: int = tiles[y * GRID_W + x]
-			var mod: Color = bright if is_vis else dim
+			var mod: Color = _directional_bright(pos) if is_vis else dim
 			var rect := Rect2(Vector2(x * CELL_SIZE, y * CELL_SIZE),
 					Vector2(CELL_SIZE, CELL_SIZE))
 			if use_tiles:
@@ -406,7 +421,7 @@ func _draw() -> void:
 			var ptex: Texture2D = prop_tiles[ppos]
 			if ptex == null:
 				continue
-			var pmod: Color = Color.WHITE if is_vis else Color(0.45, 0.45, 0.55)
+			var pmod: Color = _directional_bright(ppos) if is_vis else Color(0.45, 0.45, 0.55)
 			draw_texture_rect(ptex,
 				Rect2(Vector2(ppos.x * CELL_SIZE, ppos.y * CELL_SIZE), Vector2(CELL_SIZE, CELL_SIZE)),
 				false, pmod)

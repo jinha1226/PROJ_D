@@ -29,7 +29,7 @@ const BUNDLES: Array = [
 		"id": "magic_initiate",
 		"name_key": "UI_BUNDLE_NAME_MAGIC_INITIATE",
 		"desc_key": "UI_BUNDLE_DESC_MAGIC_INITIATE",
-		"items": ["staff", "book_conjuration", "dagger", "potion_magic", "potion_healing", "scroll_identify"],
+		"items": ["staff", "robe", "book_conjuration", "potion_magic", "potion_healing", "scroll_identify"],
 	},
 	{
 		"id": "skirmisher",

@@ -488,51 +488,51 @@ func _apply_starter_kit() -> void:
 	var kit: Array = GameManager.pending_starter_items
 	if kit.is_empty():
 		kit = ["dagger", "leather_armor", "potion_healing", "potion_healing", "scroll_identify"]
-	for id in kit:
-		player.items.append({"id": String(id), "plus": 0})
+	# Pass 1: add non-book items to inventory. Books are consumed immediately
+	# in pass 2 — they grant spells and don't persist as inventory entries.
+	for id_v in kit:
+		var id: String = String(id_v)
+		var idata = ItemRegistry.get_by_id(id) if ItemRegistry != null else null
+		if idata != null and String(idata.effect) == "study":
+			continue
+		player.items.append({"id": id, "plus": 0})
 		if GameManager != null:
-			GameManager.identify(String(id))
-	# Auto-equip first weapon and first armor found in the kit, mirroring
-	# the prior default-kit behavior so the player walks into floor 1 ready.
+			GameManager.identify(id)
+	# Auto-equip first weapon and first armor.
 	if player.equipped_weapon_id == "":
-		for id in kit:
-			var wdata = ItemRegistry.get_by_id(String(id)) if ItemRegistry != null else null
+		for id_v in kit:
+			var id: String = String(id_v)
+			var wdata = ItemRegistry.get_by_id(id) if ItemRegistry != null else null
 			if wdata != null and String(wdata.kind) == "weapon":
-				player.equipped_weapon_id = String(id)
+				player.equipped_weapon_id = id
 				break
 	if player.equipped_armor_id == "":
-		for id in kit:
-			var adata = ItemRegistry.get_by_id(String(id)) if ItemRegistry != null else null
+		for id_v in kit:
+			var id: String = String(id_v)
+			var adata = ItemRegistry.get_by_id(id) if ItemRegistry != null else null
 			if adata != null and String(adata.kind) == "armor":
-				player.equipped_armor_id = String(id)
+				player.equipped_armor_id = id
 				break
 	player.refresh_ac_from_equipment()
 	player._refresh_paperdoll()
-	# Auto-study any books in the starter kit — bypass int requirement so
-	# new mages always receive their starting spells regardless of race stats.
-	var _bi: int = player.items.size() - 1
-	while _bi >= 0:
-		var _bentry: Dictionary = player.items[_bi]
-		var _bdata = ItemRegistry.get_by_id(String(_bentry.get("id", ""))) if ItemRegistry != null else null
-		if _bdata != null and String(_bdata.effect) == "study":
-			var _spell_ids: Array = []
-			var _entry_ids = _bentry.get("grants_spell_ids", [])
-			if _entry_ids is Array and not (_entry_ids as Array).is_empty():
-				for _sid in (_entry_ids as Array):
-					_spell_ids.append(String(_sid))
-			else:
-				if String(_bdata.grants_spell_id) != "":
-					_spell_ids.append(String(_bdata.grants_spell_id))
-				for _sid in _bdata.grants_spell_ids:
-					_spell_ids.append(String(_sid))
-			for _sid in _spell_ids:
-				if _sid != "" and not player.known_spells.has(_sid):
-					player.known_spells.append(_sid)
-					var _sp = SpellRegistry.get_by_id(_sid) if SpellRegistry != null else null
-					if _sp != null:
-						CombatLog.post(LocaleManager.t("LOG_YOU_MEMORIZE") % _sp.display_name, Color(0.7, 0.95, 1.0))
-			player.items.remove_at(_bi)
-		_bi -= 1
+	# Pass 2: grant spells from books — bypass int requirement so new mages
+	# always receive their starting spells regardless of race stats.
+	for id_v in kit:
+		var id: String = String(id_v)
+		var idata = ItemRegistry.get_by_id(id) if ItemRegistry != null else null
+		if idata == null or String(idata.effect) != "study":
+			continue
+		var spell_ids: PackedStringArray = PackedStringArray()
+		if String(idata.grants_spell_id) != "":
+			spell_ids.append(String(idata.grants_spell_id))
+		for sid in idata.grants_spell_ids:
+			spell_ids.append(String(sid))
+		for sid in spell_ids:
+			if sid != "" and not player.known_spells.has(sid):
+				player.known_spells.append(sid)
+				var sp = SpellRegistry.get_by_id(sid) if SpellRegistry != null else null
+				if sp != null:
+					CombatLog.post(LocaleManager.t("LOG_YOU_MEMORIZE") % sp.display_name, Color(0.7, 0.95, 1.0))
 	GameManager.selected_starting_weapon_id = ""
 	GameManager.selected_starting_school_id = ""
 	GameManager.selected_starting_essence_id = ""
@@ -1264,7 +1264,7 @@ var _corpse_tex_cache: Dictionary = {}
 func _refresh_fov() -> void:
 	if player == null or map == null:
 		return
-	var newly_revealed: int = map.set_fov(player.compute_fov())
+	var newly_revealed: int = map.set_fov(player.compute_fov(), player.grid_pos, player.facing)
 	if newly_revealed > 0:
 		player.grant_skill_xp("tracking", float(newly_revealed) * 0.2)
 	_grant_sight_bestiary_unlocks()
