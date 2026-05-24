@@ -1,14 +1,17 @@
 extends Control
 class_name RTControlOverlay
 
-const BTN: int = 88           # D-pad button size (px)
-const HUD_H: int = 148        # BottomHUD height to clear
-const PAD: int = 16           # outer padding from edges
-const ACTION_W: int = 110     # dodge/parry button width
-const ACTION_H: int = 88      # dodge/parry button height
-const ACTION_GAP: int = 12    # gap between dodge and parry
+const BTN: int = 90
+const HUD_H: int = 148
+const PAD: int = 20
+const ACTION_W: int = 116
+const ACTION_H: int = 90
+const ACTION_GAP: int = 14
 
 var _rt: RealTimeController
+var _dpad_root: Control
+var _dodge_btn: Button
+var _parry_btn: Button
 
 func setup(rt_controller: RealTimeController) -> void:
 	_rt = rt_controller
@@ -16,26 +19,33 @@ func setup(rt_controller: RealTimeController) -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_build_dpad()
 	_build_action_buttons()
+	_reposition()
 
-func set_rt_visible(enabled: bool) -> void:
-	visible = enabled
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED or what == NOTIFICATION_VISIBILITY_CHANGED:
+		_reposition()
 
-# ── D-pad ────────────────────────────────────────────────────────────────────
+func _reposition() -> void:
+	if size == Vector2.ZERO:
+		return
+	if _dpad_root:
+		_dpad_root.position = Vector2(PAD, size.y - HUD_H - BTN * 3 - PAD)
+	if _dodge_btn:
+		_dodge_btn.position = Vector2(size.x - PAD - ACTION_W,
+				size.y - HUD_H - ACTION_GAP - ACTION_H * 2)
+		_dodge_btn.size = Vector2(ACTION_W, ACTION_H)
+	if _parry_btn:
+		_parry_btn.position = Vector2(size.x - PAD - ACTION_W,
+				size.y - HUD_H - ACTION_H)
+		_parry_btn.size = Vector2(ACTION_W, ACTION_H)
 
 func _build_dpad() -> void:
-	# Container: bottom-left corner, above HUD
-	var c := Control.new()
-	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# anchor to bottom-left
-	c.anchor_left = 0.0;  c.anchor_right  = 0.0
-	c.anchor_top  = 1.0;  c.anchor_bottom = 1.0
-	c.offset_left   = PAD
-	c.offset_right  = PAD + BTN * 3
-	c.offset_top    = -(HUD_H + BTN * 3 + PAD)
-	c.offset_bottom = -(HUD_H)
-	add_child(c)
+	_dpad_root = Control.new()
+	_dpad_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_dpad_root.custom_minimum_size = Vector2(BTN * 3, BTN * 3)
+	_dpad_root.size = Vector2(BTN * 3, BTN * 3)
+	add_child(_dpad_root)
 
-	# col, row, dir, symbol
 	var dirs: Array = [
 		[1, 0, Vector2i( 0, -1), "▲"],
 		[0, 1, Vector2i(-1,  0), "◀"],
@@ -48,7 +58,7 @@ func _build_dpad() -> void:
 		var btn := _make_dpad_btn(sym)
 		btn.position = Vector2(col * BTN, row * BTN)
 		btn.size = Vector2(BTN, BTN)
-		c.add_child(btn)
+		_dpad_root.add_child(btn)
 		btn.button_down.connect(func(): _rt.touch_dir = dir)
 		btn.button_up.connect(func():
 			if _rt.touch_dir == dir:
@@ -57,40 +67,23 @@ func _build_dpad() -> void:
 func _make_dpad_btn(sym: String) -> Button:
 	var btn := Button.new()
 	btn.text = sym
-	btn.add_theme_font_size_override("font_size", 26)
-	# Semi-transparent dark background
-	btn.add_theme_color_override("font_color", Color(1, 1, 1, 0.85))
-	btn.modulate = Color(1, 1, 1, 0.70)
+	btn.add_theme_font_size_override("font_size", 28)
+	btn.modulate = Color(1, 1, 1, 0.72)
 	return btn
 
-# ── Dodge / Parry ─────────────────────────────────────────────────────────────
-
 func _build_action_buttons() -> void:
-	var dodge_btn := _make_action_btn("회피", Color(0.3, 0.85, 1.0, 0.85))
-	# anchor bottom-right
-	dodge_btn.anchor_left   = 1.0; dodge_btn.anchor_right  = 1.0
-	dodge_btn.anchor_top    = 1.0; dodge_btn.anchor_bottom = 1.0
-	dodge_btn.offset_left   = -(PAD + ACTION_W)
-	dodge_btn.offset_right  = -PAD
-	dodge_btn.offset_top    = -(HUD_H + ACTION_GAP + ACTION_H * 2)
-	dodge_btn.offset_bottom = -(HUD_H + ACTION_GAP + ACTION_H)
-	add_child(dodge_btn)
-	dodge_btn.pressed.connect(func(): _rt.trigger_dodge())
+	_dodge_btn = _make_action_btn("회피", Color(0.3, 0.85, 1.0))
+	add_child(_dodge_btn)
+	_dodge_btn.pressed.connect(func(): _rt.trigger_dodge())
 
-	var parry_btn := _make_action_btn("막기", Color(1.0, 0.85, 0.3, 0.85))
-	parry_btn.anchor_left   = 1.0; parry_btn.anchor_right  = 1.0
-	parry_btn.anchor_top    = 1.0; parry_btn.anchor_bottom = 1.0
-	parry_btn.offset_left   = -(PAD + ACTION_W)
-	parry_btn.offset_right  = -PAD
-	parry_btn.offset_top    = -(HUD_H + ACTION_H)
-	parry_btn.offset_bottom = -(HUD_H)
-	add_child(parry_btn)
-	parry_btn.pressed.connect(func(): _rt.trigger_parry())
+	_parry_btn = _make_action_btn("막기", Color(1.0, 0.82, 0.25))
+	add_child(_parry_btn)
+	_parry_btn.pressed.connect(func(): _rt.trigger_parry())
 
 func _make_action_btn(label: String, col: Color) -> Button:
 	var btn := Button.new()
 	btn.text = label
-	btn.add_theme_font_size_override("font_size", 22)
+	btn.add_theme_font_size_override("font_size", 24)
 	btn.add_theme_color_override("font_color", col)
-	btn.modulate = Color(1, 1, 1, 0.80)
+	btn.modulate = Color(1, 1, 1, 0.82)
 	return btn
