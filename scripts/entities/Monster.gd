@@ -32,6 +32,7 @@ var facing: Vector2i = Vector2i(1, 0)
 var _map: DungeonMap
 var _tex: Texture2D = null
 var _font: Font
+var _move_tween: Tween = null
 
 func _ready() -> void:
 	TurnManager = get_node_or_null("/root/TurnManager")
@@ -98,8 +99,14 @@ func try_move(dir: Vector2i) -> bool:
 		return false
 	grid_pos = target
 	facing = dir
-	position = _map.grid_to_world(target)
+	_glide_to(_map.grid_to_world(target))
 	return true
+
+func _glide_to(world_pos: Vector2) -> void:
+	if _move_tween != null and _move_tween.is_running():
+		_move_tween.kill()
+	_move_tween = create_tween()
+	_move_tween.tween_property(self, "position", world_pos, 0.25)
 
 func take_damage(amount: int) -> void:
 	hp = max(0, hp - amount)

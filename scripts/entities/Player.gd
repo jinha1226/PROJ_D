@@ -12,6 +12,7 @@ var items_collected: int = 0
 var last_killer: String = ""
 var rt_dodge_active: bool = false
 var rt_parry_active: bool = false
+var _move_tween: Tween = null
 var items: Array = []  # [{id: String, plus: int}]
 var known_spells: Array = []  # [String]
 var quickslots: Array = ["", "", "", "", "", ""]  # item/spell ids, index = slot
@@ -109,11 +110,17 @@ func _try_move(dir: Vector2i) -> void:
 	facing = dir
 	if _renderer != null:
 		_renderer.start_walk_anim()
-	position = _map.grid_to_world(grid_pos)
+	_glide_to(_map.grid_to_world(grid_pos))
 	emit_signal("moved", grid_pos)
 	emit_signal("stats_changed")
 	_auto_pickup()
 	TurnManager.end_player_turn(_race_speed_mod() * Status.speed_mult(self))
+
+func _glide_to(world_pos: Vector2) -> void:
+	if _move_tween != null and _move_tween.is_running():
+		_move_tween.kill()
+	_move_tween = create_tween()
+	_move_tween.tween_property(self, "position", world_pos, 0.12)
 
 func _monster_at(pos: Vector2i) -> Monster:
 	var tree := get_tree()
