@@ -12,6 +12,7 @@ const PARRY_WINDOW_SEC: float = 0.25
 const PARRY_COOLDOWN_SEC: float = 4.0
 
 var _game: Node
+var touch_dir: Vector2i = Vector2i.ZERO  # set by RTControlOverlay D-pad
 var _move_timer: float = 0.0
 var _attack_timer: float = 0.0
 var _dodge_window: float = 0.0
@@ -135,6 +136,9 @@ func _tick_timers(delta: float, player: Player) -> void:
 	_parry_cooldown = max(0.0, _parry_cooldown - delta)
 
 func _held_direction() -> Vector2i:
+	# Touch D-pad takes priority over keyboard.
+	if touch_dir != Vector2i.ZERO:
+		return touch_dir
 	var dx: int = 0
 	var dy: int = 0
 	if Input.is_action_pressed("ui_right"):

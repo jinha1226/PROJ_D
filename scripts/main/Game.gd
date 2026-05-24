@@ -59,6 +59,7 @@ var _spawn_service: SpawnService
 var _effects_layer: EffectsLayer
 var _spell_targeting: SpellTargeting
 var _rt_controller: RealTimeController
+var _rt_overlay: RTControlOverlay
 var map: DungeonMap
 var player: Player
 var _companions: Array = []  # Array[Companion] — active in-dungeon nodes
@@ -1011,6 +1012,13 @@ func _spawn_ui() -> void:
 	if top_hud.has_signal("minimap_pressed"):
 		top_hud.minimap_pressed.connect(_on_minimap_tapped)
 	log_strip.tapped.connect(_on_log_tapped)
+	# RT control overlay (D-pad + dodge/parry buttons) — hidden by default.
+	_rt_overlay = RTControlOverlay.new()
+	_rt_overlay.name = "RTControlOverlay"
+	ui_layer.add_child(_rt_overlay)
+	if _rt_controller != null:
+		_rt_overlay.setup(_rt_controller)
+	_rt_overlay.visible = TurnManager.rt_mode
 	_effect_layer = Node2D.new()
 	_effect_layer.name = "EffectLayer"
 	_effect_layer.z_index = 5
@@ -1449,6 +1457,8 @@ func _center_camera_on_player(snap: bool = false) -> void:
 func on_rt_mode_changed(enabled: bool) -> void:
 	if bottom_hud != null and bottom_hud.has_method("set_rt_mode"):
 		bottom_hud.set_rt_mode(enabled)
+	if _rt_overlay != null:
+		_rt_overlay.visible = enabled
 
 func _update_hud() -> void:
 	if top_hud == null or player == null:
