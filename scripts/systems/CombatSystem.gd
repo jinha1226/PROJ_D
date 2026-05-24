@@ -18,10 +18,10 @@ const D100_MIN_HIT_CHANCE: int = 10
 const D100_MAX_HIT_CHANCE: int = 92
 const D100_MIN_BLOCK_CHANCE: int = 3
 const D100_MAX_BLOCK_CHANCE: int = 75
-const D100_PLAYER_BASE_ACCURACY: int = 84
-const D100_MONSTER_BASE_ACCURACY: int = 68
+const D100_PLAYER_BASE_ACCURACY: int = 90
+const D100_MONSTER_BASE_ACCURACY: int = 65
 const D100_STAT_POINT_PCT: int = 2
-const D100_SKILL_LEVEL_PCT: int = 4
+const D100_SKILL_LEVEL_PCT: int = 5
 const D100_PLUS_PCT: int = 3
 const D100_SLAY_PCT: int = 4
 const D100_EV_POINT_PCT: int = 3
@@ -306,7 +306,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		var brand_element: String = brand_element_of(brand)
 		var roll: int = _brand_damage_roll(brand)
 		brand_extra = Status.resist_scale(roll, monster.data.resists, brand_element)
-		brand_extra = Status.wet_lightning_scale(brand_extra, monster, brand_element)
+		brand_extra = Status.elemental_damage_scale(brand_extra, monster, brand_element)
 		if brand_element == "necro":
 			brand_extra = max(1, int(round(float(brand_extra) * FaithSystem.necrotic_damage_mult(player))))
 		final += brand_extra
@@ -390,11 +390,13 @@ static func _dagger_swift_strike(player: Player, monster: Monster) -> void:
 		_apply_player_kill_rewards(player, monster, Player.weapon_skill_for_item(weapon_item))
 
 static func _apply_player_kill_rewards(player: Player, monster: Monster, skill_id: String) -> void:
-	var xp_award: int = max(1, int(round(float(monster.data.xp_value) * XP_PACE_MULTIPLIER)))
-	player.grant_xp(xp_award)
-	player.grant_kill_skill_xp(float(xp_award), skill_id)
-	# Tracking XP: flat per-kill grant for hunting any creature.
-	player.grant_skill_xp("tracking", 0.5)
+	var base_xp: int = max(1, int(round(float(monster.data.xp_value) * XP_PACE_MULTIPLIER)))
+	var xp_award: int = player.monster_xp_award(monster, base_xp)
+	if xp_award > 0:
+		player.grant_xp(xp_award)
+		player.grant_kill_skill_xp(float(xp_award), skill_id)
+		# Tracking XP: flat per-kill grant for hunting relevant creatures.
+		player.grant_skill_xp("tracking", 0.5)
 	player.register_kill()
 	GameManager.try_kill_unlock(monster.data.id)
 	RacePassiveSystem.on_player_killed_monster(player)

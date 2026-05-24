@@ -13,11 +13,11 @@ enum Tile {
 	SHOP = 7,
 }
 
-var GRID_W: int = 42
-var GRID_H: int = 47
+var GRID_W: int = 46
+var GRID_H: int = 50
 const CELL_SIZE: int = 32
-const DEFAULT_GRID_W: int = 42
-const DEFAULT_GRID_H: int = 47
+const DEFAULT_GRID_W: int = 46
+const DEFAULT_GRID_H: int = 50
 
 const TEX_STAIRS_UP: Texture2D = preload(
 	"res://assets/tiles/individual/dngn/gateways/metal_stairs_up.png")
@@ -78,6 +78,7 @@ var hazard_tiles: Dictionary = {}
 ## Decorative props: Vector2i → Texture2D (runtime). Paths kept in prop_tile_paths for caching.
 var prop_tiles: Dictionary = {}
 var prop_tile_paths: Dictionary = {}  # Vector2i → String res:// path
+var prop_blocking: Dictionary = {}    # Vector2i → true for solid props that block movement/FOV
 
 const CLOUD_COLORS: Dictionary = {
 	"fire":        Color(1.0,  0.45, 0.1,  0.55),
@@ -102,11 +103,26 @@ const HAZARD_COLORS: Dictionary = {
 func add_cloud(pos: Vector2i, type: String, turns: int) -> void:
 	if not in_bounds(pos) or tile_at(pos) == Tile.WALL:
 		return
+	if type == "fire":
+		_burn_flammable_prop(pos)
 	var existing: Dictionary = cloud_tiles.get(pos, {})
+	var existing_type: String = String(existing.get("type", ""))
+	if (type == "fire" and existing_type == "poison") or (type == "poison" and existing_type == "fire"):
+		cloud_tiles[pos] = {"type": "fire", "turns": max(turns, int(existing.get("turns", 0))) + 1}
+		queue_redraw()
+		return
 	# Refresh if same type, else replace only if new type is "stronger"
 	if existing.is_empty() or int(existing.get("turns", 0)) < turns:
 		cloud_tiles[pos] = {"type": type, "turns": turns}
 	queue_redraw()
+
+func _burn_flammable_prop(pos: Vector2i) -> void:
+	var path: String = String(prop_tile_paths.get(pos, ""))
+	if not path.contains("/dngn/trees/"):
+		return
+	prop_tile_paths.erase(pos)
+	prop_tiles.erase(pos)
+	prop_blocking.erase(pos)
 
 func tick_clouds() -> void:
 	var expired: Array = []
@@ -195,11 +211,11 @@ func is_reserved_feature_tile(p: Vector2i) -> bool:
 
 func is_walkable(p: Vector2i) -> bool:
 	var t := tile_at(p)
-	return t != Tile.WALL and t != Tile.DOOR_CLOSED
+	return t != Tile.WALL and t != Tile.DOOR_CLOSED and not prop_blocking.has(p)
 
 func is_opaque(p: Vector2i) -> bool:
 	var t := tile_at(p)
-	return t == Tile.WALL or t == Tile.DOOR_CLOSED or fog_tiles.has(p)
+	return t == Tile.WALL or t == Tile.DOOR_CLOSED or fog_tiles.has(p) or prop_blocking.has(p)
 
 
 func add_fog(center: Vector2i, radius: int, turns: int) -> void:
@@ -252,6 +268,7 @@ func generate(map_seed: int = -1, branch_entrance: bool = false, style: String =
 	corpses.clear()
 	prop_tiles.clear()
 	prop_tile_paths.clear()
+	prop_blocking.clear()
 	_load_atmosphere(GameManager.depth)
 	queue_redraw()
 
@@ -289,6 +306,7 @@ func generate_fixed_from_file(file_path: String, depth: int,
 	corpses.clear()
 	prop_tiles.clear()
 	prop_tile_paths.clear()
+	prop_blocking.clear()
 	# Inject ASCII-authored hazard tiles (~ = bog, ^ = lava).
 	hazard_tiles = result.get("hazard_tiles", {})
 	cloud_tiles.clear()
@@ -372,14 +390,14 @@ func set_fov(new_visible: Dictionary, p_pos: Vector2i = Vector2i.ZERO, p_facing:
 
 func _directional_bright(pos: Vector2i) -> Color:
 	# Tiles in the player's facing direction are fully lit; tiles behind are
-	# slightly dimmer. Uses dot product mapped to [0.65, 1.0] brightness.
+	# strongly dimmed. Uses dot product mapped to [0.40, 1.0] brightness.
 	if _player_facing == Vector2i.ZERO:
 		return Color.WHITE
 	var delta: Vector2i = pos - _player_pos
 	if delta == Vector2i.ZERO:
 		return Color.WHITE
 	var dot: float = Vector2(_player_facing).normalized().dot(Vector2(delta).normalized())
-	var b: float = clampf(0.825 + 0.175 * dot, 0.65, 1.0)
+	var b: float = clampf(0.70 + 0.30 * dot, 0.40, 1.0)
 	return Color(b, b, b, 1.0)
 
 func _draw() -> void:

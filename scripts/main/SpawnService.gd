@@ -75,8 +75,10 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 	var zone_id: String = ZoneManager.zone_id_for_depth(depth)
 	if not MapDistrictRules.districts(zone_id).is_empty():
 		_spawn_monsters_for_districts(depth, zone_id, count, rng, false)
+		_spawn_stair_guardian_for_floor(depth, rng)
 		return
 	if host.map.rooms.is_empty():
+		_spawn_stair_guardian_for_floor(depth, rng)
 		return
 
 	# ── 1. Sort rooms by Chebyshev distance from spawn (entry) ───────────────
@@ -147,6 +149,7 @@ func _spawn_monsters_for_floor(depth: int) -> void:
 				continue
 			_do_place_monster(data, p)
 			placed += 1
+	_spawn_stair_guardian_for_floor(depth, rng)
 
 func _spawn_monsters_for_districts(depth: int, zone_id: String, count: int,
 		rng: RandomNumberGenerator, branch_pool: bool = false) -> void:
@@ -185,6 +188,54 @@ func _spawn_monsters_for_districts(depth: int, zone_id: String, count: int,
 			continue
 		_do_place_monster(data, p)
 		placed += 1
+
+func _spawn_stair_guardian_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
+	const GUARDIANS: Dictionary = {
+		1: "stair_warden",
+		2: "mire_channeler",
+		3: "mine_breaker",
+		4: "mirror_adept",
+	}
+	var guardian_id: String = String(GUARDIANS.get(depth, ""))
+	if guardian_id == "":
+		return
+	var data: MonsterData = MonsterRegistry.get_by_id(guardian_id)
+	if data == null:
+		push_warning("Stair guardian not found: %s" % guardian_id)
+		return
+	var stair_positions: Array[Vector2i] = host._all_down_stairs_positions()
+	var anchor: Vector2i = host.map.stairs_down_pos
+	if not stair_positions.is_empty():
+		anchor = stair_positions[0]
+	var pos: Vector2i = _find_guardian_pos_near(anchor, rng)
+	if pos == Vector2i(-1, -1):
+		return
+	var m: Monster = _do_place_monster(data, pos)
+	if m != null:
+		CombatLog.post("A stair guardian waits near the descent.", Color(1.0, 0.75, 0.35))
+
+func _find_guardian_pos_near(anchor: Vector2i, rng: RandomNumberGenerator) -> Vector2i:
+	for radius in range(1, 6):
+		var candidates: Array[Vector2i] = []
+		for dy in range(-radius, radius + 1):
+			for dx in range(-radius, radius + 1):
+				if max(abs(dx), abs(dy)) != radius:
+					continue
+				var p := anchor + Vector2i(dx, dy)
+				if not host.map.in_bounds(p):
+					continue
+				if host.map.is_reserved_feature_tile(p):
+					continue
+				if not host.map.is_walkable(p):
+					continue
+				if p == host.player.grid_pos:
+					continue
+				if host._monster_at(p) != null:
+					continue
+				candidates.append(p)
+		if not candidates.is_empty():
+			return candidates[rng.randi_range(0, candidates.size() - 1)]
+	return Vector2i(-1, -1)
 
 func _district_monster_weight(role: String) -> int:
 	match role:
@@ -240,7 +291,7 @@ func _pick_theme_for_zone(depth: int, zone: int, seed: int) -> MonsterData:
 			best = data       # keep first candidate as fallback
 	return best               # fallback if no zone-appropriate monster found
 
-func _do_place_monster(data: MonsterData, p: Vector2i) -> void:
+func _do_place_monster(data: MonsterData, p: Vector2i) -> Monster:
 	var m: Monster = host.MonsterScene.new()
 	host.monsters_layer.add_child(m)
 	m.setup(data, host.map, p)
@@ -250,6 +301,7 @@ func _do_place_monster(data: MonsterData, p: Vector2i) -> void:
 	m.died.connect(host._on_monster_died)
 	TurnManager.register_actor(m)
 	_roll_monster_weapon(m)
+	return m
 
 func _spawn_items_for_floor(depth: int) -> void:
 	var rng := RandomNumberGenerator.new()
@@ -512,11 +564,13 @@ func _find_item_drop_pos(origin: Vector2i) -> Vector2i:
 	return origin
 
 func _monster_count_for_depth(d: int) -> int:
-	if d <= 5:
+	if d <= 1:
 		return randi_range(7, 10)
+	if d <= 5:
+		return randi_range(8, 12)
 	if d <= 15:
-		return randi_range(10, 14)
-	return randi_range(9, 13)
+		return randi_range(11, 15)
+	return randi_range(10, 14)
 
 func _spawn_npcs_for_floor(count: int = 10) -> void:
 	if not host.get("npcs_layer"):

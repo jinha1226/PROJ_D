@@ -1,7 +1,7 @@
 class_name PropPlacer extends RefCounted
 
 ## Scatter thematic decorative props on a freshly-generated DungeonMap floor.
-## Props are visual only — they do not block movement or pathfinding.
+## Large props can block movement, pathfinding, and field of view.
 ## Call scatter() after map.generate() / map.generate_fixed_from_file().
 
 # ---------------------------------------------------------------------------
@@ -13,7 +13,6 @@ const _S  := "res://assets/tiles/individual/dngn/statues/"
 const _T  := "res://assets/tiles/individual/dngn/trees/"
 const _TR := "res://assets/tiles/individual/dngn/traps/"
 const _V  := "res://assets/tiles/individual/dngn/vaults/"
-const _I  := "res://assets/tiles/individual/item/"
 
 const ZONE_THEMES: Dictionary = {
 	# Catacombs — stone ruins, dust, cobwebs
@@ -149,6 +148,7 @@ const ZONE_THEMES: Dictionary = {
 static func scatter(map: DungeonMap, zone_id: String, seed_val: int) -> void:
 	map.prop_tile_paths.clear()
 	map.prop_tiles.clear()
+	map.prop_blocking.clear()
 
 	var theme: Dictionary = ZONE_THEMES.get(zone_id, {})
 	if theme.is_empty():
@@ -219,6 +219,8 @@ static func scatter(map: DungeonMap, zone_id: String, seed_val: int) -> void:
 			continue
 		map.prop_tile_paths[pos] = path
 		map.prop_tiles[pos] = load(path) as Texture2D
+		if _is_blocking_prop(path):
+			map.prop_blocking[pos] = true
 	_place_district_landmarks(map, zone_id, rng)
 
 # ---------------------------------------------------------------------------
@@ -250,6 +252,8 @@ static func _place_district_landmarks(map: DungeonMap, zone_id: String,
 				continue
 			map.prop_tile_paths[pos] = path
 			map.prop_tiles[pos] = load(path) as Texture2D
+			if _is_blocking_prop(path):
+				map.prop_blocking[pos] = true
 			forbidden[pos] = true
 
 static func _pick_tile_in_district(map: DungeonMap, district: Dictionary,
@@ -332,12 +336,13 @@ static func _district_profile_props(profile: String) -> Array:
 					_TR + "pressure_plate.png", _TR + "spear.png",
 					_V + "earthen_conduit_2.png", _V + "earthen_conduit_3.png"]
 		"gold":
-			return [_I + "gold/10.png", _I + "gold/16.png", _I + "gold/23.png",
-					_I + "gem/orc_found_whole.png", _D + "cache_of_baked_goods_2.png"]
+			return [_V + "golden_statue_1.png", _V + "golden_statue_2.png",
+					_V + "golden_iron_statue.png", _V + "gilded_reliquary.png",
+					_D + "cache_of_baked_goods_2.png"]
 		"armory":
-			return [_I + "weapon/long_sword1.png", _I + "weapon/mace1.png",
-					_I + "weapon/battle_axe1.png", _I + "armour/plate1.png",
-					_I + "armour/chain_mail1.png", _S + "statue_sword.png"]
+			return [_S + "statue_sword.png", _S + "statue_axe.png",
+					_S + "statue_polearm.png", _V + "wall/wall_sword_gold.png",
+					_V + "oka_iron_statue_1.png", _V + "golden_iron_statue.png"]
 		"gallery", "mirror":
 			return [_D + "sparkling_fountain2.png", _S + "statue_archer.png",
 					_S + "statue_princess.png", _S + "statue_sword.png",
@@ -347,9 +352,9 @@ static func _district_profile_props(profile: String) -> Array:
 					_D + "flower_patch_3.png", _D + "garden_patch.png",
 					_T + "tree_fall1.png", _T + "tree_fall3.png"]
 		"library", "memory":
-			return [_I + "book/manual1.png", _I + "book/manual2.png",
-					_I + "book/parchment.png", _I + "scroll/scroll.png",
-					_I + "parchment/parchment_single_conj.png", _S + "statue_depths_tomes.png"]
+			return [_V + "stacked_books_1.png", _V + "stacked_books_2.png",
+					_V + "stacked_books_3.png", _S + "statue_depths_tomes.png",
+					_V + "arcane_conduit_0.png", _V + "arcane_conduit_2.png"]
 		"stable":
 			return [_S + "crumbled_column_2.png", _S + "crumbled_column_5.png",
 					_D + "dry_fountain.png", _D + "decorative_floor.png"]
@@ -374,11 +379,11 @@ static func _district_role_props(role: String) -> Array:
 		"hazard":
 			return [_TR + "dispersal.png", _TR + "shaft.png", _TR + "teleport.png"]
 		"reward":
-			return [_I + "gold/16.png", _I + "gem/generic_unfound.png",
-					_D + "cache_of_baked_goods_1.png"]
+			return [_V + "golden_statue_1.png", _V + "silver_statue_1.png",
+					_D + "cache_of_baked_goods_1.png", _V + "gilded_reliquary.png"]
 		"skill":
-			return [_TR + "binding_sigil.png", _I + "scroll/scroll.png",
-					_I + "book/manual1.png"]
+			return [_TR + "binding_sigil.png", _V + "stacked_books_1.png",
+					_V + "arcane_conduit_2.png", _S + "statue_depths_tomes.png"]
 		"branch":
 			return [_V + "dimensional_conduit_0.png", _V + "dimensional_conduit_3.png",
 					_S + "depths_column.png"]
@@ -398,11 +403,21 @@ static func _weighted_pick(paths: Array, weights: Array, total: int,
 			return paths[i]
 	return paths[-1]
 
+static func _is_blocking_prop(path: String) -> bool:
+	if path.contains("/dngn/statues/") or path.contains("/dngn/trees/"):
+		return true
+	if path.contains("/dngn/vaults/"):
+		return not path.contains("/wall/")
+	return false
+
 ## Restore prop_tiles (Texture2D) from cached prop_tile_paths (String paths).
 ## Call after restoring a floor from cache / save.
 static func restore_textures(map: DungeonMap) -> void:
 	map.prop_tiles.clear()
+	map.prop_blocking.clear()
 	for pos in map.prop_tile_paths.keys():
 		var path: String = str(map.prop_tile_paths[pos])
 		if ResourceLoader.exists(path):
 			map.prop_tiles[pos] = load(path) as Texture2D
+			if _is_blocking_prop(path):
+				map.prop_blocking[pos] = true

@@ -64,17 +64,19 @@ func _tick_cloud_damage() -> void:
 		var type: String = cloud.get("type", "fire")
 		var dmg: int = 0
 		match type:
-			"fire":        dmg = randi_range(2, 4)
+			"fire":        dmg = Status.elemental_damage_scale(randi_range(2, 4), self, "fire")
 			"poison":      dmg = 1; Status.apply(self, "poison", 3)
-			"cold":        dmg = randi_range(1, 3)
-			"electricity": dmg = randi_range(1, 3)
-			"lava":        dmg = randi_range(6, 10)
+			"cold":
+				Status.apply_elemental_reaction(self, "cold")
+				dmg = randi_range(1, 3)
+			"electricity": dmg = Status.elemental_damage_scale(randi_range(1, 3), self, type)
+			"lava":        dmg = Status.elemental_damage_scale(randi_range(6, 10), self, "fire")
 		if dmg > 0:
 			take_damage(dmg)
 			return
 	var htype: String = _map.hazard_tiles.get(grid_pos, "")
 	if htype == "lava":
-		take_damage(randi_range(6, 10))
+		take_damage(Status.elemental_damage_scale(randi_range(6, 10), self, "fire"))
 	elif htype == "shallow_water":
 		apply_wet(3)
 
@@ -160,14 +162,18 @@ func die() -> void:
 func _draw() -> void:
 	if data == null:
 		return
-	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
+	var cs: float = float(DungeonMap.CELL_SIZE)
+	var scale_mult: float = 1.35 if data.is_boss else 1.0
+	var size := Vector2(cs * scale_mult, cs * scale_mult)
+	var rect := Rect2((Vector2(cs, cs) - size) * 0.5, size)
 	var tint: Color = Color(0.55, 1.0, 0.6) if is_ally else Color.WHITE
 	if GameManager.use_tiles and _tex != null:
 		draw_texture_rect(_tex, rect, false, tint)
 	else:
 		var glyph_col: Color = (tint * data.glyph_color) if is_ally else data.glyph_color
-		draw_string(_font, Vector2(6, DungeonMap.CELL_SIZE - 6),
-			data.glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, DungeonMap.CELL_SIZE - 6,
+		var font_size: int = int((cs - 6.0) * scale_mult)
+		draw_string(_font, Vector2(6, cs - 6),
+			data.glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size,
 			glyph_col)
 	if not is_aware and hp > 0:
 		var center := Vector2(DungeonMap.CELL_SIZE * 0.5, 4.0)

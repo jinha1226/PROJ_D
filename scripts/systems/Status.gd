@@ -19,6 +19,7 @@ const INFO: Dictionary = {
 		"ticks_hp": 1, "element": "poison", "non_lethal": true},
 	"bleeding":     {"name": "Bleeding",     "color": Color(0.9, 0.25, 0.25),
 		"ticks_hp": 1, "element": ""},
+	"wet":          {"name": "Wet",          "color": Color(0.55, 0.8, 1.0)},
 	# Movement-impairing wound statuses. speed_mult is a multiplier on the
 	# action_cost passed to TurnManager.end_player_turn — values > 1.0 make
 	# the actor take longer per action. blind clamps FOV radius to 0 so the
@@ -115,6 +116,34 @@ static func resist_scale(base: int, resists, element: String) -> int:
 	var level: int = resist_level(resists, element)
 	var mult: float = float(_RESIST_MULT.get(level, 1.0))
 	return int(round(float(base) * mult))
+
+static func is_lightning_element(element: String) -> bool:
+	return element == "lightning" or element == "electric" or element == "electricity"
+
+static func wet_lightning_scale(base: int, actor, element: String) -> int:
+	if base <= 0 or actor == null or not is_lightning_element(element):
+		return base
+	if has(actor, "wet"):
+		return int(ceil(float(base) * 1.5))
+	return base
+
+static func elemental_damage_scale(base: int, actor, element: String) -> int:
+	if base <= 0 or actor == null:
+		return base
+	if is_lightning_element(element):
+		return wet_lightning_scale(base, actor, element)
+	if element == "fire" and has(actor, "wet"):
+		remove(actor, "wet")
+		return max(1, int(ceil(float(base) * 0.75)))
+	return base
+
+static func apply_elemental_reaction(actor, element: String) -> void:
+	if actor == null:
+		return
+	if element == "cold" and has(actor, "wet"):
+		apply(actor, "frozen", 1)
+	elif element == "fire" and has(actor, "wet"):
+		remove(actor, "wet")
 
 # ── Status application ────────────────────────────────────────────────────
 static func has(actor, id: String) -> bool:
@@ -268,6 +297,7 @@ static func _apply_tick(actor, id: String) -> void:
 	if dot > 0 and "hp" in actor:
 		var elem: String = String(info.get("element", ""))
 		var raw: int = resist_scale(dot, _resists_of(actor), elem)
+		raw = elemental_damage_scale(raw, actor, elem)
 		if raw <= 0:
 			return
 		var floor_hp: int = 1 if bool(info.get("non_lethal", false)) else 0

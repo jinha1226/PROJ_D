@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://boss_mirror_adept"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "mirror_adept"
+display_name = "Mirror Adept"
+tier = 4
+hp = 56
+hd = 9
+ac = 5
+ev = 9
+speed = 10
+sight_range = 10
+attacks = [{"damage": 8, "flavour": "glass blade"}]
+ranged_attack = {"damage": 10, "range": 7, "verb": "casts", "flavour": "mirror bolt"}
+resists = ["cold+"]
+min_depth = 4
+max_depth = 4
+weight = 0
+xp_value = 52
+is_boss = true
+is_unique = true
+drop_chance_override = 0.8
+tile_path = "res://assets/tiles/individual/mon/humanoids/humans/occultist.png"
+glyph = "A"
+glyph_color = Color(0.65, 0.85, 1.0, 1)
+description = "An elven hall adept guarding the last civilized stair. Its cold sigils reward movement and punish standing still."

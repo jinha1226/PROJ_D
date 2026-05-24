@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://boss_mine_breaker"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "mine_breaker"
+display_name = "Mine Breaker"
+tier = 3
+hp = 44
+hd = 7
+ac = 5
+ev = 6
+speed = 9
+sight_range = 8
+attacks = [{"damage": 9, "flavour": "pick smash"}]
+resists = []
+min_depth = 3
+max_depth = 3
+weight = 0
+xp_value = 36
+is_boss = true
+is_unique = true
+drop_chance_override = 0.8
+tile_path = "res://assets/tiles/individual/mon/humanoids/orcs/orc_warlord.png"
+glyph = "B"
+glyph_color = Color(0.9, 0.45, 0.2, 1)
+description = "A brutal overseer of the mine gate. It raises its weapon before each crushing sweep, giving careful fighters room to survive."

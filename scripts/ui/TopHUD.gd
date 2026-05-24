@@ -19,6 +19,10 @@ signal item_slot_pressed(index: int)
 @onready var turn_label: Label = $MainMargin/MainVBox/TopRow/Bars/StatsRow/TurnLabel
 @onready var zoom_in_button: Button = $MainMargin/MainVBox/TopRow/Bars/StatsRow/ZoomInButton
 @onready var zoom_out_button: Button = $MainMargin/MainVBox/TopRow/Bars/StatsRow/ZoomOutButton
+@onready var attack_label: Label = $MainMargin/MainVBox/TopRow/Bars/CombatStatsRow/AttackLabel
+@onready var defense_label: Label = $MainMargin/MainVBox/TopRow/Bars/CombatStatsRow/DefenseLabel
+@onready var move_speed_label: Label = $MainMargin/MainVBox/TopRow/Bars/CombatStatsRow/MoveSpeedLabel
+@onready var attack_speed_label: Label = $MainMargin/MainVBox/TopRow/Bars/CombatStatsRow/AttackSpeedLabel
 @onready var rune_row: HBoxContainer = $MainMargin/MainVBox/RuneRow
 var item_slots: Array = []
 
@@ -92,6 +96,16 @@ func set_xp(cur: int, to_next: int, level: int) -> void:
 func set_gold(g: int) -> void:
 	if gold_label:
 		gold_label.text = "%dg" % g
+
+func set_combat_stats(attack: int, defense: int, move_speed: int, attack_speed: int) -> void:
+	if attack_label:
+		attack_label.text = "ATK %d" % attack
+	if defense_label:
+		defense_label.text = "DEF %d" % defense
+	if move_speed_label:
+		move_speed_label.text = "MOV %d" % move_speed
+	if attack_speed_label:
+		attack_speed_label.text = "ASP %d" % attack_speed
 
 
 var _last_turn: int = 0

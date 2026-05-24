@@ -336,7 +336,7 @@ static func _compute_power(player: Player, spell: SpellData) -> int:
 
 
 static func _apply_element_bonus(spell: SpellData, target: Monster, dmg: int) -> int:
-	var boosted: int = Status.wet_lightning_scale(dmg, target, spell.element)
+	var boosted: int = Status.elemental_damage_scale(dmg, target, spell.element)
 	if boosted > dmg:
 		CombatLog.post(LocaleManager.t("LOG_SOAKED_LIGHTNING_SURGES_FOR_EXTRA"), Color(0.6, 0.85, 1.0))
 	return boosted
@@ -347,19 +347,27 @@ static func _element_status(element: String) -> Array:
 		"fire":      return ["burning", 3]
 		"cold":      return ["frozen", 2]
 		"poison":    return ["poison", 4]
+		"acid":      return ["corroded", 3]
 	return []
 
 
 static func _apply_elemental_side_effects(spell: SpellData, target: Monster) -> void:
+	var wet_cold: bool = spell.element == "cold" and Status.has(target, "wet")
+	Status.apply_elemental_reaction(target, spell.element)
 	var pair: Array = _element_status(spell.element)
 	if pair.size() == 2 and target.hp > 0:
-		Status.apply(target, String(pair[0]), int(pair[1]))
+		var turns: int = int(pair[1])
+		if wet_cold and String(pair[0]) == "frozen":
+			turns += 2
+		Status.apply(target, String(pair[0]), turns)
 
 
 static func _on_kill(target: Monster, player: Player, spell: SpellData) -> void:
 	CombatLog.hit(LocaleManager.t("LOG_YOU_KILL_THE") % target.data.display_name)
-	player.grant_xp(target.data.xp_value)
-	player.grant_kill_skill_xp(float(target.data.xp_value), player.spell_skill_for(spell))
+	var xp_award: int = player.monster_xp_award(target, target.data.xp_value)
+	if xp_award > 0:
+		player.grant_xp(xp_award)
+		player.grant_kill_skill_xp(float(xp_award), player.spell_skill_for(spell))
 	player.register_kill()
 	GameManager.try_kill_unlock(target.data.id)
 

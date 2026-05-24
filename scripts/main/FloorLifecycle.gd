@@ -62,9 +62,11 @@ func _generate_floor(depth: int, map_seed: int,
 			host.map._tex_branch_entrance = load(etex_path) as Texture2D if etex_path != "" else null
 		else:
 			host.map._tex_branch_entrance = null
+		var zone_id := String(zone.get("id", ""))
+		# Scatter props before actor/item placement so solid landmarks reserve tiles.
+		PropPlacer.scatter(host.map, zone_id, map_seed)
 		host.player.bind_map(host.map, _random_start_pos(map_seed))
 		host._spawn_service._spawn_items_for_floor(depth)
-		var zone_id := String(zone.get("id", ""))
 		if zone_id == "abyss":
 			host._spawn_abyss_floor(depth)
 			if depth == 5:
@@ -81,8 +83,6 @@ func _generate_floor(depth: int, map_seed: int,
 		host._shop_is_special = false
 		if _is_shop_floor(depth):
 			host._place_shop_tile()
-		# Scatter thematic props for this zone.
-		PropPlacer.scatter(host.map, zone_id, map_seed)
 	host._refresh_fov()
 
 ## Pick a random walkable floor tile away from stairs/branch entrance.

@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://boss_mire_channeler"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "mire_channeler"
+display_name = "Mire Channeler"
+tier = 2
+hp = 30
+hd = 5
+ac = 3
+ev = 7
+speed = 10
+sight_range = 9
+attacks = [{"damage": 6, "flavour": "drowned staff"}]
+ranged_attack = {}
+resists = ["poison+"]
+min_depth = 2
+max_depth = 2
+weight = 0
+xp_value = 22
+is_boss = true
+is_unique = true
+drop_chance_override = 0.7
+tile_path = "res://assets/tiles/individual/mon/humanoids/water_nymph.png"
+glyph = "M"
+glyph_color = Color(0.35, 0.75, 0.9, 1)
+description = "A wet-robed guardian that turns damp ground into danger. Its lightning line is easy to see and costly to ignore."

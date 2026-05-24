@@ -3,7 +3,8 @@ extends Control
 const TOWN_SCENE_PATH: String = "res://scenes/town/Town.tscn"
 const RACE_SELECT_PATH: String = "res://scenes/menu/RaceSelect.tscn"
 
-# 6 fixed bundles. Each bundle = one full 120g spend.
+# 3 default starter paths. Advanced bundles can return later as unlocks.
+# Each bundle = one full 120g spend.
 # Items must exist in resources/items/ — verified at write time.
 # `name_key` / `desc_key` are i18n keys resolved via LocaleManager.t() at render time.
 const BUNDLES: Array = [
@@ -12,12 +13,6 @@ const BUNDLES: Array = [
 		"name_key": "UI_BUNDLE_NAME_SWORD_SHIELD",
 		"desc_key": "UI_BUNDLE_DESC_SWORD_SHIELD",
 		"items": ["short_sword", "leather_armor", "buckler", "potion_healing", "potion_healing", "scroll_identify"],
-	},
-	{
-		"id": "heavy_striker",
-		"name_key": "UI_BUNDLE_NAME_HEAVY_STRIKER",
-		"desc_key": "UI_BUNDLE_DESC_HEAVY_STRIKER",
-		"items": ["mace", "leather_armor", "bandage", "bandage", "bandage", "potion_healing"],
 	},
 	{
 		"id": "archer",
@@ -30,18 +25,6 @@ const BUNDLES: Array = [
 		"name_key": "UI_BUNDLE_NAME_MAGIC_INITIATE",
 		"desc_key": "UI_BUNDLE_DESC_MAGIC_INITIATE",
 		"items": ["staff", "robe", "book_conjuration", "potion_magic", "potion_healing", "scroll_identify"],
-	},
-	{
-		"id": "skirmisher",
-		"name_key": "UI_BUNDLE_NAME_SKIRMISHER",
-		"desc_key": "UI_BUNDLE_DESC_SKIRMISHER",
-		"items": ["dagger", "dirk", "leather_armor", "scroll_identify", "scroll_identify", "potion_healing"],
-	},
-	{
-		"id": "survivalist",
-		"name_key": "UI_BUNDLE_NAME_SURVIVALIST",
-		"desc_key": "UI_BUNDLE_DESC_SURVIVALIST",
-		"items": ["shortbow", "leather_armor", "bandage", "bandage", "bandage", "bandage"],
 	},
 ]
 

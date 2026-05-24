@@ -81,6 +81,7 @@ const KITE_PREFERRED_RANGE: int = 3  # kiter backs off until this chebyshev dist
 const BOSS_IDS: Array = [
 	"ashen_magpie", "ancient_lich", "blood_duke", "bog_serpent",
 	"ember_tyrant", "glacial_sovereign", "gnoll_warlord", "harrow_knight",
+	"stair_warden", "mire_channeler", "mine_breaker", "mirror_adept",
 	"ogre_chieftain", "orc_warchief", "pale_scholar", "sister_cinder",
 	"sovereign_jelly", "stone_warden", "storm_hierophant", "viper_saint",
 	"abyssal_sovereign",
@@ -155,6 +156,22 @@ static func _try_boss_telegraph(monster: Monster, player: Player, map: DungeonMa
 	if randf() > 0.35:
 		return false
 	match monster.data.id:
+		"stair_warden":
+			_telegraph_aoe(monster, map, 1,
+				"The Stair Warden braces for a stone sweep!",
+				monster.data.hd * 3, "")
+		"mire_channeler":
+			_telegraph_line(monster, player, map,
+				"The Mire Channeler draws a bright line through the damp air!",
+				monster.data.hd * 4, "lightning")
+		"mine_breaker":
+			_telegraph_aoe(monster, map, 1,
+				"The Mine Breaker lifts its pick for a crushing arc!",
+				monster.data.hd * 4, "")
+		"mirror_adept":
+			_telegraph_aoe(monster, map, 2,
+				"The Mirror Adept traces a freezing sigil!",
+				monster.data.hd * 3, "cold")
 		"ashen_magpie":
 			_telegraph_aoe(monster, map, 2,
 				"The Ashen Magpie spreads its wings — brace for impact!",
@@ -246,6 +263,7 @@ static func _fire_charge(monster: Monster, player: Player, map: DungeonMap) -> v
 	var hit_tiles: Array = charge.get("tiles", [])
 	var dmg: int = int(charge.get("damage", monster.data.hd * 2))
 	var element: String = String(charge.get("element", ""))
+	dmg = Status.elemental_damage_scale(dmg, player, element)
 	# Visual: spawn an AoE burst at every warning tile so the player sees
 	# the attack actually land, not just a damage number on themselves.
 	var game := _find_game()

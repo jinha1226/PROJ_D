@@ -91,6 +91,10 @@ const _HARROW_KNIGHT: Resource = preload("res://resources/monsters/harrow_knight
 const _BLOOD_DUKE: Resource = preload("res://resources/monsters/blood_duke.tres")
 const _STORM_HIEROPHANT: Resource = preload("res://resources/monsters/storm_hierophant.tres")
 const _PALE_SCHOLAR: Resource = preload("res://resources/monsters/pale_scholar.tres")
+const _STAIR_WARDEN: Resource = preload("res://resources/monsters/stair_warden.tres")
+const _MIRE_CHANNELER: Resource = preload("res://resources/monsters/mire_channeler.tres")
+const _MINE_BREAKER: Resource = preload("res://resources/monsters/mine_breaker.tres")
+const _MIRROR_ADEPT: Resource = preload("res://resources/monsters/mirror_adept.tres")
 
 const _BOG_SERPENT: Resource = preload("res://resources/monsters/bog_serpent.tres")
 const _GLACIAL_SOVEREIGN: Resource = preload("res://resources/monsters/glacial_sovereign.tres")
@@ -128,6 +132,8 @@ const _ALL_MONSTERS: Array = [
 	_ANCIENT_LICH, _GOLDEN_DRAGON, _EXECUTIONER, _TITAN,
 	# crypt branch
 	_CRYPT_ZOMBIE, _SHADOW_WRAITH,
+	# main floor stair guardians
+	_STAIR_WARDEN, _MIRE_CHANNELER, _MINE_BREAKER, _MIRROR_ADEPT,
 ]
 
 var by_id: Dictionary = {}
