@@ -21,7 +21,6 @@ const _DESCRIPTIONS: Dictionary = {
 	"spellcasting": "Improves MP efficiency and universal spell power. Every caster wants it.",
 	"conjurations": "Improves direct-damage arcane spells (force, magic missile, summons of energy).",
 	"hexes": "Improves disabling magic — confusion, fear, sleep, slow.",
-	"charms": "Improves buff and ward magic — haste, mage armor, repel.",
 	"summonings": "Improves creature-calling and gateway magic.",
 	"necromancy": "Improves pain, drain, death, and undead magic.",
 	"translocations": "Improves blink, teleport, and gateway control.",
@@ -30,8 +29,6 @@ const _DESCRIPTIONS: Dictionary = {
 	"ice": "Improves cold/ice spells and ice damage.",
 	"air": "Improves lightning/wind spells and air damage.",
 	"earth": "Improves earth/stone spells and earth damage.",
-	"poison": "Improves poison/venom spells and poison damage.",
-	"invocations": "Improves channelled magical invocations and ritual effects.",
 	"evocations": "Improves wands, scrolls, and magical tools.",
 }
 
@@ -71,9 +68,9 @@ const _HIDDEN_BY_VISIBLE: Dictionary = {
 		"maces", "axes", "staves", "polearms"],
 	"archery": ["bows", "crossbows", "slings", "throwing"],
 	"defense": ["armor", "shields"],
-	"magery": ["spellcasting", "conjurations", "hexes", "charms", "summonings",
+	"magery": ["spellcasting", "conjurations", "hexes", "summonings",
 		"necromancy", "translocations", "transmutation",
-		"fire", "ice", "air", "earth", "poison", "invocations", "evocations"],
+		"fire", "ice", "air", "earth", "evocations"],
 	"stealth": ["dodging"],
 	"tactics": ["fighting"],
 	"tracking": [],
