@@ -128,6 +128,10 @@ func _ready() -> void:
 	_spell_targeting.name = "SpellTargeting"
 	add_child(_spell_targeting)
 	_spell_targeting.setup(self)
+	var _rt_controller := RealTimeController.new()
+	_rt_controller.name = "RealTimeController"
+	add_child(_rt_controller)
+	_rt_controller.setup(self)
 	if not GameManager.run_in_progress:
 		GameManager.start_new_run()
 	PartyManager.on_run_start(GameManager.depth)
@@ -204,6 +208,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if player.hp <= 0:
 		return
+	if TurnManager.rt_mode:
+		return  # RealTimeController owns input in RT mode
 
 	# Track touch/mouse for long-press detection. Release commits the tap if
 	# the hold was short; long-press is consumed in _process().

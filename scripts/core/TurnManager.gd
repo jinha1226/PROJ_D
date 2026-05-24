@@ -7,6 +7,7 @@ signal turn_ended
 var turn_number: int = 0
 var is_player_turn: bool = true
 var actors: Array = []
+var rt_mode: bool = false
 
 var _ending_turn: bool = false
 # Set by Game._on_player_died to break out of the in-flight monster loop.
@@ -29,6 +30,12 @@ func unregister_actor(actor) -> void:
 # action_cost: weapon delay in "turns" (dagger=0.8, sword=1.0, crossbow=2.0)
 # Each monster accumulates action_cost * (speed/10.0) energy and acts when >= 1.0
 func end_player_turn(action_cost: float = 1.0, immediate: bool = false) -> void:
+	if rt_mode:
+		# Real-time: tick state only; monsters are driven by RealTimeController._process.
+		# ExpeditionState is NOT ticked per-action here — real-time fires far too many
+		# actions per second for per-action budget drain to be fair (Phase 6 rebalance).
+		turn_number += 1
+		return
 	if _ending_turn or not is_player_turn:
 		return
 	# Tick expedition turn budget BEFORE the monster loop so a player turn
