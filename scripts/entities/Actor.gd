@@ -105,8 +105,6 @@ const HIDDEN_SUBSKILL_IDS: Array = [
 	"conjurations", "hexes", "summonings",
 	"necromancy", "translocations", "transmutation",
 	"element",
-	# Utility subskills
-	"evocations",
 ]
 
 # Translation: any legacy/sub-skill id → canonical visible bucket.

@@ -42,7 +42,7 @@ const _HIDDEN_BY_VISIBLE: Dictionary = {
 	"defense": ["armor", "shields"],
 	"magery": ["spellcasting", "conjurations", "hexes", "summonings",
 		"necromancy", "translocations", "transmutation",
-		"element", "evocations"],
+		"element"],
 	"stealth": ["dodging"],
 	"tactics": ["fighting"],
 	"tracking": [],

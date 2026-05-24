@@ -26,7 +26,6 @@ const _DESCRIPTIONS: Dictionary = {
 	"translocations": "Improves blink, teleport, and gateway control.",
 	"transmutation": "Improves shape-change, alteration, and physical-conversion magic.",
 	"element": "Improves all elemental spells — fire, cold, lightning, and earth.",
-	"evocations": "Improves wands, scrolls, and magical tools.",
 }
 
 const _VISIBLE_ORDER: Array = [
@@ -67,7 +66,7 @@ const _HIDDEN_BY_VISIBLE: Dictionary = {
 	"defense": ["armor", "shields"],
 	"magery": ["spellcasting", "conjurations", "hexes", "summonings",
 		"necromancy", "translocations", "transmutation",
-		"element", "evocations"],
+		"element"],
 	"stealth": ["dodging"],
 	"tactics": ["fighting"],
 	"tracking": [],

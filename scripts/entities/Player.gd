@@ -369,7 +369,7 @@ func use_item(index: int) -> void:
 	# don't (potions are consumables, books grant spells which already train
 	# spellcasting via cast events).
 	if data.kind == "wand" or data.kind == "scroll":
-		grant_skill_xp("evocations", 4.0)
+		grant_skill_xp("spellcasting", 4.0)
 	var had_effect: bool = true
 	match data.effect:
 		"heal":
@@ -1048,7 +1048,7 @@ static func progression_school_for(raw_school: String) -> String:
 		"charm", "charms":
 			return "charms"
 		"abjuration", "evocation", "forgecraft":
-			return "conjurations"
+			return "element"
 		"hex", "hexes", "enchantment":
 			return "hexes"
 		"necromancy":
