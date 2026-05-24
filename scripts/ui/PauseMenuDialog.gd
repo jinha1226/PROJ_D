@@ -28,6 +28,23 @@ static func open(game: Node) -> void:
 		_refresh_display(game)
 	)
 
+	var tm: Node = Engine.get_main_loop().get_root().get_node_or_null("/root/TurnManager")
+	if tm != null:
+		var _rt_text := func() -> String:
+			return "전투 방식: %s" % ("실시간" if tm.rt_mode else "턴제")
+		var rt_btn: Button = _make_btn(_rt_text.call())
+		body.add_child(rt_btn)
+		rt_btn.pressed.connect(func() -> void:
+			var rt_ctrl: Node = game.get_node_or_null("RealTimeController")
+			if rt_ctrl != null and rt_ctrl.has_method("_toggle_rt_mode"):
+				rt_ctrl._toggle_rt_mode()
+			else:
+				tm.rt_mode = not tm.rt_mode
+				if game.has_method("on_rt_mode_changed"):
+					game.on_rt_mode_changed(tm.rt_mode)
+			rt_btn.text = _rt_text.call()
+		)
+
 	_add_btn(body, TranslationServer.translate("PAUSEMENU_SAVE_QUIT"), func() -> void:
 		dlg.close()
 		if game.get("player") != null and (game.player as Object).get("hp") > 0:
