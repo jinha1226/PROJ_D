@@ -25,10 +25,7 @@ const _DESCRIPTIONS: Dictionary = {
 	"necromancy": "Improves pain, drain, death, and undead magic.",
 	"translocations": "Improves blink, teleport, and gateway control.",
 	"transmutation": "Improves shape-change, alteration, and physical-conversion magic.",
-	"fire": "Improves fire-element spells and fire damage.",
-	"ice": "Improves cold/ice spells and ice damage.",
-	"air": "Improves lightning/wind spells and air damage.",
-	"earth": "Improves earth/stone spells and earth damage.",
+	"element": "Improves all elemental spells — fire, cold, lightning, and earth.",
 	"evocations": "Improves wands, scrolls, and magical tools.",
 }
 
@@ -70,7 +67,7 @@ const _HIDDEN_BY_VISIBLE: Dictionary = {
 	"defense": ["armor", "shields"],
 	"magery": ["spellcasting", "conjurations", "hexes", "summonings",
 		"necromancy", "translocations", "transmutation",
-		"fire", "ice", "air", "earth", "evocations"],
+		"element", "evocations"],
 	"stealth": ["dodging"],
 	"tactics": ["fighting"],
 	"tracking": [],

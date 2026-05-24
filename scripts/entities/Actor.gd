@@ -102,11 +102,11 @@ const HIDDEN_SUBSKILL_IDS: Array = [
 	"dodging",
 	# Magic subskills
 	"spellcasting",
-	"conjurations", "hexes", "charms", "summonings",
+	"conjurations", "hexes", "summonings",
 	"necromancy", "translocations", "transmutation",
-	"fire", "ice", "air", "earth", "poison",
+	"element",
 	# Utility subskills
-	"invocations", "evocations",
+	"evocations",
 ]
 
 # Translation: any legacy/sub-skill id → canonical visible bucket.
@@ -126,11 +126,13 @@ const SKILL_REMAP: Dictionary = {
 	"armor": "defense", "shields": "defense",
 	# Stealth
 	"dodging": "stealth",
-	# Magic → magery (hidden sub-skills only; umbrella names removed 2026-05-21)
-	"spellcasting": "magery", "conjurations": "magery", "hexes": "magery", "charms": "magery",
+	# Magic → magery (hidden sub-skills only)
+	"spellcasting": "magery", "conjurations": "magery", "hexes": "magery",
 	"summonings": "magery", "necromancy": "magery", "translocations": "magery", "transmutation": "magery",
-	"fire": "magery", "ice": "magery", "air": "magery", "earth": "magery", "poison": "magery",
-	"invocations": "magery", "evocations": "magery",
+	"element": "magery", "evocations": "magery",
+	# Legacy element ids still route to magery visible bucket (hidden tier uses "element")
+	"fire": "magery", "ice": "magery", "air": "magery", "earth": "magery",
+	"charms": "magery", "poison": "magery", "invocations": "magery",
 	# Identity (new ids resolve to themselves)
 	"weapon_mastery": "weapon_mastery", "archery": "archery", "tactics": "tactics",
 	"defense": "defense", "magery": "magery", "stealth": "stealth",

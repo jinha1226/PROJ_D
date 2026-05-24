@@ -86,6 +86,9 @@ func _race_speed_mod() -> float:
 	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
 	return race.speed_mod if race != null else 1.0
 
+func movement_action_cost() -> float:
+	return _race_speed_mod() * Status.speed_mult(self)
+
 func _try_move(dir: Vector2i) -> void:
 	var target: Vector2i = grid_pos + dir
 	if try_attack_tile(target):
@@ -247,6 +250,22 @@ func _weapon_action_cost() -> float:
 	# Each skill level reduces delay by 2.5%, capped at 25% reduction (lv9 → ×0.775)
 	var mult: float = max(0.75, 1.0 - float(skill_lv) * 0.025)
 	return base_delay * mult
+
+func attack_action_cost() -> float:
+	return _weapon_action_cost() * Status.speed_mult(self)
+
+func display_attack_power() -> int:
+	var weapon: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null and equipped_weapon_id != "" else null
+	var plus: int = int(equipped_weapon_entry().get("plus", 0)) if weapon != null else 0
+	var base: int = max(2, weapon.damage + plus) if weapon != null else 2
+	var skill_id: String = weapon_skill_for_item(weapon)
+	return max(1, base + strength / 4 + get_skill_level(skill_id) / 2 + slay_bonus)
+
+func display_move_speed() -> int:
+	return int(round(100.0 / max(0.1, movement_action_cost())))
+
+func display_attack_speed() -> int:
+	return int(round(100.0 / max(0.1, attack_action_cost())))
 
 func _attack_target_for_tile(target: Vector2i) -> Monster:
 	var direct: Monster = _monster_at(target)
@@ -1018,16 +1037,8 @@ func get_hidden_familiarity_xp(subskill_id: String) -> float:
 
 static func progression_school_for(raw_school: String) -> String:
 	match raw_school:
-		"fire":
-			return "fire"
-		"cold", "ice":
-			return "ice"
-		"air":
-			return "air"
-		"earth":
-			return "earth"
-		"alchemy", "poison":
-			return "poison"
+		"fire", "cold", "ice", "air", "earth", "alchemy", "poison":
+			return "element"
 		"conjuration", "conjurations":
 			return "conjurations"
 		"translocation", "translocations":
