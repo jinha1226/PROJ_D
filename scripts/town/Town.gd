@@ -44,11 +44,13 @@ func _refresh() -> void:
 				last_line = LocaleManager.t("UI_TOWN_STATUS_ACTIVE_RETURNED") % int(s.get("depth_reached", 0))
 		if has_safe_return:
 			_char_status.text = LocaleManager.t("UI_TOWN_STATUS_ACTIVE_MEMORIAL") % [race_name, last_line]
+		elif GameManager.starter_shop_gold > 0:
+			_char_status.text = "%s\n초기 지원금 %dg — 상점에서 장비를 구매하세요" % [race_name, GameManager.starter_shop_gold]
 		else:
 			_char_status.text = LocaleManager.t("UI_TOWN_STATUS_ACTIVE_READY") % race_name
 		_start_btn.visible = true
 		_new_char_btn.visible = false
-		_shop_btn.visible = SaveManager.has_save()
+		_shop_btn.visible = true  # always: pre-game shopping or in-run shop
 		_char_btn.visible = SaveManager.has_save()
 	else:
 		if TownState.has_last_summary():

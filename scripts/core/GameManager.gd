@@ -63,6 +63,10 @@ var branches_cleared: Array = []   # branch ids cleared this run
 # Value: Dictionary[Vector2i, bool].
 var persistent_branch_explored: Dictionary = {}
 
+# Pre-game starter shop budget. Set on race selection, cleared on first Game._ready().
+const STARTING_GOLD: int = 150
+var starter_shop_gold: int = 0
+
 # Display / meta state (persisted).
 var use_tiles: bool = true
 var use_rt_mode: bool = false
@@ -96,6 +100,7 @@ func start_new_run(random_seed: int = -1) -> void:
 	branches_cleared.clear()
 	_generate_pseudonyms()
 	pending_player_state.clear()
+	starter_shop_gold = 0
 	run_in_progress = true
 	emit_signal("depth_changed", depth)
 

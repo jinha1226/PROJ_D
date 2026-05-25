@@ -494,9 +494,12 @@ func _cancel_auto_walk(reason: String) -> void:
 		CombatLog.post(LocaleManager.t("LOG_YOU_STOP_ENEMY_APPROACHES"), Color(1.0, 0.7, 0.5))
 
 func _apply_starter_kit() -> void:
-	# Use the player's Starter Shop selection if present; otherwise fall
-	# back to a minimal race-neutral kit (covers save-test paths that
-	# bypass the shop or savefile loads that lost the pending list).
+	# Transfer unspent pre-game shop budget into the player's in-run gold.
+	if GameManager.starter_shop_gold > 0:
+		player.gold += GameManager.starter_shop_gold
+		GameManager.starter_shop_gold = 0
+	# Use items bought in the pre-game shop; fall back to a minimal kit if
+	# the player skipped the shop entirely.
 	var kit: Array = GameManager.pending_starter_items
 	if kit.is_empty():
 		kit = ["dagger", "leather_armor", "potion_healing", "potion_healing", "scroll_identify"]
