@@ -56,3 +56,11 @@ oldproject/assets/
 
 # Superpowers harness runtime state (brainstorm session state, server logs, pids)
 .superpowers/
+
+# AI upscaling tools (large binaries/models)
+Real-ESRGAN/
+
+# Asset source packs (raw downloads, not shipped)
+"Pixel Crawler - Free Pack 2.0.4/"
+"Pixel Crawler - Free Pack 2.0.4.zip"
+assets/tiles/backups/

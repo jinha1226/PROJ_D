@@ -32,8 +32,10 @@ func _build_content() -> void:
 		return
 	var p: Dictionary = _save_data.get("player", {})
 	var race_id: String = String(_save_data.get("selected_race_id", ""))
+	var talent_id: String = String(_save_data.get("selected_talent_id", ""))
 	_add_section_header(LocaleManager.t("UI_TOWN_CHAR_SEC_IDENTITY"))
 	_add_row("Race", _race_display_name(race_id))
+	_add_row("Talent", _talent_display_name(talent_id))
 	_add_row("XL", "%d" % int(p.get("xl", 1)))
 	_add_row("XP", "%d" % int(p.get("xp", 0)))
 	_add_row("Gold", "%d" % int(p.get("gold", 0)))
@@ -95,6 +97,11 @@ func _race_display_name(race_id: String) -> String:
 		if data != null and data.display_name != "":
 			return data.display_name
 	return race_id.capitalize()
+
+func _talent_display_name(talent_id: String) -> String:
+	if talent_id == "":
+		return "—"
+	return TalentSystem.display_name(talent_id)
 
 func _add_section_header(text: String) -> void:
 	var lbl := Label.new()

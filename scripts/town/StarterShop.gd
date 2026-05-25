@@ -1,7 +1,7 @@
 extends Control
 
 const TOWN_SCENE_PATH: String = "res://scenes/town/Town.tscn"
-const RACE_SELECT_PATH: String = "res://scenes/menu/RaceSelect.tscn"
+const TALENT_SELECT_PATH: String = "res://scenes/menu/TalentSelect.tscn"
 
 # 3 default starter paths. Advanced bundles can return later as unlocks.
 # Each bundle = one full 120g spend.
@@ -37,12 +37,10 @@ func _ready() -> void:
 	if ResourceLoader.exists("res://scripts/ui/GameTheme.gd"):
 		theme = load("res://scripts/ui/GameTheme.gd").create()
 	_title.text = LocaleManager.t("UI_STARTER_TITLE")
-	if RaceRegistry != null:
-		var race_data = RaceRegistry.get_by_id(TownState.current_character_race)
-		var race_name: String = race_data.display_name if race_data != null else TownState.current_character_race.capitalize()
-		_race_info.text = LocaleManager.t("UI_STARTER_CHOOSING_FOR") % race_name
-	else:
-		_race_info.text = LocaleManager.t("UI_STARTER_PICK_FALLBACK")
+	var talent_name: String = TalentSystem.display_name(TownState.current_character_talent)
+	if talent_name == "":
+		talent_name = "Veteran"
+	_race_info.text = "Talent: %s" % talent_name
 	_back_btn.text = LocaleManager.t("UI_STARTER_BTN_BACK")
 	_back_btn.pressed.connect(_on_back)
 	_build_cards()
@@ -114,8 +112,10 @@ func _on_pick(bundle_id: String) -> void:
 	get_tree().change_scene_to_file(TOWN_SCENE_PATH)
 
 func _on_back() -> void:
-	# Back to RaceSelect; clear the in-progress character creation.
+	# Back to talent selection; clear the in-progress character creation.
 	TownState.current_character_alive = false
 	TownState.current_character_race = ""
+	TownState.current_character_talent = ""
 	TownState.save_state()
-	get_tree().change_scene_to_file(RACE_SELECT_PATH)
+	GameManager.selected_talent_id = ""
+	get_tree().change_scene_to_file(TALENT_SELECT_PATH)

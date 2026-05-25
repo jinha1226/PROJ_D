@@ -7,14 +7,16 @@ const TOWN_SAVE_PATH: String = "user://town.json"
 var expedition_count: int = 0
 var current_character_alive: bool = false
 var current_character_race: String = ""
+var current_character_talent: String = ""
 var last_character_summary: Dictionary = {}
 
 func _ready() -> void:
 	load_state()
 
-func start_new_character(race_id: String) -> void:
+func start_new_character(talent_id: String) -> void:
 	current_character_alive = true
-	current_character_race = race_id
+	current_character_race = "human"
+	current_character_talent = talent_id
 	save_state()
 
 func record_death(summary: Dictionary) -> void:
@@ -22,6 +24,7 @@ func record_death(summary: Dictionary) -> void:
 	last_character_summary["victory"] = false
 	current_character_alive = false
 	current_character_race = ""
+	current_character_talent = ""
 	expedition_count += 1
 	save_state()
 
@@ -30,6 +33,7 @@ func record_victory(summary: Dictionary) -> void:
 	last_character_summary["victory"] = true
 	current_character_alive = false
 	current_character_race = ""
+	current_character_talent = ""
 	expedition_count += 1
 	save_state()
 
@@ -54,6 +58,7 @@ func save_state() -> bool:
 		"expedition_count": expedition_count,
 		"current_character_alive": current_character_alive,
 		"current_character_race": current_character_race,
+		"current_character_talent": current_character_talent,
 		"last_character_summary": last_character_summary,
 	}
 	var f := FileAccess.open(TOWN_SAVE_PATH, FileAccess.WRITE)
@@ -78,6 +83,7 @@ func load_state() -> void:
 	expedition_count = int(parsed.get("expedition_count", 0))
 	current_character_alive = bool(parsed.get("current_character_alive", false))
 	current_character_race = String(parsed.get("current_character_race", ""))
+	current_character_talent = String(parsed.get("current_character_talent", ""))
 	last_character_summary = parsed.get("last_character_summary", {})
 	if typeof(last_character_summary) != TYPE_DICTIONARY:
 		last_character_summary = {}

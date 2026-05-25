@@ -89,7 +89,7 @@ func _make_card(faith_id: String) -> Control:
 			else:
 				touch_y[0] = -9999.0
 		elif ev is InputEventMouseButton and not ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-			_on_pick(faith_id))
+			_on_pick(faith_id)
 
 	return panel
 

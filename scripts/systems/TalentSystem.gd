@@ -1,0 +1,130 @@
+extends Node
+class_name TalentSystem
+
+const DEFAULT_TALENT_ID: String = "veteran"
+
+const TALENTS: Dictionary = {
+	"veteran": {
+		"name": "Veteran",
+		"short": "Battle-hardened frontliner.",
+		"desc": "Starts with stronger melee instincts and a sturdier frame.",
+		"color": Color(0.92, 0.78, 0.35, 1.0),
+		"str": 1,
+		"dex": 0,
+		"int": 0,
+		"hp": 4,
+		"mp": 0,
+		"skills": {"weapon_mastery": 60.0, "tactics": 60.0},
+	},
+	"scout": {
+		"name": "Scout",
+		"short": "Quiet eyes and quick feet.",
+		"desc": "Starts with sharper senses and better survival instincts.",
+		"color": Color(0.48, 0.84, 0.64, 1.0),
+		"str": 0,
+		"dex": 1,
+		"int": 0,
+		"hp": 0,
+		"mp": 0,
+		"skills": {"stealth": 60.0, "tracking": 60.0},
+	},
+	"adept": {
+		"name": "Adept",
+		"short": "A practical student of the arcane.",
+		"desc": "Starts with stronger spellcraft and a clearer mind.",
+		"color": Color(0.72, 0.56, 0.98, 1.0),
+		"str": 0,
+		"dex": 0,
+		"int": 1,
+		"hp": 0,
+		"mp": 2,
+		"skills": {"magery": 60.0},
+	},
+	"survivor": {
+		"name": "Survivor",
+		"short": "Hard to kill, harder to pin down.",
+		"desc": "Starts with a tougher body and better wilderness instincts.",
+		"color": Color(0.78, 0.64, 0.42, 1.0),
+		"str": 0,
+		"dex": 0,
+		"int": 0,
+		"hp": 8,
+		"mp": 0,
+		"skills": {"survival": 60.0, "defense": 60.0},
+	},
+	"duelist": {
+		"name": "Duelist",
+		"short": "Sharp timing, clean footwork.",
+		"desc": "Starts with better weapon handling and defensive rhythm.",
+		"color": Color(0.92, 0.48, 0.4, 1.0),
+		"str": 0,
+		"dex": 1,
+		"int": 0,
+		"hp": 2,
+		"mp": 0,
+		"skills": {"weapon_mastery": 60.0, "defense": 60.0},
+	},
+}
+
+static func ids_in_order() -> Array:
+	return ["veteran", "scout", "adept", "survivor", "duelist"]
+
+static func get_talent(talent_id: String) -> Dictionary:
+	if TALENTS.has(talent_id):
+		return TALENTS[talent_id]
+	return TALENTS[DEFAULT_TALENT_ID]
+
+static func display_name(talent_id: String) -> String:
+	return String(get_talent(talent_id).get("name", DEFAULT_TALENT_ID.capitalize()))
+
+static func short_text(talent_id: String) -> String:
+	return String(get_talent(talent_id).get("short", ""))
+
+static func description_text(talent_id: String) -> String:
+	return String(get_talent(talent_id).get("desc", ""))
+
+static func color(talent_id: String) -> Color:
+	return get_talent(talent_id).get("color", Color.WHITE)
+
+static func bonus_lines(talent_id: String) -> PackedStringArray:
+	var data: Dictionary = get_talent(talent_id)
+	var lines: PackedStringArray = []
+	for stat_key in ["str", "dex", "int"]:
+		var value: int = int(data.get(stat_key, 0))
+		if value != 0:
+			lines.append("%s %+d" % [stat_key.to_upper(), value])
+	var hp: int = int(data.get("hp", 0))
+	if hp != 0:
+		lines.append("HP %+d" % hp)
+	var mp: int = int(data.get("mp", 0))
+	if mp != 0:
+		lines.append("MP %+d" % mp)
+	var skills: Dictionary = data.get("skills", {})
+	for sid in skills.keys():
+		lines.append("%s %+d XP" % [String(sid).replace("_", " ").capitalize(), int(skills[sid])])
+	return lines
+
+static func apply(player, talent_id: String) -> void:
+	if player == null:
+		return
+	var data: Dictionary = get_talent(talent_id)
+	var str_bonus: int = int(data.get("str", 0))
+	var dex_bonus: int = int(data.get("dex", 0))
+	var int_bonus: int = int(data.get("int", 0))
+	if str_bonus != 0:
+		player.strength = max(1, player.strength + str_bonus)
+	if dex_bonus != 0:
+		player.dexterity = max(1, player.dexterity + dex_bonus)
+	if int_bonus != 0:
+		player.intelligence = max(1, player.intelligence + int_bonus)
+	var hp_bonus: int = int(data.get("hp", 0))
+	if hp_bonus != 0:
+		player._apply_max_hp_gain(hp_bonus)
+	var mp_bonus: int = int(data.get("mp", 0))
+	if mp_bonus != 0:
+		player._apply_max_mp_gain(mp_bonus)
+	var skills: Dictionary = data.get("skills", {})
+	for sid in skills.keys():
+		player.grant_skill_xp(String(sid), float(skills[sid]))
+	if player.has_method("refresh_ac_from_equipment"):
+		player.refresh_ac_from_equipment()

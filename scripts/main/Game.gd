@@ -9,7 +9,6 @@ const TopHUDScene = preload("res://scenes/ui/TopHUD.tscn")
 const BottomHUDScene = preload("res://scenes/ui/BottomHUD.tscn")
 const ResultScreenScene = preload("res://scenes/ui/ResultScreen.tscn")
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
-const RACE_SELECT_PATH: String = "res://scenes/menu/RaceSelect.tscn"
 const TOWN_SCENE_PATH: String = "res://scenes/town/Town.tscn"
 
 # Monster weapon pools: monster_id -> [normal_weapons], rare_brands (5% chance)
@@ -151,6 +150,7 @@ func _ready() -> void:
 		player.set_race_from_id(GameManager.selected_race_id)
 		player.init_skills()
 		player.set_active_skills([])
+		TalentSystem.apply(player, GameManager.selected_talent_id)
 		player.refresh_ac_from_equipment()
 		player._refresh_paperdoll()
 		_apply_starter_kit()

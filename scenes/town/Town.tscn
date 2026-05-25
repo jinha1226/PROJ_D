@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://b8town0pcrwl1"]
+[gd_scene load_steps=3 format=3 uid="uid://b8town0pcrwl1"]
 
 [ext_resource type="Script" path="res://scripts/town/Town.gd" id="1_town"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/town_hub.png" id="2_townhub"]
 
 [node name="Town" type="Control"]
 layout_mode = 3
@@ -11,106 +12,171 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_town")
 
-[node name="BG" type="ColorRect" parent="."]
-layout_mode = 0
+[node name="TownArt" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.04, 0.03, 0.05, 1)
+texture = ExtResource("2_townhub")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Title" type="Label" parent="."]
+[node name="Dimmer" type="ColorRect" parent="."]
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.5
-anchor_top = 0.08
-anchor_right = 0.5
-anchor_bottom = 0.08
-offset_left = -200.0
-offset_top = 0.0
-offset_right = 200.0
-offset_bottom = 80.0
-theme_override_font_sizes/font_size = 56
-text = "Town"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="StatusBox" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.5
-anchor_top = 0.35
-anchor_right = 0.5
-anchor_bottom = 0.35
-offset_left = -260.0
-offset_top = -80.0
-offset_right = 260.0
-offset_bottom = 80.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0, 0.0, 0.0, 0.12)
+
+[node name="Header" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = 24.0
+offset_top = 20.0
+offset_right = -24.0
+offset_bottom = 120.0
+grow_horizontal = 2
 theme_override_constants/separation = 16
 
-[node name="CharacterStatus" type="Label" parent="StatusBox"]
+[node name="TitleBox" type="VBoxContainer" parent="Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="Title" type="Label" parent="Header/TitleBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 52
+text = "Town"
+
+[node name="Subtitle" type="Label" parent="Header/TitleBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.82, 0.77, 0.69, 1)
+text = "Hover a building to see what it does"
+
+[node name="MenuButton" type="Button" parent="Header"]
+custom_minimum_size = Vector2(160, 56)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 24
+flat = true
+text = "Menu"
+
+[node name="Hotspots" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+
+[node name="GateButton" type="Button" parent="Hotspots"]
+layout_mode = 0
+anchor_left = 0.38
+anchor_top = 0.14
+anchor_right = 0.60
+anchor_bottom = 0.39
+mouse_default_cursor_shape = 2
+flat = true
+text = ""
+
+[node name="ShopButton" type="Button" parent="Hotspots"]
+layout_mode = 0
+anchor_left = 0.05
+anchor_top = 0.17
+anchor_right = 0.31
+anchor_bottom = 0.47
+mouse_default_cursor_shape = 2
+flat = true
+text = ""
+
+[node name="GuildButton" type="Button" parent="Hotspots"]
+layout_mode = 0
+anchor_left = 0.64
+anchor_top = 0.11
+anchor_right = 0.93
+anchor_bottom = 0.53
+mouse_default_cursor_shape = 2
+flat = true
+text = ""
+
+[node name="InnButton" type="Button" parent="Hotspots"]
+layout_mode = 0
+anchor_left = 0.03
+anchor_top = 0.55
+anchor_right = 0.29
+anchor_bottom = 0.92
+mouse_default_cursor_shape = 2
+flat = true
+text = ""
+
+[node name="BoardButton" type="Button" parent="Hotspots"]
+layout_mode = 0
+anchor_left = 0.66
+anchor_top = 0.63
+anchor_right = 0.95
+anchor_bottom = 0.94
+mouse_default_cursor_shape = 2
+flat = true
+text = ""
+
+[node name="Footer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.04
+anchor_top = 0.83
+anchor_right = 0.96
+anchor_bottom = 0.97
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="FooterHBox" type="HBoxContainer" parent="Footer"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="StatusBox" type="VBoxContainer" parent="Footer/FooterHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="CharacterStatus" type="Label" parent="Footer/FooterHBox/StatusBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = ""
-horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="ExpeditionCount" type="Label" parent="StatusBox"]
+[node name="ExpeditionCount" type="Label" parent="Footer/FooterHBox/StatusBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-theme_override_colors/font_color = Color(0.7, 0.65, 0.6, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.72, 0.67, 0.61, 1)
 text = "Expeditions: 0"
-horizontal_alignment = 1
 
-[node name="ButtonBox" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.5
-anchor_top = 0.72
-anchor_right = 0.5
-anchor_bottom = 0.72
-offset_left = -160.0
-offset_top = -40.0
-offset_right = 160.0
-offset_bottom = 240.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 12
-
-[node name="StartButton" type="Button" parent="ButtonBox"]
-custom_minimum_size = Vector2(0, 72)
+[node name="SpotBox" type="VBoxContainer" parent="Footer/FooterHBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-flat = true
-text = "Start Expedition"
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
 
-[node name="ShopButton" type="Button" parent="ButtonBox"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-flat = true
-text = "Shop"
-
-[node name="CharacterButton" type="Button" parent="ButtonBox"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-flat = true
-text = "Character"
-
-[node name="NewCharButton" type="Button" parent="ButtonBox"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-flat = true
-text = "New Character"
-
-[node name="MenuButton" type="Button" parent="ButtonBox"]
-custom_minimum_size = Vector2(0, 56)
+[node name="SpotTitle" type="Label" parent="Footer/FooterHBox/SpotBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-flat = true
-text = "Back to Menu"
+horizontal_alignment = 2
+text = "Town Square"
+
+[node name="SpotDesc" type="Label" parent="Footer/FooterHBox/SpotBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.82, 0.77, 0.69, 1)
+horizontal_alignment = 2
+autowrap_mode = 2
+text = "Choose a building to open its screen."
