@@ -1,11 +1,14 @@
 extends Node
 class_name RealTimeController
 
-# Seconds per player action at action_cost == 1.0.
+# Seconds per player movement step at action_cost == 1.0.
 const BASE_TICK_SEC: float = 0.15
+# Seconds per player attack at action_cost == 1.0. Slower than movement for readability.
+const BASE_ATTACK_SEC: float = 0.65
 # Monster action interval at speed == 10. Higher = slower monsters.
-# Decoupled from player so enemies feel readable, not overwhelming.
-const MONSTER_BASE_SEC: float = 0.70
+const MONSTER_BASE_SEC: float = 0.90
+# Seconds a monster flashes red before executing an attack (telegraph window).
+const MONSTER_WINDUP_SEC: float = 0.45
 
 # Dodge: brief invulnerability dash.
 const DODGE_WINDOW_SEC: float = 0.30
@@ -22,6 +25,8 @@ var _dodge_window: float = 0.0
 var _dodge_cooldown: float = 0.0
 var _parry_window: float = 0.0
 var _parry_cooldown: float = 0.0
+# instance_id → remaining windup seconds before monster executes its turn
+var _windup_timers: Dictionary = {}
 
 func setup(game: Node) -> void:
 	_game = game
@@ -88,6 +93,11 @@ func _toggle_rt_mode() -> void:
 		_dodge_cooldown = 0.0
 		_parry_window = 0.0
 		_parry_cooldown = 0.0
+		_windup_timers.clear()
+		# Reset any lingering red tint on monsters
+		for actor in get_node("/root/TurnManager").actors:
+			if is_instance_valid(actor):
+				actor.modulate = Color.WHITE
 		tm.is_player_turn = true
 		var player: Player = _game.player
 		if player != null:
@@ -123,7 +133,7 @@ func _process(delta: float) -> void:
 		_attack_timer = max(0.0, _attack_timer - delta)
 		if _attack_timer <= 0.0:
 			if _try_auto_attack(player):
-				_attack_timer = player.attack_action_cost() * BASE_TICK_SEC
+				_attack_timer = player.attack_action_cost() * BASE_ATTACK_SEC
 
 func _tick_timers(delta: float, player: Player) -> void:
 	if _dodge_window > 0.0:
@@ -203,9 +213,28 @@ func _try_auto_attack(player: Player) -> bool:
 
 func _tick_monsters(delta: float, tm: Node, player: Player) -> void:
 	tm._abort_actor_loop = false
+
+	# Drain windup timers — execute attack when countdown expires.
+	for mid in _windup_timers.keys().duplicate():
+		_windup_timers[mid] -= delta
+		if _windup_timers[mid] > 0.0:
+			continue
+		_windup_timers.erase(mid)
+		if player.hp <= 0:
+			continue
+		for actor in tm.actors:
+			if is_instance_valid(actor) and actor.get_instance_id() == mid:
+				actor.modulate = Color.WHITE
+				if actor.has_method("take_turn"):
+					actor.take_turn()
+				break
+
+	# Accumulate energy; telegraph adjacent monsters instead of acting immediately.
 	for actor in tm.actors.duplicate():
 		if not is_instance_valid(actor):
 			continue
+		if _windup_timers.has(actor.get_instance_id()):
+			continue  # already in windup
 		if player.hp <= 0:
 			break
 		var spd: float = 10.0
@@ -214,8 +243,16 @@ func _tick_monsters(delta: float, tm: Node, player: Player) -> void:
 		actor.pending_energy += delta * spd / 10.0 / MONSTER_BASE_SEC
 		while actor.pending_energy >= 1.0 and is_instance_valid(actor):
 			actor.pending_energy -= 1.0
-			if actor.has_method("take_turn"):
-				actor.take_turn()
 			if player.hp <= 0:
 				break
+			var dist: int = max(abs(actor.grid_pos.x - player.grid_pos.x),
+								abs(actor.grid_pos.y - player.grid_pos.y))
+			if dist <= 1:
+				# Adjacent — flash red and delay attack so player can react.
+				_windup_timers[actor.get_instance_id()] = MONSTER_WINDUP_SEC
+				actor.modulate = Color(1.8, 0.25, 0.25)
+			else:
+				if actor.has_method("take_turn"):
+					actor.take_turn()
+
 	tm._abort_actor_loop = false

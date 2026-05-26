@@ -61,6 +61,10 @@ oldproject/assets/
 Real-ESRGAN/
 
 # Asset source packs (raw downloads, not shipped)
-"Pixel Crawler - Free Pack 2.0.4/"
-"Pixel Crawler - Free Pack 2.0.4.zip"
+Pixel Crawler*/
 assets/tiles/backups/
+
+# Work-in-progress asset generation workspace (not final game assets)
+asset_test/
+assets/backgrounds/
+assets/tiles/sheets/

@@ -71,7 +71,8 @@ func _make_card(talent_id: String) -> Control:
 	vb.add_child(desc_lab)
 
 	var bonus_line := Label.new()
-	bonus_line.text = TalentSystem.bonus_lines(talent_id).join(" / ")
+	var _blines: PackedStringArray = TalentSystem.bonus_lines(talent_id)
+	bonus_line.text = " / ".join(_blines)
 	bonus_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	bonus_line.add_theme_font_size_override("font_size", 16)
 	bonus_line.add_theme_color_override("font_color", Color(0.72, 0.88, 0.95))
@@ -90,6 +91,7 @@ func _make_card(talent_id: String) -> Control:
 				touch_y[0] = -9999.0
 		elif ev is InputEventMouseButton and not ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
 			_on_pick(talent_id)
+	)
 
 	return panel
 
