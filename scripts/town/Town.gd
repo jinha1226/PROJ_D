@@ -4,7 +4,7 @@ const GAME_SCENE_PATH: String = "res://scenes/main/Game.tscn"
 const TALENT_SELECT_PATH: String = "res://scenes/menu/TalentSelect.tscn"
 const MENU_SCENE_PATH: String = "res://scenes/menu/MainMenu.tscn"
 
-enum SpotId { GATE, SHOP, GUILD, INN, BOARD }
+enum SpotId { GATE, SHOP, GUILD, INN, BOARD, GRAVEYARD }
 
 const SPOT_DATA := {
 	SpotId.GATE: {
@@ -26,6 +26,10 @@ const SPOT_DATA := {
 	SpotId.BOARD: {
 		"title": "Recruit Board",
 		"desc": "Create a new survivor or start a fresh roster entry.",
+	},
+	SpotId.GRAVEYARD: {
+		"title": "Graveyard",
+		"desc": "Those who fell before you rest here.",
 	},
 }
 
@@ -53,6 +57,8 @@ func _build_hotspots() -> void:
 	_register_spot(SpotId.GUILD, $Hotspots/GuildButton, Callable(self, "_on_guild"))
 	_register_spot(SpotId.INN, $Hotspots/InnButton, Callable(self, "_on_inn"))
 	_register_spot(SpotId.BOARD, $Hotspots/BoardButton, Callable(self, "_on_board"))
+	if has_node("Hotspots/GraveyardButton"):
+		_register_spot(SpotId.GRAVEYARD, $Hotspots/GraveyardButton, Callable(self, "_on_graveyard"))
 
 func _register_spot(id: int, button: Button, action: Callable) -> void:
 	if button == null:
@@ -198,6 +204,29 @@ func _talent_display_name(talent_id: String) -> String:
 	if talent_id == "":
 		return "—"
 	return TalentSystem.display_name(talent_id)
+
+func _on_graveyard() -> void:
+	var records: Array = TownState.death_records
+	var dlg := GameDialog.create("Graveyard")
+	add_child(dlg)
+	var body: VBoxContainer = dlg.body()
+	if records.is_empty():
+		var lbl := Label.new()
+		lbl.text = "No one has fallen yet."
+		lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+		body.add_child(lbl)
+	else:
+		for rec in records:
+			var lbl := Label.new()
+			var xl: int = int(rec.get("xl", 1))
+			var depth: int = int(rec.get("depth_reached", 0))
+			var killer: String = String(rec.get("death_cause", "unknown"))
+			var talent: String = String(rec.get("talent", ""))
+			var talent_str: String = (" · " + TalentSystem.display_name(talent)) if talent != "" else ""
+			lbl.text = "XL%d%s  ·  %dF  ·  %s" % [xl, talent_str, depth, killer]
+			lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+			lbl.add_theme_color_override("font_color", Color(0.75, 0.65, 0.65))
+			body.add_child(lbl)
 
 func _on_menu() -> void:
 	get_tree().change_scene_to_file(MENU_SCENE_PATH)

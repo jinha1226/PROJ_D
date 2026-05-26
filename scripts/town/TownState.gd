@@ -9,6 +9,8 @@ var current_character_alive: bool = false
 var current_character_race: String = ""
 var current_character_talent: String = ""
 var last_character_summary: Dictionary = {}
+var death_records: Array = []  # newest first, capped at MAX_GRAVES
+const MAX_GRAVES: int = 20
 
 func _ready() -> void:
 	load_state()
@@ -22,6 +24,9 @@ func start_new_character(talent_id: String) -> void:
 func record_death(summary: Dictionary) -> void:
 	last_character_summary = summary.duplicate(true)
 	last_character_summary["victory"] = false
+	death_records.push_front(last_character_summary.duplicate(true))
+	if death_records.size() > MAX_GRAVES:
+		death_records.resize(MAX_GRAVES)
 	current_character_alive = false
 	current_character_race = ""
 	current_character_talent = ""
@@ -60,6 +65,7 @@ func save_state() -> bool:
 		"current_character_race": current_character_race,
 		"current_character_talent": current_character_talent,
 		"last_character_summary": last_character_summary,
+		"death_records": death_records,
 	}
 	var f := FileAccess.open(TOWN_SAVE_PATH, FileAccess.WRITE)
 	if f == null:
@@ -87,3 +93,5 @@ func load_state() -> void:
 	last_character_summary = parsed.get("last_character_summary", {})
 	if typeof(last_character_summary) != TYPE_DICTIONARY:
 		last_character_summary = {}
+	var dr = parsed.get("death_records", [])
+	death_records = dr if typeof(dr) == TYPE_ARRAY else []

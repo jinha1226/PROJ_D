@@ -1705,6 +1705,8 @@ func _on_player_died() -> void:
 	GameManager.end_run("death")
 	TownState.record_death({
 		"race": GameManager.selected_race_id,
+		"talent": GameManager.selected_talent_id if GameManager.get("selected_talent_id") != null else "",
+		"xl": player.xl,
 		"depth_reached": GameManager.depth,
 		"kills": player.kills,
 		"turns": TurnManager.turn_number,
