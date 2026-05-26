@@ -72,7 +72,27 @@ func _register_spot(id: int, button: Button, action: Callable) -> void:
 	_apply_hotspot_style(button)
 	button.mouse_entered.connect(_on_spot_hover.bind(id))
 	button.mouse_exited.connect(_on_spot_exit.bind(id))
+	button.pressed.connect(_on_spot_hover.bind(id))  # touch: update name on tap
 	button.pressed.connect(action)
+	_add_spot_label(button, String(SPOT_DATA[id]["title"]))
+
+func _add_spot_label(button: Button, title: String) -> void:
+	var lbl := Label.new()
+	lbl.text = title
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	lbl.anchor_left = 0.0
+	lbl.anchor_top = 0.0
+	lbl.anchor_right = 1.0
+	lbl.anchor_bottom = 1.0
+	lbl.add_theme_font_size_override("font_size", 18)
+	lbl.add_theme_color_override("font_color", Color(1.0, 0.95, 0.7, 1.0))
+	# Shadow for readability over dark backgrounds
+	lbl.add_theme_constant_override("shadow_offset_x", 1)
+	lbl.add_theme_constant_override("shadow_offset_y", 1)
+	lbl.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.85))
+	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(lbl)
 
 func _apply_hotspot_style(button: Button) -> void:
 	var normal := StyleBoxFlat.new()
