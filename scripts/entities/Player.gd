@@ -1348,13 +1348,6 @@ func equip_essence(slot: int, essence_id: String) -> void:
 		return
 	if not EssenceSystem.slot_is_unlocked(self, slot):
 		return
-	if essence_id != "" and not FaithSystem.allows_essence(self):
-		if CombatLog != null:
-			if not FaithSystem.has_chosen_faith(self):
-				CombatLog.post(LocaleManager.t("LOG_CHOOSE_A_FAITH_BEFORE_ATTUNING"), Color(1.0, 0.72, 0.5))
-			else:
-				CombatLog.post(LocaleManager.t("LOG_YOUR_CURRENT_FAITH_DOES_NOT"), Color(1.0, 0.72, 0.5))
-		return
 	var old: String = String(essence_slots[slot])
 	if old == essence_id:
 		return

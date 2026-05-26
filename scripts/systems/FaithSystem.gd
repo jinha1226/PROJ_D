@@ -47,7 +47,7 @@ const FAITHS: Dictionary = {
 	"essence": {
 		"name": "Essence",
 		"short": "Strength through stolen remnants and unstable transformation.",
-		"desc": "Essence is a special path that replaces normal divine power.\nIt allows the use of essences, stronger resonance, and highly flexible builds.\nIts strength depends on what the dungeon gives you.",
+		"desc": "Essence amplifies your attunement to the dungeon's remnants.\nIt grants extra essence carry capacity, stronger resonance, and bonus essence drops.\nIts strength depends on what the dungeon gives you.",
 		"color": Color(0.85, 0.72, 1.0),
 		"allows_essence": true,
 		"essence_inventory_bonus": 1,
