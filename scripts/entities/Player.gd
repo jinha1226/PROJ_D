@@ -1077,7 +1077,7 @@ static func weapon_skill_for_item(item: ItemData) -> String:
 		"axe":
 			return "axes"
 		"blunt":
-			return "maces"
+			return "axes"
 		"polearm":
 			return "polearms"
 		"ranged":

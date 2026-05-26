@@ -16,7 +16,7 @@ func start(from_world: Vector2, to_world: Vector2, weapon_skill: String) -> void
 func _skill_to_type(skill: String) -> String:
 	match skill:
 		"polearms": return "thrust"
-		"axes", "maces", "staves": return "swing"
+		"axes", "staves": return "swing"
 		_: return "slash"
 
 func _type_color(type: String) -> Color:

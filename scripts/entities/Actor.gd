@@ -93,7 +93,7 @@ const HIDDEN_SUBSKILL_IDS: Array = [
 	# Melee subskills
 	"fighting", "unarmed",
 	"short_blades", "long_blades",
-	"maces", "axes", "staves", "polearms",
+	"axes", "staves", "polearms",
 	# Ranged subskills
 	"bows", "crossbows", "slings", "throwing",
 	# Defense subskills
@@ -116,7 +116,7 @@ const SKILL_REMAP: Dictionary = {
 	"fighting": "tactics",
 	"unarmed": "weapon_mastery",
 	"short_blades": "weapon_mastery", "long_blades": "weapon_mastery",
-	"maces": "weapon_mastery", "axes": "weapon_mastery", "staves": "weapon_mastery",
+	"axes": "weapon_mastery", "staves": "weapon_mastery",
 	"polearms": "weapon_mastery",
 	# Combat → archery
 	"bows": "archery", "crossbows": "archery", "slings": "archery", "throwing": "archery",

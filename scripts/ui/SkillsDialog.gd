@@ -6,8 +6,7 @@ const _DESCRIPTIONS: Dictionary = {
 	"unarmed": "Improves bare-handed combat.\n\nFor builds without a weapon or with claw/bite natural attacks.",
 	"short_blades": "Improves daggers and short swords.\n\nFavors stab/backstab playstyles and rewards positioning over raw damage.",
 	"long_blades": "Improves long swords, scimitars, and other heavy blades.\n\nBalanced damage and accuracy for the standard melee fighter.",
-	"maces": "Improves maces, clubs, and morningstars.\n\nHigh damage swings, slower than blades.",
-	"axes": "Improves axes and cleavers.\n\nAxes can hit adjacent foes (cleave) — strong against grouped enemies.",
+	"axes": "Improves axes, maces, and blunt weapons.\n\nAxes can cleave adjacent foes — strong against grouped enemies.",
 	"staves": "Improves quarterstaves and combat staves.\n\nReach without polearm bulk; pairs with magic staff users.",
 	"polearms": "Improves spears, halberds, and glaives.\n\nReach attacks reward kiting and safer positioning.",
 	"bows": "Improves longbows and shortbows.",
@@ -61,7 +60,7 @@ const _VISIBLE_EFFECTS: Dictionary = {
 ## directly so the current dual-write behavior can be inspected in game.
 const _HIDDEN_BY_VISIBLE: Dictionary = {
 	"weapon_mastery": ["unarmed", "short_blades", "long_blades",
-		"maces", "axes", "staves", "polearms"],
+		"axes", "staves", "polearms"],
 	"archery": ["bows", "crossbows", "slings", "throwing"],
 	"defense": ["armor", "shields"],
 	"magery": ["spellcasting", "conjurations", "hexes", "summonings",

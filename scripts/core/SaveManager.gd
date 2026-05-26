@@ -34,7 +34,7 @@ func delete_save() -> void:
 ## Save schema versions:
 ##   1 — legacy: Player state only. Branch + floor cache lost on app close.
 ##   2 — Player + GameManager.floor_cache + branch_floor_cache + branch state.
-##   3 — Skills DCSS 30-split (blade→short_blades+long_blades, hafted→maces+axes+staves,
+##   3 — Skills DCSS 30-split (blade→short_blades+long_blades, hafted→axes+staves,
 ##       ranged→bows+crossbows+slings+throwing, elemental→fire+ice+air+earth+poison,
 ##       agility→dodging+stealth, tool→invocations+evocations, +new schools/elements).
 ##       Old skills dict invalid — saves at v<3 should be wiped or migrated externally.
