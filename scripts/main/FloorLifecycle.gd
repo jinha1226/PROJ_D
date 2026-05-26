@@ -163,7 +163,7 @@ func _cache_current_floor() -> void:
 	GameManager.floor_cache[GameManager.depth] = state
 
 func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
-	# Defensive clear protects all entry paths. Idempotent — empty groups are fine.
+	# Defensive clear protects all entry paths. Idempotent - empty groups are fine.
 	# Fixes audit C4 (branch 1F-up exit was leaking branch monsters/items into main dungeon).
 	host._spawn_service._clear_monsters()
 	host._spawn_service._clear_floor_items()

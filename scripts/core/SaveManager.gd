@@ -83,6 +83,8 @@ func save_run(player, game_manager) -> bool:
 			"boots": player.equipped_boots_id,
 			"kills": player.kills,
 			"last_killer": player.last_killer,
+			"last_damage_amount": player.last_damage_amount,
+			"last_damage_source": player.last_damage_source,
 			"known_spells": player.known_spells,
 			"statuses": player.statuses,
 			"resists": player.resists,

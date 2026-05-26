@@ -10,6 +10,8 @@ var gold: int = 0
 var kills: int = 0
 var items_collected: int = 0
 var last_killer: String = ""
+var last_damage_amount: int = 0
+var last_damage_source: String = ""
 var rt_dodge_active: bool = false
 var rt_parry_active: bool = false
 var _move_tween: Tween = null
@@ -904,6 +906,8 @@ func _break_enemy_awareness(radius: int) -> void:
 		n.lose_awareness()
 
 func take_damage(amount: int, source: String = "") -> void:
+	last_damage_amount = max(0, amount)
+	last_damage_source = source
 	if source != "":
 		last_killer = source
 	super.take_damage(amount, source)

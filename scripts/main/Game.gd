@@ -680,6 +680,8 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 		player.set_equipped_boots(boots_id)
 	player.kills = int(data.get("kills", 0))
 	player.last_killer = String(data.get("last_killer", ""))
+	player.last_damage_amount = int(data.get("last_damage_amount", 0))
+	player.last_damage_source = String(data.get("last_damage_source", ""))
 	player.known_spells = data.get("known_spells", [])
 	# Migrate old spell IDs that no longer exist in SpellRegistry.
 	var _spell_remap: Dictionary = {"magic_dart": "pain", "heal_wounds": ""}
@@ -1669,38 +1671,27 @@ func _reset_expedition_budget() -> void:
 
 func _on_turn_budget_exhausted() -> void:
 	TurnManager.abort_actor_loop()
-	var chance: float = ExpeditionState.safe_return_chance(player, GameManager.depth)
-	CombatLog.post(
-		LocaleManager.t("LOG_EXPEDITION_SAFE_RETURN_ATTEMPT") % int(chance * 100.0),
-		Color(0.9, 0.7, 0.5))
-	if randf() < chance:
-		# Survival XP: successful safe return is a major endurance milestone.
-		if player != null:
-			player.grant_skill_xp("survival", 5.0)
-		CombatLog.post(LocaleManager.t("LOG_EXPEDITION_SAFE_RETURN_OK"), Color(0.5, 0.95, 0.7))
-		PartyManager.on_run_complete()
-		TownState.record_safe_return({
-			"race": GameManager.selected_race_id,
-			"depth_reached": GameManager.depth,
-			"kills": player.kills,
-			"turns": TurnManager.turn_number,
-		})
-		# Save before leaving so persistent_branch_explored and floor cache
-		# survive across the town visit (and any app restart between expeditions).
-		save_with_cache()
-		await get_tree().create_timer(2.0).timeout
-		get_tree().change_scene_to_file(TOWN_SCENE_PATH)
-	else:
-		CombatLog.post(LocaleManager.t("LOG_EXPEDITION_SAFE_RETURN_FAIL"), Color(1.0, 0.3, 0.3))
-		player.last_killer = "lost in the dungeon"
-		player.hp = 0
-		_on_player_died()
+	CombatLog.post(LocaleManager.t("LOG_EXPEDITION_SAFE_RETURN_OK"), Color(0.5, 0.95, 0.7))
+	if player != null:
+		player.grant_skill_xp("survival", 5.0)
+	PartyManager.on_run_complete()
+	TownState.record_safe_return({
+		"race": GameManager.selected_race_id,
+		"depth_reached": GameManager.depth,
+		"kills": player.kills,
+		"turns": TurnManager.turn_number,
+	})
+	save_with_cache()
+	await get_tree().create_timer(2.0).timeout
+	get_tree().change_scene_to_file(TOWN_SCENE_PATH)
 
 func _on_player_died() -> void:
 	# Stop the in-flight monster loop (audit H8) so subsequent actors don't
 	# keep spamming damage against a corpse.
 	TurnManager.abort_actor_loop()
 	CombatLog.post(LocaleManager.t("LOG_YOU_DIED"), Color(1.0, 0.3, 0.3))
+	var death_label: String = _death_cause_label(player.last_damage_source, player.last_damage_amount)
+	CombatLog.post("Killed by: %s" % death_label, Color(1.0, 0.55, 0.55))
 	PartyManager.on_run_failed()
 	GameManager.end_run("death")
 	TownState.record_death({
@@ -1710,7 +1701,9 @@ func _on_player_died() -> void:
 		"depth_reached": GameManager.depth,
 		"kills": player.kills,
 		"turns": TurnManager.turn_number,
-		"death_cause": player.last_killer,
+		"death_cause": death_label,
+		"death_source": player.last_damage_source,
+		"death_damage": player.last_damage_amount,
 	})
 	await get_tree().create_timer(1.2).timeout
 	get_tree().change_scene_to_file(MENU_SCENE_PATH)
@@ -1724,7 +1717,9 @@ func _show_result_screen(victory: bool) -> void:
 		"kills": player.kills,
 		"turns": TurnManager.turn_number,
 		"runes": _count_collected_runes(),
-		"killer": player.last_killer,
+		"killer": _death_cause_label(player.last_damage_source, player.last_damage_amount),
+		"killer_source": player.last_damage_source,
+		"killer_damage": player.last_damage_amount,
 	}
 	res.show_result(data)
 	if res.has_signal("retry_pressed"):
@@ -1743,6 +1738,16 @@ func _on_result_meta(res: Node) -> void:
 	if is_instance_valid(res):
 		res.queue_free()
 	get_tree().change_scene_to_file(MENU_SCENE_PATH)
+
+func _death_cause_label(source: String, damage: int) -> String:
+	if source == "":
+		return "unknown (%d dmg)" % damage if damage > 0 else "unknown"
+	var display: String = source.replace("_", " ")
+	if MonsterRegistry != null:
+		var m = MonsterRegistry.get_by_id(source)
+		if m != null and m.display_name != "":
+			display = m.display_name
+	return "%s (%d dmg)" % [display, damage] if damage > 0 else display
 
 # ── Branch navigation ────────────────────────────────────────────────────────
 
