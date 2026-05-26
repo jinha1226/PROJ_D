@@ -1710,7 +1710,8 @@ func _on_player_died() -> void:
 		"turns": TurnManager.turn_number,
 		"death_cause": player.last_killer,
 	})
-	_show_result_screen(false)
+	await get_tree().create_timer(1.2).timeout
+	get_tree().change_scene_to_file(MENU_SCENE_PATH)
 
 func _show_result_screen(victory: bool) -> void:
 	var res = ResultScreenScene.instantiate()
