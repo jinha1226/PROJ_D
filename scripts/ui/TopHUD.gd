@@ -19,10 +19,10 @@ signal item_slot_pressed(index: int)
 @onready var turn_label: Label = $MainMargin/MainVBox/TopRow/Bars/StatsRow/TurnLabel
 @onready var zoom_in_button: Button = $MainMargin/MainVBox/TopRow/Bars/StatsRow/ZoomInButton
 @onready var zoom_out_button: Button = $MainMargin/MainVBox/TopRow/Bars/StatsRow/ZoomOutButton
-@onready var attack_label: Label = $MainMargin/MainVBox/TopRow/Bars/CombatStatsRow/AttackLabel
-@onready var defense_label: Label = $MainMargin/MainVBox/TopRow/Bars/CombatStatsRow/DefenseLabel
-@onready var move_speed_label: Label = $MainMargin/MainVBox/TopRow/Bars/CombatStatsRow/MoveSpeedLabel
-@onready var attack_speed_label: Label = $MainMargin/MainVBox/TopRow/Bars/CombatStatsRow/AttackSpeedLabel
+@onready var attack_label: Label = $MainMargin/MainVBox/CombatStatsRow/AttackLabel
+@onready var defense_label: Label = $MainMargin/MainVBox/CombatStatsRow/DefenseLabel
+@onready var move_speed_label: Label = $MainMargin/MainVBox/CombatStatsRow/MoveSpeedLabel
+@onready var attack_speed_label: Label = $MainMargin/MainVBox/CombatStatsRow/AttackSpeedLabel
 @onready var rune_row: HBoxContainer = $MainMargin/MainVBox/RuneRow
 var item_slots: Array = []
 

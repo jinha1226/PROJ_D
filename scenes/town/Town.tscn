@@ -150,6 +150,7 @@ anchor_right = 0.96
 anchor_bottom = 0.97
 grow_horizontal = 2
 grow_vertical = 0
+mouse_filter = 2
 
 [node name="FooterHBox" type="HBoxContainer" parent="Footer"]
 layout_mode = 2

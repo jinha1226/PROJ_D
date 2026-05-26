@@ -13,7 +13,7 @@ bg_color = Color(0.870588, 0.690196, 0.133333, 1)
 
 [node name="TopHUD" type="Control"]
 anchor_right = 1.0
-offset_bottom = 128.0
+offset_bottom = 152.0
 script = ExtResource("1_tophud")
 
 [node name="BG" type="ColorRect" parent="."]
@@ -141,28 +141,29 @@ custom_minimum_size = Vector2(36, 24)
 theme_override_font_sizes/font_size = 18
 text = "-"
 
-[node name="CombatStatsRow" type="HBoxContainer" parent="MainMargin/MainVBox/TopRow/Bars"]
+[node name="CombatStatsRow" type="HBoxContainer" parent="MainMargin/MainVBox"]
+size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="AttackLabel" type="Label" parent="MainMargin/MainVBox/TopRow/Bars/CombatStatsRow"]
+[node name="AttackLabel" type="Label" parent="MainMargin/MainVBox/CombatStatsRow"]
 custom_minimum_size = Vector2(72, 18)
 text = "ATK 0"
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.95, 0.72, 0.45, 1)
 
-[node name="DefenseLabel" type="Label" parent="MainMargin/MainVBox/TopRow/Bars/CombatStatsRow"]
+[node name="DefenseLabel" type="Label" parent="MainMargin/MainVBox/CombatStatsRow"]
 custom_minimum_size = Vector2(72, 18)
 text = "DEF 0"
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.68, 0.85, 1, 1)
 
-[node name="MoveSpeedLabel" type="Label" parent="MainMargin/MainVBox/TopRow/Bars/CombatStatsRow"]
+[node name="MoveSpeedLabel" type="Label" parent="MainMargin/MainVBox/CombatStatsRow"]
 custom_minimum_size = Vector2(78, 18)
 text = "MOV 100"
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.65, 1, 0.72, 1)
 
-[node name="AttackSpeedLabel" type="Label" parent="MainMargin/MainVBox/TopRow/Bars/CombatStatsRow"]
+[node name="AttackSpeedLabel" type="Label" parent="MainMargin/MainVBox/CombatStatsRow"]
 custom_minimum_size = Vector2(86, 18)
 text = "ASP 100"
 theme_override_font_sizes/font_size = 14

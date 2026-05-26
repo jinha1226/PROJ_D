@@ -1125,9 +1125,12 @@ static func aptitude_for(race: RaceData, skill_id: String) -> int:
 
 func _skill_apt_mult(id: String) -> float:
 	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id) if GameManager != null and RaceRegistry != null else null
-	if race == null:
-		return 1.0
-	return pow(1.2, aptitude_for(race, id))
+	var race_mult: float = 1.0 if race == null else pow(1.2, aptitude_for(race, id))
+	var talent_id: String = GameManager.selected_talent_id if GameManager != null else ""
+	var talent_apt: int = 0
+	if talent_id != "":
+		talent_apt = int(TalentSystem.get_talent(talent_id).get("skill_apts", {}).get(id, 0))
+	return race_mult * pow(1.2, talent_apt)
 
 ## Visible-tier level-up side effects. Extracted so the hidden tier can
 ## share level-up math without firing UI logs / stat bumps. Caller must

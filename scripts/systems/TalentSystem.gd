@@ -9,60 +9,40 @@ const TALENTS: Dictionary = {
 		"short": "Battle-hardened frontliner.",
 		"desc": "Starts with stronger melee instincts and a sturdier frame.",
 		"color": Color(0.92, 0.78, 0.35, 1.0),
-		"str": 1,
-		"dex": 0,
-		"int": 0,
-		"hp": 4,
-		"mp": 0,
-		"skills": {"weapon_mastery": 60.0, "tactics": 60.0},
+		"str": 1, "dex": 0, "int": 0, "hp": 4, "mp": 0,
+		"skill_apts": {"weapon_mastery": 2, "tactics": 2},
 	},
 	"scout": {
 		"name": "Scout",
 		"short": "Quiet eyes and quick feet.",
 		"desc": "Starts with sharper senses and better survival instincts.",
 		"color": Color(0.48, 0.84, 0.64, 1.0),
-		"str": 0,
-		"dex": 1,
-		"int": 0,
-		"hp": 0,
-		"mp": 0,
-		"skills": {"stealth": 60.0, "tracking": 60.0},
+		"str": 0, "dex": 1, "int": 0, "hp": 0, "mp": 0,
+		"skill_apts": {"stealth": 2, "tracking": 2},
 	},
 	"adept": {
 		"name": "Adept",
 		"short": "A practical student of the arcane.",
 		"desc": "Starts with stronger spellcraft and a clearer mind.",
 		"color": Color(0.72, 0.56, 0.98, 1.0),
-		"str": 0,
-		"dex": 0,
-		"int": 1,
-		"hp": 0,
-		"mp": 2,
-		"skills": {"magery": 60.0},
+		"str": 0, "dex": 0, "int": 1, "hp": 0, "mp": 2,
+		"skill_apts": {"magery": 3},
 	},
 	"survivor": {
 		"name": "Survivor",
 		"short": "Hard to kill, harder to pin down.",
 		"desc": "Starts with a tougher body and better wilderness instincts.",
 		"color": Color(0.78, 0.64, 0.42, 1.0),
-		"str": 0,
-		"dex": 0,
-		"int": 0,
-		"hp": 8,
-		"mp": 0,
-		"skills": {"survival": 60.0, "defense": 60.0},
+		"str": 0, "dex": 0, "int": 0, "hp": 8, "mp": 0,
+		"skill_apts": {"survival": 2, "defense": 2},
 	},
 	"duelist": {
 		"name": "Duelist",
 		"short": "Sharp timing, clean footwork.",
 		"desc": "Starts with better weapon handling and defensive rhythm.",
 		"color": Color(0.92, 0.48, 0.4, 1.0),
-		"str": 0,
-		"dex": 1,
-		"int": 0,
-		"hp": 2,
-		"mp": 0,
-		"skills": {"weapon_mastery": 60.0, "defense": 60.0},
+		"str": 0, "dex": 1, "int": 0, "hp": 2, "mp": 0,
+		"skill_apts": {"weapon_mastery": 2, "defense": 2},
 	},
 }
 
@@ -99,9 +79,11 @@ static func bonus_lines(talent_id: String) -> PackedStringArray:
 	var mp: int = int(data.get("mp", 0))
 	if mp != 0:
 		lines.append("MP %+d" % mp)
-	var skills: Dictionary = data.get("skills", {})
-	for sid in skills.keys():
-		lines.append("%s %+d XP" % [String(sid).replace("_", " ").capitalize(), int(skills[sid])])
+	var apts: Dictionary = data.get("skill_apts", {})
+	for sid in apts.keys():
+		var apt: int = int(apts[sid])
+		var pct: int = int((pow(1.2, apt) - 1.0) * 100.0)
+		lines.append("%s +%d%% XP" % [String(sid).replace("_", " ").capitalize(), pct])
 	return lines
 
 static func apply(player, talent_id: String) -> void:
@@ -123,8 +105,6 @@ static func apply(player, talent_id: String) -> void:
 	var mp_bonus: int = int(data.get("mp", 0))
 	if mp_bonus != 0:
 		player._apply_max_mp_gain(mp_bonus)
-	var skills: Dictionary = data.get("skills", {})
-	for sid in skills.keys():
-		player.grant_skill_xp(String(sid), float(skills[sid]))
+	# skill_apts are applied at XP-grant time via _skill_apt_mult — no upfront grant needed.
 	if player.has_method("refresh_ac_from_equipment"):
 		player.refresh_ac_from_equipment()
