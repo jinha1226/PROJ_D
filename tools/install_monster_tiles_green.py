@@ -200,10 +200,12 @@ def main():
             max_w = max(max_w, cropped.shape[1])
             max_h = max(max_h, cropped.shape[0])
 
+    TARGET_SIZE = 32   # must match DungeonMap.CELL_SIZE
+
     PAD = 4
     canvas_w = max_w + PAD * 2
     canvas_h = max_h + PAD * 2
-    print(f"Uniform canvas: {canvas_w}×{canvas_h}")
+    print(f"Uniform canvas: {canvas_w}×{canvas_h} -> resized to {TARGET_SIZE}×{TARGET_SIZE}")
 
     idx = 0
     installed = 0
@@ -223,7 +225,8 @@ def main():
             off_y = (canvas_h - ch) // 2
             off_x = (canvas_w - cw) // 2
             canvas[off_y:off_y+ch, off_x:off_x+cw] = cropped
-            out_img = Image.fromarray(canvas, "RGBA")
+            out_img = Image.fromarray(canvas, "RGBA").resize(
+                (TARGET_SIZE, TARGET_SIZE), Image.LANCZOS)
 
             # Save preview
             preview_path = os.path.join(PREVIEW_DIR, f"{idx-1:02d}_{label}.png")
