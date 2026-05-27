@@ -128,21 +128,23 @@ def remove_green_bg(arr: np.ndarray) -> np.ndarray:
     return rgba
 
 
-def detect_separators(projection, min_gap=4, threshold_frac=0.02):
-    """Return list of separator midpoint positions from a 1-D sum projection."""
-    total = float(projection.max())
-    thresh = total * threshold_frac
-    in_gap = projection < thresh
-    seps = []
-    start = None
-    for i, g in enumerate(in_gap):
-        if g and start is None:
-            start = i
-        elif not g and start is not None:
-            if i - start >= min_gap:
-                seps.append((start + i) // 2)
-            start = None
-    return seps
+def find_cell_bounds(projection, min_gap=5, threshold_frac=0.01):
+    """Return list of (start, end) content ranges between green gaps."""
+    thresh = float(projection.max()) * threshold_frac
+    gaps = []
+    in_gap = False
+    gs = 0
+    for i, v in enumerate(projection):
+        if v <= thresh and not in_gap:
+            in_gap = True; gs = i
+        elif v > thresh and in_gap:
+            if i - gs >= min_gap:
+                gaps.append((gs, i - 1))
+            in_gap = False
+    if in_gap and len(projection) - gs >= min_gap:
+        gaps.append((gs, len(projection) - 1))
+    cells = [(gaps[i][1] + 1, gaps[i + 1][0] - 1) for i in range(len(gaps) - 1)]
+    return cells
 
 
 def main():
@@ -152,25 +154,17 @@ def main():
     arr = np.array(sheet)
     H, W = arr.shape[:2]
 
-    # Detect grid lines as rows/cols that are predominantly green background
+    # Find exact cell bounds from green gap regions
     R, G, B = arr[:,:,0].astype(float), arr[:,:,1].astype(float), arr[:,:,2].astype(float)
-    # "non-green" content: high value = actual sprite pixel, near-zero = green background
     non_green = np.clip(np.maximum(R, B) - G + 30, 0, None)
+    row_proj = non_green.sum(axis=1)
+    col_proj = non_green.sum(axis=0)
 
-    # Per-row/col sum of non-green content; separator rows/cols have near-zero sum
-    row_proj = non_green.sum(axis=1)   # (H,)
-    col_proj = non_green.sum(axis=0)   # (W,)
-    row_seps = [s for s in detect_separators(row_proj, min_gap=4, threshold_frac=0.05)
-                if 30 < s < H - 30]
-    col_seps = [s for s in detect_separators(col_proj, min_gap=4, threshold_frac=0.05)
-                if 30 < s < W - 30]
+    col_cells = find_cell_bounds(col_proj)   # list of (x0, x1)
+    row_cells = find_cell_bounds(row_proj)   # list of (y0, y1)
 
-    # Build cell boundary lists
-    row_bounds = [0] + row_seps + [H]
-    col_bounds = [0] + col_seps + [W]
-
-    n_rows = len(row_bounds) - 1
-    n_cols = len(col_bounds) - 1
+    n_rows = len(row_cells)
+    n_cols = len(col_cells)
     print(f"Detected grid: {n_rows} rows × {n_cols} cols")
 
     if n_rows != 5 or n_cols != 10:
@@ -182,10 +176,10 @@ def main():
     cells = []
     for r in range(5):
         for c in range(10):
-            y0, y1 = row_bounds[r], row_bounds[r+1]
-            x0, x1 = col_bounds[c], col_bounds[c+1]
-            cell_arr = arr[y0:y1, x0:x1].copy()  # RGB slice
-            clean = remove_green_bg(cell_arr)     # -> RGBA
+            y0, y1 = row_cells[r]
+            x0, x1 = col_cells[c]
+            cell_arr = arr[y0:y1+1, x0:x1+1].copy()  # RGB slice
+            clean = remove_green_bg(cell_arr)          # -> RGBA
 
             # Tight crop
             alpha = clean[:,:,3]
