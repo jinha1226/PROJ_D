@@ -124,6 +124,12 @@ func _glide_to(world_pos: Vector2) -> void:
 	_move_tween = create_tween()
 	_move_tween.tween_property(self, "position", world_pos, 0.12)
 
+func snap_to_grid() -> void:
+	if _move_tween != null and _move_tween.is_running():
+		_move_tween.kill()
+	if _map != null:
+		position = _map.grid_to_world(grid_pos)
+
 func _monster_at(pos: Vector2i) -> Monster:
 	var tree := get_tree()
 	if tree == null:

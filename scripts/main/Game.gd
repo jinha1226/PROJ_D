@@ -1711,6 +1711,9 @@ func _reset_expedition_budget() -> void:
 
 func _on_turn_budget_exhausted() -> void:
 	TurnManager.abort_actor_loop()
+	_cancel_auto_walk("exhausted")
+	if player != null:
+		player.snap_to_grid()
 	CombatLog.post(LocaleManager.t("LOG_EXPEDITION_SAFE_RETURN_OK"), Color(0.5, 0.95, 0.7))
 	if player != null:
 		player.grant_skill_xp("survival", 5.0)
