@@ -28,3 +28,4 @@ glyph = "D"
 glyph_color = Color(1.0, 0.4, 0.1, 1)
 description = "A demon lord born of the deepest fires. Heat pours from its very presence."
 essence_id = "essence_infernal"
+essence_ids = ["essence_cinder", "essence_infernal", "essence_war_cry"]

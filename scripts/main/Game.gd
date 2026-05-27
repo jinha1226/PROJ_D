@@ -14,23 +14,18 @@ const TOWN_SCENE_PATH: String = "res://scenes/town/Town.tscn"
 # Monster weapon pools: monster_id -> [normal_weapons], rare_brands (5% chance)
 const _MONSTER_WEAPON_POOLS: Dictionary = {
 	"kobold":          [["dagger", "short_sword"],           ["venom_dagger"]],
-	"hobgoblin":       [["dagger", "short_sword", "mace"],   []],
-	"orc":             [["short_sword", "mace", "spear"],    ["flaming_sword"]],
-	"orc_warrior":     [["short_sword", "long_sword", "mace", "spear"], ["flaming_sword", "shock_mace"]],
-	"orc_priest":      [["mace", "staff"],                   ["shock_mace"]],
+	"hobgoblin":       [["dagger", "short_sword", "spear"],  []],
+	"orc":             [["short_sword", "battle_axe", "spear"], ["flaming_sword"]],
+	"orc_warrior":     [["short_sword", "long_sword", "battle_axe", "spear"], ["flaming_sword"]],
+	"orc_priest":      [["staff"],                           []],
 	"orc_wizard":      [["staff"],                           []],
-	"orc_warchief":    [["long_sword", "battle_axe"],        ["flaming_sword"]],
 	"gnoll":           [["short_sword", "spear"],            []],
-	"gnoll_sergeant":  [["long_sword", "spear", "mace"],     ["flaming_sword"]],
+	"gnoll_sergeant":  [["long_sword", "spear", "battle_axe"], ["flaming_sword"]],
 	"gnoll_shaman":    [["staff"],                           []],
-	"gnoll_warlord":   [["battle_axe", "long_sword"],        ["flaming_sword"]],
-	"minotaur":        [["battle_axe"],                      ["flaming_sword"]],
-	"skeletal_warrior":[["long_sword", "mace"],              ["frost_dagger"]],
+	"skeletal_warrior":[["long_sword", "battle_axe"],        ["frost_dagger"]],
 	"vampire_knight":  [["long_sword", "arming_sword"],      ["flaming_sword"]],
-	"harrow_knight":   [["long_sword", "arming_sword"],      ["frost_dagger"]],
 	"deep_elf_archer": [["shortbow"],                        ["longbow"]],
 	"cyclops":         [["battle_axe"],                      []],
-	"two_headed_ogre": [["battle_axe", "long_sword"],        []],
 }
 
 const _CORPSE_BLOOD_RED: String = "res://assets/tiles/corpses/blood_puddle_red.png"
@@ -321,14 +316,19 @@ func _handle_tap(screen_pos: Vector2) -> void:
 	if tapped_npc != null and target != player.grid_pos:
 		NPCInfoDialog.show_for(tapped_npc, player, self)
 		return
+	if Status.is_fleeing(player) and player.can_attack_tile(target):
+		CombatLog.post("You are too frightened to attack!", Color(0.65, 0.5, 0.9))
+		return
 	if player.can_attack_tile(target):
 		var w_id: String = player.equipped_weapon_id
 		var w: ItemData = ItemRegistry.get_by_id(w_id) if ItemRegistry != null and w_id != "" else null
-		var dist: int = max(abs(target.x - player.grid_pos.x), abs(target.y - player.grid_pos.y))
-		if w != null and w.category == "ranged" and dist > 1:
+		if w != null and w.category == "ranged":
+			var attack_target: Monster = player.attack_target_for_tile(target)
+			if attack_target == null:
+				return
 			var cs: float = DungeonMap.CELL_SIZE
 			var world_start := player.position + Vector2(cs * 0.5, cs * 0.5)
-			var world_end := map.grid_to_world(target) + Vector2(cs * 0.5, cs * 0.5)
+			var world_end := map.grid_to_world(attack_target.grid_pos) + Vector2(cs * 0.5, cs * 0.5)
 			spawn_spell_bolt(world_start, world_end, "arrow", func(): player.try_attack_tile(target))
 		else:
 			player.try_attack_tile(target)
@@ -618,7 +618,7 @@ func _apply_tester_character_setup() -> void:
 	player.equipped_boots_id = "iron_greaves"
 	player.equipped_ring_id = "ring_wizardry"
 	player.equipped_amulet_id = "amulet_magic"
-	player.quickslots = ["fireball", "blink", "haste", "scroll_magic_mapping", "potion_healing", "wand_digging"]
+	player.quickslots = ["fireball", "lightning_bolt", "", "scroll_magic_mapping", "potion_healing", "wand_digging"]
 	player.refresh_ac_from_equipment()
 	player._refresh_paperdoll()
 	CombatLog.post("Tester character initialized: max skills, all spells, all essences, consumables, scrolls, runes, and warp panel.", Color(1.0, 0.85, 0.3))
@@ -1188,9 +1188,9 @@ func _open_shop() -> void:
 	ShopDialog.open(_shop_items, player, get_tree().current_scene)
 
 func _spawn_final_boss_floor() -> void:
-	var md: MonsterData = MonsterRegistry.get_by_id("abyssal_sovereign")
+	var md: MonsterData = MonsterRegistry.get_by_id("ancient_lich")
 	if md == null:
-		push_error("abyssal_sovereign MonsterData not found!")
+		push_error("ancient_lich MonsterData not found!")
 		return
 	# Place boss in center of map, away from spawn
 	var center := Vector2i(map.GRID_W / 2, map.GRID_H / 2)
@@ -1216,7 +1216,7 @@ func _spawn_final_boss_floor() -> void:
 			Color(0.6, 0.1, 0.9))
 	map.queue_redraw()
 	# Also spawn a handful of undead guards
-	var guard_ids: Array = ["wraith", "crypt_zombie", "shadow_wraith"]
+	var guard_ids: Array = ["wraith", "ghoul", "shadow_wraith"]
 	var spawned: int = 0
 	for attempt in range(40):
 		if spawned >= 4:
@@ -1523,6 +1523,15 @@ func _grant_passive_skill_xp() -> void:
 func _on_player_turn_started() -> void:
 	if player != null and player.hp > 0:
 		player.tick_statuses()
+		if Status.will_skip_turn(player):
+			var st_name: String = ""
+			for id in ["stunned", "frozen", "paralyzed", "sleeping"]:
+				if Status.has(player, id):
+					st_name = Status.display_name(id)
+					break
+			CombatLog.post("You are %s and cannot act!" % st_name, Color(0.9, 0.85, 0.4))
+			TurnManager.end_player_turn(Status.speed_mult(player))
+			return
 		RacePassiveSystem.on_player_turn_end(player)
 		_grant_passive_skill_xp()
 		if ZoneManager.zone_id_for_depth(GameManager.depth) == "abyss" \
@@ -1840,7 +1849,7 @@ func _on_branch_cleared(branch_id: String) -> void:
 		"swamp":      GameManager.earn_title("The Poisoner")
 		"ice_caves":  GameManager.earn_title("The Frozen")
 		"infernal":   GameManager.earn_title("The Infernal")
-		"crypt": GameManager.earn_title("The Deathless")
+		"vault":      GameManager.earn_title("The Vault-Breaker")
 	# All-branches bonus
 	if GameManager.branches_cleared.size() >= 4:
 		GameManager.earn_title("The Delver")
@@ -1856,9 +1865,9 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 		map.explored = state["explored"].duplicate(true)
 		map.spawn_pos = state["spawn_pos"]
 		map.stairs_down_pos = state["stairs_down_pos"]
-		map.extra_stairs_down_positions = state.get("extra_stairs_down_positions", []).duplicate()
+		map.extra_stairs_down_positions.assign(state.get("extra_stairs_down_positions", []))
 		map.stairs_up_pos = state["stairs_up_pos"]
-		map.rooms = state["rooms"].duplicate()
+		map.rooms.assign(state["rooms"])
 		map.visible_tiles.clear()
 		map.corpses = state.get("corpses", []).duplicate(true)
 		for corpse in map.corpses:
@@ -1976,10 +1985,10 @@ func _generate_branch_floor(branch_id: String, branch_floor: int, arrive_from_ab
 ## Returns path to the authored ASCII map for a branch, or "" to use procedural.
 func _fixed_branch_map_path(branch_id: String) -> String:
 	const BRANCH_MAPS: Dictionary = {
-		"crypt":      "res://resources/maps/ascii/branch_crypt.txt",
 		"swamp":      "res://resources/maps/ascii/branch_swamp.txt",
 		"ice_caves":  "res://resources/maps/ascii/branch_ice_caves.txt",
 		"infernal":   "res://resources/maps/ascii/branch_infernal.txt",
+		"vault":      "res://resources/maps/ascii/branch_vault.txt",
 	}
 	return String(BRANCH_MAPS.get(branch_id, ""))
 
@@ -2932,7 +2941,7 @@ func _on_monster_died(monster: Monster) -> void:
 		player.mp = min(player.mp_max, player.mp + kill_mp)
 	# Final boss death → victory
 	if monster != null and monster.data != null \
-			and monster.data.id == "abyssal_sovereign":
+			and monster.data.id == "ancient_lich":
 		await get_tree().create_timer(1.2).timeout
 		CombatLog.post(LocaleManager.t("LOG_THE_ABYSSAL_SOVEREIGN_COLLAPSES_THE"),
 				Color(0.85, 0.6, 1.0))
@@ -2956,8 +2965,13 @@ func _handle_monster_essence_drop(monster: Monster) -> void:
 		drop_chance = minf(1.0, drop_chance + FaithSystem.unique_essence_drop_bonus(player))
 		if randf() >= drop_chance:
 			return
-		var uid: String = String(monster.data.essence_id)
-		if uid == "":
+		var uid: String
+		var uid_pool: Array = monster.data.essence_ids
+		if uid_pool.size() > 0:
+			uid = String(uid_pool[randi() % uid_pool.size()])
+		elif String(monster.data.essence_id) != "":
+			uid = String(monster.data.essence_id)
+		else:
 			uid = EssenceSystem.random_id()
 		CombatLog.post(LocaleManager.t("LOG_THE_LEAVES_BEHIND_AN_ESSENCE") % [
 			monster.data.display_name, EssenceSystem.display_name(uid)],
@@ -2972,7 +2986,10 @@ func _handle_monster_essence_drop(monster: Monster) -> void:
 	if randf() >= chance:
 		return
 	var essence_id: String
-	if String(monster.data.essence_id) != "":
+	var drop_pool: Array = monster.data.essence_ids
+	if drop_pool.size() > 0:
+		essence_id = String(drop_pool[randi() % drop_pool.size()])
+	elif String(monster.data.essence_id) != "":
 		essence_id = String(monster.data.essence_id)
 	else:
 		essence_id = EssenceSystem.random_id()
@@ -3111,7 +3128,7 @@ func _spawn_debug_floor_panel() -> void:
 	# Branch sections
 	var branches: Dictionary = {
 		"swamp": "Swamp", "ice_caves": "Ice Caves",
-		"infernal": "Infernal", "crypt": "Crypt",
+		"infernal": "Infernal", "vault": "Vault",
 	}
 	for branch_id in branches.keys():
 		var bhdr := Label.new()

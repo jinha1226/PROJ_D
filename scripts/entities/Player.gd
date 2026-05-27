@@ -31,7 +31,7 @@ const MAX_MASTERY_LEVEL: int = 9
 
 # Spell school list (data routing for spells — unrelated to skill ids).
 const MAGIC_SCHOOLS: Array = [
-	"conjurations", "hexes", "charms", "summonings", "necromancy",
+	"conjurations", "hexes", "charms", "necromancy",
 	"translocations", "transmutation",
 	"fire", "ice", "air", "earth", "poison",
 ]
@@ -240,10 +240,11 @@ func try_attack_tile(target: Vector2i) -> bool:
 		facing = dir
 		if _renderer != null:
 			_renderer.queue_redraw()
-	play_bump_anim(target - grid_pos)
+	var weapon: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null and equipped_weapon_id != "" else null
+	if weapon == null or weapon.category != "ranged":
+		play_bump_anim(target - grid_pos)
 	play_attack_anim(equipped_weapon_id)
-	var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null and equipped_weapon_id != "" else null
-	weapon_attacked.emit(target, weapon_skill_for_item(w))
+	weapon_attacked.emit(monster.grid_pos, weapon_skill_for_item(weapon))
 	CombatSystem.player_attack_monster(self, monster)
 	TurnManager.end_player_turn(_weapon_action_cost() * Status.speed_mult(self))
 	return true
@@ -291,14 +292,31 @@ func _attack_target_for_tile(target: Vector2i) -> Monster:
 		return null
 	# Ranged weapon: attack any visible monster within range
 	if weapon.category == "ranged":
-		if direct == null:
-			return null
 		var range_val: int = weapon.effect_value if weapon.effect_value > 0 else 6
-		if _chebyshev(target, grid_pos) > range_val:
-			return null
 		if _map != null and not _map.visible_tiles.has(target):
 			return null
-		return direct
+		if direct != null:
+			return direct
+		var dx: int = target.x - grid_pos.x
+		var dy: int = target.y - grid_pos.y
+		var steps: int = mini(max(abs(dx), abs(dy)), range_val)
+		for i in range(1, steps + 1):
+			var px: int = grid_pos.x + int(round(float(dx) * i / float(maxi(abs(dx), abs(dy)))))
+			var py: int = grid_pos.y + int(round(float(dy) * i / float(maxi(abs(dx), abs(dy)))))
+			var p := Vector2i(px, py)
+			if p == grid_pos:
+				continue
+			if _map != null:
+				if not _map.in_bounds(p):
+					return null
+				if _map.tile_at(p) == DungeonMap.Tile.WALL:
+					return null
+			var hit: Monster = _monster_at(p)
+			if hit != null and not hit.is_ally:
+				if _map != null and not _map.visible_tiles.has(hit.grid_pos):
+					return null
+				return hit
+		return null
 	# Polearm: reach 2 tiles in a straight line
 	if weapon.category != "polearm":
 		return null
@@ -320,6 +338,9 @@ func _attack_target_for_tile(target: Vector2i) -> Monster:
 	if reach_monster != null and reach_monster.is_ally:
 		return null
 	return reach_monster
+
+func attack_target_for_tile(target: Vector2i) -> Monster:
+	return _attack_target_for_tile(target)
 
 ## Locate the current index of `entry` in items[]. UI callbacks captured an
 ## entry dict at dialog-open time but items[] mutates between then and the
@@ -1062,8 +1083,6 @@ static func progression_school_for(raw_school: String) -> String:
 			return "hexes"
 		"necromancy":
 			return "necromancy"
-		"summoning", "summonings":
-			return "summonings"
 	return raw_school
 
 static func weapon_skill_for_item(item: ItemData) -> String:
@@ -1399,12 +1418,22 @@ func set_race_from_id(_race_id: String) -> void:
 	if _renderer != null:
 		_renderer.refresh_equipment(self)
 
+const _STAFF_WIZARDRY_BONUS: int = 2
+
+func _staff_bonus_for(weapon_id: String) -> int:
+	if weapon_id == "":
+		return 0
+	var d: ItemData = ItemRegistry.get_by_id(weapon_id) if ItemRegistry != null else null
+	return _STAFF_WIZARDRY_BONUS if (d != null and String(d.category) == "staff") else 0
+
 func set_equipped_weapon(id: String) -> void:
 	if equipped_weapon_id != "":
 		_remove_entry_affixes(equipped_weapon_entry())
+		wizardry_bonus -= _staff_bonus_for(equipped_weapon_id)
 	equipped_weapon_id = id
 	if id != "":
 		_apply_entry_affixes(equipped_weapon_entry())
+		wizardry_bonus += _staff_bonus_for(id)
 	# A two-handed weapon and a shield can never coexist: equipping the 2H
 	# auto-frees the shield slot.
 	if has_two_handed_weapon() and equipped_shield_id != "":

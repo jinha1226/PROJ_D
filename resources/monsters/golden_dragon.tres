@@ -25,3 +25,4 @@ tile_path = "res://assets/tiles/individual/mon/dragons/golden_dragon.png"
 glyph = "D"
 glyph_color = Color(0.95, 0.8, 0.1, 1)
 description = "The apex of dragonkind, wielding multiple elements and tremendous HP. Nothing here is wasted."
+essence_ids = ["essence_golden", "essence_bastion", "essence_dread"]

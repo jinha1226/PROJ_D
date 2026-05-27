@@ -40,7 +40,7 @@ const _HIDDEN_BY_VISIBLE: Dictionary = {
 		"axes", "staves", "polearms"],
 	"archery": ["bows", "crossbows", "slings", "throwing"],
 	"defense": ["armor", "shields"],
-	"magery": ["spellcasting", "conjurations", "hexes", "summonings",
+	"magery": ["spellcasting", "conjurations", "hexes",
 		"necromancy", "translocations", "transmutation",
 		"element"],
 	"stealth": ["dodging"],
@@ -762,15 +762,8 @@ static func _open_essence_slot_picker(dlg: GameDialog, player: Player, parent: N
 				_rebuild_body(dlg, player, parent))
 			body.add_child(btn)
 
-	if current_id != "":
-		var clear_btn := Button.new()
-		clear_btn.text = "Unequip"
-		clear_btn.custom_minimum_size = Vector2(0, 48)
-		clear_btn.pressed.connect(func():
-			player.equip_essence(slot_index, "")
-			picker.close()
-			_rebuild_body(dlg, player, parent))
-		body.add_child(clear_btn)
+	# Unequip is intentionally disabled in-dungeon.
+	# Visit the Purification Altar in town to remove a slotted essence (costs gold).
 
 static func _equip_id(slot: String, player: Player) -> String:
 	match slot:

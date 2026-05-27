@@ -6,7 +6,7 @@
 script = ExtResource("1_sdata")
 id = "animate_skeleton"
 display_name = "Animate Skeleton"
-school = "summoning"
+school = "necromancy"
 spell_level = 2
 xl_required = 3
 mp_cost = 2

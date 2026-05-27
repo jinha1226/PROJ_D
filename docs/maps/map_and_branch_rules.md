@@ -20,7 +20,7 @@ New clean rule layer:
 
 ## Main Change
 
-`PROJ_D` is a 15-floor continuous dungeon crawl with side branches. The new game keeps the main-dungeon descent structure, but compresses it from 15 floors into 5 fixed main floors.
+`PROJ_D` is a 15-floor continuous dungeon crawl with side branches. The new game keeps the main-dungeon descent structure, but compresses it into 6 fixed main floors.
 
 Every main dungeon theme becomes one fixed main floor:
 
@@ -28,7 +28,8 @@ Every main dungeon theme becomes one fixed main floor:
 - `PROJ_D` lair depths 4-6 -> Main Floor 2: Lair
 - `PROJ_D` orc mines depths 7-9 -> Main Floor 3: Orc Mines
 - `PROJ_D` elven halls depths 10-12 -> Main Floor 4: Elven Halls
-- `PROJ_D` abyss depths 13-14 -> Main Floor 5: Abyss, then final boss
+- `PROJ_D` crypt depths 13-15 -> Main Floor 5: Crypt
+- `PROJ_D` abyss depths 16+ -> Main Floor 6: Abyss, then final boss
 
 This is still a dungeon made of floors. It is not five separate unrelated expeditions. Each compressed floor represents the whole theme band from `PROJ_D`.
 
@@ -80,7 +81,7 @@ Each expedition area needs:
 - `reward profile`
 - `skill hooks`
 
-Main route areas are the 5 compressed dungeon floors. Branches are sharper optional challenge floors with stronger identity.
+Main route areas are the 6 compressed dungeon floors. Branches are sharper optional challenge floors with stronger identity.
 
 ## Main Dungeon Floors
 
@@ -90,7 +91,7 @@ First pass:
   - source: `PROJ_D` depths 1-3
   - style: BSP
   - role: starter ruin expedition
-  - branch: Sunken Crypt
+  - branch: none
 
 - Main Floor 2: Green Lair
   - source: `PROJ_D` depths 4-6
@@ -110,8 +111,14 @@ First pass:
   - role: ranged, magic, elite threats
   - branch: Infernal Gate
 
-- Main Floor 5: Shattered Abyss
-  - source: `PROJ_D` depths 13-14
+- Main Floor 5: Crypt
+  - source: `PROJ_D` depths 13-15
+  - style: crypt / necropolis
+  - role: undead pressure, narrow tomb routes, graveward rewards
+  - branch: Vault
+
+- Main Floor 6: Shattered Abyss
+  - source: `PROJ_D` abyss depths 16+
   - style: cave
   - role: unstable endgame expedition into final boss
   - branch: none
@@ -136,6 +143,22 @@ First branch set inherited from `PROJ_D`:
   - reward: `essence_glacial`
   - pressure: cold, reflective sightlines, brittle cover, slow terrain
 
+- Infernal Gate
+  - source: `infernal`
+  - parent: Main Floor 4, Elven Halls
+  - fixed entrance: Elven Halls infernal gate
+  - unlock: after reaching Main Floor 4
+  - reward: `essence_infernal`
+  - pressure: fire, lava, aggressive enemies
+
+- Vault
+  - source: `vault`
+  - parent: Main Floor 5, Crypt
+  - fixed entrance: Crypt vault gate
+  - unlock: after reaching Main Floor 5
+  - reward: `essence_bastion`
+  - pressure: gold, stonework, elite guards, locked treasure
+
 ## Clean-Room Dungeon Inspirations
 
 External dungeon wikis are useful as structural references, not as source material to copy. For this game, use the following transferable patterns:
@@ -148,22 +171,6 @@ External dungeon wikis are useful as structural references, not as source materi
 - Environmental hazards should be local and legible: long sightlines, thin ice crossings, bog channels, crusher lanes, time-slip pockets.
 
 Do not reuse another work's proper nouns, lore explanations, boss names, or exact floor layouts. Translate only the design function into PocketCrawl's own themes.
-
-- Infernal Gate
-  - source: `infernal`
-  - parent: Main Floor 4, Elven Halls
-  - fixed entrance: Elven Halls infernal gate
-  - unlock: after reaching Main Floor 4
-  - reward: `essence_infernal`
-  - pressure: fire, lava, aggressive enemies
-
-- Sunken Crypt
-  - source: `crypt`
-  - parent: Main Floor 1, Buried Catacombs
-  - fixed entrance: Catacombs crypt gate
-  - unlock: after reaching Main Floor 1
-  - reward: `essence_undeath`
-  - pressure: undead, sealed tombs, magic threats
 
 `PROJ_D` rune and faith reward logic should not be ported. Branch boss rewards should be essence-first.
 
@@ -220,13 +227,15 @@ For the first playable version:
 
 - Main route uses `MapGen.generate_styled`.
 - Area config chooses map style by main floor.
-- Main dungeon has 5 floors, not 15 floors.
+- Main dungeon has 6 floors, not 15 floors.
 - Each compressed main floor should be denser than an old `PROJ_D` floor because it represents an entire theme band.
 - Each main floor should use a fixed layout seed or authored layout file.
 - Do not call fresh random map generation for every visit.
 - Use a separate spawn seed for per-visit monster placement.
 - Branch entrance locations are fixed parts of each stage layout.
-- Shattered Abyss has no branch; clearing Main Floor 5 should lead toward the final boss sequence.
+- Main Floor 4 is a branch-rich floor and may host more than one fixed gate landmark in the authored layout. The branch selection layer must keep those entrances readable and mutually exclusive if only one branch is allowed per run.
+- Crypt is now a main floor, not a branch.
+- Shattered Abyss has no branch; clearing Main Floor 6 should lead toward the final boss sequence.
 - Branch maps use 3 floors, not 4, to fit mobile sessions.
 - Final branch floor removes downward stairs and spawns the boss.
 - Branch clear marks the branch complete and grants essence reward.
@@ -242,7 +251,8 @@ Baseline:
 - Main Floor 2: 260 turns
 - Main Floor 3: 270 turns
 - Main Floor 4: 290 turns
-- Main Floor 5: 300 turns
+- Main Floor 5: 310 turns
+- Main Floor 6: 320 turns
 - branches: 170-190 turns per floor
 
 The timer should create pressure without forcing constant rush play. It should be visible before expedition launch.

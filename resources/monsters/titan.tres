@@ -23,3 +23,4 @@ tile_path = "res://assets/tiles/individual/mon/humanoids/giants/titan.png"
 glyph = "C"
 glyph_color = Color(0.9, 0.9, 0.95, 1)
 description = "The apex of giant-kind. Its presence alone warrants respect, and its reach warrants fear."
+essence_ids = ["essence_titan", "essence_might", "essence_iron_will"]

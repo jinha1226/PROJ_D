@@ -28,4 +28,5 @@ glyph = "e"
 glyph_color = Color(0.75, 0.85, 1, 1)
 description = "A disciplined ranged attacker. Fragile up close, but dangerous if allowed to keep distance."
 essence_id = "essence_arcana"
+essence_ids = ["essence_tracker", "essence_swiftness", "essence_nimble"]
 ai_flags = ["kite"]

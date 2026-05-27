@@ -26,3 +26,4 @@ glyph = "H"
 glyph_color = Color(0.78, 0.62, 0.3, 1)
 ai_flags = ["healer"]
 description = "A commanding gnoll that drives its kin to fight harder. Eliminating it early breaks a group's momentum."
+essence_ids = ["essence_iron_will", "essence_fang", "essence_pack"]

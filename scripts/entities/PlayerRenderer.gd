@@ -38,7 +38,6 @@ const DOLL_HAND2_MAP: Dictionary = {
 const DOLL_HAND1_MAP: Dictionary = {
 	"short_sword": "res://assets/tiles/individual/player/hand1/short_sword.png",
 	"dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
-	"mace": "res://assets/tiles/individual/player/hand1/mace.png",
 	"long_sword": "res://assets/tiles/individual/player/hand1/long_sword_slant.png",
 	"arming_sword": "res://assets/tiles/individual/player/hand1/long_sword_slant2.png",
 	"bastard_sword": "res://assets/tiles/individual/player/hand1/heavy_sword.png",
@@ -52,7 +51,6 @@ const DOLL_HAND1_MAP: Dictionary = {
 	"flaming_sword": "res://assets/tiles/individual/player/hand1/short_sword.png",
 	"frost_dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
 	"venom_dagger": "res://assets/tiles/individual/player/hand1/dagger.png",
-	"shock_mace": "res://assets/tiles/individual/player/hand1/mace.png",
 	"dirk": "res://assets/tiles/individual/player/hand1/athame.png",
 	"stiletto": "res://assets/tiles/individual/player/hand1/dagger.png",
 	"quick_blade": "res://assets/tiles/individual/player/hand1/sword_thief.png",
@@ -64,7 +62,6 @@ const _ATTACK_FPS: float = 14.0
 const _ATTACK_FRAMES: Dictionary = {"slash": 6, "thrust": 8, "spellcast": 7}
 ## Weapon base_id → attack animation type. Unlisted weapons default to "slash".
 const _WEAPON_ATTACK_ANIM: Dictionary = {
-	"mace": "thrust", "shock_mace": "thrust",
 	"spear": "thrust", "javelin": "thrust", "staff": "thrust",
 }
 
@@ -144,8 +141,6 @@ const _WEAPON_OVERLAY_MAP: Dictionary = {
 	"flaming_sword":  "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/longsword/walk/longsword.png",
 	"bastard_sword":  "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/longsword/walk/longsword.png",
 	"great_blade":    "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/sword/longsword/walk/longsword.png",
-	"mace":           "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/blunt/mace/walk/mace.png",
-	"shock_mace":     "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/blunt/mace/walk/mace.png",
 	"battle_axe":     "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/blunt/waraxe/walk/waraxe.png",
 	"staff":          "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/magic/simple/foreground/walk/simple.png",
 	"spear":          "res://Universal-LPC-Spritesheet-Character-Generator/spritesheets/weapon/polearm/spear/foreground/walk/iron.png",

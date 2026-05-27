@@ -25,3 +25,4 @@ tile_path = "res://assets/tiles/individual/mon/demons/executioner.png"
 glyph = "&"
 glyph_color = Color(0.4, 0.05, 0.05, 1)
 description = "An executioner demon of terrifying melee precision. If it reaches you, it expects the fight to end quickly."
+essence_ids = ["essence_fang", "essence_wither", "essence_shadow"]

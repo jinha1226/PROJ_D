@@ -103,6 +103,6 @@ D:\PROJ_D\archive       (forthcoming) ship-time archives
 - Map art/design handoff lives in `docs/map_art_design.md`: zone-by-zone sub-regions, prop/tile choices, and implementation notes for later authored map dressing.
 - Next verification pass: new run enters/exits starting shop, essence pickup/equip/effect/save-load works, turn budget decreases on move/wait/attack/cast/item/stairs, and hidden XP rises for weapon/ranged/magic/defense actions.
 - Resists simplified to 4 types: fire / cold / poison / will. Do not re-expand without explicit decision.
-- Map size: 32×36 (compressed for mobile readability vs Pixel Dungeon ~larger and DCSS ~much larger).
+- Map size: 56×62 (enlarged 2026-05-27 from 46×50; original docs cited 32×36 but code had drifted to 46×50 before this change).
 - Faith and Essence are parallel build axes; `faith_id == ""` is migration-state only after `first_shrine_choice_done == true`.
 - DCSS reference clone in `oldproject/crawl/` for cross-checking formulas — never import into active code.

@@ -29,3 +29,4 @@ glyph = "S"
 glyph_color = Color(0.3, 0.85, 0.3, 1)
 description = "An enormous serpent saturated with swamp venom. Its scales drip poison."
 essence_id = "essence_plague"
+essence_ids = ["essence_serpent", "essence_plague", "essence_constrict"]

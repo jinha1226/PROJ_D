@@ -26,3 +26,4 @@ tile_path = "res://assets/tiles/individual/mon/animals/black_bear.png"
 glyph = "B"
 glyph_color = Color(0.15, 0.1, 0.05, 1)
 description = "A large predator that hits surprisingly hard. Straightforward to fight, but do not underestimate the opening blows."
+essence_ids = ["essence_vitality", "essence_might", "essence_regeneration"]

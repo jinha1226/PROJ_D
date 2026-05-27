@@ -49,6 +49,8 @@ const INFO: Dictionary = {
 		"ac_down": 2},
 	"drained":      {"name": "Drained",      "color": Color(0.55, 0.35, 0.8),
 		"ev_down": 2},
+	"cursed":       {"name": "Cursed",       "color": Color(0.5, 0.3, 0.8),
+		"ac_down": 2},
 	# Stat debuffs
 	"berserk":      {"name": "Berserk",      "color": Color(1.0, 0.45, 0.3),
 		"str_bonus": 4},
@@ -61,7 +63,6 @@ const INFO: Dictionary = {
 	# Player buffs (effects checked externally in Combat/Player systems)
 	"mage_armor":   {"name": "Mage Armor",   "color": Color(0.5, 0.7, 1.0)},
 	"blur":         {"name": "Blur",         "color": Color(0.7, 0.75, 1.0)},
-	"stoneskin":    {"name": "Stoneskin",    "color": Color(0.8, 0.8, 0.65)},
 	"magic_ward":   {"name": "Magic Ward",   "color": Color(0.75, 0.5, 1.0)},
 	"invulnerable": {"name": "Invulnerable", "color": Color(1.0, 0.95, 0.5)},
 	"hasted":       {"name": "Hasted",       "color": Color(0.4, 1.0, 0.65)},
@@ -154,12 +155,25 @@ static func has(actor, id: String) -> bool:
 		return false
 	return int(actor.get(key).get(id, 0)) > 0
 
+## WL-resisted status IDs and their base WL threshold for 0% resist.
+## At threshold+0: 0% resist. Each +1 WL above threshold adds 5%, capped at 80%.
+const WL_RESISTED: Dictionary = {
+	"feared": 5, "stunned": 5, "slow": 3, "weakened": 4, "cursed": 4,
+}
+
 static func apply(actor, id: String, turns: int) -> void:
 	if actor == null or turns <= 0:
 		return
 	var key: String = _dict_name(actor)
 	if key == "":
 		return
+	# WL resistance check — only applies to player for the 5 control effects.
+	if actor is Player and WL_RESISTED.has(id):
+		var base: int = int(WL_RESISTED[id])
+		var resist_chance: float = clampf(float(int(actor.wl) - base) * 0.05, 0.0, 0.80)
+		if randf() < resist_chance:
+			_log_resist(id)
+			return
 	# Survival shortens negative status durations on the player. Beneficial
 	# statuses (shroud/might/haste) also shrink as a side effect — acceptable
 	# first-pass tradeoff; balance pass can split positive vs negative lists.
@@ -326,6 +340,14 @@ static func _resists_of(actor):
 	if "data" in actor and actor.data != null and "resists" in actor.data:
 		return actor.data.resists
 	return []
+
+static func _log_resist(id: String) -> void:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return
+	var combat_log = tree.root.get_node_or_null("/root/CombatLog")
+	if combat_log != null:
+		combat_log.post("You resist the %s!" % display_name(id), Color(0.7, 0.85, 1.0))
 
 static func _log_tick_damage(actor, id: String, dmg: int) -> void:
 	if actor is Player:

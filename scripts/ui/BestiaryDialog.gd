@@ -108,26 +108,29 @@ static func _make_monster_card(data: MonsterData, kills: int) -> Control:
 		desc_lbl.add_theme_color_override("font_color", Color(0.78, 0.78, 0.85))
 		vb.add_child(desc_lbl)
 
-	var eid: String = String(data.essence_id)
-	if eid != "":
-		var ess_row := HBoxContainer.new()
-		ess_row.add_theme_constant_override("separation", GameTheme.PAD_L)
-		var ess_icon := TextureRect.new()
-		ess_icon.texture = EssenceSystem.icon_texture_of(eid)
-		ess_icon.custom_minimum_size = Vector2(32, 32)
-		ess_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		ess_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		ess_row.add_child(ess_icon)
+	var pool: Array = data.essence_ids
+	if pool.is_empty() and String(data.essence_id) != "":
+		pool = [String(data.essence_id)]
+	if not pool.is_empty():
+		for eid in pool:
+			var ess_row := HBoxContainer.new()
+			ess_row.add_theme_constant_override("separation", GameTheme.PAD_L)
+			var ess_icon := TextureRect.new()
+			ess_icon.texture = EssenceSystem.icon_texture_of(eid)
+			ess_icon.custom_minimum_size = Vector2(32, 32)
+			ess_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			ess_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			ess_row.add_child(ess_icon)
 
-		var ess_lbl := Label.new()
-		ess_lbl.text = LocaleManager.t("BESTIARY_ESSENCE_FMT") % [
-			EssenceSystem.display_name(eid), EssenceSystem.description(eid)]
-		ess_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		ess_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
-		ess_lbl.add_theme_color_override("font_color", EssenceSystem.color_of(eid))
-		ess_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		ess_row.add_child(ess_lbl)
-		vb.add_child(ess_row)
+			var ess_lbl := Label.new()
+			ess_lbl.text = LocaleManager.t("BESTIARY_ESSENCE_FMT") % [
+				EssenceSystem.display_name(eid), EssenceSystem.description(eid)]
+			ess_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			ess_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+			ess_lbl.add_theme_color_override("font_color", EssenceSystem.color_of(eid))
+			ess_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			ess_row.add_child(ess_lbl)
+			vb.add_child(ess_row)
 	elif kills > 0:
 		var ess_lbl := Label.new()
 		ess_lbl.text = LocaleManager.t("BESTIARY_ESSENCE_RANDOM")

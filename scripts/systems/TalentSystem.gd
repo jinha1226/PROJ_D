@@ -9,7 +9,7 @@ const TALENTS: Dictionary = {
 		"short": "Battle-hardened frontliner.",
 		"desc": "Starts with stronger melee instincts and a sturdier frame.",
 		"color": Color(0.92, 0.78, 0.35, 1.0),
-		"str": 1, "dex": 0, "int": 0, "hp": 4, "mp": 0,
+		"str": 1, "dex": 0, "int": 0, "hp": 6, "mp": 0,
 		"skill_apts": {"weapon_mastery": 2, "tactics": 2},
 	},
 	"scout": {
@@ -17,7 +17,7 @@ const TALENTS: Dictionary = {
 		"short": "Quiet eyes and quick feet.",
 		"desc": "Starts with sharper senses and better survival instincts.",
 		"color": Color(0.48, 0.84, 0.64, 1.0),
-		"str": 0, "dex": 1, "int": 0, "hp": 0, "mp": 0,
+		"str": 0, "dex": 1, "int": 0, "hp": 2, "mp": 0,
 		"skill_apts": {"stealth": 2, "tracking": 2},
 	},
 	"adept": {
@@ -25,29 +25,13 @@ const TALENTS: Dictionary = {
 		"short": "A practical student of the arcane.",
 		"desc": "Starts with stronger spellcraft and a clearer mind.",
 		"color": Color(0.72, 0.56, 0.98, 1.0),
-		"str": 0, "dex": 0, "int": 1, "hp": 0, "mp": 2,
+		"str": 0, "dex": 0, "int": 2, "hp": 0, "mp": 4,
 		"skill_apts": {"magery": 3},
-	},
-	"survivor": {
-		"name": "Survivor",
-		"short": "Hard to kill, harder to pin down.",
-		"desc": "Starts with a tougher body and better wilderness instincts.",
-		"color": Color(0.78, 0.64, 0.42, 1.0),
-		"str": 0, "dex": 0, "int": 0, "hp": 8, "mp": 0,
-		"skill_apts": {"survival": 2, "defense": 2},
-	},
-	"duelist": {
-		"name": "Duelist",
-		"short": "Sharp timing, clean footwork.",
-		"desc": "Starts with better weapon handling and defensive rhythm.",
-		"color": Color(0.92, 0.48, 0.4, 1.0),
-		"str": 0, "dex": 1, "int": 0, "hp": 2, "mp": 0,
-		"skill_apts": {"weapon_mastery": 2, "defense": 2},
 	},
 }
 
 static func ids_in_order() -> Array:
-	return ["veteran", "scout", "adept", "survivor", "duelist"]
+	return ["veteran", "scout", "adept"]
 
 static func get_talent(talent_id: String) -> Dictionary:
 	if TALENTS.has(talent_id):

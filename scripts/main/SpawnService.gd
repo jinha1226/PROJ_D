@@ -191,10 +191,10 @@ func _spawn_monsters_for_districts(depth: int, zone_id: String, count: int,
 
 func _spawn_stair_guardian_for_floor(depth: int, rng: RandomNumberGenerator) -> void:
 	const GUARDIANS: Dictionary = {
-		1: "stair_warden",
-		2: "mire_channeler",
-		3: "mine_breaker",
-		4: "mirror_adept",
+		1: "skeletal_warrior",
+		2: "troll",
+		3: "ogre",
+		4: "stone_warden",
 	}
 	var guardian_id: String = String(GUARDIANS.get(depth, ""))
 	if guardian_id == "":

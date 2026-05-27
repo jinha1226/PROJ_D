@@ -79,12 +79,8 @@ static func take_turn(monster: Monster, map: DungeonMap) -> void:
 const KITE_PREFERRED_RANGE: int = 3  # kiter backs off until this chebyshev distance
 
 const BOSS_IDS: Array = [
-	"ashen_magpie", "ancient_lich", "blood_duke", "bog_serpent",
-	"ember_tyrant", "glacial_sovereign", "gnoll_warlord", "harrow_knight",
-	"stair_warden", "mire_channeler", "mine_breaker", "mirror_adept",
-	"ogre_chieftain", "orc_warchief", "pale_scholar", "sister_cinder",
-	"sovereign_jelly", "stone_warden", "storm_hierophant", "viper_saint",
-	"abyssal_sovereign",
+	"ancient_lich", "bog_serpent", "ember_tyrant",
+	"glacial_sovereign", "golden_dragon",
 ]
 
 ## Close-range specials (dist == 1). Returns true if ability was used.
@@ -99,13 +95,67 @@ static func _try_special_close(monster: Monster, player: Player, map: DungeonMap
 			if randf() < 0.30:
 				_drain_life(monster, player)
 				return true
-		"wraith", "shadow_wraith":
+		"vampire_bat":
+			if randf() < 0.20 and player.hp > 0:
+				Status.apply(player, "weakened", 2)
+				CombatLog.post("The Vampire Bat's bite drains your vitality!", Color(0.55, 0.55, 0.6))
+				return true
+		"wraith":
 			if randf() < 0.35:
 				_drain_life(monster, player)
 				return true
-		"wight":
-			if randf() < 0.25:
+		"shadow_wraith":
+			if randf() < 0.35:
 				_drain_life(monster, player)
+				return true
+			if randf() < 0.25 and player.hp > 0:
+				Status.apply(player, "weakened", 3)
+				CombatLog.post("The Shadow Wraith saps your strength!", Color(0.55, 0.55, 0.6))
+				return true
+		"ghoul":
+			if randf() < 0.25 and player.hp > 0:
+				Status.apply(player, "weakened", 3)
+				CombatLog.post("The Ghoul's rotting touch saps your strength!", Color(0.55, 0.55, 0.6))
+				return true
+		"troll":
+			if randf() < 0.25 and player.hp > 0:
+				Status.apply(player, "slow", 2)
+				CombatLog.post("The Troll grabs you — your movement is slowed!", Color(0.35, 0.8, 0.35))
+				return true
+		"ogre":
+			if randf() < 0.20 and player.hp > 0:
+				Status.apply(player, "stunned", 1)
+				CombatLog.post("The Ogre's club connects with a thunderous blow!", Color(0.9, 0.85, 0.4))
+				return true
+		"titan":
+			if randf() < 0.25 and player.hp > 0:
+				Status.apply(player, "stunned", 1)
+				CombatLog.post("The Titan's strike sends shockwaves through you!", Color(0.9, 0.85, 0.4))
+				return true
+		"cyclops":
+			if randf() < 0.25 and player.hp > 0:
+				Status.apply(player, "stunned", 1)
+				CombatLog.post("The Cyclops slams you! You are stunned!", Color(0.9, 0.85, 0.4))
+				return true
+		"anaconda":
+			if randf() < 0.30 and player.hp > 0:
+				Status.apply(player, "slow", 3)
+				CombatLog.post("The Anaconda coils around you — your movement slows!", Color(0.35, 0.5, 0.2))
+				return true
+		"bone_dragon":
+			if randf() < 0.30 and player.hp > 0:
+				Status.apply(player, "feared", 2)
+				CombatLog.post("The Bone Dragon's presence fills you with dread!", Color(0.5, 0.3, 0.8))
+				return true
+		"executioner":
+			if randf() < 0.25 and player.hp > 0:
+				Status.apply(player, "feared", 2)
+				CombatLog.post("The Executioner looms over you — your will crumbles!", Color(0.65, 0.5, 0.9))
+				return true
+		"mummy":
+			if randf() < 0.30 and player.hp > 0:
+				Status.apply(player, "cursed", 5)
+				CombatLog.post("The Mummy's touch withers your defenses!", Color(0.5, 0.3, 0.8))
 				return true
 	return false
 
@@ -128,9 +178,34 @@ static func _try_special_ranged(monster: Monster, player: Player, map: DungeonMa
 				return true
 		"mummy":
 			if dist <= 5 and randf() < 0.30:
-				_smite(monster, player, "The Mummy curses you!")
+				Status.apply(player, "cursed", 5)
+				CombatLog.post("The Mummy curses you! Your defenses weaken!", Color(0.5, 0.3, 0.8))
+				return true
+		"lich", "ancient_lich":
+			if dist <= 6 and randf() < 0.30:
+				Status.apply(player, "cursed", 6)
+				CombatLog.post("The %s lays a curse upon you!" % monster.data.display_name, Color(0.5, 0.3, 0.8))
+				return true
+		"gnoll_shaman":
+			if dist <= 6 and randf() < 0.25:
+				Status.apply(player, "cursed", 4)
+				CombatLog.post("The Gnoll Shaman hexes you!", Color(0.5, 0.3, 0.8))
+				return true
+		"giant_wolf_spider":
+			if dist <= 4 and randf() < 0.35:
+				Status.apply(player, "slow", 3)
+				CombatLog.post("The Giant Wolf Spider snares you in webbing!", Color(0.7, 0.7, 0.55))
+				return true
+		"stone_giant":
+			if dist <= 6 and randf() < 0.20:
+				Status.apply(player, "stunned", 1)
+				CombatLog.post("The Stone Giant hurls a boulder — the impact stuns you!", Color(0.9, 0.85, 0.4))
 				return true
 		"balrug":
+			if dist <= 6 and randf() < 0.30:
+				Status.apply(player, "feared", 2)
+				CombatLog.post("The Balrug's demonic aura overwhelms your will!", Color(0.65, 0.5, 0.9))
+				return true
 			if dist <= 6 and randf() < 0.40:
 				_smite(monster, player, "The Balrug breathes hellfire!")
 				return true
@@ -138,56 +213,28 @@ static func _try_special_ranged(monster: Monster, player: Player, map: DungeonMa
 			if dist <= 5 and randf() < 0.35:
 				_smite(monster, player, "The Red Devil spits fire!")
 				return true
-		"ice_devil":
-			if dist <= 5 and randf() < 0.35:
-				_smite(monster, player, "The Ice Devil blasts you with cold!")
-				return true
-		"earth_elemental":
+		"swamp_dragon":
 			if dist <= 5 and randf() < 0.30:
-				_smite(monster, player, "The Earth Elemental hurls a boulder!")
+				Status.apply(player, "slow", 3)
+				CombatLog.post("The Swamp Dragon spits bog — your legs are mired!", Color(0.35, 0.6, 0.25))
+				return true
+		"glacial_sovereign":
+			if dist <= 6 and randf() < 0.35:
+				Status.apply(player, "slow", 3)
+				CombatLog.post("The Glacial Sovereign's frost field grips you!", Color(0.5, 0.85, 1.0))
 				return true
 	return false
 
 
 ## Boss telegraphed attack selection.
 static func _try_boss_telegraph(monster: Monster, player: Player, map: DungeonMap) -> bool:
-	if monster.data.id == "abyssal_sovereign":
-		return _abyssal_sovereign_turn(monster, player, map)
 	if randf() > 0.35:
 		return false
 	match monster.data.id:
-		"stair_warden":
-			_telegraph_aoe(monster, map, 1,
-				"The Stair Warden braces for a stone sweep!",
-				monster.data.hd * 3, "")
-		"mire_channeler":
-			_telegraph_line(monster, player, map,
-				"The Mire Channeler draws a bright line through the damp air!",
-				monster.data.hd * 4, "lightning")
-		"mine_breaker":
-			_telegraph_aoe(monster, map, 1,
-				"The Mine Breaker lifts its pick for a crushing arc!",
-				monster.data.hd * 4, "")
-		"mirror_adept":
-			_telegraph_aoe(monster, map, 2,
-				"The Mirror Adept traces a freezing sigil!",
-				monster.data.hd * 3, "cold")
-		"ashen_magpie":
-			_telegraph_aoe(monster, map, 2,
-				"The Ashen Magpie spreads its wings — brace for impact!",
-				monster.data.hd * 4, "")
 		"ancient_lich":
 			_telegraph_aoe(monster, map, 3,
 				"The Ancient Lich channels torment!",
 				monster.data.hd * 3, "drain")
-		"gnoll_warlord", "orc_warchief", "ogre_chieftain":
-			_telegraph_aoe(monster, map, 1,
-				"The %s raises its weapon for a mighty cleave!" % monster.data.display_name,
-				monster.data.hd * 4, "")
-		"storm_hierophant":
-			_telegraph_line(monster, player, map,
-				"The %s charges a devastating bolt!" % monster.data.display_name,
-				monster.data.hd * 6, "lightning")
 		"ember_tyrant":
 			_telegraph_line(monster, player, map,
 				"The %s charges a devastating bolt!" % monster.data.display_name,
@@ -565,7 +612,7 @@ static func _abyssal_sovereign_turn(monster: Monster, player: Player, map: Dunge
 					for off in offsets:
 						var t: Vector2i = monster.grid_pos + off
 						if map.is_walkable(t) and not _occupied(t, monster) and t != player.grid_pos:
-							var mid: String = ["zombie","crypt_zombie","wraith"][randi() % 3]
+							var mid: String = ["zombie","skeletal_warrior","wraith"][randi() % 3]
 							if game.spawn_monster_at(mid, t):
 								break
 		CombatLog.post(LocaleManager.t("LOG_THE_SOVEREIGN_S_SERVANTS_HEED"), Color(0.7, 0.3, 1.0))
@@ -582,7 +629,7 @@ static func _abyssal_sovereign_turn(monster: Monster, player: Player, map: Dunge
 				for off in offsets:
 					var t: Vector2i = monster.grid_pos + off
 					if map.is_walkable(t) and not _occupied(t, monster) and t != player.grid_pos:
-						var mid: String = ["zombie","crypt_zombie"][randi() % 2]
+						var mid: String = ["zombie","skeletal_warrior"][randi() % 2]
 						game.spawn_monster_at(mid, t)
 						break
 

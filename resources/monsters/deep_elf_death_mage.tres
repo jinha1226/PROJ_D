@@ -24,3 +24,4 @@ glyph_color = Color(0.6, 0.25, 0.75, 1)
 description = "An elven necromancer who fields undead and necrotic spells. Kill it before the room fills with its minions."
 ai_flags = ["summoner"]
 summon_pool = ["zombie", "crypt_zombie"]
+essence_ids = ["essence_wither", "essence_shadow", "essence_marrow"]

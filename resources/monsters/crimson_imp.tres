@@ -26,3 +26,4 @@ tile_path = "res://assets/tiles/individual/mon/demons/crimson_imp.png"
 glyph = "x"
 glyph_color = Color(0.8, 0.2, 0.2, 1)
 description = "A small fire-resistant demon with a nasty bite. Fast and difficult to corner."
+essence_ids = ["essence_fire", "essence_nimble", "essence_swiftness"]

@@ -49,6 +49,7 @@ Reward placement should sell the theme:
 | Lair | hunter blinds, fungal potion pockets, safe shelters |
 | Orc Mines | pay chests, locked armories, foreman stores |
 | Elven Halls | libraries, reliquaries, wand archives |
+| Crypt | sealed tombs, grave chapels, necromancer studies |
 | Abyss | rare broken caches, shifting rooms, memory wells |
 
 Sub-area metadata lives in `ExpeditionFixedLayoutDesigns.gd` as landmark `role`, `district_style`, `reward_profile`, `skill_hook`, or `dynamic_rule` fields. These fields are intentionally lightweight so the first playable pass can use them for spawn and loot bias without adding another map format.
@@ -69,11 +70,11 @@ Tiles:
 Flow:
 
 ```text
-Sealed Crypt Gate -- Undertaker Cells -- Upper Chapel / Main Exit
-        |                    \          /
-Broken Training Hall -- Ossuary Ring -- Bone Scriptorium
-        |                    /
-Entry Stair -------- Pilgrim Cache
+Upper Chapel / Main Exit -- Undertaker Cells -- Bone Scriptorium
+        |                     \            /
+Broken Training Hall -- Ossuary Ring -- Pilgrim Cache
+        |                     /
+Entry Stair ----------- Sealed Reliquary
 ```
 
 Fixed landmarks:
@@ -84,12 +85,11 @@ Fixed landmarks:
 - Ossuary Ring: central loop, lets the player learn alternate paths. Monster profile: skeletons and grave slimes.
 - Bone Scriptorium: upper-right scroll and map-lore pocket. Monster profile: undead casters and grave slimes.
 - Undertaker Cells: upper-left locked side rooms. Monster profile: zombies and grave slimes.
-- Sealed Crypt Gate: upper-left fixed branch entrance to Sunken Crypt. Monster profile: undead guards.
+- Sealed Reliquary: lower-right high-value side pocket with a visible risk. Monster profile: undead guards and grave slimes.
 - Upper Chapel: upper-right main stage exit. Monster profile: stronger undead.
 
 Design notes:
 
-- The branch gate is visible early but not necessarily safe to enter.
 - Lockpicking should have a low-risk door here.
 - Tracking can mark old footprints around the ossuary.
 - Keep the first floor readable: monster profiles should teach "vermin outside, undead deeper, slimes around old bodies and water."
@@ -212,7 +212,46 @@ Design notes:
 - Magery and Tactics should both reveal useful information here.
 - Monster ecology: archers and scouts in open terraces, mages and animated books in libraries, illusions and elite guards in the Mirror Court, demons near the Burning Mirror Gate.
 
-### Main Floor 5: Shattered Abyss
+### Main Floor 5: Crypt
+
+Purpose: a tighter, more solemn undead floor after the elven halls. This is the last stop before the abyss and should feel like the dungeon has collapsed into burial architecture and sealed rites.
+
+Tiles:
+
+- wall: `res://assets/tiles/individual/dngn/wall/wall_stone_necropolis_1.png`
+- floor: `res://assets/tiles/individual/dngn/floor/necro_squares00.png`
+
+Flow:
+
+```text
+Grave Cathedral -- Necromancer Study -- Vault Gate
+      |                    |                 /
+Charnel Walk -- Tomb Loop -- Grief Archive -- Ossuary Vault
+      |                    /
+Lower Crypt Entry ---- Burial Chapel / Main Exit
+```
+
+Fixed landmarks:
+
+- Entry: bottom center.
+- Charnel Walk: lower-left early corridor with tight line-of-sight and narrow chokepoints.
+- Tomb Loop: central loop with two or three routes around the main halls.
+- Grief Archive: lower-right reward room for books, rings, and identification items.
+- Vault Gate: upper-right fixed branch entrance to Vault.
+- Burial Chapel: upper-right main exit and last safe prep zone.
+- Necromancer Study: upper-mid magic pressure room with stronger undead casters.
+- Ossuary Vault: upper-left locked treasure room with a visible risk.
+- Grave Cathedral: top-center landmark, a large combat hall before the abyss.
+
+Design notes:
+
+- This floor should be noticeably narrower and more claustrophobic than Elven Halls.
+- It needs at least one reliable choke point and one retreat loop in every authored layout.
+- Door timing matters more here than on previous floors.
+- The Vault Gate should be visible but costly to approach so the player must choose it intentionally.
+- Monster ecology: skeletons and zombies near the entry, wights and grave slimes in the loop, necromancers and revenants near the study and vault, stronger undead near the chapel.
+
+### Main Floor 6: Shattered Abyss
 
 Purpose: final approach. No branch. Pressure funnels toward final boss while parts of the map feel unstable.
 
@@ -239,7 +278,7 @@ Fixed landmarks:
 - Left Shard and Right Shard: fragmented mid-map routes.
 - Rift Market Ruin: weird rare consumable cache with dangerous spawns.
 - Time-Slip Gallery: shifting sub-area that can reuse the old `PROJ_D` Abyss shift logic.
-- Void Spine: narrow unstable central path.
+- Void Spine: unstable central path that should still leave a wider island field around it.
 - Memory Well: Tracking reward area and route preview landmark.
 - Final Gate: upper center, opens final boss sequence.
 
@@ -247,48 +286,13 @@ Design notes:
 
 - No branch entrance.
 - The layout should be memorable and hostile.
-- Temporary hazards can vary by visit, but the major island shapes stay fixed.
+- Temporary hazards can vary by visit, but the major island shapes stay fixed and broad enough for multi-enemy fights.
 - The Time-Slip Gallery may alter local walls, doors, fog, or exits every fixed turn interval. Do not shift the whole map; only this authored pocket should move.
 - Monster ecology: void beasts on the shards and spine, demons near the right shard and market ruin, phase beasts inside shifting pockets, memory echoes near the Memory Well.
 
 ## Branches
 
 Branches are fixed too, but they can still be multi-floor. Each floor should keep its authored layout and use visit-based spawn variation.
-
-### Sunken Crypt
-
-Parent: Buried Catacombs.
-
-Tiles:
-
-- wall: `res://assets/tiles/individual/dngn/wall/wall_stone_necropolis_1.png`
-- floor: `res://assets/tiles/individual/dngn/floor/necro_squares00.png`
-- entrance: `res://assets/tiles/individual/dngn/gateways/necropolis_portal.png`
-
-Floor beats:
-
-- outer tombs
-- sealed royal vault
-- lich chamber
-
-Core structure:
-
-- bottom entry
-- side sealed tombs
-- central tomb corridor
-- upper boss chamber
-
-Skills:
-
-- Lockpicking opens tomb rooms and shortcut doors.
-- Tracking reveals warded undead clusters.
-
-Monster ecology:
-
-- Sunken Crypt: zombies at the flooded entry, skeletons in outer tombs, grave slimes in flooded crypt water, undead casters near the lich antechamber.
-- Blackfen Swamp: insects and amphibians near the reed entry, slimes in bog channels, reptiles and poison beasts in the reed maze, the serpent nest as the boss pocket.
-- Ice Caves: cold beasts in breach tunnels, ice constructs near thin ice, safer vermin-only pressure around the warm shelter, glacial sovereign in the throne.
-- Infernal Gate: fire beasts at the vestibule, demons in the ash barracks, demon mages in the cinder library and counter-ward, fire elementals around the lava crucible.
 
 ### Blackfen Swamp
 
@@ -375,6 +379,37 @@ Skills:
 
 - Magery identifies counter-wards.
 - Tactics marks safe attack windows near lava.
+
+### Vault
+
+Parent: Crypt.
+
+Tiles:
+
+- wall: `res://assets/tiles/individual/dngn/wall/vault_stone00.png`
+- floor: `res://assets/tiles/individual/dngn/floor/metal_gold0.png`
+- entrance: `res://assets/tiles/individual/dngn/gateways/enter_vaults.png`
+
+Floor beats:
+
+- gilded entry hall
+- ledger office
+- reliquary stack
+- guard reserve
+- treasury core
+
+Core structure:
+
+- compact central route
+- one or two guard chokepoints
+- visible reward room at the far end
+- optional side stash rooms off the main line
+
+Skills:
+
+- Lockpicking opens shortcut doors and sealed treasure rooms.
+- Tactics marks elite guard lanes and safe opening windows.
+- Survival helps identify the most heavily trapped corridor.
 
 ## Authoring Rule
 

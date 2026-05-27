@@ -173,7 +173,7 @@ const _BRANCH_BOSSES: Dictionary = {
 	"swamp": "bog_serpent",
 	"ice_caves": "glacial_sovereign",
 	"infernal": "ember_tyrant",
-	"crypt": "ancient_lich",
+	"vault": "golden_dragon",
 }
 
 func _find_monster(monsters: Array, id: String) -> Dictionary:
@@ -230,12 +230,12 @@ func _print_xl_reach() -> void:
 	var branch_swamp: Dictionary = {"floors": [6, 9], "boss": "bog_serpent", "rune_d": 6}
 	var branch_ice: Dictionary = {"floors": [9, 12], "boss": "glacial_sovereign", "rune_d": 9}
 	var branch_infernal: Dictionary = {"floors": [12, 15], "boss": "ember_tyrant", "rune_d": 12}
-	var branch_crypt: Dictionary = {"floors": [15, 18], "boss": "ancient_lich", "rune_d": 15}
+	var branch_vault: Dictionary = {"floors": [15, 18], "boss": "golden_dragon", "rune_d": 15}
 	var scenarios: Array = [
 		{"name": "no-branch (D1-14)",        "main": [1, 14], "branches": []},
 		{"name": "1-branch swamp",           "main": [1, 14], "branches": [branch_swamp]},
 		{"name": "full 4-branch",            "main": [1, 14],
-			"branches": [branch_swamp, branch_ice, branch_infernal, branch_crypt]},
+			"branches": [branch_swamp, branch_ice, branch_infernal, branch_vault]},
 	]
 	var rates: Array = [
 		{"name": "casual",   "rate": 0.5},

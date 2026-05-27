@@ -1,7 +1,7 @@
 class_name MagicDialog extends RefCounted
 
 const _SCHOOL_ORDER: Array = [
-	"elemental", "arcane", "hex", "necromancy", "summoning",
+	"elemental", "arcane", "hex", "necromancy",
 ]
 
 static func open(player: Player, parent: Node) -> void:
@@ -177,26 +177,18 @@ static func _describe(player: Player, spell: SpellData) -> String:
 			return "AoE %d-%d" % [lo, hi]
 		"heal":
 			return "+%d HP" % (12 + power / 2)
-		"blink":        return "Teleport"
 		"fog":          return "Block vision"
-		"sleep":        return "Sleep (5d8 HP)"
 		"hold":         return "Paralyze"
 		"fear":         return "Frighten"
 		"confusion":    return "Confuse"
 		"buff_ac":      return "AC 13+DEX"
-		"buff_speed":   return "Speed ×2"
-		"buff_haste":   return "Extra action"
 		"buff_damage":  return "+1d4 dmg"
-		"buff_resist":  return "Elem resist"
-		"buff_blur":    return "Agility bonus"
-		"buff_stoneskin": return "Phys resist"
 		"buff_magic_ward": return "Spell ward"
 		"buff_invulnerable": return "Immune dmg"
 		"instant_kill": return "HP≤100 dies"
 		"power_word_pain": return "HP≤100 pain"
 		"power_word_stun": return "HP≤150 stun"
 		"debuff_str":   return "Halve dmg"
-		"polymorph":    return "Beastform"
 		"summon":       return "Summon ally"
 		"disease":      return "Disease"
 		"floor_travel": return "Floor warp"
@@ -233,7 +225,6 @@ static func _school_color(school: String) -> Color:
 		"arcane":        return Color(0.45, 0.75, 1.0)
 		"hex":           return Color(1.0, 0.55, 0.85)
 		"necromancy":    return Color(0.75, 0.35, 0.95)
-		"summoning":     return Color(0.9, 0.75, 0.35)
 	return Color(0.8, 0.8, 0.85)
 
 

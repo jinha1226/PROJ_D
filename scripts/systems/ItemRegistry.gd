@@ -2,7 +2,6 @@ extends Node
 
 const _SHORT_SWORD: Resource = preload("res://resources/items/short_sword.tres")
 const _DAGGER: Resource = preload("res://resources/items/dagger.tres")
-const _MACE: Resource = preload("res://resources/items/mace.tres")
 const _LONG_SWORD: Resource = preload("res://resources/items/long_sword.tres")
 const _LEATHER_ARMOR: Resource = preload("res://resources/items/leather_armor.tres")
 const _ROBE: Resource = preload("res://resources/items/robe.tres")
@@ -25,7 +24,6 @@ const _BATTLE_AXE: Resource = preload("res://resources/items/battle_axe.tres")
 const _FLAMING_SWORD: Resource = preload("res://resources/items/flaming_sword.tres")
 const _FROST_DAGGER: Resource = preload("res://resources/items/frost_dagger.tres")
 const _VENOM_DAGGER: Resource = preload("res://resources/items/venom_dagger.tres")
-const _SHOCK_MACE: Resource = preload("res://resources/items/shock_mace.tres")
 const _POTION_BERSERK: Resource = preload("res://resources/items/potion_berserk.tres")
 const _SCROLL_IDENTIFY: Resource = preload("res://resources/items/scroll_identify.tres")
 const _SCROLL_SHROUDING: Resource = preload("res://resources/items/scroll_shrouding.tres")
@@ -35,8 +33,6 @@ const _BOOK_AIR: Resource = preload("res://resources/items/book_air.tres")
 const _BOOK_EARTH: Resource = preload("res://resources/items/book_earth.tres")
 const _BOOK_NECROMANCY: Resource = preload("res://resources/items/book_necromancy.tres")
 const _BOOK_HEXES: Resource = preload("res://resources/items/book_hexes.tres")
-const _BOOK_TRANSLOCATION: Resource = preload("res://resources/items/book_translocation.tres")
-const _BOOK_SUMMONING: Resource = preload("res://resources/items/book_summoning.tres")
 const _BOOK_CONJURATION: Resource = preload("res://resources/items/book_conjuration.tres")
 const _SPEAR: Resource = preload("res://resources/items/spear.tres")
 const _RING_STR: Resource = preload("res://resources/items/ring_str.tres")
@@ -135,11 +131,6 @@ const _RUNE_CRYPT: Resource = preload("res://resources/items/rune_crypt.tres")
 # Spellpages
 const _SPELLPAGE_FIREBALL: Resource = preload("res://resources/items/spellpage_fireball.tres")
 const _SPELLPAGE_FIRE_STORM: Resource = preload("res://resources/items/spellpage_fire_storm.tres")
-const _SPELLPAGE_CHAIN_LIGHTNING: Resource = preload("res://resources/items/spellpage_chain_lightning.tres")
-const _SPELLPAGE_HASTE: Resource = preload("res://resources/items/spellpage_haste.tres")
-const _SPELLPAGE_STONESKIN: Resource = preload("res://resources/items/spellpage_stoneskin.tres")
-const _SPELLPAGE_SLEEP: Resource = preload("res://resources/items/spellpage_sleep.tres")
-const _SPELLPAGE_POLYMORPH: Resource = preload("res://resources/items/spellpage_polymorph.tres")
 # Spellpages (tier 1)
 const _SPELLPAGE_FREEZE: Resource = preload("res://resources/items/spellpage_freeze.tres")
 const _SPELLPAGE_PAIN: Resource = preload("res://resources/items/spellpage_pain.tres")
@@ -149,12 +140,10 @@ const _SPELLPAGE_SANDBLAST: Resource = preload("res://resources/items/spellpage_
 const _SPELLPAGE_FOXFIRE: Resource = preload("res://resources/items/spellpage_foxfire.tres")
 # Spellpages (tier 2)
 const _SPELLPAGE_ANIMATE_SKELETON: Resource = preload("res://resources/items/spellpage_animate_skeleton.tres")
-const _SPELLPAGE_BLINK: Resource = preload("res://resources/items/spellpage_blink.tres")
 const _SPELLPAGE_CALL_IMP: Resource = preload("res://resources/items/spellpage_call_imp.tres")
 const _SPELLPAGE_CONJURE_FLAME: Resource = preload("res://resources/items/spellpage_conjure_flame.tres")
 const _SPELLPAGE_PETRIFY: Resource = preload("res://resources/items/spellpage_petrify.tres")
 const _SPELLPAGE_SCORCH: Resource = preload("res://resources/items/spellpage_scorch.tres")
-const _SPELLPAGE_SHROUD_OF_GOLUBRIA: Resource = preload("res://resources/items/spellpage_shroud_of_golubria.tres")
 const _SPELLPAGE_STATIC_DISCHARGE: Resource = preload("res://resources/items/spellpage_static_discharge.tres")
 # Spellpages (tier 3)
 const _SPELLPAGE_CONFUSE: Resource = preload("res://resources/items/spellpage_confuse.tres")
@@ -162,20 +151,16 @@ const _SPELLPAGE_HEX_FEAR: Resource = preload("res://resources/items/spellpage_h
 const _SPELLPAGE_LEE_RAPID_DECONSTRUCTION: Resource = preload("res://resources/items/spellpage_lee_rapid_deconstruction.tres")
 const _SPELLPAGE_LIGHTNING_BOLT: Resource = preload("res://resources/items/spellpage_lightning_bolt.tres")
 const _SPELLPAGE_STONE_ARROW: Resource = preload("res://resources/items/spellpage_stone_arrow.tres")
-const _SPELLPAGE_SUMMON_VERMIN: Resource = preload("res://resources/items/spellpage_summon_vermin.tres")
-const _SPELLPAGE_SWIFTNESS: Resource = preload("res://resources/items/spellpage_swiftness.tres")
 const _SPELLPAGE_VAMPIRIC_DRAINING: Resource = preload("res://resources/items/spellpage_vampiric_draining.tres")
 # Spellpages (tier 4)
 const _SPELLPAGE_AIRSTRIKE: Resource = preload("res://resources/items/spellpage_airstrike.tres")
 const _SPELLPAGE_ANIMATE_DEAD: Resource = preload("res://resources/items/spellpage_animate_dead.tres")
 const _SPELLPAGE_HEX_SLEEP: Resource = preload("res://resources/items/spellpage_hex_sleep.tres")
 const _SPELLPAGE_LEHUDIB_CRYSTAL_SPEAR: Resource = preload("res://resources/items/spellpage_lehudib_crystal_spear.tres")
-const _SPELLPAGE_MONSTROUS_MENAGERIE: Resource = preload("res://resources/items/spellpage_monstrous_menagerie.tres")
 const _SPELLPAGE_OZOCUBUS_REFRIGERATION: Resource = preload("res://resources/items/spellpage_ozocubus_refrigeration.tres")
 # Spellpages (tier 5)
 const _SPELLPAGE_DEATHS_DOOR: Resource = preload("res://resources/items/spellpage_deaths_door.tres")
 const _SPELLPAGE_IGNITION: Resource = preload("res://resources/items/spellpage_ignition.tres")
-const _SPELLPAGE_MALIGN_GATEWAY: Resource = preload("res://resources/items/spellpage_malign_gateway.tres")
 const _SPELLPAGE_SHATTER: Resource = preload("res://resources/items/spellpage_shatter.tres")
 const _SPELLPAGE_HAUNT: Resource = preload("res://resources/items/spellpage_haunt.tres")
 const _SPELLPAGE_MASS_CONFUSION: Resource = preload("res://resources/items/spellpage_mass_confusion.tres")
@@ -189,19 +174,16 @@ const SPELL_POOL: Array = [
 	{"spell_id": "pain",            "tier": 1},
 	{"spell_id": "shock",           "tier": 1},
 
-	{"spell_id": "sleep",           "tier": 1},
 	{"spell_id": "slow",            "tier": 1},
 	{"spell_id": "sandblast",       "tier": 1},
 	{"spell_id": "foxfire",         "tier": 1},
 
 	# Tier 2 — available from depth 2
 	{"spell_id": "animate_skeleton","tier": 2},
-	{"spell_id": "blink",           "tier": 2},
 	{"spell_id": "call_imp",        "tier": 2},
 	{"spell_id": "conjure_flame",   "tier": 2},
 	{"spell_id": "petrify",         "tier": 2},
 	{"spell_id": "scorch",          "tier": 2},
-	{"spell_id": "shroud_of_golubria","tier": 2},
 	{"spell_id": "static_discharge","tier": 2},
 	# Tier 3 — available from depth 3
 	{"spell_id": "confuse",         "tier": 3},
@@ -209,35 +191,27 @@ const SPELL_POOL: Array = [
 	{"spell_id": "lee_rapid_deconstruction","tier": 3},
 	{"spell_id": "lightning_bolt",  "tier": 3},
 	{"spell_id": "stone_arrow",     "tier": 3},
-	{"spell_id": "summon_vermin",   "tier": 3},
-	{"spell_id": "swiftness",       "tier": 3},
 	{"spell_id": "vampiric_draining","tier": 3},
 	# Tier 4 — available from depth 4
 	{"spell_id": "airstrike",       "tier": 4},
 	{"spell_id": "animate_dead",    "tier": 4},
 	{"spell_id": "hex_sleep",       "tier": 4},
 	{"spell_id": "lehudib_crystal_spear","tier": 4},
-	{"spell_id": "monstrous_menagerie","tier": 4},
 	{"spell_id": "ozocubus_refrigeration","tier": 4},
-	{"spell_id": "polymorph",       "tier": 4},
-	{"spell_id": "stoneskin",       "tier": 4},
 	# Tier 5 — available from depth 5
 	{"spell_id": "deaths_door",     "tier": 5},
 	{"spell_id": "fireball",        "tier": 5},
 	{"spell_id": "ignition",        "tier": 5},
-	{"spell_id": "malign_gateway",  "tier": 5},
 	{"spell_id": "shatter",         "tier": 5},
-	{"spell_id": "haste",           "tier": 6},
 	{"spell_id": "haunt",           "tier": 6},
 	{"spell_id": "mass_confusion",  "tier": 6},
 	# Tier 7 — high-end spells
-	{"spell_id": "chain_lightning", "tier": 7},
 	{"spell_id": "fire_storm",      "tier": 7},
 	{"spell_id": "glaciate",        "tier": 7},
 ]
 
 const _ALL_ITEMS: Array = [
-	_SHORT_SWORD, _DAGGER, _MACE, _LONG_SWORD, _BATTLE_AXE, _SPEAR,
+	_SHORT_SWORD, _DAGGER, _LONG_SWORD, _BATTLE_AXE, _SPEAR,
 	_STILETTO, _DIRK, _ASSASSIN_BLADE, _QUICK_BLADE,
 	_ARMING_SWORD, _BASTARD_SWORD, _GREAT_BLADE,
 	_RING_STR, _RING_INT, _RING_DEX, _RING_PROTECTION, _RING_SLAYING, _RING_WIZARDRY,
@@ -247,7 +221,7 @@ const _ALL_ITEMS: Array = [
 	_LEATHER_GLOVES, _IRON_GAUNTLETS,
 	_LEATHER_BOOTS, _IRON_GREAVES,
 	_SHORTBOW, _LONGBOW, _CROSSBOW,
-	_FLAMING_SWORD, _FROST_DAGGER, _VENOM_DAGGER, _SHOCK_MACE,
+	_FLAMING_SWORD, _FROST_DAGGER, _VENOM_DAGGER,
 	_LEATHER_ARMOR, _ROBE, _CHAIN_MAIL, _RING_MAIL, _SCALE_MAIL, _PLATE_MAIL, _TROLL_LEATHER,
 	_POTION_HEALING, _POTION_MIGHT, _POTION_CURE_POISON, _POTION_MAGIC,
 	_POTION_BERSERK, _BANDAGE, _STAFF,
@@ -256,7 +230,7 @@ const _ALL_ITEMS: Array = [
 	_SCROLL_ENCHANT_WEAPON, _SCROLL_ENCHANT_ARMOR, _SCROLL_IDENTIFY,
 	_SCROLL_FEAR, _SCROLL_BRAND, _SCROLL_IMMOLATION,
 	_BOOK_FIRE, _BOOK_COLD, _BOOK_AIR, _BOOK_EARTH,
-	_BOOK_NECROMANCY, _BOOK_HEXES, _BOOK_TRANSLOCATION, _BOOK_SUMMONING, _BOOK_CONJURATION,
+	_BOOK_NECROMANCY, _BOOK_HEXES, _BOOK_CONJURATION,
 	_GOLD_PILE,
 	_WAND_FIRE, _WAND_FROST, _WAND_LIGHTNING, _WAND_TELEPORT,
 	_WAND_FEAR, _WAND_HASTE, _WAND_DIGGING,
@@ -270,26 +244,25 @@ const _ALL_ITEMS: Array = [
 	_RING_BOG, _RING_GLACIER, _RING_EMBER, _RING_UNDEATH,
 	_ESSENCE_SHARD,
 	_RUNE_SWAMP, _RUNE_ICE, _RUNE_INFERNAL, _RUNE_CRYPT,
-	_SPELLPAGE_FIREBALL, _SPELLPAGE_FIRE_STORM, _SPELLPAGE_CHAIN_LIGHTNING,
-	_SPELLPAGE_HASTE, _SPELLPAGE_STONESKIN, _SPELLPAGE_SLEEP, _SPELLPAGE_POLYMORPH,
+	_SPELLPAGE_FIREBALL, _SPELLPAGE_FIRE_STORM,
 	# Tier 1 spellpages
 	_SPELLPAGE_FREEZE, _SPELLPAGE_PAIN,
 	_SPELLPAGE_SHOCK, _SPELLPAGE_SLOW,
 	_SPELLPAGE_SANDBLAST, _SPELLPAGE_FOXFIRE,
 	# Tier 2 spellpages
-	_SPELLPAGE_ANIMATE_SKELETON, _SPELLPAGE_BLINK, _SPELLPAGE_CALL_IMP,
+	_SPELLPAGE_ANIMATE_SKELETON, _SPELLPAGE_CALL_IMP,
 	_SPELLPAGE_CONJURE_FLAME, _SPELLPAGE_PETRIFY, _SPELLPAGE_SCORCH,
-	_SPELLPAGE_SHROUD_OF_GOLUBRIA, _SPELLPAGE_STATIC_DISCHARGE,
+	_SPELLPAGE_STATIC_DISCHARGE,
 	# Tier 3 spellpages
 	_SPELLPAGE_CONFUSE, _SPELLPAGE_HEX_FEAR, _SPELLPAGE_LEE_RAPID_DECONSTRUCTION,
-	_SPELLPAGE_LIGHTNING_BOLT, _SPELLPAGE_STONE_ARROW, _SPELLPAGE_SUMMON_VERMIN,
-	_SPELLPAGE_SWIFTNESS, _SPELLPAGE_VAMPIRIC_DRAINING,
+	_SPELLPAGE_LIGHTNING_BOLT, _SPELLPAGE_STONE_ARROW,
+	_SPELLPAGE_VAMPIRIC_DRAINING,
 	# Tier 4 spellpages
 	_SPELLPAGE_AIRSTRIKE, _SPELLPAGE_ANIMATE_DEAD, _SPELLPAGE_HEX_SLEEP,
-	_SPELLPAGE_LEHUDIB_CRYSTAL_SPEAR, _SPELLPAGE_MONSTROUS_MENAGERIE,
+	_SPELLPAGE_LEHUDIB_CRYSTAL_SPEAR,
 	_SPELLPAGE_OZOCUBUS_REFRIGERATION,
 	# Tier 5 spellpages
-	_SPELLPAGE_DEATHS_DOOR, _SPELLPAGE_IGNITION, _SPELLPAGE_MALIGN_GATEWAY,
+	_SPELLPAGE_DEATHS_DOOR, _SPELLPAGE_IGNITION,
 	_SPELLPAGE_SHATTER, _SPELLPAGE_HAUNT, _SPELLPAGE_MASS_CONFUSION, _SPELLPAGE_GLACIATE,
 ]
 

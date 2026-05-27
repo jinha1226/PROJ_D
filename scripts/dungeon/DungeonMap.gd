@@ -13,11 +13,11 @@ enum Tile {
 	SHOP = 7,
 }
 
-var GRID_W: int = 46
-var GRID_H: int = 50
+var GRID_W: int = 56
+var GRID_H: int = 62
 const CELL_SIZE: int = 32
-const DEFAULT_GRID_W: int = 46
-const DEFAULT_GRID_H: int = 50
+const DEFAULT_GRID_W: int = 56
+const DEFAULT_GRID_H: int = 62
 
 const TEX_STAIRS_UP: Texture2D = preload(
 	"res://assets/tiles/individual/dngn/gateways/metal_stairs_up.png")

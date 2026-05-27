@@ -125,6 +125,19 @@ const ZONE_THEMES: Dictionary = {
 			[_S + "statue_cerebov.png",            1],
 		],
 	},
+	"vault": {
+		"density": 0.07,
+		"props": [
+			[_V + "golden_statue_1.png",        4],
+			[_V + "golden_statue_2.png",        4],
+			[_V + "gilded_reliquary.png",       3],
+			[_V + "fountain_stone_lantern.png", 3],
+			[_V + "lectern.png",                2],
+			[_V + "golden_iron_statue.png",     2],
+			[_V + "ensign_dark.png",            1],
+			[_V + "bottled_spirits.png",        1],
+		],
+	},
 	"crypt": {
 		"density": 0.06,
 		"props": [

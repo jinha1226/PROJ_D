@@ -28,3 +28,4 @@ glyph = "W"
 glyph_color = Color(0.4, 0.35, 0.6, 1)
 description = "A swift shade that phases through darkness, draining life with each pass."
 essence_id = ""
+essence_ids = ["essence_shadow", "essence_wither", "essence_cold"]

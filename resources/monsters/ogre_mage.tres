@@ -23,3 +23,4 @@ tile_path = "res://assets/tiles/individual/mon/humanoids/ogre_mage.png"
 glyph = "O"
 glyph_color = Color(0.3, 0.55, 0.75, 1)
 description = "A hulking mage combining brute force with arcane power. Neither its fists nor its spells should be underestimated."
+essence_ids = ["essence_warding", "essence_shadow", "essence_might"]

@@ -6,7 +6,7 @@
 script = ExtResource("1_sdata")
 id = "call_imp"
 display_name = "Call Imp"
-school = "summoning"
+school = "necromancy"
 spell_level = 2
 xl_required = 3
 mp_cost = 2

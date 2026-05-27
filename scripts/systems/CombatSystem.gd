@@ -42,8 +42,6 @@ const _DAMAGE_DICE_BY_WEAPON_ID: Dictionary = {
 	"flaming_sword": [1, 8, 0],
 	"bastard_sword": [1, 10, 0],
 	"great_blade": [2, 6, 0],
-	"mace": [1, 6, 1],
-	"shock_mace": [1, 6, 1],
 	"battle_axe": [1, 8, 1],
 	"spear": [1, 6, 0],
 	"javelin": [1, 6, 0],
@@ -281,6 +279,7 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	var flat_bonus: int = 0
 	flat_bonus += RacePassiveSystem.melee_damage_bonus(player)
 	flat_bonus += backstab_bonus
+	flat_bonus += EssenceSystem.melee_flat_bonus(player)
 	var mult: float = 1.0
 	# Faith/essence damage hooks routed by canonical bucket. Mastery mults
 	# stubbed to 1.0 under the dual-tier model — left in chain so future
@@ -331,6 +330,11 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	if monster.hp > 0:
 		EssenceSystem.apply_melee_hit_effects(player, monster)
 		RingSystem.apply_melee_hit_effects(player, monster)
+	# Hydra double-strike: 30% chance to hit again with reduced damage
+	if monster.hp > 0 and EssenceSystem.has_hydra_double(player) and randf() < 0.30:
+		var hydra_dmg: int = max(1, base_final / 2)
+		monster.take_damage(hydra_dmg)
+		CombatLog.hit("Hydra strike! (%d)" % hydra_dmg)
 	if weapon != null and weapon.category == "axe":
 		_cleave_hit(player, monster, final)
 	if monster.hp > 0:
@@ -567,7 +571,8 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	if player.equipped_shield_id != "" and not player.has_two_handed_weapon():
 		_grant_defense_xp(player, "shields", DEFENSE_XP_HIT_TAKEN)
 	var raw: int = randi_range(1, max(1, dmg_base))
-	var soak: int = _armor_soak_roll(player.ac)
+	var eff_ac: int = max(0, player.ac - (2 if Status.has(player, "cursed") else 0))
+	var soak: int = _armor_soak_roll(eff_ac)
 	var final: int = max(1, raw - soak)
 	final = max(1, final - EssenceSystem.incoming_damage_reduction(player))
 	# Defense mastery: small multiplicative DR after flat soak/reduction.
@@ -643,8 +648,6 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	var dmg_hi: int = max(dmg_lo, dmg_base * 3 / 2)
 	var raw: int = randi_range(dmg_lo, dmg_hi) + monster.data.hd / 2
 	var soak: int = _armor_soak_roll(player.ac)
-	if Status.has(player, "stoneskin"):
-		soak += randi_range(2, 5)
 	var final: int = max(1, raw - soak)
 	final = max(1, final - EssenceSystem.incoming_damage_reduction(player))
 	# Defense mastery: small multiplicative DR after flat soak/reduction.

@@ -25,3 +25,4 @@ glyph = "V"
 glyph_color = Color(0.6, 0.35, 0.55, 1)
 description = "An undead noble who drains life on every hit. The drain accumulates quickly if you let the fight drag."
 essence_id = "essence_drain"
+essence_ids = ["essence_blood", "essence_shadow", "essence_swiftness"]

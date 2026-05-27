@@ -68,8 +68,6 @@ static func _cast_status_family(spell: SpellData, player: Player, game: Node) ->
 	match spell.effect:
 		"hold":
 			_apply_status_to_target(spell, player, game, "paralyzed", 5)
-		"sleep":
-			_cast_sleep(spell, player, game)
 		"fear":
 			_apply_status_to_target(spell, player, game, "feared", 6)
 		"confusion":
@@ -84,9 +82,6 @@ static func _cast_status_family(spell: SpellData, player: Player, game: Node) ->
 			_apply_status_to_target(spell, player, game, "weakened", 8)
 		"disease":
 			_apply_status_to_target(spell, player, game, "diseased", 8)
-		"polymorph":
-			_apply_status_to_target(spell, player, game, "confused", 6)
-			CombatLog.post(LocaleManager.t("LOG_THE_TARGET_S_FORM_SHIFTS"), Color(0.5, 1.0, 0.6))
 		_:
 			return false
 	return true
@@ -95,9 +90,6 @@ static func _cast_utility_family(spell: SpellData, player: Player, game: Node, p
 	match spell.effect:
 		"heal":
 			_cast_heal(spell, player, power, game)
-		"blink":
-			player._blink(max(2, effective_spell_range(spell)))
-			CombatLog.post(LocaleManager.t("LOG_YOU_CAST") % spell.display_name, Color(0.7, 0.85, 1.0))
 		"banish":
 			_cast_banish(spell, player, game)
 		"fog":
@@ -126,24 +118,9 @@ static func _cast_buff_family(spell: SpellData, player: Player) -> void:
 				"Magical armor surrounds you. (AC %d)" % (13 + player.dexterity / 2),
 				Color(0.5, 0.7, 1.0))
 			player.refresh_ac_from_equipment()
-		"buff_speed":
-			_cast_buff(player, "hasted", 12, spell.display_name,
-				"You move with unnatural speed!", Color(0.4, 1.0, 0.65))
-		"buff_haste":
-			_cast_buff(player, "hasted", 8, spell.display_name,
-				"Time blurs around you!", Color(0.4, 1.0, 0.65))
 		"buff_damage":
 			_cast_buff(player, "damage_boost", 8, spell.display_name,
 				"Your strikes surge with power! (+1d4 dmg)", Color(1.0, 0.65, 0.3))
-		"buff_resist":
-			_cast_buff(player, "stoneskin", 10, spell.display_name,
-				"Your skin hardens like stone!", Color(0.8, 0.8, 0.65))
-		"buff_blur":
-			_cast_buff(player, "blur", 10, spell.display_name,
-				"Your form becomes indistinct. (+3 EV)", Color(0.7, 0.75, 1.0))
-		"buff_stoneskin":
-			_cast_buff(player, "stoneskin", 12, spell.display_name,
-				"Your skin becomes like stone!", Color(0.8, 0.8, 0.65))
 		"buff_magic_ward":
 			_cast_buff(player, "magic_ward", 10, spell.display_name,
 				"A ward against magic protects you!", Color(0.75, 0.5, 1.0))
@@ -544,8 +521,7 @@ static func _find_nearest_visible(player: Player, game: Node,
 const _SUMMON_TABLE: Dictionary = {
 	"call_imp":        {"monster": "crimson_imp",  "turns": 18, "count": 1},
 	"animate_dead":    {"monster": "",             "turns": 20, "count": 1},
-	"summon_vermin":   {"monster": "rat",          "turns": 12, "count": 3},
-	"animate_skeleton":{"monster": "crypt_zombie", "turns": 20, "count": 1},
+	"animate_skeleton":{"monster": "skeletal_warrior", "turns": 20, "count": 1},
 	"animate_objects": {"monster": "crimson_imp",  "turns": 15, "count": 2},
 	"conjure_fey":     {"monster": "crimson_imp",  "turns": 20, "count": 1},
 }

@@ -88,6 +88,38 @@ func _build_content() -> void:
 		inv_lbl.add_theme_color_override("font_color", Color(0.7, 0.85, 0.95))
 		inv_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_content.add_child(inv_lbl)
+	# ── 소지품 ────────────────────────────────────────────────────────────
+	_add_section_header("소지품")
+	var items: Array = p.get("items", [])
+	var equipped_slots: Dictionary = {}
+	for slot in ["weapon", "armor", "shield", "helmet", "gloves", "boots", "ring", "amulet"]:
+		var eid: String = String(p.get(slot, ""))
+		if eid != "":
+			equipped_slots[eid] = slot
+	if typeof(items) == TYPE_ARRAY and not items.is_empty():
+		for entry in items:
+			if typeof(entry) != TYPE_DICTIONARY:
+				continue
+			var item_id: String = String(entry.get("id", ""))
+			if item_id == "":
+				continue
+			var data = ItemRegistry.get_by_id(item_id) if ItemRegistry != null else null
+			var item_name: String = data.display_name if data != null else item_id
+			var plus: int = int(entry.get("plus", 0))
+			var plus_str: String = ("+%d " % plus) if plus != 0 else ""
+			var eq_str: String = (" [%s]" % equipped_slots[item_id]) if equipped_slots.has(item_id) else ""
+			var row := Label.new()
+			row.text = "%s%s%s" % [plus_str, item_name, eq_str]
+			row.add_theme_font_size_override("font_size", 18)
+			if equipped_slots.has(item_id):
+				row.add_theme_color_override("font_color", Color(1.0, 0.85, 0.45))
+			_content.add_child(row)
+	else:
+		var empty := Label.new()
+		empty.text = "—"
+		empty.add_theme_font_size_override("font_size", 18)
+		empty.add_theme_color_override("font_color", Color(0.55, 0.55, 0.6))
+		_content.add_child(empty)
 
 func _race_display_name(race_id: String) -> String:
 	if race_id == "":

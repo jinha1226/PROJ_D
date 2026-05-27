@@ -24,3 +24,4 @@ glyph = "G"
 glyph_color = Color(0.75, 0.65, 0.4, 1)
 description = "A hyena-headed pack hunter. Dangerous in numbers, manageable alone — but they rarely travel alone."
 gold_drop_max = 12
+essence_ids = ["essence_fang", "essence_pack", "essence_tracker"]

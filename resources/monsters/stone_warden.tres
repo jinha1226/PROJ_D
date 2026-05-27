@@ -28,3 +28,4 @@ glyph = "U"
 glyph_color = Color(0.7, 0.75, 0.65, 1)
 description = "An ancient sentinel of weight, order, and refusal. It endures what would break lesser foes and grinds down reckless attackers. This is not a fight to rush without force to back it up."
 essence_id = "essence_bastion"
+essence_ids = ["essence_stone", "essence_scales", "essence_warding"]

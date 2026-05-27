@@ -101,7 +101,8 @@ func start_new_run(random_seed: int = -1) -> void:
 	branches_cleared.clear()
 	_generate_pseudonyms()
 	pending_player_state.clear()
-	starter_shop_gold = 0
+	# Do NOT clear starter_shop_gold here — _apply_starter_kit() converts
+	# the remaining budget to player.gold and clears it at run entry.
 	run_in_progress = true
 	emit_signal("depth_changed", depth)
 

@@ -28,3 +28,4 @@ glyph = "I"
 glyph_color = Color(0.5, 0.85, 1.0, 1)
 description = "An ancient being of living ice, ruling the frozen depths with absolute cold."
 essence_id = "essence_glacial"
+essence_ids = ["essence_glacial", "essence_tempest", "essence_cold"]

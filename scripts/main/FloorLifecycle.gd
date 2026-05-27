@@ -174,9 +174,9 @@ func _restore_floor_from_cache(depth: int, arrive_from_above: bool) -> void:
 	host.map.explored = state.explored.duplicate(true)
 	host.map.spawn_pos = state.spawn_pos
 	host.map.stairs_down_pos = state.stairs_down_pos
-	host.map.extra_stairs_down_positions = state.get("extra_stairs_down_positions", []).duplicate()
+	host.map.extra_stairs_down_positions.assign(state.get("extra_stairs_down_positions", []))
 	host.map.stairs_up_pos = state.stairs_up_pos
-	host.map.rooms = state.rooms.duplicate()
+	host.map.rooms.assign(state.rooms)
 	host.map.altar_map = state.get("altar_map", {}).duplicate()
 	host.map.broken_altar_positions = state.get("broken_altar_positions", []).duplicate()
 	host.map.altar_active = bool(state.get("altar_active", false))
@@ -301,6 +301,7 @@ func _fixed_map_path_for_depth(depth: int) -> String:
 		2: "res://resources/maps/ascii/main_lair.txt",
 		3: "res://resources/maps/ascii/main_orc_mines.txt",
 		4: "res://resources/maps/ascii/main_elven_halls.txt",
-		5: "res://resources/maps/ascii/main_abyss.txt",
+		5: "res://resources/maps/ascii/main_crypt.txt",
+		6: "res://resources/maps/ascii/main_abyss.txt",
 	}
 	return String(MAIN_MAPS.get(depth, ""))

@@ -6,21 +6,22 @@ extends Node
 # wall/floor: zone-themed tiles (override depth-based selection)
 # Note: depth 3 (B3 ruined temple) is overridden in DungeonMap._load_atmosphere
 const MAIN_ZONES: Array = [
-	# 15-floor PROJ_D layout compressed to 5 PROJ_G themed floors (2026-05-21).
-	# Original ranges retained in comments for migration reference.
-	{"id": "dungeon",     "from": 1, "to": 1, "env": "",      "map_style": "bsp",       # was depths 1-3 (Catacombs)
+	{"id": "dungeon",     "from": 1, "to": 1, "env": "",       "map_style": "bsp",
 		"wall":  "res://assets/tiles/individual/dngn/wall/brick_gray0.png",
 		"floor": "res://assets/tiles/individual/dngn/floor/pebble_brown0.png"},
-	{"id": "lair",        "from": 2, "to": 2, "env": "",      "map_style": "cave",      # was depths 4-6 (Lair)
+	{"id": "lair",        "from": 2, "to": 2, "env": "",       "map_style": "cave",
 		"wall":  "res://assets/tiles/individual/dngn/wall/bmaus_stone_wall0.png",
 		"floor": "res://assets/tiles/individual/dngn/floor/lair0.png"},
-	{"id": "orc_mines",   "from": 3, "to": 3, "env": "",      "map_style": "bsp",       # was depths 7-9 (Orc Mines)
+	{"id": "orc_mines",   "from": 3, "to": 3, "env": "",       "map_style": "bsp",
 		"wall":  "res://assets/tiles/individual/dngn/wall/brick_brown0.png",
 		"floor": "res://assets/tiles/individual/dngn/floor/orc0.png"},
-	{"id": "elven_halls", "from": 4, "to": 4, "env": "",      "map_style": "bsp_large", # was depths 10-12 (Elven Halls)
+	{"id": "elven_halls", "from": 4, "to": 4, "env": "",       "map_style": "bsp_large",
 		"wall":  "res://assets/tiles/individual/dngn/wall/marble_wall1.png",
 		"floor": "res://assets/tiles/individual/dngn/floor/mosaic0.png"},
-	{"id": "abyss",       "from": 5, "to": 5, "env": "abyss", "map_style": "cave",      # was depths 13-14 (Abyss + final boss)
+	{"id": "crypt",       "from": 5, "to": 5, "env": "necro",  "map_style": "crypt",
+		"wall":  "res://assets/tiles/individual/dngn/wall/wall_stone_necropolis_1.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/necro_squares00.png"},
+	{"id": "abyss",       "from": 6, "to": 6, "env": "abyss",  "map_style": "cave",
 		"wall":  "res://assets/tiles/individual/dngn/wall/abyss/abyss0.png",
 		"floor": "res://assets/tiles/individual/dngn/floor/demonic_red1.png"},
 ]
@@ -78,22 +79,22 @@ const BRANCHES: Dictionary = {
 		"wall": "res://assets/tiles/individual/dngn/wall/volcanic_wall0.png",
 		"floor": "res://assets/tiles/individual/dngn/floor/lava00.png",
 	},
-	"crypt": {
-		"display_name": "Crypt",
-		"map_style": "crypt",
-		"env": "necro",
-		"entrance_range": [1, 1],
+	"vault": {
+		"display_name": "Vault",
+		"map_style": "bsp_large",
+		"env": "",
+		"entrance_range": [5, 5],
 		"floors": 3,
-		"resistance": "necro+",
-		"boss_id": "ancient_lich",
-		"essence_reward": "essence_undeath",
-		"ring_reward": "ring_undeath",
-		"resist_ring": "ring_necro_resist",
-		"rune_reward": "rune_crypt",
-		"brand_element": "drain",
-		"entrance_tile": "res://assets/tiles/individual/dngn/gateways/necropolis_portal.png",
-		"wall": "res://assets/tiles/individual/dngn/wall/wall_stone_necropolis_1.png",
-		"floor": "res://assets/tiles/individual/dngn/floor/necro_squares00.png",
+		"resistance": "",
+		"boss_id": "golden_dragon",
+		"essence_reward": "essence_bastion",
+		"ring_reward": "ring_vault",
+		"resist_ring": "",
+		"rune_reward": "rune_vault",
+		"brand_element": "",
+		"entrance_tile": "res://assets/tiles/individual/dngn/gateways/enter_vaults.png",
+		"wall": "res://assets/tiles/individual/dngn/wall/vault_stone00.png",
+		"floor": "res://assets/tiles/individual/dngn/floor/metal_gold0.png",
 	},
 }
 
@@ -138,7 +139,8 @@ const MAIN_TURN_BUDGETS: Dictionary = {
 	2: 260,
 	3: 270,
 	4: 290,
-	5: 300,
+	5: 310,
+	6: 320,
 }
 const BRANCH_TURN_BUDGET: int = 180  # PROJ_G says 170-190; pick middle.
 
@@ -153,35 +155,35 @@ func turn_budget_for_branch(_branch_id: String) -> int:
 const BRANCH_MONSTER_POOLS: Dictionary = {
 	"swamp": [
 		# weak
-		"adder", "vampire_bat", "giant_wolf_spider", "scorpion",
+		"adder", "vampire_bat",
 		# mid
-		"zombie", "ghoul", "phantom",
+		"ghoul", "shadow_wraith",
 		# strong
-		"vampire", "swamp_dragon", "wyvern",
+		"swamp_dragon",
 	],
 	"ice_caves": [
 		# weak
-		"yak", "wight", "crypt_zombie", "gargoyle",
+		"gargoyle", "stone_warden",
 		# mid
-		"wraith", "shadow_wraith", "stone_giant",
+		"wraith", "shadow_wraith",
 		# strong
-		"frost_giant", "ice_devil", "ice_dragon", "titan",
+		"stone_giant", "ice_dragon",
 	],
 	"infernal": [
 		# weak
-		"crimson_imp", "fire_elemental",
+		"crimson_imp",
 		# mid
-		"red_devil", "iron_golem",
+		"red_devil", "balrug",
 		# strong
-		"balrug", "fire_giant", "fire_dragon", "executioner",
+		"executioner", "fire_dragon",
 	],
-	"crypt": [
+	"vault": [
 		# weak
-		"zombie", "crypt_zombie", "skeletal_warrior", "mummy", "phantom",
+		"gargoyle", "stone_warden",
 		# mid
-		"ghoul", "wight", "wraith", "shadow_wraith", "revenant",
+		"cyclops", "stone_giant",
 		# strong
-		"vampire", "vampire_knight", "lich", "deep_elf_death_mage", "bone_dragon",
+		"titan", "bone_dragon",
 	],
 }
 

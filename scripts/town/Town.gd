@@ -20,8 +20,8 @@ const SPOT_DATA := {
 		"desc": "Check the current character, records, and status.",
 	},
 	SpotId.INN: {
-		"title": "Rest Tent",
-		"desc": "A quiet place for recovery and between-run prep.",
+		"title": "Purification Altar",
+		"desc": "Remove an equipped essence for a fee. The essence returns to your inventory.",
 	},
 	SpotId.BOARD: {
 		"title": "Recruit Board",
@@ -203,19 +203,104 @@ func _on_guild() -> void:
 		node.closed.connect(_update_ui)
 
 func _on_inn() -> void:
-	var dlg := GameDialog.create("Rest Tent")
+	var dlg := GameDialog.create("정수 정화")
 	add_child(dlg)
+	_build_purge_dialog(dlg)
+
+const PURGE_COST: int = 150
+
+func _build_purge_dialog(dlg: GameDialog) -> void:
 	var body: VBoxContainer = dlg.body()
-	var lines := [
-		"The tent is quiet between expeditions.",
-		"Use this space later for recovery or town services.",
-	]
-	for line in lines:
-		var lbl := Label.new()
-		lbl.text = line
-		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
-		body.add_child(lbl)
+	if body == null:
+		return
+	for child in body.get_children():
+		child.queue_free()
+
+	if not SaveManager.has_save():
+		var no_save := Label.new()
+		no_save.text = "활성 캐릭터가 없습니다."
+		no_save.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+		body.add_child(no_save)
+		return
+
+	var save_data: Dictionary = SaveManager.load_save()
+	var p: Dictionary = save_data.get("player", {})
+	var gold: int = int(p.get("gold", 0))
+	var slots: Array = p.get("essence_slots", [])
+
+	var gold_lbl := Label.new()
+	gold_lbl.text = "보유 골드: %dg" % gold
+	gold_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+	gold_lbl.add_theme_color_override("font_color", Color(0.95, 0.85, 0.45))
+	body.add_child(gold_lbl)
+
+	var hint_lbl := Label.new()
+	hint_lbl.text = "슬롯당 제거 비용: %dg  ·  정수는 인벤토리로 반환됩니다." % PURGE_COST
+	hint_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
+	hint_lbl.add_theme_color_override("font_color", Color(0.72, 0.72, 0.78))
+	body.add_child(hint_lbl)
+
+	var has_any := false
+	for i in slots.size():
+		var eid: String = String(slots[i])
+		if eid == "":
+			continue
+		has_any = true
+
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+		body.add_child(row)
+
+		var icon := TextureRect.new()
+		icon.texture = EssenceSystem.icon_texture_of(eid)
+		icon.custom_minimum_size = Vector2(28, 28)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		row.add_child(icon)
+
+		var name_lbl := Label.new()
+		name_lbl.text = "슬롯 %d: %s" % [i + 1, EssenceSystem.display_name(eid)]
+		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+		name_lbl.add_theme_color_override("font_color", EssenceSystem.color_of(eid))
+		row.add_child(name_lbl)
+
+		var btn := Button.new()
+		btn.text = "제거 (%dg)" % PURGE_COST
+		btn.custom_minimum_size = Vector2(0, 48)
+		btn.disabled = gold < PURGE_COST
+		var slot_index := i
+		btn.pressed.connect(func():
+			var sd: Dictionary = SaveManager.load_save()
+			var pp: Dictionary = sd.get("player", {})
+			var g: int = int(pp.get("gold", 0))
+			if g < PURGE_COST:
+				return
+			var slts: Array = pp.get("essence_slots", [])
+			if slot_index >= slts.size():
+				return
+			var removed_id: String = String(slts[slot_index])
+			slts[slot_index] = ""
+			pp["essence_slots"] = slts
+			var inv: Array = pp.get("essence_inventory", [])
+			if typeof(inv) != TYPE_ARRAY:
+				inv = []
+			inv.append(removed_id)
+			pp["essence_inventory"] = inv
+			pp["gold"] = g - PURGE_COST
+			sd["player"] = pp
+			SaveManager.save(sd)
+			_build_purge_dialog(dlg)
+		)
+		row.add_child(btn)
+
+	if not has_any:
+		var empty := Label.new()
+		empty.text = "장착된 정수가 없습니다."
+		empty.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+		empty.add_theme_color_override("font_color", Color(0.62, 0.62, 0.68))
+		body.add_child(empty)
 
 func _on_board() -> void:
 	get_tree().change_scene_to_file(TALENT_SELECT_PATH)

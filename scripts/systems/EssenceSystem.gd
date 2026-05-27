@@ -6,11 +6,7 @@ class_name EssenceSystem extends RefCounted
 
 
 const SLOT_COUNT: int = 3
-# PROJ_G expedition-count thresholds (replaces prior XL-based unlocks):
-# slot 1 from the start (expedition 0+), slot 2 after 6 completed
-# expeditions, slot 3 after 14. Pair synergies emerge mid-career;
-# triple-slot hybrid builds at late career.
-const SLOT_UNLOCK_EXPEDITION_COUNTS: Array = [0, 6, 14]
+# Slot unlock: 1 slot per XL, capped at SLOT_COUNT. XL1=1 slot, XL2=2, XL3+=3.
 const INVENTORY_CAP: int = 4
 const ESSENCE_ICON_DIR := "res://assets/tiles/individual/item/essence/"
 
@@ -46,6 +42,26 @@ const ESSENCE_TIER_BY_ID := {
 	"essence_glacial": "unique",
 	"essence_infernal": "unique",
 	"essence_undeath": "unique",
+	# Normal tier additions
+	"essence_nimble": "normal",
+	"essence_fang": "normal",
+	"essence_pack": "normal",
+	"essence_marrow": "normal",
+	# Rare tier additions
+	"essence_shadow": "rare",
+	"essence_tracker": "rare",
+	"essence_blood": "rare",
+	"essence_scales": "rare",
+	"essence_iron_will": "rare",
+	"essence_wither": "rare",
+	"essence_constrict": "rare",
+	# Unique tier additions
+	"essence_titan": "unique",
+	"essence_necromancer": "unique",
+	"essence_abyssal": "unique",
+	"essence_war_cry": "unique",
+	"essence_hydra": "unique",
+	"essence_golden": "unique",
 }
 
 const ESSENCES: Dictionary = {
@@ -228,6 +244,208 @@ const ESSENCES: Dictionary = {
 		"penalty_effect": "hp_down",
 		"penalty_value": 4,
 	},
+	# ── Normal Tier Additions ─────────────────────────────────────────────────
+	"essence_nimble": {
+		"name": "Nimble Essence",
+		"desc": "+1 Evasion. Stealth+2.",
+		"passive_desc": "Agile and harder to detect.",
+		"penalty_desc": "Will -1.",
+		"passive_effect": "",
+		"color": Color(0.55, 0.9, 0.55),
+		"effect": "stat_dex",
+		"value": 1,
+		"penalty_effect": "wl_down",
+		"penalty_value": 1,
+	},
+	"essence_fang": {
+		"name": "Fang Essence",
+		"desc": "+1 Dexterity. Melee hits deliver a venomous bite.",
+		"passive_desc": "Melee hits deal 2 extra poison damage and apply poison for 4 turns.",
+		"penalty_desc": "Fire vulnerable.",
+		"passive_effect": "fang_poison",
+		"color": Color(0.4, 0.85, 0.45),
+		"effect": "stat_dex",
+		"value": 1,
+		"penalty_effect": "vuln_fire",
+	},
+	"essence_pack": {
+		"name": "Pack Essence",
+		"desc": "On kill, next melee attack gains a damage surge.",
+		"passive_desc": "Killing an enemy grants a 1-turn damage boost.",
+		"penalty_desc": "AC -1.",
+		"passive_effect": "on_kill_pack",
+		"color": Color(0.75, 0.55, 0.3),
+		"effect": "on_kill_pack",
+		"penalty_effect": "ac_down",
+		"penalty_value": 1,
+	},
+	"essence_marrow": {
+		"name": "Marrow Essence",
+		"desc": "+4 max HP, +1 Armor Class.",
+		"passive_desc": "Undead resilience thickens your body.",
+		"penalty_desc": "Fire vulnerable.",
+		"passive_effect": "",
+		"color": Color(0.85, 0.85, 0.75),
+		"effect": "hp_max",
+		"value": 4,
+		"penalty_effect": "vuln_fire",
+	},
+	# ── Rare Tier Additions ────────────────────────────────────────────────────
+	"essence_shadow": {
+		"name": "Shadow Essence",
+		"desc": "+1 Evasion. Stealth+2. 20% chance to blind attacker when hit.",
+		"passive_desc": "Shadow form evades and disorients attackers.",
+		"penalty_desc": "Fire vulnerable.",
+		"passive_effect": "shadow_blind",
+		"color": Color(0.35, 0.3, 0.5),
+		"effect": "shadow_blind",
+		"penalty_effect": "vuln_fire",
+	},
+	"essence_tracker": {
+		"name": "Tracker Essence",
+		"desc": "Stealth+3. Read the dungeon like a predator.",
+		"passive_desc": "Expert at remaining hidden.",
+		"penalty_desc": "Will -1.",
+		"passive_effect": "",
+		"color": Color(0.6, 0.45, 0.25),
+		"effect": "",
+		"penalty_effect": "wl_down",
+		"penalty_value": 1,
+	},
+	"essence_blood": {
+		"name": "Blood Essence",
+		"desc": "Melee hits heal 2 HP.",
+		"passive_desc": "Drain vitality from each strike.",
+		"penalty_desc": "Will -2.",
+		"passive_effect": "blood_heal",
+		"color": Color(0.85, 0.2, 0.3),
+		"effect": "blood_heal",
+		"penalty_effect": "wl_down",
+		"penalty_value": 2,
+	},
+	"essence_scales": {
+		"name": "Scale Essence",
+		"desc": "+2 Armor Class. Fire and cold resistance.",
+		"passive_desc": "Draconic scales deflect and resist.",
+		"penalty_desc": "EV -1.",
+		"passive_effect": "",
+		"color": Color(0.6, 0.8, 0.45),
+		"effect": "ac_bonus",
+		"value": 2,
+		"penalty_effect": "ev_down",
+		"penalty_value": 1,
+	},
+	"essence_iron_will": {
+		"name": "Iron Will Essence",
+		"desc": "+3 Will.",
+		"passive_desc": "Will-resisted effects are even less likely to land.",
+		"penalty_desc": "STR -1.",
+		"passive_effect": "",
+		"color": Color(0.65, 0.65, 0.85),
+		"effect": "wl_bonus",
+		"value": 3,
+		"penalty_effect": "str_down",
+		"penalty_value": 1,
+	},
+	"essence_wither": {
+		"name": "Wither Essence",
+		"desc": "Melee hits corrode enemy armor for 3 turns.",
+		"passive_desc": "Mummified touch erodes defenses.",
+		"penalty_desc": "HP max -4.",
+		"passive_effect": "wither_corrode",
+		"color": Color(0.65, 0.5, 0.35),
+		"effect": "wither_corrode",
+		"penalty_effect": "hp_down",
+		"penalty_value": 4,
+	},
+	"essence_constrict": {
+		"name": "Constrict Essence",
+		"desc": "25% chance to slow enemies on melee hit.",
+		"passive_desc": "Crushing grip can immobilize foes.",
+		"penalty_desc": "DEX -1.",
+		"passive_effect": "constrict_slow",
+		"color": Color(0.3, 0.55, 0.35),
+		"effect": "constrict_slow",
+		"penalty_effect": "dex_down",
+		"penalty_value": 1,
+	},
+	# ── Unique Tier Additions ──────────────────────────────────────────────────
+	"essence_titan": {
+		"name": "Titan Essence",
+		"desc": "+3 Strength, +8 max HP. Earthshatter skill.",
+		"passive_desc": "Giant fortitude and devastating strikes.",
+		"penalty_desc": "EV -2.",
+		"passive_effect": "",
+		"color": Color(0.75, 0.65, 0.45),
+		"effect": "stat_str",
+		"value": 3,
+		"penalty_effect": "ev_down",
+		"penalty_value": 2,
+		"active_skill": {"id": "earthshatter", "name": "Earthshatter", "desc": "Deal damage to all adjacent enemies.", "cooldown": 12},
+	},
+	"essence_necromancer": {
+		"name": "Necromancer Essence",
+		"desc": "+2 Will. Necromancy spells gain +2 power. Raise Dead skill.",
+		"passive_desc": "Dark mastery strengthens the mind against death.",
+		"penalty_desc": "HP max -4. Fire vulnerable.",
+		"passive_effect": "",
+		"color": Color(0.5, 0.3, 0.7),
+		"effect": "wl_bonus",
+		"value": 2,
+		"penalty_effect": "hp_down",
+		"penalty_value": 4,
+		"active_skill": {"id": "raise_dead", "name": "Raise Dead", "desc": "Summon a skeletal warrior ally for 8 turns.", "cooldown": 20},
+	},
+	"essence_abyssal": {
+		"name": "Abyssal Essence",
+		"desc": "+1 Intelligence. Melee hits deal +2 drain damage. Void Step skill.",
+		"passive_desc": "Abyssal energies hunger for life force.",
+		"penalty_desc": "Cold vulnerable.",
+		"passive_effect": "abyssal_dark",
+		"color": Color(0.3, 0.2, 0.5),
+		"effect": "stat_int",
+		"value": 1,
+		"penalty_effect": "vuln_cold",
+		"active_skill": {"id": "void_step", "name": "Void Step", "desc": "Teleport to a target tile.", "cooldown": 10},
+	},
+	"essence_war_cry": {
+		"name": "War Cry Essence",
+		"desc": "+2 Strength. Melee +2 flat damage. War Cry skill.",
+		"passive_desc": "Bloodlust amplifies every strike.",
+		"penalty_desc": "EV -1.",
+		"passive_effect": "war_cry_bonus",
+		"color": Color(1.0, 0.35, 0.15),
+		"effect": "stat_str",
+		"value": 2,
+		"penalty_effect": "ev_down",
+		"penalty_value": 1,
+		"active_skill": {"id": "war_cry", "name": "War Cry", "desc": "Fear all adjacent enemies for 2 turns.", "cooldown": 10},
+	},
+	"essence_hydra": {
+		"name": "Hydra Essence",
+		"desc": "30% chance to strike twice on melee attack. Multihead Strike skill.",
+		"passive_desc": "Multiple heads lash out in rapid succession.",
+		"penalty_desc": "AC -1.",
+		"passive_effect": "hydra_double",
+		"color": Color(0.3, 0.7, 0.5),
+		"effect": "hydra_double",
+		"penalty_effect": "ac_down",
+		"penalty_value": 1,
+		"active_skill": {"id": "multihead", "name": "Multihead Strike", "desc": "Strike all adjacent enemies.", "cooldown": 8},
+	},
+	"essence_golden": {
+		"name": "Golden Essence",
+		"desc": "+2 Will. All resistances +1. Dragon Aura skill.",
+		"passive_desc": "Draconic majesty radiates elemental resilience.",
+		"penalty_desc": "EV -2.",
+		"passive_effect": "",
+		"color": Color(1.0, 0.85, 0.2),
+		"effect": "wl_bonus",
+		"value": 2,
+		"penalty_effect": "ev_down",
+		"penalty_value": 2,
+		"active_skill": {"id": "dragon_aura", "name": "Dragon Aura", "desc": "Reflect 50% of incoming damage for 3 turns.", "cooldown": 15},
+	},
 	# ── Unique Monster Essences ────────────────────────────────────────────────
 	"essence_gloam": {
 		"name": "Gloam Essence",
@@ -330,12 +548,7 @@ static func all_ids() -> Array:
 static func active_slot_count(player: Player) -> int:
 	if player == null:
 		return 1
-	var exp_count: int = int(TownState.expedition_count)
-	var count: int = 0
-	for needed in SLOT_UNLOCK_EXPEDITION_COUNTS:
-		if exp_count >= int(needed):
-			count += 1
-	return clampi(count, 1, SLOT_COUNT)
+	return clampi(player.xl, 1, SLOT_COUNT)
 
 static func slot_is_unlocked(player: Player, slot_index: int) -> bool:
 	return slot_index >= 0 and slot_index < active_slot_count(player)
@@ -414,7 +627,8 @@ static func apply(player: Player, essence_id: String) -> void:
 		"hp_max":
 			player.hp_max += value
 			player.hp = mini(player.hp + value, player.hp_max)
-		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch", "plague_bonus", "glacial_retaliate", "infernal_fire", "drain_touch":
+		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch", "plague_bonus", "glacial_retaliate", "infernal_fire", "drain_touch", \
+		"on_kill_pack", "shadow_blind", "blood_heal", "wither_corrode", "constrict_slow", "hydra_double", "war_cry_bonus", "abyssal_dark":
 			pass
 	if effect == "wl_bonus":
 		player.wl += value
@@ -447,7 +661,8 @@ static func remove(player: Player, essence_id: String) -> void:
 		"hp_max":
 			player.hp_max = maxi(1, player.hp_max - value)
 			player.hp = mini(player.hp, player.hp_max)
-		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch", "plague_bonus", "glacial_retaliate", "infernal_fire", "drain_touch":
+		"ac_bonus", "wl_bonus", "fury", "drain", "regen", "venom_touch", "plague_bonus", "glacial_retaliate", "infernal_fire", "drain_touch", \
+		"on_kill_pack", "shadow_blind", "blood_heal", "wither_corrode", "constrict_slow", "hydra_double", "war_cry_bonus", "abyssal_dark":
 			pass
 	if effect == "wl_bonus":
 		player.wl = maxi(0, player.wl - value)
@@ -496,6 +711,23 @@ static func _apply_unique_stats(player: Player, essence_id: String, applying: bo
 			player.hp_max = maxi(1, player.hp_max - 6 * mult)
 			player.hp = mini(player.hp, player.hp_max)
 			player.add_resist("fire", -1 if applying else 1)
+		"essence_marrow":
+			player.add_resist("fire", -1 if applying else 1)
+		"essence_scales":
+			player.add_resist("fire", 1 if applying else -1)
+			player.add_resist("cold", 1 if applying else -1)
+		"essence_necromancer":
+			player.add_resist("fire", -1 if applying else 1)
+		"essence_titan":
+			player.hp_max = maxi(1, player.hp_max + 8 * mult)
+			player.hp = mini(player.hp + (8 if applying else 0), player.hp_max)
+		"essence_abyssal":
+			player.add_resist("cold", -1 if applying else 1)
+		"essence_golden":
+			player.add_resist("fire", 1 if applying else -1)
+			player.add_resist("cold", 1 if applying else -1)
+			player.add_resist("poison", 1 if applying else -1)
+			player.wl = maxi(0, player.wl + mult)
 
 static func tick(player: Player) -> void:
 	var regen_count: int = 0
@@ -527,6 +759,9 @@ static func active_synergies(player: Player) -> Array:
 		["essence_bloodwake", "essence_fury", "ESSENCE_SYN_BLOODWAKE_FURY"],
 		["essence_tempest", "essence_arcana", "ESSENCE_SYN_TEMPEST_ARCANA"],
 		["essence_pale_star", "essence_arcana", "ESSENCE_SYN_PALE_STAR_ARCANA"],
+		["essence_shadow", "essence_gloam", "ESSENCE_SYN_SHADOW_GLOAM"],
+		["essence_blood", "essence_fury", "ESSENCE_SYN_BLOOD_FURY"],
+		["essence_tracker", "essence_swiftness", "ESSENCE_SYN_TRACKER_SWIFT"],
 	]
 	var out: Array = []
 	for p in pairs:
@@ -539,6 +774,20 @@ static func has_venom_touch(player: Player) -> bool:
 
 static func has_drain_touch(player: Player) -> bool:
 	return player != null and player.essence_slots.has("essence_undeath")
+
+static func has_blood_heal(player: Player) -> bool:
+	return player != null and player.essence_slots.has("essence_blood")
+
+static func has_hydra_double(player: Player) -> bool:
+	return player != null and player.essence_slots.has("essence_hydra")
+
+static func melee_flat_bonus(player: Player) -> int:
+	if player == null:
+		return 0
+	var bonus: int = 0
+	if player.essence_slots.has("essence_war_cry"):
+		bonus += 2
+	return bonus
 
 static func has_synergy(player: Player, a: String, b: String) -> bool:
 	return player != null and player.essence_slots.has(a) and player.essence_slots.has(b)
@@ -553,6 +802,12 @@ static func stealth_bonus(player: Player) -> int:
 		bonus += 1
 	if player.essence_slots.has("essence_gloam"):
 		bonus += 2
+	if player.essence_slots.has("essence_nimble"):
+		bonus += 2
+	if player.essence_slots.has("essence_shadow"):
+		bonus += 2
+	if player.essence_slots.has("essence_tracker"):
+		bonus += 3
 	if has_synergy(player, "essence_swiftness", "essence_venom"):
 		bonus += 2
 	return bonus
@@ -609,11 +864,19 @@ static func bonus_ac(player: Player) -> int:
 		total += 2
 	if player.essence_slots.has("essence_bastion"):
 		total += 2
+	if player.essence_slots.has("essence_marrow"):
+		total += 1
+	if player.essence_slots.has("essence_scales"):
+		total += 2
 	if player.essence_slots.has("essence_swiftness"):
 		total -= 1
 	if player.essence_slots.has("essence_fury"):
 		total -= 1
 	if player.essence_slots.has("essence_tempest"):
+		total -= 1
+	if player.essence_slots.has("essence_pack"):
+		total -= 1
+	if player.essence_slots.has("essence_hydra"):
 		total -= 1
 	return total
 
@@ -623,9 +886,21 @@ static func bonus_ev(player: Player) -> int:
 	var total: int = 0
 	if player.essence_slots.has("essence_swiftness"):
 		total += 1
+	if player.essence_slots.has("essence_nimble"):
+		total += 1
+	if player.essence_slots.has("essence_shadow"):
+		total += 1
 	if player.essence_slots.has("essence_vitality"):
 		total -= 1
 	if player.essence_slots.has("essence_bastion"):
+		total -= 2
+	if player.essence_slots.has("essence_scales"):
+		total -= 1
+	if player.essence_slots.has("essence_war_cry"):
+		total -= 1
+	if player.essence_slots.has("essence_titan"):
+		total -= 2
+	if player.essence_slots.has("essence_golden"):
 		total -= 2
 	return total
 
@@ -702,6 +977,28 @@ static func apply_melee_hit_effects(player: Player, monster: Monster) -> void:
 		elif effect_id == "dread_fear":
 			if randf() < 0.20 and monster.hp > 0:
 				Status.apply(monster, "feared", int(2 * FaithSystem.resonance_mult(player)))
+		elif effect_id == "fang_poison":
+			var fang_dmg: int = Status.resist_scale(2, monster.data.resists, "poison")
+			if fang_dmg > 0:
+				monster.take_damage(fang_dmg)
+			Status.apply(monster, "poison", int(4 * FaithSystem.resonance_mult(player)))
+			CombatLog.hit(TranslationServer.translate("ESSENCE_LOG_FANG_POISON") % monster.data.loc_name())
+		elif effect_id == "shadow_blind":
+			if randf() < 0.20 and monster.hp > 0:
+				Status.apply(monster, "blind", 2)
+				CombatLog.hit(TranslationServer.translate("ESSENCE_LOG_SHADOW_BLIND") % monster.data.loc_name())
+		elif effect_id == "blood_heal":
+			player.heal(2)
+		elif effect_id == "wither_corrode":
+			Status.apply(monster, "corroded", 3)
+			CombatLog.hit(TranslationServer.translate("ESSENCE_LOG_WITHER_CORRODE") % monster.data.loc_name())
+		elif effect_id == "constrict_slow":
+			if randf() < 0.25 and monster.hp > 0:
+				Status.apply(monster, "slow", 3)
+				CombatLog.hit(TranslationServer.translate("ESSENCE_LOG_CONSTRICT_SLOW") % monster.data.loc_name())
+		elif effect_id == "abyssal_dark":
+			monster.take_damage(2)
+			CombatLog.hit(TranslationServer.translate("ESSENCE_LOG_ABYSSAL_DARK") % [monster.data.loc_name(), 2])
 	# Gloam + Swiftness resonance: first unaware hit also weakens
 	if not monster.is_aware and has_synergy(player, "essence_gloam", "essence_swiftness"):
 		Status.apply(monster, "weak", int(2 * FaithSystem.resonance_mult(player)))
@@ -721,5 +1018,7 @@ static func apply_on_kill_effects(player: Player) -> void:
 			player.heal(5)
 			var wake_dur: int = 3 if has_bloodwake_fury else 2
 			Status.apply(player, "damage_boost", wake_dur)
+		elif effect_id == "on_kill_pack":
+			Status.apply(player, "damage_boost", 1)
 	if has_synergy(player, "essence_fury", "essence_drain"):
 		player.heal(2)

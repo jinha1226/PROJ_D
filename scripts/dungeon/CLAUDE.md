@@ -4,13 +4,13 @@
 Map size, BSP+L-corridor generation, FOV shadowcasting, depth-banded terrain art, tile rendering. Two files: `MapGen.gd` (generation), `DungeonMap.gd` (runtime + draw).
 
 ## Map identity
-- Size 32×36 — compressed for mobile readability. Do not enlarge without explicit decision.
+- Size 56×62 — enlarged 2026-05-27 (was 46×50; docs had stale 32×36 reference). Constants in `DungeonMap.DEFAULT_GRID_W/H`.
 - BSP rooms + L-corridor connect + farthest-BFS stairs.
 - Depth-banded floor art: dirt → limestone → bloody cobble → crystal.
 - Branch-specific palettes via ZoneManager.
 
 ## Rendering perf (audit M7)
-`_draw()` runs full-grid loops every redraw — at 32×36 = 1152 cells × 7 broad layers (warning, hazard, cloud, corpse, altar, fog, broken_altar). Per-corpse `load()` was removed in Phase 0 (texture is now resolved at spawn and cached on the corpse dict).
+`_draw()` runs full-grid loops every redraw — at 56×62 = 3472 cells × 7 broad layers (warning, hazard, cloud, corpse, altar, fog, broken_altar). Per-corpse `load()` was removed in Phase 0 (texture is now resolved at spawn and cached on the corpse dict). Cell count ~3× legacy 32×36 — monitor mobile perf.
 
 Mitigations to consider when revisiting:
 - Layers with empty dictionaries already short-circuit; keep that pattern.
@@ -26,7 +26,7 @@ Corpse textures are **runtime-composed** via a port of DCSS `tile::corpsify`: mo
 ## Modification rules
 1. New rendering layer → respect visible/explored/reveal_all combo and short-circuit on empty.
 2. No `load()` inside `_draw()` — resolve resources at data creation time.
-3. Map size constants live in DungeonMap; do not hardcode 32 / 36 elsewhere.
+3. Map size constants live in DungeonMap; do not hardcode 56 / 62 elsewhere.
 
 ## If you change X, also check Y
 - New tile category → AtlasTexture / asset import + render layer order + reveal logic.

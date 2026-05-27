@@ -1,35 +1,114 @@
 ---
 name: project-skill-visibility-design
-description: "PROJ_D skill system design — 9 visible PROJ_G skills carry 80% of performance, 30+ hidden DCSS-style familiarity buckets carry the remaining 20%. Decided 2026-05-21."
+description: PROJ_D skill system — 8 visible skills + hidden sub-skill familiarity buckets. Verified 2026-05-27 from Actor.gd/Player.gd source.
 metadata: 
   node_type: memory
   type: project
-  originSessionId: ae9b7462-a38a-4a0b-9765-08fe3229d2e0
+  originSessionId: 8f8bcc7d-e3af-4569-becb-10d0bb8b6e11
 ---
 
-PocketCrawl's skill system has two tiers by design:
+## Visible Skills (8) — Actor.gd SKILL_IDS
 
-**Visible (PROJ_G 9-skill set):** Weapon Mastery, Archery, Tactics, Defense, Magery, Stealth, Lockpicking, Tracking, Survival. Shown in UI, tutorials, toasts, character sheet. Each level contributes ~80% of the player's actual performance in that domain.
+`weapon_mastery`, `archery`, `tactics`, `defense`, `magery`, `stealth`, `tracking`, `survival`
 
-**Hidden (30+ DCSS sub-skill familiarities):** blade, dagger, axe, polearm, staves, bows, crossbows, slings, throwing, fire, ice, hex, necromancy, summoning, armor, shield, etc. These grow silently as the player uses specific items/spells. Each contributes ~20% of performance as a *narrow* bonus (e.g., dagger familiarity only boosts dagger attacks, not all melee).
+**lockpicking was removed.** Do not reference it.
 
-**Why:** User decided (2026-05-21) this is the right shape for a commercial launch:
-1. Onboarding is gated by 9 skills — new players never face 30+ choices
-2. Heavy users get DCSS-style depth as "you got better at the thing you actually used"
-3. Marketing message: "deep build variety" (true, just hidden)
-4. Expansion-pack reserve: a future "Master Mode" can expose the hidden tier for veterans
-5. Hidden values are **narrow** boosts only, never gates — equipment use is never blocked by a 0 in a hidden bucket
+Categories (Player.gd SKILL_CATEGORIES):
+- Combat: weapon_mastery, archery, tactics
+- Defense: defense
+- Magic: magery
+- Utility: stealth, tracking, survival
 
-**How to apply:**
-- UI/tutorial/save displays only the 9 visible skills.
-- XP grants from actions write to BOTH the canonical 9-skill bucket AND the hidden familiarity bucket simultaneously.
-- Combat/spell formulas reference visible_skill * 0.8 + hidden_familiarity * 0.2 (after balance pass).
-- Hidden familiarity is always narrow: dagger familiarity boosts only dagger attacks, never broad melee.
-- Save format must persist both tiers — collapsing on save would erase the design's identity reward.
+XP curve (Actor.gd SKILL_XP_DELTA): `[12, 28, 55, 95, 150, 230, 340, 490, 700]`, max level 9.
 
-**Forbidden anti-patterns (per user):**
-- Don't make a high hidden value gate a low one (e.g., "your Defense is 40 but shield_familiarity is 0 so the shield does nothing")
-- Don't let hidden values exceed 20% of effect — "secretly 30 skills" feeling
-- Don't expose hidden buckets in default UI; reserve for an opt-in "Details" screen if ever
+---
 
-Related: PROJ_G 9-skill spec in `/mnt/d/PROJ_G/expedition_roguelike_proto/docs/rules/mobile_skill_balance_rules.md`. Current implementation lives in `Player.SKILL_IDS` (visible) and will gain `HIDDEN_SUBSKILL_IDS` when option-A from 2026-05-21 lands.
+## Hidden Sub-skills — Actor.gd HIDDEN_SUBSKILL_IDS → SKILL_REMAP
+
+XP dual-written to visible bucket AND hidden bucket on every action.
+
+| Hidden sub-skill | → Visible bucket |
+|-----------------|-----------------|
+| fighting | tactics |
+| unarmed | weapon_mastery |
+| short_blades | weapon_mastery |
+| long_blades | weapon_mastery |
+| axes | weapon_mastery |
+| staves | weapon_mastery |
+| polearms | weapon_mastery |
+| bows | archery |
+| crossbows | archery |
+| slings | archery |
+| throwing | archery |
+| armor | defense |
+| shields | defense |
+| dodging | stealth |
+| spellcasting | magery |
+| conjurations | magery |
+| hexes | magery |
+| summonings | magery |
+| necromancy | magery |
+| translocations | magery |
+| transmutation | magery |
+| element | magery |
+
+---
+
+## Weapon Category → Hidden Sub-skill (Player.gd weapon_skill_for_item)
+
+| Item category | Hidden sub-skill |
+|--------------|-----------------|
+| dagger | short_blades |
+| blade | long_blades |
+| axe | axes |
+| blunt | axes (same as axe!) |
+| polearm | polearms |
+| staff | weapon_mastery (direct, no sub-skill) |
+| ranged (bow/longbow) | bows |
+| ranged (crossbow) | crossbows |
+| ranged (sling) | slings |
+| ranged (javelin/dart/throw) | throwing |
+
+---
+
+## Spell School → Hidden Sub-skill (Player.gd progression_school_for)
+
+| Spell school | Hidden sub-skill |
+|-------------|-----------------|
+| fire, cold, air, earth, poison | element |
+| abjuration, evocation | element (grouped with elements!) |
+| conjurations | conjurations |
+| translocations | translocations |
+| transmutation | transmutation |
+| hexes, enchantment | hexes |
+| necromancy | necromancy |
+| summoning/summonings | summonings |
+
+---
+
+## Weapon Items (base only — branded variants excluded)
+
+| Category | Items | Hidden sub-skill |
+|----------|-------|-----------------|
+| dagger | dagger(4/1.0), stiletto(5/0.8), dirk(6/0.8) | short_blades |
+| blade | short_sword(5/1.0), arming_sword(7/1.2), long_sword(10/1.4), great_blade(10/1.4), bastard_sword(15/1.5) | long_blades |
+| blunt | mace(8/1.25) | axes |
+| axe | battle_axe(15/1.7) | axes |
+| polearm | spear(6/1.0) | polearms |
+| staff | staff(10/1.3) | weapon_mastery |
+| ranged | shortbow(8/1.4), longbow(14/1.7), crossbow(16/1.9) | bows/crossbows |
+
+Branded/special variants (flaming_sword, frost_dagger, venom_dagger, shock_mace, quick_blade, assassin_blade) exist in resources but user wants to review/remove.
+
+---
+
+## Talent System (3 talents as of 2026-05-27)
+
+veteran: STR+1, HP+6, weapon_mastery apt 2, tactics apt 2
+scout: DEX+1, HP+2, stealth apt 2, tracking apt 2
+adept: INT+2, MP+4, magery apt 3
+
+Survivor and Duelist were removed 2026-05-27.
+
+**Why:** Reduced from 5 to 3 for clarity. Survivor/Duelist had overlapping identity with Veteran.
+**How to apply:** Do not reference survivor or duelist talents; unknown ids fall back to veteran.

@@ -102,7 +102,7 @@ const HIDDEN_SUBSKILL_IDS: Array = [
 	"dodging",
 	# Magic subskills
 	"spellcasting",
-	"conjurations", "hexes", "summonings",
+	"conjurations", "hexes",
 	"necromancy", "translocations", "transmutation",
 	"element",
 ]
@@ -126,7 +126,7 @@ const SKILL_REMAP: Dictionary = {
 	"dodging": "stealth",
 	# Magic → magery (hidden sub-skills only)
 	"spellcasting": "magery", "conjurations": "magery", "hexes": "magery",
-	"summonings": "magery", "necromancy": "magery", "translocations": "magery", "transmutation": "magery",
+	"necromancy": "magery", "translocations": "magery", "transmutation": "magery",
 	"element": "magery", "evocations": "magery",
 	# Legacy element ids still route to magery visible bucket (hidden tier uses "element")
 	"fire": "magery", "ice": "magery", "air": "magery", "earth": "magery",

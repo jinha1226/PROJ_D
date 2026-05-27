@@ -21,3 +21,4 @@ glyph = "g"
 glyph_color = Color(0.35, 0.7, 0.4, 1)
 description = "A common raider with little durability. Not dangerous alone, but often the first sign of a crowded fight."
 min_depth = 1
+essence_ids = ["essence_fang", "essence_pack", "essence_nimble"]

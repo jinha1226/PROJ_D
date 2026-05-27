@@ -10,7 +10,7 @@ const NAMES: Array = [
 ]
 
 ## Melee weapon pool (tier 1-2). Picked at spawn.
-const WEAPON_POOL: Array = ["dagger", "short_sword", "mace", "spear", "arming_sword"]
+const WEAPON_POOL: Array = ["dagger", "short_sword", "battle_axe", "spear", "arming_sword"]
 ## Armor pool (tier 1-2). Picked at spawn.
 const ARMOR_POOL: Array  = ["leather_armor", "robe", "ring_mail"]
 

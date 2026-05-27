@@ -234,7 +234,7 @@ spell_int_discount:   +2 arcana, +2 pale_star, max +4 with synergies
 
 ## Zones & Turn Budget
 
-### Main Path (5 floors)
+### Main Path (6 floors)
 
 | Depth | Zone ID | Style | Turn Budget |
 |---|---|---|---|
@@ -242,7 +242,8 @@ spell_int_discount:   +2 arcana, +2 pale_star, max +4 with synergies
 | 2 | lair | cave | 260 |
 | 3 | orc_mines | BSP | 270 |
 | 4 | elven_halls | BSP large | 290 |
-| 5 | abyss | cave | 300 |
+| 5 | crypt | crypt | 310 |
+| 6 | abyss | cave | 320 |
 
 ### Branches (4, each 3 floors)
 
@@ -251,10 +252,10 @@ spell_int_discount:   +2 arcana, +2 pale_star, max +4 with synergies
 | swamp | poison | 180 | bog_serpent | essence_plague |
 | ice_caves | cold | 180 | glacial_sovereign | essence_glacial |
 | infernal | fire | 180 | ember_tyrant | essence_infernal |
-| crypt | necro | 180 | ancient_lich | essence_undeath |
+| vault | neutral | 180 | golden_dragon | essence_bastion |
 
 Branch entrances:
-- crypt at depth 1, swamp at depth 2, ice_caves at depth 3, infernal at depth 4
+- swamp at depth 2, ice_caves at depth 3, infernal at depth 4, vault at depth 5
 
 Completion bonuses: +35 per branch rune, +120 for all 4.
 
@@ -277,7 +278,7 @@ Completion bonuses: +35 per branch rune, +120 for all 4.
 
 ### Equipment Tier by Depth
 
-Main floors 1–5. Branch effective depths up to 7 (ice_caves/infernal top out at 6–7).
+Main floors 1–6. Branch effective depths up to 8 (swamp 3–5, ice_caves 4–6, infernal 5–7, vault 6–8).
 
 | Depth | T1 | T2 | T3 | T4 | T5 |
 |---|---|---|---|---|---|
@@ -325,7 +326,7 @@ discount range: 0–4 (from arcana/pale_star essences)
 
 ### Depth Distribution (min_depth → max_depth)
 
-Main floors depth 1–5. Branch effective depths: crypt 2–4, swamp 3–5, ice_caves 4–6, infernal 5–7.
+Main floors depth 1–6. Branch effective depths: swamp 3–5, ice_caves 4–6, infernal 5–7, vault 6–8.
 
 | Depth | Monsters |
 |---|---|
@@ -350,7 +351,7 @@ Main floors depth 1–5. Branch effective depths: crypt 2–4, swamp 3–5, ice_
 | blood_duke | 5 | 70 | unique, depth 5 |
 | glacial_sovereign | 5 | 75 | ice_caves branch boss |
 | ember_tyrant | 6 | 85 | infernal branch boss |
-| ancient_lich | 6 | 108 | crypt branch boss (HD 18) |
+| golden_dragon | 6 | 108 | vault branch boss (HD 18) |
 | sovereign_jelly | 6 | 90 | unique, depth 6 |
 | abyssal_sovereign | 7 | 300 | final boss |
 

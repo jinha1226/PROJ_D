@@ -38,12 +38,9 @@ const _ALL: Array[Resource] = [
 	preload("res://resources/spells/blink.tres"),
 	preload("res://resources/spells/shroud_of_golubria.tres"),
 	preload("res://resources/spells/swiftness.tres"),
-	# Summoning
+	# Necromancy (summoned allies)
 	preload("res://resources/spells/call_imp.tres"),
 	preload("res://resources/spells/animate_skeleton.tres"),
-	preload("res://resources/spells/summon_vermin.tres"),
-	preload("res://resources/spells/monstrous_menagerie.tres"),
-	preload("res://resources/spells/malign_gateway.tres"),
 ]
 
 var by_id: Dictionary = {}

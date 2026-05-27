@@ -6,7 +6,6 @@ const BUY_CATALOG: Array = [
 	{"id": "short_sword", "price":  60},
 	{"id": "spear",       "price":  70},
 	{"id": "staff",       "price":  70},
-	{"id": "mace",        "price":  80},
 	{"id": "shortbow",    "price":  80},
 	{"id": "long_sword",  "price":  90},
 	# Armor
@@ -111,8 +110,35 @@ func _build_cards() -> void:
 		_build_sell_cards()
 
 func _build_buy_cards() -> void:
+	if _is_pregame() and not GameManager.pending_starter_items.is_empty():
+		_grid.add_child(_make_cart_section())
 	for entry in BUY_CATALOG:
 		_grid.add_child(_make_buy_card(entry))
+
+func _make_cart_section() -> Control:
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 4)
+
+	var hdr := Label.new()
+	hdr.text = "구매 목록 (%d)" % GameManager.pending_starter_items.size()
+	hdr.add_theme_font_size_override("font_size", 16)
+	hdr.add_theme_color_override("font_color", Color(0.65, 1.0, 0.7))
+	vb.add_child(hdr)
+
+	for id_v in GameManager.pending_starter_items:
+		var id: String = String(id_v)
+		var data = ItemRegistry.get_by_id(id) if ItemRegistry != null else null
+		var item_name: String = data.display_name if data != null else id
+		var lbl := Label.new()
+		lbl.text = "  · %s" % item_name
+		lbl.add_theme_font_size_override("font_size", 15)
+		lbl.add_theme_color_override("font_color", Color(0.85, 0.9, 0.85))
+		vb.add_child(lbl)
+
+	var sep := HSeparator.new()
+	sep.add_theme_constant_override("separation", 8)
+	vb.add_child(sep)
+	return vb
 
 func _speed_label(delay: float) -> String:
 	if delay <= 1.0:
@@ -244,7 +270,7 @@ func _on_buy(item_id: String, price: int) -> void:
 	var items: Array = _save_data["player"].get("items", [])
 	if typeof(items) != TYPE_ARRAY:
 		items = []
-	items.append({"id": item_id})
+	items.append({"id": item_id, "plus": 0})
 	_save_data["player"]["items"] = items
 	SaveManager.save(_save_data)
 	_build_cards()

@@ -80,7 +80,26 @@ Tile notes:
 - Loot identity: books, parchment, wands, staves, essence.
 - Layout: more open courtyards and diagonal garden paths; fewer cramped corridors.
 
-## Main 5F - Abyssal Breach / Final Route
+## Main 5F - Crypt
+
+Theme: the dungeon tightens into sealed burial architecture. This floor should feel narrower and more dangerous than Elven Halls, with reliable choke points and one or two retreat loops.
+
+Sub-regions:
+- Charnel Walk: first tight corridor, teaches pressure from narrow halls.
+- Tomb Loop: central loop with alternate routes and door decisions.
+- Necromancer Study: magic pressure pocket with undead casters.
+- Grief Archive: book/ring/identification reward room.
+- Ossuary Vault: visible high-risk treasure room.
+- Burial Chapel: last safe prep zone before the abyss.
+- Grave Cathedral: large combat hall landmark.
+- Vault Gate: fixed branch entrance to Vault, visually distinct from the crypt rooms.
+
+Tile/prop notes:
+- Use `wall_stone_necropolis_1`, `floor/necro_squares00`, crumbled columns, gravestone variants, dry fountains, and grave/ossuary dressing.
+- Reward identity: necromancy books, charms, rings, essence of undeath, identification items.
+- Layout should be solemn and readable: long halls, tomb chambers, narrow side crypts, and one clear exit route.
+
+## Main 6F - Abyssal Breach / Final Route
 
 Theme: the dungeon is collapsing into a shifting void. This floor can justify changing tiles over time.
 
@@ -93,17 +112,8 @@ Sub-regions:
 
 Tile notes:
 - Use `dngn/wall/abyss`, `water/starwater_*`, `traps/dispersal`, `traps/teleport*`, `statues/statue_zot_*`, `mon/tentacles/*` if needed as environmental blockers/props.
-- Make the unstable area visually distinct before it changes.
+- Make the unstable area visually distinct before it changes, and keep it wide enough for multi-enemy movement rather than a single-file corridor.
 - Do not fill the whole map with chaos. Keep one stable path plus optional dangerous shortcuts.
-
-## Branch - Crypt
-
-Sub-regions: bone hall, sarcophagus rows, grave garden, ossuary vault, necromancer study.
-
-Tile/prop notes:
-- Use crumbled columns, wraith/ancient hero statues, dry/blood fountains, corpse/blood puddle dressing.
-- Reward identity: necromancy books, charms, rings, essence of undeath.
-- Layout should be solemn and readable: long halls, tomb chambers, narrow side crypts.
 
 ## Branch - Swamp / Bog
 
@@ -131,6 +141,15 @@ Tile/prop notes:
 - Use demonic trees, fire/orb statues, blood fountains, fire/hell-themed traps.
 - Add visible heat zones before damage hazards.
 - Reward identity: branded weapons, armour, fire spells, high-risk gold.
+
+## Branch - Vault
+
+Sub-regions: gold hall, ledger office, reliquary stack, guard reserve, treasury core.
+
+Tile/prop notes:
+- Use golden statues, vault signage, reliquary shelves, ledger desks, and guarded treasure dressing.
+- Reward identity: gold, gems, rings, high-value consumables, and elite guard drops.
+- Layout should feel compact and deliberate: short halls, guarded rooms, and a visible central reward route.
 
 ## Implementation Notes
 

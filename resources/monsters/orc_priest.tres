@@ -26,3 +26,4 @@ description = "An orcish healer who sustains its allies. Killing it first makes 
 ai_flags = ["healer", "summoner"]
 summon_pool = ["orc"]
 gold_drop_max = 40
+essence_ids = ["essence_warding", "essence_marrow", "essence_vitality"]

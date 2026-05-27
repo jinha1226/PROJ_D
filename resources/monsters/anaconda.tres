@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon_anacnd1"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "anaconda"
+body_type = "serpentine"
+display_name = "anaconda"
+tier = 4
+hp = 36
+hd = 7
+ac = 4
+ev = 9
+speed = 10
+sight_range = 7
+attacks = [{"damage": 9, "flavour": "bite"}, {"damage": 7, "flavour": "constrict"}]
+ranged_attack = {}
+resists = []
+min_depth = 3
+max_depth = 6
+weight = 10
+xp_value = 22
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/anaconda.png"
+glyph = "s"
+glyph_color = Color(0.35, 0.5, 0.2, 1)
+essence_id = "essence_venom"
+essence_ids = ["essence_constrict", "essence_scales", "essence_might"]
+description = "A massive constrictor. Its bite is unremarkable; its grip is not."

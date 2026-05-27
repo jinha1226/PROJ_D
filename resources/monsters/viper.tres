@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bmon_viper01"]
+
+[ext_resource type="Script" path="res://scripts/entities/MonsterData.gd" id="1_mdata"]
+
+[resource]
+script = ExtResource("1_mdata")
+id = "viper"
+body_type = "serpentine"
+display_name = "viper"
+tier = 3
+hp = 18
+hd = 3
+ac = 2
+ev = 13
+speed = 12
+sight_range = 7
+attacks = [{"damage": 6, "flavour": "bite", "poison_turns": 4}]
+ranged_attack = {}
+resists = []
+min_depth = 2
+max_depth = 5
+weight = 14
+xp_value = 9
+is_boss = false
+tile_path = "res://assets/tiles/individual/mon/animals/adder.png"
+glyph = "s"
+glyph_color = Color(0.7, 0.55, 0.2, 1)
+essence_id = "essence_venom"
+essence_ids = ["essence_venom", "essence_scales", "essence_nimble"]
+description = "A heavier snake with a more potent venom. Slower than an adder but hits harder."
