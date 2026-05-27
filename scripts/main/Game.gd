@@ -65,6 +65,7 @@ var ui_layer: CanvasLayer
 var top_hud: TopHUD
 var bottom_hud: BottomHUD
 var log_strip: CombatLogStrip
+var _vignette: VignetteOverlay
 var _effect_layer: Node2D
 
 var _targeting_spell: SpellData = null
@@ -503,6 +504,24 @@ func _apply_starter_kit() -> void:
 	var kit: Array = GameManager.pending_starter_items
 	if kit.is_empty():
 		kit = ["dagger", "leather_armor", "potion_healing", "potion_healing", "scroll_identify"]
+	else:
+		# Guarantee minimum armor — players who skipped armor in the shop still
+		# enter the dungeon with leather_armor at no extra cost.
+		var has_armor: bool = false
+		var has_weapon: bool = false
+		for id_v in kit:
+			var d = ItemRegistry.get_by_id(String(id_v)) if ItemRegistry != null else null
+			if d == null:
+				continue
+			if String(d.kind) == "armor":
+				has_armor = true
+			elif String(d.kind) == "weapon":
+				has_weapon = true
+		kit = kit.duplicate()
+		if not has_armor:
+			kit.push_front("leather_armor")
+		if not has_weapon:
+			kit.push_front("dagger")
 	# Pass 1: add non-book items to inventory. Books are consumed immediately
 	# in pass 2 — they grant spells and don't persist as inventory entries.
 	for id_v in kit:
@@ -997,6 +1016,10 @@ func _spawn_ui() -> void:
 	log_strip.grow_horizontal = 2
 	log_strip.grow_vertical = 0
 	ui_layer.add_child(log_strip)
+	_vignette = VignetteOverlay.new()
+	_vignette.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ui_layer.add_child(_vignette)
 	bottom_hud.bag_pressed.connect(_on_bag_pressed)
 	bottom_hud.status_pressed.connect(_on_status_pressed)
 	bottom_hud.rest_pressed.connect(_on_rest_pressed)
@@ -1473,6 +1496,8 @@ func _update_hud() -> void:
 		return
 	top_hud.set_hp(player.hp, player.hp_max)
 	top_hud.set_mp(player.mp, player.mp_max)
+	if _vignette != null:
+		_vignette.set_hp_ratio(float(player.hp) / float(max(1, player.hp_max)))
 	top_hud.set_xp(player.xp, player.xp_to_next(), player.xl)
 	if GameManager.branch_zone != "":
 		var bcfg: Dictionary = ZoneManager.branch_config(GameManager.branch_zone)
@@ -1681,6 +1706,7 @@ func _reset_expedition_budget() -> void:
 func _on_turn_budget_exhausted() -> void:
 	TurnManager.abort_actor_loop()
 	CombatLog.post(LocaleManager.t("LOG_EXPEDITION_SAFE_RETURN_OK"), Color(0.5, 0.95, 0.7))
+	_show_return_notice()
 	if player != null:
 		player.grant_skill_xp("survival", 5.0)
 	PartyManager.on_run_complete()
@@ -1691,8 +1717,40 @@ func _on_turn_budget_exhausted() -> void:
 		"turns": TurnManager.turn_number,
 	})
 	save_with_cache()
-	await get_tree().create_timer(2.0).timeout
+	await get_tree().create_timer(2.5).timeout
 	get_tree().change_scene_to_file(TOWN_SCENE_PATH)
+
+func _show_return_notice() -> void:
+	if ui_layer == null:
+		return
+	var panel := PanelContainer.new()
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	panel.grow_vertical = Control.GROW_DIRECTION_BOTH
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.08, 0.14, 0.08, 0.92)
+	sb.border_color = Color(0.45, 0.9, 0.55)
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(8)
+	sb.set_content_margin_all(24)
+	panel.add_theme_stylebox_override("panel", sb)
+	var vbox := VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 10)
+	panel.add_child(vbox)
+	var title := Label.new()
+	title.text = "귀환"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 28)
+	title.add_theme_color_override("font_color", Color(0.5, 1.0, 0.6))
+	vbox.add_child(title)
+	var body := Label.new()
+	body.text = "탐험 시간이 끝났습니다.\n마을로 돌아갑니다..."
+	body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	body.add_theme_font_size_override("font_size", 20)
+	body.add_theme_color_override("font_color", Color(0.85, 0.95, 0.85))
+	vbox.add_child(body)
+	ui_layer.add_child(panel)
 
 func _on_player_died() -> void:
 	# Stop the in-flight monster loop (audit H8) so subsequent actors don't

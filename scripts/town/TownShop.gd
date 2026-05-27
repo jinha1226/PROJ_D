@@ -2,14 +2,12 @@ extends Control
 
 const BUY_CATALOG: Array = [
 	# Weapons
-	{"id": "dagger",      "price":  40},
 	{"id": "short_sword", "price":  60},
 	{"id": "spear",       "price":  70},
 	{"id": "staff",       "price":  70},
 	{"id": "shortbow",    "price":  80},
 	{"id": "long_sword",  "price":  90},
 	# Armor
-	{"id": "leather_armor",   "price":  55},
 	{"id": "buckler",         "price":  40},
 	{"id": "leather_cap",     "price":  35},
 	{"id": "leather_gloves",  "price":  30},
