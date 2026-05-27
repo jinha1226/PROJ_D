@@ -66,6 +66,7 @@ var top_hud: TopHUD
 var bottom_hud: BottomHUD
 var log_strip: CombatLogStrip
 var _vignette: VignetteOverlay
+var _portal_effect: PortalReturnEffect
 var _effect_layer: Node2D
 
 var _targeting_spell: SpellData = null
@@ -1020,6 +1021,11 @@ func _spawn_ui() -> void:
 	_vignette.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ui_layer.add_child(_vignette)
+	_portal_effect = PortalReturnEffect.new()
+	_portal_effect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_portal_effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_portal_effect.visible = false
+	ui_layer.add_child(_portal_effect)
 	bottom_hud.bag_pressed.connect(_on_bag_pressed)
 	bottom_hud.status_pressed.connect(_on_status_pressed)
 	bottom_hud.rest_pressed.connect(_on_rest_pressed)
@@ -1706,7 +1712,6 @@ func _reset_expedition_budget() -> void:
 func _on_turn_budget_exhausted() -> void:
 	TurnManager.abort_actor_loop()
 	CombatLog.post(LocaleManager.t("LOG_EXPEDITION_SAFE_RETURN_OK"), Color(0.5, 0.95, 0.7))
-	_show_return_notice()
 	if player != null:
 		player.grant_skill_xp("survival", 5.0)
 	PartyManager.on_run_complete()
@@ -1717,40 +1722,21 @@ func _on_turn_budget_exhausted() -> void:
 		"turns": TurnManager.turn_number,
 	})
 	save_with_cache()
-	await get_tree().create_timer(2.5).timeout
+	await get_tree().create_timer(0.4).timeout
+	_play_portal_return()
+	await _portal_effect.finished
 	get_tree().change_scene_to_file(TOWN_SCENE_PATH)
 
-func _show_return_notice() -> void:
-	if ui_layer == null:
+func _play_portal_return() -> void:
+	if _portal_effect == null or ui_layer == null:
 		return
-	var panel := PanelContainer.new()
-	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	panel.grow_vertical = Control.GROW_DIRECTION_BOTH
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.08, 0.14, 0.08, 0.92)
-	sb.border_color = Color(0.45, 0.9, 0.55)
-	sb.set_border_width_all(2)
-	sb.set_corner_radius_all(8)
-	sb.set_content_margin_all(24)
-	panel.add_theme_stylebox_override("panel", sb)
-	var vbox := VBoxContainer.new()
-	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	vbox.add_theme_constant_override("separation", 10)
-	panel.add_child(vbox)
-	var title := Label.new()
-	title.text = "귀환"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 28)
-	title.add_theme_color_override("font_color", Color(0.5, 1.0, 0.6))
-	vbox.add_child(title)
-	var body := Label.new()
-	body.text = "탐험 시간이 끝났습니다.\n마을로 돌아갑니다..."
-	body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	body.add_theme_font_size_override("font_size", 20)
-	body.add_theme_color_override("font_color", Color(0.85, 0.95, 0.85))
-	vbox.add_child(body)
-	ui_layer.add_child(panel)
+	var origin: Vector2 = get_viewport_rect().size * 0.5
+	if player != null:
+		var canvas_tx: Transform2D = get_viewport().get_canvas_transform()
+		origin = canvas_tx * player.global_position
+	_portal_effect.visible = true
+	_portal_effect.start(origin)
+
 
 func _on_player_died() -> void:
 	# Stop the in-flight monster loop (audit H8) so subsequent actors don't
