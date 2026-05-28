@@ -3,7 +3,6 @@ class_name SkillsDialog extends RefCounted
 ## Per-sub-skill long-press descriptions. Keys are the post-30-split sub-skill ids.
 const _DESCRIPTIONS: Dictionary = {
 	"fighting": "Increases max HP by 5 each level.\n\nFighting is the universal melee foundation — every melee build wants it for HP and a small accuracy bonus.",
-	"unarmed": "Improves bare-handed combat.\n\nFor builds without a weapon or with claw/bite natural attacks.",
 	"short_blades": "Improves daggers and short swords.\n\nFavors stab/backstab playstyles and rewards positioning over raw damage.",
 	"long_blades": "Improves long swords, scimitars, and other heavy blades.\n\nBalanced damage and accuracy for the standard melee fighter.",
 	"axes": "Improves axes and heavy blunt weapons.\n\nAxes can cleave adjacent foes — strong against grouped enemies.",
@@ -58,7 +57,7 @@ const _VISIBLE_EFFECTS: Dictionary = {
 ## Visible skill -> hidden familiarity rows. These rows read player.hidden_skills
 ## directly so the current dual-write behavior can be inspected in game.
 const _HIDDEN_BY_VISIBLE: Dictionary = {
-	"weapon_mastery": ["unarmed", "short_blades", "long_blades",
+	"weapon_mastery": ["short_blades", "long_blades",
 		"axes", "staves", "polearms"],
 	"archery": ["bows", "crossbows", "slings", "throwing"],
 	"defense": ["armor", "shields"],

@@ -17,7 +17,6 @@ size_score = 10
 resist_mods = ["poison+", "fire+", "electric+"]
 skill_aptitudes = {
 "fighting": 1,
-"unarmed": 0,
 "short_blades": -1,
 "long_blades": -1,
 "maces": 0,

@@ -257,7 +257,7 @@ func try_attack_tile(target: Vector2i) -> bool:
 
 func _weapon_action_cost() -> float:
 	var base_delay: float = 1.0
-	var skill_id: String = "unarmed"
+	var skill_id: String = "weapon_mastery"
 	if equipped_weapon_id != "":
 		var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null else null
 		if w != null and float(w.delay) > 0.0:
@@ -1093,7 +1093,7 @@ static func progression_school_for(raw_school: String) -> String:
 
 static func weapon_skill_for_item(item: ItemData) -> String:
 	if item == null:
-		return "unarmed"
+		return "weapon_mastery"
 	match String(item.category):
 		"dagger":
 			return "short_blades"
@@ -1118,7 +1118,7 @@ static func weapon_skill_for_item(item: ItemData) -> String:
 			return "bows"
 		"staff":
 			return "weapon_mastery"
-	return "unarmed"
+	return "weapon_mastery"
 
 func spell_skill_for(spell: SpellData) -> String:
 	if spell == null:

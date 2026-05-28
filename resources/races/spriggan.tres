@@ -18,7 +18,6 @@ mp_mod = 1
 size_score = 4
 skill_aptitudes = {
 "fighting": -2,
-"unarmed": -2,
 "short_blades": 1,
 "long_blades": -2,
 "maces": -3,

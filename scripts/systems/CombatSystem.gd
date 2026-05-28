@@ -188,7 +188,7 @@ static func _player_attack_profile(player: Player) -> Dictionary:
 		"weapon_dmg": UNARMED_DAMAGE,
 		"stat_source": player.strength,
 		"stat_scale": 0.35,
-		"skill_id": "unarmed",
+		"skill_id": "weapon_mastery",
 		"weapon": null,
 		"weapon_plus": 0,
 		"req_hit_pen": 0,

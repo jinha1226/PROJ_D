@@ -17,7 +17,6 @@ hp_mod = 1
 size_score = 11
 skill_aptitudes = {
 "fighting": 1,
-"unarmed": 0,
 "short_blades": -1,
 "long_blades": 1,
 "maces": 1,

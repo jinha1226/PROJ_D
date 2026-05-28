@@ -91,7 +91,7 @@ const MAX_SKILL_LEVEL: int = 9
 # combat formulas.
 const HIDDEN_SUBSKILL_IDS: Array = [
 	# Melee subskills
-	"fighting", "unarmed",
+	"fighting",
 	"short_blades", "long_blades",
 	"axes", "staves", "polearms",
 	# Ranged subskills
@@ -114,7 +114,6 @@ const HIDDEN_SUBSKILL_IDS: Array = [
 const SKILL_REMAP: Dictionary = {
 	# Combat → tactics (general fitness) / weapon_mastery (specific weapons)
 	"fighting": "tactics",
-	"unarmed": "weapon_mastery",
 	"short_blades": "weapon_mastery", "long_blades": "weapon_mastery",
 	"axes": "weapon_mastery", "staves": "weapon_mastery",
 	"polearms": "weapon_mastery",

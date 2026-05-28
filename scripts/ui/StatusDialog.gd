@@ -36,7 +36,7 @@ const _VISIBLE_SKILL_LABELS: Dictionary = {
 }
 
 const _HIDDEN_BY_VISIBLE: Dictionary = {
-	"weapon_mastery": ["fighting", "unarmed", "short_blades", "long_blades",
+	"weapon_mastery": ["fighting", "short_blades", "long_blades",
 		"axes", "staves", "polearms"],
 	"archery": ["bows", "crossbows", "slings", "throwing"],
 	"defense": ["armor", "shields"],
