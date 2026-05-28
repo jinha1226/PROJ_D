@@ -7,6 +7,32 @@ class_name PlayerRenderer extends Node2D
 const DEFAULT_BASE_TEX: Texture2D = preload(
 	"res://assets/tiles/individual/player/base/human_m.png")
 
+## Pre-composed sprites: armor_tier × weapon_type → single PNG.
+const _COMPOSED_DIR: String = "res://assets/tiles/individual/player/composed/"
+
+const _ARMOR_TIER_MAP: Dictionary = {
+	"":            "robe",
+	"robe":        "robe",
+	"leather_armor": "leather", "ring_mail": "leather",
+	"scale_mail":  "leather",   "troll_leather": "leather",
+	"chain_mail":  "chain",
+	"plate_mail":  "plate",
+}
+
+const _WEAPON_TYPE_MAP: Dictionary = {
+	"":              "none",
+	"dagger":        "dagger", "dirk": "dagger", "stiletto": "dagger",
+	"throwing_knife": "dagger", "quick_blade": "dagger",
+	"venom_dagger":  "dagger", "frost_dagger": "dagger", "assassin_blade": "dagger",
+	"short_sword":   "sword",  "arming_sword": "sword",
+	"long_sword":    "sword",  "bastard_sword": "sword", "flaming_sword": "sword",
+	"battle_axe":    "axe",    "war_axe": "axe",
+	"great_blade":   "greatsword",
+	"spear":         "spear",  "javelin": "spear", "halberd": "spear", "glaive": "spear",
+	"staff":         "staff",  "quarterstaff": "staff",
+	"shortbow":      "none",   "longbow": "none", "crossbow": "none",
+}
+
 ## DCSS per-race player tile (static, no animation).
 const _RACE_DCSS_MAP: Dictionary = {
 	"human":    "res://assets/tiles/individual/player/base/human_m.png",
@@ -197,7 +223,8 @@ const _EQUIP_SHEET_SLOTS: Array[Array] = [
 
 # ── Runtime state ──────────────────────────────────────────────────────────────
 
-var _dcss_tile: Texture2D = DEFAULT_BASE_TEX  # current race DCSS tile
+var _composed_tex: Texture2D = null           # pre-composed armor+weapon sprite
+var _dcss_tile: Texture2D = DEFAULT_BASE_TEX  # current race DCSS tile (fallback)
 var _base_tex: Texture2D = DEFAULT_BASE_TEX
 var _body_doll_tex: Texture2D = null
 var _hand1_doll_tex: Texture2D = null
@@ -217,16 +244,32 @@ var _atk_sheets: Dictionary = {}          # {anim: Array[Texture2D]} (head+hair+
 
 # ── Public API ─────────────────────────────────────────────────────────────────
 
-## Load the DCSS race tile + equipment doll overlays for in-dungeon rendering.
+## Load composed sprite (armor+weapon) or fall back to DCSS race tile + doll layers.
 ## Called by Player._on_equipment_changed() and set_race_from_id().
 func refresh_equipment(p: Player) -> void:
+	# --- Composed sprite lookup ---
+	var ItemRegistry = get_node_or_null("/root/ItemRegistry")
+	var armor_base: String = p.equipped_armor_id
+	var weapon_base: String = p.equipped_weapon_id
+	if ItemRegistry != null:
+		if armor_base != "":
+			armor_base = String(ItemRegistry.base_id_of(armor_base))
+		if weapon_base != "":
+			weapon_base = String(ItemRegistry.base_id_of(weapon_base))
+	var armor_tier: String  = String(_ARMOR_TIER_MAP.get(armor_base, "leather"))
+	var weapon_type: String = String(_WEAPON_TYPE_MAP.get(weapon_base, "none"))
+	var composed_path: String = _COMPOSED_DIR + armor_tier + "_" + weapon_type + ".png"
+	if ResourceLoader.exists(composed_path):
+		_composed_tex = load(composed_path) as Texture2D
+	else:
+		_composed_tex = null
+
+	# --- DCSS race tile + doll fallback (used when composed_tex is null) ---
 	var GameManager = get_node_or_null("/root/GameManager")
 	var race_id: String = GameManager.selected_race_id if GameManager != null else "human"
 	var dcss_path: String = String(_RACE_DCSS_MAP.get(race_id, _RACE_DCSS_MAP["human"]))
 	_dcss_tile = load(dcss_path) as Texture2D if ResourceLoader.exists(dcss_path) else DEFAULT_BASE_TEX
-
-	var ItemRegistry = get_node_or_null("/root/ItemRegistry")
-	_body_doll_tex = _load_doll_tex(p.equipped_armor_id, DOLL_BODY_MAP, ItemRegistry)
+	_body_doll_tex  = _load_doll_tex(p.equipped_armor_id,  DOLL_BODY_MAP,  ItemRegistry)
 	_hand2_doll_tex = _load_doll_tex(p.equipped_shield_id, DOLL_HAND2_MAP, ItemRegistry)
 	_hand1_doll_tex = _load_doll_tex(p.equipped_weapon_id, DOLL_HAND1_MAP, ItemRegistry)
 	queue_redraw()
@@ -418,7 +461,9 @@ func _draw() -> void:
 	var GameManager = get_node_or_null("/root/GameManager")
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
 	if GameManager != null and GameManager.use_tiles:
-		if _dcss_tile != null:
+		if _composed_tex != null:
+			draw_texture_rect(_composed_tex, rect, false)
+		elif _dcss_tile != null:
 			draw_texture_rect(_dcss_tile, rect, false)
 			if _body_doll_tex != null:
 				draw_texture_rect(_body_doll_tex, rect, false)
