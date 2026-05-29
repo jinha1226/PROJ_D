@@ -461,16 +461,19 @@ func _draw() -> void:
 	var GameManager = get_node_or_null("/root/GameManager")
 	var rect := Rect2(Vector2.ZERO, Vector2(DungeonMap.CELL_SIZE, DungeonMap.CELL_SIZE))
 	if GameManager != null and GameManager.use_tiles:
+		var cs: float = DungeonMap.CELL_SIZE
+		var draw_rect: Rect2 = Rect2(Vector2(cs, 0), Vector2(-cs, cs)) \
+				if player.facing.x < 0 else rect
 		if _composed_tex != null:
-			draw_texture_rect(_composed_tex, rect, false)
+			draw_texture_rect(_composed_tex, draw_rect, false)
 		elif _dcss_tile != null:
-			draw_texture_rect(_dcss_tile, rect, false)
+			draw_texture_rect(_dcss_tile, draw_rect, false)
 			if _body_doll_tex != null:
-				draw_texture_rect(_body_doll_tex, rect, false)
+				draw_texture_rect(_body_doll_tex, draw_rect, false)
 			if _hand2_doll_tex != null:
-				draw_texture_rect(_hand2_doll_tex, rect, false)
+				draw_texture_rect(_hand2_doll_tex, draw_rect, false)
 			if _hand1_doll_tex != null:
-				draw_texture_rect(_hand1_doll_tex, rect, false)
+				draw_texture_rect(_hand1_doll_tex, draw_rect, false)
 		else:
 			draw_string(ThemeDB.fallback_font,
 				Vector2(6, DungeonMap.CELL_SIZE - 6),
