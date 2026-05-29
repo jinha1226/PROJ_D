@@ -11,43 +11,16 @@ const _VISIBLE_EQUIP_SLOTS: Array = [
 	["EQUIP_AMULET", "amulet"],
 ]
 
-const _RESIST_ELEMENTS: Array = ["fire", "cold", "poison", "necro", "lightning", "corr"]
+const _RESIST_ELEMENTS: Array = ["fire", "cold", "poison", "lightning", "necro", "will"]
 const _RESIST_LABELS: Dictionary = {
 	"fire": "Fire",
 	"cold": "Cold",
 	"poison": "Poison",
+	"lightning": "Lightning",
 	"necro": "Necro",
+	"will": "Will",
 }
 
-const _VISIBLE_SKILLS: Array = [
-	"weapon_mastery", "archery", "tactics", "defense",
-	"magery", "stealth", "tracking", "survival",
-]
-
-const _VISIBLE_SKILL_LABELS: Dictionary = {
-	"weapon_mastery": "Weapon Mastery",
-	"archery": "Archery",
-	"tactics": "Tactics",
-	"defense": "Defense",
-	"magery": "Magery",
-	"stealth": "Stealth",
-	"tracking": "Tracking",
-	"survival": "Survival",
-}
-
-const _HIDDEN_BY_VISIBLE: Dictionary = {
-	"weapon_mastery": ["fighting", "short_blades", "long_blades",
-		"axes", "staves", "polearms"],
-	"archery": ["bows", "crossbows", "slings", "throwing"],
-	"defense": ["armor", "shields"],
-	"magery": ["spellcasting", "conjurations", "hexes",
-		"necromancy", "translocations", "transmutation",
-		"element"],
-	"stealth": ["dodging"],
-	"tactics": ["fighting"],
-	"tracking": [],
-	"survival": [],
-}
 
 
 static func open(player: Player, parent: Node) -> void:
@@ -69,7 +42,7 @@ static func _rebuild_body(dlg: GameDialog, player: Player, parent: Node) -> void
 	body.add_child(_vitals_card(player))
 	body.add_child(_stats_card(player))
 	body.add_child(_combat_card(player))
-	body.add_child(_skills_card(player))
+	body.add_child(_talents_card(player))
 	body.add_child(_equipment_card(player))
 	body.add_child(_resists_card(player))
 	body.add_child(_essence_card(dlg, player, parent))
@@ -172,88 +145,56 @@ static func _combat_card(player: Player) -> Control:
 	row.add_child(_kv_row("EV", str(player.ev)))
 	row.add_child(_kv_row("Will", str(player.wl)))
 	row.add_child(_kv_row("Sight", str(Player.SIGHT_RADIUS + player.fov_radius_bonus)))
-	row.add_child(_kv_row("Weapon", str(player.get_skill_level("weapon_mastery"))))
-	row.add_child(_kv_row("Magery", str(player.get_skill_level("magery"))))
-
-	var notes := Label.new()
-	notes.text = "Defense covers armor and shield handling. Stealth covers evasion-side growth. Hidden familiarity rows below show exact action training."
-	notes.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	notes.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
-	notes.add_theme_color_override("font_color", Color(0.78, 0.76, 0.7))
-	vb.add_child(notes)
 	return card
 
-static func _skills_card(player: Player) -> Control:
-	var card := UICards.card(Color(0.94, 0.84, 0.42))
+## Displays job and selected talents
+static func _talents_card(player: Player) -> Control:
+	var card := UICards.card(Color(0.72, 0.56, 0.98))
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", GameTheme.PAD_M)
 	card.add_child(vb)
-	vb.add_child(UICards.section_header("Skills", GameTheme.TYPO_SUBTITLE))
-
-	for skill_id in _VISIBLE_SKILLS:
-		vb.add_child(_skill_status_block(String(skill_id), player))
+	vb.add_child(UICards.section_header("Build", GameTheme.TYPO_SUBTITLE))
+	# Job row
+	var job_row := HBoxContainer.new()
+	job_row.add_theme_constant_override("separation", GameTheme.PAD_M)
+	vb.add_child(job_row)
+	var job_lbl := Label.new()
+	job_lbl.text = "Job:"
+	job_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+	job_lbl.add_theme_color_override("font_color", Color(0.75, 0.75, 0.8))
+	job_row.add_child(job_lbl)
+	var job_val := Label.new()
+	job_val.text = TalentSystem.job_display_name(player.job_id) if player.job_id != "" else "(none)"
+	job_val.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+	var job_data: Dictionary = TalentSystem.get_job(player.job_id)
+	job_val.add_theme_color_override("font_color", job_data.get("color", Color.WHITE) if not job_data.is_empty() else Color.WHITE)
+	job_row.add_child(job_val)
+	# Talents
+	if player.talent_ids.is_empty():
+		var none_lbl := Label.new()
+		none_lbl.text = "No talents yet. Gain XL 5/10/15/20 to unlock."
+		none_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
+		none_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.65))
+		none_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		vb.add_child(none_lbl)
+	else:
+		for talent_id in player.talent_ids:
+			var t_data: Dictionary = TalentSystem.get_talent(talent_id)
+			var t_row := HBoxContainer.new()
+			t_row.add_theme_constant_override("separation", GameTheme.PAD_S)
+			vb.add_child(t_row)
+			var t_name := Label.new()
+			t_name.text = String(t_data.get("name", talent_id))
+			t_name.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+			t_name.add_theme_color_override("font_color", t_data.get("color", Color.WHITE))
+			t_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			t_row.add_child(t_name)
+			var t_concept := Label.new()
+			t_concept.text = "[T%d %s]" % [int(t_data.get("tier", 0)), String(t_data.get("concept", "")).capitalize()]
+			t_concept.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
+			t_concept.add_theme_color_override("font_color", Color(0.62, 0.64, 0.7))
+			t_row.add_child(t_concept)
 	return card
-
-static func _skill_status_block(skill_id: String, player: Player) -> Control:
-	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 2)
-
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", GameTheme.PAD_M)
-	vb.add_child(row)
-
-	var name_lbl := Label.new()
-	name_lbl.text = _skill_label(skill_id)
-	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
-	name_lbl.add_theme_color_override("font_color", Color(0.94, 0.84, 0.42))
-	row.add_child(name_lbl)
-
-	var lv: int = player.get_skill_level(skill_id)
-	var lv_lbl := Label.new()
-	lv_lbl.text = "MAX" if lv >= Player.MAX_SKILL_LEVEL else "Lv.%d" % lv
-	lv_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
-	lv_lbl.add_theme_color_override("font_color",
-		Color(1.0, 0.85, 0.2) if lv >= Player.MAX_SKILL_LEVEL else Color(0.85, 0.85, 0.85))
-	row.add_child(lv_lbl)
-
-	var xp: float = player.get_skill_xp(skill_id)
-	var next_need: float = float(Player.SKILL_XP_DELTA[lv]) if lv < Player.SKILL_XP_DELTA.size() else 0.0
-	if next_need > 0.0:
-		var bar := ProgressBar.new()
-		bar.max_value = next_need
-		bar.value = clamp(xp, 0.0, next_need)
-		bar.show_percentage = false
-		bar.custom_minimum_size = Vector2(0, 4)
-		bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		vb.add_child(bar)
-
-	var hidden_ids: Array = _HIDDEN_BY_VISIBLE.get(skill_id, [])
-	if not hidden_ids.is_empty():
-		var hidden_line := Label.new()
-		hidden_line.text = _hidden_summary(hidden_ids, player)
-		hidden_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		hidden_line.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
-		hidden_line.add_theme_color_override("font_color", Color(0.62, 0.64, 0.7))
-		vb.add_child(hidden_line)
-	return vb
-
-static func _hidden_summary(hidden_ids: Array, player: Player) -> String:
-	var parts: Array[String] = []
-	for raw_id in hidden_ids:
-		var sid: String = String(raw_id)
-		var entry: Dictionary = player.hidden_skills.get(sid, {"level": 0, "xp": 0.0})
-		var lv: int = int(entry.get("level", 0))
-		var xp: int = int(float(entry.get("xp", 0.0)))
-		parts.append("%s %d/%d" % [sid.replace("_", " "), lv, xp])
-	return "Hidden: " + ", ".join(parts)
-
-static func _skill_label(skill_id: String) -> String:
-	var key: String = "SKILL_NAME_" + skill_id.to_upper()
-	var translated: String = LocaleManager.t(key)
-	if translated != key:
-		return translated
-	return String(_VISIBLE_SKILL_LABELS.get(skill_id, skill_id.capitalize().replace("_", " ")))
 
 static func _equipment_card(player: Player) -> Control:
 	var card := UICards.card(Color(0.7, 0.7, 0.82))
@@ -335,6 +276,21 @@ static func _essence_card(dlg: GameDialog, player: Player, parent: Node) -> Cont
 			lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
 			lbl.add_theme_color_override("font_color", Color(0.8, 0.78, 0.92))
 			vb.add_child(lbl)
+
+	var talent_synergies: Array = EssenceSystem.active_talent_synergies(player)
+	if not talent_synergies.is_empty():
+		var talent_sync_header := Label.new()
+		talent_sync_header.text = "Talent Resonance"
+		talent_sync_header.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+		talent_sync_header.add_theme_color_override("font_color", Color(0.85, 0.9, 0.7))
+		vb.add_child(talent_sync_header)
+		for line in talent_synergies:
+			var t_lbl := Label.new()
+			t_lbl.text = "- %s" % String(line)
+			t_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			t_lbl.add_theme_font_size_override("font_size", GameTheme.TYPO_CAPTION)
+			t_lbl.add_theme_color_override("font_color", Color(0.84, 0.82, 0.7))
+			vb.add_child(t_lbl)
 
 	return card
 
@@ -652,8 +608,12 @@ static func _element_color(element: String) -> Color:
 			return Color(0.5, 0.82, 1.0)
 		"poison":
 			return Color(0.45, 0.95, 0.45)
+		"lightning":
+			return Color(1.0, 0.95, 0.3)
 		"necro":
 			return Color(0.72, 0.48, 0.95)
+		"will":
+			return Color(0.6, 0.85, 0.95)
 	return Color(0.82, 0.82, 0.88)
 
 static func _essence_slot_row(dlg: GameDialog, player: Player, parent: Node, slot_index: int) -> Control:

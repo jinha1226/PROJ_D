@@ -141,7 +141,7 @@ AC = armor.ac_bonus + weapon_plus + EssenceSystem.bonus_ac(player)
 ```
 xp_award = monster.xp_value × 2.2
 ```
-Rune completion bonus: `entry_depth × 150` (crypt 150, swamp 300, ice_caves 450, infernal 600)
+Rune completion bonus: `entry_depth × 150` (swamp 300, ice_caves 450, infernal 600, vault 750)
 
 ---
 
@@ -218,6 +218,37 @@ Skill aptitudes stored per race in `.tres` files (range -3 to +3, affect XP gain
 | Bloodrush | fury + drain | +2 HP on kill |
 | Ghost Venom / Gloam Swift | gloam + swiftness | stealth +2, weakens first unaware hit |
 | Bastion Vital | bastion + vitality | stacks DR/AC |
+
+### Talent + Essence Resonance
+| Talent | Essence match | Bonus |
+|---|---|---|
+| bloodlust | drain / undeath / blood | +1 HP on kill |
+| venom | venom / serpent | +10% proc, +1 poison turn |
+| frost_touch | cold / glacial | +10% proc, +1 freeze turn |
+| momentum | tempest / swiftness | free-attack chance +15% |
+| soul_tap | arcana / pale_star / undeath | +1 MP on spell crit |
+| cleave | fire / infernal / cinder | splash burns longer, hits harder |
+| purify | warding / iron_will | cleanse faster, heal more |
+| unstoppable | bastion / titan | stronger low-HP threshold |
+| execute | venom / serpent / plague | finisher threshold raised |
+| volley / multishot / chain_strike | tempest | extra spread / pierce |
+| arcane_surge | arcana / cinder | proc chance increased |
+| last_rites | undeath / dread | revive with more HP |
+
+### Essence Tag Groups
+Talent resonance is now tag-based, so new essences only need the right tag group.
+
+| Tag | Typical essences |
+|---|---|
+| fire | fire, cinder, infernal |
+| cold / ward | cold, glacial, pale_star |
+| poison / nature | venom, fang, serpent, plague, wither, constrict |
+| death / void | drain, undeath, shadow, gloam, dread, abyssal, marrow |
+| blood / life | vitality, regeneration, blood, bloodwake |
+| storm / speed / ranged | swiftness, nimble, tempest, tracker |
+| stone / fortify / giant | stone, bastion, scales, titan, marrow |
+| arcane | arcana, fire, cinder, infernal, necromancer, tempest |
+| ward / will | warding, iron_will, golden, pale_star, glacial |
 
 ### Key Essence Functions
 ```
@@ -319,25 +350,25 @@ discount range: 0–4 (from arcana/pale_star essences)
 
 ## Monster Data
 
+- Current roster: 50 monsters total (46 regular + 4 unique).
 - **Accuracy base**: 68 + hd×3
 - **XP value** on kill: `xp_value × 2.2` (pace multiplier)
 - Gold drop (humanoids): 30% chance for `randi_range(gold_max/2, gold_max)`
 - Speed default: 10 (faster = < 10 turns per player action, slower = > 10)
 
-### Depth Distribution (min_depth → max_depth)
+### Combat Bands
 
 Main floors depth 1–6. Branch effective depths: swamp 3–5, ice_caves 4–6, infernal 5–7, vault 6–8.
 
-| Depth | Monsters |
-|---|---|
-| 1–2 (fodder) | rat, jackal, bat, kobold, zombie, goblin, giant_cockroach, hobgoblin, adder |
-| 2–3 | hound, scorpion, vampire_bat, gnoll, gnoll_sergeant, black_bear, crimson_imp, wolf, phantom, wight\*, crypt_zombie\* |
-| 3–4 | orc, orc_warrior, orc_priest, orc_wizard, centaur, gargoyle, giant_wolf_spider, warg, yak, basilisk, steam_dragon, ghoul\*, mummy\*, gnoll_shaman |
-| 4–5 | hornet, ogre, red_devil, two_headed_ogre, fire_elemental, earth_elemental, deep_elf_archer, manticore, troll, wyvern, swamp_dragon, cyclops, deep_troll, ogre_mage, vampire, deep_elf_death_mage, wraith, ice_devil, minotaur |
-| 5–7 | skeletal_warrior\*, vampire_knight, fire_dragon, fire_giant, frost_giant, balrug, ice_dragon, lich\*, shadow_wraith, revenant, iron_golem |
-| 6–7 | executioner, stone_giant, bone_dragon, titan, golden_dragon |
+| Band | Role | Representative monsters |
+|---|---|---|
+| 1–2 | fodder / teaching | goblin, kobold, zombie, adder, wolf, black bear |
+| 2–3 | pressure / packs | gnoll, gnoll_sergeant, scorpion, vampire_bat, giant_wolf_spider, hobgoblin |
+| 3–4 | zone identity | orc, orc_warrior, orc_wizard, orc_priest, deep_elf_archer, gargoyle, ogre |
+| 4–5 | elite pressure | vampire, wraith, ghoul, mummy, ogre_mage, deep_elf_death_mage, swamp_dragon |
+| 5–6 | apex / branch bosses | lich, ancient_lich, balrug, fire_dragon, ice_dragon, bone_dragon, titan, golden_dragon |
 
-\* = primarily appears in thematic branch (wight/crypt_zombie/mummy/ghoul in crypt, skeletal_warrior in crypt, lich in crypt)
+Branch specials are intentionally themed rather than exhaustive: swamp leans venom/water, ice_caves leans cold/stone, infernal leans fire/hell, vault leans guardians/stone/gold.
 
 ### Bosses (spawned by zone, not pick_by_depth)
 

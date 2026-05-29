@@ -19,16 +19,6 @@ var items: Array = []  # [{id: String, plus: int}]
 var known_spells: Array = []  # [String]
 var quickslots: Array = ["", "", "", "", "", ""]  # item/spell ids, index = slot
 
-# Name retained for DCSS "general combat fitness" semantics; the gate is now
-# tactics (the fighting hidden subskill moved tactics→ in 2026-05-21).
-const FIGHTING_HP_PER_LEVEL: int = 5
-
-# Deprecated DCSS mastery system. Constants kept as empty/identity so UI
-# files referencing them don't crash; mastery getters return 0/identity.
-# The UI sweep will remove the mastery cards in a follow-up.
-const MASTERY_XP_DELTA: Array = [60, 140, 275, 475, 750, 1150, 1700, 2450, 3500]
-const MAX_MASTERY_LEVEL: int = 9
-
 # Spell school list (data routing for spells — unrelated to skill ids).
 const MAGIC_SCHOOLS: Array = [
 	"conjurations", "hexes", "charms", "necromancy",
@@ -36,13 +26,10 @@ const MAGIC_SCHOOLS: Array = [
 	"fire", "ice", "air", "earth", "poison",
 ]
 
-# Surface category grouping for SkillsDialog (only the 9 visible skills).
-const SKILL_CATEGORIES: Dictionary = {
-	"weapon_mastery": "Combat", "archery": "Combat", "tactics": "Combat",
-	"defense": "Defense",
-	"magery": "Magic",
-	"stealth": "Utility", "tracking": "Utility", "survival": "Utility",
-}
+# Talent system runtime fields
+var free_attack: bool = false   # momentum: next attack costs no action
+var revived: bool = false        # last_rites: used-flag (once per run)
+var purify_timer: int = 0        # purify: turns since last purify trigger
 
 
 func _ready() -> void:
@@ -252,22 +239,23 @@ func try_attack_tile(target: Vector2i) -> bool:
 	play_attack_anim(equipped_weapon_id)
 	weapon_attacked.emit(monster.grid_pos, weapon_skill_for_item(weapon))
 	CombatSystem.player_attack_monster(self, monster)
-	TurnManager.end_player_turn(_weapon_action_cost() * Status.speed_mult(self))
+	var cost: float = _weapon_action_cost() * Status.speed_mult(self)
+	if free_attack and weapon != null and weapon.category != "ranged":
+		cost = 0.0
+		free_attack = false
+	elif free_attack:
+		# Don't let a stored momentum window linger on a ranged attack.
+		free_attack = false
+	TurnManager.end_player_turn(cost)
 	return true
 
 func _weapon_action_cost() -> float:
 	var base_delay: float = 1.0
-	var skill_id: String = "weapon_mastery"
 	if equipped_weapon_id != "":
 		var w: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null else null
 		if w != null and float(w.delay) > 0.0:
 			base_delay = float(w.delay)
-		if w != null:
-			skill_id = weapon_skill_for_item(w)
-	var skill_lv: int = get_skill_level(skill_id)
-	# Each skill level reduces delay by 2.5%, capped at 25% reduction (lv9 → ×0.775)
-	var mult: float = max(0.75, 1.0 - float(skill_lv) * 0.025)
-	return base_delay * mult
+	return base_delay
 
 func attack_action_cost() -> float:
 	return _weapon_action_cost() * Status.speed_mult(self)
@@ -276,8 +264,7 @@ func display_attack_power() -> int:
 	var weapon: ItemData = ItemRegistry.get_by_id(equipped_weapon_id) if ItemRegistry != null and equipped_weapon_id != "" else null
 	var plus: int = int(equipped_weapon_entry().get("plus", 0)) if weapon != null else 0
 	var base: int = max(2, weapon.damage + plus) if weapon != null else 2
-	var skill_id: String = weapon_skill_for_item(weapon)
-	return max(1, base + strength / 4 + get_skill_level(skill_id) / 2 + slay_bonus)
+	return max(1, base + strength / 4 + slay_bonus)
 
 func display_move_speed() -> int:
 	return int(round(100.0 / max(0.1, movement_action_cost())))
@@ -406,16 +393,14 @@ func use_item(index: int) -> void:
 	var had_effect: bool = true
 	match data.effect:
 		"heal":
-			var survival_mult: float = 1.0 + float(get_skill_level("survival")) * 0.03
-			var heal_amt: int = maxi(1, int(round(float(data.effect_value) * EssenceSystem.potion_heal_mult(self) * FaithSystem.potion_heal_mult(self) * survival_mult)))
+			var heal_amt: int = maxi(1, int(round(float(data.effect_value) * EssenceSystem.potion_heal_mult(self) * FaithSystem.potion_heal_mult(self))))
 			heal_amt += EssenceSystem.potion_heal_bonus(self)
 			heal(heal_amt)
 			BodyPartSystem.reduce_wounds(self, 1)
 			CombatLog.post(LocaleManager.t("LOG_YOU_FEEL_BETTER_HP") % heal_amt,
 				Color(0.6, 1.0, 0.6))
 		"bandage":
-			var survival_mult: float = 1.0 + float(get_skill_level("survival")) * 0.03
-			var heal_amt: int = maxi(1, int(round(6.0 * survival_mult)))
+			var heal_amt: int = 6
 			heal(heal_amt)
 			BodyPartSystem.reduce_wounds(self, 1)
 			CombatLog.post(LocaleManager.t("LOG_YOU_BANDAGE_YOUR_WOUNDS_HP") % heal_amt, Color(0.85, 0.9, 0.65))
@@ -768,22 +753,15 @@ func equipped_amulet_entry() -> Dictionary:
 
 func refresh_ac_from_equipment() -> void:
 	ac = 0
-	ev = 1 + dexterity / 2 + get_skill_level("agility")
+	ev = 1 + dexterity / 2
 	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id) if ItemRegistry != null and equipped_armor_id != "" else null
 	if armor != null:
 		var armor_plus: int = int(equipped_armor_entry().get("plus", 0))
 		ac += armor.ac_bonus + armor_plus
-		var armor_skill: int = get_skill_level("armor")
-		var penalty_mult: float = max(0.0, 1.0 - float(armor_skill) * 0.1)
-		ev -= int(round(float(armor.ev_penalty) * penalty_mult))
-		var armor_missing: int = max(0, armor.required_skill - armor_skill)
-		ev -= armor_missing
+		ev -= armor.ev_penalty
 	var shield: ItemData = ItemRegistry.get_by_id(equipped_shield_id) if ItemRegistry != null and equipped_shield_id != "" else null
 	if shield != null:
 		ev -= shield.ev_penalty
-		var shield_skill: int = get_skill_level("shield")
-		var shield_missing: int = max(0, shield.required_skill - shield_skill)
-		ev -= shield_missing
 
 	var helmet: ItemData = ItemRegistry.get_by_id(equipped_helmet_id) if ItemRegistry != null and equipped_helmet_id != "" else null
 	if helmet != null:
@@ -802,10 +780,8 @@ func refresh_ac_from_equipment() -> void:
 
 	if has_status("mage_armor"):
 		ac = max(ac, 13 + dexterity / 2)
-	ac += get_skill_level("defense")
 	ac += EssenceSystem.bonus_ac(self)
 	ev += EssenceSystem.bonus_ev(self)
-	ev += agility_mastery_ev_bonus()
 	ev = max(0, ev)
 	emit_signal("stats_changed")
 
@@ -973,6 +949,40 @@ func play_hit_anim() -> void:
 func register_kill() -> void:
 	kills += 1
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Talent system API
+# ──────────────────────────────────────────────────────────────────────────────
+
+func select_talent(id: String) -> void:
+	if talent_ids.has(id):
+		return
+	talent_ids.append(id)
+	TalentSystem.apply_talent(self, id)
+	emit_signal("stats_changed")
+
+func _actor_player_tick() -> void:
+	EssenceSystem.tick(self)
+	tick_purify()
+
+## Advance the purify countdown. Call once per player turn tick.
+func tick_purify() -> void:
+	if not has_talent("purify"):
+		purify_timer = 0
+		return
+	purify_timer += 1
+	var purify_interval: int = 20
+	var purify_heal: int = 3
+	if EssenceSystem.has_talent_tags(self, "purify", ["ward", "will", "fortify"]):
+		purify_interval = 15
+		purify_heal = 4
+	if purify_timer >= purify_interval:
+		purify_timer = 0
+		var removed: String = Status.remove_first_debuff(self)
+		if removed != "":
+			CombatLog.post("Purify: %s cleansed. (+%d HP)" % [Status.display_name(removed), purify_heal],
+				Color(0.9, 0.9, 0.65))
+			heal(purify_heal)
+
 func _apply_max_hp_gain(amount: int, source: String = "") -> void:
 	if amount == 0:
 		return
@@ -993,42 +1003,14 @@ func _apply_max_mp_gain(amount: int) -> void:
 	else:
 		mp = min(mp, mp_max)
 
-func _fighting_hp_gain() -> int:
-	return FIGHTING_HP_PER_LEVEL
-
 func _level_up_mp_gain() -> int:
 	return 1 + intelligence / 3
 
-func grant_kill_skill_xp(amount: float, action_skill: String = "") -> void:
-	# Route kill XP through grant_skill_xp so dual-write to hidden tier
-	# happens correctly. Two-mode XP routing:
-	#   active_skills empty  → action-routed: full XP to action_skill
-	#   active_skills filled → manual: split across active visible skills
-	# action_skill may be a legacy/sub-skill id; it is translated to canonical.
-	if amount <= 0.0:
-		return
-	var canon_action: String = _canonical_skill(action_skill)
-	var fallback: String = canon_action if canon_action != "" else "weapon_mastery"
-	if active_skills.is_empty():
-		# Preserve the caller's original id (could be a hidden sub-skill like
-		# "polearms") so dual-write into hidden tier still fires for it.
-		var grant_id: String = action_skill if HIDDEN_SUBSKILL_IDS.has(action_skill) or SKILL_IDS.has(action_skill) else fallback
-		grant_skill_xp(grant_id, amount)
-		return
-	var targets: Array = []
-	for id in active_skills:
-		var sid: String = String(id)
-		if SKILL_IDS.has(sid) and get_skill_level(sid) < MAX_SKILL_LEVEL:
-			targets.append(sid)
-	if targets.is_empty():
-		targets = [fallback]
-	var share: float = amount / float(targets.size())
-	for sid in targets:
-		grant_skill_xp(String(sid), share)
+## No-op stubs — skill XP system removed. Called by CombatSystem legacy paths.
+func grant_kill_skill_xp(_amount: float, _action_skill: String = "") -> void:
+	pass
 
-## DCSS mastery system — DEPRECATED under PROJ_G 9-skill model.
-## Stubs return identity values so UI cards render empty/no-effect until the
-## UI sweep removes them. Do not add new callers.
+## Mastery stubs — return identity values so any remaining callers compile.
 func melee_mastery_dmg_mult() -> float:
 	return 1.0
 
@@ -1053,23 +1035,14 @@ func get_category_total_xp(_category: String) -> float:
 func get_category_mastery_level(_category: String) -> int:
 	return 0
 
-func get_skill_xp(id: String) -> float:
-	var canon: String = _canonical_skill(id)
-	if canon == "":
-		return 0.0
-	var entry: Dictionary = skills.get(canon, {"xp": 0.0})
-	return float(entry.get("xp", 0.0))
+func get_skill_xp(_id: String) -> float:
+	return 0.0
 
-## Hidden-tier inspector — reserved for the future balance pass / debug tools.
-## UI must not surface this. Returns the silent familiarity level for a
-## DCSS-style sub-skill id (dagger / polearms / fire / etc.).
-func get_hidden_familiarity_level(subskill_id: String) -> int:
-	var entry: Dictionary = hidden_skills.get(subskill_id, {"level": 0})
-	return int(entry.get("level", 0))
+func get_hidden_familiarity_level(_subskill_id: String) -> int:
+	return 0
 
-func get_hidden_familiarity_xp(subskill_id: String) -> float:
-	var entry: Dictionary = hidden_skills.get(subskill_id, {"xp": 0.0})
-	return float(entry.get("xp", 0.0))
+func get_hidden_familiarity_xp(_subskill_id: String) -> float:
+	return 0.0
 
 static func progression_school_for(raw_school: String) -> String:
 	match raw_school:
@@ -1152,94 +1125,9 @@ static func aptitude_for(race: RaceData, skill_id: String) -> int:
 		return 0
 	return int(round(total / float(count)))
 
-func _skill_apt_mult(id: String) -> float:
-	var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id) if GameManager != null and RaceRegistry != null else null
-	var race_mult: float = 1.0 if race == null else pow(1.2, aptitude_for(race, id))
-	var talent_id: String = GameManager.selected_talent_id if GameManager != null else ""
-	var talent_apt: int = 0
-	if talent_id != "":
-		talent_apt = int(TalentSystem.get_talent(talent_id).get("skill_apts", {}).get(id, 0))
-	return race_mult * pow(1.2, talent_apt)
-
-## Visible-tier level-up side effects. Extracted so the hidden tier can
-## share level-up math without firing UI logs / stat bumps. Caller must
-## have already incremented `skills[canon]["level"]`.
-func _on_visible_skill_level_up(canonical_id: String, new_level: int) -> void:
-	var pretty: String = canonical_id.capitalize().replace("_", " ")
-	CombatLog.post(LocaleManager.t("LOG_SKILL_REACHES") % [pretty, new_level],
-		Color(0.7, 0.95, 0.5))
-	match canonical_id:
-		"stealth":
-			ev += 1
-		"tactics":
-			var hp_gain: int = _fighting_hp_gain()
-			_apply_max_hp_gain(hp_gain, "+%d max HP from Tactics." % hp_gain)
-
-## Dual-write skill XP grant.
-##   - Resolve canonical visible bucket via SKILL_REMAP.
-##   - Add XP to visible bucket (with race aptitude mult on visible only),
-##     run level-up loop, fire side effects.
-##   - If `id` is also a hidden sub-skill, ALSO add raw XP to the matching
-##     hidden bucket and run a silent level-up loop (no log, no stats).
-##   - Unknown ids: silent no-op.
-##   - `active_skills` filter applies to the visible tier only.
-func grant_skill_xp(id: String, amount: float) -> void:
-	if amount <= 0.0:
-		return
-	var canon: String = _canonical_skill(id)
-	if canon == "":
-		return  # unknown id, silent no-op
-	var scaled_amount: float = amount * _skill_challenge_xp_mult(canon)
-	if scaled_amount <= 0.0:
-		return
-	# ── Visible tier ─────────────────────────────────────────────────────
-	if active_skills.size() > 0 and not active_skills.has(canon):
-		# Visible bucket filtered out by manual-mode selection. Hidden tier
-		# still gets to accumulate (it represents item-specific familiarity,
-		# which is independent of which visible skill the player is grinding).
-		pass
-	else:
-		if not skills.has(canon):
-			skills[canon] = {"level": 0, "xp": 0.0}
-		var v_entry: Dictionary = skills[canon]
-		v_entry["xp"] = float(v_entry.get("xp", 0.0)) + scaled_amount * _skill_apt_mult(canon)
-		while int(v_entry.get("level", 0)) < MAX_SKILL_LEVEL:
-			var lv: int = int(v_entry["level"])
-			var need: float = float(SKILL_XP_DELTA[lv]) if lv < SKILL_XP_DELTA.size() else 99999.0
-			if float(v_entry["xp"]) < need:
-				break
-			v_entry["xp"] = float(v_entry["xp"]) - need
-			v_entry["level"] = lv + 1
-			_on_visible_skill_level_up(canon, int(v_entry["level"]))
-		skills[canon] = v_entry
-	# ── Hidden tier (only if caller passed a hidden-tier sub-skill id) ───
-	if HIDDEN_SUBSKILL_IDS.has(id):
-		if not hidden_skills.has(id):
-			hidden_skills[id] = {"level": 0, "xp": 0.0}
-		var h_entry: Dictionary = hidden_skills[id]
-		h_entry["xp"] = float(h_entry.get("xp", 0.0)) + scaled_amount
-		while int(h_entry.get("level", 0)) < MAX_SKILL_LEVEL:
-			var lv2: int = int(h_entry["level"])
-			var need2: float = float(SKILL_XP_DELTA[lv2]) if lv2 < SKILL_XP_DELTA.size() else 99999.0
-			if float(h_entry["xp"]) < need2:
-				break
-			h_entry["xp"] = float(h_entry["xp"]) - need2
-			h_entry["level"] = lv2 + 1
-			# silent — no log, no stat side effect
-		hidden_skills[id] = h_entry
-	emit_signal("stats_changed")
-
-func _skill_challenge_xp_mult(canonical_id: String) -> float:
-	var skill_level: int = get_skill_level(canonical_id)
-	var challenge_depth: int = _current_challenge_depth()
-	var over: int = skill_level - challenge_depth
-	if over >= 3:
-		return 0.0
-	if over == 2:
-		return 0.25
-	if over == 1:
-		return 0.5
-	return 1.0
+## No-op stub — skill XP system removed. CombatSystem legacy paths still call this.
+func grant_skill_xp(_id: String, _amount: float) -> void:
+	pass
 
 func monster_xp_award(monster, base_amount: int) -> int:
 	if monster == null or monster.data == null or base_amount <= 0:
@@ -1308,8 +1196,15 @@ func _level_up() -> void:
 		Color(1.0, 0.9, 0.3))
 	if xl == 12 or xl == 15 or xl == 18:
 		_auto_stat_bump()
+	# Talent tier unlock: XL 5/10/15/20
+	var tier_map: Dictionary = {5: 1, 10: 2, 15: 3, 20: 4}
+	if tier_map.has(xl):
+		var game_node: Node = get_tree().current_scene if get_tree() != null else null
+		if game_node != null and game_node.has_method("_open_talent_picker"):
+			game_node._open_talent_picker(int(tier_map[xl]))
 
 func _level_up_hp_gain() -> int:
+	# Race hp_per_level only — no skill bonus.
 	var base: int = 5
 	if GameManager != null and RaceRegistry != null:
 		var race: RaceData = RaceRegistry.get_by_id(GameManager.selected_race_id)
@@ -1543,8 +1438,8 @@ func _apply_accessory_stat(id: String) -> void:
 			add_resist("necro", 1)
 		"resist_lightning":
 			add_resist("lightning", 1)
-		"resist_corr":
-			add_resist("corr", 1)
+		"resist_will":
+			add_resist("will", 1)
 		"slay_bonus":
 			slay_bonus += d.effect_value
 		"wizardry":
@@ -1577,8 +1472,8 @@ func _remove_accessory_stat(id: String) -> void:
 			add_resist("necro", -1)
 		"resist_lightning":
 			add_resist("lightning", -1)
-		"resist_corr":
-			add_resist("corr", -1)
+		"resist_will":
+			add_resist("will", -1)
 		"slay_bonus":
 			slay_bonus -= d.effect_value
 		"wizardry":
@@ -1631,8 +1526,8 @@ func _apply_affix_value(mod_type: String, value: int) -> void:
 			_apply_resist_mod("necro", value)
 		"resist_lightning":
 			_apply_resist_mod("lightning", value)
-		"resist_corr":
-			_apply_resist_mod("corr", value)
+		"resist_will":
+			_apply_resist_mod("will", value)
 
 func _apply_resist_mod(kind: String, value: int) -> void:
 	add_resist(kind, value)

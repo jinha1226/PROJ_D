@@ -64,6 +64,50 @@ const ESSENCE_TIER_BY_ID := {
 	"essence_golden": "unique",
 }
 
+const ESSENCE_TAGS_BY_ID := {
+	"essence_fire": ["fire", "arcane"],
+	"essence_cold": ["cold", "ward", "arcane"],
+	"essence_might": ["might", "melee", "war"],
+	"essence_arcana": ["arcane", "magic"],
+	"essence_swiftness": ["speed", "storm", "stealth"],
+	"essence_vitality": ["life", "blood", "fortify"],
+	"essence_stone": ["stone", "fortify"],
+	"essence_warding": ["ward", "will", "fortify"],
+	"essence_regeneration": ["life", "restoration"],
+	"essence_venom": ["poison", "nature"],
+	"essence_fury": ["fury", "melee"],
+	"essence_drain": ["death", "drain", "blood"],
+	"essence_plague": ["poison", "plague", "death"],
+	"essence_glacial": ["cold", "ward"],
+	"essence_infernal": ["fire", "arcane", "fury"],
+	"essence_undeath": ["death", "drain", "void"],
+	"essence_nimble": ["speed", "stealth"],
+	"essence_fang": ["poison", "nature", "beast"],
+	"essence_pack": ["beast", "speed", "fury"],
+	"essence_marrow": ["death", "stone", "fortify"],
+	"essence_shadow": ["shadow", "void", "stealth"],
+	"essence_tracker": ["stealth", "beast", "speed"],
+	"essence_blood": ["blood", "life", "drain"],
+	"essence_scales": ["stone", "ward", "dragon"],
+	"essence_iron_will": ["will", "ward", "fortify"],
+	"essence_wither": ["death", "poison", "decay"],
+	"essence_constrict": ["nature", "poison", "control"],
+	"essence_titan": ["stone", "fortify", "giant", "melee"],
+	"essence_necromancer": ["death", "arcane", "necromancy"],
+	"essence_abyssal": ["void", "death", "drain"],
+	"essence_war_cry": ["war", "melee", "fury"],
+	"essence_hydra": ["beast", "nature", "melee"],
+	"essence_golden": ["holy", "ward", "dragon"],
+	"essence_gloam": ["shadow", "void", "stealth"],
+	"essence_cinder": ["fire", "arcane"],
+	"essence_serpent": ["poison", "nature", "stealth"],
+	"essence_bastion": ["fortify", "stone", "ward"],
+	"essence_dread": ["shadow", "void", "fear"],
+	"essence_bloodwake": ["blood", "fury", "life", "drain"],
+	"essence_tempest": ["storm", "speed", "ranged", "arcane"],
+	"essence_pale_star": ["arcane", "ward", "will", "cold"],
+}
+
 const ESSENCES: Dictionary = {
 	"essence_fire": {
 		"name": "Fire Essence",
@@ -614,8 +658,8 @@ static func apply(player: Player, essence_id: String) -> void:
 			player.add_resist("fire", 1)
 		"resist_cold":
 			player.add_resist("cold", 1)
-		"resist_corr":
-			player.add_resist("corr", 1)
+		"resist_will":
+			player.add_resist("will", 1)
 		"resist_necro":
 			player.add_resist("necro", 1)
 		"stat_str":
@@ -648,8 +692,8 @@ static func remove(player: Player, essence_id: String) -> void:
 			player.add_resist("fire", -1)
 		"resist_cold":
 			player.add_resist("cold", -1)
-		"resist_corr":
-			player.add_resist("corr", -1)
+		"resist_will":
+			player.add_resist("will", -1)
 		"resist_necro":
 			player.add_resist("necro", -1)
 		"stat_str":
@@ -743,6 +787,28 @@ static func passive_desc(id: String) -> String:
 static func passive_effect(id: String) -> String:
 	return String(ESSENCES.get(id, {}).get("passive_effect", ""))
 
+static func essence_tags_of(id: String) -> Array:
+	return Array(ESSENCE_TAGS_BY_ID.get(id, []))
+
+static func has_essence_tag(player: Player, tag: String) -> bool:
+	if player == null or tag == "":
+		return false
+	for essence_id in player.essence_slots:
+		if essence_tags_of(String(essence_id)).has(tag):
+			return true
+	return false
+
+static func has_any_essence_tags(player: Player, tags: Array) -> bool:
+	if player == null:
+		return false
+	for tag in tags:
+		if has_essence_tag(player, String(tag)):
+			return true
+	return false
+
+static func has_talent_tags(player: Player, talent_id: String, tags: Array) -> bool:
+	return player != null and player.has_talent(talent_id) and has_any_essence_tags(player, tags)
+
 static func active_synergies(player: Player) -> Array:
 	var pairs: Array = [
 		["essence_fire", "essence_arcana", "ESSENCE_SYN_BLAZECRAFT"],
@@ -767,6 +833,57 @@ static func active_synergies(player: Player) -> Array:
 	for p in pairs:
 		if has_synergy(player, p[0], p[1]):
 			out.append(TranslationServer.translate(p[2]))
+	return out
+
+static func has_essence(player: Player, essence_id: String) -> bool:
+	return player != null and essence_id != "" and player.essence_slots.has(essence_id)
+
+static func has_any_essence(player: Player, essence_ids: Array) -> bool:
+	if player == null:
+		return false
+	for essence_id in essence_ids:
+		if player.essence_slots.has(String(essence_id)):
+			return true
+	return false
+
+static func has_talent_essence(player: Player, talent_id: String, essence_id: String) -> bool:
+	return player != null and player.has_talent(talent_id) and has_essence(player, essence_id)
+
+static func has_talent_any_essence(player: Player, talent_id: String, essence_ids: Array) -> bool:
+	return player != null and player.has_talent(talent_id) and has_any_essence(player, essence_ids)
+
+static func active_talent_synergies(player: Player) -> Array:
+	var out: Array = []
+	if has_talent_tags(player, "bloodlust", ["death", "blood", "drain"]):
+		out.append("Bloodlust + Death/Blood essences: kill heals +1 HP.")
+	if has_talent_tags(player, "arcane_flow", ["arcane", "death", "void"]):
+		out.append("Arcane Flow + Arcane/Death/Void essences: kill restores more MP.")
+	if has_talent_tags(player, "venom", ["poison", "nature"]):
+		out.append("Venom + Poison essences: poison chance rises and lasts longer.")
+	if has_talent_tags(player, "frost_touch", ["cold", "ward"]):
+		out.append("Frost Touch + Cold/Ward essences: freeze lasts longer.")
+	if has_talent_tags(player, "momentum", ["storm", "speed"]):
+		out.append("Momentum + Storm/Speed essences: free follow-up chance rises.")
+	if has_talent_tags(player, "soul_tap", ["arcane", "death", "void"]):
+		out.append("Soul Tap + Arcane/Death/Void essences: spell crits restore more MP.")
+	if has_talent_tags(player, "cleave", ["fire", "fury"]):
+		out.append("Cleave + Fire/Fury essences: splash burns harder and longer.")
+	if has_talent_tags(player, "shadow_step", ["shadow", "void"]):
+		out.append("Shadow Step + Shadow/Void essences: dodge blink becomes more reliable.")
+	if has_talent_tags(player, "purify", ["ward", "will", "fortify"]):
+		out.append("Purify + Ward/Will essences: cleanse comes faster and heals more.")
+	if has_talent_tags(player, "unstoppable", ["stone", "fortify", "giant"]):
+		out.append("Unstoppable + Stone/Fortify/Giant essences: low-HP threshold becomes sturdier.")
+	if has_talent_tags(player, "execute", ["poison", "plague", "death"]):
+		out.append("Execute + Poison/Plague essences: finishers trigger sooner.")
+	if has_talent_tags(player, "volley", ["storm", "speed", "ranged"]):
+		out.append("Volley + Storm/Speed essences: secondary shots spread wider.")
+	if has_talent_tags(player, "multishot", ["storm", "speed", "ranged"]):
+		out.append("Multishot + Storm/Speed essences: straight-line pierce extends further.")
+	if has_talent_tags(player, "arcane_surge", ["arcane", "fire"]):
+		out.append("Arcane Surge + Arcane/Fire essences: free-cast surge procs more often.")
+	if has_talent_tags(player, "last_rites", ["death", "void"]):
+		out.append("Last Rites + Death/Void essences: revival returns with more life.")
 	return out
 
 static func has_venom_touch(player: Player) -> bool:

@@ -66,18 +66,13 @@ static func _d100_hit_chance(accuracy_pct: int, ev_score_pct: int) -> int:
 
 static func _player_accuracy_pct(player: Player, profile: Dictionary) -> int:
 	var stat_source: int = int(profile.stat_source)
-	var skill_level: int = int(profile.skill_level)
 	var weapon_plus: int = int(profile.weapon_plus)
 	var req_hit_pen: int = int(profile.req_hit_pen)
-	var skill_id: String = String(profile.skill_id)
 	var acc: int = D100_PLAYER_BASE_ACCURACY
 	acc += (stat_source - 10) * D100_STAT_POINT_PCT
-	acc += skill_level * D100_SKILL_LEVEL_PCT
 	acc += weapon_plus * D100_PLUS_PCT
 	acc += player.slay_bonus * D100_SLAY_PCT
 	acc += req_hit_pen * D100_STATUS_HIT_PENALTY_PCT
-	if String(Player.SKILL_REMAP.get(skill_id, "")) == "weapon_mastery":
-		acc += player.get_skill_level("weapon_mastery") * 2
 	acc -= Status.hit_penalty(player) * D100_STATUS_HIT_PENALTY_PCT
 	return acc
 
@@ -202,10 +197,6 @@ static func _player_attack_profile(player: Player) -> Dictionary:
 			profile.weapon = weapon
 			profile.weapon_plus = int(entry.get("plus", 0))
 			profile.weapon_dmg = max(UNARMED_DAMAGE, weapon.damage + int(profile.weapon_plus))
-			# DCSS 30-split: weapon_skill_for_item returns the canonical sub-skill
-			# (short_blades / bows / spellcasting / etc). Stat source/scale stay
-			# weapon-class-specific because finesse weapons key off DEX while
-			# heavy weapons key off STR.
 			profile.skill_id = Player.weapon_skill_for_item(weapon)
 			if weapon.category == "ranged":
 				profile.stat_source = player.dexterity
@@ -219,9 +210,6 @@ static func _player_attack_profile(player: Player) -> Dictionary:
 			var pen: Dictionary = _weapon_req_penalty(player, weapon)
 			profile.req_hit_pen = pen.hit
 			profile.req_dmg_pct = pen.dmg_pct
-	var skill_id: String = String(profile.skill_id)
-	if skill_id != "":
-		profile.skill_level = player.get_skill_level(skill_id)
 	return profile
 
 static func _player_attack_hits(player: Player, monster: Monster, profile: Dictionary) -> bool:
@@ -281,17 +269,25 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 	flat_bonus += backstab_bonus
 	flat_bonus += EssenceSystem.melee_flat_bonus(player)
 	var mult: float = 1.0
-	# Faith/essence damage hooks routed by canonical bucket. Mastery mults
-	# stubbed to 1.0 under the dual-tier model — left in chain so future
-	# wiring of the 20% hidden-familiarity bonus can replace them in place.
-	var canon_skill: String = String(Player.SKILL_REMAP.get(skill_id, ""))
-	if canon_skill == "archery":
+	# Route by weapon category (skill system removed — check weapon directly).
+	var weapon_obj: ItemData = profile.weapon
+	var is_ranged: bool = weapon_obj != null and weapon_obj.category == "ranged"
+	if is_ranged:
 		mult *= EssenceSystem.ranged_damage_mult(player)
 		mult *= FaithSystem.ranged_damage_mult(player)
 		mult *= player.ranged_mastery_dmg_mult()
-	elif canon_skill == "weapon_mastery" or skill_id == "":
+	else:
 		mult *= FaithSystem.melee_damage_mult(player)
 		mult *= player.melee_mastery_dmg_mult()
+	# Talent: unstoppable — damage bonus when below threshold; stronger with Bastion/Titan.
+	if player.has_talent("unstoppable") and player.hp_max > 0:
+		var unstoppable_threshold: float = 0.3
+		var unstoppable_bonus: float = 0.10
+		if EssenceSystem.has_talent_tags(player, "unstoppable", ["stone", "fortify", "giant"]):
+			unstoppable_threshold = 0.35
+			unstoppable_bonus = 0.15
+		if float(player.hp) / float(player.hp_max) <= unstoppable_threshold:
+			mult *= 1.0 + unstoppable_bonus
 	if not monster.is_aware:
 		var uw_mult: float = EssenceSystem.unaware_damage_mult(player)
 		if uw_mult > 1.0:
@@ -309,13 +305,40 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		if brand_element == "necro":
 			brand_extra = max(1, int(round(float(brand_extra) * FaithSystem.necrotic_damage_mult(player))))
 		final += brand_extra
+	# execute check: talent kills poisoned/bleeding enemies at low HP before damage
+	if player.has_talent("execute"):
+		var has_execute_status: bool = Status.has(monster, "poison") or Status.has(monster, "bleeding")
+		if has_execute_status and monster.hp > 0:
+			var hp_ratio: float = float(monster.hp) / float(max(1, monster.data.hp))
+			var execute_threshold: float = 0.35
+			if EssenceSystem.has_talent_tags(player, "execute", ["poison", "plague", "death"]):
+				execute_threshold = 0.45
+			if hp_ratio <= execute_threshold:
+				monster.hp = 0
 	CombatLog.hit(_hit_log(monster.data.display_name, brand, final, brand_extra, backstab_bonus))
 	var was_alive: bool = monster.hp > 0
-	monster.take_damage(final)
+	if monster.hp > 0:
+		monster.take_damage(final)
 	BodyPartSystem.process_hit(monster, final, player.grid_pos)
 	monster.become_aware(player.grid_pos)
-	# Tactics XP on every successful hit — positioning and timing awareness.
-	player.grant_skill_xp("tactics", 1.5)
+	# Talent: venom — poison on melee hit, stronger with matching essences.
+	if player.has_talent("venom") and monster.hp > 0:
+		var venom_chance: float = 0.15
+		var venom_turns: int = 3
+		if EssenceSystem.has_talent_tags(player, "venom", ["poison", "nature"]):
+			venom_chance = 0.25
+			venom_turns = 4
+		if randf() < venom_chance:
+			Status.apply(monster, "poison", venom_turns)
+	# Talent: frost_touch — freeze on melee hit, stronger with cold essences.
+	if player.has_talent("frost_touch") and monster.hp > 0:
+		var frost_chance: float = 0.20
+		var frost_turns: int = 1
+		if EssenceSystem.has_talent_tags(player, "frost_touch", ["cold", "ward"]):
+			frost_chance = 0.30
+			frost_turns = 2
+		if randf() < frost_chance:
+			Status.apply(monster, "frozen", frost_turns)
 	if brand != "" and brand_extra > 0 and monster.hp > 0:
 		_apply_brand_status(monster, brand)
 		if brand == "drain" and brand_extra > 0:
@@ -335,22 +358,128 @@ static func player_attack_monster(player: Player, monster: Monster) -> void:
 		var hydra_dmg: int = max(1, base_final / 2)
 		monster.take_damage(hydra_dmg)
 		CombatLog.hit("Hydra strike! (%d)" % hydra_dmg)
-	if weapon != null and weapon.category == "axe":
-		_cleave_hit(player, monster, final)
-	if monster.hp > 0:
-		var w_check: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
-		if w_check != null and w_check.category == "dagger":
-			var swift_chance: float = player.get_skill_level("weapon_mastery") * 0.05
-			if swift_chance > 0.0 and randf() < swift_chance:
-				CombatLog.hit(LocaleManager.t("LOG_SWIFT_STRIKE"))
-				_dagger_swift_strike(player, monster)
+	# cleave talent: melee attacks hit adjacent enemies for 50% damage + burning 2t
+	if weapon == null or weapon.category != "ranged":
+		if player.has_talent("cleave"):
+			_talent_cleave_hit(player, monster, final)
+		elif weapon != null and weapon.category == "axe":
+			_cleave_hit(player, monster, final)
+	# Ranged talent effects
+	if weapon != null and weapon.category == "ranged":
+		# chain_strike: 40% damage to one adjacent enemy, stronger with Tempest.
+		if player.has_talent("chain_strike"):
+			var neighbors: Array = _get_adjacent_monsters(monster)
+			if not neighbors.is_empty():
+				var chain_target: Monster = neighbors[0]
+				var chain_mult: float = 0.4
+				if EssenceSystem.has_talent_tags(player, "chain_strike", ["storm", "speed", "ranged"]):
+					chain_mult = 0.5
+				var chain_dmg: int = max(1, int(round(float(final) * chain_mult)))
+				chain_target.take_damage(chain_dmg)
+				CombatLog.hit("Chain Strike! %s for %d." % [chain_target.data.display_name, chain_dmg])
+		# volley: also hits adjacent enemies, stronger with Tempest.
+		if player.has_talent("volley"):
+			var adj: Array = _get_adjacent_monsters(monster)
+			var hits: int = 0
+			var volley_limit: int = 1
+			var volley_mult: float = 0.6
+			if EssenceSystem.has_talent_tags(player, "volley", ["storm", "speed", "ranged"]):
+				volley_limit = 2
+				volley_mult = 0.5
+			for vol_m in adj:
+				if hits >= volley_limit:
+					break
+				var volley_dmg: int = max(1, int(round(float(final) * volley_mult)))
+				vol_m.take_damage(volley_dmg)
+				CombatLog.hit("Volley! %s for %d." % [vol_m.data.display_name, volley_dmg])
+				hits += 1
+		# multishot: pierce through enemies in a straight line
+		if player.has_talent("multishot"):
+			var pierce_hits: int = 0
+			var pierce_limit: int = 2
+			if EssenceSystem.has_talent_tags(player, "multishot", ["storm", "speed", "ranged"]):
+				pierce_limit = 3
+			for pierce_m in _get_monsters_in_line(player.grid_pos, monster.grid_pos, monster):
+				if pierce_hits >= pierce_limit:
+					break
+				pierce_m.take_damage(final)
+				CombatLog.hit("Multishot! %s for %d." % [pierce_m.data.display_name, final])
+				pierce_hits += 1
 	if was_alive and monster.hp <= 0:
 		CombatLog.hit(LocaleManager.t("LOG_YOU_KILL_THE") % monster.data.display_name)
 		_apply_player_kill_rewards(player, monster, skill_id)
-		# Tactics XP bonus on a backstab killing-blow. backstab_bonus > 0
-		# iff the kill landed before the monster was aware of the player.
-		if backstab_bonus > 0:
-			player.grant_skill_xp("tactics", 5.0)
+
+static func _get_adjacent_monsters(anchor: Monster) -> Array:
+	var result: Array = []
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return result
+	for node in tree.get_nodes_in_group("monsters"):
+		if not (node is Monster):
+			continue
+		var m: Monster = node as Monster
+		if m == anchor or m.hp <= 0:
+			continue
+		var dist: int = max(abs(m.grid_pos.x - anchor.grid_pos.x),
+				abs(m.grid_pos.y - anchor.grid_pos.y))
+		if dist <= 1:
+			result.append(m)
+	return result
+
+## Returns monsters on the ray from origin through primary (excluding primary).
+static func _get_monsters_in_line(origin: Vector2i, primary: Vector2i, skip: Monster) -> Array:
+	var result: Array = []
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return result
+	var dx: int = primary.x - origin.x
+	var dy: int = primary.y - origin.y
+	if dx == 0 and dy == 0:
+		return result
+	var step_x: int = sign(dx)
+	var step_y: int = sign(dy)
+	# Collect all group monsters keyed by grid_pos for fast lookup
+	var pos_map: Dictionary = {}
+	for node in tree.get_nodes_in_group("monsters"):
+		if not (node is Monster):
+			continue
+		var m: Monster = node as Monster
+		if m == skip or m.hp <= 0:
+			continue
+		pos_map[m.grid_pos] = m
+	# Walk the ray beyond the primary target
+	var cur: Vector2i = primary + Vector2i(step_x, step_y)
+	for _i in range(20):
+		if pos_map.has(cur):
+			result.append(pos_map[cur])
+		# Stop if we deviate off axis (only cardinal/diagonal lines supported)
+		cur += Vector2i(step_x, step_y)
+	return result
+
+## Talent cleave: hits all adjacent enemies for reduced damage + burning.
+static func _talent_cleave_hit(player: Player, primary: Monster, base_dmg: int) -> void:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return
+	var cleave_mult: float = 0.4
+	var burn_turns: int = 1
+	if EssenceSystem.has_talent_tags(player, "cleave", ["fire", "fury"]):
+		cleave_mult = 0.5
+		burn_turns = 2
+	var cleave_dmg: int = max(1, int(round(float(base_dmg) * cleave_mult)))
+	for node in tree.get_nodes_in_group("monsters"):
+		if not (node is Monster):
+			continue
+		var m: Monster = node as Monster
+		if m == primary or m.hp <= 0:
+			continue
+		var dist: int = max(abs(m.grid_pos.x - player.grid_pos.x),
+				abs(m.grid_pos.y - player.grid_pos.y))
+		if dist <= 1:
+			CombatLog.hit(LocaleManager.t("LOG_CLEAVE_HITS_THE_FOR") % [m.data.display_name, cleave_dmg])
+			m.take_damage(cleave_dmg)
+			if m.hp > 0:
+				Status.apply(m, "burning", burn_turns)
 
 static func _cleave_hit(player: Player, primary: Monster, base_dmg: int) -> void:
 	var tree := Engine.get_main_loop() as SceneTree
@@ -380,7 +509,6 @@ static func _dagger_swift_strike(player: Player, monster: Monster) -> void:
 	var dice: Array = _weapon_damage_dice(weapon_item)
 	var raw: int = _roll_dice(int(dice[0]), int(dice[1]), int(dice[2]))
 	raw += _damage_modifier_from_score(player.dexterity + _player_size_score(player))
-	raw += _skill_damage_step(player.get_skill_level("weapon_mastery"))
 	raw += randi_range(0, 1)
 	var eff_ac2: int = max(0, monster.data.ac - (2 if Status.has(monster, "corroded") else 0))
 	var soak: int = _armor_soak_roll(eff_ac2)
@@ -398,14 +526,36 @@ static func _apply_player_kill_rewards(player: Player, monster: Monster, skill_i
 	var xp_award: int = player.monster_xp_award(monster, base_xp)
 	if xp_award > 0:
 		player.grant_xp(xp_award)
-		player.grant_kill_skill_xp(float(xp_award), skill_id)
-		# Tracking XP: flat per-kill grant for hunting relevant creatures.
-		player.grant_skill_xp("tracking", 0.5)
 	player.register_kill()
 	GameManager.try_kill_unlock(monster.data.id)
 	RacePassiveSystem.on_player_killed_monster(player)
 	EssenceSystem.apply_on_kill_effects(player)
 	RingSystem.apply_on_kill_effects(player)
+
+	# Talent: bloodlust — heal 2 HP on kill, +1 with drain/undeath/blood essences.
+	if player.has_talent("bloodlust"):
+		var bloodlust_heal: int = 2
+		if EssenceSystem.has_talent_tags(player, "bloodlust", ["death", "blood", "drain"]):
+			bloodlust_heal += 1
+		player.heal(bloodlust_heal)
+	# Talent: arcane_flow — recover 1 MP on kill, +1 with arcana/pale star.
+	if player.has_talent("arcane_flow"):
+		var arcane_flow_mp: int = 1
+		if EssenceSystem.has_talent_tags(player, "arcane_flow", ["arcane", "death", "void"]):
+			arcane_flow_mp += 1
+		player.mp = min(player.mp_max, player.mp + arcane_flow_mp)
+	# Talent: momentum — chance to empower the next melee attack only.
+	if player.has_talent("momentum"):
+		var kill_weapon: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null and player.equipped_weapon_id != "" else null
+		var momentum_chance: float = 0.40
+		if EssenceSystem.has_talent_tags(player, "momentum", ["storm", "speed"]):
+			momentum_chance = 0.55
+		if kill_weapon != null and kill_weapon.category != "ranged" and randf() < momentum_chance:
+			player.free_attack = true
+	# Talent: plague_vector — spread poison to adjacent monsters if victim was poisoned
+	if player.has_talent("plague_vector") and Status.has(monster, "poison"):
+		for neighbor in _get_adjacent_monsters(monster):
+			Status.apply(neighbor, "poison", 2)
 
 	# Humanoid gold drop: direct reward (no floor item needed)
 	if monster.data.gold_drop_max > 0 and randf() < 0.30:
@@ -530,7 +680,7 @@ static func _backstab_bonus(player: Player, monster: Monster, weapon: ItemData,
 	if monster == null or monster.is_aware:
 		return 0
 	var bonus_mult: float = BACKSTAB_BASE_BONUS
-	bonus_mult += float(player.get_skill_level("stealth")) * BACKSTAB_PER_AGILITY
+	bonus_mult += float(player.get_skill_level("dodging")) * BACKSTAB_PER_AGILITY
 	if weapon != null and weapon.category == "dagger":
 		bonus_mult += BACKSTAB_DAGGER_BONUS
 	bonus_mult = min(BACKSTAB_MAX_BONUS, bonus_mult)
@@ -575,11 +725,31 @@ static func monster_ranged_attack_player(monster: Monster, player: Player,
 	var soak: int = _armor_soak_roll(eff_ac)
 	var final: int = max(1, raw - soak)
 	final = max(1, final - EssenceSystem.incoming_damage_reduction(player))
-	# Defense mastery: small multiplicative DR after flat soak/reduction.
 	final = max(1, int(round(float(final) * player.defense_mastery_incoming_mult())))
 	final = RacePassiveSystem.on_player_hit(player, final)
+	# Talent: unstoppable — reduce incoming damage below threshold; stronger with Bastion/Titan.
+	if player.has_talent("unstoppable") and player.hp_max > 0:
+		var unstoppable_threshold: float = 0.3
+		var unstoppable_dr: float = 0.25
+		if EssenceSystem.has_talent_tags(player, "unstoppable", ["stone", "fortify", "giant"]):
+			unstoppable_threshold = 0.35
+			unstoppable_dr = 0.30
+		if float(player.hp) / float(player.hp_max) <= unstoppable_threshold:
+			final = max(1, int(float(final) * (1.0 - unstoppable_dr)))
 	CombatLog.damage_taken(LocaleManager.t("LOG_THE_YOU_FOR") \
 			% [monster.data.display_name, verb, final])
+	# Talent: last_rites — survive lethal ranged hit once per run
+	if player.hp - final <= 0 and player.has_talent("last_rites") and not player.revived:
+		player.revived = true
+		var revive_ratio: float = 0.25
+		if EssenceSystem.has_talent_tags(player, "last_rites", ["death", "void"]):
+			revive_ratio = 0.30
+		player.hp = max(1, int(player.hp_max * revive_ratio))
+		CombatLog.post("Last Rites: risen from death!", Color(0.9, 0.8, 0.4))
+		BodyPartSystem.process_hit(player, final, monster.grid_pos)
+		if player.hp > 0:
+			_apply_armor_brand_retaliation(player, monster)
+		return
 	player.take_damage(final, monster.data.id)
 	BodyPartSystem.process_hit(player, final, monster.grid_pos)
 	if player.hp > 0:
@@ -636,14 +806,12 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 		_grant_defense_xp(player, "armor", DEFENSE_XP_HIT_TAKEN)
 	if player.equipped_shield_id != "" and not player.has_two_handed_weapon():
 		_grant_defense_xp(player, "shields", DEFENSE_XP_HIT_TAKEN)
-	# Parry: blade weapon skill gives chance to halve damage
+	# Parry: blade weapon — small base chance without skill (talent system placeholder)
 	if player.equipped_weapon_id != "":
 		var _wp: ItemData = ItemRegistry.get_by_id(player.equipped_weapon_id) if ItemRegistry != null else null
-		if _wp != null and _wp.category == "blade":
-			var parry_chance: float = player.get_skill_level("weapon_mastery") * 0.03
-			if parry_chance > 0.0 and randf() < parry_chance:
-				CombatLog.miss(LocaleManager.t("LOG_YOU_PARRY_THE_S_ATTACK") % monster.data.display_name)
-				return
+		if _wp != null and _wp.category == "blade" and randf() < 0.05:
+			CombatLog.miss(LocaleManager.t("LOG_YOU_PARRY_THE_S_ATTACK") % monster.data.display_name)
+			return
 	var dmg_lo: int = max(1, dmg_base * 3 / 5)
 	var dmg_hi: int = max(dmg_lo, dmg_base * 3 / 2)
 	var raw: int = randi_range(dmg_lo, dmg_hi) + monster.data.hd / 2
@@ -653,11 +821,49 @@ static func monster_attack_player(monster: Monster, player: Player) -> void:
 	# Defense mastery: small multiplicative DR after flat soak/reduction.
 	final = max(1, int(round(float(final) * player.defense_mastery_incoming_mult())))
 	final = RacePassiveSystem.on_player_hit(player, final)
+	# Talent: unstoppable — reduce incoming damage below threshold; stronger with Bastion/Titan.
+	if player.has_talent("unstoppable") and player.hp_max > 0:
+		var unstoppable_threshold: float = 0.3
+		var unstoppable_dr: float = 0.25
+		if EssenceSystem.has_talent_tags(player, "unstoppable", ["stone", "fortify", "giant"]):
+			unstoppable_threshold = 0.35
+			unstoppable_dr = 0.30
+		if float(player.hp) / float(player.hp_max) <= unstoppable_threshold:
+			final = max(1, int(float(final) * (1.0 - unstoppable_dr)))
 	CombatLog.damage_taken(LocaleManager.t("LOG_THE_HITS_YOU_FOR") % [monster.data.display_name, final])
+	# Talent: last_rites — survive lethal hit once per run
+	if player.hp - final <= 0 and player.has_talent("last_rites") and not player.revived:
+		player.revived = true
+		var revive_ratio: float = 0.25
+		if EssenceSystem.has_talent_tags(player, "last_rites", ["death", "void"]):
+			revive_ratio = 0.30
+		player.hp = max(1, int(player.hp_max * revive_ratio))
+		CombatLog.post("Last Rites: risen from death!", Color(0.9, 0.8, 0.4))
+		BodyPartSystem.process_hit(player, final, monster.grid_pos)
+		if player.hp > 0:
+			_apply_armor_brand_retaliation(player, monster)
+		return
 	player.take_damage(final, monster.data.id)
 	BodyPartSystem.process_hit(player, final, monster.grid_pos)
 	if player.hp > 0:
 		_apply_armor_brand_retaliation(player, monster)
+		# Talent: glacial — slow attacker when player is hit, stronger with cold essences.
+		if player.has_talent("glacial"):
+			var glacial_turns: int = 1
+			if EssenceSystem.has_talent_tags(player, "glacial", ["cold", "ward"]):
+				glacial_turns = 2
+			Status.apply(monster, "slow", glacial_turns)
+		# Talent: shadow_step — chance to teleport behind attacker, stronger with Gloam.
+		if player.has_talent("shadow_step"):
+			var shadow_step_chance: float = 0.20
+			if EssenceSystem.has_talent_tags(player, "shadow_step", ["shadow", "void"]):
+				shadow_step_chance = 0.25
+			if randf() < shadow_step_chance:
+				var behind: Vector2i = monster.grid_pos + (monster.grid_pos - player.grid_pos).sign()
+				if player._map != null and player._map.is_walkable(behind) and behind != monster.grid_pos:
+					player.grid_pos = behind
+					player.position = player._map.grid_to_world(behind)
+					CombatLog.post("Shadow Step: you slip behind the enemy!", Color(0.5, 0.4, 0.65))
 	var poison_turns: int = int(attack.get("poison_turns", 0))
 	if poison_turns > 0 and player.hp > 0:
 		player.apply_status("poison", poison_turns)
@@ -680,17 +886,13 @@ static func ally_attack_monster(ally: Monster, target: Monster) -> void:
 	if target.hp <= 0:
 		target.die()
 
-## Defense skill XP per defensive event. Tuned smaller than kill XP since
-## defensive events fire more frequently — every monster turn vs every kill.
-const DEFENSE_XP_HIT_TAKEN: float = 1.5  # armor / shields when struck
-const DEFENSE_XP_DODGE: float = 2.0      # dodging when EV beats to-hit
-const DEFENSE_XP_BLOCK: float = 3.0      # shields bonus on successful block
+## Defense XP constants kept for reference; system removed — all are no-ops.
+const DEFENSE_XP_HIT_TAKEN: float = 1.5
+const DEFENSE_XP_DODGE: float = 2.0
+const DEFENSE_XP_BLOCK: float = 3.0
 
-static func _grant_defense_xp(player: Player, skill_id: String, amount: float) -> void:
-	# Bypass active_skills routing — defensive events should always train
-	# the relevant defensive sub-skill, not the player's chosen actives.
-	if Player.SKILL_IDS.has(skill_id) or Player.HIDDEN_SUBSKILL_IDS.has(skill_id):
-		player.grant_skill_xp(skill_id, amount)
+static func _grant_defense_xp(_player: Player, _skill_id: String, _amount: float) -> void:
+	pass  # skill XP system removed
 
 static func _try_player_shield_block(player: Player, monster: Monster) -> bool:
 	if player.equipped_shield_id == "" or player.has_two_handed_weapon():
@@ -698,13 +900,8 @@ static func _try_player_shield_block(player: Player, monster: Monster) -> bool:
 	var shield: ItemData = ItemRegistry.get_by_id(player.equipped_shield_id) if ItemRegistry != null and player.equipped_shield_id != "" else null
 	if shield == null:
 		return false
-	var shield_skill: int = player.get_skill_level("defense")
-	var missing: int = max(0, shield.required_skill - shield_skill)
-	var block_pct: int = _clamp_pct(
-		shield.effect_value + shield_skill * 3 - missing * 4,
-		D100_MIN_BLOCK_CHANCE,
-		D100_MAX_BLOCK_CHANCE
-	)
+	# No skill modifier — use base shield block chance only
+	var block_pct: int = _clamp_pct(shield.effect_value, D100_MIN_BLOCK_CHANCE, D100_MAX_BLOCK_CHANCE)
 	if not _roll_pct(block_pct):
 		return false
 	CombatLog.miss(LocaleManager.t("LOG_YOU_BLOCK_THE_S_ATTACK") % monster.data.display_name)

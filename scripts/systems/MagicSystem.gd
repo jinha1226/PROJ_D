@@ -18,17 +18,41 @@ static func cast(spell_id: String, player: Player, game: Node) -> bool:
 			Color(1.0, 0.7, 0.5))
 		return false
 	var wizardry_scale: float = max(0.6, 1.0 - float(player.wizardry_bonus) * 0.08)
-	var mp_cost: int = max(1, int(ceil(float(spell.mp_cost) * FaithSystem.spell_cost_mult(player) * wizardry_scale)))
-	if not RacePassiveSystem.on_spell_cast_mp_check(player, mp_cost):
+	var base_mp_cost: int = max(1, int(ceil(float(spell.mp_cost) * FaithSystem.spell_cost_mult(player) * wizardry_scale)))
+	# Talent: overload — +1 MP cost, softer with Arcana/Cinder resonance.
+	var extra_mp: int = 0
+	if player.has_talent("overload"):
+		extra_mp = 1
+		if EssenceSystem.has_talent_tags(player, "overload", ["arcane", "fire"]):
+			extra_mp = 0
+	var mp_cost: int = base_mp_cost + extra_mp
+	# Talent: arcane_surge — chance for a free cast + double power.
+	var free_cast: bool = false
+	if player.has_talent("arcane_surge"):
+		var surge_chance: float = 0.12
+		if EssenceSystem.has_talent_tags(player, "arcane_surge", ["arcane", "fire"]):
+			surge_chance = 0.17
+		if randf() < surge_chance:
+			free_cast = true
+	if not free_cast and not RacePassiveSystem.on_spell_cast_mp_check(player, mp_cost):
 		CombatLog.post(LocaleManager.t("LOG_NOT_ENOUGH_MP_FOR") % spell.display_name,
 			Color(1.0, 0.7, 0.5))
 		return false
-	player.mp = max(0, player.mp - mp_cost)
+	if not free_cast:
+		player.mp = max(0, player.mp - mp_cost)
 	player.emit_signal("stats_changed")
 	var power: int = _compute_power(player, spell)
+	# Talent: arcane_surge — double power on free cast
+	if free_cast:
+		power *= 2
+		CombatLog.post("Arcane Surge! (free cast, double power)", Color(1.0, 0.6, 0.1))
+	# Talent: overload — spell damage boost, stronger with Arcana/Cinder resonance.
+	if player.has_talent("overload"):
+		var overload_mult: float = 1.4
+		if EssenceSystem.has_talent_tags(player, "overload", ["arcane", "fire"]):
+			overload_mult = 1.5
+		power = int(float(power) * overload_mult)
 	_cast_effect(spell, player, game, power)
-	# Grant magery XP on every cast — higher-level spells give more.
-	player.grant_skill_xp("magery", 2.0 * (1.0 + float(spell.spell_level)))
 	return true
 
 static func _cast_effect(spell: SpellData, player: Player, game: Node, power: int) -> void:
@@ -289,8 +313,6 @@ static func _cast_prismatic(spell: SpellData, player: Player, power: int, game: 
 
 
 static func _armor_spell_mult(player: Player) -> float:
-	# Robe amplifies spell power slightly; other armors use encumbrance formula.
-	# defense skill reduces effective encumbrance before the penalty is applied.
 	if player.equipped_armor_id == "robe":
 		return 1.1
 	if player.equipped_armor_id == "":
@@ -299,16 +321,12 @@ static func _armor_spell_mult(player: Player) -> float:
 	if item == null:
 		return 1.0
 	var enc: int = item.encumbrance
-	var def_skill: int = player.get_skill_level("armor")
-	return maxf(0.5, 1.0 - max(0, enc - def_skill) * 0.03)
+	return maxf(0.5, 1.0 - max(0, enc) * 0.03)
 
 
 static func _compute_power(player: Player, spell: SpellData) -> int:
-	var total_skill: float = float(player.get_skill_level("magery"))
-	var base: int = int(float(player.intelligence) * (1.0 + total_skill * 0.06) * _armor_spell_mult(player))
+	var base: int = int(float(player.intelligence) * _armor_spell_mult(player))
 	var power: int = base + EssenceSystem.spell_power_bonus(player, spell) + player.wizardry_bonus * 4
-	# Hidden spell-school familiarity is tracked for inspection but does not
-	# affect formulas until the dedicated 80/20 balance pass.
 	return int(float(power) * FaithSystem.spell_damage_mult(player) * player.magic_mastery_power_mult())
 
 
@@ -339,14 +357,19 @@ static func _apply_elemental_side_effects(spell: SpellData, target: Monster) -> 
 		Status.apply(target, String(pair[0]), turns)
 
 
-static func _on_kill(target: Monster, player: Player, spell: SpellData) -> void:
+static func _on_kill(target: Monster, player: Player, _spell: SpellData) -> void:
 	CombatLog.hit(LocaleManager.t("LOG_YOU_KILL_THE") % target.data.display_name)
 	var xp_award: int = player.monster_xp_award(target, target.data.xp_value)
 	if xp_award > 0:
 		player.grant_xp(xp_award)
-		player.grant_kill_skill_xp(float(xp_award), player.spell_skill_for(spell))
 	player.register_kill()
 	GameManager.try_kill_unlock(target.data.id)
+	# Talent: bloodlust — heal 2 HP on kill
+	if player.has_talent("bloodlust"):
+		player.heal(2)
+	# Talent: arcane_flow — recover 1 MP on spell kill
+	if player.has_talent("arcane_flow"):
+		player.mp = min(player.mp_max, player.mp + 1)
 
 
 static func _damage_auto_target(spell: SpellData, player: Player,
@@ -375,6 +398,17 @@ static func _damage_auto_target(spell: SpellData, player: Player,
 		_apply_elemental_side_effects(spell, target)
 	if was_alive and target.hp <= 0:
 		_on_kill(target, player, spell)
+	# Talent: soul_tap — spell crit returns MP, stronger with Arcana/Undeath resonance.
+	if player.has_talent("soul_tap") and scaled > 0:
+		var soul_tap_mp: int = 1
+		var soul_tap_chance: float = 0.15
+		if EssenceSystem.has_talent_tags(player, "soul_tap", ["arcane", "death", "void"]):
+			soul_tap_mp = 2
+			soul_tap_chance = 0.20
+		if randf() < soul_tap_chance:
+			player.mp = min(player.mp_max, player.mp + soul_tap_mp)
+		player.emit_signal("stats_changed")
+		CombatLog.post("Soul Tap! (+%d MP)" % soul_tap_mp, Color(0.7, 0.3, 0.8))
 	_spawn_impact_cloud(spell, target.grid_pos, game)
 
 
