@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_swiftness"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "swiftness"
+display_name = "Swiftness"
+school = "charms"
+spell_level = 2
+xl_required = 3
+mp_cost = 2
+difficulty = 2
+base_damage = 0
+max_range = 0
+targeting = "self"
+element = ""
+effect = "haste"
+effect_value = 8
+description = "Temporarily accelerates your movement speed, letting you outrun enemies or reposition quickly."
+icon_path = "res://assets/tiles/individual/spell/swiftness.png"
