@@ -463,7 +463,7 @@ func _draw() -> void:
 	if GameManager != null and GameManager.use_tiles:
 		var cs: float = DungeonMap.CELL_SIZE
 		var draw_rect: Rect2 = Rect2(Vector2(cs, 0), Vector2(-cs, cs)) \
-				if player.facing.x < 0 else rect
+				if player.facing.x > 0 else rect
 		if _composed_tex != null:
 			draw_texture_rect(_composed_tex, draw_rect, false)
 		elif _dcss_tile != null:
