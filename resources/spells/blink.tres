@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://spell_blink"]
+
+[ext_resource type="Script" path="res://scripts/entities/SpellData.gd" id="1_sdata"]
+
+[resource]
+script = ExtResource("1_sdata")
+id = "blink"
+display_name = "Blink"
+school = "translocations"
+spell_level = 1
+xl_required = 1
+mp_cost = 1
+difficulty = 1
+base_damage = 0
+max_range = 0
+targeting = "self"
+element = ""
+effect = "blink"
+effect_value = 6
+description = "Randomly teleports you a short distance. Useful for escaping melee range or repositioning out of danger."
+icon_path = "res://assets/tiles/individual/spell/blink.png"
