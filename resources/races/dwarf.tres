@@ -15,36 +15,4 @@ dex_mod = -3
 hp_mod = 1
 size_score = 9
 resist_mods = ["poison+", "fire+"]
-skill_aptitudes = {
-"fighting": 1,
-"short_blades": -2,
-"long_blades": -1,
-"maces": 2,
-"axes": 2,
-"staves": 1,
-"polearms": 0,
-"bows": -2,
-"crossbows": -2,
-"slings": -2,
-"throwing": -2,
-"armor": 1,
-"dodging": -3,
-"stealth": -2,
-"shields": 1,
-"spellcasting": -2,
-"conjurations": -1,
-"hexes": 0,
-"charms": 0,
-"summonings": -2,
-"necromancy": 1,
-"translocations": -2,
-"transmutation": -2,
-"fire": 2,
-"ice": -1,
-"air": -3,
-"earth": 1,
-"poison": -2,
-"invocations": 3,
-"evocations": 1
-}
 hp_per_level = 6

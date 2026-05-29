@@ -117,6 +117,8 @@ const _RING_POISON_RESIST: Resource = preload("res://resources/items/ring_poison
 const _RING_COLD_RESIST: Resource = preload("res://resources/items/ring_cold_resist.tres")
 const _RING_FIRE_RESIST: Resource = preload("res://resources/items/ring_fire_resist.tres")
 const _RING_NECRO_RESIST: Resource = preload("res://resources/items/ring_necro_resist.tres")
+const _RING_LIGHTNING_RESIST: Resource = preload("res://resources/items/ring_lightning_resist.tres")
+const _RING_WILL_RESIST: Resource = preload("res://resources/items/ring_will_resist.tres")
 # Unique rings
 const _RING_BOG: Resource = preload("res://resources/items/ring_bog.tres")
 const _RING_GLACIER: Resource = preload("res://resources/items/ring_glacier.tres")
@@ -241,6 +243,7 @@ const _ALL_ITEMS: Array = [
 	_POTION_PARALYSIS, _POTION_TOXIC_GAS, _POTION_LIQUID_FLAME,
 	_SCROLL_CURSE, _SCROLL_TORMENT, _SCROLL_VULNERABILITY,
 	_RING_POISON_RESIST, _RING_COLD_RESIST, _RING_FIRE_RESIST, _RING_NECRO_RESIST,
+	_RING_LIGHTNING_RESIST, _RING_WILL_RESIST,
 	_RING_BOG, _RING_GLACIER, _RING_EMBER, _RING_UNDEATH,
 	_ESSENCE_SHARD,
 	_RUNE_SWAMP, _RUNE_ICE, _RUNE_INFERNAL, _RUNE_CRYPT,

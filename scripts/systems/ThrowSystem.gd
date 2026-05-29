@@ -78,8 +78,7 @@ static func _resolve_weapon(data: ItemData, player: Player,
 		"throw_pierce", "throw_heavy":
 			if hit != null:
 				var base: int = maxi(1, data.damage)
-				var bonus: int = player.get_skill_level("archery") / 2
-				var dmg: int = randi_range(base, base + bonus)
+				var dmg: int = randi_range(base, base + 1)
 				hit.take_damage(dmg)
 				hit.become_aware(player.grid_pos)
 				CombatLog.post("The %s hits the %s for %d." % [data.display_name, hit.data.display_name, dmg],

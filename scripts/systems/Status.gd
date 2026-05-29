@@ -174,20 +174,38 @@ static func apply(actor, id: String, turns: int) -> void:
 		if randf() < resist_chance:
 			_log_resist(id)
 			return
-	# Survival shortens negative status durations on the player. Beneficial
-	# statuses (shroud/might/haste) also shrink as a side effect — acceptable
-	# first-pass tradeoff; balance pass can split positive vs negative lists.
-	if actor is Player and actor.has_method("get_skill_level"):
-		var survival_lv: int = actor.get_skill_level("survival")
-		if survival_lv > 0:
-			var reduction: float = float(survival_lv) * 0.05
-			turns = max(1, int(round(float(turns) * (1.0 - reduction))))
+	# (Skill-based duration reduction removed with skill system.)
 	var d: Dictionary = actor.get(key)
 	var first: bool = not d.has(id)
 	d[id] = max(int(d.get(id, 0)), turns)
 	actor.set(key, d)
 	if first:
 		_on_apply(actor, id)
+
+## Purify talent helper: remove the first debuff (damage-over-time or action-impair)
+## from actor. Returns the removed status id, or "" if nothing was removed.
+static func remove_first_debuff(actor) -> String:
+	var key: String = _dict_name(actor)
+	if key == "":
+		return ""
+	var d: Dictionary = actor.get(key)
+	if d.is_empty():
+		return ""
+	# Prefer harmful statuses in this order
+	var debuff_priority: Array = [
+		"poison", "bleeding", "burning", "diseased",
+		"slow", "blind", "crippled",
+		"frozen", "paralyzed", "stunned", "confused", "feared",
+		"weak", "corroded", "drained", "cursed", "vulnerable",
+	]
+	for id in debuff_priority:
+		if d.has(id):
+			remove(actor, id)
+			return id
+	# Fallback: remove any status present
+	var fallback: String = String(d.keys()[0])
+	remove(actor, fallback)
+	return fallback
 
 static func remove(actor, id: String) -> void:
 	var key: String = _dict_name(actor)

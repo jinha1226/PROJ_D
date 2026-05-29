@@ -18,38 +18,6 @@ hp_mod = 3
 mp_mod = -1
 size_score = 18
 resist_mods = ["fire-", "cold+"]
-skill_aptitudes = {
-"fighting": -2,
-"short_blades": -2,
-"long_blades": -2,
-"maces": -1,
-"axes": -2,
-"staves": -2,
-"polearms": -2,
-"bows": -4,
-"crossbows": -4,
-"slings": -4,
-"throwing": -1,
-"armor": -2,
-"dodging": -2,
-"stealth": -5,
-"shields": -1,
-"spellcasting": -5,
-"conjurations": -3,
-"hexes": -4,
-"charms": -4,
-"summonings": -3,
-"necromancy": -2,
-"translocations": -3,
-"transmutation": -1,
-"fire": -3,
-"ice": -3,
-"air": -4,
-"earth": -1,
-"poison": -3,
-"invocations": -1,
-"evocations": -3
-}
 passive_id = "regeneration"
 hp_per_level = 8
 speed_mod = 1.2

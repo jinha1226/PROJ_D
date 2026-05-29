@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://ring_lightning_resist"]
+
+[ext_resource type="Script" uid="uid://cg5crcd45pc6a" path="res://scripts/entities/ItemData.gd" id="1_idata"]
+
+[resource]
+script = ExtResource("1_idata")
+id = "ring_lightning_resist"
+display_name = "Ring of Storm Warding"
+kind = "ring"
+tier = 3
+tile_path = "res://assets/tiles/individual/item/ring/ruby.png"
+glyph = "="
+glyph_color = Color(1.0, 0.95, 0.3, 1)
+slot = "ring"
+effect = "resist_lightning"
+description = "A topaz ring crackling faintly with static. Grants resistance to lightning while worn."
+identified_tile_path = "res://assets/tiles/individual/item/ring/ruby.png"

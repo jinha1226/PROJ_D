@@ -106,10 +106,8 @@ static func _do_attack(npc: NPCActor, player: Player, game_node: Node) -> void:
 	if not is_instance_valid(npc) or npc.hp <= 0:
 		return
 
-	# Simple damage: player slay_bonus + 1d(4+skill) — not routed through
-	# CombatSystem because that requires Monster type. Wire properly later.
-	var wpn_skill: int = player.get_skill_level("weapon_mastery")
-	var dmg: int = randi_range(1, 4 + wpn_skill) + player.slay_bonus
+	# Simple damage: player slay_bonus + 1d4 — not routed through CombatSystem.
+	var dmg: int = randi_range(1, 4) + player.slay_bonus
 	dmg = max(1, dmg - npc.ac / 4)
 
 	player.facing = (npc.grid_pos - player.grid_pos).sign()

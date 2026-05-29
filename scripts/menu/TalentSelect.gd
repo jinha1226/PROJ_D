@@ -16,10 +16,10 @@ func _ready() -> void:
 func _build_cards() -> void:
 	for child in _container.get_children():
 		child.queue_free()
-	var ids: Array = TalentSystem.ids_in_order()
+	var ids: Array = TalentSystem.job_ids_in_order()
 	if ids.is_empty():
 		var lab := Label.new()
-		lab.text = "No talents loaded."
+		lab.text = "No jobs loaded."
 		_container.add_child(lab)
 		return
 	for id in ids:
@@ -55,12 +55,16 @@ func _make_card(talent_id: String) -> Control:
 	name_lab.text = TalentSystem.display_name(talent_id)
 	name_lab.add_theme_font_size_override("font_size", 34)
 	name_lab.add_theme_color_override("font_color", TalentSystem.color(talent_id))
+	name_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vb.add_child(name_lab)
 
 	var short_lab := Label.new()
 	short_lab.text = TalentSystem.short_text(talent_id)
 	short_lab.add_theme_font_size_override("font_size", 20)
 	short_lab.add_theme_color_override("font_color", Color(0.9, 0.9, 0.93))
+	short_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	short_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vb.add_child(short_lab)
 
 	var desc_lab := Label.new()
@@ -97,7 +101,8 @@ func _make_card(talent_id: String) -> Control:
 
 func _on_pick(talent_id: String) -> void:
 	GameManager.selected_race_id = "human"
-	GameManager.selected_talent_id = talent_id
+	GameManager.selected_talent_id = talent_id  # legacy compat
+	GameManager.selected_job_id = talent_id      # new talent system
 	TownState.start_new_character(talent_id)
 	GameManager.starter_shop_gold = GameManager.STARTING_GOLD
 	GameManager.pending_starter_items = []
@@ -105,6 +110,7 @@ func _on_pick(talent_id: String) -> void:
 
 func _on_back() -> void:
 	GameManager.selected_talent_id = ""
+	GameManager.selected_job_id = ""
 	TownState.current_character_alive = false
 	TownState.current_character_race = ""
 	TownState.current_character_talent = ""

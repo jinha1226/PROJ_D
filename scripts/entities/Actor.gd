@@ -39,6 +39,11 @@ var xp: int = 0
 var statuses: Dictionary = {}
 var resists: Dictionary = {}
 var body_wounds: Dictionary = {}
+# Talent system fields
+var job_id: String = ""
+var talent_ids: Array = []
+# Legacy skill fields — kept as empty dicts so any remaining code that
+# reads player.skills / player.hidden_skills doesn't crash. Functionally inert.
 var skills: Dictionary = {}
 var hidden_skills: Dictionary = {}
 var active_skills: Array = []
@@ -76,65 +81,14 @@ const MAX_XL: int = 20
 # PROJ_G visible 9-skill set. These are the ONLY skills shown in UI,
 # save files, tutorials, and the character sheet. Each represents 80%
 # of player performance in its domain after the balance pass.
-const SKILL_IDS: Array = [
-	"weapon_mastery", "archery", "tactics", "defense",
-	"magery", "stealth", "tracking", "survival",
-]
+## Stub constants retained for backward-compat. Any code still referencing
+## SKILL_IDS / SKILL_XP_DELTA / MAX_SKILL_LEVEL / HIDDEN_SUBSKILL_IDS / SKILL_REMAP
+## will compile without error. The skill system is otherwise removed.
+const SKILL_IDS: Array = []
 const SKILL_XP_DELTA: Array = [12, 28, 55, 95, 150, 230, 340, 490, 700]
 const MAX_SKILL_LEVEL: int = 9
-
-# Hidden familiarity tier — DCSS sub-skills retained as silent XP banks.
-# UI never displays them. XP grants dual-write to BOTH the hidden id and
-# the canonical visible bucket. Reserved for the balance pass which will
-# wire 20% narrow bonuses (e.g., dagger familiarity boosts only dagger
-# attacks). Until then, hidden buckets accrue data but contribute 0 to
-# combat formulas.
-const HIDDEN_SUBSKILL_IDS: Array = [
-	# Melee subskills
-	"fighting",
-	"short_blades", "long_blades",
-	"axes", "staves", "polearms",
-	# Ranged subskills
-	"bows", "crossbows", "slings", "throwing",
-	# Defense subskills
-	"armor", "shields",
-	# Stealth subskills
-	"dodging",
-	# Magic subskills
-	"spellcasting",
-	"conjurations", "hexes",
-	"necromancy", "translocations", "transmutation",
-	"element",
-]
-
-# Translation: any legacy/sub-skill id → canonical visible bucket.
-# When external code asks for "fighting" / "polearms" / "fire" / etc.,
-# this routes them to the right one of the 9. Includes identity entries
-# for the new ids so direct-name lookups also work.
-const SKILL_REMAP: Dictionary = {
-	# Combat → tactics (general fitness) / weapon_mastery (specific weapons)
-	"fighting": "tactics",
-	"short_blades": "weapon_mastery", "long_blades": "weapon_mastery",
-	"axes": "weapon_mastery", "staves": "weapon_mastery",
-	"polearms": "weapon_mastery",
-	# Combat → archery
-	"bows": "archery", "crossbows": "archery", "slings": "archery", "throwing": "archery",
-	# Defense
-	"armor": "defense", "shields": "defense",
-	# Stealth
-	"dodging": "stealth",
-	# Magic → magery (hidden sub-skills only)
-	"spellcasting": "magery", "conjurations": "magery", "hexes": "magery",
-	"necromancy": "magery", "translocations": "magery", "transmutation": "magery",
-	"element": "magery", "evocations": "magery",
-	# Legacy element ids still route to magery visible bucket (hidden tier uses "element")
-	"fire": "magery", "ice": "magery", "air": "magery", "earth": "magery",
-	"charms": "magery", "poison": "magery", "invocations": "magery",
-	# Identity (new ids resolve to themselves)
-	"weapon_mastery": "weapon_mastery", "archery": "archery", "tactics": "tactics",
-	"defense": "defense", "magery": "magery", "stealth": "stealth",
-	"tracking": "tracking", "survival": "survival",
-}
+const HIDDEN_SUBSKILL_IDS: Array = []
+const SKILL_REMAP: Dictionary = {}
 
 # Natural light-wound healing. Only progresses when no hostile monster is
 # in FOV — being threatened resets the ticker. Severe (level-2) wounds
@@ -214,64 +168,36 @@ func has_two_handed_weapon() -> bool:
 		return true
 	return _TWO_HANDED_IDS.has(w.id)
 
-func get_skill_level(id: String) -> int:
-	var canon: String = _canonical_skill(id)
-	if canon == "":
-		return 0
-	var entry: Dictionary = skills.get(canon, {"level": 0})
-	return int(entry.get("level", 0))
+## Skill system removed. Returns 0 for all skill queries (stub for compat).
+func get_skill_level(_id: String) -> int:
+	return 0
 
+## Talent system query — primary API.
+func has_talent(id: String) -> bool:
+	return talent_ids.has(id)
+
+## No-op stub — init_skills callers no longer need to do anything.
 func init_skills() -> void:
-	# active_skills stays empty by default — XP is action-routed (the action's own
-	# skill receives full XP). Players opt into manual proportional split via
-	# SkillsDialog Manual mode (toggle_skill_active).
-	for id in SKILL_IDS:
-		if not skills.has(id):
-			skills[id] = {"level": 0, "xp": 0.0}
-	for id in HIDDEN_SUBSKILL_IDS:
-		if not hidden_skills.has(id):
-			hidden_skills[id] = {"level": 0, "xp": 0.0}
+	pass
 
-func _canonical_skill(id: String) -> String:
-	return String(SKILL_REMAP.get(id, ""))
+## Stub — returns "" for all ids (SKILL_REMAP is now empty).
+func _canonical_skill(_id: String) -> String:
+	return ""
 
-func is_skill_active(id: String) -> bool:
-	var canon: String = _canonical_skill(id)
-	if canon == "":
-		return false
-	return active_skills.has(canon)
+## Stubs retained so any remaining callers (SkillsDialog legacy code) don't crash.
+func is_skill_active(_id: String) -> bool:
+	return false
 
-func set_active_skills(ids: Array) -> void:
-	# Empty array is a valid state (= action-routed mode). Do not auto-fill.
-	# Translate legacy ids through SKILL_REMAP so callers passing sub-skill ids
-	# still resolve to a valid visible bucket.
-	active_skills.clear()
-	for id in ids:
-		var canon: String = _canonical_skill(String(id))
-		if canon != "" and SKILL_IDS.has(canon) and not active_skills.has(canon):
-			active_skills.append(canon)
-	emit_signal("stats_changed")
+func set_active_skills(_ids: Array) -> void:
+	pass
 
-func toggle_skill_active(id: String) -> bool:
-	# Allows emptying the list — empty = action-routed (auto) mode.
-	var canon: String = _canonical_skill(id)
-	if canon == "" or not SKILL_IDS.has(canon):
-		return false
-	if active_skills.has(canon):
-		active_skills.erase(canon)
-	else:
-		active_skills.append(canon)
-	emit_signal("stats_changed")
-	return true
+func toggle_skill_active(_id: String) -> bool:
+	return false
 
 func hp_regen_period() -> int:
 	var armor: ItemData = ItemRegistry.get_by_id(equipped_armor_id) if ItemRegistry != null and equipped_armor_id != "" else null
 	var base: int = 3 if armor != null and armor.brand == "regen" else 5
-	# Survival shortens the regen period (faster HP recovery). Floor at 2 so the
-	# bonus stays meaningful but never trivialises healing.
-	var survival_lv: int = get_skill_level("survival")
-	var reduced: int = base - int(floor(float(survival_lv) / 3.0))
-	return max(2, reduced)
+	return base
 
 func mp_regen_period() -> int:
 	return 6
@@ -350,8 +276,8 @@ func tick_statuses() -> void:
 		_regen_wound_ticker = 0
 	if not statuses.is_empty() or not expired.is_empty():
 		emit_signal("stats_changed")
-	if self is Player:
-		EssenceSystem.tick(self)
+	if has_method("_actor_player_tick"):
+		call("_actor_player_tick")
 
 func _heal_one_light_wound() -> void:
 	var light_parts: Array = []

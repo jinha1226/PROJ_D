@@ -37,6 +37,7 @@ func _on_continue() -> void:
 func _on_start() -> void:
 	GameManager.selected_race_id = "human"
 	GameManager.selected_talent_id = ""
+	GameManager.selected_job_id = ""
 	GameManager.selected_starting_weapon_id = ""
 	GameManager.selected_starting_school_id = ""
 	GameManager.selected_starting_essence_id = ""

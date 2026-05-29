@@ -57,14 +57,15 @@ func _build_content() -> void:
 			if data != null:
 				label = data.display_name
 		_add_row(slot.capitalize(), label)
-	_add_section_header(LocaleManager.t("UI_TOWN_CHAR_SEC_SKILLS"))
-	var skills: Dictionary = p.get("skills", {})
-	if typeof(skills) != TYPE_DICTIONARY:
-		skills = {}
-	for sid in Player.SKILL_IDS:
-		var entry: Dictionary = skills.get(sid, {"level": 0, "xp": 0.0})
-		var lv: int = int(entry.get("level", 0))
-		_add_row(String(sid).capitalize(), "Lv.%d" % lv)
+	_add_section_header("Build")
+	var job_id: String = String(p.get("job_id", ""))
+	_add_row("Job", TalentSystem.job_display_name(job_id) if job_id != "" else "—")
+	var t_ids: Array = p.get("talent_ids", [])
+	if typeof(t_ids) == TYPE_ARRAY and not t_ids.is_empty():
+		for tid in t_ids:
+			_add_row("Talent", TalentSystem.talent_display_name(String(tid)))
+	else:
+		_add_row("Talents", "—")
 	_add_section_header(LocaleManager.t("UI_TOWN_CHAR_SEC_ESSENCES"))
 	var es: Array = p.get("essence_slots", [])
 	if typeof(es) != TYPE_ARRAY:

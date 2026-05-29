@@ -32,7 +32,8 @@ var run_in_progress: bool = false
 
 # Character selection — set by menus before start_new_run().
 var selected_race_id: String = "human"
-var selected_talent_id: String = ""
+var selected_talent_id: String = ""   # legacy — kept for save compat
+var selected_job_id: String = ""      # new talent system: T0 job selection
 var selected_starting_weapon_id: String = ""
 var selected_starting_school_id: String = ""
 var selected_starting_essence_id: String = ""
@@ -135,6 +136,7 @@ func load_run() -> bool:
 	gold = int(data.get("gold", 0))
 	selected_race_id = String(data.get("selected_race_id", "human"))
 	selected_talent_id = String(data.get("selected_talent_id", ""))
+	selected_job_id = String(data.get("selected_job_id", ""))
 	identified = data.get("identified", {})
 	pseudonyms = data.get("pseudonyms", {})
 	potion_colors = data.get("potion_colors", {})

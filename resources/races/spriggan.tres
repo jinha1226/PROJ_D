@@ -16,38 +16,6 @@ int_mod = 1
 hp_mod = -3
 mp_mod = 1
 size_score = 4
-skill_aptitudes = {
-"fighting": -2,
-"short_blades": 1,
-"long_blades": -2,
-"maces": -3,
-"axes": -2,
-"staves": -3,
-"polearms": -3,
-"bows": 0,
-"crossbows": 0,
-"slings": 0,
-"throwing": 0,
-"armor": -3,
-"dodging": 3,
-"stealth": 5,
-"shields": -3,
-"spellcasting": 2,
-"conjurations": -3,
-"hexes": 2,
-"charms": 2,
-"summonings": -2,
-"necromancy": -1,
-"translocations": 4,
-"transmutation": 2,
-"fire": -2,
-"ice": -2,
-"air": -1,
-"earth": -1,
-"poison": 1,
-"invocations": 0,
-"evocations": 3
-}
 passive_id = "fleet"
 hp_per_level = 2
 speed_mod = 0.8

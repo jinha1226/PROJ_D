@@ -15,37 +15,5 @@ str_mod = 2
 dex_mod = -2
 hp_mod = 1
 size_score = 11
-skill_aptitudes = {
-"fighting": 1,
-"short_blades": -1,
-"long_blades": 1,
-"maces": 1,
-"axes": 1,
-"staves": -1,
-"polearms": 1,
-"bows": -1,
-"crossbows": -1,
-"slings": -1,
-"throwing": -1,
-"armor": 0,
-"dodging": -2,
-"stealth": -2,
-"shields": 0,
-"spellcasting": -1,
-"conjurations": 0,
-"hexes": 0,
-"charms": 0,
-"summonings": 0,
-"necromancy": 0,
-"translocations": -1,
-"transmutation": -1,
-"fire": 0,
-"ice": 0,
-"air": -1,
-"earth": 0,
-"poison": 0,
-"invocations": 1,
-"evocations": 0
-}
 passive_id = "bloodthirst"
 hp_per_level = 6

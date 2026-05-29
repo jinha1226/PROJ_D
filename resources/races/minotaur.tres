@@ -16,37 +16,5 @@ int_mod = -3
 hp_mod = 1
 mp_mod = -1
 size_score = 14
-skill_aptitudes = {
-"fighting": 2,
-"short_blades": 1,
-"long_blades": 2,
-"maces": 2,
-"axes": 2,
-"staves": 2,
-"polearms": 2,
-"bows": 1,
-"crossbows": 1,
-"slings": 1,
-"throwing": 0,
-"armor": 2,
-"dodging": 1,
-"stealth": -1,
-"shields": 2,
-"spellcasting": -4,
-"conjurations": -3,
-"hexes": -4,
-"charms": -4,
-"summonings": -3,
-"necromancy": -3,
-"translocations": -3,
-"transmutation": -3,
-"fire": -3,
-"ice": -3,
-"air": -3,
-"earth": -2,
-"poison": -3,
-"invocations": 0,
-"evocations": -1
-}
 passive_id = "headbutt"
 hp_per_level = 6

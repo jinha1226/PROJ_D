@@ -118,4 +118,5 @@ func _on_back() -> void:
 	TownState.current_character_talent = ""
 	TownState.save_state()
 	GameManager.selected_talent_id = ""
+	GameManager.selected_job_id = ""
 	get_tree().change_scene_to_file(TALENT_SELECT_PATH)

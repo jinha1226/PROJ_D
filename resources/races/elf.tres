@@ -17,37 +17,5 @@ int_mod = 4
 hp_mod = -2
 mp_mod = 2
 size_score = 9
-skill_aptitudes = {
-"fighting": -2,
-"short_blades": 0,
-"long_blades": -1,
-"maces": -3,
-"axes": -2,
-"staves": 0,
-"polearms": -3,
-"bows": 3,
-"crossbows": 3,
-"slings": 2,
-"throwing": 0,
-"armor": -2,
-"dodging": 2,
-"stealth": 3,
-"shields": -2,
-"spellcasting": 3,
-"conjurations": 1,
-"hexes": 3,
-"charms": 3,
-"summonings": 1,
-"necromancy": 2,
-"translocations": 1,
-"transmutation": 0,
-"fire": 1,
-"ice": 1,
-"air": 1,
-"earth": 1,
-"poison": 1,
-"invocations": 1,
-"evocations": 1
-}
 passive_id = "keen_eyes"
 hp_per_level = 3

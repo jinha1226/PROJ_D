@@ -146,8 +146,10 @@ func _ready() -> void:
 		_apply_race_mods(GameManager.selected_race_id)
 		player.set_race_from_id(GameManager.selected_race_id)
 		player.init_skills()
-		player.set_active_skills([])
-		TalentSystem.apply(player, GameManager.selected_talent_id)
+		# Apply job if selected (replaces old TalentSystem.apply legacy call)
+		var job_id: String = String(GameManager.get("selected_job_id") if GameManager.get("selected_job_id") != null else "")
+		if job_id != "":
+			TalentSystem.apply_job(player, job_id)
 		player.refresh_ac_from_equipment()
 		player._refresh_paperdoll()
 		_apply_starter_kit()
@@ -590,11 +592,12 @@ func _apply_tester_character_setup() -> void:
 	player.intelligence = max(player.intelligence, 40)
 	player.resists = {"fire": 3, "cold": 3, "poison": 3, "necro": 3}
 
-	for sid in Player.SKILL_IDS:
-		player.skills[String(sid)] = {"level": Player.MAX_SKILL_LEVEL, "xp": 0.0}
-	for sid in Player.HIDDEN_SUBSKILL_IDS:
-		player.hidden_skills[String(sid)] = {"level": Player.MAX_SKILL_LEVEL, "xp": 0.0}
-	player.set_active_skills([])
+	# Skill system removed — nothing to initialize.
+	# Grant all T1-T4 talents for tester convenience.
+	player.talent_ids = []
+	for tid in TalentSystem.TALENTS.keys():
+		player.talent_ids.append(String(tid))
+		TalentSystem.apply_talent(player, String(tid))
 
 	player.known_spells.clear()
 	if SpellRegistry != null:
@@ -726,62 +729,18 @@ func _apply_loaded_player_state(data: Dictionary) -> void:
 		player.resists = Player.resists_from_tags(loaded_resists)
 	else:
 		player.resists = {}
-	# ── Skill migration to dual-tier 9+30 (save_version >= 5) ──────────────
-	# Old saves carry a `skills` dict that may contain any of:
-	#   - DCSS 30-split sub-skill ids (post-2026-05 saves)
-	#   - PROJ_G 9-skill ids (current format)
-	#   - even older umbrella ids (melee/magic/defense/dodge/stealth)
-	# Strategy: route every old key through Player.SKILL_REMAP to a canonical
-	# visible bucket; level becomes max-of-old, XP becomes sum-of-old per
-	# bucket. Hidden tier is reconstructed by copying any sub-skill keys from
-	# the old `skills` dict (per-sub-skill data preserved verbatim), then
-	# overwritten by `hidden_skills` if present (post-v5 saves).
-	var loaded_skills: Dictionary = data.get("skills", {})
-	var loaded_hidden: Dictionary = data.get("hidden_skills", {})
-	# Pre-v5 umbrella keys: collapse to nearest sub-skill so SKILL_REMAP works.
-	if loaded_skills.has("melee") and not loaded_skills.has("fighting"):
-		loaded_skills["fighting"] = loaded_skills["melee"]
-	loaded_skills.erase("melee")
-	if loaded_skills.has("magic") and not loaded_skills.has("spellcasting"):
-		loaded_skills["spellcasting"] = loaded_skills["magic"]
-	loaded_skills.erase("magic")
-	if loaded_skills.has("dodge") and not loaded_skills.has("dodging"):
-		loaded_skills["dodging"] = loaded_skills["dodge"]
-	loaded_skills.erase("dodge")
-	# Visible: sum XP across old keys that remap to the same new bucket;
-	# level becomes max-of-old.
-	var new_visible: Dictionary = {}
-	for vid in Player.SKILL_IDS:
-		new_visible[vid] = {"level": 0, "xp": 0.0}
-	for old_id in loaded_skills.keys():
-		var canon: String = String(Player.SKILL_REMAP.get(old_id, ""))
-		if canon == "" or not new_visible.has(canon):
-			continue
-		var old_entry = loaded_skills[old_id]
-		if typeof(old_entry) != TYPE_DICTIONARY:
-			continue
-		var lv: int = clampi(int(old_entry.get("level", 0)), 0, Player.MAX_SKILL_LEVEL)
-		var xp: float = float(old_entry.get("xp", 0.0))
-		new_visible[canon]["xp"] = float(new_visible[canon]["xp"]) + xp
-		new_visible[canon]["level"] = max(int(new_visible[canon]["level"]), lv)
-	player.skills = new_visible
-	# Hidden: preserve per-sub-skill data verbatim.
-	#   1) pre-v5 saves: the old `skills` dict itself contains sub-skill keys.
-	#   2) v5+ saves: `hidden_skills` is the canonical source — it overrides.
-	var new_hidden: Dictionary = {}
-	for hid in Player.HIDDEN_SUBSKILL_IDS:
-		new_hidden[hid] = {"level": 0, "xp": 0.0}
-	for old_id in loaded_skills.keys():
-		if Player.HIDDEN_SUBSKILL_IDS.has(old_id) and typeof(loaded_skills[old_id]) == TYPE_DICTIONARY:
-			new_hidden[old_id] = (loaded_skills[old_id] as Dictionary).duplicate(true)
-	for hid in loaded_hidden.keys():
-		if Player.HIDDEN_SUBSKILL_IDS.has(hid) and typeof(loaded_hidden[hid]) == TYPE_DICTIONARY:
-			new_hidden[hid] = (loaded_hidden[hid] as Dictionary).duplicate(true)
-	player.hidden_skills = new_hidden
-	# Active skills: route legacy ids through SKILL_REMAP via set_active_skills,
-	# which dedupes and emits stats_changed.
-	player.active_skills = data.get("active_skills", [])
-	player.set_active_skills(player.active_skills)
+	# ── Talent system restore (save_version >= 6) ────────────────────────
+	# Legacy saves (v<6) had skills/hidden_skills; they are silently dropped.
+	player.job_id = String(data.get("job_id", ""))
+	var saved_talent_ids = data.get("talent_ids", [])
+	player.talent_ids = []
+	if saved_talent_ids is Array:
+		for tid in saved_talent_ids:
+			var tid_s: String = String(tid)
+			if tid_s != "" and not player.talent_ids.has(tid_s):
+				player.talent_ids.append(tid_s)
+				TalentSystem.apply_talent(player, tid_s)
+	player.revived = bool(data.get("revived", false))
 	var saved_qs = data.get("quickslots", null)
 	if saved_qs is Array:
 		for i in range(min(int(saved_qs.size()), player.quickslots.size())):
@@ -1211,6 +1170,46 @@ func _generate_shop_inventory() -> void:
 				_shop_items.append({"item_data": item, "price": _shop_price(item, false), "sold": false})
 
 ## Open the shop dialog. Generates inventory on first visit (lazy).
+func _open_talent_picker(tier: int) -> void:
+	var choices: Array = TalentSystem.talents_for_tier(tier)
+	if choices.is_empty():
+		return
+	# Filter out already-owned talents (shouldn't happen, but be safe)
+	choices = choices.filter(func(id): return not player.talent_ids.has(id))
+	if choices.is_empty():
+		return
+	var dlg: GameDialog = GameDialog.create("Choose a Talent (Tier %d)" % tier)
+	add_child(dlg)
+	var body: VBoxContainer = dlg.body()
+	if body == null:
+		return
+	body.add_theme_constant_override("separation", GameTheme.PAD_M)
+	var tier_label := Label.new()
+	tier_label.text = "XL %d reached — pick one talent:" % player.xl
+	tier_label.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+	tier_label.add_theme_color_override("font_color", Color(0.9, 0.85, 0.6))
+	tier_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.add_child(tier_label)
+	for talent_id in choices:
+		var data: Dictionary = TalentSystem.get_talent(talent_id)
+		var btn := Button.new()
+		btn.custom_minimum_size = Vector2(0, GameTheme.TAP_MIN_HEIGHT * 1.5)
+		var concept: String = String(data.get("concept", ""))
+		var name_: String = String(data.get("name", talent_id))
+		var desc_: String = String(data.get("desc", ""))
+		btn.text = "[%s] %s\n%s" % [concept.capitalize(), name_, desc_]
+		btn.add_theme_font_size_override("font_size", GameTheme.TYPO_BODY)
+		var col: Color = data.get("color", Color.WHITE)
+		btn.add_theme_color_override("font_color", col)
+		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		body.add_child(btn)
+		var captured_id: String = talent_id
+		btn.pressed.connect(func():
+			player.select_talent(captured_id)
+			CombatLog.post("Talent acquired: %s!" % TalentSystem.talent_display_name(captured_id),
+				Color(1.0, 0.9, 0.3))
+			dlg.queue_free())
+
 func _open_shop() -> void:
 	if _shop_items.is_empty():
 		_generate_shop_inventory()
@@ -1351,8 +1350,8 @@ func _grant_sight_bestiary_unlocks() -> void:
 	# here (the natural kill XP path still pays out if/when killed).
 	if player == null or map == null:
 		return
-	if player.get_skill_level("tracking") < 3:
-		return
+	# Tracking feature: always active (skill system removed)
+	# Previously required tracking level 3; now unconditional.
 	var tree := get_tree()
 	if tree == null:
 		return
@@ -1534,7 +1533,7 @@ func _on_player_moved(new_pos: Vector2i) -> void:
 const _RESPAWN_INTERVAL: int = 18
 
 ## Per-turn passive XP for skills with no event-driven trigger:
-##   stealth: trickles while no monster is aware of the player (sneaking)
+##   dodging: trickles while no monster is aware of the player (sneaking)
 ##   invocations: trickles while a faith is chosen (devotional practice)
 ## Amounts kept tiny (0.25-0.4) since this fires every player turn — over a
 ## long run accumulates without dominating active skill growth.
@@ -1547,7 +1546,7 @@ func _grant_passive_skill_xp() -> void:
 			any_aware = true
 			break
 	if not any_aware:
-		player.grant_skill_xp("stealth", 0.4)
+		player.grant_skill_xp("dodging", 0.4)
 	if String(player.faith_id) != "":
 		player.grant_skill_xp("invocations", 0.25)
 

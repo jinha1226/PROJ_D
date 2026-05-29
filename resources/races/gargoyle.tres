@@ -15,37 +15,5 @@ dex_mod = -3
 hp_mod = -2
 size_score = 10
 resist_mods = ["poison+", "fire+", "electric+"]
-skill_aptitudes = {
-"fighting": 1,
-"short_blades": -1,
-"long_blades": -1,
-"maces": 0,
-"axes": -1,
-"staves": 0,
-"polearms": -1,
-"bows": 0,
-"crossbows": 0,
-"slings": 0,
-"throwing": -1,
-"armor": 1,
-"dodging": -2,
-"stealth": 2,
-"shields": 1,
-"spellcasting": -1,
-"conjurations": 1,
-"hexes": -1,
-"charms": -1,
-"summonings": -1,
-"necromancy": -2,
-"translocations": -1,
-"transmutation": -3,
-"fire": 0,
-"ice": 0,
-"air": -2,
-"earth": 2,
-"poison": -2,
-"invocations": 1,
-"evocations": -1
-}
 passive_id = "stone_body"
 hp_per_level = 3

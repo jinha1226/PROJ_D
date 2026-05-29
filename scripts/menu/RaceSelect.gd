@@ -153,56 +153,10 @@ func _apply_layer(parent: Control, tex: Texture2D, dim: bool) -> void:
 	rect.modulate = Color(0.4, 0.4, 0.45, 1) if dim else Color.WHITE
 	parent.add_child(rect)
 
-# 9-skill visible aptitude row. Each cell aggregates the race's
-# sub-skill aptitudes into the canonical PROJ_G bucket — race .tres files
-# still store DCSS sub-skill ids (short_blades, fire, dodging, ...) and
-# we average those that map to the same visible skill.
-const _APT_ORDER: Array = [
-	"weapon_mastery", "archery", "tactics", "defense",
-	"magery", "stealth", "tracking", "survival",
-]
-const _APT_LABELS: Dictionary = {
-	"weapon_mastery": "Wpn", "archery": "Arc", "tactics": "Tac", "defense": "Def",
-	"magery": "Mag", "stealth": "Sth", "tracking": "Trk", "survival": "Srv",
-}
-
-func _aggregate_aptitude(data: RaceData, visible_id: String) -> int:
-	# Direct hit first (race file uses the visible id explicitly — rare).
-	if data.skill_aptitudes.has(visible_id):
-		return int(data.skill_aptitudes[visible_id])
-	# Otherwise average all sub-skill aptitudes that remap to this visible id.
-	var total: float = 0.0
-	var count: int = 0
-	for sub_id in Player.HIDDEN_SUBSKILL_IDS:
-		if String(Player.SKILL_REMAP.get(sub_id, "")) != visible_id:
-			continue
-		if data.skill_aptitudes.has(sub_id):
-			total += float(data.skill_aptitudes[sub_id])
-			count += 1
-	if count == 0:
-		return 0
-	return int(round(total / float(count)))
-
-func _make_apt_row(data: RaceData) -> Control:
-	if data.skill_aptitudes.is_empty():
-		return null
-	var flow := HFlowContainer.new()
-	flow.add_theme_constant_override("h_separation", 10)
-	flow.add_theme_constant_override("v_separation", 4)
-	flow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var any := false
-	for sid in _APT_ORDER:
-		var apt: int = _aggregate_aptitude(data, sid)
-		if apt == 0:
-			continue
-		any = true
-		var lbl := Label.new()
-		lbl.text = "%s %+d" % [_APT_LABELS[sid], apt]
-		lbl.add_theme_font_size_override("font_size", 18)
-		lbl.add_theme_color_override("font_color",
-			Color(0.45, 0.9, 0.5) if apt > 0 else Color(0.9, 0.45, 0.45))
-		flow.add_child(lbl)
-	return flow if any else null
+## Aptitude row removed (skill system removed). Returns null so the card
+## skips the row cleanly.
+func _make_apt_row(_data: RaceData) -> Control:
+	return null
 
 func _on_pick(race_id: String) -> void:
 	GameManager.selected_race_id = race_id

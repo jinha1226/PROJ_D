@@ -52,7 +52,7 @@ func _ready() -> void:
 	slay_bonus = 2
 	ev = 8
 	skills["weapon_mastery"] = 3
-	skills["tactics"] = 2
+	skills["survival"] = 2
 	skills["defense"] = 2
 	_randomize_appearance()
 	_assign_starter_equipment()

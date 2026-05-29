@@ -210,9 +210,8 @@ static func _armor_spell_mult(player: Player) -> float:
 		_: return 0.5
 
 
-static func _compute_power(player: Player, spell: SpellData) -> int:
-	var total_skill: float = float(player.get_skill_level("magery"))
-	return int(float(player.intelligence) * (1.0 + total_skill * 0.06) * _armor_spell_mult(player))
+static func _compute_power(player: Player, _spell: SpellData) -> int:
+	return int(float(player.intelligence) * _armor_spell_mult(player))
 
 
 static func _school_color(school: String) -> Color:

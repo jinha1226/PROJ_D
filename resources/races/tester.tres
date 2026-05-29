@@ -16,16 +16,6 @@ hp_mod = 250
 mp_mod = 120
 size_score = 12
 resist_mods = ["fire+++", "cold+++", "poison+++", "necromancy+++"]
-skill_aptitudes = {
-"weapon_mastery": 9,
-"archery": 9,
-"tactics": 9,
-"defense": 9,
-"magery": 9,
-"stealth": 9,
-"tracking": 9,
-"survival": 9
-}
 passive_id = "adaptable"
 hp_per_level = 20
 speed_mod = 0.7

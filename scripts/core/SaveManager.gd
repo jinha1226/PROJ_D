@@ -34,16 +34,11 @@ func delete_save() -> void:
 ## Save schema versions:
 ##   1 — legacy: Player state only. Branch + floor cache lost on app close.
 ##   2 — Player + GameManager.floor_cache + branch_floor_cache + branch state.
-##   3 — Skills DCSS 30-split (blade→short_blades+long_blades, hafted→axes+staves,
-##       ranged→bows+crossbows+slings+throwing, elemental→fire+ice+air+earth+poison,
-##       agility→dodging+stealth, tool→invocations+evocations, +new schools/elements).
-##       Old skills dict invalid — saves at v<3 should be wiped or migrated externally.
-##   4 — Equipment slots: helmet, gloves, boots (in addition to weapon, armor, ring, amulet, shield).
-##   5 — Dual-tier skill model: `skills` is now PROJ_G 9-bucket only; `hidden_skills`
-##       stores per-DCSS-sub-skill familiarity XP banks. Legacy v<5 saves migrate
-##       inline in Game._apply_loaded_player_state (visible = max-of-old level + sum
-##       XP; hidden = per-sub-skill data preserved verbatim).
-const SAVE_VERSION: int = 5
+##   3 — Skills DCSS 30-split (blade→short_blades+long_blades, ...).
+##   4 — Equipment slots: helmet, gloves, boots.
+##   5 — Dual-tier skill model: skills + hidden_skills.
+##   6 — Talent system: job_id, talent_ids, revived; skills removed.
+const SAVE_VERSION: int = 6
 
 func save_run(player, game_manager) -> bool:
 	var data: Dictionary = {
@@ -54,6 +49,7 @@ func save_run(player, game_manager) -> bool:
 		"gold": game_manager.gold,
 		"selected_race_id": game_manager.selected_race_id,
 		"selected_talent_id": game_manager.selected_talent_id,
+		"selected_job_id": game_manager.selected_job_id,
 		"identified": game_manager.identified,
 		"pseudonyms": game_manager.pseudonyms,
 		"potion_colors": game_manager.potion_colors,
@@ -88,9 +84,9 @@ func save_run(player, game_manager) -> bool:
 			"known_spells": player.known_spells,
 			"statuses": player.statuses,
 			"resists": player.resists,
-			"skills": player.skills,
-			"hidden_skills": player.hidden_skills,
-			"active_skills": player.active_skills,
+			"job_id": player.job_id,
+			"talent_ids": player.talent_ids,
+			"revived": player.revived,
 			"quickslots": player.quickslots,
 			"essence_slots": player.essence_slots,
 			"essence_inventory": player.essence_inventory,

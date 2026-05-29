@@ -17,37 +17,5 @@ int_mod = 1
 hp_mod = -2
 size_score = 6
 resist_mods = ["poison+"]
-skill_aptitudes = {
-"fighting": 1,
-"short_blades": 3,
-"long_blades": -2,
-"maces": -1,
-"axes": -2,
-"staves": -1,
-"polearms": -2,
-"bows": 3,
-"crossbows": 3,
-"slings": 2,
-"throwing": 1,
-"armor": -2,
-"dodging": 2,
-"stealth": 4,
-"shields": -2,
-"spellcasting": 0,
-"conjurations": 0,
-"hexes": 0,
-"charms": 0,
-"summonings": 0,
-"necromancy": 0,
-"translocations": 0,
-"transmutation": -1,
-"fire": 0,
-"ice": 0,
-"air": 0,
-"earth": 0,
-"poison": 0,
-"invocations": 1,
-"evocations": 2
-}
 passive_id = "trapfinder"
 hp_per_level = 3

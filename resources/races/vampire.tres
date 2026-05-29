@@ -15,36 +15,4 @@ dex_mod = 1
 int_mod = 2
 size_score = 10
 resist_mods = ["neg+", "cold+", "poison+"]
-skill_aptitudes = {
-"fighting": 0,
-"short_blades": 1,
-"long_blades": 1,
-"maces": -1,
-"axes": -1,
-"staves": -1,
-"polearms": -1,
-"bows": -1,
-"crossbows": -1,
-"slings": -1,
-"throwing": -1,
-"armor": -1,
-"dodging": 1,
-"stealth": 2,
-"shields": -1,
-"spellcasting": 0,
-"conjurations": -1,
-"hexes": 1,
-"charms": 1,
-"summonings": -1,
-"necromancy": 1,
-"translocations": 0,
-"transmutation": -1,
-"fire": -1,
-"ice": 1,
-"air": -1,
-"earth": -1,
-"poison": 0,
-"invocations": -1,
-"evocations": 0
-}
 passive_id = "blood_drain"
